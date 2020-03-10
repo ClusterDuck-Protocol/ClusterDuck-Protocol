@@ -34,6 +34,8 @@ To start we will need to copy the library into your Arduino library folder.
 You should be able pull new commits directly to this folder in your Arduino library.
 
 ## Quick Start
+[How To Build A Duck User Manual]
+
 Open new sketch in Adruino IDE and include the ClusterDuck library
 
     #include "ClusterDuck.h"
@@ -183,3 +185,4 @@ This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE)
 [Project OWL]: <https://project-owl.com>
 [ClusterDuck Protocol]: <http://clusterduckprotocol.org>
 [Slack]: <https://www.project-owl.com/slack>
+[How To Build A Duck User Manual]: <https://www.project-owl.com/How_To_Make_A_Duck_PROJECT_OWL_2020_v2.pdf>
