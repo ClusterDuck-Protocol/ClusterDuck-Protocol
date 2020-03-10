@@ -1,6 +1,6 @@
 # The ClusterDuck Protocol
 #### What is it?
-The ClusterDuck Protocol is a mesh communication protocol based on LoRa. It is meant to be easy to impliment and expand the mesh network. Currently it supports hardware architectures that use ESP32 and SX1276 chips.
+The ClusterDuck Protocol is a mesh communication protocol based on LoRa. It is meant to be easy to impliment and expand the mesh network. Currently it supports hardware architectures that use **ESP32** and **SX1276** chips.
 #### How does it work?
 The network is made up of multiple nodes called **"Ducks"**. There are 3 core roles in the ClusterDuck network: DuckLink, MamaDuck, and PapaDuck. **DuckLinks** serve as edge nodes that only transmit data. These function as remote sensors or as additional access points to a Captive Portal. **MamaDucks** inherit the same functionality of the DuckLinks, but also receive messages. MamaDucks repeat messages from DuckLinks and other MamaDucks until the message reaches a PapaDuck. **PapaDucks** are the endpoint of the network where all of the data is collected and can be stored or pushed up to the cloud. **(free tier cloud platform coming soon)**
 
