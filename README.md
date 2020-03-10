@@ -1,3 +1,16 @@
+# The ClusterDuck Protocol
+#### What is it?
+The ClusterDuck Protocol is a mesh communication protocol based on LoRa. It is meant to be easy to impliment and expand the mesh network. Currently it supports hardware architectures that use ESP32 and SX1276 chips.
+#### How does it work?
+The network is made up of multiple nodes called **"Ducks"**. There are 3 core roles in the ClusterDuck network: DuckLink, MamaDuck, and PapaDuck. **DuckLinks** serve as edge nodes that only transmit data. These function as remote sensors or as additional access points to a Captive Portal. **MamaDucks** inherit the same functionality of the DuckLinks, but also receive messages. MamaDucks repeat messages from DuckLinks and other MamaDucks until the message reaches a PapaDuck. **PapaDucks** are the endpoint of the network where all of the data is collected and can be stored or pushed up to the cloud. **(free tier cloud platform coming soon)**
+
+![overview](https://media.wired.com/photos/5bd3991147d18c4c60798e17/master/w_1616,c_limit/ProjectOwl-Inline_01.jpg)
+
+#### Captive Portal
+The Captive Portal is an important feature in the ClusterDuck Protocol. The Captive Portal allows for devices such as smartphones and laptops to access the network without the need of downloading additional software. This is beneficial after events such as earthquakes or hurricanes where communication infrastructure becomes crippled. Survivors are able to connect and send messages just by connecting to the WiFi access point of a DuckLink or MamaDuck.
+
+![portal](https://github.com/knouse1344/owl/blob/master/app/assets/images/cluster_demo_vector.gif)
+
 # API and Getting Started
 Check out the [ClusterDuck Protocol] website for more information and projects.
 ### Downloading Library from GitHub
@@ -149,9 +162,6 @@ Now compile and upload to your device. If using a Heltec LoRa ESP32 board you sh
 
 
 
-
-
-[//]:
 
 [Project OWL]: <https://project-owl.com>
 [ClusterDuck Protocol]: <http://clusterduckprotocol.org>
