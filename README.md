@@ -45,7 +45,7 @@ Initializes the ClusterDuck class object
     duck.begin(baudRate);
 Initializes the baud rate for serial printing and messaging. You can adust to your desired baud rate.
 - int baudRate
--- Default is **115000**
+-- Default is **115200**
 
 Set device ID and captive portal form length.
     
