@@ -8,10 +8,10 @@
 #define SSID        ""
 #define PASSWORD    ""
 
-#define ORG         ""                  // "quickstart" or use your organisation
+#define ORG         ""                  
 #define DEVICE_ID   ""
-#define DEVICE_TYPE "PAPA"                // your device type or not used for "quickstart"
-#define TOKEN       ""      // your device token or not used for "quickstart"#define SSID        "nick_owl" // Type your SSID
+#define DEVICE_TYPE "PAPA"                
+#define TOKEN       ""      
 
 char server[]           = ORG ".messaging.internetofthings.ibmcloud.com";
 char topic[]            = "iot-2/evt/status/fmt/json";
