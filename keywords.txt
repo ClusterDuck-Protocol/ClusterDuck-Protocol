@@ -1,0 +1,40 @@
+ClusterDuck	KEYWORD1
+
+setDeviceId	KEYWORD2
+setupLoRa	KEYWORD2
+setupDisplay	KEYWORD2
+setupPortal	KEYWORD2
+runCaptivePortal	KEYWORD2
+setupDuckLink	KEYWORD2
+setupMamaDuck	KEYWORD2
+runDuckLink	KEYWORD2
+runMamaDuck	KEYWORD2
+getPortalDataArray	KEYWORD2
+getPortalDataString	KEYWORD2
+getPacketData	KEYWORD2
+duckMac	KEYWORD2
+sendPayloadStandard	KEYWORD2
+uuidCreator	KEYWORD2
+getDeviceId	KEYWORD2
+getLastPacket	KEYWORD2
+sendPayloadMessage	KEYWORD2
+imAlive	KEYWORD2
+loRaReceive	KEYWORD2
+restartDuck	KEYWORD2
+couple	KEYWORD2
+readMessages	KEYWORD2
+reboot	KEYWORD2
+idInPath 	KEYWORD2
+
+Packet	KEYWORD3
+
+DNS_PORT	LITERAL1
+*DNS	LITERAL1
+*AP	LITERAL1
+byteCodes	LITERAL1
+ping_B	LITERAL1
+senderId_B	LITERAL1
+messageId_B	LITERAL1
+payload_B	LITERAL1
+iamhere_B	LITERAL1
+path_B	LITERAL1
