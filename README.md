@@ -1,25 +1,27 @@
 # The ClusterDuck Protocol
 
 ## What is it?
-The ClusterDuck Protocol is a mesh communication protocol based on LoRa. It is meant to be easy to implement and expand the mesh network. Currently it supports hardware architectures that use **ESP32** and **SX1276** chips.
+The ClusterDuck Protocol is a mesh network communication protocol based on LoRa (Long Range radio). It is meant to be easy to implement and to expand. Currently it supports hardware architectures that use **ESP32** and **SX1276** chips.
 
 [![License](https://img.shields.io/badge/License-Apache2-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![Slack](https://img.shields.io/badge/Join-Slack-blue)](https://www.project-owl.com/slack)
 
 ## How does it work?
-The network is made up of multiple nodes called **"Ducks"**. There are 3 core roles in the ClusterDuck network: DuckLink, MamaDuck, and PapaDuck. **DuckLinks** serve as edge nodes that only transmit data. These function as remote sensors or as additional access points to a Captive Portal. **MamaDucks** inherit the same functionality of the DuckLinks, but also receive messages. MamaDucks repeat messages from DuckLinks and other MamaDucks until the message reaches a PapaDuck. **PapaDucks** are the endpoint of the network where all of the data is collected and can be stored or pushed up to the cloud. **(free tier cloud platform coming soon)**
+The network is made up of multiple nodes called **"Ducks"**. There are 3 core roles in a ClusterDuck network: DuckLink, MamaDuck, and PapaDuck. **DuckLinks** serve as edge nodes that only transmit data. These function as remote sensors or as additional access points to a Captive Portal. **MamaDucks** inherit the same functionality of the DuckLinks, but also receive messages. MamaDucks repeat messages from DuckLinks and other MamaDucks until the message reaches a PapaDuck. **PapaDucks** are the endpoint of the network where all of the data is collected and can be stored or pushed up to the cloud. **(free tier cloud platform coming soon)**
 
 ![overview](https://media.wired.com/photos/5bd3991147d18c4c60798e17/master/w_1616,c_limit/ProjectOwl-Inline_01.jpg)
 
 ## Captive Portal
-The Captive Portal is an important feature in the ClusterDuck Protocol. The Captive Portal allows for devices such as smartphones and laptops to access the network without the need of downloading additional software. This is beneficial after events such as earthquakes or hurricanes where communication infrastructure becomes crippled. Survivors are able to connect and send messages just by connecting to the WiFi access point of a DuckLink or MamaDuck.
+The Captive Portal is an important feature in the ClusterDuck Protocol network. The Captive Portal allows devices such as smartphones and laptops to access the network without the need to download additional software as it takes advantage a system that is native to smartphones such as Android and iPhone devices. 
+
+This is beneficial after events such as earthquakes or hurricanes where communication infrastructure is crippled. Survivors are able to connect and send messages just by connecting to the WiFi access point of a DuckLink or MamaDuck.
 
 ![portal](https://github.com/knouse1344/owl/blob/master/app/assets/images/cluster_demo_vector.gif)
 
 # API and Getting Started
-Check out the [ClusterDuck Protocol] website for more information and projects.
+Check out the [ClusterDuck Protocol] website for more information and to learn about projects built upon this codebase.
 
 ## Downloading Library from GitHub
-For ease of use, we will need to copy the library into your Arduino library folder.
+To start we will need to copy the library into your Arduino library folder.
 1. Copy ClusterDuck folder
 2. Navigate to your ``Arduino`` folder. This can be found in your default Documents folder.
 3. Navigate to the ``library`` folder
@@ -41,7 +43,7 @@ Initializes the ClusterDuck class object
 #### In setup()
 
     duck.begin(baudRate);
-Initializes the baude rate for serial printing and messaging. You can adust to your desired baude rate.
+Initializes the baud rate for serial printing and messaging. You can adust to your desired baud rate.
 - int baudRate
 -- Default is **115000**
 
@@ -50,7 +52,7 @@ Set device ID and captive portal form length.
     duck.setDeviceId(String deviceId, const int formLength);
 - String deviceId
 -- input the device ID used to identify your registered device on the web
--- do not leave null or empty string
+-- do not leave null or an empty string
 - const int formLength 
 -- (optional) define the number of captive portal form fields
 -- Default is **10** to match our default captive portal template
@@ -63,7 +65,7 @@ Setup **DuckLink**
 
 #### In loop()
 
-Add cooresponding Duck run code. Must be of the same device type as used in ``setup()``. (e.g. if ``duck.setupMamaDuck()`` is used in ``setup()`` use ``duck.runMamaDuck()``)
+Add corresponding Duck run code. Must be of the same device type as used in ``setup()``. (e.g. if ``duck.setupMamaDuck()`` is used in ``setup()`` use ``duck.runMamaDuck()``)
 
     duck.runDuckLink();
     
@@ -84,14 +86,16 @@ Your sketch should look something like this:
         duck.runDuckLink();
     }
 
-Now compile and upload to your device. If using a Heltec LoRa ESP32 board you should see a Duck Online message on the LED screen. You can now open your phone or laptop's wifi preferences and connect to the ``SOS DuckLink Network``!
+Now compile and upload to your device. If using a Heltec LoRa ESP32 board you should see a Duck Online message on the LED screen. You can now open your phone or laptop's Wi-Fi preferences and connect to the ``SOS DuckLink Network``! 
+
+If you don't see the captive portal screen, you can force it by accessing [neverssl.com](http://neverssl.com) which will force the captive portal to intercept the HTTP request.
 
 ## API
 ``setDeviceId(String deviceId, const int formLength)``
 - Set device ID and captive portal form length. Do not leave **deviceId** *null* or as an empty string. **formLength** defaults to 10. Use in ``setup()``.
 
 ``void begin(int baudRate)``
-- Initialize baude rate for serial. Use in ``setup()``.
+- Initialize baud rate for serial. Use in ``setup()``.
 
 ``void setupDisplay(String deviceType)``
 - Initializes LED screen on Heltec LoRa ESP32 and configures it to show status, device ID, and the device type. Use in ``setup()``.
@@ -172,7 +176,6 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 ## License
 
 This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE) file for details.
-
 
 
 [Project OWL]: <https://project-owl.com>
