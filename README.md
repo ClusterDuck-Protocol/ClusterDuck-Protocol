@@ -145,7 +145,7 @@ If you don't see the captive portal screen, you can force it by accessing [never
 
 ``String * getPacketData(int pSize)``
 - Called to iterate through received LoRa packet and return data as an array of Strings.
-- Note: if using standerd byte codes it will store **senderId**, **messageId**, **payload**, and **path** in a Packet object. This can be accessed using ``getLastPacket()``
+- Note: if using standard byte codes it will store **senderId**, **messageId**, **payload**, and **path** in a Packet object. This can be accessed using ``getLastPacket()``
 
 ``void restartDuck()``
 - If using the ESP32 architecture, calling this function will reboot the device.
