@@ -20,7 +20,7 @@ This is beneficial after events such as earthquakes or hurricanes where communic
 ![portal](https://github.com/knouse1344/owl/blob/master/app/assets/images/cluster_demo_vector.gif)
 
 # API and Getting Started
-Check out the [ClusterDuck Protocol] website for more information and to learn about projects built upon this codebase. You can reach out directly on our [Slack] too!
+Check out the [ClusterDuck Protocol] website for more information and to learn about projects built upon this codebase. You can reach out directly on our [Slack] too! Check out our [How To Build A Duck User Manual] for in depth instructions for setting up your environment and materials. 
 
 ## Downloading Library from GitHub
 To start we will need to copy the library into your Arduino library folder.
@@ -34,7 +34,6 @@ To start we will need to copy the library into your Arduino library folder.
 You should be able pull new commits directly to this folder in your Arduino library.
 
 ## Quick Start
-[How To Build A Duck User Manual]
 
 Open new sketch in Adruino IDE and include the ClusterDuck library
 
