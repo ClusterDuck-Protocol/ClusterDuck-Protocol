@@ -1,4 +1,4 @@
-# The ClusterDuck Protocol
+![Logo](https://github.com/Project-Owl/web/blob/master/app/assets/images/CDP_LOGO.png?raw=true)
 
 ## What is it?
 The ClusterDuck Protocol is a mesh network communication protocol based on LoRa (Long Range radio). It is meant to be easy to implement and to expand. Currently it supports hardware architectures that use **ESP32** and **SX1276** chips.
