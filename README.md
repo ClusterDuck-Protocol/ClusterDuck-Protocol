@@ -1,5 +1,5 @@
 # API and Getting Started
-Check out [Project OWL] for quickstart videos
+Check out the [ClusterDuck Protocol] website for more information and projects.
 ### Downloading Library from GitHub
 For ease of use, we will need to copy the library into your Arduino library folder.
 1. Copy ClusterDuck folder
@@ -151,7 +151,7 @@ Now compile and upload to your device. If using a Heltec LoRa ESP32 board you sh
 
 
 
-[//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
-
+[//]:
 
 [Project OWL]: <https://project-owl.com>
+[ClusterDuck Protocol]: <http://clusterduckprotocol.org>
