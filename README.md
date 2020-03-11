@@ -36,6 +36,7 @@ To start we will need to copy the library into your Arduino library folder.
 You should be able pull new commits directly to this folder in your Arduino library.
 
 ### Importing as a .zip Library
+Download The ClusterDuck Protocol as a .Zip file.
 
 In the Arduino IDE, navigate to ``Sketch > Include Library > Add .ZIP Library.`` At the top of
 the drop down list, select the option to "Add .ZIP Library''.
