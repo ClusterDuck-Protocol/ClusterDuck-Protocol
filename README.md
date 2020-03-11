@@ -1,4 +1,4 @@
-![Logo](https://github.com/Project-Owl/web/blob/master/app/assets/images/CDP_LOGO.png?raw=true)
+![Logo](https://www.project-owl.com/assets/CDP_LOGO.png)
 
 [![License](https://img.shields.io/badge/License-Apache2-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![Slack](https://img.shields.io/badge/Join-Slack-blue)](https://www.project-owl.com/slack)
 
