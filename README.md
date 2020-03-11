@@ -23,6 +23,8 @@ This is beneficial after events such as earthquakes or hurricanes where communic
 Check out the [ClusterDuck Protocol] website for more information and to learn about projects built upon this codebase. You can reach out directly on our [Slack] too! Check out our [How To Build A Duck User Manual] for in depth instructions for setting up your environment and materials. 
 
 ## Downloading Library from GitHub
+
+### Manual Install 
 To start we will need to copy the library into your Arduino library folder.
 1. Copy ClusterDuck folder
 2. Navigate to your ``Arduino`` folder. This can be found in your default Documents folder.
@@ -32,6 +34,15 @@ To start we will need to copy the library into your Arduino library folder.
 6. You should now be able to see examples by going to File -> Examples -> ClusterDuck
 
 You should be able pull new commits directly to this folder in your Arduino library.
+
+### Importing as a .zip Library
+
+In the Arduino IDE, navigate to ``Sketch > Include Library > Add .ZIP Library.`` At the top of
+the drop down list, select the option to "Add .ZIP Library''.
+
+Navigate to the downloaded ClusterDuck Protocol Folder and select.
+Return to the Sketch > Include Library menu. menu. You should now see the library at the
+bottom of the drop-down menu. It is ready to be used in your sketch. 
 
 ## Quick Start
 
