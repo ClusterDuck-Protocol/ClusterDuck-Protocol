@@ -107,7 +107,7 @@ If you don't see the captive portal screen, you can force it by accessing [never
 
 ## Setting up the IBM Watson IoT Platform
 
-1. Create an IBM Cloud account through [this link](https://cloud.ibm.com/). Fill out all the required information and confirm your email address.
+1. Create an IBM Cloud account through [this link](https://ibm.biz/BdqiVW). Fill out all the required information and confirm your email address.
 1. Follow this link to provision an instance of the [IBM Watson IoT Platform](https://cloud.ibm.com/catalog/services/internet-of-things-platform). Note: you can also find this by [browsing through the catalog](https://cloud.ibm.com/catalog).
 1. Make sure the Lite plan is selected and click `Create`.  You can change the `Service Name` if you want to, but it's not required.
 ![iot-platform-3](https://github.com/Code-and-Response/ClusterDuck-Protocol/blob/master/assets/images/iot-platform-3.png)
