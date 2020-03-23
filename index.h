@@ -163,7 +163,7 @@ const char MAIN_page[] PROGMEM = R"=====(
                     <input class="textbox textbox-full" name="zipcode" type="number" placeholder="00682" /> <br /> <br />
 
                     <label for="phone">Phone</label><br /> 
-                    <input class="textbox textbox-full" name="phone" id="phoneNumber" type="text" placeholder="787-123-1234" />
+                    <input class="textbox textbox-full" name="phone" id="phoneNumber" type="number" placeholder="787-123-1234" />
                     <br /> <br /> 
 
                     <label for="status">Current Status</label><br /> 
@@ -182,9 +182,9 @@ const char MAIN_page[] PROGMEM = R"=====(
 
                     <br />
                     <label for="status">How many people are with you?</label><br /> 
-                    <span>Adults </span><input class="textbox textbox-small" name="adults" id="adultsInput" type="text" placeholder="2" />
-                    <span>Children </span><input class="textbox textbox-small" name="children" id="childrenInput" type="text" placeholder="2" />
-                    <span>Elderly </span><input class="textbox textbox-small" name="elderly" id="elderlyInput" type="text" placeholder="2" /><br><br>
+                    <span>Adults </span><input class="textbox textbox-small" name="adults" id="adultsInput" type="number" placeholder="2" />
+                    <span>Children </span><input class="textbox textbox-small" name="children" id="childrenInput" type="number" placeholder="2" />
+                    <span>Elderly </span><input class="textbox textbox-small" name="elderly" id="elderlyInput" type="number" placeholder="2" /><br><br>
 
                     <label for="status">Do you have any pets?</label><br /> 
                     <input class="textbox textbox-full" name="pets" id="petsInput" type="text" placeholder="1 gato y 1 perro" />
