@@ -6,6 +6,8 @@ Note: Check Local Rules and regulations for frequency. Can be bought from differ
 
 #### - Battery Case https://tinyurl.com/qsep8ru
 
+#### - JST 1.25mm 2pin connector Male https://tinyurl.com/wfjj4bq
 
 
+![CDP-BOX](https://github.com/Code-and-Response/ClusterDuck-Protocol/blob/master/assets/images/CDP_BOX.jpg)
 
