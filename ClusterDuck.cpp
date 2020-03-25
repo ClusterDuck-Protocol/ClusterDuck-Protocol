@@ -3,7 +3,7 @@
 U8X8_SSD1306_128X64_NONAME_SW_I2C u8x8(/* clock=*/ 15, /* data=*/ 4, /* reset=*/ 16);
 
 IPAddress apIP(192, 168, 1, 1);
-WebServer webServer(80);
+AsyncWebServer webServer(80);
 
 auto tymer = timer_create_default();
 
@@ -87,31 +87,53 @@ void ClusterDuck::setupPortal(const char *AP) {
 
   dnsServer.start(DNS_PORT, "*", apIP);
 
-  webServer.onNotFound([&]()
-  {
-    webServer.send(200, "text/html", portal);
+  Serial.println("Setting up Web Server");
+
+  webServer.onNotFound([&](AsyncWebServerRequest *request) {
+    request->send(200, "text/html", portal);
   });
 
-  webServer.on("/", [&]()
-  {
-    webServer.send(200, "text/html", portal);
+  webServer.on("/", HTTP_GET, [&](AsyncWebServerRequest *request) {
+    request->send(200, "text/html", portal);
   });
 
-  webServer.on("/id", [&]() {
-    webServer.send(200, "text/html", _deviceId);
+  // Captive Portal form submission
+  webServer.on("/formSubmit", HTTP_POST, [&](AsyncWebServerRequest *request) {
+    Serial.println("Submitting Form");
+
+    int paramsNumber = request->params();
+    String val = "";
+
+    for (int i = 0; i < paramsNumber; i++) {
+      AsyncWebParameter *p = request->getParam(i);
+      Serial.printf("%s: %s", p->name().c_str(), p->value().c_str());
+      Serial.println();
+
+      val = val + p->value().c_str() + "*";
+    }
+
+    sendPayloadStandard(val);
+
+    request->send(200, "text/html", portal);
   });
 
-  webServer.on("/restart", [&]()
-  {
-    webServer.send(200, "text/plain", "Restarting...");
+  webServer.on("/id", HTTP_GET, [&](AsyncWebServerRequest *request) {
+    request->send(200, "text/html", _deviceId);
+  });
+
+  webServer.on("/restart", HTTP_GET, [&](AsyncWebServerRequest *request) {
+    request->send(200, "text/plain", "Restarting...");
     delay(1000);
     restartDuck();
   });
 
-  webServer.on("/mac", [&]() {
+  webServer.on("/mac", HTTP_GET, [&](AsyncWebServerRequest *request) {
     String mac = duckMac(true);
-    webServer.send(200, "text/html", mac);
+    request->send(200, "text/html", mac);
   });
+
+  // for captive portal
+  webServer.addHandler(new CaptiveRequestHandler(MAIN_page)).setFilter(ON_AP_FILTER);
 
   // Test 👍👌😅
 
@@ -129,17 +151,17 @@ void ClusterDuck::setupPortal(const char *AP) {
 }
 
 //Run Captive Portal
-bool ClusterDuck::runCaptivePortal() {
-  dnsServer.processNextRequest();
-  webServer.handleClient();
-  if (webServer.arg(1) != "" || webServer.arg(1) != NULL) {
-    Serial.println("data received");
-    Serial.println(webServer.arg(1));
-    return true;
-  } else {
-    return false;
-  }
-}
+// bool ClusterDuck::runCaptivePortal() {
+//   dnsServer.processNextRequest();
+//   webServer.handleClient();
+//   if (webServer.arg(1) != "" || webServer.arg(1) != NULL) {
+//     Serial.println("data received");
+//     Serial.println(webServer.arg(1));
+//     return true;
+//   } else {
+//     return false;
+//   }
+// }
 
 //Setup premade DuckLink with default settings
 void ClusterDuck::setupDuckLink() {
@@ -152,11 +174,12 @@ void ClusterDuck::setupDuckLink() {
 
 void ClusterDuck::runDuckLink() { //TODO: Add webserver clearing after message sent
 
-  if (runCaptivePortal()) {
-    Serial.println("Portal data received");
-    sendPayloadMessage(getPortalDataString());
-    Serial.println("Message Sent");
-  }
+  dnsServer.processNextRequest();
+  // if (runCaptivePortal()) {
+  //   Serial.println("Portal data received");
+  //   sendPayloadMessage(getPortalDataString());
+  //   Serial.println("Message Sent");
+  // }
 
 }
 
@@ -195,12 +218,15 @@ void ClusterDuck::runMamaDuck() {
       LoRa.receive();
     }
   }
-  if (runCaptivePortal()) {
-    Serial.println("Portal data received");
-    sendPayloadStandard(getPortalDataString());
-    Serial.println("Message Sent");
-    LoRa.receive();
-  }
+
+  dnsServer.processNextRequest();
+
+  // if (runCaptivePortal()) {
+  //   Serial.println("Portal data received");
+  //   sendPayloadStandard(getPortalDataString());
+  //   Serial.println("Message Sent");
+  //   LoRa.receive();
+  // }
 }
 
 /**
@@ -208,28 +234,28 @@ void ClusterDuck::runMamaDuck() {
   Reads WebServer Parameters and couples into Data Struct
   @return coupled Data Struct
 */
-String * ClusterDuck::getPortalDataArray() {
-  //Array holding all form values
-  String * val = formArray;
+// String * ClusterDuck::getPortalDataArray() {
+//   //Array holding all form values
+//   String * val = formArray;
 
-  for (int i = 0; i < fLength; ++i) {
-    val[i] = webServer.arg(i);
-  }
+//   for (int i = 0; i < fLength; ++i) {
+//     val[i] = webServer.arg(i);
+//   }
 
-  return val;
-}
+//   return val;
+// }
 
-String ClusterDuck::getPortalDataString() {
-  //String holding all form values
-  String val = "";
+// String ClusterDuck::getPortalDataString() {
+//   //String holding all form values
+//   String val = "";
 
-  for (int i = 0; i < fLength; ++i) {
-    val = val + webServer.arg(i) + "*";
-  }
+//   for (int i = 0; i < fLength; ++i) {
+//     val = val + webServer.arg(i) + "*";
+//   }
 
-  Serial.println(val);
-  return val;
-}
+//   Serial.println(val);
+//   return val;
+// }
 
 void ClusterDuck::sendPayloadMessage(String msg) {
   LoRa.beginPacket();

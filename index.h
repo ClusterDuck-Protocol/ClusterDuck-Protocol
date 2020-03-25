@@ -147,7 +147,7 @@ const char MAIN_page[] PROGMEM = R"=====(
             <p>You are connected to a ClusterDuck Emergency Network. Please fill out the form to share your status with first responders.</p>
 
             <div id="form">
-                <form>
+                <form action="/formSubmit" method="post">
                     <label for="firstName">First Name</label><br>
                     <input class="textbox textbox-full" name="firstName" id="firstName" type="text" placeholder="Tarzán" /><br><br>
                     <label for="lastName">Last Name(s)</label><br>
@@ -193,7 +193,7 @@ const char MAIN_page[] PROGMEM = R"=====(
                     <label for="status">Additional Comments</label><br /> 
                     <textarea class="textbox comments" id="commentsInput" cols="30" rows="2"></textarea><br /> 
 
-                    <a href="#" class="sendReportBtn" id="sendReport">SEND REPORT</a>
+                    <input type="submit" class="sendReportBtn" value="SEND REPORT" />
                 </form>
 
                 <p style="font-size: 10px; text-align: center;margin-top: 24px;">Powered by the ClusterDuck Protocol</p>

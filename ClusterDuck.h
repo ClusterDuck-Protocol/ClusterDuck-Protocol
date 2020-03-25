@@ -13,7 +13,7 @@
 #include <U8x8lib.h>
 
 #include <DNSServer.h>
-#include <WebServer.h>
+#include <ESPAsyncWebServer.h>
 #include <ESPmDNS.h>
 #include "index.h"
 
@@ -103,6 +103,26 @@ class ClusterDuck {
     static byte path_B;
 
 
+};
+
+class CaptiveRequestHandler: public AsyncWebHandler {
+  public:
+    CaptiveRequestHandler(String portal) {
+      _portal = portal;
+    }
+    virtual ~CaptiveRequestHandler() { }
+
+    bool canHandle(AsyncWebServerRequest *request) {
+      return true;
+    }
+
+    void handleRequest(AsyncWebServerRequest *request) {
+      AsyncResponseStream *response = request->beginResponseStream("text/html");
+      response->print(_portal);
+      request->send(response);
+    }
+
+    String _portal;
 };
 
 #endif
