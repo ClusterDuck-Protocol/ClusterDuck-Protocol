@@ -222,4 +222,4 @@ v1.0.4
 [Project OWL]: <https://project-owl.com>
 [ClusterDuck Protocol]: <http://clusterduckprotocol.org>
 [Slack]: <https://www.project-owl.com/slack>
-[How To Build A Duck User Manual]: <https://www.project-owl.com/How_To_Make_A_Duck_PROJECT_OWL_2020_v2.pdf>
+[How To Build A Duck User Manual]: <https://docs.google.com/document/d/1HNsU7lN5gbZgcciP0BSyMYGDVNDM6RYfsXgdpwo66YE/edit?usp=sharing>
