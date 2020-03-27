@@ -17,11 +17,8 @@ void setup() {
   // put your setup code here, to run once:
   dht.begin();
   duck.begin();
-  duck.setDeviceId("Z", 18);
+  duck.setDeviceId("Z");
   duck.setupMamaDuck();
-
- 
-  
 
   timer.every(15000, runSensor);
 }
@@ -36,7 +33,7 @@ void loop() {
 
 bool runSensor(void *) {
 
- String sensorVal = "Temp: ";
+  String sensorVal = "Temp: ";
   sensorVal += dht.readTemperature();
   sensorVal += "Humidity: ";
   sensorVal += dht.readHumidity();

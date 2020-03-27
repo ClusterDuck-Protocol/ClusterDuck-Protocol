@@ -14,11 +14,8 @@ void setup() {
   
   // put your setup code here, to run once:
   duck.begin();
-  duck.setDeviceId("Z", 18);
+  duck.setDeviceId("Z");
   duck.setupMamaDuck();
-
- 
-  
 
   timer.every(15000, runSensor);
 }
@@ -32,11 +29,8 @@ void loop() {
 }
 
 bool runSensor(void *) {
-
- String sensorVal = "CO: ";
- sensorVal += mq7.getPPM();
-
-
+  String sensorVal = "CO: ";
+  sensorVal += mq7.getPPM();
 
   duck.sendPayloadMessage(sensorVal);
 

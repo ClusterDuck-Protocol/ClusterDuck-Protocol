@@ -147,7 +147,7 @@ const char MAIN_page[] PROGMEM = R"=====(
             <p>You are connected to a ClusterDuck Emergency Network. Please fill out the form to share your status with first responders.</p>
 
             <div id="form">
-                <form>
+                <form action="/formSubmit" method="post">
                     <label for="firstName">First Name</label><br>
                     <input class="textbox textbox-full" name="firstName" id="firstName" type="text" placeholder="Tarzán" /><br><br>
                     <label for="lastName">Last Name(s)</label><br>
@@ -191,9 +191,9 @@ const char MAIN_page[] PROGMEM = R"=====(
 
                     <br /> <br />
                     <label for="status">Additional Comments</label><br /> 
-                    <textarea class="textbox comments" id="commentsInput" cols="30" rows="2"></textarea><br /> 
+                    <textarea class="textbox comments" name="message" id="commentsInput" cols="30" rows="2"></textarea><br /> 
 
-                    <a href="#" class="sendReportBtn" id="sendReport">SEND REPORT</a>
+                    <input type="submit" class="sendReportBtn" value="SEND REPORT" />
                 </form>
 
                 <p style="font-size: 10px; text-align: center;margin-top: 24px;">Powered by the ClusterDuck Protocol</p>
@@ -210,83 +210,7 @@ const char MAIN_page[] PROGMEM = R"=====(
       </div>
 
 
-      <script type="text/javascript">         
-   
-         var sendReport = document.getElementById('sendReport')
-         var formContent = document.getElementById("formContent")
-         var bodySent = document.getElementById("bodySent")
-         var sendUpdate = document.getElementById("bupdate")
-
-         sendUpdate.addEventListener("click",function(e){
-            formContent.className += " on";
-            formContent.classList.remove('off');
-            bodySent.classList.remove("on")
-            bodySent.className += " off"
-         },false);
-
-         sendReport.addEventListener("click",function(e){
-
-            /////// set up current date
-            // var d = new Date();
-            // var da = "MONTH " + d.getDate() + ", " + d.getFullYear() + " @ " + d.getHours() + ":" + d.getMinutes();
-
-            ///// grab data from form
-            var firstNameInput = document.getElementById('firstName').value
-            var lastNameInput = document.getElementById('lastName').value
-            var phoneInput = document.getElementById('phoneNumber').value
-            var locationInput = document.getElementById('streetAddress').value
-            var currentStatusSos = document.getElementById('currentStatusSos').checked
-            var currentStatusOk = document.getElementById('currentStatusOk').checked
-            var waterNeed = document.getElementById('waterNeed').checked
-            var transportationNeed = document.getElementById('transportationNeed').checked
-            var foodNeed = document.getElementById('foodNeed').checked
-            var inspectionNeed = document.getElementById('inspectionNeed').checked
-            var firstAidNeed = document.getElementById('firstAidNeed').checked
-            var shelterNeed = document.getElementById('shelterNeed').checked
-            var childrenInput = document.getElementById('childrenInput').value
-            var adultsInput = document.getElementById('adultsInput').value
-            var elderlyInput = document.getElementById('elderlyInput').value
-            var petsInput = document.getElementById('petsInput').value
-            var messageInput = document.getElementById('commentsInput').value
-
-            ///// if some elements are empty, fill them with NONE
-            if (firstNameInput == "") {firstNameInput = "None"}
-            if (phoneInput == "") {phoneInput = "1234567890"}
-            if (locationInput == "") {locationInput = "None"}
-            if (messageInput == "") {messageInput = "None"}
-            if (childrenInput == "") {childrenInput = "0"}
-            if (adultsInput == "") {adultsInput = "0"}
-            if (elderlyInput == "") {elderlyInput = "0"}
-            if (petsInput == "") {petsInput = "0"}
-
-            var mid = "";
-            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            for (var i = 0; i < 12; i++) {
-               mid += possible.charAt(Math.floor(Math.random() * possible.length));
-            }
-
-            ////// compile the URL we will send to the backend and then submit
-            var submitUrl = "?mid=" + mid + "&fn=" + firstNameInput + "&ln=" + lastNameInput + "&location=" + locationInput + "&number=" + phoneInput + "&sok=" + currentStatusOk + "&ssos=" + currentStatusSos + "&wa=" + waterNeed + "&trans=" + transportationNeed + "&food=" + foodNeed + "&insp=" + inspectionNeed + "&aid=" + firstAidNeed + "&shelt=" + shelterNeed + "&adult=" + adultsInput + "&child=" + childrenInput + "&elderlyInput=" + elderlyInput + "&pets=" + petsInput + "&msg=" + messageInput
-
-            console.log(submitUrl);
-
-            var url = window.location.href;
-            if (url.indexOf('?') > -1){
-               url = url.split("?")[0]
-               url += submitUrl
-            }else{
-               url += submitUrl
-            }
-            window.location.href = url;
-
-            ////// show message sent confirmation
-            bodySent.className += " on";
-            bodySent.classList.remove('off');
-            formContent.classList.remove("on")
-            formContent.className += " off"
-
-         },false);
-
+      <script type="text/javascript">      
 
 
 
