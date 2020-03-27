@@ -42,6 +42,7 @@ class ClusterDuck {
 
     static void setupDuckLink();
     static void setupMamaDuck();
+    static void processPortalRequest();
     static void runDuckLink();
     static void runMamaDuck();
 

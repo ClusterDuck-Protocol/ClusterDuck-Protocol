@@ -150,19 +150,6 @@ void ClusterDuck::setupPortal(const char *AP) {
   }
 }
 
-//Run Captive Portal
-// bool ClusterDuck::runCaptivePortal() {
-//   dnsServer.processNextRequest();
-//   webServer.handleClient();
-//   if (webServer.arg(1) != "" || webServer.arg(1) != NULL) {
-//     Serial.println("data received");
-//     Serial.println(webServer.arg(1));
-//     return true;
-//   } else {
-//     return false;
-//   }
-// }
-
 //Setup premade DuckLink with default settings
 void ClusterDuck::setupDuckLink() {
   setupDisplay("Duck");
@@ -172,14 +159,15 @@ void ClusterDuck::setupDuckLink() {
   Serial.println("Duck Online");
 }
 
-void ClusterDuck::runDuckLink() { //TODO: Add webserver clearing after message sent
+void ClusterDuck::runDuckLink() {
+
+  processPortalRequest();
+
+}
+
+void ClusterDuck::processPortalRequest() { //TODO: Add webserver clearing after message sent
 
   dnsServer.processNextRequest();
-  // if (runCaptivePortal()) {
-  //   Serial.println("Portal data received");
-  //   sendPayloadMessage(getPortalDataString());
-  //   Serial.println("Message Sent");
-  // }
 
 }
 
@@ -219,43 +207,9 @@ void ClusterDuck::runMamaDuck() {
     }
   }
 
-  dnsServer.processNextRequest();
+  processPortalRequest();
 
-  // if (runCaptivePortal()) {
-  //   Serial.println("Portal data received");
-  //   sendPayloadStandard(getPortalDataString());
-  //   Serial.println("Message Sent");
-  //   LoRa.receive();
-  // }
 }
-
-/**
-  getPortalData
-  Reads WebServer Parameters and couples into Data Struct
-  @return coupled Data Struct
-*/
-// String * ClusterDuck::getPortalDataArray() {
-//   //Array holding all form values
-//   String * val = formArray;
-
-//   for (int i = 0; i < fLength; ++i) {
-//     val[i] = webServer.arg(i);
-//   }
-
-//   return val;
-// }
-
-// String ClusterDuck::getPortalDataString() {
-//   //String holding all form values
-//   String val = "";
-
-//   for (int i = 0; i < fLength; ++i) {
-//     val = val + webServer.arg(i) + "*";
-//   }
-
-//   Serial.println(val);
-//   return val;
-// }
 
 void ClusterDuck::sendPayloadMessage(String msg) {
   LoRa.beginPacket();
@@ -307,12 +261,6 @@ String ClusterDuck::readMessages(byte mLength)  {
   }
   return incoming;
 }
-
-/**
-  receive
-  Reads and Parses Received Packets
-  @param packetSize
-*/
 
 bool ClusterDuck::idInPath(String path) {
   Serial.println("Checking Path");
