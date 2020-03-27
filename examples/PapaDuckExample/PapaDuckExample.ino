@@ -101,31 +101,33 @@ void setupMQTT()
     }
   }
 }
-
 void quackJson() {
-  const int bufferSize = 4 * JSON_OBJECT_SIZE(1);
-  DynamicJsonBuffer jsonBuffer(bufferSize);
+  const int bufferSize = 4*  JSON_OBJECT_SIZE(4);
+  StaticJsonDocument<bufferSize> doc;
 
-  JsonObject& root = jsonBuffer.createObject();
+  JsonObject root = doc.as<JsonObject>();
 
   Packet lastPacket = duck.getLastPacket();
 
-  root["DeviceID"]        = lastPacket.senderId;
-  root["MessageID"]       = lastPacket.messageId;
-  root["Payload"]         = lastPacket.payload;
+  doc["DeviceID"]        = lastPacket.senderId;
+  doc["MessageID"]       = lastPacket.messageId;
+  doc["Payload"]     .set(lastPacket.payload);
+  doc["path"]         .set(lastPacket.path + "," + duck.getDeviceId());
 
-  root["path"]            = lastPacket.path + "," + duck.getDeviceId();
 
   String jsonstat;
-  root.printTo(jsonstat);
-  root.prettyPrintTo(Serial);
+  serializeJson(doc, jsonstat);
 
   if (client.publish(topic, jsonstat.c_str())) {
+    
+    serializeJsonPretty(doc, Serial);
+     Serial.println("");
     Serial.println("Publish ok");
-    root.prettyPrintTo(Serial);
-    Serial.println("");
+   
   }
   else {
     Serial.println("Publish failed");
   }
+
+
 }
