@@ -129,8 +129,8 @@ If you don't see the captive portal screen, you can force it by accessing [never
 ![iot-platform-11](https://github.com/Code-and-Response/ClusterDuck-Protocol/blob/master/assets/images/iot-platform-11.png)
 
 ## API
-``setDeviceId(String deviceId, const int formLength)``
-- Set device ID and captive portal form length. Do not leave **deviceId** *null* or as an empty string. **formLength** defaults to 10. Use in ``setup()``.
+``setDeviceId(String deviceId)``
+- Set device ID that will be used to prevent DDoS (Duck Denial of Service or Duck DoS). Do not leave **deviceId** *null* or as an empty string. Use in ``setup()``.
 
 ``void begin(int baudRate)``
 - Initialize baud rate for serial. Use in ``setup()``.
@@ -144,8 +144,8 @@ If you don't see the captive portal screen, you can force it by accessing [never
 ``void setupPortal(const char *AP)``
 - Initializes the captive portal code. ***AP** is the value that will be displayed when accessing the wifi settings of devices such as smartphones and laptops. Use in ``setup()``.
 
-``bool runCaptivePortal()``
-- Processes requests coming through the captive portal. Returns ``true`` if there is a new submission. Use this in your ``loop()`` function to run continuously. 
+``void processPortalRequest()``
+- Handles incoming and active connections to the captive portal. **Required** for runing captive portal. Use in ``loop()``.
 
 ``void setupDuckLink()``
 - Template for setting up a **DuckLink** device. Use in ``setup()``
@@ -214,6 +214,9 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our Code of Conduc
 ## License
 
 This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE) file for details.
+
+## Version
+v1.0.4
 
 
 [Project OWL]: <https://project-owl.com>

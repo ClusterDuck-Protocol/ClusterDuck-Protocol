@@ -33,7 +33,7 @@ class ClusterDuck {
     ClusterDuck();
 
     //Exposed Methods
-    static void setDeviceId(String deviceId = "", const int formLength = 10);
+    static void setDeviceId(String deviceId = "");
     static void begin(int baudRate = 115200);
     static void setupLoRa(long BAND = 915E6, int SS = 18, int RST = 14, int DI0 = 26, int TxPower = 20);
     static void setupDisplay(String deviceType);
@@ -91,9 +91,6 @@ class ClusterDuck {
     static void restartDuck();
     static String readMessages(byte mLength);
     static bool reboot(void *);
-
-    static String * formArray;
-    static int fLength;
 
     // QuackPack
     static byte ping_B;

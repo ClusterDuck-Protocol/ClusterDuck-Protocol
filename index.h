@@ -191,7 +191,7 @@ const char MAIN_page[] PROGMEM = R"=====(
 
                     <br /> <br />
                     <label for="status">Additional Comments</label><br /> 
-                    <textarea class="textbox comments" id="commentsInput" cols="30" rows="2"></textarea><br /> 
+                    <textarea class="textbox comments" name="message" id="commentsInput" cols="30" rows="2"></textarea><br /> 
 
                     <input type="submit" class="sendReportBtn" value="SEND REPORT" />
                 </form>

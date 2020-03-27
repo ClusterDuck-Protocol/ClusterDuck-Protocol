@@ -9,7 +9,7 @@ void setup() {
   
   // put your setup code here, to run once:
   duck.begin();
-  duck.setDeviceId("D", 18);
+  duck.setDeviceId("D");
   duck.setupDuckLink();
 
   //timer.every(300000, runCode);

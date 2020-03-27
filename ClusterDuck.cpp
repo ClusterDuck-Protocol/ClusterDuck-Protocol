@@ -14,13 +14,9 @@ ClusterDuck::ClusterDuck() {
 
 }
 
-void ClusterDuck::setDeviceId(String deviceId, const int formLength) {
+void ClusterDuck::setDeviceId(String deviceId) {
   _deviceId = deviceId;
 
-  String * values = new String[formLength];
-
-  formArray = values;
-  fLength = formLength;
 }
 
 void ClusterDuck::begin(int baudRate) {
@@ -165,7 +161,7 @@ void ClusterDuck::runDuckLink() {
 
 }
 
-void ClusterDuck::processPortalRequest() { //TODO: Add webserver clearing after message sent
+void ClusterDuck::processPortalRequest() {
 
   dnsServer.processNextRequest();
 
@@ -432,9 +428,6 @@ float ClusterDuck::_snr;
 long ClusterDuck::_freqErr;
 int ClusterDuck::_availableBytes;
 int ClusterDuck::_packetSize = 0;
-
-String * ClusterDuck::formArray;
-int ClusterDuck::fLength;
 
 Packet ClusterDuck::_lastPacket;
 
