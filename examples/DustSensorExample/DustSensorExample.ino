@@ -10,19 +10,7 @@ const uint8_t SHARP_VO_PIN = 0;    // Sharp Dust/particle analog out pin used fo
 
 GP2YDustSensor dustSensor(GP2YDustSensorType::GP2Y1010AU0F, SHARP_LED_PIN, SHARP_VO_PIN);
 
-
 ClusterDuck duck;
-
-bool runSensor(void *) {
-
-  //Dust sensor
-  String sensorVal = "Current dust concentration: " + dustSensor.getDustDensity();
-  sensorVal += " ug/m3";
-
-  duck.sendPayloadMessage(sensorVal);
-
-  return true;
-}
 
 void setup() {
   
@@ -43,4 +31,15 @@ void loop() {
   // put your main code here, to run repeatedly:
   duck.runMamaDuck();
   
+}
+
+bool runSensor(void *) {
+
+  //Dust sensor
+  String sensorVal = "Current dust concentration: " + dustSensor.getDustDensity();
+  sensorVal += " ug/m3";
+
+  duck.sendPayloadMessage(sensorVal);
+
+  return true;
 }
