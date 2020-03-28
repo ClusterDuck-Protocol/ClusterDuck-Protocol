@@ -12,20 +12,6 @@ DHT dht(DHTPIN, DHTTYPE);
 
 ClusterDuck duck;
 
-bool runSensor(void *) {
-
-  String sensorVal = "Temp: ";
-  sensorVal += dht.readTemperature();
-  sensorVal += "Humidity: ";
-  sensorVal += dht.readHumidity();
-
-
-  duck.sendPayloadMessage(sensorVal);
-
-  
-  return true;
-}
-
 void setup() {
   
   // put your setup code here, to run once:
@@ -43,4 +29,16 @@ void loop() {
   // put your main code here, to run repeatedly:
   duck.runMamaDuck();
   
+}
+
+bool runSensor(void *) {
+
+  String sensorVal = "Temp: ";
+  sensorVal += dht.readTemperature();
+  sensorVal += "Humidity: ";
+  sensorVal += dht.readHumidity();
+
+  duck.sendPayloadMessage(sensorVal);
+  
+  return true;
 }
