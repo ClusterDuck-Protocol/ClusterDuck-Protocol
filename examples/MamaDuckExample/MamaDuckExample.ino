@@ -5,11 +5,6 @@
 
 ClusterDuck duck;
 
-bool runSensor(void *) {
-
-  return true;
-}
-
 void setup() {
   
   // put your setup code here, to run once:
@@ -28,3 +23,7 @@ void loop() {
   
 }
 
+bool runSensor(void *) {
+
+  return true;
+}
