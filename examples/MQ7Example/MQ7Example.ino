@@ -16,26 +16,6 @@ MQUnifiedsensor MQ7(pin, type);
 
 ClusterDuck duck;
 
-bool runSensor(void *) {
-
-  MQ7.update();
-
-  String sensorVal = "H2: ";
-  sensorVal += MQ7.readSensor("H2");
-  sensorVal += " LPG: ";
-  sensorVal += MQ7.readSensor("LPG");
-  sensorVal += " CH4: ";
-  sensorVal += MQ7.readSensor("CH4");
-  sensorVal += " CO: ";
-  sensorVal += MQ7.readSensor("CO");
-  sensorVal += "Alcohol: ";
-  sensorVal += MQ7.readSensor("Alcohol");
-
-  duck.sendPayloadMessage(sensorVal);
-  
-  return true;
-}
-
 void setup() {
   
   // put your setup code here, to run once:
@@ -61,4 +41,24 @@ void loop() {
   // put your main code here, to run repeatedly:
   duck.runMamaDuck();
   
+}
+
+bool runSensor(void *) {
+
+  MQ7.update();
+
+  String sensorVal = "H2: ";
+  sensorVal += MQ7.readSensor("H2");
+  sensorVal += " LPG: ";
+  sensorVal += MQ7.readSensor("LPG");
+  sensorVal += " CH4: ";
+  sensorVal += MQ7.readSensor("CH4");
+  sensorVal += " CO: ";
+  sensorVal += MQ7.readSensor("CO");
+  sensorVal += "Alcohol: ";
+  sensorVal += MQ7.readSensor("Alcohol");
+
+  duck.sendPayloadMessage(sensorVal);
+  
+  return true;
 }
