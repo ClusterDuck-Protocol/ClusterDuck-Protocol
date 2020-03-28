@@ -9,7 +9,8 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        example: [-c ./examples/BMP180Example/platformio.ini ./examples/BMP180Example/]
+        example: [-c ./examples/BMP180Example/platformio.ini ./examples/BMP180Example/,
+                  -c ./examples/BMP280Example/platformio.ini ./examples/BMP280Example/]
 
     steps:
     - uses: actions/checkout@v1
