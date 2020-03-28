@@ -3,16 +3,33 @@
 
 auto timer = timer_create_default(); // create a timer with default settings
 
-//Setup MQ7
-#include "MQ7.h" //https://github.com/swatish17/MQ7-Library
-#define analogMQ7  32            //GPIO PIN fot MQ
-MQ7 mq7(analogMQ7,5.0); //Setting up to 5V the MQ Sensor
+//Setup DHT11
+#include <DHT.h>
+#define DHTTYPE DHT11
+#define DHTPIN  23
+#define TIMEOUT 5000
+DHT dht(DHTPIN, DHTTYPE);
 
 ClusterDuck duck;
+
+bool runSensor(void *) {
+
+  String sensorVal = "Temp: ";
+  sensorVal += dht.readTemperature();
+  sensorVal += "Humidity: ";
+  sensorVal += dht.readHumidity();
+
+
+  duck.sendPayloadMessage(sensorVal);
+
+  
+  return true;
+}
 
 void setup() {
   
   // put your setup code here, to run once:
+  dht.begin();
   duck.begin();
   duck.setDeviceId("Z");
   duck.setupMamaDuck();
@@ -26,14 +43,4 @@ void loop() {
   // put your main code here, to run repeatedly:
   duck.runMamaDuck();
   
-}
-
-bool runSensor(void *) {
-  String sensorVal = "CO: ";
-  sensorVal += mq7.getPPM();
-
-  duck.sendPayloadMessage(sensorVal);
-
-  
-  return true;
 }

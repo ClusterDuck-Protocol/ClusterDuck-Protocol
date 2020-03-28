@@ -9,6 +9,22 @@ Adafruit_BMP085_Unified bmp = Adafruit_BMP085_Unified(10085);
 
 ClusterDuck duck;
 
+bool runSensor(void *) {
+  float T,P;
+  
+  bmp.getTemperature(&T);
+  Serial.println(T);
+  bmp.getPressure(&P);
+  Serial.println(P);
+  
+  String sensorVal = "Temp: " + String(T) + " Pres: " + String(P);
+
+  duck.sendPayloadMessage(sensorVal);
+
+  
+  return true;
+}
+
 void setup() {
   
   // put your setup code here, to run once:
@@ -37,18 +53,4 @@ void loop() {
   
 }
 
-bool runSensor(void *) {
-  float T,P;
-  
-  bmp.getTemperature(&T);
-  Serial.println(T);
-  bmp.getPressure(&P);
-  Serial.println(P);
-  
-  String sensorVal = "Temp: " + String(T) + " Pres: " + String(P);
 
-  duck.sendPayloadMessage(sensorVal);
-
-  
-  return true;
-}

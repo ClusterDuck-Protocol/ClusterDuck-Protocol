@@ -5,6 +5,13 @@
 
 ClusterDuck duck;
 
+// Use this with the timer to run code at a timed interval
+// Works well with taking sensor readings
+bool runCode(void *) {
+
+  return true;
+}
+
 void setup() {
   
   // put your setup code here, to run once:
@@ -21,11 +28,4 @@ void loop() {
   // Run captive portal and LoRa in the DuckLink configuration
   duck.runDuckLink();
   
-}
-
-// Use this with the timer to run code at a timed interval
-// Works well with taking sensor readings
-bool runCode(void *) {
-
-  return true;
 }
