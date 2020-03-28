@@ -62,7 +62,7 @@ bottom of the drop-down menu. It is ready to be used in your sketch.
 
 ## Quick Start
 
-Open new sketch in Adruino IDE or create a new project with platformIO and include the ClusterDuck library
+Open new sketch in Arduino IDE or create a new project with platformIO and include the ClusterDuck library
 
     #include "ClusterDuck.h"
 Create ClusterDuck object
