@@ -28,6 +28,46 @@ PubSubClient client(server, 8883, wifiClient);
 
 byte ping = 0xF4;
 
+void setup() {
+  // put your setup code here, to run once:
+
+  duck.begin();
+  duck.setDeviceId("Papa");
+
+  duck.setupLoRa();
+  LoRa.receive();
+  duck.setupDisplay("Papa");
+
+  setupWiFi();
+  
+  Serial.println("PAPA Online");
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  if(WiFi.status() != WL_CONNECTED)
+  {
+    Serial.print("WiFi disconnected, reconnecting to local network: ");
+    Serial.print(SSID);
+    setupWiFi();
+
+  }
+  setupMQTT();
+
+  int packetSize = LoRa.parsePacket();
+  if (packetSize != 0) {
+    byte whoIsIt = LoRa.peek();
+    if(whoIsIt != ping) {
+      Serial.println(packetSize);
+      String * val = duck.getPacketData(packetSize);
+      quackJson();
+    }
+  }
+
+  
+  timer.tick();
+}
+
 void setupWiFi()
 {
   Serial.println();
@@ -88,43 +128,5 @@ void quackJson() {
   else {
     Serial.println("Publish failed");
   }
-}
 
-void setup() {
-  // put your setup code here, to run once:
-
-  duck.begin();
-  duck.setDeviceId("Papa");
-
-  duck.setupLoRa();
-  LoRa.receive();
-  duck.setupDisplay("Papa");
-
-  setupWiFi();
-  
-  Serial.println("PAPA Online");
-}
-
-void loop() {
-  // put your main code here, to run repeatedly:
-  if(WiFi.status() != WL_CONNECTED)
-  {
-    Serial.print("WiFi disconnected, reconnecting to local network: ");
-    Serial.print(SSID);
-    setupWiFi();
-
-  }
-  setupMQTT();
-
-  int packetSize = LoRa.parsePacket();
-  if (packetSize != 0) {
-    byte whoIsIt = LoRa.peek();
-    if(whoIsIt != ping) {
-      Serial.println(packetSize);
-      String * val = duck.getPacketData(packetSize);
-      quackJson();
-    }
-  }
-  
-  timer.tick();
 }
