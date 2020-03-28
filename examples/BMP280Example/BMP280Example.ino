@@ -9,21 +9,6 @@ Adafruit_BMP280 bmp;
 
 ClusterDuck duck;
 
-bool runSensor(void *) {
-  float T,P;
-  
-  T = bmp.readTemperature();
-  Serial.println(T);
-  P = bmp.readPressure();
-  Serial.println(P);
-  
-  String sensorVal = "Temp: " + String(T) + " Pres: " + String(P); //Store Data
-
-  duck.sendPayloadMessage(sensorVal);
-
-  return true;
-}
-
 void setup() {
   
   // put your setup code here, to run once:
@@ -50,3 +35,17 @@ void loop() {
   
 }
 
+bool runSensor(void *) {
+  float T,P;
+  
+  T = bmp.readTemperature();
+  Serial.println(T);
+  P = bmp.readPressure();
+  Serial.println(P);
+  
+  String sensorVal = "Temp: " + String(T) + " Pres: " + String(P); //Store Data
+
+  duck.sendPayloadMessage(sensorVal);
+
+  return true;
+}
