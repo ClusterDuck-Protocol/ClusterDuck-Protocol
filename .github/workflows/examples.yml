@@ -1,4 +1,4 @@
-name: PlatformIO CI examples
+name: Build examples
 
 on: [push]
 
@@ -29,8 +29,5 @@ jobs:
         pip install platformio
         platformio lib -g install file://.
 
-    - name: Run PlatformIO
+    - name: Build
       run: platformio ci --lib="." ${{ matrix.example }}
-      with:
-          name: binary
-          path: .pio/build/heltec_wifi_lora_32_V2/firmware.elf
