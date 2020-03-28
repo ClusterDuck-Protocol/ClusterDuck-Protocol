@@ -22,20 +22,35 @@ This is beneficial after events such as earthquakes or hurricanes where communic
 # API and Getting Started
 Check out the [ClusterDuck Protocol] website for more information and to learn about projects built upon this codebase. You can reach out directly on our [Slack] too! Check out our [How To Build A Duck User Manual] for in depth instructions for setting up your environment and materials. 
 
-## Downloading Library from GitHub
+## PlatformIO
+[PlatformIO](https://platformio.org/) is a ecosystem for embedded development. Grab your favorite IDE from [here](https://platformio.org/install/integration) and make sure to install the platformIO ide extension. If you are not sure which IDE to use, use [VSCode](https://docs.platformio.org/en/latest/integration/ide/vscode.html#installation).
 
-### Manual Install 
+### Installing ClusterDuck-Protocol globally
+
+1. From the [PIO Home](https://docs.platformio.org/en/latest/integration/ide/vscode.html#setting-up-the-project) tab select `Libraries`
+1. Search for `ClusterDuck Protocol` and install it
+
+### Installing ClusterDuck-Protocol for project only
+
+1. Create a `New Project` from the [PIO Home](https://docs.platformio.org/en/latest/integration/ide/vscode.html#setting-up-the-project) tab
+1. Choose a name, select the `Heltec Wifi LoRa 32 (V2) (Heltec Automation)` as board and `Arduino` as framework
+1. Open the `platformio.ini` within your newly created project and add `lib_deps = ClusterDuck Protocol` at the end.
+
+## Arduino 
+### Downloading Library from GitHub
+
+#### Manual Install 
 To start we will need to copy the library into your Arduino library folder.
 1. Copy ClusterDuck folder
-2. Navigate to your ``Arduino`` folder. This can be found in your default Documents folder.
-3. Navigate to the ``library`` folder
-4. Paste into ``library`` folder
-5. Restart Arduino
-6. You should now be able to see examples by going to File -> Examples -> ClusterDuck
+1. Navigate to your ``Arduino`` folder. This can be found in your default Documents folder.
+1. Navigate to the ``library`` folder
+1. Paste into ``library`` folder
+1. Restart Arduino
+1. You should now be able to see examples by going to File -> Examples -> ClusterDuck
 
 You should be able pull new commits directly to this folder in your Arduino library.
 
-### Importing as a .zip Library
+#### Importing as a .zip Library
 Download The ClusterDuck Protocol as a .Zip file.
 
 In the Arduino IDE, navigate to ``Sketch > Include Library > Add .ZIP Library.`` At the top of
@@ -47,7 +62,7 @@ bottom of the drop-down menu. It is ready to be used in your sketch.
 
 ## Quick Start
 
-Open new sketch in Adruino IDE and include the ClusterDuck library
+Open new sketch in Adruino IDE or create a new project with platformIO and include the ClusterDuck library
 
     #include "ClusterDuck.h"
 Create ClusterDuck object
