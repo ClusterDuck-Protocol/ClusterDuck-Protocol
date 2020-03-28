@@ -17,7 +17,7 @@
     "frameworks": "arduino",
     "platforms": "espressif32",
     "examples": [
-        "[Ee]xamples/*/*/*.cpp"
+        "[Ee]xamples/*/*.ino"
     ],
     "dependencies": {
         "LoRa": "0.7.1",
