@@ -88,9 +88,6 @@ void quackJson() {
   else {
     Serial.println("Publish failed");
   }
-
-
-<<<<<<< HEAD:examples/PapaDuckExample/src/main.cpp
 }
 
 void setup() {
@@ -128,9 +125,6 @@ void loop() {
       quackJson();
     }
   }
-
   
   timer.tick();
-=======
->>>>>>> de1e002e91384151077e2130db4712f210694368:examples/PapaDuckExample/PapaDuckExample.ino
 }
