@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        example: [-c examples/BMP180Example/platformio.ini examples/BMP180Example/]
+        example: [-c ./examples/BMP180Example/platformio.ini ./examples/BMP180Example/]
 
     steps:
     - uses: actions/checkout@v1
@@ -22,6 +22,4 @@ jobs:
         pip install platformio
 
     - name: Run PlatformIO
-      run: platformio ci --lib="." 
-      env:
-        PLATFORMIO_CI_SRC: ${{ matrix.example }}
+      run: platformio ci --lib="." ${{ matrix.example }}
