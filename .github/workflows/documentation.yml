@@ -7,10 +7,13 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
-      - run: mkdir ouptut
+      - run: mkdir output
       - uses: Ender-events/pandoc@master
         with: 
           args: "--resource-path=doc doc/howToBuildADuck.md --pdf-engine=xelatex  -V \"mainfont:DejaVu Sans\" -V \"geometry: left=2cm,right=2cm,top=3cm,bottom=3cm\" -o output/howToBuildADuck.pdf"
+      - uses: docker://michaelperrin/pdfunite
+        with:
+          args: "doc/assets/pdfs/title.pdf output/howToBuildADuck.pdf output/final.pdf"
       - uses: actions/upload-artifact@master
         with:
           name: output
