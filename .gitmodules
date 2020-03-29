@@ -34,3 +34,6 @@
 [submodule "libraries-tes/u8g2"]
 	path = libraries-tes/u8g2
 	url = https://github.com/olikraus/u8g2
+[submodule "Libraries/pubsubclient"]
+	path = Libraries/pubsubclient
+	url = https://github.com/knolleary/pubsubclient.git
