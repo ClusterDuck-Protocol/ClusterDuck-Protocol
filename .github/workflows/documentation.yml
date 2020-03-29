@@ -8,8 +8,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: mkdir ouptut
-      - uses: docker://jagregory/pandoc:latest
+      - uses: docker://pandoc/latex:2.9
         with: 
+          run: apk add ttf-dejavu
           args: "--resource-path=doc doc/howToBuildADuck.md --pdf-engine=xelatex  -V \"mainfont:DejaVu Sans\" -V \"geometry: left=2cm,right=2cm,top=3cm,bottom=3cm\" -o output/howToBuildADuck.pdf"
       - uses: actions/upload-artifact@master
         with:
