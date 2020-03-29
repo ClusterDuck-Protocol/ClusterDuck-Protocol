@@ -24,7 +24,7 @@ MamaDucks act as central hubs to DuckLink groups.  The MamaDuck is able to recei
 
 ### PapaDuck:
 
-PapaDuck is the final Duck in the ClusterDuck and transmits network data to the internet.  When communicating with other Ducks the PapaDuck similarly uses LoRa. The data that the PapaDuck receives gets pushed to the OWL Data Management System (DMS), the cloud platform, through the Internet. It acts like a gateway that collects data from MamaDucks and then upload it to OWL. \
+PapaDuck is the final Duck in the ClusterDuck and transmits network data to the internet.  When communicating with other Ducks the PapaDuck similarly uses LoRa. The data that the PapaDuck receives gets pushed to the OWL Data Management System (DMS), the cloud platform, through the Internet. It acts like a gateway that collects data from MamaDucks and then upload it to OWL.
                         
 
 ## Raw Materials
@@ -122,7 +122,7 @@ The required libraries to work with the ClusterDuck protocol can be installed in
 
 In the source code there is a folder with the required libraries you will need to copy and paste these libraries into the arduino Libraries folder so they can be found. 
 
-Go to your copy of the ClusterDuck Protocol source code and find the Libraries folder. Copy all the libraries in that folder. Navigate to your Arduino folder. This is usually found in your _Documents_ for windows _C:\Users\USER\Documents\Arduino._ for MacOS _/Users/USER/Documents/Arduino/_. In the Arduino Libraries folder drag or paste all the libraries. 
+Go to your copy of the ClusterDuck Protocol source code and find the Libraries folder. Copy all the libraries in that folder. Navigate to your Arduino folder. This is usually found in your _Documents_ for windows _C:/Users/USER/Documents/Arduino._ for MacOS _/Users/USER/Documents/Arduino/_. In the Arduino Libraries folder drag or paste all the libraries. 
 
 
 ##### Installing libraries through Library Manager
