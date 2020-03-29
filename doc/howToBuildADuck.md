@@ -31,7 +31,7 @@
 
 Ducks are IoT devices that connect together to form simple mesh networks.  The Ducks utilize a combined network of LoRa (Long Range) technology, WiFi, Bluetooth, and sometimes other connectivities. When the Ducks need to communicate with each other they transmit over LoRa, a long-range and power efficient radio protocol. Often a user will need to communicate with the Ducks and may use WiFi.  A networked cluster of Ducks - a _ClusterDuck_ - is composed of several types of ducks: the DuckLink, MamaDuck, PapaDuck.
 
-![alt_text](./assets/images/ducks.png "ducks")
+![different Ducks](./assets/images/ducks.png "ducks")
 
 ### DuckLinks
 
@@ -89,7 +89,7 @@ Download USB to UART Bridge VCP Driver from [here](https://www.silabs.com/produc
     https://dl.espressif.com/dl/package_esp32_index.json,https://adafruit.github.io/arduino-board-index/package_adafruit_index.json
 
 
-    ![alt_text](./assets/images/arduino_boards.png "Arduino Boards")
+    ![Add additional boards to Arduino](./assets/images/arduino_boards.png "Arduino Boards")
 
 
 ### Install Clusterduck Protocol
@@ -100,7 +100,7 @@ Download USB to UART Bridge VCP Driver from [here](https://www.silabs.com/produc
 
 In the Arduino IDE, navigate to _Sketch > Include Library > Add .ZIP Library_. At the top of the drop down list, select the option to "Add .ZIP Library".
 
-![alt_text](./assets/images/add_Library.png "add library to arduino")
+![Add library as zip](./assets/images/add_Library.png "add library to arduino")
 
 Navigate to the downloaded ClusterDuck Protocol Folder and select.
 
@@ -180,21 +180,21 @@ DuckLink Hardware and Firmware Assembly
 
 1. Connect ESP32 board to your computer via USB cable.
 
-    ![alt_text](./assets/images/esp32.jpg "image_tooltip")
+    ![Connected ESP32 board](./assets/images/esp32.jpg "Connected ESP32 board")
 
 1. In Arduino IDE, select Tools > “board” to Heltec_WiFi_LoRa_32
 
-    ![alt_text](./assets/images/arduino_heltec.png "image_tooltip")
+    ![Select the correct board](./assets/images/arduino_heltec.png "Select the correct board")
 
 1. In Arduino IDE, select Tools > “port” to <USB_PORT>
 
-    ![alt_text](./assets/images/arduino_port.png "image_tooltip")
+    ![Select the correct port](./assets/images/arduino_port.png "Select the correct port")
 
 1. Select Duck:
 
     At this point you will need to choose what kind of Duck you want to make. There are Examples for different Ducks included in the ClusterDuck Protocol. Go to File -> Examples -> Clusterduck. 
 
-    ![alt_text](./assets/images/arduino_examples.png "image_tooltip")
+    ![Using Cluster Duck examples](./assets/images/arduino_examples.png "Using Cluster Duck examples")
 
 
     **Choose an Example File** 
@@ -229,7 +229,7 @@ DuckLink Hardware and Firmware Assembly
 
     Finally, upload this code to the Duck device by hitting the right-pointing arrow in the top left corner. 
 
-    ![alt_text](./assets/images/arduino_upload.png "image_tooltip")
+    ![Upload firmware](./assets/images/arduino_upload.png "Upload firmware")
 
 
     This will show a lot of activity in the console, and if successful will say complete. If this process fails for any reason, contact us and we can help debug whatever is going wrong.
@@ -240,7 +240,7 @@ DuckLink Hardware and Firmware Assembly
 
     Finished Duck:
 
-    ![alt_text](./assets/images/setup.png "image_tooltip")
+    ![Running duck example](./assets/images/setup.png "Running duck example")
 
 
 
@@ -277,7 +277,7 @@ Double check to see if the credentials (network and password) for WiFi are corre
 
 ## API Reference And Quickstart CLusterDuck Protocol
 
-![alt_text](./assets/images/cdp.png "image_tooltip")
+![The ClusterDuck Protocol](./assets/images/cdp.png "The ClusterDuck Protocol")
 
 
 **[Github](https://github.com/Code-and-Response/ClusterDuck-Protocol)** 
