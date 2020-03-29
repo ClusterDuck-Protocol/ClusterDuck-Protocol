@@ -37,3 +37,6 @@
 [submodule "Libraries/pubsubclient"]
 	path = Libraries/pubsubclient
 	url = https://github.com/knolleary/pubsubclient.git
+[submodule "Libraries/arduino-LoRa"]
+	path = Libraries/arduino-LoRa
+	url = https://github.com/sandeepmistry/arduino-LoRa
