@@ -1,0 +1,66 @@
+[submodule "libraries-tes/ArduinoJson"]
+	path = libraries-tes/ArduinoJson
+	url = https://github.com/bblanchon/ArduinoJson.git
+[submodule "libraries-tes/Adafruit_BMP085_Unified"]
+	path = libraries-tes/Adafruit_BMP085_Unified
+	url = https://github.com/adafruit/Adafruit_BMP085_Unified
+[submodule "libraries-tes/Adafruit_BMP280_Library"]
+	path = libraries-tes/Adafruit_BMP280_Library
+	url = https://github.com/adafruit/Adafruit_BMP280_Library
+[submodule "libraries-tes/Adafruit_Sensor"]
+	path = libraries-tes/Adafruit_Sensor
+	url = https://github.com/adafruit/Adafruit_Sensor
+[submodule "libraries-tes/arduino-timer"]
+	path = libraries-tes/arduino-timer
+	url = https://github.com/contrem/arduino-timer
+[submodule "libraries-tes/AsyncTCP"]
+	path = libraries-tes/AsyncTCP
+	url = https://github.com/me-no-dev/AsyncTCP.git
+[submodule "libraries-tes/DHT-sensor-library"]
+	path = libraries-tes/DHT-sensor-library
+	url = https://github.com/adafruit/DHT-sensor-library
+[submodule "libraries-tes/esp8266-oled-ssd1306"]
+	path = libraries-tes/esp8266-oled-ssd1306
+	url = https://github.com/ThingPulse/esp8266-oled-ssd1306
+[submodule "libraries-tes/ESPAsyncWebServer"]
+	path = libraries-tes/ESPAsyncWebServer
+	url = https://github.com/me-no-dev/ESPAsyncWebServer
+[submodule "libraries-tes/arduino-LoRa"]
+	path = libraries-tes/arduino-LoRa
+	url = https://github.com/sandeepmistry/arduino-LoRa
+[submodule "libraries-tes/pubsubclient"]
+	path = libraries-tes/pubsubclient
+	url = https://github.com/knolleary/pubsubclient.git
+[submodule "libraries-tes/u8g2"]
+	path = libraries-tes/u8g2
+	url = https://github.com/olikraus/u8g2
+[submodule "Libraries/pubsubclient"]
+	path = Libraries/pubsubclient
+	url = https://github.com/knolleary/pubsubclient.git
+[submodule "Libraries/arduino-LoRa"]
+	path = Libraries/arduino-LoRa
+	url = https://github.com/sandeepmistry/arduino-LoRa
+[submodule "Libraries/arduino-timer"]
+	path = Libraries/arduino-timer
+	url = https://github.com/contrem/arduino-timer
+[submodule "Libraries/AsyncTCP"]
+	path = Libraries/AsyncTCP
+	url = https://github.com/me-no-dev/AsyncTCP
+[submodule "Libraries/esp8266-oled-ssd1306"]
+	path = Libraries/esp8266-oled-ssd1306
+	url = https://github.com/ThingPulse/esp8266-oled-ssd1306
+[submodule "Libraries/ESPAsyncWebServer"]
+	path = Libraries/ESPAsyncWebServer
+	url = https://github.com/me-no-dev/ESPAsyncWebServer
+[submodule "Libraries/Adafruit_BMP085_Unified"]
+	path = Libraries/Adafruit_BMP085_Unified
+	url = https://github.com/adafruit/Adafruit_BMP085_Unified
+[submodule "Libraries/Adafruit_BMP280_Library"]
+	path = Libraries/Adafruit_BMP280_Library
+	url = https://github.com/adafruit/Adafruit_BMP280_Library
+[submodule "Libraries/Adafruit_Sensor"]
+	path = Libraries/Adafruit_Sensor
+	url = https://github.com/adafruit/Adafruit_Sensor
+[submodule "Libraries/DHT-sensor-library"]
+	path = Libraries/DHT-sensor-library
+	url = https://github.com/adafruit/DHT-sensor-library
