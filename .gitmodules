@@ -52,3 +52,15 @@
 [submodule "Libraries/ESPAsyncWebServer"]
 	path = Libraries/ESPAsyncWebServer
 	url = https://github.com/me-no-dev/ESPAsyncWebServer
+[submodule "Libraries/Adafruit_BMP085_Unified"]
+	path = Libraries/Adafruit_BMP085_Unified
+	url = https://github.com/adafruit/Adafruit_BMP085_Unified
+[submodule "Libraries/Adafruit_BMP280_Library"]
+	path = Libraries/Adafruit_BMP280_Library
+	url = https://github.com/adafruit/Adafruit_BMP280_Library
+[submodule "Libraries/Adafruit_Sensor"]
+	path = Libraries/Adafruit_Sensor
+	url = https://github.com/adafruit/Adafruit_Sensor
+[submodule "Libraries/DHT-sensor-library"]
+	path = Libraries/DHT-sensor-library
+	url = https://github.com/adafruit/DHT-sensor-library
