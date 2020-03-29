@@ -25,13 +25,13 @@ contribute:
 
 ## Asking for General Help
 
-The best place to ask for help is through the [ClusterDuck-Protocol Slack workspace][]. Open an
+The best place to ask for help is through the [ClusterDuck-Protocol Slack workspace](https://www.project-owl.com/slack). Open an
 issue to request an invitation.
 
 ## Discussing non-technical topics
 
-Discussion of non-technical topics are also best to discuss in the #general channel 
-of the [ClusterDuck-Protocol Slack workspace][].
+Discussion of non-technical topics are also best to discuss in the \#general channel 
+of the [ClusterDuck-Protocol Slack workspace](https://www.project-owl.com/slack).
 
 ## Submitting a Bug Report
 
