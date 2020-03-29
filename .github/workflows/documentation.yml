@@ -10,7 +10,7 @@ jobs:
       - run: mkdir output
       - uses: Ender-events/pandoc@master
         with: 
-          args: "--resource-path=doc doc/howToBuildADuck.md --pdf-engine=xelatex  -V \"mainfont:DejaVu Sans\" -V \"geometry: left=2cm,right=2cm,top=3cm,bottom=3cm\" -o output/howToBuildADuck.pdf"
+          args: "--resource-path=doc -f markdown-implicit_figures doc/howToBuildADuck.md --pdf-engine=xelatex  -V \"mainfont:DejaVu Sans\" -V \"geometry: left=2cm,right=2cm,top=3cm,bottom=3cm\" -o output/howToBuildADuck.pdf"
       - uses: docker://michaelperrin/pdfunite:0.48.0
         with:
           args: "doc/assets/pdfs/title.pdf output/howToBuildADuck.pdf output/final.pdf"
