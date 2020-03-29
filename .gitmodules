@@ -40,3 +40,15 @@
 [submodule "Libraries/arduino-LoRa"]
 	path = Libraries/arduino-LoRa
 	url = https://github.com/sandeepmistry/arduino-LoRa
+[submodule "Libraries/arduino-timer"]
+	path = Libraries/arduino-timer
+	url = https://github.com/contrem/arduino-timer
+[submodule "Libraries/AsyncTCP"]
+	path = Libraries/AsyncTCP
+	url = https://github.com/me-no-dev/AsyncTCP
+[submodule "Libraries/esp8266-oled-ssd1306"]
+	path = Libraries/esp8266-oled-ssd1306
+	url = https://github.com/ThingPulse/esp8266-oled-ssd1306
+[submodule "Libraries/ESPAsyncWebServer"]
+	path = Libraries/ESPAsyncWebServer
+	url = https://github.com/me-no-dev/ESPAsyncWebServer
