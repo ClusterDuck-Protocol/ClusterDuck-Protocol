@@ -17,7 +17,7 @@ void setup() {
   // put your setup code here, to run once:
   dht.begin();
   duck.begin();
-  duck.setDeviceId("Z");
+  duck.setDeviceId("ABC");
   duck.setupMamaDuck();
 
   timer.every(15000, runSensor);
