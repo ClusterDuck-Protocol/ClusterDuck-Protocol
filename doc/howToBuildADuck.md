@@ -1,34 +1,51 @@
 # How to build a duck
 
+<!-- MarkdownTOC levels="2,3" autolink="true" -->
 
-[TOC]
+- [Duck Descriptions](#duck-descriptions)
+    - [DuckLinks](#ducklinks)
+    - [MamaDucks](#mamaducks)
+    - [PapaDuck](#papaduck)
+- [Raw Materials](#raw-materials)
+    - [Software](#software)
+    - [Hardware](#hardware)
+- [Arduino Software Preparation](#arduino-software-preparation)
+    - [Install VCP Driver](#install-vcp-driver)
+    - [Install the necessary libraries that work with ClusterDuck Protocol:](#install-the-necessary-libraries-that-work-with-clusterduck-protocol)
+    - [Install Clusterduck Protocol](#install-clusterduck-protocol)
+    - [Load the Heltec ESP32 Board to your Arduino IDE:](#load-the-heltec-esp32-board-to-your-arduino-ide)
+- [Install The firmware](#install-the-firmware)
+- [FAQs](#faqs)
+    - [General](#general)
+    - [Errors when compiling](#errors-when-compiling)
+    - [Setup Issues](#setup-issues)
+    - [Cloud Errors](#cloud-errors)
+- [API Reference And Quickstart CLusterDuck Protocol](#api-reference-and-quickstart-clusterduck-protocol)
+    - [Quick Start](#quick-start)
+    - [API](#api)
+
+<!-- /MarkdownTOC -->
+
 
 ## Duck Descriptions
 
 Ducks are IoT devices that connect together to form simple mesh networks.  The Ducks utilize a combined network of LoRa (Long Range) technology, WiFi, Bluetooth, and sometimes other connectivities. When the Ducks need to communicate with each other they transmit over LoRa, a long-range and power efficient radio protocol. Often a user will need to communicate with the Ducks and may use WiFi.  A networked cluster of Ducks - a _ClusterDuck_ - is composed of several types of ducks: the DuckLink, MamaDuck, PapaDuck.
 
-
 ![alt_text](./assets/images/ducks.png "ducks")
 
-
-
-### DuckLinks: 
+### DuckLinks
 
 These are the basic nodes of the mesh network. The DuckLinks create a WiFi network where users can connect to it and submit emergencies. The DuckLink collects that data and transmits it to the MamaDuck using LoRa (915 MHz in the United States, 433 MHz in Europe and Asia). Anyone with a working WiFi device such as a smartphone or laptop can connect to a DuckLink.
 
-
-### MamaDucks:
+### MamaDucks
 
 MamaDucks act as central hubs to DuckLink groups.  The MamaDuck is able to receive data over LoRa from the DuckLinks and transmit this data further into the network.  This transmission can occur through other MamaDucks on the way towards the PapaDuck (once again using LoRa). The MamaDuck has most of the same properties as a Ducklink, though small changes in the device firmware help to optimize the architecture of the network.
 
-
-### PapaDuck:
+### PapaDuck
 
 PapaDuck is the final Duck in the ClusterDuck and transmits network data to the internet.  When communicating with other Ducks the PapaDuck similarly uses LoRa. The data that the PapaDuck receives gets pushed to the OWL Data Management System (DMS), the cloud platform, through the Internet. It acts like a gateway that collects data from MamaDucks and then upload it to OWL.
                         
-
 ## Raw Materials
-
 
 ### Software
 
@@ -37,7 +54,6 @@ You will need the [Arduino IDE](https://www.arduino.cc/en/main/software) to inst
 The Ducklinks use our [ClusterDuck](https://github.com/Code-and-Response/ClusterDuck-Protocol) Protocol. Project OWL’s open source Duck firmware.
 
 Depending on your computer setup, you may also need [USB to UART drivers](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers).   If you have any problems, please reach out on the [Project OWL Github](https://github.com/Project-Owl) or in the [Project OWL slack.](https://www.project-owl.com/slack)
-
 
 ### Hardware
 
@@ -51,13 +67,11 @@ There are many combinations of electronics, batteries, and enclosures that can b
 
 * **Enclosure:** Plastic Box (or 3D print, or rubber ducky, or anything you want really) if a case is necessary, [this](https://www.amazon.com/gp/product/B07DVS1HC4/ref=ppx_yo_dt_b_asin_title_o06_s00?ie=UTF8&psc=1) would work.
 
-
 ## Arduino Software Preparation
 
 Open Arduino IDE.  If you do not have this developer environment yet, download the Arduino IDE [here](https://www.arduino.cc/en/main/software)
 
 Download USB to UART Bridge VCP Driver from [here](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
-
 
 ### Install VCP Driver
 
@@ -65,9 +79,7 @@ Download USB to UART Bridge VCP Driver from [here](https://www.silabs.com/produc
 * Make sure you click on the folder that says Legacy MacVCP Driver and then click on ‘Silicon Labs VCP Driver.pkg’
 * Once it is finished installing, go to Mac System Preferences -> Security and Privacy -> General. Make sure Silicon Labs is allowed.
 
-
 ### Install the necessary libraries that work with ClusterDuck Protocol: 
-
 
 #### Add ESP32 Board Library
 
@@ -82,22 +94,17 @@ Download USB to UART Bridge VCP Driver from [here](https://www.silabs.com/produc
 
 ### Install Clusterduck Protocol
 
-
 #### Using the Library Manager “COMING SOON”
-
 
 #### Importing as a .zip Library
 
 In the Arduino IDE, navigate to _Sketch > Include Library > Add .ZIP Library_. At the top of the drop down list, select the option to "Add .ZIP Library".
 
-
 ![alt_text](./assets/images/add_Library.png "add library to arduino")
-
 
 Navigate to the downloaded ClusterDuck Protocol Folder and select.
 
 Return to the _Sketch > Include Library menu._ menu. You should now see the library at the bottom of the drop-down menu. It is ready to be used in your sketch. The zip file will have been expanded in the _libraries_ folder in your Arduino sketches directory.
-
 
 #### Manual Install
 
@@ -146,7 +153,7 @@ Go to the following websites and download the Libraries:
 * [adafruit/Adafruit_BMP280_Library: Arduino Library for BMP280 sensors](https://github.com/adafruit/Adafruit_BMP280_Library)
 * [https://arduinojson.org/v6/doc/installation/](https://arduinojson.org/v6/doc/installation/) Version 6
 * [me-no-dev/AsyncTCP: Async TCP Library for ESP32](https://github.com/me-no-dev/AsyncTCP)
-[adafruit/DHT-sensor-library: Arduino library for DHT11, DHT22, etc Temperature & Humidity Sensors](https://github.com/adafruit/* DHT-sensor-library)
+* [adafruit/DHT-sensor-library: Arduino library for DHT11, DHT22, etc Temperature & Humidity Sensors](https://github.com/adafruit/DHT-sensor-library)
 * [https://github.com/ThingPulse/esp8266-oled-ssd1306](https://github.com/ThingPulse/esp8266-oled-ssd1306)
 * [https://github.com/me-no-dev/ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer)
 * [https://github.com/FastLED/FastLED](https://github.com/FastLED/FastLED)
@@ -358,7 +365,7 @@ void loop() {
 Now compile and upload to your device. If using a Heltec LoRa ESP32 board you should see a Duck Online message on the LED screen. You can now open your phone or laptop's wifi preferences and connect to the `SOS DuckLink Network`!
 
 
-## API
+### API
 
 ```c
 setDeviceId(String deviceId, const int formLength)
