@@ -43,7 +43,9 @@ bool runSensor(void *) {
   P = bmp.readPressure();
   Serial.println(P);
   
-  payload.sensorVal = "Temp: " + String(T) + " Pres: " + String(P); //Store Data
+  String sensorVal = "Temp: " + String(T) + " Pres: " + String(P); //Store Data
+
+  duck.sendPayloadMessage(sensorVal);
 
   return true;
 }

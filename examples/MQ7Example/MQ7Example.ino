@@ -3,10 +3,16 @@
 
 auto timer = timer_create_default(); // create a timer with default settings
 
-//Setup MQ7
-#include "MQ7.h" //https://github.com/swatish17/MQ7-Library
-#define analogMQ7  32            //GPIO PIN fot MQ
-MQ7 mq7(analogMQ7,5.0); //Setting up to 5V the MQ Sensor
+//Include the library
+#include <MQUnifiedsensor.h>
+
+//Definitions
+#define pin A0 //Analog input 0 of your arduino
+#define type 7 //MQ7
+//#define calibration_button 13 //Pin to calibrate your sensor
+
+//Declare Sensor
+MQUnifiedsensor MQ7(pin, type);
 
 ClusterDuck duck;
 
@@ -16,6 +22,15 @@ void setup() {
   duck.begin();
   duck.setDeviceId("Z");
   duck.setupMamaDuck();
+
+  //init the sensor
+  /*****************************  MQInicializar****************************************
+  Input:  pin, type 
+  Output:  
+  Remarks: This function create the sensor object.
+  ************************************************************************************/ 
+  MQ7.inicializar(); 
+  //pinMode(calibration_button, INPUT);
 
   timer.every(15000, runSensor);
 }
@@ -29,11 +44,21 @@ void loop() {
 }
 
 bool runSensor(void *) {
-  String sensorVal = "CO: ";
-  sensorVal += mq7.getPPM();
+
+  MQ7.update();
+
+  String sensorVal = "H2: ";
+  sensorVal += MQ7.readSensor("H2");
+  sensorVal += " LPG: ";
+  sensorVal += MQ7.readSensor("LPG");
+  sensorVal += " CH4: ";
+  sensorVal += MQ7.readSensor("CH4");
+  sensorVal += " CO: ";
+  sensorVal += MQ7.readSensor("CO");
+  sensorVal += "Alcohol: ";
+  sensorVal += MQ7.readSensor("Alcohol");
 
   duck.sendPayloadMessage(sensorVal);
-
   
   return true;
 }

@@ -3,12 +3,12 @@
 
 auto timer = timer_create_default(); // create a timer with default settings
 
-//Dust setup
-#include "WaveshareSharpDustSensor.h"
-const int iled = 22; //drive the led of sensor
-const int vout = 0;  //analog input
-int   adcvalue;
-WaveshareSharpDustSensor ds;
+#include <GP2YDustSensor.h>
+
+const uint8_t SHARP_LED_PIN = 22;   // Sharp Dust/particle sensor Led Pin
+const uint8_t SHARP_VO_PIN = 0;    // Sharp Dust/particle analog out pin used for reading 
+
+GP2YDustSensor dustSensor(GP2YDustSensorType::GP2Y1010AU0F, SHARP_LED_PIN, SHARP_VO_PIN);
 
 ClusterDuck duck;
 
@@ -20,8 +20,7 @@ void setup() {
   duck.setupMamaDuck();
 
   //Dust sensor
-  pinMode(iled, OUTPUT);
-  digitalWrite(iled, LOW);  //iled default closed
+  dustSensor.begin();
 
   timer.every(150000, runSensor);
 }
@@ -37,17 +36,8 @@ void loop() {
 bool runSensor(void *) {
 
   //Dust sensor
-  digitalWrite(iled, HIGH);
-  delayMicroseconds(280);
-  adcvalue = analogRead(vout);
-  digitalWrite(iled, LOW);  
-  adcvalue = ds.Filter(adcvalue);
-  float density = ds.Conversion(adcvalue);
-  Serial.print("The current dust concentration is: ");
-  Serial.print(density);
-  Serial.print(" ug/m3\n");
-
-  String sensorVal = "Current dust concentration: " + String(density/2500);
+  String sensorVal = "Current dust concentration: " + dustSensor.getDustDensity();
+  sensorVal += " ug/m3";
 
   duck.sendPayloadMessage(sensorVal);
 
