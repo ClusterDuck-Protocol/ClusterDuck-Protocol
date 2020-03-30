@@ -7,8 +7,7 @@
 #include "WProgram.h"
 #endif
 
-#include <SPI.h>
-#include <LoRa.h>
+#include <RadioLib.h>
 #include <WiFi.h>
 #include <U8x8lib.h>
 
@@ -35,7 +34,7 @@ class ClusterDuck {
     //Exposed Methods
     static void setDeviceId(String deviceId = "");
     static void begin(int baudRate = 115200);
-    static void setupLoRa(long BAND = 915E6, int SS = 18, int RST = 14, int DI0 = 26, int TxPower = 20);
+    static void setupLoRa(long BAND = 915.0, int SS = 18, int RST = 14, int DI0 = 26, int DI1 = 25, int TxPower = 20);
     static void setupDisplay(String deviceType);
     static void setupPortal(const char *AP = " 🆘 DUCK EMERGENCY PORTAL");
     static bool runCaptivePortal();
@@ -80,6 +79,8 @@ class ClusterDuck {
 
     static int _packetSize;
 
+    static setFlag(void);
+
     static DNSServer dnsServer;
     static const byte DNS_PORT;
     static const char *DNS;
@@ -89,7 +90,6 @@ class ClusterDuck {
     static String runTime;
 
     static void restartDuck();
-    static String readMessages(byte mLength);
     static bool reboot(void *);
 
     // QuackPack

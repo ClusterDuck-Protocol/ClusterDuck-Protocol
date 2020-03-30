@@ -5,6 +5,8 @@ U8X8_SSD1306_128X64_NONAME_SW_I2C u8x8(/* clock=*/ 15, /* data=*/ 4, /* reset=*/
 IPAddress apIP(192, 168, 1, 1);
 AsyncWebServer webServer(80);
 
+SX1276 lora = new Module(18, 26, 14, 25);
+
 auto tymer = timer_create_default();
 
 String ClusterDuck::_deviceId = "";
@@ -48,28 +50,55 @@ void ClusterDuck::setupDisplay(String deviceType)  {
 }
 
 // Initial LoRa settings
-void ClusterDuck::setupLoRa(long BAND, int SS, int RST, int DI0, int TxPower) {
-  SPI.begin(5, 19, 27, 18);
-  LoRa.setPins(SS, RST, DI0);
-  LoRa.setTxPower(TxPower);
+void ClusterDuck::setupLoRa(long BAND, int SS, int RST, int DI0, int DI1, int TxPower) {
   //LoRa.setSignalBandwidth(62.5E3);
 
+  lora = new Module(SS, DI0, RST, DI1);
+
+  Serial.println("Starting LoRa......");
+
+  int state = lora.begin(BAND,125.0,7,7,TxPower,1); //TODO: Make more modular -> Bandwidth, Spreading factor
+
   //Initialize LoRa
-  if (!LoRa.begin(BAND))
-  {
+  if (state == ERR_NONE) {
+    Serial.println("LoRa online, Quack!");
+  } else {
     u8x8.clear();
     u8x8.drawString(0, 0, "Starting LoRa failed!");
-    Serial.println("Starting LoRa failed!");
-    while (1);
-  }
-  else
-  {
-    Serial.println("LoRa On");
+    Serial.print("Starting LoRa Failed!!!");
+    Serial.println(state);
+    while (true);
   }
 
-  //  LoRa.setSyncWord(0xF3);         // ranges from 0-0xFF, default 0x34
-  LoRa.enableCrc();
+  lora.setDio0Action(setFlag);
+
+  state = lora.startReceive();
+  
+  if (state == ERR_NONE) {
+    Serial.println("Listening for quacks");
+  } else {
+    Serial.print(F("failed, code "));
+    Serial.println(state);
+    while (true);
+  }
 }
+
+//============= Used for receiving LoRa packets ==========
+volatile bool receivedFlag = false;
+
+// disable interrupt when it's not needed
+volatile bool enableInterrupt = true;
+
+void ClusterDuck::setFlag(void) {
+  // check if the interrupt is enabled
+  if(!enableInterrupt) {
+    return;
+  }
+  // we got a packet, set the flag
+  receivedFlag = true;
+}
+
+//=========================================================
 
 //Setup Captive Portal
 void ClusterDuck::setupPortal(const char *AP) {
@@ -172,35 +201,62 @@ void ClusterDuck::setupMamaDuck() {
   setupPortal();
   setupLoRa();
 
-  //LoRa.onReceive(repeatLoRaPacket);
-  LoRa.receive();
-
   Serial.println("MamaDuck Online");
 
   tymer.every(1800000, imAlive);
   tymer.every(43200000, reboot);
 }
 
+int ClusterDuck::handlePacket() {
+  int pSize = lora.getPacketLength();
+  int state = lora.readData(transmission, pSize);
+
+  if (state == ERR_NONE) {
+    // packet was successfully received
+    Serial.println("Packet Received!");
+
+    return pSize;
+  } else {
+    // some other error occurred
+    Serial.print("Failed, code ");
+    Serial.println(state);
+
+    return -1;
+  }
+}
+
 void ClusterDuck::runMamaDuck() {
   tymer.tick();
 
-  int packetSize = LoRa.parsePacket();
-  if (packetSize != 0) {
-    byte whoIsIt = LoRa.peek();
-    if(whoIsIt == senderId_B) {
-      String * msg = getPacketData(packetSize);
-      if(!idInPath(_lastPacket.path)) {
-        sendPayloadStandard(_lastPacket.payload, _lastPacket.senderId, _lastPacket.messageId, _lastPacket.path);
-        LoRa.receive();
+  if(receivedFlag) {  //If LoRa packet received
+    int pSize = handlePacket();
+    if(pSize > 0) {
+      byte whoIsIt = transmission[0];
+      if(whoIsIt == senderId_B) {
+        String * msg = getPacketData(pSize);
+        if(!idInPath(_lastPacket.path)) {
+          sendPayloadStandard(_lastPacket.payload, _lastPacket.senderId, _lastPacket.messageId, _lastPacket.path);
+          
+          lora.startReceive();
+          enableInterrupt = true;
+        }
+        delete(msg);
+      } else if(whoIsIt == ping_B) {
+        memset(transmission, 0x00, packetIndex);
+        packetIndex = 0;
+        couple(iamhere_B, "1");
+        int state = lora.transmit(transmission, packetIndex);
+        
+        lora.startReceive();
+        enableInterrupt = true;
       }
-      delete(msg);
-    } else if(whoIsIt == ping_B) {
-      LoRa.beginPacket();
-      couple(iamhere_B, "1");
-      LoRa.endPacket();
-      Serial.println("Pong packet sent");
-      LoRa.receive();
+      
+    } else {
+      Serial.println("Byte code not recognized!"); 
+      memset(transmission, 0x00, pSize); //Reset transmission
+
     }
+    
   }
 
   processPortalRequest();
@@ -208,12 +264,30 @@ void ClusterDuck::runMamaDuck() {
 }
 
 void ClusterDuck::sendPayloadMessage(String msg) {
-  LoRa.beginPacket();
-  couple(senderId_B, _deviceId);
-  couple(messageId_B, uuidCreator());
+  couple(senderId_B, senderId);
+  couple(messageId_B, messageId);
   couple(payload_B, msg);
-  couple(path_B, _deviceId);
-  LoRa.endPacket(); 
+  couple(path_B, path);
+
+  int state = lora.transmit(transmission, packetIndex);
+
+  memset(transmission, 0x00, packetIndex); //Reset transmission
+  packetIndex = 0; //Reset packetIndex
+
+  if (state == ERR_NONE) {
+    // the packet was successfully transmitted
+    Serial.println("Packet sent");
+  } else if (state == ERR_PACKET_TOO_LONG) {
+    // the supplied packet was longer than 256 bytes
+    Serial.println(F(" too long!"));
+  } else if (state == ERR_TX_TIMEOUT) {
+    // timeout occured while transmitting packet
+    Serial.println(F(" timeout!"));
+  } else {
+    // some other error occurred
+    Serial.print(F("failed, code "));
+    Serial.println(state);
+  }
 }
 
 void ClusterDuck::sendPayloadStandard(String msg, String senderId, String messageId, String path) {
@@ -226,36 +300,58 @@ void ClusterDuck::sendPayloadStandard(String msg, String senderId, String messag
   }
 
   String total = senderId + messageId + path + msg;
-  if(total.length() + 4 > 240) {
+  if(total.length() + 4 > 250) {
     Serial.println("Warning: message is too large!"); //TODO: do something
   }
+
+  if(packetIndex < 1) {
+    packetIndex = total.length();
+  }
   
-  LoRa.beginPacket();
   couple(senderId_B, senderId);
   couple(messageId_B, messageId);
   couple(payload_B, msg);
   couple(path_B, path);
-  LoRa.endPacket();
-  Serial.println("Here7");
-  
-  Serial.println("Packet sent");
+
+  int state = lora.transmit(transmission, packetIndex);
+
+  memset(transmission, 0x00, packetIndex); //Reset transmission
+  packetIndex = 0; //Reset packetIndex
+
+  if (state == ERR_NONE) {
+    // the packet was successfully transmitted
+    Serial.println("Packet sent");
+  } else if (state == ERR_PACKET_TOO_LONG) {
+    // the supplied packet was longer than 256 bytes
+    Serial.println(F(" too long!"));
+  } else if (state == ERR_TX_TIMEOUT) {
+    // timeout occured while transmitting packet
+    Serial.println(F(" timeout!"));
+  } else {
+    // some other error occurred
+    Serial.print(F("failed, code "));
+    Serial.println(state);
+  }
+
 }
 
 void ClusterDuck::couple(byte byteCode, String outgoing) {
-  LoRa.write(byteCode);               // add byteCode
-  LoRa.write(outgoing.length());      // add payload length
-  LoRa.print(outgoing);               // add payload
-}
+  int outgoingLen = outgoing.length() + 1;
+  byte byteBuffer[outgoingLen];
 
-//Decode LoRa message
-String ClusterDuck::readMessages(byte mLength)  {
-  String incoming = "";
+  outgoing.getBytes(byteBuffer, outgoingLen);
 
-  for (int i = 0; i < mLength; i++)
-  {
-    incoming += (char)LoRa.read();
+  transmission[packetIndex] = byteCode; //add byte code
+  packetIndex++;
+  transmission[packetIndex + 1] = (byte)outgoingLen; // add payload length
+  packetIndex++;
+
+  for(int i=0; i < outgoingLen; i++) {  // add payload
+    transmission[i+2] = byteBuffer[i];
   }
-  return incoming;
+
+  packetIndex = packetIndex + outgoingLen;
+
 }
 
 bool ClusterDuck::idInPath(String path) {
@@ -284,37 +380,94 @@ bool ClusterDuck::idInPath(String path) {
 
 String * ClusterDuck::getPacketData(int pSize) {
   String * packetData = new String[pSize];
-  int i = 0;
-  byte byteCode, mLength;
+  packetIndex = 0;
+  int len = 0;
+  byte byteCode;
+  bool sId, mId, pLoad, pth;
+  String msg = "";
+  bool gotLen = false;
 
-  while (LoRa.available())
-  {
-    byteCode = LoRa.read();
-    mLength  = LoRa.read();
-    if (byteCode == senderId_B)
-    {
-      _lastPacket.senderId  = readMessages(mLength);
+  for(int i=0; i < pSize; i++) {
+    if(i > 0 && len == 0) {
+      gotLen = false;
+      if(sId) {
+        _lastPacket.senderId  = msg;
+        Serial.println("User ID: " + _lastPacket.senderId);
+        msg = "";
+        sId = false;
+
+      } else if(mId) {
+        _lastPacket.messageId = msg;
+        Serial.println("Message ID: " + _lastPacket.messageId);
+        msg = "";
+        mId = false;
+      } else if(pLoad) {
+        _lastPacket.payload = msg;
+        Serial.println("Message: " + _lastPacket.payload);
+        msg = "";
+        pLoad = false;
+      } else if(pth) {
+        _lastPacket.path = msg;
+        Serial.println("Path: " + _lastPacket.path);
+        msg = "";
+        pth = false;
+      }
+    }
+    if(transmission[i] == senderId_B){
+      Serial.println(transmission[1+i]);
+      sId = true;
+      len = transmission[i+1];
+      Serial.println("Len = " + String(len));
+
+    } else if(transmission[i] == messageId_B) {
+      mId = true;
+      len = transmission[i+1];
+      Serial.println("Lenof2 = " + String(len));
+
+    } else if(transmission[i] == payload_B) {
+      pLoad = true;
+      len = transmission[i+1];
+      Serial.println("Lenof2 = " + String(len));
+
+    } else if(transmission[i] == path_B) {
+      pth = true;
+      len = transmission[i+1];
+      Serial.println("Lenof2 = " + String(len));
+
+    } else if(len > 0 && gotLen) {
+      msg = msg + String((char)transmission[i]);
+      Serial.println((char)transmission[i]);
+      len--;
+    }
+    else {
+      gotLen = true;
+    }
+    packetIndex++;
+  }
+
+  if(len == 0) {
+    if(sId) {
+      _lastPacket.senderId  = msg;
       Serial.println("User ID: " + _lastPacket.senderId);
-    }
-    else if (byteCode == messageId_B) {
-      _lastPacket.messageId = readMessages(mLength);
+      msg = "";
+
+    } else if(mId) {
+      _lastPacket.messageId = msg;
       Serial.println("Message ID: " + _lastPacket.messageId);
-    }
-    else if (byteCode == payload_B) {
-      _lastPacket.payload = readMessages(mLength);
+      msg = "";
+
+    } else if(pLoad) {
+      _lastPacket.payload = msg;
       Serial.println("Message: " + _lastPacket.payload);
-    }
-    else if (byteCode == path_B) {
-      _lastPacket.path = readMessages(mLength);
+      msg = "";
+
+    } else if(pth) {
+      _lastPacket.path = msg;
       Serial.println("Path: " + _lastPacket.path);
-    } else {
-      packetData[i] = readMessages(mLength);
-      _lastPacket.payload = _lastPacket.payload + packetData[i];
-      _lastPacket.payload = _lastPacket.payload + "*";
-      //Serial.println("Data" + i + ": " + packetData[i]);
-      i++;
+      msg = "";
     }
   }
+  
   return packetData;
 }
 
@@ -430,6 +583,9 @@ int ClusterDuck::_availableBytes;
 int ClusterDuck::_packetSize = 0;
 
 Packet ClusterDuck::_lastPacket;
+
+byte transmission[250];
+int packetIndex = 0;
 
 byte ClusterDuck::ping_B       = 0xF4;
 byte ClusterDuck::senderId_B   = 0xF5;
