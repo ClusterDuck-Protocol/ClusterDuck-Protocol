@@ -5,13 +5,13 @@
 #include <WiFiClientSecure.h>
 #include "timer.h"
 
-#define SSID        ""
-#define PASSWORD    ""
+#define SSID        "HEINEKEN"
+#define PASSWORD    "duckduckowl"
 
-#define ORG         ""                  
-#define DEVICE_ID   ""
-#define DEVICE_TYPE "PAPA"                
-#define TOKEN       ""      
+#define ORG         "9c6nfo"
+#define DEVICE_ID   "TIMO_DUCK"
+#define DEVICE_TYPE "PAPA"
+#define TOKEN       "qQTQ5q(4qvAVSlxdHu"
 
 char server[]           = ORG ".messaging.internetofthings.ibmcloud.com";
 char topic[]            = "iot-2/evt/status/fmt/json";
@@ -35,7 +35,6 @@ void setup() {
   duck.setDeviceId("Papa");
 
   duck.setupLoRa();
-  LoRa.receive();
   duck.setupDisplay("Papa");
 
   setupWiFi();
@@ -54,13 +53,12 @@ void loop() {
   }
   setupMQTT();
 
-  int packetSize = LoRa.parsePacket();
-  if (packetSize != 0) {
-    byte whoIsIt = LoRa.peek();
-    if(whoIsIt != ping) {
-      Serial.println(packetSize);
-      String * val = duck.getPacketData(packetSize);
+  if(duck.getFlag()) {  //If LoRa packet received
+    int pSize = duck.handlePacket();
+    if(pSize > 3) {
+      String * msg = duck.getPacketData(pSize);
       quackJson();
+      
     }
   }
 

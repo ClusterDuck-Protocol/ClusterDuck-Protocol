@@ -70,6 +70,11 @@ class ClusterDuck {
     static void couple(byte byteCode, String outgoing);
     static bool idInPath(String path);
 
+    volatile bool getFlag();
+    volatile bool getInterrupt();
+    void flipFlag();
+    void flipInterrupt();
+
   protected:
     static Packet _lastPacket;
     static String _deviceId;

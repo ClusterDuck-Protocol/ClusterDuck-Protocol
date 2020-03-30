@@ -425,21 +425,20 @@ String * ClusterDuck::getPacketData(int pSize) {
     } else if(transmission[i] == messageId_B) {
       mId = true;
       len = transmission[i+1];
-      Serial.println("Lenof2 = " + String(len));
+      Serial.println("Len = " + String(len));
 
     } else if(transmission[i] == payload_B) {
       pLoad = true;
       len = transmission[i+1];
-      Serial.println("Lenof2 = " + String(len));
+      Serial.println("Len = " + String(len));
 
     } else if(transmission[i] == path_B) {
       pth = true;
       len = transmission[i+1];
-      Serial.println("Lenof2 = " + String(len));
+      Serial.println("Len = " + String(len));
 
     } else if(len > 0 && gotLen) {
       msg = msg + String((char)transmission[i]);
-      Serial.println((char)transmission[i]);
       len--;
     }
     else {
@@ -569,6 +568,23 @@ Packet ClusterDuck::getLastPacket() {
   Packet packet = _lastPacket;
   _lastPacket = Packet();
   return packet;
+}
+
+volatile bool ClusterDuck::getFlag() {
+  return receivedFlag;
+}
+
+volatile bool ClusterDuck::getInterrupt() {
+  return enableInterrupt;
+}
+
+//Setter
+void ClusterDuck::flipFlag() {
+  !receivedFlag;
+}
+
+void ClusterDuck::flipInterrupt() {
+  !enableInterrupt;
 }
 
 DNSServer ClusterDuck::dnsServer;
