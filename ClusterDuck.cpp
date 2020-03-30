@@ -9,6 +9,9 @@ SX1276 lora = new Module(18, 26, 14, 25);
 
 auto tymer = timer_create_default();
 
+byte transmission[250];
+int packetIndex = 0;
+
 String ClusterDuck::_deviceId = "";
 
 ClusterDuck::ClusterDuck() {
@@ -264,10 +267,10 @@ void ClusterDuck::runMamaDuck() {
 }
 
 void ClusterDuck::sendPayloadMessage(String msg) {
-  couple(senderId_B, senderId);
-  couple(messageId_B, messageId);
+  couple(senderId_B, _deviceId);
+  couple(messageId_B, uuidCreator());
   couple(payload_B, msg);
-  couple(path_B, path);
+  couple(path_B, _deviceId);
 
   int state = lora.transmit(transmission, packetIndex);
 
@@ -556,10 +559,6 @@ String ClusterDuck::uuidCreator() {
   return String(msg);
 }
 
-void ClusterDuck::loRaReceive() {
-  LoRa.receive();
-}
-
 //Getters
 
 String ClusterDuck::getDeviceId() {
@@ -583,9 +582,6 @@ int ClusterDuck::_availableBytes;
 int ClusterDuck::_packetSize = 0;
 
 Packet ClusterDuck::_lastPacket;
-
-byte transmission[250];
-int packetIndex = 0;
 
 byte ClusterDuck::ping_B       = 0xF4;
 byte ClusterDuck::senderId_B   = 0xF5;

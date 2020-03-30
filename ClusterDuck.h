@@ -42,6 +42,7 @@ class ClusterDuck {
     static void setupDuckLink();
     static void setupMamaDuck();
     static void processPortalRequest();
+    static int handlePacket();
     static void runDuckLink();
     static void runMamaDuck();
 
@@ -66,8 +67,6 @@ class ClusterDuck {
     static void sendPayloadMessage(String msg);
     static bool imAlive(void *);
 
-    static void loRaReceive();
-
     static void couple(byte byteCode, String outgoing);
     static bool idInPath(String path);
 
@@ -79,7 +78,7 @@ class ClusterDuck {
 
     static int _packetSize;
 
-    static setFlag(void);
+    static void setFlag(void);
 
     static DNSServer dnsServer;
     static const byte DNS_PORT;
