@@ -162,8 +162,8 @@ private:
   String m_clientId;
   Timer<>  m_timer; // create a timer with default settings
 
-  WiFiClientSecure m_wifiClient;
-  PubSubClient m_pubSubClient;
+  std::unique_ptr<WiFiClientSecure> m_wifiClient;
+  std::unique_ptr<PubSubClient> m_pubSubClient;
 
   byte m_ping;
 
