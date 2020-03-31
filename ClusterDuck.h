@@ -19,9 +19,9 @@
 
 #include "timer.h"
 
-#include <PubSubClient.h>
-#include <ArduinoJson.h>
-#include <WiFiClientSecure.h>
+// forward declaration
+class PubSubClient;
+class WiFiClientSecure;
 
 typedef struct
 {
