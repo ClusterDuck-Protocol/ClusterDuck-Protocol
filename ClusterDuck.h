@@ -19,6 +19,10 @@
 
 #include "timer.h"
 
+#include <PubSubClient.h>
+#include <ArduinoJson.h>
+#include <WiFiClientSecure.h>
+
 typedef struct
 {
   String senderId;
@@ -27,81 +31,6 @@ typedef struct
   String path;
 } Packet;
 
-class ClusterDuck {
-  public:
-    //Constructor
-    ClusterDuck();
-
-    //Exposed Methods
-    static void setDeviceId(String deviceId = "");
-    static void begin(int baudRate = 115200);
-    static void setupLoRa(long BAND = 915E6, int SS = 18, int RST = 14, int DI0 = 26, int TxPower = 20);
-    static void setupDisplay(String deviceType);
-    static void setupPortal(const char *AP = " 🆘 DUCK EMERGENCY PORTAL");
-    static bool runCaptivePortal();
-
-    static void setupDuckLink();
-    static void setupMamaDuck();
-    static void processPortalRequest();
-    static void runDuckLink();
-    static void runMamaDuck();
-
-    static String * getPortalDataArray();
-    static String getPortalDataString();
-    static String * getPacketData(int pSize);
-
-    static String duckMac(boolean format);
-
-    static int _rssi;
-    static float _snr;
-    static long _freqErr;
-    static int _availableBytes;
-
-    static void sendPayloadStandard(String msg, String senderId = "", String messageId = "", String path = "");
-
-    static String uuidCreator();
-
-    static String getDeviceId();
-    static Packet getLastPacket();
-    
-    static void sendPayloadMessage(String msg);
-    static bool imAlive(void *);
-
-    static void loRaReceive();
-
-    static void couple(byte byteCode, String outgoing);
-    static bool idInPath(String path);
-
-  protected:
-    static Packet _lastPacket;
-    static String _deviceId;
-
-  private:
-
-    static int _packetSize;
-
-    static DNSServer dnsServer;
-    static const byte DNS_PORT;
-    static const char *DNS;
-    static const char *AP;
-    static String portal;
-
-    static String runTime;
-
-    static void restartDuck();
-    static String readMessages(byte mLength);
-    static bool reboot(void *);
-
-    // QuackPack
-    static byte ping_B;
-    static byte senderId_B;
-    static byte messageId_B;
-    static byte payload_B;
-    static byte iamhere_B;
-    static byte path_B;
-
-
-};
 
 class CaptiveRequestHandler: public AsyncWebHandler {
   public:
@@ -122,5 +51,129 @@ class CaptiveRequestHandler: public AsyncWebHandler {
 
     String _portal;
 };
+
+class DuckLink
+{
+private:
+
+    String readMessages(byte mLength);
+
+    static String _deviceId;
+    int _rssi;
+    float _snr;
+    long _freqErr;
+    int _availableBytes;
+    
+    int _packetSize;
+
+    DNSServer dnsServer;
+    const byte DNS_PORT;
+    const char *DNS;
+    const char *AP;
+    String portal;
+
+    String runTime;
+
+    // QuackPack
+    static byte messageId_B;
+    static byte payload_B;
+    static byte path_B;
+
+    U8X8_SSD1306_128X64_NONAME_SW_I2C u8x8;
+
+    IPAddress apIP;
+    AsyncWebServer webServer;
+    
+
+protected:
+
+    static bool reboot(void *);
+    static void restart();
+    static bool imAlive(void *);
+
+    byte ping_B;
+    static byte senderId_B;
+    byte iamhere_B;
+
+    Packet _lastPacket;
+    Timer<> tymer;
+
+public:
+    DuckLink(/* args */);
+    ~DuckLink();
+
+    //Exposed Methods
+    void setDeviceId(String deviceId = "");
+    void begin(int baudRate = 115200);
+    void setupLoRa(long BAND = 915E6, int SS = 18, int RST = 14, int DI0 = 26, int TxPower = 20);
+    void setupDisplay(String deviceType);
+    void setupPortal(const char *AP = " 🆘 DUCK EMERGENCY PORTAL");
+    bool runCaptivePortal();
+
+    virtual void setup();
+    void processPortalRequest();
+    virtual void run();
+
+    String * getPortalDataArray();
+    String getPortalDataString();
+    String * getPacketData(int pSize);
+    String duckMac(boolean format);
+    void sendPayloadStandard(String msg, String senderId = "", String messageId = "", String path = "");
+    static String uuidCreator();
+    String getDeviceId();
+    Packet getLastPacket();
+    static void sendPayloadMessage(String msg);
+    void loRaReceive();
+    static void couple(byte byteCode, String outgoing);
+    bool idInPath(String path);
+};
+
+class MamaDuck : public DuckLink
+{
+private:
+  /* data */
+public:
+  MamaDuck(/* args */);
+  ~MamaDuck();
+
+  virtual void setup();
+  virtual void run();
+
+};
+
+class PapaDuck : public MamaDuck
+{
+private:
+
+  void setupWiFi();
+  void setupMQTT();
+  void quackJson();
+
+  String m_ssid;
+  String m_password;
+  String m_org;
+  String m_deviceId;
+  String m_deviceType;
+  String m_token;
+  String m_server;
+  String m_topic;
+  String m_authMethod;
+  String m_clientId;
+  Timer<>  m_timer; // create a timer with default settings
+
+  WiFiClientSecure m_wifiClient;
+  PubSubClient m_pubSubClient;
+
+  byte m_ping;
+
+public:
+  PapaDuck(String ssid, String password, String org, String deviceId, String deviceType, String token, String server, String topic, String authMethod, String clientId);
+  ~PapaDuck();
+
+  virtual void setup();
+  virtual void run();
+  
+};
+
 
 #endif

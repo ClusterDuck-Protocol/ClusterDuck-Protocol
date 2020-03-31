@@ -3,14 +3,14 @@
 
 //auto timer = timer_create_default(); // create a timer with default settings
 
-ClusterDuck duck;
+DuckLink duck;
 
 void setup() {
   
   // put your setup code here, to run once:
   duck.begin();
   duck.setDeviceId("D");
-  duck.setupDuckLink();
+  duck.setup();
 
   //timer.every(300000, runCode);
 }
@@ -19,7 +19,7 @@ void loop() {
   //timer.tick();
   
   // Run captive portal and LoRa in the DuckLink configuration
-  duck.runDuckLink();
+  duck.run();
   
 }
 

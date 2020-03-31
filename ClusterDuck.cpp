@@ -1,30 +1,51 @@
 #include "ClusterDuck.h"
 
-U8X8_SSD1306_128X64_NONAME_SW_I2C u8x8(/* clock=*/ 15, /* data=*/ 4, /* reset=*/ 16);
 
-IPAddress apIP(192, 168, 1, 1);
-AsyncWebServer webServer(80);
+  //static variable definition
+  byte DuckLink::messageId_B = 0xF6;
+  byte DuckLink::senderId_B = 0xF5; 
+  byte DuckLink::payload_B=0xF7; 
+  byte DuckLink::path_B=0xF3;
+  String DuckLink::_deviceId = "";
 
-auto tymer = timer_create_default();
-
-String ClusterDuck::_deviceId = "";
-
-ClusterDuck::ClusterDuck() {
-
+DuckLink::DuckLink(/* args */) :
+  _rssi(0),
+  _snr(0),
+  _freqErr(0),
+  _availableBytes(0),
+  _packetSize(0),
+  dnsServer(),
+  DNS_PORT(53),
+  DNS("duck"),
+  AP(0),
+  portal(MAIN_page),
+  runTime(""),
+    u8x8(/* clock=*/ 15, /* data=*/ 4, /* reset=*/ 16),
+  apIP(192, 168, 1, 1),
+  webServer(80),
+  ping_B(0xF4), 
+  iamhere_B(0xF8), 
+  _lastPacket(),
+  tymer(timer_create_default())
+{
 
 }
 
-void ClusterDuck::setDeviceId(String deviceId) {
+DuckLink::~DuckLink()
+{
+}
+
+void DuckLink::setDeviceId(String deviceId) {
   _deviceId = deviceId;
 
 }
 
-void ClusterDuck::begin(int baudRate) {
+void DuckLink::begin(int baudRate) {
   Serial.begin(baudRate);
   Serial.println("Serial start");
 }
 
-void ClusterDuck::setupDisplay(String deviceType)  {
+void DuckLink::setupDisplay(String deviceType)  {
   u8x8.begin();
   u8x8.setFont(u8x8_font_chroma48medium8_r);
 
@@ -48,7 +69,7 @@ void ClusterDuck::setupDisplay(String deviceType)  {
 }
 
 // Initial LoRa settings
-void ClusterDuck::setupLoRa(long BAND, int SS, int RST, int DI0, int TxPower) {
+void DuckLink::setupLoRa(long BAND, int SS, int RST, int DI0, int TxPower) {
   SPI.begin(5, 19, 27, 18);
   LoRa.setPins(SS, RST, DI0);
   LoRa.setTxPower(TxPower);
@@ -72,7 +93,7 @@ void ClusterDuck::setupLoRa(long BAND, int SS, int RST, int DI0, int TxPower) {
 }
 
 //Setup Captive Portal
-void ClusterDuck::setupPortal(const char *AP) {
+void DuckLink::setupPortal(const char *AP) {
   WiFi.mode(WIFI_AP);
   WiFi.softAP(AP);
   delay(200); // wait for 200ms for the access point to start before configuring
@@ -120,7 +141,7 @@ void ClusterDuck::setupPortal(const char *AP) {
   webServer.on("/restart", HTTP_GET, [&](AsyncWebServerRequest *request) {
     request->send(200, "text/plain", "Restarting...");
     delay(1000);
-    restartDuck();
+    restart();
   });
 
   webServer.on("/mac", HTTP_GET, [&](AsyncWebServerRequest *request) {
@@ -147,7 +168,7 @@ void ClusterDuck::setupPortal(const char *AP) {
 }
 
 //Setup premade DuckLink with default settings
-void ClusterDuck::setupDuckLink() {
+void DuckLink::setup() {
   setupDisplay("Duck");
   setupLoRa();
   setupPortal();
@@ -155,59 +176,19 @@ void ClusterDuck::setupDuckLink() {
   Serial.println("Duck Online");
 }
 
-void ClusterDuck::runDuckLink() {
+void DuckLink::run() {
 
   processPortalRequest();
 
 }
 
-void ClusterDuck::processPortalRequest() {
+void DuckLink::processPortalRequest() {
 
   dnsServer.processNextRequest();
 
 }
 
-void ClusterDuck::setupMamaDuck() {
-  setupDisplay("Mama");
-  setupPortal();
-  setupLoRa();
-
-  //LoRa.onReceive(repeatLoRaPacket);
-  LoRa.receive();
-
-  Serial.println("MamaDuck Online");
-
-  tymer.every(1800000, imAlive);
-  tymer.every(43200000, reboot);
-}
-
-void ClusterDuck::runMamaDuck() {
-  tymer.tick();
-
-  int packetSize = LoRa.parsePacket();
-  if (packetSize != 0) {
-    byte whoIsIt = LoRa.peek();
-    if(whoIsIt == senderId_B) {
-      String * msg = getPacketData(packetSize);
-      if(!idInPath(_lastPacket.path)) {
-        sendPayloadStandard(_lastPacket.payload, _lastPacket.senderId, _lastPacket.messageId, _lastPacket.path);
-        LoRa.receive();
-      }
-      delete(msg);
-    } else if(whoIsIt == ping_B) {
-      LoRa.beginPacket();
-      couple(iamhere_B, "1");
-      LoRa.endPacket();
-      Serial.println("Pong packet sent");
-      LoRa.receive();
-    }
-  }
-
-  processPortalRequest();
-
-}
-
-void ClusterDuck::sendPayloadMessage(String msg) {
+void DuckLink::sendPayloadMessage(String msg) {
   LoRa.beginPacket();
   couple(senderId_B, _deviceId);
   couple(messageId_B, uuidCreator());
@@ -216,7 +197,7 @@ void ClusterDuck::sendPayloadMessage(String msg) {
   LoRa.endPacket(); 
 }
 
-void ClusterDuck::sendPayloadStandard(String msg, String senderId, String messageId, String path) {
+void DuckLink::sendPayloadStandard(String msg, String senderId, String messageId, String path) {
   if(senderId == "") senderId = _deviceId;
   if(messageId == "") messageId = uuidCreator();
   if(path == "") {
@@ -241,14 +222,14 @@ void ClusterDuck::sendPayloadStandard(String msg, String senderId, String messag
   Serial.println("Packet sent");
 }
 
-void ClusterDuck::couple(byte byteCode, String outgoing) {
+void DuckLink::couple(byte byteCode, String outgoing) {
   LoRa.write(byteCode);               // add byteCode
   LoRa.write(outgoing.length());      // add payload length
   LoRa.print(outgoing);               // add payload
 }
 
 //Decode LoRa message
-String ClusterDuck::readMessages(byte mLength)  {
+String DuckLink::readMessages(byte mLength)  {
   String incoming = "";
 
   for (int i = 0; i < mLength; i++)
@@ -258,7 +239,7 @@ String ClusterDuck::readMessages(byte mLength)  {
   return incoming;
 }
 
-bool ClusterDuck::idInPath(String path) {
+bool DuckLink::idInPath(String path) {
   Serial.println("Checking Path");
   String temp = "";
   int len = path.length() + 1;
@@ -282,7 +263,7 @@ bool ClusterDuck::idInPath(String path) {
   return false;
 }
 
-String * ClusterDuck::getPacketData(int pSize) {
+String * DuckLink::getPacketData(int pSize) {
   String * packetData = new String[pSize];
   int i = 0;
   byte byteCode, mLength;
@@ -322,23 +303,23 @@ String * ClusterDuck::getPacketData(int pSize) {
   restart
   Only restarts ESP
 */
-void ClusterDuck::restartDuck()
+void DuckLink::restart()
 {
   Serial.println("Restarting Duck...");
   ESP.restart();
 }
 
 //Timer reboot
-bool ClusterDuck::reboot(void *) {
+bool DuckLink::reboot(void *) {
   String reboot = "REBOOT";
   Serial.println(reboot);
   sendPayloadMessage(reboot);
-  restartDuck();
+  restart();
 
   return true;
 }
 
-bool ClusterDuck::imAlive(void *) {
+bool DuckLink::imAlive(void *) {
   String alive = "1";
   sendPayloadMessage(alive);
   Serial.print("alive");
@@ -347,7 +328,7 @@ bool ClusterDuck::imAlive(void *) {
 }
 
 //Get Duck MAC address
-String ClusterDuck::duckMac(boolean format)
+String DuckLink::duckMac(boolean format)
 {
   char id1[15];
   char id2[15];
@@ -381,7 +362,7 @@ String ClusterDuck::duckMac(boolean format)
 }
 
 //Create a uuid
-String ClusterDuck::uuidCreator() {
+String DuckLink::uuidCreator() {
   byte randomValue;
   char msg[50];
   int numBytes = 0;
@@ -403,39 +384,185 @@ String ClusterDuck::uuidCreator() {
   return String(msg);
 }
 
-void ClusterDuck::loRaReceive() {
+void DuckLink::loRaReceive() {
   LoRa.receive();
 }
 
 //Getters
 
-String ClusterDuck::getDeviceId() {
+String DuckLink::getDeviceId() {
   return _deviceId;
 }
 
-Packet ClusterDuck::getLastPacket() {
+Packet DuckLink::getLastPacket() {
   Packet packet = _lastPacket;
   _lastPacket = Packet();
   return packet;
 }
 
-DNSServer ClusterDuck::dnsServer;
-const char * ClusterDuck::DNS  = "duck";
-const byte ClusterDuck::DNS_PORT = 53;
+MamaDuck::MamaDuck(/* args */)
+{
+}
 
-int ClusterDuck::_rssi = 0;
-float ClusterDuck::_snr;
-long ClusterDuck::_freqErr;
-int ClusterDuck::_availableBytes;
-int ClusterDuck::_packetSize = 0;
+MamaDuck::~MamaDuck()
+{
+}
 
-Packet ClusterDuck::_lastPacket;
+void MamaDuck::setup() {
+  setupDisplay("Mama");
+  setupPortal();
+  setupLoRa();
 
-byte ClusterDuck::ping_B       = 0xF4;
-byte ClusterDuck::senderId_B   = 0xF5;
-byte ClusterDuck::messageId_B  = 0xF6;
-byte ClusterDuck::payload_B    = 0xF7;
-byte ClusterDuck::iamhere_B    = 0xF8;
-byte ClusterDuck::path_B       = 0xF3;
+  //LoRa.onReceive(repeatLoRaPacket);
+  LoRa.receive();
 
-String ClusterDuck::portal = MAIN_page;
+  Serial.println("MamaDuck Online");
+
+  tymer.every(1800000, imAlive);
+  tymer.every(43200000, reboot);
+}
+
+void MamaDuck::run() {
+  tymer.tick();
+
+  int packetSize = LoRa.parsePacket();
+  if (packetSize != 0) {
+    byte whoIsIt = LoRa.peek();
+    if(whoIsIt == senderId_B) {
+      String * msg = getPacketData(packetSize);
+      if(!idInPath(_lastPacket.path)) {
+        sendPayloadStandard(_lastPacket.payload, _lastPacket.senderId, _lastPacket.messageId, _lastPacket.path);
+        LoRa.receive();
+      }
+      delete(msg);
+    } else if(whoIsIt == ping_B) {
+      LoRa.beginPacket();
+      couple(iamhere_B, "1");
+      LoRa.endPacket();
+      Serial.println("Pong packet sent");
+      LoRa.receive();
+    }
+  }
+
+  processPortalRequest();
+}
+
+PapaDuck::PapaDuck(String ssid, String password, String org, String deviceId, String deviceType, String token, String server, String topic, String authMethod, String clientId) :
+  m_ssid(ssid), 
+  m_password(password), 
+  m_org(org), 
+  m_deviceId(deviceId), 
+  m_deviceType(deviceType), 
+  m_token(token), 
+  m_server(server), 
+  m_topic(topic), 
+  m_authMethod(authMethod), 
+  m_clientId(clientId), 
+  m_timer(timer_create_default()),
+  m_pubSubClient(m_server.c_str(), 8883, m_wifiClient),
+  m_ping(0xF4)
+{
+}
+
+PapaDuck::~PapaDuck()
+{
+}
+
+void PapaDuck::setup()
+{
+  setupDisplay("Papa");
+  setupLoRa();
+  LoRa.receive();
+  
+  setupWiFi();
+  
+  Serial.println("PAPA Online");
+}
+void PapaDuck::run()
+{
+  if(WiFi.status() != WL_CONNECTED)
+  {
+    Serial.print("WiFi disconnected, reconnecting to local network: ");
+    Serial.print(m_ssid);
+    setupWiFi();
+
+  }
+  setupMQTT();
+
+  int packetSize = LoRa.parsePacket();
+  if (packetSize != 0) {
+    byte whoIsIt = LoRa.peek();
+    if(whoIsIt != m_ping) {
+      Serial.println(packetSize);
+      String * val = getPacketData(packetSize);
+      quackJson();
+    }
+  }
+
+  
+  m_timer.tick();
+}
+
+void PapaDuck::setupWiFi()
+{
+  Serial.println();
+  Serial.print("Connecting to ");
+  Serial.print(m_ssid);
+
+  // Connect to Access Poink
+  WiFi.begin(m_ssid.c_str(), m_password.c_str());
+
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    m_timer.tick(); //Advance timer to reboot after awhile
+    //delay(500);
+    Serial.print(".");
+  }
+
+  // Connected to Access Point
+  Serial.println("");
+  Serial.println("WiFi connected - PAPA ONLINE");
+}
+
+void PapaDuck::setupMQTT()
+{
+  if (!!!m_pubSubClient.connected()) {
+    Serial.print("Reconnecting client to "); Serial.println(m_server);
+    while ( ! (m_org == "quickstart" ? m_pubSubClient.connect(m_clientId.c_str()) : m_pubSubClient.connect(m_clientId.c_str(), m_authMethod.c_str(), m_token.c_str())))
+    {
+      m_timer.tick(); //Advance timer to reboot after awhile
+      Serial.print("i");
+      delay(500);
+    }
+  }
+}
+
+void PapaDuck::quackJson() {
+  const int bufferSize = 4*  JSON_OBJECT_SIZE(4);
+  StaticJsonDocument<bufferSize> doc;
+
+  JsonObject root = doc.as<JsonObject>();
+
+  Packet lastPacket = getLastPacket();
+
+  doc["DeviceID"]        = lastPacket.senderId;
+  doc["MessageID"]       = lastPacket.messageId;
+  doc["Payload"]     .set(lastPacket.payload);
+  doc["path"]         .set(lastPacket.path + "," + getDeviceId());
+
+
+  String jsonstat;
+  serializeJson(doc, jsonstat);
+
+  if (m_pubSubClient.publish(m_topic.c_str(), jsonstat.c_str())) {
+    
+    serializeJsonPretty(doc, Serial);
+     Serial.println("");
+    Serial.println("Publish ok");
+   
+  }
+  else {
+    Serial.println("Publish failed");
+  }
+
+}
