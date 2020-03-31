@@ -83,12 +83,16 @@ void loop() {
   setupMQTT();
 
   if(duck.getFlag()) {  //If LoRa packet received
+    duck.flipFlag();
+    duck.flipInterrupt();
     int pSize = duck.handlePacket();
     if(pSize > 3) {
       String * msg = duck.getPacketData(pSize);
       quackJson();
       
     }
+    duck.flipInterrupt();
+    lora.startReceive();
   }
 
   

@@ -211,11 +211,14 @@ void ClusterDuck::setupMamaDuck() {
 
 int ClusterDuck::handlePacket() {
   int pSize = lora.getPacketLength();
+  memset(transmission, 0x00, pSize); //Reset transmission
+  packetIndex = 0;
   int state = lora.readData(transmission, pSize);
 
   if (state == ERR_NONE) {
     // packet was successfully received
     Serial.println("Packet Received!");
+    Serial.println("Packet Size: " + pSize);
 
     return pSize;
   } else {
@@ -232,34 +235,35 @@ void ClusterDuck::runMamaDuck() {
 
   if(receivedFlag) {  //If LoRa packet received
     receivedFlag = false;
+    enableInterrupt = false;
     int pSize = handlePacket();
-    if(pSize > 0) {
-      byte whoIsIt = transmission[0];
-      if(whoIsIt == senderId_B) {
+    // if(pSize > 0) {
+    //   byte whoIsIt = transmission[0];
+      //if(whoIsIt == senderId_B) {
         String * msg = getPacketData(pSize);
-        if(!idInPath(_lastPacket.path)) {
+        packetIndex = 0;
+        if(msg[0] != "pong" && !idInPath(_lastPacket.path)) {
+          Serial.print("Send Packet");
           sendPayloadStandard(_lastPacket.payload, _lastPacket.senderId, _lastPacket.messageId, _lastPacket.path);
           
-          lora.startReceive();
-          enableInterrupt = true;
         }
-        delete(msg);
-      } else if(whoIsIt == ping_B) {
-        memset(transmission, 0x00, packetIndex);
-        packetIndex = 0;
-        couple(iamhere_B, "1");
-        int state = lora.transmit(transmission, packetIndex);
-        
-        lora.startReceive();
-        enableInterrupt = true;
-      }
+        //delete(msg);
+      //} else if(whoIsIt == ping_B) {
+      //   memset(transmission, 0x00, packetIndex);
+      //   packetIndex = 0;
+      //   couple(iamhere_B, "1");
+      //   int state = lora.transmit(transmission, packetIndex);
+      // }
       
-    } else {
-      Serial.println("Byte code not recognized!"); 
+    // } else {
+      // Serial.println("Byte code not recognized!"); 
       memset(transmission, 0x00, pSize); //Reset transmission
+      packetIndex = 0;
 
-    }
-    
+    // }
+    enableInterrupt = true;
+    lora.startReceive();
+    Serial.println("Start receive");
   }
 
   processPortalRequest();
@@ -272,7 +276,8 @@ void ClusterDuck::sendPayloadMessage(String msg) {
   couple(payload_B, msg);
   couple(path_B, _deviceId);
 
-  int state = lora.transmit(transmission, packetIndex);
+  Serial.println(F("Packet index: " + packetIndex));
+  int state = lora.transmit(transmission, 250);
 
   memset(transmission, 0x00, packetIndex); //Reset transmission
   packetIndex = 0; //Reset packetIndex
@@ -350,10 +355,9 @@ void ClusterDuck::couple(byte byteCode, String outgoing) {
   packetIndex++;
 
   for(int i=0; i < outgoingLen; i++) {  // add payload
-    transmission[i+2] = byteBuffer[i];
+    transmission[packetIndex] = byteBuffer[i];
+    packetIndex++;
   }
-
-  packetIndex = packetIndex + outgoingLen;
 
 }
 
@@ -386,7 +390,7 @@ String * ClusterDuck::getPacketData(int pSize) {
   packetIndex = 0;
   int len = 0;
   byte byteCode;
-  bool sId, mId, pLoad, pth;
+  bool sId, mId, pLoad, pth, ping;
   String msg = "";
   bool gotLen = false;
 
@@ -437,12 +441,24 @@ String * ClusterDuck::getPacketData(int pSize) {
       len = transmission[i+1];
       Serial.println("Len = " + String(len));
 
+    } else if(transmission[i] == ping_B) {
+      Serial.print("ping");
+      memset(transmission, 0x00, packetIndex);
+      packetIndex = 0;
+      couple(iamhere_B, "1");
+      int state = lora.transmit(transmission, packetIndex);
+      memset(transmission, 0x00, packetIndex);
+      packetIndex = 0;
+      packetData[0] = "pong";
+      return packetData;
+
     } else if(len > 0 && gotLen) {
       msg = msg + String((char)transmission[i]);
       len--;
-    }
-    else {
+
+    } else {
       gotLen = true;
+
     }
     packetIndex++;
   }
@@ -578,13 +594,36 @@ volatile bool ClusterDuck::getInterrupt() {
   return enableInterrupt;
 }
 
+int ClusterDuck::getRSSI() {
+  return lora.getRSSI();
+}
+
 //Setter
 void ClusterDuck::flipFlag() {
-  !receivedFlag;
+  if (receivedFlag == true) {
+    receivedFlag = false;
+  } else {
+    receivedFlag = true;
+  }
 }
 
 void ClusterDuck::flipInterrupt() {
-  !enableInterrupt;
+  if (enableInterrupt == true) {
+    enableInterrupt = false;
+  } else {
+    enableInterrupt = true;
+  }
+}
+
+void ClusterDuck::startReceive() {
+  lora.startReceive();
+}
+
+void ClusterDuck::ping() {
+  couple(ping_B, "0");
+  int state = lora.transmit(transmission, packetIndex);
+  memset(transmission, 0x00, packetIndex);
+  packetIndex = 0;
 }
 
 DNSServer ClusterDuck::dnsServer;
