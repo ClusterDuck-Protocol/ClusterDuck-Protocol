@@ -19,9 +19,8 @@
 
 #include "timer.h"
 
-// forward declaration
-class PubSubClient;
-class WiFiClientSecure;
+#include <PubSubClient.h>
+#include <WiFiClientSecure.h>
 
 typedef struct
 {
@@ -162,8 +161,8 @@ private:
   String m_clientId;
   Timer<>  m_timer; // create a timer with default settings
 
-  std::unique_ptr<WiFiClientSecure> m_wifiClient;
-  std::unique_ptr<PubSubClient> m_pubSubClient;
+  WiFiClientSecure m_wifiClient;
+  PubSubClient m_pubSubClient;
 
   byte m_ping;
 

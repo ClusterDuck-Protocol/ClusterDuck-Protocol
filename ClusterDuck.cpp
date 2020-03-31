@@ -1,8 +1,6 @@
 #include "ClusterDuck.h"
 
-#include <PubSubClient.h>
 #include <ArduinoJson.h>
-#include <WiFiClientSecure.h>
 
   //static variable definition
   byte DuckLink::messageId_B = 0xF6;
