@@ -90,6 +90,24 @@ protected:
     static bool reboot(void *);
     static void restart();
     static bool imAlive(void *);
+    void setupLoRa(long BAND = 915E6, int SS = 18, int RST = 14, int DI0 = 26, int TxPower = 20);
+    void setupDisplay(String deviceType);
+    void setupPortal(const char *AP = " 🆘 DUCK EMERGENCY PORTAL");
+    bool runCaptivePortal();
+    
+    void processPortalRequest();
+    
+    String * getPortalDataArray();
+    String getPortalDataString();
+    String * getPacketData(int pSize);
+    String duckMac(boolean format);
+    void sendPayloadStandard(String msg, String senderId = "", String messageId = "", String path = "");
+    static String uuidCreator();
+    String getDeviceId();
+    Packet getLastPacket();
+    static void sendPayloadMessage(String msg);
+    void loRaReceive();
+    static void couple(byte byteCode, String outgoing);
 
     byte ping_B;
     static byte senderId_B;
@@ -105,33 +123,16 @@ public:
     //Exposed Methods
     void setDeviceId(String deviceId = "");
     void begin(int baudRate = 115200);
-    void setupLoRa(long BAND = 915E6, int SS = 18, int RST = 14, int DI0 = 26, int TxPower = 20);
-    void setupDisplay(String deviceType);
-    void setupPortal(const char *AP = " 🆘 DUCK EMERGENCY PORTAL");
-    bool runCaptivePortal();
-
     virtual void setup();
-    void processPortalRequest();
     virtual void run();
 
-    String * getPortalDataArray();
-    String getPortalDataString();
-    String * getPacketData(int pSize);
-    String duckMac(boolean format);
-    void sendPayloadStandard(String msg, String senderId = "", String messageId = "", String path = "");
-    static String uuidCreator();
-    String getDeviceId();
-    Packet getLastPacket();
-    static void sendPayloadMessage(String msg);
-    void loRaReceive();
-    static void couple(byte byteCode, String outgoing);
-    bool idInPath(String path);
+
 };
 
 class MamaDuck : public DuckLink
 {
 private:
-  /* data */
+    bool idInPath(String path);
 public:
   MamaDuck(/* args */);
   ~MamaDuck();

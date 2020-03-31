@@ -239,7 +239,7 @@ String DuckLink::readMessages(byte mLength)  {
   return incoming;
 }
 
-bool DuckLink::idInPath(String path) {
+bool MamaDuck::idInPath(String path) {
   Serial.println("Checking Path");
   String temp = "";
   int len = path.length() + 1;
