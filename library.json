@@ -14,7 +14,12 @@
         "type": "git",
         "url": "https://github.com/Code-and-Response/ClusterDuck-Protocol.git"
     },
+<<<<<<< HEAD
      "export":
+=======
+    
+  "export":
+>>>>>>> 7375caa1b051a42130bac004ff60926995412c16
     {
         "include": 
         [
@@ -23,7 +28,12 @@
             "examples/*"
         ]
     },
+<<<<<<< HEAD
    "frameworks": "arduino",
+=======
+  
+    "frameworks": "arduino",
+>>>>>>> 7375caa1b051a42130bac004ff60926995412c16
     "platforms": "espressif32",
     
     "examples": [
@@ -35,4 +45,10 @@
         "arduino-timer": "2.0.1",
         "ESP Async WebServer": "1.2.3"
     }
+<<<<<<< HEAD
  }
+=======
+ 
+
+}
+>>>>>>> 7375caa1b051a42130bac004ff60926995412c16
