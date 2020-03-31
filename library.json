@@ -30,9 +30,9 @@
         "[Ee]xamples/*/*.ino"
     ],
     "dependencies": {
-        "LoRa": "0.7.1",
-        "U8g2": "2.28.0",
-        "arduino-timer": "2.0.1",
-        "ESP Async WebServer": "1.2.3"
+        "LoRa": "~0.7.1",
+        "U8g2": "~2.28.0",
+        "arduino-timer": "~2.0.1",
+        "ESP Async WebServer": "~1.2.3"
     }
  }
