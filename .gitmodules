@@ -35,3 +35,9 @@
 [submodule "Libraries/U8g2_Arduino"]
 	path = Libraries/U8g2_Arduino
 	url = https://github.com/olikraus/U8g2_Arduino.git
+[submodule "Libraries/GP2YDustSensor"]
+	path = Libraries/GP2YDustSensor
+	url = https://github.com/luciansabo/GP2YDustSensor.git
+[submodule "Libraries/MQSensorsLib"]
+	path = Libraries/MQSensorsLib
+	url = https://github.com/miguel5612/MQSensorsLib.git
