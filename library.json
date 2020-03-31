@@ -8,14 +8,13 @@
         "email": "info@project-owl.com",
         "url": "https://www.project-owl.com"
     },
-    "version": "1.0.4",
+    "version": "1.0.5",
     "repository":
     {
         "type": "git",
         "url": "https://github.com/Code-and-Response/ClusterDuck-Protocol.git"
     },
-    
-  "export":
+     "export":
     {
         "include": 
         [
@@ -24,8 +23,7 @@
             "examples/*"
         ]
     },
-  
-    "frameworks": "arduino",
+   "frameworks": "arduino",
     "platforms": "espressif32",
     
     "examples": [
@@ -37,6 +35,4 @@
         "arduino-timer": "2.0.1",
         "ESP Async WebServer": "1.2.3"
     }
- 
-
-}
+ }
