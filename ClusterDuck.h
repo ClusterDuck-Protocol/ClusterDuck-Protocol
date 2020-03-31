@@ -57,7 +57,6 @@ private:
 
     String readMessages(byte mLength);
 
-    static String _deviceId;
     int _rssi;
     float _snr;
     long _freqErr;
@@ -108,6 +107,7 @@ protected:
     void loRaReceive();
     static void couple(byte byteCode, String outgoing);
 
+    static String _deviceId;
     byte ping_B;
     static byte senderId_B;
     byte iamhere_B;
