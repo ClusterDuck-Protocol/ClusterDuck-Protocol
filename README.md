@@ -28,22 +28,6 @@ Check out the [ClusterDuck Protocol] website for more information and to learn a
 - [Use with the Arduino IDE](doc/howToBuildADuck.md#Arduino-IDE)
 
 
-
-- ## Arduino IDE
-
-#### Install The ClusterDuck Protocol on your local machine
-You will need to clone the ClusterDuck Protocol onto your local machine and include the libraries folder into your local arduino libraries folder.
-1. Clone the ClusterDuck Protocol onto your local machine `git clone https://github.com/Code-and-Response/ClusterDuck-Protocol.git`
-1. Pull all the Library submodules needed for the Arduino IDE `git submodule update --init --recursive`
-1. Copy the `ClusterDuck-Protocol`folder into your local Arduino Libraries folder **MacOs** ~/Documents/Arduino/libraries/  **windows** My Documents\Arduino\libraries\
-1. Navigate into the `ClusterDuck-Protocol` folder and open `Libraries` folder
-1. Copy all the libraris form the `Libraries` folder
-1. Paste into into your local Arduino Libraries folder **MacOs** ~/Documents/Arduino/libraries/  **windows** My Documents\Arduino\libraries\
-1. Open Arduino IDE
-1. You should now be able to see the examples by going to File -> Examples -> ClusterDuck
-
-You should be able pull new commits directly to this folder in your Arduino library.
-
 ## Quick Start
 
 Open new sketch in Arduino IDE or create a new project with platformIO and include the ClusterDuck library
