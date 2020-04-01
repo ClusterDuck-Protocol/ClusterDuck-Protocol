@@ -115,6 +115,8 @@ Download USB to UART Bridge VCP Driver from [here](https://www.silabs.com/produc
 ![iot-platform-10](https://github.com/Code-and-Response/ClusterDuck-Protocol/blob/master/assets/images/iot-platform-10.png)
 1. Open `PapaDuckExample.ino` and replace `ORG`, `DEVICE_ID`, `DEVICE_TYPE`, and `TOKEN` with the information from the summary screen. Make sure you also have the correct WiFi SSID and password filled out in that file as well. After you flash the duck with this information, you'll see data flowing through the IBM Watson IoT Platform.
 ![iot-platform-11](https://github.com/Code-and-Response/ClusterDuck-Protocol/blob/master/assets/images/iot-platform-11.png)
+
+
 ### Install Clusterduck Protocol
 
 #### Using the Library Manager “COMING SOON”
@@ -130,29 +132,22 @@ Navigate to the downloaded ClusterDuck Protocol Folder and select.
 Return to the _Sketch > Include Library menu._ menu. You should now see the library at the bottom of the drop-down menu. It is ready to be used in your sketch. The zip file will have been expanded in the _libraries_ folder in your Arduino sketches directory.
 
 #### Manual Install
-
-You can also copy the library manually into your Arduino libraries folder as follows. 
-
-1. Copy ClusterDuck folder (Download Zip or Clone to local machine)
-1. Navigate to your Arduino folder. This can be found in your default Documents folder.
-1. Navigate to the library folder
-1. Paste into library folder
-1. Restart Arduino
-1. You should now be able to see examples by going to _File -> Examples -> ClusterDuck_
+You will need to clone the ClusterDuck Protocol onto your local machine and include the libraries folder into your local arduino libraries folder.
+1. Clone the ClusterDuck Protocol onto your local machine `git clone https://github.com/Code-and-Response/ClusterDuck-Protocol.git`
+1. Pull all the Library submodules needed for the Arduino IDE `git submodule update --init --recursive`
+1. Copy the `ClusterDuck-Protocol`folder into your local Arduino Libraries folder **MacOs** _/Users/USER/Documents/Arduino/_. **windows** _C:/Users/USER/Documents/Arduino._
+1. Navigate into the `ClusterDuck-Protocol` folder and open `Libraries` folder
+1. Copy all the libraris form the `Libraries` folder
+1. Paste into into your local Arduino Libraries folder **MacOs** _/Users/USER/Documents/Arduino/_.  **windows** _C:/Users/USER/Documents/Arduino._
+1. Open Arduino IDE
+1. You should now be able to see the examples by going to File -> Examples -> ClusterDuck
 
 You should be able pull new commits directly to this folder in your Arduino library.
 
 
 #### Add required libraries
 
-The required libraries to work with the ClusterDuck protocol can be installed in multiple ways. There is a folder in the source code that is called “Libraries” and contains all the required libraries to work with the ClusterDuck Protocol. Or you can download all the libraries manual and import into Arduino by .zip. Some libraries are available in the Arduino Libraries manager. 
-
-
-##### Installing libraries by included libraries folder.
-
-In the source code there is a folder with the required libraries you will need to copy and paste these libraries into the arduino Libraries folder so they can be found. 
-
-Go to your copy of the ClusterDuck Protocol source code and find the Libraries folder. Copy all the libraries in that folder. Navigate to your Arduino folder. This is usually found in your _Documents_ for windows _C:/Users/USER/Documents/Arduino._ for MacOS _/Users/USER/Documents/Arduino/_. In the Arduino Libraries folder drag or paste all the libraries. 
+The required libraries to work with the ClusterDuck protocol can be installed in multiple ways. There is a folder in the source code that is called “Libraries” and contains all the submoduls to work with the ClusterDuck Protocol. Or you can download all the libraries manual and import into Arduino by .zip. Some libraries are available in the Arduino Libraries manager. 
 
 
 ##### Installing libraries through Library Manager
