@@ -23,7 +23,7 @@ This is beneficial after events such as earthquakes or hurricanes where communic
 # Installation
 Check out the [ClusterDuck Protocol] website for more information and to learn about projects built upon this codebase. You can reach out directly on our [Slack] too for any questions! 
 
-To use the ClusterDuck Protocol follow the [How To Build a Duck](doc/howToBuildADuck.md) instalation guide.
+To use the ClusterDuck Protocol follow the [How To Build a Duck](doc/howToBuildADuck.md) installation guide.
 
 - [Use with platformIO](doc/howToBuildADuck.md#PlatformIO)
 
@@ -183,7 +183,7 @@ This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE)
 v1.0.5
 
 
-[Project OWL]: <https://project-owl.com>
+[Project OWL]: <https://www.project-owl.com/>
 [ClusterDuck Protocol]: <http://clusterduckprotocol.org>
-[Slack]: <https://www.project-owl.com/slack>
+[Slack Workspace]: <https://www.project-owl.com/slack>
 

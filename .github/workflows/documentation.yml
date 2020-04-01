@@ -15,8 +15,13 @@ jobs:
         with:
           args: "doc/assets/pdfs/title.pdf output/howToBuildADuck.pdf output/final.pdf"
       - run: rm output/howToBuildADuck.pdf
-      - run: mv output/final.pdf output/How\ to\ build\ a\ duck.pdf
+      - run: cp output/final.pdf doc/HowToBuildADuck.pdf
       - uses: actions/upload-artifact@master
         with:
           name: output
           path: output
+      - run: rm -rf output
+      - uses: mikeal/publish-to-github-action@master
+        if: github.ref == 'refs/heads/master'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
