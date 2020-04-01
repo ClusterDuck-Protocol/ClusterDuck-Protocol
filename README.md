@@ -23,7 +23,7 @@ This is beneficial after events such as earthquakes or hurricanes where communic
 # Installation
 Check out the [ClusterDuck Protocol] website for more information and to learn about projects built upon this codebase. You can reach out directly on our [Slack] too! Check out our [How To Build A Duck User Manual] for in depth instructions for setting up your environment and materials. 
 
-- [Use with platformIO](doc/howToBuildADuck.md#PlatformIO)
+- [Use with platformIO](ddoc/howToBuildADuck.md#PlatformIO)
 
 - ## PlatformIO
 [PlatformIO](https://platformio.org/) is a ecosystem for embedded development. Grab your favorite IDE from [here](https://platformio.org/install/integration) and make sure to install the platformIO ide extension. If you are not sure which IDE to use, use [VSCode](https://docs.platformio.org/en/latest/integration/ide/vscode.html#installation).
