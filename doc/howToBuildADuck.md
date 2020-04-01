@@ -55,6 +55,8 @@ PapaDuck is the final Duck in the ClusterDuck and transmits network data to the 
 
 You will need the [Arduino IDE](https://www.arduino.cc/en/main/software) to install the firmware on your Arduino devices.
 
+Or you can use your favourite Code editor with the [platformIO](https://platformio.org/) plugin.
+
 The Ducklinks use our [ClusterDuck](https://github.com/Code-and-Response/ClusterDuck-Protocol) Protocol. Project OWL’s open source Duck firmware.
 
 Depending on your computer setup, you may also need [USB to UART drivers](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers).   If you have any problems, please reach out on the [Project OWL Github](https://github.com/Project-Owl) or in the [Project OWL slack.](https://www.project-owl.com/slack)
