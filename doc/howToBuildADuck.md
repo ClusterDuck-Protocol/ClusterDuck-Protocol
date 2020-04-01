@@ -9,6 +9,8 @@
 - [Raw Materials](#raw-materials)
     - [Software](#software)
     - [Hardware](#hardware)
+    
+- [Platform IO setup](#platformIO)
 - [Arduino Software Preparation](#arduino-software-preparation)
     - [Install VCP Driver](#install-vcp-driver)
     - [Install the necessary libraries that work with ClusterDuck Protocol:](#install-the-necessary-libraries-that-work-with-clusterduck-protocol)
