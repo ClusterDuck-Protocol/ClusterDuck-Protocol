@@ -32,7 +32,7 @@ class CaptiveRequestHandler : public AsyncWebHandler
   public:
     CaptiveRequestHandler(String portal)
     {
-        _portal = portal;
+        m_portal = portal;
     }
     virtual ~CaptiveRequestHandler() {}
 
@@ -44,11 +44,11 @@ class CaptiveRequestHandler : public AsyncWebHandler
     void handleRequest(AsyncWebServerRequest *request)
     {
         AsyncResponseStream *response = request->beginResponseStream("text/html");
-        response->print(_portal);
+        response->print(m_portal);
         request->send(response);
     }
 
-    String _portal;
+    String m_portal;
 };
 
 class DuckLink
@@ -56,30 +56,30 @@ class DuckLink
   private:
     String readMessages(byte mLength);
 
-    int _rssi;           ///< TODO
-    float _snr;          ///< TODO
-    long _freqErr;       ///< TODO
-    int _availableBytes; ///< TODO
+    int m_rssi;           ///< TODO
+    float m_snr;          ///< TODO
+    long m_freqErr;       ///< TODO
+    int m_availableBytes; ///< TODO
 
-    int _packetSize; ///< TODO
+    int m_packetSize; ///< TODO
 
-    DNSServer dnsServer; ///< TODO
-    const byte DNS_PORT; ///< TODO
-    const char *DNS;     ///< TODO
-    const char *AP;      ///< TODO
-    String portal;       ///< TODO
+    DNSServer m_dnsServer; ///< TODO
+    const byte m_dnsPort;  ///< TODO
+    const char *m_dns;     ///< TODO
+    const char *m_ap;      ///< TODO
+    String m_portal;       ///< TODO
 
-    String runTime; ///< TODO
+    String m_runTime; ///< TODO
 
     // QuackPack
-    static byte messageId_B; ///< TODO
-    static byte payload_B;   ///< TODO
-    static byte path_B;      ///< TODO
+    static byte m_messageId_B; ///< TODO
+    static byte m_payload_B;   ///< TODO
+    static byte m_path_B;      ///< TODO
 
-    U8X8_SSD1306_128X64_NONAME_SW_I2C u8x8; ///< TODO
+    U8X8_SSD1306_128X64_NONAME_SW_I2C m_u8x8; ///< TODO
 
-    IPAddress apIP;           ///< TODO
-    AsyncWebServer webServer; ///< TODO
+    IPAddress m_apIp;           ///< TODO
+    AsyncWebServer m_webServer; ///< TODO
 
   protected:
     static bool reboot(void *);
@@ -103,13 +103,12 @@ class DuckLink
     void loRaReceive();
     static void couple(byte byteCode, String outgoing);
 
-    static String _deviceId; ///< TODO
-    byte ping_B;             ///< TODO
-    static byte senderId_B;  ///< TODO
-    byte iamhere_B;          ///< TODO
+    static String m_deviceId; ///< TODO
+    byte m_ping_B;             ///< TODO
+    static byte m_senderId_B;  ///< TODO
+    byte m_iamhere_B;          ///< TODO
 
-    Packet _lastPacket; ///< TODO
-    Timer<> tymer;      ///< TODO
+    Packet m_lastPacket; ///< TODO
 
   public:
     DuckLink(/* args */);
@@ -127,6 +126,9 @@ class MamaDuck : public DuckLink
 {
   private:
     bool idInPath(String path);
+
+  protected:
+    Timer<> m_timer; ///< TODO
 
   public:
     MamaDuck(/* args */);
@@ -153,7 +155,6 @@ class PapaDuck : public MamaDuck
     String m_topic;      ///< TODO
     String m_authMethod; ///< TODO
     String m_clientId;   ///< TODO
-    Timer<> m_timer;     ///< TODO
 
     WiFiClientSecure m_wifiClient; ///< TODO
     PubSubClient m_pubSubClient;   ///< TODO

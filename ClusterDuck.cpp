@@ -3,20 +3,20 @@
 #include <ArduinoJson.h>
 
 // static variable definition
-byte DuckLink::messageId_B = 0xF6;
-byte DuckLink::senderId_B  = 0xF5;
-byte DuckLink::payload_B   = 0xF7;
-byte DuckLink::path_B      = 0xF3;
-String DuckLink::_deviceId = "";
+byte DuckLink::m_messageId_B = 0xF6;
+byte DuckLink::m_senderId_B  = 0xF5;
+byte DuckLink::m_payload_B   = 0xF7;
+byte DuckLink::m_path_B      = 0xF3;
+String DuckLink::m_deviceId = "";
 
 /**
  * @brief Construct a new Duck Link:: Duck Link object
  *
  */
 DuckLink::DuckLink(/* args */)
-    : _rssi(0), _snr(0), _freqErr(0), _availableBytes(0), _packetSize(0), dnsServer(), DNS_PORT(53), DNS("duck"), AP(0),
-      portal(MAIN_page), runTime(""), u8x8(/* clock=*/15, /* data=*/4, /* reset=*/16), apIP(192, 168, 1, 1),
-      webServer(80), ping_B(0xF4), iamhere_B(0xF8), _lastPacket(), tymer(timer_create_default())
+    : m_rssi(0), m_snr(0), m_freqErr(0), m_availableBytes(0), m_packetSize(0), m_dnsServer(), m_dnsPort(53), m_dns("duck"), m_ap(0),
+      m_portal(MAIN_page), m_runTime(""), m_u8x8(/* clock=*/15, /* data=*/4, /* reset=*/16), m_apIp(192, 168, 1, 1),
+      m_webServer(80), m_ping_B(0xF4), m_iamhere_B(0xF8), m_lastPacket())
 {
 }
 
@@ -33,7 +33,7 @@ DuckLink::~DuckLink() {}
  */
 void DuckLink::setDeviceId(String deviceId)
 {
-    _deviceId = deviceId;
+    m_deviceId = deviceId;
 }
 
 /**
@@ -55,26 +55,26 @@ void DuckLink::begin(int baudRate)
  */
 void DuckLink::setupDisplay(String deviceType)
 {
-    u8x8.begin();
-    u8x8.setFont(u8x8_font_chroma48medium8_r);
+    m_u8x8.begin();
+    m_u8x8.setFont(u8x8_font_chroma48medium8_r);
 
-    u8x8.setCursor(0, 1);
-    u8x8.print("    ((>.<))    ");
+    m_u8x8.setCursor(0, 1);
+    m_u8x8.print("    ((>.<))    ");
 
-    u8x8.setCursor(0, 2);
-    u8x8.print("  Project OWL  ");
+    m_u8x8.setCursor(0, 2);
+    m_u8x8.print("  Project OWL  ");
 
-    u8x8.setCursor(0, 4);
-    u8x8.print("Device: " + deviceType);
+    m_u8x8.setCursor(0, 4);
+    m_u8x8.print("Device: " + deviceType);
 
-    u8x8.setCursor(0, 5);
-    u8x8.print("Status: Online");
+    m_u8x8.setCursor(0, 5);
+    m_u8x8.print("Status: Online");
 
-    u8x8.setCursor(0, 6);
-    u8x8.print("ID:     " + _deviceId);
+    m_u8x8.setCursor(0, 6);
+    m_u8x8.print("ID:     " + m_deviceId);
 
-    u8x8.setCursor(0, 7);
-    u8x8.print(duckMac(false));
+    m_u8x8.setCursor(0, 7);
+    m_u8x8.print(duckMac(false));
 }
 
 /**
@@ -95,8 +95,8 @@ void DuckLink::setupLoRa(long BAND, int SS, int RST, int DI0, int TxPower)
 
     // Initialize LoRa
     if (!LoRa.begin(BAND)) {
-        u8x8.clear();
-        u8x8.drawString(0, 0, "Starting LoRa failed!");
+        m_u8x8.clear();
+        m_u8x8.drawString(0, 0, "Starting LoRa failed!");
         Serial.println("Starting LoRa failed!");
         while (1)
             ;
@@ -120,20 +120,20 @@ void DuckLink::setupPortal(const char *AP)
     WiFi.softAP(AP);
     delay(200); // wait for 200ms for the access point to start before configuring
 
-    WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
+    WiFi.softAPConfig(m_apIp, m_apIp, IPAddress(255, 255, 255, 0));
 
     Serial.println("Created Hotspot");
 
-    dnsServer.start(DNS_PORT, "*", apIP);
+    m_dnsServer.start(m_dnsPort, "*", m_apIp);
 
     Serial.println("Setting up Web Server");
 
-    webServer.onNotFound([&](AsyncWebServerRequest *request) { request->send(200, "text/html", portal); });
+    m_webServer.onNotFound([&](AsyncWebServerRequest *request) { request->send(200, "text/html", m_portal); });
 
-    webServer.on("/", HTTP_GET, [&](AsyncWebServerRequest *request) { request->send(200, "text/html", portal); });
+    m_webServer.on("/", HTTP_GET, [&](AsyncWebServerRequest *request) { request->send(200, "text/html", m_portal); });
 
     // Captive Portal form submission
-    webServer.on("/formSubmit", HTTP_POST, [&](AsyncWebServerRequest *request) {
+    m_webServer.on("/formSubmit", HTTP_POST, [&](AsyncWebServerRequest *request) {
         Serial.println("Submitting Form");
 
         int paramsNumber = request->params();
@@ -149,30 +149,30 @@ void DuckLink::setupPortal(const char *AP)
 
         sendPayloadStandard(val);
 
-        request->send(200, "text/html", portal);
+        request->send(200, "text/html", m_portal);
     });
 
-    webServer.on("/id", HTTP_GET, [&](AsyncWebServerRequest *request) { request->send(200, "text/html", _deviceId); });
+    m_webServer.on("/id", HTTP_GET, [&](AsyncWebServerRequest *request) { request->send(200, "text/html", m_deviceId); });
 
-    webServer.on("/restart", HTTP_GET, [&](AsyncWebServerRequest *request) {
+    m_webServer.on("/restart", HTTP_GET, [&](AsyncWebServerRequest *request) {
         request->send(200, "text/plain", "Restarting...");
         delay(1000);
         restart();
     });
 
-    webServer.on("/mac", HTTP_GET, [&](AsyncWebServerRequest *request) {
+    m_webServer.on("/mac", HTTP_GET, [&](AsyncWebServerRequest *request) {
         String mac = duckMac(true);
         request->send(200, "text/html", mac);
     });
 
     // for captive portal
-    webServer.addHandler(new CaptiveRequestHandler(MAIN_page)).setFilter(ON_AP_FILTER);
+    m_webServer.addHandler(new CaptiveRequestHandler(MAIN_page)).setFilter(ON_AP_FILTER);
 
     // Test 👍👌😅
 
-    webServer.begin();
+    m_webServer.begin();
 
-    if (!MDNS.begin(DNS)) {
+    if (!MDNS.begin(m_dns)) {
         Serial.println("Error setting up MDNS responder!");
     } else {
         Serial.println("Created local DNS");
@@ -207,7 +207,7 @@ void DuckLink::run()
 void DuckLink::processPortalRequest()
 {
 
-    dnsServer.processNextRequest();
+    m_dnsServer.processNextRequest();
 }
 
 /**
@@ -219,10 +219,10 @@ void DuckLink::processPortalRequest()
 void DuckLink::sendPayloadMessage(String msg)
 {
     LoRa.beginPacket();
-    couple(senderId_B, _deviceId);
-    couple(messageId_B, uuidCreator());
-    couple(payload_B, msg);
-    couple(path_B, _deviceId);
+    couple(m_senderId_B, m_deviceId);
+    couple(m_messageId_B, uuidCreator());
+    couple(m_payload_B, msg);
+    couple(m_path_B, m_deviceId);
     LoRa.endPacket();
 }
 
@@ -238,13 +238,13 @@ void DuckLink::sendPayloadMessage(String msg)
 void DuckLink::sendPayloadStandard(String msg, String senderId, String messageId, String path)
 {
     if (senderId == "")
-        senderId = _deviceId;
+        senderId = m_deviceId;
     if (messageId == "")
         messageId = uuidCreator();
     if (path == "") {
-        path = _deviceId;
+        path = m_deviceId;
     } else {
-        path = path + "," + _deviceId;
+        path = path + "," + m_deviceId;
     }
 
     String total = senderId + messageId + path + msg;
@@ -253,10 +253,10 @@ void DuckLink::sendPayloadStandard(String msg, String senderId, String messageId
     }
 
     LoRa.beginPacket();
-    couple(senderId_B, senderId);
-    couple(messageId_B, messageId);
-    couple(payload_B, msg);
-    couple(path_B, path);
+    couple(m_senderId_B, senderId);
+    couple(m_messageId_B, messageId);
+    couple(m_payload_B, msg);
+    couple(m_path_B, path);
     LoRa.endPacket();
     Serial.println("Here7");
 
@@ -315,7 +315,7 @@ bool MamaDuck::idInPath(String path)
 
     for (int i = 0; i < len; i++) {
         if (arr[i] == ',' || i == len - 1) {
-            if (temp == _deviceId) {
+            if (temp == m_deviceId) {
                 Serial.print(path);
                 Serial.print("false");
                 return true;
@@ -347,22 +347,22 @@ String *DuckLink::getPacketData(int pSize)
     while (LoRa.available()) {
         byteCode = LoRa.read();
         mLength  = LoRa.read();
-        if (byteCode == senderId_B) {
-            _lastPacket.senderId = readMessages(mLength);
-            Serial.println("User ID: " + _lastPacket.senderId);
-        } else if (byteCode == messageId_B) {
-            _lastPacket.messageId = readMessages(mLength);
-            Serial.println("Message ID: " + _lastPacket.messageId);
-        } else if (byteCode == payload_B) {
-            _lastPacket.payload = readMessages(mLength);
-            Serial.println("Message: " + _lastPacket.payload);
-        } else if (byteCode == path_B) {
-            _lastPacket.path = readMessages(mLength);
-            Serial.println("Path: " + _lastPacket.path);
+        if (byteCode == m_senderId_B) {
+            m_lastPacket.senderId = readMessages(mLength);
+            Serial.println("User ID: " + m_lastPacket.senderId);
+        } else if (byteCode == m_messageId_B) {
+            m_lastPacket.messageId = readMessages(mLength);
+            Serial.println("Message ID: " + m_lastPacket.messageId);
+        } else if (byteCode == m_payload_B) {
+            m_lastPacket.payload = readMessages(mLength);
+            Serial.println("Message: " + m_lastPacket.payload);
+        } else if (byteCode == m_path_B) {
+            m_lastPacket.path = readMessages(mLength);
+            Serial.println("Path: " + m_lastPacket.path);
         } else {
             packetData[i]       = readMessages(mLength);
-            _lastPacket.payload = _lastPacket.payload + packetData[i];
-            _lastPacket.payload = _lastPacket.payload + "*";
+            m_lastPacket.payload = m_lastPacket.payload + packetData[i];
+            m_lastPacket.payload = m_lastPacket.payload + "*";
             // Serial.println("Data" + i + ": " + packetData[i]);
             i++;
         }
@@ -488,7 +488,7 @@ void DuckLink::loRaReceive()
  */
 String DuckLink::getDeviceId()
 {
-    return _deviceId;
+    return m_deviceId;
 }
 
 /**
@@ -498,8 +498,8 @@ String DuckLink::getDeviceId()
  */
 Packet DuckLink::getLastPacket()
 {
-    Packet packet = _lastPacket;
-    _lastPacket   = Packet();
+    Packet packet = m_lastPacket;
+    m_lastPacket   = Packet();
     return packet;
 }
 
@@ -507,7 +507,7 @@ Packet DuckLink::getLastPacket()
  * @brief Construct a new Mama Duck:: Mama Duck object
  *
  */
-MamaDuck::MamaDuck(/* args */) {}
+MamaDuck::MamaDuck(/* args */) : m_timer(timer_create_default()) {}
 
 /**
  * @brief Destroy the Mama Duck:: Mama Duck object
@@ -530,8 +530,8 @@ void MamaDuck::setup()
 
     Serial.println("MamaDuck Online");
 
-    tymer.every(1800000, imAlive);
-    tymer.every(43200000, reboot);
+    m_timer.every(1800000, imAlive);
+    m_timer.every(43200000, reboot);
 }
 
 /**
@@ -540,21 +540,21 @@ void MamaDuck::setup()
  */
 void MamaDuck::run()
 {
-    tymer.tick();
+    m_timer.tick();
 
     int packetSize = LoRa.parsePacket();
     if (packetSize != 0) {
         byte whoIsIt = LoRa.peek();
-        if (whoIsIt == senderId_B) {
+        if (whoIsIt == m_senderId_B) {
             String *msg = getPacketData(packetSize);
-            if (!idInPath(_lastPacket.path)) {
-                sendPayloadStandard(_lastPacket.payload, _lastPacket.senderId, _lastPacket.messageId, _lastPacket.path);
+            if (!idInPath(m_lastPacket.path)) {
+                sendPayloadStandard(m_lastPacket.payload, m_lastPacket.senderId, m_lastPacket.messageId, m_lastPacket.path);
                 LoRa.receive();
             }
             delete (msg);
-        } else if (whoIsIt == ping_B) {
+        } else if (whoIsIt == m_ping_B) {
             LoRa.beginPacket();
-            couple(iamhere_B, "1");
+            couple(m_iamhere_B, "1");
             LoRa.endPacket();
             Serial.println("Pong packet sent");
             LoRa.receive();
@@ -582,7 +582,7 @@ void MamaDuck::run()
 PapaDuck::PapaDuck(String ssid, String password, String org, String deviceId, String deviceType, String token,
                    String server, String topic, String authMethod, String clientId)
     : m_ssid(ssid), m_password(password), m_org(org), m_deviceId(deviceId), m_deviceType(deviceType), m_token(token),
-      m_server(server), m_topic(topic), m_authMethod(authMethod), m_clientId(clientId), m_timer(timer_create_default()),
+      m_server(server), m_topic(topic), m_authMethod(authMethod), m_clientId(clientId),
       m_pubSubClient(m_server.c_str(), 8883, m_wifiClient), m_ping(0xF4)
 {
 }
