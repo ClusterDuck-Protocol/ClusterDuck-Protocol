@@ -30,7 +30,7 @@ issue to request an invitation.
 
 ## Discussing non-technical topics
 
-Discussion of non-technical topics are also best to discuss in the #general channel 
+Discussion of non-technical topics are also best to discuss in the \#general channel 
 of the [ClusterDuck-Protocol Slack workspace][].
 
 ## Submitting a Bug Report
