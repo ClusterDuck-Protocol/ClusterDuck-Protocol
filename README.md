@@ -21,38 +21,14 @@ This is beneficial after events such as earthquakes or hurricanes where communic
 
 
 # Installation
-Check out the [ClusterDuck Protocol] website for more information and to learn about projects built upon this codebase. You can reach out directly on our [Slack] too! Check out our [How To Build A Duck User Manual] for in depth instructions for setting up your environment and materials. 
+Check out the [ClusterDuck Protocol] website for more information and to learn about projects built upon this codebase. You can reach out directly on our [Slack] too for any questions! 
 
-- [Use with platformIO](doc/howToBuildADuck.md##PlatformIO)
+To use the ClusterDuck Protocol follow the [How To Build a Duck](doc/howToBuildADuck.md) instalation guide.
 
-- ## PlatformIO
-[PlatformIO](https://platformio.org/) is a ecosystem for embedded development. Grab your favorite IDE from [here](https://platformio.org/install/integration) and make sure to install the platformIO ide extension. If you are not sure which IDE to use, use [VSCode](https://docs.platformio.org/en/latest/integration/ide/vscode.html#installation).
+- [Use with platformIO](doc/howToBuildADuck.md#PlatformIO)
 
-### Installing ClusterDuck-Protocol globally
+- [Use with the Arduino IDE](doc/howToBuildADuck.md#Arduino-IDE)
 
-1. From the [PIO Home](https://docs.platformio.org/en/latest/integration/ide/vscode.html#setting-up-the-project) tab select `Libraries`
-1. Search for `ClusterDuck Protocol` and install it
-
-### Installing ClusterDuck-Protocol for project only
-
-1. Create a `New Project` from the [PIO Home](https://docs.platformio.org/en/latest/integration/ide/vscode.html#setting-up-the-project) tab
-1. Choose a name, select the `Heltec Wifi LoRa 32 (V2) (Heltec Automation)` as board and `Arduino` as framework
-1. Open the `platformio.ini` within your newly created project and add `lib_deps = ClusterDuck Protocol` at the end.
-
-- ## Arduino IDE
-
-#### Install The ClusterDuck Protocol on your local machine
-You will need to clone the ClusterDuck Protocol onto your local machine and include the libraries folder into your local arduino libraries folder.
-1. Clone the ClusterDuck Protocol onto your local machine `git clone https://github.com/Code-and-Response/ClusterDuck-Protocol.git`
-1. Pull all the Library submodules needed for the Arduino IDE `git submodule update --init --recursive`
-1. Copy the `ClusterDuck-Protocol`folder into your local Arduino Libraries folder **MacOs** ~/Documents/Arduino/libraries/  **windows** My Documents\Arduino\libraries\
-1. Navigate into the `ClusterDuck-Protocol` folder and open `Libraries` folder
-1. Copy all the libraris form the `Libraries` folder
-1. Paste into into your local Arduino Libraries folder **MacOs** ~/Documents/Arduino/libraries/  **windows** My Documents\Arduino\libraries\
-1. Open Arduino IDE
-1. You should now be able to see the examples by going to File -> Examples -> ClusterDuck
-
-You should be able pull new commits directly to this folder in your Arduino library.
 
 ## Quick Start
 
@@ -210,4 +186,4 @@ v1.0.5
 [Project OWL]: <https://project-owl.com>
 [ClusterDuck Protocol]: <http://clusterduckprotocol.org>
 [Slack]: <https://www.project-owl.com/slack>
-[How To Build A Duck User Manual]: <https://docs.google.com/document/d/1HNsU7lN5gbZgcciP0BSyMYGDVNDM6RYfsXgdpwo66YE/edit?usp=sharing>
+
