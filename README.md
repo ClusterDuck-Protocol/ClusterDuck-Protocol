@@ -44,24 +44,14 @@ Check out the [ClusterDuck Protocol] website for more information and to learn a
 You will need to clone the ClusterDuck Protocol onto your local machine and include the libraries folder into your local arduino libraries folder.
 1. Clone the ClusterDuck Protocol onto your local machine `git clone https://github.com/Code-and-Response/ClusterDuck-Protocol.git`
 1. Pull all the Library submodules needed for the Arduino IDE `git submodule update --init --recursive`
-1. Copy the `ClusterDuck-Protocol`folder into your local Arduino Libraries folder **MacOs** ~/Documents/Arduino/libraries/ **windows** My Documents\Arduino\libraries\
+1. Copy the `ClusterDuck-Protocol`folder into your local Arduino Libraries folder **MacOs** ~/Documents/Arduino/libraries/  **windows** My Documents\Arduino\libraries\
 1. Navigate into the `ClusterDuck-Protocol` folder and open `Libraries` folder
 1. Copy all the libraris form the `Libraries` folder
-1. Paste into into your local Arduino Libraries folder **MacOs** ~/Documents/Arduino/libraries/ **windows** My Documents\Arduino\libraries\
+1. Paste into into your local Arduino Libraries folder **MacOs** ~/Documents/Arduino/libraries/  **windows** My Documents\Arduino\libraries\
 1. Open Arduino IDE
 1. You should now be able to see the examples by going to File -> Examples -> ClusterDuck
 
 You should be able pull new commits directly to this folder in your Arduino library.
-
-#### Importing as a .zip Library
-Download The ClusterDuck Protocol as a .Zip file.
-
-In the Arduino IDE, navigate to ``Sketch > Include Library > Add .ZIP Library.`` At the top of
-the drop down list, select the option to "Add .ZIP Library''.
-
-Navigate to the downloaded ClusterDuck Protocol Folder and select.
-Return to the Sketch > Include Library menu. menu. You should now see the library at the
-bottom of the drop-down menu. It is ready to be used in your sketch. 
 
 ## Quick Start
 
