@@ -16,7 +16,7 @@ String DuckLink::m_deviceId = "";
 DuckLink::DuckLink(/* args */)
     : m_rssi(0), m_snr(0), m_freqErr(0), m_availableBytes(0), m_packetSize(0), m_dnsServer(), m_dnsPort(53), m_dns("duck"), m_ap(0),
       m_portal(MAIN_page), m_runTime(""), m_u8x8(/* clock=*/15, /* data=*/4, /* reset=*/16), m_apIp(192, 168, 1, 1),
-      m_webServer(80), m_ping_B(0xF4), m_iamhere_B(0xF8), m_lastPacket())
+      m_webServer(80), m_ping_B(0xF4), m_iamhere_B(0xF8), m_lastPacket()
 {
 }
 
@@ -626,7 +626,6 @@ void PapaDuck::run()
         byte whoIsIt = LoRa.peek();
         if (whoIsIt != m_ping) {
             Serial.println(packetSize);
-            String *val = getPacketData(packetSize);
             quackJson();
         }
     }
