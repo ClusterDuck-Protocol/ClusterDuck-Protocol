@@ -57,30 +57,30 @@ private:
 
     String readMessages(byte mLength);
 
-    int _rssi;
-    float _snr;
-    long _freqErr;
-    int _availableBytes;
+    int _rssi;              ///< TODO
+    float _snr;             ///< TODO
+    long _freqErr;          ///< TODO
+    int _availableBytes;    ///< TODO
     
-    int _packetSize;
+    int _packetSize;        ///< TODO
 
-    DNSServer dnsServer;
-    const byte DNS_PORT;
-    const char *DNS;
-    const char *AP;
-    String portal;
+    DNSServer dnsServer;    ///< TODO
+    const byte DNS_PORT;    ///< TODO
+    const char *DNS;        ///< TODO
+    const char *AP;         ///< TODO
+    String portal;          ///< TODO
 
-    String runTime;
+    String runTime;         ///< TODO
 
     // QuackPack
-    static byte messageId_B;
-    static byte payload_B;
-    static byte path_B;
+    static byte messageId_B;///< TODO
+    static byte payload_B;  ///< TODO
+    static byte path_B;     ///< TODO
 
-    U8X8_SSD1306_128X64_NONAME_SW_I2C u8x8;
+    U8X8_SSD1306_128X64_NONAME_SW_I2C u8x8; ///< TODO
 
-    IPAddress apIP;
-    AsyncWebServer webServer;
+    IPAddress apIP;           ///< TODO
+    AsyncWebServer webServer; ///< TODO
     
 
 protected:
@@ -107,13 +107,13 @@ protected:
     void loRaReceive();
     static void couple(byte byteCode, String outgoing);
 
-    static String _deviceId;
-    byte ping_B;
-    static byte senderId_B;
-    byte iamhere_B;
+    static String _deviceId;///< TODO
+    byte ping_B;            ///< TODO
+    static byte senderId_B; ///< TODO
+    byte iamhere_B;         ///< TODO
 
-    Packet _lastPacket;
-    Timer<> tymer;
+    Packet _lastPacket;     ///< TODO
+    Timer<> tymer;          ///< TODO
 
 public:
     DuckLink(/* args */);
@@ -149,22 +149,22 @@ private:
   void setupMQTT();
   void quackJson();
 
-  String m_ssid;
-  String m_password;
-  String m_org;
-  String m_deviceId;
-  String m_deviceType;
-  String m_token;
-  String m_server;
-  String m_topic;
-  String m_authMethod;
-  String m_clientId;
-  Timer<>  m_timer; // create a timer with default settings
+  String m_ssid;        ///< TODO
+  String m_password;    ///< TODO
+  String m_org;         ///< TODO
+  String m_deviceId;    ///< TODO
+  String m_deviceType;  ///< TODO
+  String m_token;       ///< TODO
+  String m_server;      ///< TODO
+  String m_topic;       ///< TODO
+  String m_authMethod;  ///< TODO
+  String m_clientId;    ///< TODO
+  Timer<>  m_timer;     ///< TODO
 
-  WiFiClientSecure m_wifiClient;
-  PubSubClient m_pubSubClient;
+  WiFiClientSecure m_wifiClient;  ///< TODO
+  PubSubClient m_pubSubClient;    ///< TODO
 
-  byte m_ping;
+  byte m_ping;          ///< TODO
 
 public:
   PapaDuck(String ssid, String password, String org, String deviceId, String deviceType, String token, String server, String topic, String authMethod, String clientId);

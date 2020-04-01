@@ -9,6 +9,10 @@
   byte DuckLink::path_B=0xF3;
   String DuckLink::_deviceId = "";
 
+/**
+ * @brief Construct a new Duck Link:: Duck Link object
+ * 
+ */
 DuckLink::DuckLink(/* args */) :
   _rssi(0),
   _snr(0),
@@ -32,20 +36,39 @@ DuckLink::DuckLink(/* args */) :
 
 }
 
+/**
+ * @brief Destroy the Duck Link:: Duck Link object
+ * 
+ */
 DuckLink::~DuckLink()
 {
 }
 
+/**
+ * @brief Set device ID
+ * 
+ * @param deviceId used device ID. Do not leave deviceId _null_ or as an empty string.
+ */
 void DuckLink::setDeviceId(String deviceId) {
   _deviceId = deviceId;
 
 }
 
+/**
+ * @brief Initialize baude rate for serial. Use in `setup()`.
+ * 
+ * @param baudRate desired baude rate
+ */
 void DuckLink::begin(int baudRate) {
   Serial.begin(baudRate);
   Serial.println("Serial start");
 }
 
+/**
+ * @brief Initializes LED screen on Heltec LoRa ESP32 and configures it to show status, device ID, and the device type. Use in `setup()`.
+ * 
+ * @param deviceType TODO: valid values for deviceType
+ */
 void DuckLink::setupDisplay(String deviceType)  {
   u8x8.begin();
   u8x8.setFont(u8x8_font_chroma48medium8_r);
@@ -69,7 +92,15 @@ void DuckLink::setupDisplay(String deviceType)  {
   u8x8.print(duckMac(false));
 }
 
-// Initial LoRa settings
+/**
+ * @brief Initial LoRa settings
+ * 
+ * @param BAND TODO: Add defailt values for Heltec LoRa ESP32
+ * @param SS TODO: Add defailt values for Heltec LoRa ESP32
+ * @param RST TODO: Add defailt values for Heltec LoRa ESP32
+ * @param DI0 TODO: Add defailt values for Heltec LoRa ESP32
+ * @param TxPower TODO: Add defailt values for Heltec LoRa ESP32
+ */
 void DuckLink::setupLoRa(long BAND, int SS, int RST, int DI0, int TxPower) {
   SPI.begin(5, 19, 27, 18);
   LoRa.setPins(SS, RST, DI0);
@@ -93,7 +124,11 @@ void DuckLink::setupLoRa(long BAND, int SS, int RST, int DI0, int TxPower) {
   LoRa.enableCrc();
 }
 
-//Setup Captive Portal
+/**
+ * @brief Setup Capative Portal
+ * 
+ * @param AP the value that will be displayed when accessing the wifi settings of devices such as smartphones and laptops.
+ */
 void DuckLink::setupPortal(const char *AP) {
   WiFi.mode(WIFI_AP);
   WiFi.softAP(AP);
@@ -168,7 +203,9 @@ void DuckLink::setupPortal(const char *AP) {
   }
 }
 
-//Setup premade DuckLink with default settings
+/**
+ * @brief Setup premade DuckLink with default settings
+ */
 void DuckLink::setup() {
   setupDisplay("Duck");
   setupLoRa();
@@ -177,18 +214,30 @@ void DuckLink::setup() {
   Serial.println("Duck Online");
 }
 
+/**
+ * @brief Template for running core functionality of a DuckLink.
+ */
 void DuckLink::run() {
 
   processPortalRequest();
 
 }
 
+/**
+ * @brief TODO
+ */
 void DuckLink::processPortalRequest() {
 
   dnsServer.processNextRequest();
 
 }
 
+/**
+ * @brief Packages msg into a LoRa packet and sends over LoRa.
+ * Will automatically set the current device's ID as the sender ID and create a UUID for the message.
+ * 
+ * @param msg the message payload
+ */
 void DuckLink::sendPayloadMessage(String msg) {
   LoRa.beginPacket();
   couple(senderId_B, _deviceId);
@@ -198,6 +247,14 @@ void DuckLink::sendPayloadMessage(String msg) {
   LoRa.endPacket(); 
 }
 
+/**
+ * @brief Similar to and might replace sendPayloadMessage().
+ * 
+ * @param msg the message payload
+ * @param senderId the ID of the originator of the message
+ * @param messageId the UUID of the message
+ * @param path the recorded pathway of the message and is used as a check to prevent the device from sending multiple of the same message.
+ */
 void DuckLink::sendPayloadStandard(String msg, String senderId, String messageId, String path) {
   if(senderId == "") senderId = _deviceId;
   if(messageId == "") messageId = uuidCreator();
@@ -223,13 +280,31 @@ void DuckLink::sendPayloadStandard(String msg, String senderId, String messageId
   Serial.println("Packet sent");
 }
 
+/**
+ * @brief Writes data to LoRa packet.   
+ * 
+ * @ref setDeviceId() for byte codes. In addition it writes the outgoing length to the LoRa packet.
+ * 
+ * Use between a LoRa.beginPacket() and LoRa.endPacket() 
+ * 
+ * @note LoRa.endPacket() will send the LoRa packet
+ * 
+ * @param byteCode byteCode is paired with the outgoing so it can be used to identify data on an individual level.
+ * @param outgoing the payload data to be sent
+ */
 void DuckLink::couple(byte byteCode, String outgoing) {
   LoRa.write(byteCode);               // add byteCode
   LoRa.write(outgoing.length());      // add payload length
   LoRa.print(outgoing);               // add payload
 }
 
-//Decode LoRa message
+/**
+ * @brief Decode LoRa message
+ * Used after `LoRa.read()` to convert LoRa packet into a String.
+ * 
+ * @param mLength length of the incoming message
+ * @return the converted string
+ */
 String DuckLink::readMessages(byte mLength)  {
   String incoming = "";
 
@@ -240,6 +315,12 @@ String DuckLink::readMessages(byte mLength)  {
   return incoming;
 }
 
+/**
+ * @brief Checks if the path contains deviceId. Returns bool.
+ * 
+ * @param path TODO
+ * @return true: if the path contains the deviceId
+ */
 bool MamaDuck::idInPath(String path) {
   Serial.println("Checking Path");
   String temp = "";
@@ -264,6 +345,13 @@ bool MamaDuck::idInPath(String path) {
   return false;
 }
 
+/**
+ * @brief Called to iterate through received LoRa packet and return data as an array of Strings.
+ * @note: if using standard byte codes it will store senderId, messageId, payload, and path in a Packet object. This can be accessed using getLastPacket()
+ * 
+ * @param pSize TODO
+ * @return TODO
+ */
 String * DuckLink::getPacketData(int pSize) {
   String * packetData = new String[pSize];
   int i = 0;
@@ -301,16 +389,20 @@ String * DuckLink::getPacketData(int pSize) {
 }
 
 /**
-  restart
-  Only restarts ESP
-*/
+ * @brief If using the ESP32 architecture, calling this function will reboot the device.
+ */
 void DuckLink::restart()
 {
   Serial.println("Restarting Duck...");
   ESP.restart();
 }
 
-//Timer reboot
+/**
+ * @brief Used to call `restartDuck()` when using a timer
+ * @details [long description]
+ * 
+ * @return true TODO: why this is not a void function?
+ */
 bool DuckLink::reboot(void *) {
   String reboot = "REBOOT";
   Serial.println(reboot);
@@ -320,6 +412,11 @@ bool DuckLink::reboot(void *) {
   return true;
 }
 
+/**
+ * @brief Used to send a '1' over LoRa on a timer to signify the device is still on and functional.
+ * 
+ * @return true TODO: why this is not a void function?
+ */
 bool DuckLink::imAlive(void *) {
   String alive = "1";
   sendPayloadMessage(alive);
@@ -328,7 +425,13 @@ bool DuckLink::imAlive(void *) {
   return true;
 }
 
-//Get Duck MAC address
+/**
+ * @brief Returns the MAC address of the device. 
+ * @details [long description]
+ * 
+ * @param format Using `true` as an argument will return the MAC address formatted using ':'
+ * @return MAC address
+ */
 String DuckLink::duckMac(boolean format)
 {
   char id1[15];
@@ -362,7 +465,10 @@ String DuckLink::duckMac(boolean format)
   }
 }
 
-//Create a uuid
+/**
+ * @brief Create a uuid
+ * @return uuid
+ */
 String DuckLink::uuidCreator() {
   byte randomValue;
   char msg[50];
@@ -385,30 +491,53 @@ String DuckLink::uuidCreator() {
   return String(msg);
 }
 
+/**
+ * @brief TODO
+ */
 void DuckLink::loRaReceive() {
   LoRa.receive();
 }
 
-//Getters
 
+/**
+ * @brief Returns the device ID
+ * @return device ID
+ */
 String DuckLink::getDeviceId() {
   return _deviceId;
 }
 
+/**
+ * @brief Returns a packet object containing senderId, messageId, payload, and path of last packet received.
+ * @note values are updated after running `getPacketData()`
+ * @return packet object
+ */
 Packet DuckLink::getLastPacket() {
   Packet packet = _lastPacket;
   _lastPacket = Packet();
   return packet;
 }
 
+/**
+ * @brief Construct a new Mama Duck:: Mama Duck object
+ * 
+ */
 MamaDuck::MamaDuck(/* args */)
 {
 }
 
+/**
+ * @brief Destroy the Mama Duck:: Mama Duck object
+ * 
+ */
 MamaDuck::~MamaDuck()
 {
 }
 
+/**
+ * @brief Template for setting up a MamaDuck device.
+ * 
+ */
 void MamaDuck::setup() {
   setupDisplay("Mama");
   setupPortal();
@@ -423,6 +552,10 @@ void MamaDuck::setup() {
   tymer.every(43200000, reboot);
 }
 
+/**
+ * @brief Template for running core functionality of a MamaDuck.
+ * 
+ */
 void MamaDuck::run() {
   tymer.tick();
 
@@ -448,6 +581,20 @@ void MamaDuck::run() {
   processPortalRequest();
 }
 
+/**
+ * @brief Construct a new Papa Duck:: Papa Duck object
+ * 
+ * @param ssid        SSID of the wifi network to connect. Needs internet access
+ * @param password    password used to connect to the wifi network
+ * @param org         name of the organisation
+ * @param deviceId    unique identifier of the duck
+ * @param deviceType  device type: duck, mama, papa (TODO: Should this be a enum - and anyway isn't this always papa here?)
+ * @param token       access token for MQTT server
+ * @param server      MQTT broker
+ * @param topic       used MQTT token
+ * @param authMethod  authentification method for the MQTT server
+ * @param clientId    MQTT client ID
+ */
 PapaDuck::PapaDuck(String ssid, String password, String org, String deviceId, String deviceType, String token, String server, String topic, String authMethod, String clientId) :
   m_ssid(ssid), 
   m_password(password), 
@@ -465,10 +612,18 @@ PapaDuck::PapaDuck(String ssid, String password, String org, String deviceId, St
 {
 }
 
+/**
+ * @brief Destroy the Papa Duck:: Papa Duck object
+ * 
+ */
 PapaDuck::~PapaDuck()
 {
 }
 
+/**
+ * @brief Template for setting up a PapaDuck device.
+ * 
+ */
 void PapaDuck::setup()
 {
   setupDisplay("Papa");
@@ -479,6 +634,11 @@ void PapaDuck::setup()
   
   Serial.println("PAPA Online");
 }
+
+/**
+ * @brief Template for running core functionality of a PapaDuck.
+ * 
+ */
 void PapaDuck::run()
 {
   if(WiFi.status() != WL_CONNECTED)
@@ -504,6 +664,10 @@ void PapaDuck::run()
   m_timer.tick();
 }
 
+/**
+ * @brief Setting up the wifi connection
+ * 
+ */
 void PapaDuck::setupWiFi()
 {
   Serial.println();
@@ -525,6 +689,10 @@ void PapaDuck::setupWiFi()
   Serial.println("WiFi connected - PAPA ONLINE");
 }
 
+/**
+ * @brief connect to a MQTT broker
+ * 
+ */
 void PapaDuck::setupMQTT()
 {
   if (!!!m_pubSubClient.connected()) {
@@ -538,6 +706,10 @@ void PapaDuck::setupMQTT()
   }
 }
 
+/**
+ * @brief TODO
+ * 
+ */
 void PapaDuck::quackJson() {
   const int bufferSize = 4*  JSON_OBJECT_SIZE(4);
   StaticJsonDocument<bufferSize> doc;
