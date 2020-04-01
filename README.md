@@ -183,7 +183,7 @@ This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE)
 v1.0.5
 
 
-[Project OWL]: <https://project-owl.com>
+[Project OWL]: <https://www.project-owl.com/>
 [ClusterDuck Protocol]: <http://clusterduckprotocol.org>
 [Slack]: <https://www.project-owl.com/slack>
 
