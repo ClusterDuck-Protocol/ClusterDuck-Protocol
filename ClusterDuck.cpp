@@ -7,16 +7,16 @@ byte DuckLink::m_messageId_B = 0xF6;
 byte DuckLink::m_senderId_B  = 0xF5;
 byte DuckLink::m_payload_B   = 0xF7;
 byte DuckLink::m_path_B      = 0xF3;
-String DuckLink::m_deviceId = "";
+String DuckLink::m_deviceId  = "";
 
 /**
  * @brief Construct a new Duck Link:: Duck Link object
  *
  */
 DuckLink::DuckLink(/* args */)
-    : m_rssi(0), m_snr(0), m_freqErr(0), m_availableBytes(0), m_packetSize(0), m_dnsServer(), m_dnsPort(53), m_dns("duck"), m_ap(0),
-      m_portal(MAIN_page), m_runTime(""), m_u8x8(/* clock=*/15, /* data=*/4, /* reset=*/16), m_apIp(192, 168, 1, 1),
-      m_webServer(80), m_ping_B(0xF4), m_iamhere_B(0xF8), m_lastPacket()
+    : m_rssi(0), m_snr(0), m_freqErr(0), m_availableBytes(0), m_packetSize(0), m_dnsServer(), m_dnsPort(53),
+      m_dns("duck"), m_ap(0), m_portal(MAIN_page), m_runTime(""), m_u8x8(/* clock=*/15, /* data=*/4, /* reset=*/16),
+      m_apIp(192, 168, 1, 1), m_webServer(80), m_ping_B(0xF4), m_iamhere_B(0xF8), m_lastPacket()
 {
 }
 
@@ -152,7 +152,8 @@ void DuckLink::setupPortal(const char *AP)
         request->send(200, "text/html", m_portal);
     });
 
-    m_webServer.on("/id", HTTP_GET, [&](AsyncWebServerRequest *request) { request->send(200, "text/html", m_deviceId); });
+    m_webServer.on("/id", HTTP_GET,
+                   [&](AsyncWebServerRequest *request) { request->send(200, "text/html", m_deviceId); });
 
     m_webServer.on("/restart", HTTP_GET, [&](AsyncWebServerRequest *request) {
         request->send(200, "text/plain", "Restarting...");
@@ -360,7 +361,7 @@ String *DuckLink::getPacketData(int pSize)
             m_lastPacket.path = readMessages(mLength);
             Serial.println("Path: " + m_lastPacket.path);
         } else {
-            packetData[i]       = readMessages(mLength);
+            packetData[i]        = readMessages(mLength);
             m_lastPacket.payload = m_lastPacket.payload + packetData[i];
             m_lastPacket.payload = m_lastPacket.payload + "*";
             // Serial.println("Data" + i + ": " + packetData[i]);
@@ -499,7 +500,7 @@ String DuckLink::getDeviceId()
 Packet DuckLink::getLastPacket()
 {
     Packet packet = m_lastPacket;
-    m_lastPacket   = Packet();
+    m_lastPacket  = Packet();
     return packet;
 }
 
@@ -548,7 +549,8 @@ void MamaDuck::run()
         if (whoIsIt == m_senderId_B) {
             String *msg = getPacketData(packetSize);
             if (!idInPath(m_lastPacket.path)) {
-                sendPayloadStandard(m_lastPacket.payload, m_lastPacket.senderId, m_lastPacket.messageId, m_lastPacket.path);
+                sendPayloadStandard(m_lastPacket.payload, m_lastPacket.senderId, m_lastPacket.messageId,
+                                    m_lastPacket.path);
                 LoRa.receive();
             }
             delete (msg);
@@ -684,8 +686,6 @@ void PapaDuck::quackJson()
 {
     const int bufferSize = 4 * JSON_OBJECT_SIZE(4);
     StaticJsonDocument<bufferSize> doc;
-
-    JsonObject root = doc.as<JsonObject>();
 
     Packet lastPacket = getLastPacket();
 

@@ -104,9 +104,9 @@ class DuckLink
     static void couple(byte byteCode, String outgoing);
 
     static String m_deviceId; ///< TODO
-    byte m_ping_B;             ///< TODO
-    static byte m_senderId_B;  ///< TODO
-    byte m_iamhere_B;          ///< TODO
+    byte m_ping_B;            ///< TODO
+    static byte m_senderId_B; ///< TODO
+    byte m_iamhere_B;         ///< TODO
 
     Packet m_lastPacket; ///< TODO
 
