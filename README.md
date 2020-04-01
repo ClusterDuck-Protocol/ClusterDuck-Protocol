@@ -38,9 +38,8 @@ Check out the [ClusterDuck Protocol] website for more information and to learn a
 1. Open the `platformio.ini` within your newly created project and add `lib_deps = ClusterDuck Protocol` at the end.
 
 - ## Arduino IDE
-### Downloading Library from GitHub
 
-#### Manual Install 
+#### Install The ClusterDuck Protocol on your local machine
 You will need to clone the ClusterDuck Protocol onto your local machine and include the libraries folder into your local arduino libraries folder.
 1. Clone the ClusterDuck Protocol onto your local machine `git clone https://github.com/Code-and-Response/ClusterDuck-Protocol.git`
 1. Pull all the Library submodules needed for the Arduino IDE `git submodule update --init --recursive`
