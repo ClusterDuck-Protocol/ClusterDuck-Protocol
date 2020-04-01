@@ -11,7 +11,7 @@
     - [Hardware](#hardware)
     
 - [Platform IO setup](#PlatformIO)
-- [Arduino IDE](#arduino-software-preparation)
+- [Arduino IDE](#arduino-IDE)
     - [Install VCP Driver](#install-vcp-driver)
     - [Install the necessary libraries that work with ClusterDuck Protocol:](#install-the-necessary-libraries-that-work-with-clusterduck-protocol)
    
