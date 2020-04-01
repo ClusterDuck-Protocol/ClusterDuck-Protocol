@@ -21,7 +21,9 @@ This is beneficial after events such as earthquakes or hurricanes where communic
 
 
 # Installation
-Check out the [ClusterDuck Protocol] website for more information and to learn about projects built upon this codebase. You can reach out directly on our [Slack] too! Check out our [How To Build A Duck User Manual] for in depth instructions for setting up your environment and materials. 
+Check out the [ClusterDuck Protocol] website for more information and to learn about projects built upon this codebase. You can reach out directly on our [Slack] too for any questions! 
+
+To use the ClusterDuck Protocol follow the [How To Build a Duck](doc/howToBuildADuck.md) instalation guide.
 
 - [Use with platformIO](doc/howToBuildADuck.md#PlatformIO)
 
@@ -184,4 +186,4 @@ v1.0.5
 [Project OWL]: <https://project-owl.com>
 [ClusterDuck Protocol]: <http://clusterduckprotocol.org>
 [Slack]: <https://www.project-owl.com/slack>
-[How To Build A Duck User Manual]: <https://docs.google.com/document/d/1HNsU7lN5gbZgcciP0BSyMYGDVNDM6RYfsXgdpwo66YE/edit?usp=sharing>
+
