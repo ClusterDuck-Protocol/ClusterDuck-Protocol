@@ -1,0 +1,12 @@
+BasedOnStyle: LLVM
+
+AlignConsecutiveAssignments: true
+AlignEscapedNewlines: Left
+AllowShortBlocksOnASingleLine: true
+AllowShortFunctionsOnASingleLine: Empty
+BreakBeforeBraces: Linux
+ColumnLimit: 120
+IncludeBlocks: Regroup
+IndentCaseLabels: true
+IndentPPDirectives: BeforeHash
+IndentWidth: 4
