@@ -10,7 +10,7 @@ auto timer = timer_create_default(); // create a timer with default settings
 #define TIMEOUT 5000
 DHT dht(DHTPIN, DHTTYPE);
 
-ClusterDuck duck;
+MamaDuck duck;
 
 void setup() {
   
@@ -18,7 +18,7 @@ void setup() {
   dht.begin();
   duck.begin();
   duck.setDeviceId("ABC");
-  duck.setupMamaDuck();
+  duck.setup();
 
   timer.every(15000, runSensor);
 }
@@ -27,7 +27,7 @@ void loop() {
   timer.tick();
   
   // put your main code here, to run repeatedly:
-  duck.runMamaDuck();
+  duck.run();
   
 }
 

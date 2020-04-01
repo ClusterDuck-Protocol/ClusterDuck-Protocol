@@ -7,14 +7,14 @@ auto timer = timer_create_default(); // create a timer with default settings
 #include <Adafruit_BMP280.h>
 Adafruit_BMP280 bmp;
 
-ClusterDuck duck;
+MamaDuck duck;
 
 void setup() {
   
   // put your setup code here, to run once:
   duck.begin();
   duck.setDeviceId("Z");
-  duck.setupMamaDuck();
+  duck.setup();
 
   //Temperature and pressure
   if(!bmp.begin())
@@ -31,7 +31,7 @@ void loop() {
   timer.tick();
   
   // put your main code here, to run repeatedly:
-  duck.runMamaDuck();
+  duck.run();
   
 }
 

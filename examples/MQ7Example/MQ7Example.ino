@@ -14,14 +14,14 @@ auto timer = timer_create_default(); // create a timer with default settings
 //Declare Sensor
 MQUnifiedsensor MQ7(pin, type);
 
-ClusterDuck duck;
+MamaDuck duck;
 
 void setup() {
   
   // put your setup code here, to run once:
   duck.begin();
   duck.setDeviceId("Z");
-  duck.setupMamaDuck();
+  duck.setup();
 
   //init the sensor
   /*****************************  MQInicializar****************************************
@@ -39,7 +39,7 @@ void loop() {
   timer.tick();
   
   // put your main code here, to run repeatedly:
-  duck.runMamaDuck();
+  duck.run();
   
 }
 

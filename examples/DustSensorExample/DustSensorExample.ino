@@ -10,14 +10,14 @@ const uint8_t SHARP_VO_PIN = 0;    // Sharp Dust/particle analog out pin used fo
 
 GP2YDustSensor dustSensor(GP2YDustSensorType::GP2Y1010AU0F, SHARP_LED_PIN, SHARP_VO_PIN);
 
-ClusterDuck duck;
+MamaDuck duck;
 
 void setup() {
   
   // put your setup code here, to run once:
   duck.begin();
   duck.setDeviceId("Z");
-  duck.setupMamaDuck();
+  duck.setup();
 
   //Dust sensor
   dustSensor.begin();
@@ -29,7 +29,7 @@ void loop() {
   timer.tick();
   
   // put your main code here, to run repeatedly:
-  duck.runMamaDuck();
+  duck.run();
   
 }
 

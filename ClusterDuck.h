@@ -100,7 +100,6 @@ class DuckLink
     static String uuidCreator();
     String getDeviceId();
     Packet getLastPacket();
-    static void sendPayloadMessage(String msg);
     void loRaReceive();
     static void couple(byte byteCode, String outgoing);
 
@@ -121,6 +120,7 @@ class DuckLink
     void begin(int baudRate = 115200);
     virtual void setup();
     virtual void run();
+    static void sendPayloadMessage(String msg);
 };
 
 class MamaDuck : public DuckLink
