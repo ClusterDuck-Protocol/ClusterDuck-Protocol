@@ -70,7 +70,7 @@ There are many combinations of electronics, batteries, and enclosures that can b
 
 * **Enclosure:** Plastic Box (or 3D print, or rubber ducky, or anything you want really) if a case is necessary, [this](https://www.amazon.com/gp/product/B07DVS1HC4/ref=ppx_yo_dt_b_asin_title_o06_s00?ie=UTF8&psc=1) would work.
 
-##PlatformIO
+## PlatformIO
 
 ## Arduino Software Preparation
 
