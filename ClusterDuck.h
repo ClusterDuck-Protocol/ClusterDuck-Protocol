@@ -74,9 +74,12 @@ class ClusterDuck {
     volatile bool getInterrupt();
     void flipFlag();
     void flipInterrupt();
-    void startReceive();
+    static void startReceive();
     static int getRSSI();
     static void ping();
+    static void startTransmit();
+    static void setupDetect();
+    static int runDetect();
 
   protected:
     static Packet _lastPacket;

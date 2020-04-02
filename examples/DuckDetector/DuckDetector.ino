@@ -10,11 +10,24 @@ int ledR = 25;
 int ledG = 2;
 int ledB = 4;
 
+void setupLED() {
+   ledcAttachPin(ledR, 1); // assign RGB led pins to channels
+   ledcAttachPin(ledG, 2);
+   ledcAttachPin(ledB, 3);
+   
+   // Initialize channels 
+   // channels 0-15, resolution 1-16 bits, freq limits depend on resolution
+   // ledcSetup(uint8_t channel, uint32_t freq, uint8_t resolution_bits);
+   ledcSetup(1, 12000, 8); // 12 kHz PWM, 8-bit resolution
+   ledcSetup(2, 12000, 8);
+   ledcSetup(3, 12000, 8);
+}
+
+
 void setup() {
    duck.begin();
-   duck.setupDuck("Detector");
-   duck.setupDisplay("Detector");
-   duck.setupLoRa();
+   duck.setDeviceId("Det");
+   duck.setupDetect();
 
    setupLED();
 
@@ -26,17 +39,11 @@ void loop() {
    timer.tick();
 
    if(duck.getFlag()) {  //If LoRa packet received
-      duck.flipFlag();
-      duck.flipInterrupt();
-      int pSize = duck.handlePacket();
-      String * msg = duck.getPacketData();
-      if(msg[0] == "pong") {
-         ponger = true;
-         ledOn(duck.getRSSI);
+      int val = duck.runDetect();
+      if(val != 0) {
+        ledOn(val);
+        ponger = true;
       }
-
-      duck.flipInterrupt();
-      lora.startReceive();
    }
 
 }
@@ -51,20 +58,10 @@ bool ping(void *) {
       setColor(0,0,25);
    }
 
-   return true;
-}
+   duck.ping();
+   duck.startReceive();
 
-void setupLED() {
-   ledcAttachPin(ledR, 1); // assign RGB led pins to channels
-   ledcAttachPin(ledG, 2);
-   ledcAttachPin(ledB, 3);
-   
-   // Initialize channels 
-   // channels 0-15, resolution 1-16 bits, freq limits depend on resolution
-   // ledcSetup(uint8_t channel, uint32_t freq, uint8_t resolution_bits);
-   ledcSetup(1, 12000, 8); // 12 kHz PWM, 8-bit resolution
-   ledcSetup(2, 12000, 8);
-   ledcSetup(3, 12000, 8);
+   return true;
 }
 
 void ledOn(int incoming) {
@@ -95,4 +92,3 @@ void setColor(int red, int green, int blue)
 }
 
 
-#endif

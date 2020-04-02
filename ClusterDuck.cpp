@@ -69,7 +69,7 @@ void ClusterDuck::setupLoRa(long BAND, int SS, int RST, int DI0, int DI1, int Tx
     u8x8.drawString(0, 0, "Starting LoRa failed!");
     Serial.print("Starting LoRa Failed!!!");
     Serial.println(state);
-    while (true);
+    restartDuck();
   }
 
   lora.setDio0Action(setFlag);
@@ -79,9 +79,9 @@ void ClusterDuck::setupLoRa(long BAND, int SS, int RST, int DI0, int DI1, int Tx
   if (state == ERR_NONE) {
     Serial.println("Listening for quacks");
   } else {
-    Serial.print(F("failed, code "));
+    Serial.print("failed, code ");
     Serial.println(state);
-    while (true);
+    restartDuck();
   }
 }
 
@@ -192,6 +192,35 @@ void ClusterDuck::runDuckLink() {
 
 }
 
+void ClusterDuck::setupDetect() {
+  setupDisplay("Detector");
+  setupLoRa();
+  setupPortal();
+
+  Serial.println("Detector Online");
+}
+
+int ClusterDuck::runDetect() {
+  int val = 0;
+  if(receivedFlag) {  //If LoRa packet received
+    receivedFlag = false;
+    enableInterrupt = false;
+    int pSize = handlePacket();
+    Serial.println(pSize);
+    if(pSize > 0) {
+      for(int i=0; i < pSize; i++) {
+        if(transmission[i] == iamhere_B) {
+          val = lora.getRSSI();
+        }
+      }
+    }  
+    enableInterrupt = true;
+    startReceive();
+    Serial.println("Start receive");
+  }
+  return val;
+}
+
 void ClusterDuck::processPortalRequest() {
 
   dnsServer.processNextRequest();
@@ -218,7 +247,7 @@ int ClusterDuck::handlePacket() {
   if (state == ERR_NONE) {
     // packet was successfully received
     Serial.println("Packet Received!");
-    Serial.println("Packet Size: " + pSize);
+    Serial.println(pSize);
 
     return pSize;
   } else {
@@ -237,14 +266,17 @@ void ClusterDuck::runMamaDuck() {
     receivedFlag = false;
     enableInterrupt = false;
     int pSize = handlePacket();
-    // if(pSize > 0) {
+    Serial.println(pSize);
+    if(pSize > 0) {
     //   byte whoIsIt = transmission[0];
       //if(whoIsIt == senderId_B) {
         String * msg = getPacketData(pSize);
         packetIndex = 0;
-        if(msg[0] != "pong" && !idInPath(_lastPacket.path)) {
+        if(msg[0] != "ping" && !idInPath(_lastPacket.path)) {
           Serial.print("Send Packet");
           sendPayloadStandard(_lastPacket.payload, _lastPacket.senderId, _lastPacket.messageId, _lastPacket.path);
+          memset(transmission, 0x00, pSize); //Reset transmission
+          packetIndex = 0;
           
         }
         //delete(msg);
@@ -255,14 +287,14 @@ void ClusterDuck::runMamaDuck() {
       //   int state = lora.transmit(transmission, packetIndex);
       // }
       
-    // } else {
+    } else {
       // Serial.println("Byte code not recognized!"); 
       memset(transmission, 0x00, pSize); //Reset transmission
       packetIndex = 0;
 
-    // }
+     }
     enableInterrupt = true;
-    lora.startReceive();
+    startReceive();
     Serial.println("Start receive");
   }
 
@@ -276,26 +308,10 @@ void ClusterDuck::sendPayloadMessage(String msg) {
   couple(payload_B, msg);
   couple(path_B, _deviceId);
 
-  Serial.println(F("Packet index: " + packetIndex));
-  int state = lora.transmit(transmission, 250);
+  Serial.println("Packet index: ");
+  Serial.print(packetIndex);
+  startTransmit();
 
-  memset(transmission, 0x00, packetIndex); //Reset transmission
-  packetIndex = 0; //Reset packetIndex
-
-  if (state == ERR_NONE) {
-    // the packet was successfully transmitted
-    Serial.println("Packet sent");
-  } else if (state == ERR_PACKET_TOO_LONG) {
-    // the supplied packet was longer than 256 bytes
-    Serial.println(F(" too long!"));
-  } else if (state == ERR_TX_TIMEOUT) {
-    // timeout occured while transmitting packet
-    Serial.println(F(" timeout!"));
-  } else {
-    // some other error occurred
-    Serial.print(F("failed, code "));
-    Serial.println(state);
-  }
 }
 
 void ClusterDuck::sendPayloadStandard(String msg, String senderId, String messageId, String path) {
@@ -312,34 +328,19 @@ void ClusterDuck::sendPayloadStandard(String msg, String senderId, String messag
     Serial.println("Warning: message is too large!"); //TODO: do something
   }
 
-  if(packetIndex < 1) {
-    packetIndex = total.length();
-  }
+  // if(packetIndex < 1) {
+  //   packetIndex = total.length();
+  // }
   
   couple(senderId_B, senderId);
   couple(messageId_B, messageId);
   couple(payload_B, msg);
   couple(path_B, path);
 
-  int state = lora.transmit(transmission, packetIndex);
+  Serial.println("Packet index: ");
+  Serial.print(packetIndex);
 
-  memset(transmission, 0x00, packetIndex); //Reset transmission
-  packetIndex = 0; //Reset packetIndex
-
-  if (state == ERR_NONE) {
-    // the packet was successfully transmitted
-    Serial.println("Packet sent");
-  } else if (state == ERR_PACKET_TOO_LONG) {
-    // the supplied packet was longer than 256 bytes
-    Serial.println(F(" too long!"));
-  } else if (state == ERR_TX_TIMEOUT) {
-    // timeout occured while transmitting packet
-    Serial.println(F(" timeout!"));
-  } else {
-    // some other error occurred
-    Serial.print(F("failed, code "));
-    Serial.println(state);
-  }
+  startTransmit();
 
 }
 
@@ -387,6 +388,10 @@ bool ClusterDuck::idInPath(String path) {
 
 String * ClusterDuck::getPacketData(int pSize) {
   String * packetData = new String[pSize];
+  if(pSize == 0) {
+    Serial.println("Packet is empty!");
+    return packetData;
+  }
   packetIndex = 0;
   int len = 0;
   byte byteCode;
@@ -442,17 +447,27 @@ String * ClusterDuck::getPacketData(int pSize) {
       Serial.println("Len = " + String(len));
 
     } else if(transmission[i] == ping_B) {
-      Serial.print("ping");
+      if(_deviceId != "Det") {
+        memset(transmission, 0x00, packetIndex);
+        packetIndex = 0;
+        couple(iamhere_B, "1");
+        startTransmit();
+        Serial.println("pong sent");
+        packetData[0] = "ping";
+        return packetData;
+      }
       memset(transmission, 0x00, packetIndex);
       packetIndex = 0;
-      couple(iamhere_B, "1");
-      int state = lora.transmit(transmission, packetIndex);
+      packetData[0] = "ping";
+
+    } else if(transmission[i] == iamhere_B) {
+      Serial.print("pong");
       memset(transmission, 0x00, packetIndex);
       packetIndex = 0;
       packetData[0] = "pong";
       return packetData;
 
-    } else if(len > 0 && gotLen) {
+      } else if(len > 0 && gotLen) {
       msg = msg + String((char)transmission[i]);
       len--;
 
@@ -616,14 +631,42 @@ void ClusterDuck::flipInterrupt() {
 }
 
 void ClusterDuck::startReceive() {
-  lora.startReceive();
+  int state = lora.startReceive();
+  
+  if (state == ERR_NONE) {
+    
+  } else {
+    Serial.print("failed, code ");
+    Serial.println(state);
+    restartDuck();
+  }
+}
+
+void ClusterDuck::startTransmit() {
+  int state = lora.transmit(transmission, packetIndex);
+
+  memset(transmission, 0x00, packetIndex); //Reset transmission
+  packetIndex = 0; //Reset packetIndex
+
+  if (state == ERR_NONE) {
+    // the packet was successfully transmitted
+    Serial.println("Packet sent");
+  } else if (state == ERR_PACKET_TOO_LONG) {
+    // the supplied packet was longer than 256 bytes
+    Serial.println(" too long!");
+  } else if (state == ERR_TX_TIMEOUT) {
+    // timeout occured while transmitting packet
+    Serial.println(" timeout!");
+  } else {
+    // some other error occurred
+    Serial.print(F("failed, code "));
+    Serial.println(state);
+  }
 }
 
 void ClusterDuck::ping() {
   couple(ping_B, "0");
-  int state = lora.transmit(transmission, packetIndex);
-  memset(transmission, 0x00, packetIndex);
-  packetIndex = 0;
+  startTransmit();
 }
 
 DNSServer ClusterDuck::dnsServer;
