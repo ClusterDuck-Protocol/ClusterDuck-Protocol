@@ -10,14 +10,14 @@ The ClusterDuck Protocol was created by [Project OWL] to be an easy to use mobil
 ## How does it work?
 The network is made  up of multiple nodes called **"Ducks"**. There are 3 core roles in a ClusterDuck network: DuckLink, MamaDuck, and PapaDuck. **DuckLinks** serve as edge nodes that only transmit data. These function as remote sensors or as additional access points to a Captive Portal. **MamaDucks** inherit the same functionality of the DuckLinks, but also receive messages. MamaDucks repeat messages from DuckLinks and other MamaDucks until the message reaches a PapaDuck. **PapaDucks** are the endpoint of the network where all of the data is collected and can be stored or pushed up to the cloud. **(free tier cloud platform coming soon)**
 
-![overview](https://www.project-owl.com/assets/DuckExplain.jpg)
+![overview](doc/assets/images/DuckExplain.jpg)
 
 ## Captive Portal
 The Captive Portal is an important feature in the ClusterDuck Protocol network. The Captive Portal allows devices such as smartphones and laptops to access the network without the need to download additional software as it takes advantage a system that is native to smartphones such as Android and iPhone devices. 
 
 This is beneficial after events such as earthquakes or hurricanes where communication infrastructure is crippled. Survivors are able to connect and send messages just by connecting to the WiFi access point of a DuckLink or MamaDuck.
 
-![portal](https://github.com/knouse1344/owl/blob/master/app/assets/images/cluster_demo_vector.gif)
+![portal](doc/assets/images/cluster_demo_vector.gif)
 
 
 # Installation
