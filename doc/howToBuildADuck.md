@@ -211,7 +211,7 @@ DuckLink Hardware and Firmware Assembly
 
     **Choose an Example File** 
 
-    _Note: every Clusterduck network needs at least 1 Mama and 1 Papa_
+    _Note: every Clusterduck network needs at least 1 MamaDuck and 1 PapaDuck_
 
 
     **MamaDuckEcample:** Choose a DuckID and modify the code for your needs for api references and more explanation see down below or go to [GitHub](https://github.com/Code-and-Response/ClusterDuck-Protocol)
