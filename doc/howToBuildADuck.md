@@ -123,6 +123,7 @@ In the Arduino IDE, navigate to _Sketch > Include Library > Add .ZIP Library_. A
 
 Navigate to the downloaded ClusterDuck Protocol Folder and select.
 
+
 Return to the _Sketch > Include Library menu._ menu. You should now see the library at the bottom of the drop-down menu. It is ready to be used in your sketch. The zip file will have been expanded in the _libraries_ folder in your Arduino sketches directory.
 
 #### Manual Install
