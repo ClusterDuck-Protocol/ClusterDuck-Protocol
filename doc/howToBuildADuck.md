@@ -76,7 +76,7 @@ There are many combinations of electronics, batteries, and enclosures that can b
 ## PlatformIO
 [PlatformIO](https://platformio.org/) is a ecosystem for embedded development. Grab your favorite IDE from [here](https://platformio.org/install/integration) and make sure to install the PlatformIO IDE extension. If you are not sure which IDE to use, use [VSCode](https://docs.platformio.org/en/latest/integration/ide/vscode.html#installation).
 
-### Installing ClusterDuck-Protocol globally
+### Installing ClusterDuck-Protocol global
 
 1. From the [PIO Home](https://docs.platformio.org/en/latest/integration/ide/vscode.html#setting-up-the-project) tab select `Libraries`
 1. Search for `ClusterDuck Protocol` and install it
@@ -122,6 +122,7 @@ In the Arduino IDE, navigate to _Sketch > Include Library > Add .ZIP Library_. A
 ![Add library as zip](./assets/images/add_Library.png "add library to arduino")
 
 Navigate to the downloaded ClusterDuck Protocol Folder and select.
+
 
 Return to the _Sketch > Include Library menu._ menu. You should now see the library at the bottom of the drop-down menu. It is ready to be used in your sketch. The zip file will have been expanded in the _libraries_ folder in your Arduino sketches directory.
 

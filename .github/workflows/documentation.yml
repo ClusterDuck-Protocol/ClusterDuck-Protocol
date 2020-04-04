@@ -1,12 +1,12 @@
 name: Documentation
-
 on: push
-
 jobs:
   convert_via_pandoc:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
+        with:
+          lfs: true
       - run: mkdir output
       - uses: Ender-events/pandoc@master
         with: 
