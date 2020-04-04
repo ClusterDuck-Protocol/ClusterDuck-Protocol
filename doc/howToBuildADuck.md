@@ -76,7 +76,7 @@ There are many combinations of electronics, batteries, and enclosures that can b
 ## PlatformIO
 [PlatformIO](https://platformio.org/) is a ecosystem for embedded development. Grab your favorite IDE from [here](https://platformio.org/install/integration) and make sure to install the PlatformIO IDE extension. If you are not sure which IDE to use, use [VSCode](https://docs.platformio.org/en/latest/integration/ide/vscode.html#installation).
 
-### Installing ClusterDuck-Protocol globally
+### Installing ClusterDuck-Protocol global
 
 1. From the [PIO Home](https://docs.platformio.org/en/latest/integration/ide/vscode.html#setting-up-the-project) tab select `Libraries`
 1. Search for `ClusterDuck Protocol` and install it
