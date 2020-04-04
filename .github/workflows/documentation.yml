@@ -15,12 +15,12 @@ jobs:
         with:
           args: "doc/assets/pdfs/title.pdf output/howToBuildADuck.pdf output/final.pdf"
       - run: rm output/howToBuildADuck.pdf
-      - run: mv output/final.pdf doc/How\ to\ build\ a\ duck.pdf
-      - run: rm -rf output
+      - run: cp output/final.pdf doc/HowToBuildADuck.pdf
       - uses: actions/upload-artifact@master
         with:
-          name: doc
-          path: doc/How\ to\ build\ a\ duck.pdf
+          name: output
+          path: output
+      - run: rm -rf output
       - uses: mikeal/publish-to-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
