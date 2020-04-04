@@ -35,7 +35,7 @@
 
 Ducks are IoT devices that connect together to form simple mesh networks.  The Ducks utilize a combined network of LoRa (Long Range) technology, WiFi, Bluetooth, and sometimes other connectivities. When the Ducks need to communicate with each other they transmit over LoRa, a long-range and power efficient radio protocol. Often a user will need to communicate with the Ducks and may use WiFi.  A networked cluster of Ducks - a _ClusterDuck_ - is composed of several types of ducks: the DuckLink, MamaDuck, PapaDuck.
 
-![overview](https://www.project-owl.com/assets/DuckExplain.jpg)
+![overview](./assets/images/DuckExplain.jpg)
 
 ### DuckLinks
 
@@ -73,13 +73,9 @@ There are many combinations of electronics, batteries, and enclosures that can b
 
 * **Enclosure:** Plastic Box (or 3D print, or rubber ducky, or anything you want really) if a case is necessary, [this](https://www.amazon.com/gp/product/B07DVS1HC4/ref=ppx_yo_dt_b_asin_title_o06_s00?ie=UTF8&psc=1) would work.
 
-<<<<<<< HEAD
-## PlatformIO
-[PlatformIO](https://platformio.org/) is a ecosystem for embedded development. Grab your favorite IDE from [here](https://platformio.org/install/integration) and make sure to install the PlatformIO IDE extension. If you are not sure which IDE to use, use [VSCode](https://docs.platformio.org/en/latest/integration/ide/vscode.html#installation).
-=======
+
 ##  PlatformIO
 [PlatformIO](https://platformio.org/) is a ecosystem for embedded development. Grab your favorite IDE from [here](https://platformio.org/install/integration) and make sure to install the platformIO IDE extension. If you are not sure which IDE to use, use [VSCode](https://docs.platformio.org/en/latest/integration/ide/vscode.html#installation).
->>>>>>> documentation
 
 ### Installing ClusterDuck-Protocol global
 
@@ -264,23 +260,23 @@ DuckLink Hardware and Firmware Assembly
 1. Create an IBM Cloud account through [this link](https://ibm.biz/BdqiVW). Fill out all the required information and confirm your email address.
 1. Follow this link to provision an instance of the [IBM Watson IoT Platform](https://cloud.ibm.com/catalog/services/internet-of-things-platform). Note: you can also find this by [browsing through the catalog](https://cloud.ibm.com/catalog).
 1. Make sure the Lite plan is selected and click `Create`.  You can change the `Service Name` if you want to, but it's not required.
-![iot-platform-3](https://github.com/Code-and-Response/ClusterDuck-Protocol/blob/master/assets/images/iot-platform-3.png)
+![iot-platform-3](./assets/images/iot-platform-3.png)
 1. After the service provisions, click `Launch`.
-![iot-platform-4](https://github.com/Code-and-Response/ClusterDuck-Protocol/blob/master/assets/images/iot-platform-4.png)
+![iot-platform-4](./assets/images/iot-platform-4.png)
 1. Click `Add Device`.
-![iot-platform-5](https://github.com/Code-and-Response/ClusterDuck-Protocol/blob/master/assets/images/iot-platform-5.png)
+![iot-platform-5](./assets/images/iot-platform-5.png)
 1. Enter your `Device Type` and `Device ID`, then click `Next`.
-![iot-platform-6](https://github.com/Code-and-Response/ClusterDuck-Protocol/blob/master/assets/images/iot-platform-6.png)
+![iot-platform-6](./assets/images/iot-platform-6.png)
 1. Filling out anything in the `Device Information` tab is optional, click `Next`.
-![iot-platform-7](https://github.com/Code-and-Response/ClusterDuck-Protocol/blob/master/assets/images/iot-platform-7.png)
+![iot-platform-7](./assets/images/iot-platform-7.png)
 1. Leave the field for `Authentication Token` blank, as one will be generated automatically. You can specify your own if you prefer. Click `Next`.
-![iot-platform-8](https://github.com/Code-and-Response/ClusterDuck-Protocol/blob/master/assets/images/iot-platform-8.png)
+![iot-platform-8](./assets/images/iot-platform-8.png)
 1. Ensure that the `Summary` page looks good, then click `Finish`.
-![iot-platform-9](https://github.com/Code-and-Response/ClusterDuck-Protocol/blob/master/assets/images/iot-platform-9.png)
+![iot-platform-9](./assets/images/iot-platform-9.png)
 1. You'll see the authentication token listed, ensure that you do not misplace it, otherwise, you will have to regenerate a new token.
-![iot-platform-10](https://github.com/Code-and-Response/ClusterDuck-Protocol/blob/master/assets/images/iot-platform-10.png)
+![iot-platform-10](./assets/images/iot-platform-10.png)
 1. Open `PapaDuckExample.ino` and replace `ORG`, `DEVICE_ID`, `DEVICE_TYPE`, and `TOKEN` with the information from the summary screen. Make sure you also have the correct WiFi SSID and password filled out in that file as well. After you flash the duck with this information, you'll see data flowing through the IBM Watson IoT Platform.
-![iot-platform-11](https://github.com/Code-and-Response/ClusterDuck-Protocol/blob/master/assets/images/iot-platform-11.png)
+![iot-platform-11](./assets/images/iot-platform-11.png)
 
 
 ## FAQs
