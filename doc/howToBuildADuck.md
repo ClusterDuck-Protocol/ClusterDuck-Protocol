@@ -30,8 +30,6 @@
 
 <!-- /MarkdownTOC -->
 
-
-
 ## Duck Descriptions
 
 
