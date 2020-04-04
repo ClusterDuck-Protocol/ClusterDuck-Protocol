@@ -74,7 +74,7 @@ There are many combinations of electronics, batteries, and enclosures that can b
 * **Enclosure:** Plastic Box (or 3D print, or rubber ducky, or anything you want really) if a case is necessary, [this](https://www.amazon.com/gp/product/B07DVS1HC4/ref=ppx_yo_dt_b_asin_title_o06_s00?ie=UTF8&psc=1) would work.
 
 ## PlatformIO
-[PlatformIO](https://platformio.org/) is a ecosystem for embedded development. Grab your favorite IDE from [here](https://platformio.org/install/integration) and make sure to install the platformIO IDE extension. If you are not sure which IDE to use, use [VSCode](https://docs.platformio.org/en/latest/integration/ide/vscode.html#installation).
+[PlatformIO](https://platformio.org/) is a ecosystem for embedded development. Grab your favorite IDE from [here](https://platformio.org/install/integration) and make sure to install the PlatformIO IDE extension. If you are not sure which IDE to use, use [VSCode](https://docs.platformio.org/en/latest/integration/ide/vscode.html#installation).
 
 ### Installing ClusterDuck-Protocol globally
 
@@ -211,7 +211,7 @@ DuckLink Hardware and Firmware Assembly
 
     **Choose an Example File** 
 
-    _Note: every Clusterduck network needs at least 1 Mama and 1 Papa_
+    _Note: every Clusterduck network needs at least 1 MamaDuck and 1 PapaDuck_
 
 
     **MamaDuckEcample:** Choose a DuckID and modify the code for your needs for api references and more explanation see down below or go to [GitHub](https://github.com/Code-and-Response/ClusterDuck-Protocol)
