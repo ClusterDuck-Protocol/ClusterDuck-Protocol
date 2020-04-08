@@ -11,7 +11,6 @@ String ClusterDuck::_deviceId = "";
 
 ClusterDuck::ClusterDuck() {
 
-
 }
 
 void ClusterDuck::setDeviceId(String deviceId) {

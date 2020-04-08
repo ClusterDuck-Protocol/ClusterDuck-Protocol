@@ -9,12 +9,16 @@
 - [Raw Materials](#raw-materials)
     - [Software](#software)
     - [Hardware](#hardware)
-- [Arduino Software Preparation](#arduino-software-preparation)
+- [PlatformIO](#platformio)
+    - [Installing ClusterDuck-Protocol global](#installing-clusterduck-protocol-global)
+    - [Installing ClusterDuck-Protocol for project only](#installing-clusterduck-protocol-for-project-only)
+- [Arduino IDE](#arduino-ide)
     - [Install VCP Driver](#install-vcp-driver)
     - [Install the necessary libraries that work with ClusterDuck Protocol:](#install-the-necessary-libraries-that-work-with-clusterduck-protocol)
     - [Install Clusterduck Protocol](#install-clusterduck-protocol)
     - [Load the Heltec ESP32 Board to your Arduino IDE:](#load-the-heltec-esp32-board-to-your-arduino-ide)
 - [Install The firmware](#install-the-firmware)
+- [Setting up the IBM Watson IoT Platform](#setting-up-the-ibm-watson-iot-platform)
 - [FAQs](#faqs)
     - [General](#general)
     - [Errors when compiling](#errors-when-compiling)
@@ -26,12 +30,12 @@
 
 <!-- /MarkdownTOC -->
 
-
 ## Duck Descriptions
+
 
 Ducks are IoT devices that connect together to form simple mesh networks.  The Ducks utilize a combined network of LoRa (Long Range) technology, WiFi, Bluetooth, and sometimes other connectivities. When the Ducks need to communicate with each other they transmit over LoRa, a long-range and power efficient radio protocol. Often a user will need to communicate with the Ducks and may use WiFi.  A networked cluster of Ducks - a _ClusterDuck_ - is composed of several types of ducks: the DuckLink, MamaDuck, PapaDuck.
 
-![different Ducks](./assets/images/ducks.png "ducks")
+![overview](./assets/images/DuckExplain.jpg)
 
 ### DuckLinks
 
@@ -51,6 +55,8 @@ PapaDuck is the final Duck in the ClusterDuck and transmits network data to the 
 
 You will need the [Arduino IDE](https://www.arduino.cc/en/main/software) to install the firmware on your Arduino devices.
 
+Or you can use your favorite Code editor with the [platformIO](https://platformio.org/) plugin.
+
 The Ducklinks use our [ClusterDuck](https://github.com/Code-and-Response/ClusterDuck-Protocol) Protocol. Project OWL’s open source Duck firmware.
 
 Depending on your computer setup, you may also need [USB to UART drivers](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers).   If you have any problems, please reach out on the [Project OWL Github](https://github.com/Project-Owl) or in the [Project OWL slack.](https://www.project-owl.com/slack)
@@ -67,7 +73,22 @@ There are many combinations of electronics, batteries, and enclosures that can b
 
 * **Enclosure:** Plastic Box (or 3D print, or rubber ducky, or anything you want really) if a case is necessary, [this](https://www.amazon.com/gp/product/B07DVS1HC4/ref=ppx_yo_dt_b_asin_title_o06_s00?ie=UTF8&psc=1) would work.
 
-## Arduino Software Preparation
+
+##  PlatformIO
+[PlatformIO](https://platformio.org/) is a ecosystem for embedded development. Grab your favorite IDE from [here](https://platformio.org/install/integration) and make sure to install the platformIO IDE extension. If you are not sure which IDE to use, use [VSCode](https://docs.platformio.org/en/latest/integration/ide/vscode.html#installation).
+
+### Installing ClusterDuck-Protocol global
+
+1. From the [PIO Home](https://docs.platformio.org/en/latest/integration/ide/vscode.html#setting-up-the-project) tab select `Libraries`
+1. Search for `ClusterDuck Protocol` and install it
+
+### Installing ClusterDuck-Protocol for project only
+
+1. Create a `New Project` from the [PIO Home](https://docs.platformio.org/en/latest/integration/ide/vscode.html#setting-up-the-project) tab
+1. Choose a name, select the `Heltec Wifi LoRa 32 (V2) (Heltec Automation)` as board and `Arduino` as framework
+1. Open the `platformio.ini` within your newly created project and add `lib_deps = ClusterDuck Protocol` at the end.
+
+## Arduino IDE
 
 Open Arduino IDE.  If you do not have this developer environment yet, download the Arduino IDE [here](https://www.arduino.cc/en/main/software)
 
@@ -91,7 +112,6 @@ Download USB to UART Bridge VCP Driver from [here](https://www.silabs.com/produc
 
     ![Add additional boards to Arduino](./assets/images/arduino_boards.png "Arduino Boards")
 
-
 ### Install Clusterduck Protocol
 
 #### Using the Library Manager “COMING SOON”
@@ -104,32 +124,26 @@ In the Arduino IDE, navigate to _Sketch > Include Library > Add .ZIP Library_. A
 
 Navigate to the downloaded ClusterDuck Protocol Folder and select.
 
+
 Return to the _Sketch > Include Library menu._ menu. You should now see the library at the bottom of the drop-down menu. It is ready to be used in your sketch. The zip file will have been expanded in the _libraries_ folder in your Arduino sketches directory.
 
 #### Manual Install
-
-You can also copy the library manually into your Arduino libraries folder as follows. 
-
-1. Copy ClusterDuck folder (Download Zip or Clone to local machine)
-1. Navigate to your Arduino folder. This can be found in your default Documents folder.
-1. Navigate to the library folder
-1. Paste into library folder
-1. Restart Arduino
-1. You should now be able to see examples by going to _File -> Examples -> ClusterDuck_
+You will need to clone the ClusterDuck Protocol onto your local machine and include the libraries folder into your local arduino libraries folder.
+1. Clone the ClusterDuck Protocol onto your local machine `git clone https://github.com/Code-and-Response/ClusterDuck-Protocol.git`
+1. Pull all the Library submodules needed for the Arduino IDE `git submodule update --init --recursive`
+1. Copy the `ClusterDuck-Protocol`folder into your local Arduino Libraries folder **MacOs** _/Users/USER/Documents/Arduino/_. **windows** _C:/Users/USER/Documents/Arduino._
+1. Navigate into the `ClusterDuck-Protocol` folder and open `Libraries` folder
+1. Copy all the libraris form the `Libraries` folder
+1. Paste into into your local Arduino Libraries folder **MacOs** _/Users/USER/Documents/Arduino/_.  **windows** _C:/Users/USER/Documents/Arduino._
+1. Open Arduino IDE
+1. You should now be able to see the examples by going to File -> Examples -> ClusterDuck
 
 You should be able pull new commits directly to this folder in your Arduino library.
 
 
 #### Add required libraries
 
-The required libraries to work with the ClusterDuck protocol can be installed in multiple ways. There is a folder in the source code that is called “Libraries” and contains all the required libraries to work with the ClusterDuck Protocol. Or you can download all the libraries manual and import into Arduino by .zip. Some libraries are available in the Arduino Libraries manager. 
-
-
-##### Installing libraries by included libraries folder.
-
-In the source code there is a folder with the required libraries you will need to copy and paste these libraries into the arduino Libraries folder so they can be found. 
-
-Go to your copy of the ClusterDuck Protocol source code and find the Libraries folder. Copy all the libraries in that folder. Navigate to your Arduino folder. This is usually found in your _Documents_ for windows _C:/Users/USER/Documents/Arduino._ for MacOS _/Users/USER/Documents/Arduino/_. In the Arduino Libraries folder drag or paste all the libraries. 
+The required libraries to work with the ClusterDuck protocol can be installed in multiple ways. There is a folder in the source code that is called “Libraries” and contains all the submoduls to work with the ClusterDuck Protocol. Or you can download all the libraries manual and import into Arduino by .zip. Some libraries are available in the Arduino Libraries manager. 
 
 
 ##### Installing libraries through Library Manager
@@ -199,7 +213,7 @@ DuckLink Hardware and Firmware Assembly
 
     **Choose an Example File** 
 
-    _Note: every Clusterduck network needs at least 1 Mama and 1 Papa_
+    _Note: every Clusterduck network needs at least 1 MamaDuck and 1 PapaDuck_
 
 
     **MamaDuckEcample:** Choose a DuckID and modify the code for your needs for api references and more explanation see down below or go to [GitHub](https://github.com/Code-and-Response/ClusterDuck-Protocol)
@@ -241,7 +255,45 @@ DuckLink Hardware and Firmware Assembly
     Finished Duck:
 
     ![Running duck example](./assets/images/setup.png "Running duck example")
+## Setting up the IBM Watson IoT Platform
 
+1. Create an IBM Cloud account through [this link](https://ibm.biz/BdqiVW). Fill out all the required information and confirm your email address.
+1. Follow this link to provision an instance of the [IBM Watson IoT Platform](https://cloud.ibm.com/catalog/services/internet-of-things-platform). Note: you can also find this by [browsing through the catalog](https://cloud.ibm.com/catalog).
+1. Make sure the Lite plan is selected and click `Create`.  You can change the `Service Name` if you want to, but it's not required.
+
+    ![iot-platform-3](./assets/images/iot-platform-3.png)
+
+1. After the service provisions, click `Launch`.
+
+    ![iot-platform-4](./assets/images/iot-platform-4.png)
+
+1. Click `Add Device`.
+
+    ![iot-platform-5](./assets/images/iot-platform-5.png)
+
+1. Enter your `Device Type` and `Device ID`, then click `Next`.
+
+    ![iot-platform-6](./assets/images/iot-platform-6.png)
+
+1. Filling out anything in the `Device Information` tab is optional, click `Next`.
+
+    ![iot-platform-7](./assets/images/iot-platform-7.png)
+
+1. Leave the field for `Authentication Token` blank, as one will be generated automatically. You can specify your own if you prefer. Click `Next`.
+
+    ![iot-platform-8](./assets/images/iot-platform-8.png)
+
+1. Ensure that the `Summary` page looks good, then click `Finish`.
+
+    ![iot-platform-9](./assets/images/iot-platform-9.png)
+
+1. You'll see the authentication token listed, ensure that you do not misplace it, otherwise, you will have to regenerate a new token.
+
+    ![iot-platform-10](./assets/images/iot-platform-10.png)
+
+1. Open `PapaDuckExample.ino` and replace `ORG`, `DEVICE_ID`, `DEVICE_TYPE`, and `TOKEN` with the information from the summary screen. Make sure you also have the correct WiFi SSID and password filled out in that file as well. After you flash the duck with this information, you'll see data flowing through the IBM Watson IoT Platform.
+
+![iot-platform-11](./assets/images/iot-platform-11.png)
 
 
 ## FAQs
