@@ -200,7 +200,7 @@ DuckLink Hardware and Firmware Assembly
 
     ![Select the correct board](./assets/images/arduino_heltec.png "Select the correct board")
 
-1. In Arduino IDE, select Tools > “port” to <USB_PORT>
+1. In Arduino IDE, select Tools > “port” to \<USB_PORT\>
 
     ![Select the correct port](./assets/images/arduino_port.png "Select the correct port")
 
