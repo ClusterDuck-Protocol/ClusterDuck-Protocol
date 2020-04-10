@@ -88,7 +88,7 @@ Your sketch should look something like this:
 
 Now compile and upload to your device. If using a Heltec LoRa ESP32 board you should see a Duck Online message on the LED screen. You can now open your phone or laptop's Wi-Fi preferences and connect to the ``SOS DuckLink Network``! 
 
-If you don't see the captive portal screen, you can force it by accessing [neverssl.com](http://neverssl.com) which will force the captive portal to intercept the HTTP request.
+If you don't see the captive portal screen, you can force it by accessing [neverssl.com](http://neverssl.com) which will ensure that the captive portal intercepts the HTTP request.
 
 
 
