@@ -54,6 +54,8 @@ it's time to create a fork.
 Fork the project [on GitHub](https://github.com/Code-and-Response/ClusterDuck-Protocol) and clone your fork
 locally.
 
+You will need to have [Git Large File Storage](https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage) installed locally.
+
 ```text
 $ git clone git@github.com:username/ClusterDuck-Protocol.git
 $ cd ClusterDuck-Protocol
