@@ -552,7 +552,7 @@ void MamaDuck::run()
                                     m_lastPacket.path);
                 LoRa.receive();
             }
-            delete (msg);
+            delete[] (msg);
         } else if (whoIsIt == m_ping_B) {
             LoRa.beginPacket();
             couple(m_iamhere_B, "1");
