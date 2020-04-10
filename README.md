@@ -1,4 +1,4 @@
-![Logo](https://www.project-owl.com/assets/CDP_LOGO.png)
+![Logo](doc/assets/images/CDP_LOGO_small.png)
 
 [![License](https://img.shields.io/badge/License-Apache2-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![Slack](https://img.shields.io/badge/Join-Slack-blue)](https://www.project-owl.com/slack)
 
@@ -10,55 +10,25 @@ The ClusterDuck Protocol was created by [Project OWL] to be an easy to use mobil
 ## How does it work?
 The network is made  up of multiple nodes called **"Ducks"**. There are 3 core roles in a ClusterDuck network: DuckLink, MamaDuck, and PapaDuck. **DuckLinks** serve as edge nodes that only transmit data. These function as remote sensors or as additional access points to a Captive Portal. **MamaDucks** inherit the same functionality of the DuckLinks, but also receive messages. MamaDucks repeat messages from DuckLinks and other MamaDucks until the message reaches a PapaDuck. **PapaDucks** are the endpoint of the network where all of the data is collected and can be stored or pushed up to the cloud. **(free tier cloud platform coming soon)**
 
-![overview](https://www.project-owl.com/assets/DuckExplain.jpg)
+![overview](doc/assets/images/DuckExplain.jpg)
 
 ## Captive Portal
 The Captive Portal is an important feature in the ClusterDuck Protocol network. The Captive Portal allows devices such as smartphones and laptops to access the network without the need to download additional software as it takes advantage a system that is native to smartphones such as Android and iPhone devices. 
 
 This is beneficial after events such as earthquakes or hurricanes where communication infrastructure is crippled. Survivors are able to connect and send messages just by connecting to the WiFi access point of a DuckLink or MamaDuck.
 
-![portal](https://github.com/knouse1344/owl/blob/master/app/assets/images/cluster_demo_vector.gif)
+![portal](doc/assets/images/cluster_demo_vector.gif)
 
-# API and Getting Started
-Check out the [ClusterDuck Protocol] website for more information and to learn about projects built upon this codebase. You can reach out directly on our [Slack] too! Check out our [How To Build A Duck User Manual] for in depth instructions for setting up your environment and materials. 
 
-## PlatformIO
-[PlatformIO](https://platformio.org/) is a ecosystem for embedded development. Grab your favorite IDE from [here](https://platformio.org/install/integration) and make sure to install the platformIO ide extension. If you are not sure which IDE to use, use [VSCode](https://docs.platformio.org/en/latest/integration/ide/vscode.html#installation).
+# Installation
+Check out the [ClusterDuck Protocol] website for more information and to learn about projects built upon this codebase. You can reach out directly on our [Slack] too for any questions! 
 
-### Installing ClusterDuck-Protocol globally
+To use the ClusterDuck Protocol follow the [How To Build a Duck](doc/howToBuildADuck.md) installation guide.
 
-1. From the [PIO Home](https://docs.platformio.org/en/latest/integration/ide/vscode.html#setting-up-the-project) tab select `Libraries`
-1. Search for `ClusterDuck Protocol` and install it
+- [Use with platformIO](doc/howToBuildADuck.md#PlatformIO)
 
-### Installing ClusterDuck-Protocol for project only
+- [Use with the Arduino IDE](doc/howToBuildADuck.md#Arduino-IDE)
 
-1. Create a `New Project` from the [PIO Home](https://docs.platformio.org/en/latest/integration/ide/vscode.html#setting-up-the-project) tab
-1. Choose a name, select the `Heltec Wifi LoRa 32 (V2) (Heltec Automation)` as board and `Arduino` as framework
-1. Open the `platformio.ini` within your newly created project and add `lib_deps = ClusterDuck Protocol` at the end.
-
-## Arduino 
-### Downloading Library from GitHub
-
-#### Manual Install 
-To start we will need to copy the library into your Arduino library folder.
-1. Copy ClusterDuck folder
-1. Navigate to your ``Arduino`` folder. This can be found in your default Documents folder.
-1. Navigate to the ``library`` folder
-1. Paste into ``library`` folder
-1. Restart Arduino
-1. You should now be able to see examples by going to File -> Examples -> ClusterDuck
-
-You should be able pull new commits directly to this folder in your Arduino library.
-
-#### Importing as a .zip Library
-Download The ClusterDuck Protocol as a .Zip file.
-
-In the Arduino IDE, navigate to ``Sketch > Include Library > Add .ZIP Library.`` At the top of
-the drop down list, select the option to "Add .ZIP Library''.
-
-Navigate to the downloaded ClusterDuck Protocol Folder and select.
-Return to the Sketch > Include Library menu. menu. You should now see the library at the
-bottom of the drop-down menu. It is ready to be used in your sketch. 
 
 ## Quick Start
 
@@ -120,28 +90,7 @@ Now compile and upload to your device. If using a Heltec LoRa ESP32 board you sh
 
 If you don't see the captive portal screen, you can force it by accessing [neverssl.com](http://neverssl.com) which will force the captive portal to intercept the HTTP request.
 
-## Setting up the IBM Watson IoT Platform
 
-1. Create an IBM Cloud account through [this link](https://ibm.biz/BdqiVW). Fill out all the required information and confirm your email address.
-1. Follow this link to provision an instance of the [IBM Watson IoT Platform](https://cloud.ibm.com/catalog/services/internet-of-things-platform). Note: you can also find this by [browsing through the catalog](https://cloud.ibm.com/catalog).
-1. Make sure the Lite plan is selected and click `Create`.  You can change the `Service Name` if you want to, but it's not required.
-![iot-platform-3](https://github.com/Code-and-Response/ClusterDuck-Protocol/blob/master/assets/images/iot-platform-3.png)
-1. After the service provisions, click `Launch`.
-![iot-platform-4](https://github.com/Code-and-Response/ClusterDuck-Protocol/blob/master/assets/images/iot-platform-4.png)
-1. Click `Add Device`.
-![iot-platform-5](https://github.com/Code-and-Response/ClusterDuck-Protocol/blob/master/assets/images/iot-platform-5.png)
-1. Enter your `Device Type` and `Device ID`, then click `Next`.
-![iot-platform-6](https://github.com/Code-and-Response/ClusterDuck-Protocol/blob/master/assets/images/iot-platform-6.png)
-1. Filling out anything in the `Device Information` tab is optional, click `Next`.
-![iot-platform-7](https://github.com/Code-and-Response/ClusterDuck-Protocol/blob/master/assets/images/iot-platform-7.png)
-1. Leave the field for `Authentication Token` blank, as one will be generated automatically. You can specify your own if you prefer. Click `Next`.
-![iot-platform-8](https://github.com/Code-and-Response/ClusterDuck-Protocol/blob/master/assets/images/iot-platform-8.png)
-1. Ensure that the `Summary` page looks good, then click `Finish`.
-![iot-platform-9](https://github.com/Code-and-Response/ClusterDuck-Protocol/blob/master/assets/images/iot-platform-9.png)
-1. You'll see the authentication token listed, ensure that you do not misplace it, otherwise, you will have to regenerate a new token.
-![iot-platform-10](https://github.com/Code-and-Response/ClusterDuck-Protocol/blob/master/assets/images/iot-platform-10.png)
-1. Open `PapaDuckExample.ino` and replace `ORG`, `DEVICE_ID`, `DEVICE_TYPE`, and `TOKEN` with the information from the summary screen. Make sure you also have the correct WiFi SSID and password filled out in that file as well. After you flash the duck with this information, you'll see data flowing through the IBM Watson IoT Platform.
-![iot-platform-11](https://github.com/Code-and-Response/ClusterDuck-Protocol/blob/master/assets/images/iot-platform-11.png)
 
 ## API
 ``setDeviceId(String deviceId)``
@@ -234,7 +183,7 @@ This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE)
 v1.0.5
 
 
-[Project OWL]: <https://project-owl.com>
+[Project OWL]: <https://www.project-owl.com/>
 [ClusterDuck Protocol]: <http://clusterduckprotocol.org>
-[Slack]: <https://www.project-owl.com/slack>
-[How To Build A Duck User Manual]: <https://docs.google.com/document/d/1HNsU7lN5gbZgcciP0BSyMYGDVNDM6RYfsXgdpwo66YE/edit?usp=sharing>
+[Slack Workspace]: <https://www.project-owl.com/slack>
+
