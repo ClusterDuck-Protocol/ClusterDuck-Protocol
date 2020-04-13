@@ -338,7 +338,7 @@ bool ClusterDuck::reboot(void *) {
 }
 
 bool ClusterDuck::imAlive(void *) {
-  String alive = "1";
+  String alive = "Health Quack";
   sendPayloadMessage(alive);
   Serial.print("alive");
 
