@@ -5,13 +5,13 @@
 #include <WiFiClientSecure.h>
 #include "timer.h"
 
-#define SSID        "HEINEKEN"
-#define PASSWORD    "duckduckowl"
+#define SSID        "WIELINK-GAST"
+#define PASSWORD    "Wielink2020"
 
-#define ORG         "9c6nfo"
+#define ORG         "9c6nfo"                  
 #define DEVICE_ID   "TIMO_DUCK"
-#define DEVICE_TYPE "PAPA"
-#define TOKEN       "qQTQ5q(4qvAVSlxdHu"
+#define DEVICE_TYPE "PAPA"                
+#define TOKEN       "qQTQ5q(4qvAVSlxdHu"      
 
 char server[]           = ORG ".messaging.internetofthings.ibmcloud.com";
 char topic[]            = "iot-2/evt/status/fmt/json";
