@@ -75,8 +75,6 @@ void loop() {
   timer.tick();
 }
 
-
-
 void setupMQTT()
 {
   if (!!!client.connected()) {
