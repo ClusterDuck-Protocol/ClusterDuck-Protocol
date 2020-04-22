@@ -9,6 +9,7 @@
 
 #include <RadioLib.h>
 #include <WiFi.h>
+#include <WiFiClientSecure.h>
 #include <U8x8lib.h>
 
 #include <DNSServer.h>
@@ -36,7 +37,10 @@ class ClusterDuck {
     static void begin(int baudRate = 115200);
     static void setupLoRa(long BAND = 915.0, int SS = 18, int RST = 14, int DI0 = 26, int DI1 = 25, int TxPower = 20);
     static void setupDisplay(String deviceType);
-    static void setupPortal(const char *AP = " 🆘 DUCK EMERGENCY PORTAL");
+    static void setupWebServer(bool createCaptivePortal = false);
+		static void setupWifiAp(const char *AP = " 🆘 DUCK EMERGENCY PORTAL");
+		static void setupDns();
+		static void setupInternet(String SSID, String PASSWORD);
     static bool runCaptivePortal();
 
     static void setupDuckLink();
@@ -63,7 +67,7 @@ class ClusterDuck {
 
     static String getDeviceId();
     static Packet getLastPacket();
-    
+
     static void sendPayloadMessage(String msg);
     static bool imAlive(void *);
 
@@ -80,6 +84,12 @@ class ClusterDuck {
     static void startTransmit();
     static void setupDetect();
     static int runDetect();
+
+    static void setColor(int ledR = 25,int ledG = 4,int ledB = 2);
+    static void setupLED();
+
+    static String getSSID();
+    static String getPassword();
 
   protected:
     static Packet _lastPacket;
@@ -109,6 +119,10 @@ class ClusterDuck {
     static byte payload_B;
     static byte iamhere_B;
     static byte path_B;
+
+    static int ledR;
+    static int ledG;
+    static int ledB;
 
 
 };

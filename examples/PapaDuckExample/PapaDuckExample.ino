@@ -28,33 +28,6 @@ PubSubClient client(server, 8883, wifiClient);
 
 byte ping = 0xF4;
 
-//Setup LED
-int ledR = 25;
-int ledG = 4;
-int ledB = 2;
-
-void setupLED() {
-  ledcAttachPin(ledR, 1); // assign RGB led pins to channels
-  ledcAttachPin(ledG, 2);
-  ledcAttachPin(ledB, 3);
-//  
-//  // Initialize channels 
-//  // channels 0-15, resolution 1-16 bits, freq limits depend on resolution
-//  // ledcSetup(uint8_t channel, uint32_t freq, uint8_t resolution_bits);
-  ledcSetup(1, 12000, 8); // 12 kHz PWM, 8-bit resolution
-  ledcSetup(2, 12000, 8);
-  ledcSetup(3, 12000, 8);
-}
-
-void setColor(int red, int green, int blue)
-{
-  ledcWrite(1, red);
-  ledcWrite(2, green);
-  ledcWrite(3, blue);  
-}
-
-
-
 void setup() {
   // put your setup code here, to run once:
 
@@ -63,11 +36,14 @@ void setup() {
 
   duck.setupLoRa();
   duck.setupDisplay("Papa");
-  setupLED();
-  setColor(255,10,000);
 
-  setupWiFi();
-  
+  const * char ap = "PapaDuck Setup";
+  duck.setupWifiAp(ap);
+	duck.setupDns();
+
+	duck.setupInternet(SSID, PASSWORD);
+  duck.setupWebServer();
+
   Serial.println("PAPA Online");
 }
 
@@ -76,9 +52,9 @@ void loop() {
   if(WiFi.status() != WL_CONNECTED)
   {
     Serial.print("WiFi disconnected, reconnecting to local network: ");
-    Serial.print(SSID);
-    setupWiFi();
-
+    Serial.print(duck.getSSID());
+    duck.setupInternet(duck.getSSID(), duck.getPassword());
+		duck.setupDns();
   }
   setupMQTT();
 
@@ -89,37 +65,17 @@ void loop() {
     if(pSize > 3) {
       String * msg = duck.getPacketData(pSize);
       quackJson();
-      
+
     }
     duck.flipInterrupt();
     duck.startReceive();
   }
 
-  
+
   timer.tick();
 }
 
-void setupWiFi()
-{
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.print(SSID);
 
-  // Connect to Access Poink
-  WiFi.begin(SSID, PASSWORD);
-
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    timer.tick(); //Advance timer to reboot after awhile
-    //delay(500);
-    Serial.print(".");
-  }
-
-  // Connected to Access Point
-  Serial.println("");
-  Serial.println("WiFi connected - PAPA ONLINE");
-  setColor(0,255,0);
-}
 
 void setupMQTT()
 {
@@ -151,11 +107,11 @@ void quackJson() {
   serializeJson(doc, jsonstat);
 
   if (client.publish(topic, jsonstat.c_str())) {
-    
+
     serializeJsonPretty(doc, Serial);
      Serial.println("");
     Serial.println("Publish ok");
-   
+
   }
   else {
     Serial.println("Publish failed");
