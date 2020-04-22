@@ -231,6 +231,7 @@ void ClusterDuck::runMamaDuck() {
   tymer.tick();
 
   if(receivedFlag) {  //If LoRa packet received
+    receivedFlag = false;
     int pSize = handlePacket();
     if(pSize > 0) {
       byte whoIsIt = transmission[0];
@@ -345,7 +346,7 @@ void ClusterDuck::couple(byte byteCode, String outgoing) {
 
   transmission[packetIndex] = byteCode; //add byte code
   packetIndex++;
-  transmission[packetIndex + 1] = (byte)outgoingLen; // add payload length
+  transmission[packetIndex] = (byte)outgoingLen; // add payload length
   packetIndex++;
 
   for(int i=0; i < outgoingLen; i++) {  // add payload
