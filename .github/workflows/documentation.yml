@@ -2,7 +2,7 @@ name: Documentation
 on:
   push:
     paths:
-    - '/doc/howToBuildADuck.md'
+    - 'doc/**'
 jobs:
   convert_via_pandoc:
     runs-on: ubuntu-18.04
