@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-
-=======
->>>>>>> 16db53a255255080fd94d399a577952702c8b25d
 # How to build a duck
 
 <!-- MarkdownTOC levels="2,3" autolink="true" -->
@@ -600,8 +596,3 @@ Packet getLastPacket()
 
 * Returns a Packet object containing senderId, messageId, payload, and path of last packet received.
 * Note: values are updated after running `getPacketData()`
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 16db53a255255080fd94d399a577952702c8b25d
