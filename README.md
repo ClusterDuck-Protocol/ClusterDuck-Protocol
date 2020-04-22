@@ -20,6 +20,9 @@ This is beneficial after events such as earthquakes or hurricanes where communic
 ![portal](doc/assets/images/cluster_demo_vector.gif)
 
 
+## **NEW** DetectorDuck
+When setting up a network it can be difficult to figure out where to place Duck devices in the field. A DetectorDuck can be used to easily make sure that Ducks are able to maintain connectivity when deploying *ad hoc*. It works by broadcasing a ping every 3 seconds and takes the **RSSI** value of the *pong* of the nearest Duck device. Based on the **RSSI** value, the attached RGB LED will change color between **Blue** (no devices in range), **Green** (great connection), **Purple** (good connection), and **Red** (fair connection).
+
 # Installation
 Check out the [ClusterDuck Protocol] website for more information and to learn about projects built upon this codebase. You can reach out directly on our [Slack] too for any questions! 
 
@@ -102,11 +105,33 @@ If you don't see the captive portal screen, you can force it by accessing [never
 ``void setupDisplay(String deviceType)``
 - Initializes LED screen on Heltec LoRa ESP32 and configures it to show status, device ID, and the device type. Use in ``setup()``.
 
-``void setupLoRa(long BAND, int SS, int RST, int DI0, int TxPower)``
-- Initializes LoRa radio. If using **Heltec LoRa ESP32** set **SS** to , **RST** to and **DIO** to . **TxPower** corresponds to the the transmit power of the radio (max value: 20). Use in ``setup()``.
+``void setupLoRa(long BAND, int SS, int RST, int DI0, int DI1, int TxPower)``
+- Initializes LoRa radio. Default setting is **Heltec LoRa ESP32** pins (**SS** = 18, **RST** = 14, **DI0** = 26, **DI1** = 25). **TxPower** corresponds to the the transmit power of the radio (max value: 20). Use in ``setup()``.
 
-``void setupPortal(const char *AP)``
-- Initializes the captive portal code. ***AP** is the value that will be displayed when accessing the wifi settings of devices such as smartphones and laptops. Use in ``setup()``.
+``void setFlag(void)``
+- On LoRa packet received set **receivedFlag** to *true* if **enableInterrupt** is *false*.
+
+``void setupWebServer(bool createCaptivePortal = false)``
+- Initializes the websever and routes. Setting **createCaptivePortal** to *true* will make the captive portal automatically pop up on connection. If set to *false*, the captive portal can still be accessed by opening a browser and going to **192.168.1.1**. 
+- */* : **HTTP_GET** : Captive Portal.
+- */formSubmit* : **HTTP_POST** : Collects data from all inputs that have a *name* tag in *html*, turns it into a single *String* with each element separated by a *. Then runs ``sendPayloadStandard(String msg)``.
+- */id* : returns **_deviceId**.
+- */restart* : **HTTP_GET** : Restarts Duck.
+- */mac* : **HTTP_GET** : Returns device's mac address
+- */wifi* : **HTTP_GET** : Portal to change wifi credentials
+- */changeSSID* : **HTTP_POST** : Takes input values with **name** tags equal to **ssid** and **pass**. Uses these values to run ``setupInternet(String SSID, String PASSWORD)``
+
+``void setupWifiAp(const char * AP)``
+- Initializes WiFi access point with SSID = **AP**.
+
+``void setupDns()``
+- Initializes DNS server.
+
+``void setupInternet(String SSID, String PASSWORD)``
+- Connects device to WiFi using supplied credentails.
+
+``int handlePacket()``
+- Takes received LoRa packet and puts data into **transmission**.
 
 ``void processPortalRequest()``
 - Handles incoming and active connections to the captive portal. **Required** for runing captive portal. Use in ``loop()``.
@@ -117,17 +142,17 @@ If you don't see the captive portal screen, you can force it by accessing [never
 ``void runDuckLink()``
 - Template for running core functionality of a **DuckLink**. Use in ``loop()``.
 
+``void setupDetect()``
+- Template for settuing up a **DetectorDuck** device. Use in ``setup()``.
+
+``void runDetect()``
+- Template for running core functionality of a **DetectorDuck**. Use in ``loop()``.
+
 ``void setupMamaDuck()``
 - Template for setting up a **MamaDuck** device. Use in ``setup()``.
 
 ``void runMamaDuck()``
 - Template for running core functionality of a **MamaDuck**. Use in ``loop()``.
-
-``String * getPortalDataArray()``
-- Returns webserver arguments based on **formLength** as an array of ``Strings``.
-
-``String getPortalDataString()``
-- Returns webserver arguments based on **formLength** as a single String with arguments separated by *
 
 ``void sendPayloadMessage(String msg)``
 - Packages **msg** into a LoRa packet and sends over LoRa. Will automatically set the current device's ID as the sender ID and create a UUID for the message.
@@ -136,11 +161,7 @@ If you don't see the captive portal screen, you can force it by accessing [never
 - Similar to and might replace ``sendPayloadMessage()``. **senderId** is the ID of the originator of the message. **messageId** is the UUID of the message. **ms** is the message payload to be sent. **path** is the recorded pathway of the message and is used as a check to prevent the device from sending multiple of the same message.
 
 ``void couple(byte byteCode, String outgoing)``
-- Writes data to LoRa packet. **outgoing** is the payload data to be sent. **byteCode** is paired with the **outgoing** so it can be used to identify data on an individual level. Reference ``setDeviceId()`` for byte codes. In addition it writes the **outgoing** length to the LoRa packet. 
-- Use between a ``LoRa.beginPacket()`` and ``LoRa.endPacket()`` (**note:** ``LoRa.endPacket()`` will send the LoRa packet)
-
-``String readMessages(byte mLength)``
-- Returns a String. Used after ``LoRa.read()`` to convert LoRa packet into a String.
+- Writes data to LoRa packet. **outgoing** is the payload data to be sent. **byteCode** is paired with the **outgoing** so it can be used to identify data on an individual level. Reference ``setDeviceId()`` for byte codes. In addition it writes the **outgoing** length to the LoRa packet.
 
 ``bool idInPath(String path)``
 - Checks if the **path** contains **deviceId**. Returns bool.
@@ -170,6 +191,43 @@ If you don't see the captive portal screen, you can force it by accessing [never
 ``Packet getLastPacket()``
 - Returns a Packet object containing **senderId**, **messageId**, **payload**, and **path** of last packet received.
 - Note: values are updated after running ``getPacketData()``
+
+``volatile bool getFlag()``
+- Returns value of **receivedFlag**.
+
+``volatile bool getInterrupt()``
+- Returns value of **enableInterrupt**.
+
+``int getRSSI()``
+- Returns RSSI for last packet received.
+
+``Sting getSSID()``
+- Returns set SSID for wifi credentials.
+
+``Sting getPassword()``
+- Returns set password for wifi credentials.
+
+``void flipFlag()``
+- Flips value of bool **receivedFlag**.
+
+``void flipInterrupt()``
+- Flips value of bool **enableInterrupt**.
+
+``void startReceive()``
+- Starts LoRa receive mode.
+
+``void startTransmit()``
+- Transmits package stored in **transmission**. Resets both **packetIndex** and **transmission**
+- **TODO:** if there is an error sending packet, the packet is deleted. Add functionalilty to retry, but not create infinite loop. Maybe use interrupt.
+
+``void ping()``
+- Send a ping using byte code **ping_B**.
+
+``void setupLED()``
+- Setup channel for RGB LED.
+
+``void setColor(int red, int green, int blue)``
+- Set color of RGB LED, 0-256.
 
 ## Contributing
 

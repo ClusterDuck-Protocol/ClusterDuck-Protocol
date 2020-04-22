@@ -325,27 +325,6 @@ void ClusterDuck::setupMamaDuck() {
   tymer.every(43200000, reboot);
 }
 
-int ClusterDuck::handlePacket() {
-  int pSize = lora.getPacketLength();
-  memset(transmission, 0x00, pSize); //Reset transmission
-  packetIndex = 0;
-  int state = lora.readData(transmission, pSize);
-
-  if (state == ERR_NONE) {
-    // packet was successfully received
-    Serial.println("Packet Received!");
-    Serial.println(pSize);
-
-    return pSize;
-  } else {
-    // some other error occurred
-    Serial.print("Failed, code ");
-    Serial.println(state);
-
-    return -1;
-  }
-}
-
 void ClusterDuck::runMamaDuck() {
   tymer.tick();
 
@@ -377,6 +356,27 @@ void ClusterDuck::runMamaDuck() {
 
   processPortalRequest();
 
+}
+
+int ClusterDuck::handlePacket() {
+  int pSize = lora.getPacketLength();
+  memset(transmission, 0x00, pSize); //Reset transmission
+  packetIndex = 0;
+  int state = lora.readData(transmission, pSize);
+
+  if (state == ERR_NONE) {
+    // packet was successfully received
+    Serial.println("Packet Received!");
+    Serial.println(pSize);
+
+    return pSize;
+  } else {
+    // some other error occurred
+    Serial.print("Failed, code ");
+    Serial.println(state);
+
+    return -1;
+  }
 }
 
 void ClusterDuck::sendPayloadMessage(String msg) {
