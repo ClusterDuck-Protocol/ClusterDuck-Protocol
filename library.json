@@ -36,4 +36,10 @@
         "ESP Async WebServer": "~1.2.3",
         "RadioLib": "~3.5.0"
     }
+<<<<<<< HEAD
  }
+=======
+ 
+}
+
+>>>>>>> edb7580... Update library.json
