@@ -578,6 +578,3 @@ Packet getLastPacket()
 * Note: values are updated after running `getPacketData()`
 
 
-
-
-
