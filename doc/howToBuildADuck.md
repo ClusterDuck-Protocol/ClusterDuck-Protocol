@@ -1,3 +1,4 @@
+
 # How to build a duck
 
 <!-- MarkdownTOC levels="2,3" autolink="true" -->
@@ -47,11 +48,7 @@ MamaDucks act as central hubs to DuckLink groups.  The MamaDuck is able to recei
 
 ### PapaDuck
 
-<<<<<<< HEAD
 PapaDuck is the final Duck in the ClusterDuck and transmits network data to the internet.  When communicating with other Ducks the PapaDuck similarly uses LoRa. The data that the PapaDuck receives gets pushed to the OWL Data Management System (DMS), the cloud platform, through the Internet. It acts like a gateway that collects data from MamaDucks and then upload it to the DMS.
-=======
-PapaDuck is the final Duck in the ClusterDuck and transmits network data to the internet.  When communicating with other Ducks the PapaDuck similarly uses LoRa. The data that the PapaDuck receives gets pushed to the OWL Data Management System (DMS), the cloud platform, through the Internet. It acts like a gateway that collects data from MamaDucks and then upload it to OWL.
->>>>>>> 16db53a255255080fd94d399a577952702c8b25d
                         
 ## Raw Materials
 
@@ -79,10 +76,7 @@ There are many combinations of electronics, batteries, and enclosures that can b
 
 
 ##  PlatformIO
-<<<<<<< HEAD
 
-=======
->>>>>>> 16db53a255255080fd94d399a577952702c8b25d
 [PlatformIO](https://platformio.org/) is a ecosystem for embedded development. Grab your favorite IDE from [here](https://platformio.org/install/integration) and make sure to install the PlatformIO IDE extension. If you are not sure which IDE to use, use [VSCode](https://docs.platformio.org/en/latest/integration/ide/vscode.html#installation).
 
 ### Installing ClusterDuck-Protocol global
@@ -136,13 +130,7 @@ Navigate to the downloaded ClusterDuck Protocol Folder and select.
 Return to the _Sketch > Include Library menu._ menu. You should now see the library at the bottom of the drop-down menu. It is ready to be used in your sketch. The zip file will have been expanded in the _libraries_ folder in your Arduino sketches directory.
 
 #### Manual Install
-<<<<<<< HEAD
 You will need to clone the ClusterDuck Protocol onto your local machine and include the libraries folder into your local arduino libraries folder.
-=======
-
-You will need to clone the ClusterDuck Protocol onto your local machine and include the libraries folder into your local arduino libraries folder.
-
->>>>>>> 16db53a255255080fd94d399a577952702c8b25d
 1. Clone the ClusterDuck Protocol onto your local machine `git clone https://github.com/Code-and-Response/ClusterDuck-Protocol.git`
 1. Pull all the Library submodules needed for the Arduino IDE `git submodule update --init --recursive`
 1. Copy the `ClusterDuck-Protocol`folder into your local Arduino Libraries folder **MacOs** _/Users/USER/Documents/Arduino/_. **windows** _C:/Users/USER/Documents/Arduino._
@@ -222,11 +210,7 @@ DuckLink Hardware and Firmware Assembly
 
     At this point you will need to choose what kind of Duck you want to make. There are Examples for different Ducks included in the ClusterDuck Protocol. Go to File -> Examples -> Clusterduck. 
 
-<<<<<<< HEAD
     ![Using Cluster Duck examples](./assets/images/arduino_examples.png)
-=======
-    ![Using Cluster Duck examples](./assets/images/arduino_examples.png "Using Cluster Duck examples")
->>>>>>> 16db53a255255080fd94d399a577952702c8b25d
 
 
     **Choose an Example File** 
@@ -273,10 +257,6 @@ DuckLink Hardware and Firmware Assembly
     Finished Duck:
 
     ![Running duck example](./assets/images/setup.png "Running duck example")
-<<<<<<< HEAD
-=======
-
->>>>>>> 16db53a255255080fd94d399a577952702c8b25d
 ## Setting up the IBM Watson IoT Platform
 
 1. Create an IBM Cloud account through [this link](https://ibm.biz/BdqiVW). Fill out all the required information and confirm your email address.
@@ -596,3 +576,7 @@ Packet getLastPacket()
 
 * Returns a Packet object containing senderId, messageId, payload, and path of last packet received.
 * Note: values are updated after running `getPacketData()`
+
+
+
+
