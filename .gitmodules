@@ -2,9 +2,9 @@
 [submodule "Libraries/pubsubclient"]
 	path = Libraries/pubsubclient
 	url = https://github.com/knolleary/pubsubclient.git
-[submodule "Libraries/arduino-LoRa"]
-	path = Libraries/arduino-LoRa
-	url = https://github.com/sandeepmistry/arduino-LoRa
+[submodule "Libraries/RadioLib"]
+	path = Libraries/RadioLib
+	url = https://github.com/jgromes/RadioLib
 [submodule "Libraries/arduino-timer"]
 	path = Libraries/arduino-timer
 	url = https://github.com/contrem/arduino-timer

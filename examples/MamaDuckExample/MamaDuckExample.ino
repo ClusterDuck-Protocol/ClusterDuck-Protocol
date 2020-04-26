@@ -9,7 +9,7 @@ void setup() {
   
   // put your setup code here, to run once:
   duck.begin();
-  duck.setDeviceId("ABC");
+  duck.setDeviceId("R");
   duck.setupMamaDuck();
 
   //timer.every(300000, runSensor);
@@ -20,6 +20,7 @@ void loop() {
   
   // put your main code here, to run repeatedly:
   duck.runMamaDuck();
+  
   
 }
 

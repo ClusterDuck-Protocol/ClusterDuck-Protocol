@@ -7,9 +7,9 @@
 #include "WProgram.h"
 #endif
 
-#include <SPI.h>
-#include <LoRa.h>
+#include <RadioLib.h>
 #include <WiFi.h>
+#include <WiFiClientSecure.h>
 #include <U8x8lib.h>
 
 #include <DNSServer.h>
@@ -35,14 +35,18 @@ class ClusterDuck {
     //Exposed Methods
     static void setDeviceId(String deviceId = "");
     static void begin(int baudRate = 115200);
-    static void setupLoRa(long BAND = 915E6, int SS = 18, int RST = 14, int DI0 = 26, int TxPower = 20);
+    static void setupLoRa(long BAND = 915.0, int SS = 18, int RST = 14, int DI0 = 26, int DI1 = 25, int TxPower = 20);
     static void setupDisplay(String deviceType);
-    static void setupPortal(const char *AP = " 🆘 DUCK EMERGENCY PORTAL");
+    static void setupWebServer(bool createCaptivePortal = false);
+		static void setupWifiAp(const char *AP = " 🆘 DUCK EMERGENCY PORTAL");
+		static void setupDns();
+		static void setupInternet(String SSID, String PASSWORD);
     static bool runCaptivePortal();
 
     static void setupDuckLink();
     static void setupMamaDuck();
     static void processPortalRequest();
+    static int handlePacket();
     static void runDuckLink();
     static void runMamaDuck();
 
@@ -63,14 +67,29 @@ class ClusterDuck {
 
     static String getDeviceId();
     static Packet getLastPacket();
-    
+
     static void sendPayloadMessage(String msg);
     static bool imAlive(void *);
 
-    static void loRaReceive();
-
     static void couple(byte byteCode, String outgoing);
     static bool idInPath(String path);
+
+    volatile bool getFlag();
+    volatile bool getInterrupt();
+    void flipFlag();
+    void flipInterrupt();
+    static void startReceive();
+    static int getRSSI();
+    static void ping();
+    static void startTransmit();
+    static void setupDetect();
+    static int runDetect();
+
+    static void setColor(int ledR = 25,int ledG = 4,int ledB = 2);
+    static void setupLED();
+
+    static String getSSID();
+    static String getPassword();
 
   protected:
     static Packet _lastPacket;
@@ -79,6 +98,8 @@ class ClusterDuck {
   private:
 
     static int _packetSize;
+
+    static void setFlag(void);
 
     static DNSServer dnsServer;
     static const byte DNS_PORT;
@@ -89,7 +110,6 @@ class ClusterDuck {
     static String runTime;
 
     static void restartDuck();
-    static String readMessages(byte mLength);
     static bool reboot(void *);
 
     // QuackPack
@@ -99,6 +119,10 @@ class ClusterDuck {
     static byte payload_B;
     static byte iamhere_B;
     static byte path_B;
+
+    static int ledR;
+    static int ledG;
+    static int ledB;
 
 
 };

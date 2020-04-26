@@ -8,10 +8,10 @@
 #define SSID        ""
 #define PASSWORD    ""
 
-#define ORG         ""                  
+#define ORG         ""
 #define DEVICE_ID   ""
-#define DEVICE_TYPE "PAPA"                
-#define TOKEN       ""      
+#define DEVICE_TYPE ""
+#define TOKEN       ""
 
 char server[]           = ORG ".messaging.internetofthings.ibmcloud.com";
 char topic[]            = "iot-2/evt/status/fmt/json";
@@ -35,11 +35,15 @@ void setup() {
   duck.setDeviceId("Papa");
 
   duck.setupLoRa();
-  LoRa.receive();
   duck.setupDisplay("Papa");
 
-  setupWiFi();
-  
+  const char * ap = "PapaDuck Setup";
+  duck.setupWifiAp(ap);
+	duck.setupDns();
+
+	duck.setupInternet(SSID, PASSWORD);
+  duck.setupWebServer();
+
   Serial.println("PAPA Online");
 }
 
@@ -48,45 +52,27 @@ void loop() {
   if(WiFi.status() != WL_CONNECTED)
   {
     Serial.print("WiFi disconnected, reconnecting to local network: ");
-    Serial.print(SSID);
-    setupWiFi();
-
+    Serial.print(duck.getSSID());
+    duck.setupInternet(duck.getSSID(), duck.getPassword());
+		duck.setupDns();
   }
   setupMQTT();
 
-  int packetSize = LoRa.parsePacket();
-  if (packetSize != 0) {
-    byte whoIsIt = LoRa.peek();
-    if(whoIsIt != ping) {
-      Serial.println(packetSize);
-      String * val = duck.getPacketData(packetSize);
+  if(duck.getFlag()) {  //If LoRa packet received
+    duck.flipFlag();
+    duck.flipInterrupt();
+    int pSize = duck.handlePacket();
+    if(pSize > 3) {
+      String * msg = duck.getPacketData(pSize);
       quackJson();
+
     }
+    duck.flipInterrupt();
+    duck.startReceive();
   }
 
-  
+
   timer.tick();
-}
-
-void setupWiFi()
-{
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.print(SSID);
-
-  // Connect to Access Poink
-  WiFi.begin(SSID, PASSWORD);
-
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    timer.tick(); //Advance timer to reboot after awhile
-    //delay(500);
-    Serial.print(".");
-  }
-
-  // Connected to Access Point
-  Serial.println("");
-  Serial.println("WiFi connected - PAPA ONLINE");
 }
 
 void setupMQTT()
@@ -119,11 +105,11 @@ void quackJson() {
   serializeJson(doc, jsonstat);
 
   if (client.publish(topic, jsonstat.c_str())) {
-    
+
     serializeJsonPretty(doc, Serial);
      Serial.println("");
     Serial.println("Publish ok");
-   
+
   }
   else {
     Serial.println("Publish failed");
