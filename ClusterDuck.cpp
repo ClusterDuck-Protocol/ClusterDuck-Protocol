@@ -62,7 +62,7 @@ void ClusterDuck::setupLoRa(long BAND, int SS, int RST, int DI0, int DI1, int Tx
 
   Serial.println("Starting LoRa......");
 
-  int state = lora.begin(BAND,125.0,7,7,TxPower,1); //TODO: Make more modular -> Bandwidth, Spreading factor
+  int state = lora.begin(); //TODO: Make more modular -> Bandwidth, Spreading factor
 
   //Initialize LoRa
   if (state == ERR_NONE) {
@@ -73,6 +73,31 @@ void ClusterDuck::setupLoRa(long BAND, int SS, int RST, int DI0, int DI1, int Tx
     Serial.print("Starting LoRa Failed!!!");
     Serial.println(state);
     restartDuck();
+  }
+
+  if (lora.setFrequency(915.0) == ERR_INVALID_FREQUENCY) {
+    Serial.println(F("Selected frequency is invalid for this module!"));
+    while (true);
+  }
+
+  if (lora.setBandwidth(125.0) == ERR_INVALID_BANDWIDTH) {
+    Serial.println(F("Selected bandwidth is invalid for this module!"));
+    while (true);
+  }
+
+  if (lora.setSpreadingFactor(7) == ERR_INVALID_SPREADING_FACTOR) {
+    Serial.println(F("Selected spreading factor is invalid for this module!"));
+    while (true);
+  }
+
+  if (lora.setOutputPower(20) == ERR_INVALID_OUTPUT_POWER) {
+    Serial.println(F("Selected output power is invalid for this module!"));
+    while (true);
+  }
+
+  if (lora.setGain(0) == ERR_INVALID_GAIN) {
+    Serial.println(F("Selected gain is invalid for this module!"));
+    while (true);
   }
 
   lora.setDio0Action(setFlag);
