@@ -496,7 +496,11 @@ String * ClusterDuck::getPacketData(int pSize) {
   packetIndex = 0;
   int len = 0;
   byte byteCode;
-  bool sId, mId, pLoad, pth, ping;
+  bool sId = false;
+  bool mId = false;
+  bool pLoad = false;
+  bool pth = false;
+  bool ping = false;
   String msg = "";
   bool gotLen = false;
 
