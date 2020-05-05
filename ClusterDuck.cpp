@@ -673,25 +673,20 @@ String ClusterDuck::duckMac(boolean format)
 
 //Create a uuid
 String ClusterDuck::uuidCreator() {
-  byte randomValue;
-  char msg[50];
-  int numBytes = 0;
+  String msg = "";
   int i;
 
-  numBytes = atoi("8");
-  if (numBytes > 0)
-  {
-    memset(msg, 0, sizeof(msg));
-    for (i = 0; i < numBytes; i++) {
-      randomValue = random(0, 37);
-      msg[i] = randomValue + 'a';
-      if (randomValue > 26) {
-        msg[i] = (randomValue - 26) + '0';
+  for (i = 0; i < 8; i++) {
+      byte randomValue = random(0, 36);
+      if (randomValue < 26) {
+        msg = msg + char(randomValue + 'a');
+      } else {
+        msg = msg + char((randomValue - 26) + '0');
       }
-    }
   }
-
-  return String(msg);
+  Serial.print("uuidCreator ");
+  Serial.println(msg);
+  return msg;
 }
 
 //Getters
