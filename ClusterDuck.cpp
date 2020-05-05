@@ -373,7 +373,7 @@ void ClusterDuck::runMamaDuck() {
       }
     } else {
       // Serial.println("Byte code not recognized!");
-      memset(transmission, 0x00, pSize); //Reset transmission
+      memset(transmission, 0x00, 250); //Reset transmission
       packetIndex = 0;
 
      }
