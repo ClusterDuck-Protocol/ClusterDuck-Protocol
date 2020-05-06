@@ -28,7 +28,8 @@ void ClusterDuck::setDeviceId(String deviceId) {
 
 void ClusterDuck::begin(int baudRate) {
   Serial.begin(baudRate);
-  Serial.println("Serial start");
+  Serial.print("Serial start ");
+  Serial.println(baudRate, DEC);
 }
 
 void ClusterDuck::setupDisplay(String deviceType)  {
@@ -316,6 +317,7 @@ int ClusterDuck::runDetect() {
     receivedFlag = false;
     enableInterrupt = false;
     int pSize = handlePacket();
+    Serial.print("runDetect pSize ");
     Serial.println(pSize);
     if(pSize > 0) {
       for(int i=0; i < pSize; i++) {
@@ -325,8 +327,8 @@ int ClusterDuck::runDetect() {
       }
     }
     enableInterrupt = true;
+    Serial.println("runDetect startReceive");
     startReceive();
-    Serial.println("Start receive");
   }
   return val;
 }
@@ -357,12 +359,13 @@ void ClusterDuck::runMamaDuck() {
     receivedFlag = false;
     enableInterrupt = false;
     int pSize = handlePacket();
+    Serial.print("runMamaDuck pSize ");
     Serial.println(pSize);
     if(pSize > 0) {
       String * msg = getPacketData(pSize);
       packetIndex = 0;
       if(msg[0] != "ping" && !idInPath(_lastPacket.path)) {
-        Serial.print("Send Packet");
+        Serial.println("runMamaDuck relayPacket");
         sendPayloadStandard(_lastPacket.payload, _lastPacket.senderId, _lastPacket.messageId, _lastPacket.path);
         memset(transmission, 0x00, pSize); //Reset transmission
         packetIndex = 0;
@@ -370,13 +373,13 @@ void ClusterDuck::runMamaDuck() {
       }
     } else {
       // Serial.println("Byte code not recognized!");
-      memset(transmission, 0x00, pSize); //Reset transmission
+      memset(transmission, 0x00, 250); //Reset transmission
       packetIndex = 0;
 
      }
     enableInterrupt = true;
+    Serial.println("runMamaDuck startReceive");
     startReceive();
-    Serial.println("Start receive");
   }
 
   processPortalRequest();
@@ -391,13 +394,13 @@ int ClusterDuck::handlePacket() {
 
   if (state == ERR_NONE) {
     // packet was successfully received
-    Serial.println("Packet Received!");
+    Serial.print("handlePacket pSize ");
     Serial.println(pSize);
 
     return pSize;
   } else {
     // some other error occurred
-    Serial.print("Failed, code ");
+    Serial.print("handlePacket Failed, code ");
     Serial.println(state);
 
     return -1;
@@ -410,8 +413,8 @@ void ClusterDuck::sendPayloadMessage(String msg) {
   couple(payload_B, msg);
   couple(path_B, _deviceId);
 
-  Serial.println("Packet index: ");
-  Serial.print(packetIndex);
+  Serial.print("sendPayloadMessage packetIndex ");
+  Serial.println(packetIndex);
   startTransmit();
 
 }
@@ -435,8 +438,8 @@ void ClusterDuck::sendPayloadStandard(String msg, String senderId, String messag
   couple(payload_B, msg);
   couple(path_B, path);
 
-  Serial.println("Packet index: ");
-  Serial.print(packetIndex);
+  Serial.print("sendPayloadStandard packetIndex ");
+  Serial.println(packetIndex);
 
   startTransmit();
 
@@ -461,7 +464,9 @@ void ClusterDuck::couple(byte byteCode, String outgoing) {
 }
 
 bool ClusterDuck::idInPath(String path) {
-  Serial.println("Checking Path");
+  Serial.print("idInPath '");
+  Serial.print(path);
+  Serial.print("' ");
   String temp = "";
   int len = path.length() + 1;
   char arr[len];
@@ -470,8 +475,7 @@ bool ClusterDuck::idInPath(String path) {
   for (int i = 0; i < len; i++) {
     if (arr[i] == ',' || i == len - 1) {
       if (temp == _deviceId) {
-        Serial.print(path);
-        Serial.print("false");
+        Serial.println("true");
         return true;
       }
       temp = "";
@@ -479,21 +483,24 @@ bool ClusterDuck::idInPath(String path) {
       temp += arr[i];
     }
   }
-  Serial.println("true");
-  Serial.println(path);
+  Serial.println("false");
   return false;
 }
 
 String * ClusterDuck::getPacketData(int pSize) {
   String * packetData = new String[pSize];
   if(pSize == 0) {
-    Serial.println("Packet is empty!");
+    Serial.println("getPacketData Packet is empty!");
     return packetData;
   }
   packetIndex = 0;
   int len = 0;
   byte byteCode;
-  bool sId, mId, pLoad, pth, ping;
+  bool sId = false;
+  bool mId = false;
+  bool pLoad = false;
+  bool pth = false;
+  bool ping = false;
   String msg = "";
   bool gotLen = false;
 
@@ -502,47 +509,47 @@ String * ClusterDuck::getPacketData(int pSize) {
       gotLen = false;
       if(sId) {
         _lastPacket.senderId  = msg;
-        Serial.println("User ID: " + _lastPacket.senderId);
+        Serial.println("getPacketData User ID: " + _lastPacket.senderId);
         msg = "";
         sId = false;
 
       } else if(mId) {
         _lastPacket.messageId = msg;
-        Serial.println("Message ID: " + _lastPacket.messageId);
+        Serial.println("getPacketData Message ID: " + _lastPacket.messageId);
         msg = "";
         mId = false;
       } else if(pLoad) {
         _lastPacket.payload = msg;
-        Serial.println("Message: " + _lastPacket.payload);
+        Serial.println("getPacketData Message: " + _lastPacket.payload);
         msg = "";
         pLoad = false;
       } else if(pth) {
         _lastPacket.path = msg;
-        Serial.println("Path: " + _lastPacket.path);
+        Serial.println("getPacketData Path: " + _lastPacket.path);
         msg = "";
         pth = false;
       }
     }
     if(transmission[i] == senderId_B){
-      Serial.println(transmission[1+i]);
+      //Serial.println(transmission[1+i]);
       sId = true;
       len = transmission[i+1];
-      Serial.println("Len = " + String(len));
+      Serial.println("getPacketData senderId_B Len = " + String(len));
 
     } else if(transmission[i] == messageId_B) {
       mId = true;
       len = transmission[i+1];
-      Serial.println("Len = " + String(len));
+      Serial.println("getPacketData messageId_B Len = " + String(len));
 
     } else if(transmission[i] == payload_B) {
       pLoad = true;
       len = transmission[i+1];
-      Serial.println("Len = " + String(len));
+      Serial.println("getPacketData payload_B Len = " + String(len));
 
     } else if(transmission[i] == path_B) {
       pth = true;
       len = transmission[i+1];
-      Serial.println("Len = " + String(len));
+      Serial.println("getPacketData path_B Len = " + String(len));
 
     } else if(transmission[i] == ping_B) {
       if(_deviceId != "Det") {
@@ -550,7 +557,7 @@ String * ClusterDuck::getPacketData(int pSize) {
         packetIndex = 0;
         couple(iamhere_B, "1");
         startTransmit();
-        Serial.println("pong sent");
+        Serial.println("getPacketData pong sent");
         packetData[0] = "ping";
         return packetData;
       }
@@ -559,7 +566,7 @@ String * ClusterDuck::getPacketData(int pSize) {
       packetData[0] = "ping";
 
     } else if(transmission[i] == iamhere_B) {
-      Serial.print("pong");
+      Serial.println("getPacketData pong received");
       memset(transmission, 0x00, packetIndex);
       packetIndex = 0;
       packetData[0] = "pong";
@@ -579,22 +586,22 @@ String * ClusterDuck::getPacketData(int pSize) {
   if(len == 0) {
     if(sId) {
       _lastPacket.senderId  = msg;
-      Serial.println("User ID: " + _lastPacket.senderId);
+      Serial.println("getPacketData len0 User ID: " + _lastPacket.senderId);
       msg = "";
 
     } else if(mId) {
       _lastPacket.messageId = msg;
-      Serial.println("Message ID: " + _lastPacket.messageId);
+      Serial.println("getPacketData len0 Message ID: " + _lastPacket.messageId);
       msg = "";
 
     } else if(pLoad) {
       _lastPacket.payload = msg;
-      Serial.println("Message: " + _lastPacket.payload);
+      Serial.println("getPacketData len0 Message: " + _lastPacket.payload);
       msg = "";
 
     } else if(pth) {
       _lastPacket.path = msg;
-      Serial.println("Path: " + _lastPacket.path);
+      Serial.println("getPacketData len0 Path: " + _lastPacket.path);
       msg = "";
     }
   }
@@ -624,8 +631,8 @@ bool ClusterDuck::reboot(void *) {
 
 bool ClusterDuck::imAlive(void *) {
   String alive = "Health Quack";
+  Serial.print("imAlive sending");
   sendPayloadMessage(alive);
-  Serial.print("alive");
 
   return true;
 }
@@ -666,25 +673,20 @@ String ClusterDuck::duckMac(boolean format)
 
 //Create a uuid
 String ClusterDuck::uuidCreator() {
-  byte randomValue;
-  char msg[50];
-  int numBytes = 0;
+  String msg = "";
   int i;
 
-  numBytes = atoi("8");
-  if (numBytes > 0)
-  {
-    memset(msg, 0, sizeof(msg));
-    for (i = 0; i < numBytes; i++) {
-      randomValue = random(0, 37);
-      msg[i] = randomValue + 'a';
-      if (randomValue > 26) {
-        msg[i] = (randomValue - 26) + '0';
+  for (i = 0; i < 8; i++) {
+      byte randomValue = random(0, 36);
+      if (randomValue < 26) {
+        msg = msg + char(randomValue + 'a');
+      } else {
+        msg = msg + char((randomValue - 26) + '0');
       }
-    }
   }
-
-  return String(msg);
+  Serial.print("uuidCreator ");
+  Serial.println(msg);
+  return msg;
 }
 
 //Getters
@@ -741,7 +743,7 @@ void ClusterDuck::startReceive() {
   if (state == ERR_NONE) {
 
   } else {
-    Serial.print("failed, code ");
+    Serial.print("startReceive failed, code ");
     Serial.println(state);
     restartDuck();
   }
@@ -755,16 +757,16 @@ void ClusterDuck::startTransmit() {
 
   if (state == ERR_NONE) {
     // the packet was successfully transmitted
-    Serial.println("Packet sent");
+    Serial.println("startTransmit Packet sent");
   } else if (state == ERR_PACKET_TOO_LONG) {
     // the supplied packet was longer than 256 bytes
-    Serial.println(" too long!");
+    Serial.println("startTransmit too long!");
   } else if (state == ERR_TX_TIMEOUT) {
     // timeout occured while transmitting packet
-    Serial.println(" timeout!");
+    Serial.println("startTransmit timeout!");
   } else {
     // some other error occurred
-    Serial.print(F("failed, code "));
+    Serial.print(F("startTransmit failed, code "));
     Serial.println(state);
   }
 }
