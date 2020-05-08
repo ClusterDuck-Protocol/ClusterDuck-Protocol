@@ -103,6 +103,14 @@ Download USB to UART Bridge VCP Driver from [here](https://www.silabs.com/produc
 * Make sure you click on the folder that says Legacy MacVCP Driver and then click on ‘Silicon Labs VCP Driver.pkg’
 * Once it is finished installing, go to Mac System Preferences -> Security and Privacy -> General. Make sure Silicon Labs is allowed.
 
+#### Ubuntu Linux Platforms: 
+*  The driver is already installed on your machine due to latest kernels. you can check to see by running the following commands. 
+```ls -al /lib/modules/"$(uname -r)"/kernel/drivers/usb/serial/usbserial.ko
+```
+```
+ls -al /lib/modules/"$(uname -r)"/kernel/drivers/usb/serial/cp210x.ko
+```
+
 ### Install the necessary libraries that work with ClusterDuck Protocol: 
 
 #### Add ESP32 Board Library
@@ -117,9 +125,9 @@ Download USB to UART Bridge VCP Driver from [here](https://www.silabs.com/produc
 
 ### Install ClusterDuck Protocol
 
-#### Using the Library Manager “COMING SOON”
+###### Using the Library Manager “COMING SOON”
 
-#### Importing as a .zip Library
+## Importing as a .zip Library
 
 In the Arduino IDE, navigate to _Sketch > Include Library > Add .ZIP Library_. At the top of the drop down list, select the option to "Add .ZIP Library".
 
@@ -150,8 +158,9 @@ You should be able pull new commits directly to this folder in your Arduino libr
 
 The required libraries to work with the ClusterDuck protocol can be installed in multiple ways. There is a folder in the source code that is called “Libraries” and contains all the submodules to work with the ClusterDuck Protocol. Or you can download all the libraries manual and import into Arduino by .zip. Some libraries are available in the Arduino Libraries manager. 
 
+You should be able pull new commits directly to this folder in your Arduino library.
 
-##### Installing libraries through Library Manager
+## Installing libraries through Library Manager
 
 Some Libraries can be installed with the Arduino Library manager. 
 
@@ -162,7 +171,7 @@ Go to _Sketch > Include Library > Manage Libraries_:
 * Search for ArduinoJson and install _ArduinoJson by Benoit Blanchon_
 
 
-##### Installing libraries by adding .Zip files
+## Installing libraries by adding .Zip files
 
 To add Libraries by zip files. Go to _Sketch > include Library > add .zip Library…_
 
@@ -186,7 +195,7 @@ Go to the following websites and download the Libraries:
 * [espressif/arduino-esp32: Arduino core for the ESP32](https://github.com/espressif/arduino-esp32)
 
 
-### Load the Heltec ESP32 Board to your Arduino IDE:
+# Load the Heltec ESP32 Board to your Arduino IDE:
 
 In Arduino IDE, select _Tools > Board > Boards Manager_, and in the pop up window type “esp32” into the search field. You should see the “esp32 by Espressif Systems” library. Install this library.
 
@@ -302,9 +311,9 @@ DuckLink Hardware and Firmware Assembly
 ![iot-platform-11](./assets/images/iot-platform-11.png)
 
 
-## FAQs
+# FAQs
 
-### General
+## General
 
 #### How many ducks do I need to set-up to test if it works?
 
@@ -320,6 +329,14 @@ The cause of this error because the library is missing. To install the library, 
 
 This issue occurred because when the program tried to compile, it came across two “Wifi.h” files and was not sure which one to choose. The Wifi.h that is needed is 
 
+#### Linux issue with permission denied to port 
+* ser_open(): can't open device "/dev/ttyACM0": Permission denied
+* To fix this run the following commands via terminal 
+$ sudo usermod -a -G dialout <username>
+$ sudo chmod a+rw /dev/ttyACM0
+* Replace username with your devices name & Replace /dev/ttyACM0 with your USB Port
+* That can be found inside Arduino IDE via TOOLS > Port 
+    
 ### Setup Issues
 
 #### Board not displaying in Port
@@ -341,7 +358,7 @@ Double check to see if the credentials (network and password) for WiFi are corre
 **[Github](https://github.com/Code-and-Response/ClusterDuck-Protocol)** 
 
 
-### Quick Start
+# Quick Start
 
 Open new sketch in Arduino IDE and include the ClusterDuck library
 
