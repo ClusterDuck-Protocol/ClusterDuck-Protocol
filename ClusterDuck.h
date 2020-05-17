@@ -52,7 +52,7 @@ class ClusterDuck {
 
     static String * getPortalDataArray();
     static String getPortalDataString();
-    static String * getPacketData(int pSize);
+    static String getPacketData(int pSize);
 
     static String duckMac(boolean format);
 

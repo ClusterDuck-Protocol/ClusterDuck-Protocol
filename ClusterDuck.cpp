@@ -362,9 +362,9 @@ void ClusterDuck::runMamaDuck() {
     Serial.print("runMamaDuck pSize ");
     Serial.println(pSize);
     if(pSize > 0) {
-      String * msg = getPacketData(pSize);
+      String msg = getPacketData(pSize);
       packetIndex = 0;
-      if(msg[0] != "ping" && !idInPath(_lastPacket.path)) {
+      if(msg != "ping" && !idInPath(_lastPacket.path)) {
         Serial.println("runMamaDuck relayPacket");
         sendPayloadStandard(_lastPacket.payload, _lastPacket.senderId, _lastPacket.messageId, _lastPacket.path);
         memset(transmission, 0x00, pSize); //Reset transmission
@@ -487,8 +487,8 @@ bool ClusterDuck::idInPath(String path) {
   return false;
 }
 
-String * ClusterDuck::getPacketData(int pSize) {
-  String * packetData = new String[pSize];
+String ClusterDuck::getPacketData(int pSize) {
+  String packetData = "";
   if(pSize == 0) {
     Serial.println("getPacketData Packet is empty!");
     return packetData;
@@ -558,18 +558,18 @@ String * ClusterDuck::getPacketData(int pSize) {
         couple(iamhere_B, "1");
         startTransmit();
         Serial.println("getPacketData pong sent");
-        packetData[0] = "ping";
+        packetData = "ping";
         return packetData;
       }
       memset(transmission, 0x00, packetIndex);
       packetIndex = 0;
-      packetData[0] = "ping";
+      packetData = "ping";
 
     } else if(transmission[i] == iamhere_B) {
       Serial.println("getPacketData pong received");
       memset(transmission, 0x00, packetIndex);
       packetIndex = 0;
-      packetData[0] = "pong";
+      packetData = "pong";
       return packetData;
 
       } else if(len > 0 && gotLen) {
