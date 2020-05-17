@@ -750,6 +750,8 @@ void ClusterDuck::startReceive() {
 }
 
 void ClusterDuck::startTransmit() {
+  bool oldEI = enableInterrupt;
+  enableInterrupt = false;
   int state = lora.transmit(transmission, packetIndex);
 
   memset(transmission, 0x00, packetIndex); //Reset transmission
@@ -768,6 +770,11 @@ void ClusterDuck::startTransmit() {
     // some other error occurred
     Serial.print(F("startTransmit failed, code "));
     Serial.println(state);
+  }
+
+  if (oldEI) {
+    enableInterrupt = true;
+    startReceive();
   }
 }
 
