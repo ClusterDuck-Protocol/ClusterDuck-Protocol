@@ -63,7 +63,7 @@ void loop() {
     duck.flipInterrupt();
     int pSize = duck.handlePacket();
     if(pSize > 3) {
-      String * msg = duck.getPacketData(pSize);
+      duck.getPacketData(pSize);
       quackJson();
 
     }
