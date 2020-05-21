@@ -30,20 +30,15 @@ You can purchase the above through the web based management system once logged i
 * If you look at the schematic for the Heltec Esp32 + Lora V.2 Board, You will see that you can't use U0TXD & U0RXD because they are used for the programming of the board.
 
     **The pins that are free and not tied up with anything important on the board are as follows:**
+    * GPIO-17  GPIO-2
 
-        * GPIO-17  GPIO-2
+    * GPIO-22  GPIO-23
 
-        * GPIO-22  GPIO-23
+    * GPIO-0    GPIO-12
 
-        * GPIO-0    GPIO-12
-
-        * GPIO-13  GPIO-25    
+    * GPIO-13  GPIO-25    
 
 Note: **All other spare pins are inputs only, best avoided**.
-
-# **Integration into TTgo T-Beam Esp32 Lora Boards: **
-
--The  TTgo T-Beam unit does not have many if any spare Gpio ports as they are all in use for the ESP32 or LoRa or GPS leaving just two pins to spare 13 and 25
 
 # Wiring the Two Boards Together to RockBlock 9603:
 
@@ -61,7 +56,7 @@ Note: **All other spare pins are inputs only, best avoided**.
 
     * Heltec Ground → Iridium Ground
 
-2. Wiring the Heltec Esp32 + Lora V.2 Board → RockBlock
+2. Wiring the TTgo T-Beam V.2 Board → RockBlock
 
     * TTgo T-Beam Pin 25 (Txpin) →  Iridium txdata pin
 
