@@ -3,7 +3,7 @@
 
 Once you've created an account and logged in, you can register your specific Rock BLOCK 9603 modem and enable (purchase) service. [More Info here](https://docs.rockblock.rock7.com/docs/rockblock-management-system)
 
-## How to Enable Service:## 
+## How to Enable Service:
 **In addition to the modem hardware, you will also need to purchase line rental AND credits to use the service.**
 
 **Line Rental** - Purchased in one month increments, currently £12.00/$13.00 per month. Needed to communicate with the Iridium satellites. Expires after the purchased time has elapsed. This is a fixed base cost.
@@ -29,7 +29,7 @@ You can purchase the above through the web based management system once logged i
 
 * If you look at the schematic for the Heltec Esp32 + Lora V.2 Board, You will see that you can't use U0TXD & U0RXD because they are used for the programming of the board.
 
-    * **The pins that are free and not tied up with anything important on the board are as follows:**
+    **The pins that are free and not tied up with anything important on the board are as follows:**
 
         * GPIO-17  GPIO-2
 
@@ -45,7 +45,7 @@ Note: **All other spare pins are inputs only, best avoided**.
 
 -The  TTgo T-Beam unit does not have many if any spare Gpio ports as they are all in use for the ESP32 or LoRa or GPS leaving just two pins to spare 13 and 25
 
-# **Wiring the Two Boards Together to RockBlock 9603:** 
+# Wiring the Two Boards Together to RockBlock 9603:
 
 **When you Purchase a Rockblock you will want to buy this accessory cable to interface with the RockBlock easier**
 
@@ -53,25 +53,23 @@ Note: **All other spare pins are inputs only, best avoided**.
 
 1. Wiring the Heltec Esp32 + Lora V.2 Board → RockBlock
 
-    1. Heltec Pin 12 (Txpin) →  Iridium txdata pin
+    * Heltec Pin 12 (Txpin) →  Iridium txdata pin
+    
+    * Heltec Pin 13 (Rxpin) → Iridium rxdata pin
 
-    2. Heltec Pin 13 (Rxpin) → Iridium rxdata pin
+    * Heltec 5V  → Iridium 5v IN
 
-    3. Heltec 5V  → Iridium 5v IN
-
-    4. Heltec Ground → Iridium Ground
-
-	
+    * Heltec Ground → Iridium Ground
 
 2. Wiring the Heltec Esp32 + Lora V.2 Board → RockBlock
 
-    5. TTgo T-Beam Pin 25 (Txpin) →  Iridium txdata pin
+    * TTgo T-Beam Pin 25 (Txpin) →  Iridium txdata pin
 
-    6. TTgo T-Beam Pin 13 (Rxpin) → Iridium rxdata pin
+    * TTgo T-Beam Pin 13 (Rxpin) → Iridium rxdata pin
 
-    7. TTgo T-Beam 5V  → Iridium 5v IN
+    * TTgo T-Beam 5V  → Iridium 5v IN
 
-    8. TTgo T-Beam Ground → Iridium Ground
+    * TTgo T-Beam Ground → Iridium Ground
 
 **This is called the Basic TTL Connection**  You can also add in pin sleep and more to optimize the performance and power saving of the RockBlock.
 
@@ -81,8 +79,6 @@ Note: **All other spare pins are inputs only, best avoided**.
 
 **The Important Note: Make sure your rxpin and txpin are defined as how you plugged in the module to the Heltec Board** 
 
- 
-
 5. Once you have properly changed the rxpin and txpin. Plug in your Heltec board or Ttgo and upload this sketch to your board. Once you see that it successfully has uploaded to the Heltec or TTgo open Serial Monitor. **Which can be found here:** Tools → Serial Monitor
 
 ![image alt text](image_2.png) 
@@ -91,7 +87,7 @@ Note: **All other spare pins are inputs only, best avoided**.
 
 7. To check if it successfully  sent your message to the Iridium cloud check your account messages at the following link: [https://rockblock.rock7.com/Operations](https://rockblock.rock7.com/Operations)
 
-# **Helpful Resources:**
+# Helpful Resources:
 
 * Rock Block 9603 Developer's Guide Which is extremely helpful: [https://cdn.sparkfun.com/assets/6/d/4/c/a/RockBLOCK-9603-Developers-Guide_1.pdf](https://cdn.sparkfun.com/assets/6/d/4/c/a/RockBLOCK-9603-Developers-Guide_1.pdf)
 
