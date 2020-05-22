@@ -17,7 +17,7 @@ You can purchase the above through the web based management system once logged i
 
 1. Open the Arduino IDE to Install the required library in order to communicate with the RockBlock Satellite Modules. 
 
-![image](./assets/images/Rockblock Library.jpg "library")
+![image](doc/assets/images/Rockblock Library.jpg "library")
 
 2. To Install the Iridium Library goto Sketch → Include Library → Manage Libraries. Once you click this you should get a dialog box to search for libraries.  
 
