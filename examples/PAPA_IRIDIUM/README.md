@@ -17,17 +17,11 @@ You can purchase the above through the web based management system once logged i
 
 1. Open the Arduino IDE to Install the required library in order to communicate with the RockBlock Satellite Modules. 
 
-![image](doc/assets/images/Rockblock Library.jpg "library")
-
 2. To Install the Iridium Library goto Sketch → Include Library → Manage Libraries. Once you click this you should get a dialog box to search for libraries.  
 
 3.  Search for Iridium and Install the Iridium SBD as seen in below screenshot. Once that is installed you will now have access to all the RockBlock example sketches.
 
-[[TOC]]
-
-* I highly recommend if you are going to be prototyping with this board that you add on female header pins like seen below. This will make easy wiring using jumper cables. 
-
-![image alt text](image_0.png)
+* I highly recommend if you are going to be prototyping with this board that you add on female header pins. This will make easy wiring using jumper cables. 
 
 * If you look at the schematic for the Heltec Esp32 + Lora V.2 Board, You will see that you can't use U0TXD & U0RXD because they are used for the programming of the board.
 
@@ -77,8 +71,6 @@ Note: **All other spare pins are inputs only, best avoided**.
 **The Important Note: Make sure your rxpin and txpin are defined as how you plugged in the module to the Heltec Board** 
 
 5. Once you have properly changed the rxpin and txpin. Plug in your Heltec board or Ttgo and upload this sketch to your board. Once you see that it successfully has uploaded to the Heltec or TTgo open Serial Monitor. **Which can be found here:** Tools → Serial Monitor
-
-![image alt text](image_2.png) 
 
 6. If the RockBlock is wired properly to your Heltec or TTgo board you should get output saying setting up Modem and see the version print out. 
 
