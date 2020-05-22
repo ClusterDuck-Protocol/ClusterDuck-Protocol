@@ -13,12 +13,12 @@ Once you've created an account and logged in, you can register your specific Roc
 You can purchase the above through the web based management system once logged in to your account.
 
 ## Setting up Arduino IDE for RockBlock 9603 & RockBlock Mk2:
-
+![](/doc/assets/images/Rockblock_Library.jpg)
 
 1. Open the Arduino IDE to Install the required library in order to communicate with the RockBlock Satellite Modules. 
 
 2. To Install the Iridium Library goto Sketch → Include Library → Manage Libraries. Once you click this you should get a dialog box to search for libraries.  
-
+![](/doc/assets/images/Rockblock_SerialMON.png)
 3.  Search for Iridium and Install the Iridium SBD as seen in below screenshot. Once that is installed you will now have access to all the RockBlock example sketches.
 
 * I highly recommend if you are going to be prototyping with this board that you add on female header pins. This will make easy wiring using jumper cables. 
