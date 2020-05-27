@@ -1,4 +1,3 @@
-
 #include <ClusterDuck.h>
 #include <PubSubClient.h>
 #include <IridiumSBD.h>
@@ -31,7 +30,7 @@ void loop() {
     duck.flipInterrupt();
     int pSize = duck.handlePacket();
     if(pSize > 3) {
-      String * msg = duck.getPacketData(pSize);
+     duck.getPacketData(pSize);
       quackJson();
     }
     duck.flipInterrupt();
@@ -42,8 +41,11 @@ void loop() {
 void quackJson() {
   int err;
   Packet lastPacket = duck.getLastPacket();
+  
+  //Uncomment the lines below of which data you want to send
    String data = lastPacket.senderId +  "/" + lastPacket.messageId + "/"+ lastPacket.payload + "/"+  lastPacket.path + "," + duck.getDeviceId() ;
   // String data = lastPacket.messageId ;
+  
   Serial.println(data);
   const   char *text = data.c_str();
   // Send the message
@@ -96,4 +98,3 @@ void setupRockBlock(){
   }
   
 }
-  
