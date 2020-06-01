@@ -17,6 +17,44 @@ String password = "";
 
 String ClusterDuck::_deviceId = "";
 
+/* Firmware Page */
+String firmwarePage = 
+"<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>"
+"<form method='POST' action='#' enctype='multipart/form-data' id='upload_form'>"
+   "<input type='file' name='update'>"
+        "<input type='submit' value='Update'>"
+    "</form>"
+ "<div id='prg'>progress: 0%</div>"
+ "<script>"
+  "$('form').submit(function(e){"
+  "e.preventDefault();"
+  "var form = $('#upload_form')[0];"
+  "var data = new FormData(form);"
+  " $.ajax({"
+  "url: '/update',"
+  "type: 'POST',"
+  "data: data,"
+  "contentType: false,"
+  "processData:false,"
+  "xhr: function() {"
+  "var xhr = new window.XMLHttpRequest();"
+  "xhr.upload.addEventListener('progress', function(evt) {"
+  "if (evt.lengthComputable) {"
+  "var per = evt.loaded / evt.total;"
+  "$('#prg').html('progress: ' + Math.round(per*100) + '%');"
+  "}"
+  "}, false);"
+  "return xhr;"
+  "},"
+  "success:function(d, s) {"
+  "console.log('success!')" 
+ "},"
+ "error: function (a, b, c) {"
+ "}"
+ "});"
+ "});"
+ "</script>";
+
 ClusterDuck::ClusterDuck() {
 
 }
@@ -128,8 +166,30 @@ void ClusterDuck::setFlag(void) {
   // we got a packet, set the flag
   receivedFlag = true;
 }
+// =====================================
 
-//=========================================================
+// handle the upload of the firmware
+void handleFirmwareUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t lenght, bool final)
+{
+  // handle upload and update
+  if (!index) {
+    Serial.printf("Update: %s\n", filename.c_str());
+    if (!Update.begin(UPDATE_SIZE_UNKNOWN)) { //start with max available size
+      Update.printError(Serial);
+    }
+  }
+  // flashing firmware to ESP
+  if (lenght){
+    Update.write(data, lenght);
+  }
+  if (final) {
+    if (Update.end(true)) { //true to set the size to the current progress
+      Serial.printf("Update Success: %ub written\nRebooting...\n", index+len);
+    } else {
+      Update.printError(Serial);
+    }
+  }
+}
 
 //Setup WebServer
 void ClusterDuck::setupWebServer(bool createCaptivePortal) {
@@ -227,6 +287,23 @@ void ClusterDuck::setupWebServer(bool createCaptivePortal) {
       request->send(500, "text/plain", "There was an error");
     }
 	});
+
+  // web interface for OTA 
+  webServer.on("/firmware", HTTP_GET, [](AsyncWebServerRequest *request) {
+       AsyncWebServerResponse *response = request->beginResponse(200, "text/html", firmwarePage);
+       request->send(response);
+  });
+  // handling uploading firmware file
+  webServer.on("/firmware", HTTP_POST, [](AsyncWebServerRequest *request) {
+    if (!Update.hasError()) {
+      AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "Upload complete");
+      request->send(response);
+      ESP.restart();
+    } else {
+      AsyncWebServerResponse *response = request->beginResponse(500, "text/plain", "Upload ERROR");
+        request->send(response);
+    } 
+  }, handleFirmwareUpload);
 
   // for captive portal
 	if (createCaptivePortal == true) {
