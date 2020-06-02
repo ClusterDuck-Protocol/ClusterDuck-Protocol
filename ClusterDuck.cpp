@@ -24,7 +24,6 @@ String firmwarePage =
    "<input type='file' name='update'>"
         "<input type='submit' value='Update'>"
     "</form>"
- "<div id='prg'>progress: 0%</div>"
  "<script>"
   "$('form').submit(function(e){"
   "e.preventDefault();"
@@ -36,16 +35,6 @@ String firmwarePage =
   "data: data,"
   "contentType: false,"
   "processData:false,"
-  "xhr: function() {"
-  "var xhr = new window.XMLHttpRequest();"
-  "xhr.upload.addEventListener('progress', function(evt) {"
-  "if (evt.lengthComputable) {"
-  "var per = evt.loaded / evt.total;"
-  "$('#prg').html('progress: ' + Math.round(per*100) + '%');"
-  "}"
-  "}, false);"
-  "return xhr;"
-  "},"
   "success:function(d, s) {"
   "console.log('success!')" 
  "},"
@@ -169,8 +158,7 @@ void ClusterDuck::setFlag(void) {
 // =====================================
 
 // handle the upload of the firmware
-void handleFirmwareUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t lenght, bool final)
-{
+void handleFirmwareUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t lenght, bool final){
   // handle upload and update
   if (!index) {
     Serial.printf("Update: %s\n", filename.c_str());
@@ -184,7 +172,7 @@ void handleFirmwareUpload(AsyncWebServerRequest *request, String filename, size_
   }
   if (final) {
     if (Update.end(true)) { //true to set the size to the current progress
-      Serial.printf("Update Success: %ub written\nRebooting...\n", index+len);
+      Serial.printf("Update Success: %ub written\nRebooting...\n", index+lenght);
     } else {
       Update.printError(Serial);
     }
@@ -410,14 +398,14 @@ void ClusterDuck::setupDuckLink() {
 	setupWifiAp();
 	setupDns();
   setupWebServer(true);
+  setupOTA();
 
   Serial.println("Duck Online");
 }
 
 void ClusterDuck::runDuckLink() {
-
+  ArduinoOTA.handle();
   processPortalRequest();
-
 }
 
 void ClusterDuck::setupDetect() {
@@ -426,11 +414,13 @@ void ClusterDuck::setupDetect() {
   setupWifiAp();
 	setupDns();
   setupWebServer(false);
+  setupOTA();
 
   Serial.println("Detector Online");
 }
 
 int ClusterDuck::runDetect() {
+  ArduinoOTA.handle();
   int val = 0;
   if(receivedFlag) {  //If LoRa packet received
     receivedFlag = false;
