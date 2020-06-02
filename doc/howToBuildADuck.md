@@ -270,6 +270,24 @@ DuckLink Hardware and Firmware Assembly
 
     ![Running duck example](./assets/images/setup.png "Running duck example")
 
+2. Upload the firmware OTA
+    Ons you uploaded the firmware via cabel, you can do this also **O**ver**T**he**A**ir.
+    Connect to ducks wifi an then ther are two ways to continue:
+
+    #### Upload via IDE
+
+    In Platform IO uncommend the "upload_port = duck.local" line in .ini File and use the normal Upload butten (the white arrow at the bottom).
+
+    In Adruino IDE you can upload your sketch under Tools->Port-><your device>(under the Serial Port Section is the networkn sektion).
+
+    #### Upload the Binary to Capativ Portal
+
+    To upload to the Capativ Portal first you need to build a binary file. Then open "duck.local/firmware" and upload the binary.
+
+    To create the binary with Platform IO comile your code (the white hook at the bottom). Then you find the binary in the build folder (/.pio/build/<your board>/firmware.bin).
+
+    To create the binary with Adruino IDE select Sketch->Export Compiled Binary. You will find this next to your sketch.
+
 ## Setting up the IBM Watson IoT Platform
 
 1. Create an IBM Cloud account through [this link](https://ibm.biz/BdqiVW). Fill out all the required information and confirm your email address.
