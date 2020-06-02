@@ -271,7 +271,8 @@ DuckLink Hardware and Firmware Assembly
     ![Running duck example](./assets/images/setup.png "Running duck example")
 
 2. Upload the firmware OTA
-    Ons you uploaded the firmware via cabel, you can do this also **O**ver**T**he**A**ir.
+
+    Once you uploaded the firmware via cabel, you can do this also **O**ver**T**he**A**ir.
     Connect to ducks wifi an then ther are two ways to continue:
 
     #### Upload via IDE
