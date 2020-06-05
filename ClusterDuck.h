@@ -1,6 +1,8 @@
 #ifndef CD
 #define CD
 
+#include "cdpcfg.h"
+
 #if (ARDUINO >=100)
 #include "Arduino.h"
 #else
@@ -36,8 +38,8 @@ class ClusterDuck {
 
     //Exposed Methods
     static void setDeviceId(String deviceId = "");
-    static void begin(int baudRate = 115200);
-    static void setupLoRa(long BAND = 915.0, int SS = 18, int RST = 14, int DI0 = 26, int DI1 = 25, int TxPower = 20);
+    static void begin(int baudRate = CDPCFG_SERIAL_BAUD);
+    static void setupLoRa(long BAND = CDPCFG_RF_LORA_FREQ, int SS = CDPCFG_PIN_LORA_CS, int RST = CDPCFG_PIN_LORA_RST, int DI0 = CDPCFG_PIN_LORA_DIO0, int DI1 = CDPCFG_PIN_LORA_DIO1, int TxPower = CDPCFG_RF_LORA_TXPOW);
     static void setupDisplay(String deviceType);
     static void setupWebServer(bool createCaptivePortal = false);
 		static void setupWifiAp(const char *AP = " 🆘 DUCK EMERGENCY PORTAL");
@@ -88,7 +90,7 @@ class ClusterDuck {
     static void setupDetect();
     static int runDetect();
 
-    static void setColor(int ledR = 25,int ledG = 4,int ledB = 2);
+    static void setColor(int ledR = CDPCFG_PIN_RGBLED_R, int ledG = CDPCFG_PIN_RGBLED_G, int ledB = CDPCFG_PIN_RGBLED_B);
     static void setupLED();
 
     static String getSSID();

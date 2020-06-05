@@ -1,15 +1,15 @@
 #include "ClusterDuck.h"
 
-U8X8_SSD1306_128X64_NONAME_SW_I2C u8x8(/* clock=*/ 15, /* data=*/ 4, /* reset=*/ 16);
+U8X8_SSD1306_128X64_NONAME_SW_I2C u8x8(/* clock=*/ CDPCFG_PIN_OLED_CLOCK, /* data=*/ CDPCFG_PIN_OLED_DATA, /* reset=*/ CDPCFG_PIN_OLED_RESET);
 
-IPAddress apIP(192, 168, 1, 1);
-AsyncWebServer webServer(80);
+IPAddress apIP(CDPCFG_AP_IP1, CDPCFG_AP_IP2, CDPCFG_AP_IP3, CDPCFG_AP_IP4);
+AsyncWebServer webServer(CDPCFG_WEB_PORT);
 
-SX1276 lora = new Module(18, 26, 14, 25);
+SX1276 lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO0, CDPCFG_PIN_LORA_RST, CDPCFG_PIN_LORA_DIO1);
 
 auto tymer = timer_create_default();
 
-byte transmission[250];
+byte transmission[CDPCFG_CDP_BUFSIZE];
 int packetIndex = 0;
 
 String ssid = "";
@@ -103,27 +103,27 @@ void ClusterDuck::setupLoRa(long BAND, int SS, int RST, int DI0, int DI1, int Tx
     restartDuck();
   }
 
-  if (lora.setFrequency(915.0) == ERR_INVALID_FREQUENCY) {
+  if (lora.setFrequency(CDPCFG_RF_LORA_FREQ) == ERR_INVALID_FREQUENCY) {
     Serial.println(F("Selected frequency is invalid for this module!"));
     while (true);
   }
 
-  if (lora.setBandwidth(125.0) == ERR_INVALID_BANDWIDTH) {
+  if (lora.setBandwidth(CDPCFG_RF_LORA_BW) == ERR_INVALID_BANDWIDTH) {
     Serial.println(F("Selected bandwidth is invalid for this module!"));
     while (true);
   }
 
-  if (lora.setSpreadingFactor(7) == ERR_INVALID_SPREADING_FACTOR) {
+  if (lora.setSpreadingFactor(CDPCFG_RF_LORA_SF) == ERR_INVALID_SPREADING_FACTOR) {
     Serial.println(F("Selected spreading factor is invalid for this module!"));
     while (true);
   }
 
-  if (lora.setOutputPower(20) == ERR_INVALID_OUTPUT_POWER) {
+  if (lora.setOutputPower(CDPCFG_RF_LORA_TXPOW) == ERR_INVALID_OUTPUT_POWER) {
     Serial.println(F("Selected output power is invalid for this module!"));
     while (true);
   }
 
-  if (lora.setGain(0) == ERR_INVALID_GAIN) {
+  if (lora.setGain(CDPCFG_RF_LORA_GAIN) == ERR_INVALID_GAIN) {
     Serial.println(F("Selected gain is invalid for this module!"));
     while (true);
   }
@@ -321,7 +321,7 @@ void ClusterDuck::setupDns() {
   else
   {
     Serial.println("Created local DNS");
-    MDNS.addService("http", "tcp", 80);
+    MDNS.addService("http", "tcp", CDPCFG_WEB_PORT);
   }
 }
 
@@ -458,8 +458,8 @@ void ClusterDuck::setupMamaDuck() {
 
   Serial.println("MamaDuck Online");
 
-  tymer.every(1800000, imAlive);
-  tymer.every(43200000, reboot);
+  tymer.every(CDPCFG_MILLIS_ALIVE, imAlive);
+  tymer.every(CDPCFG_MILLIS_REBOOT, reboot);
 }
 
 void ClusterDuck::runMamaDuck() {
@@ -478,13 +478,13 @@ void ClusterDuck::runMamaDuck() {
       if(msg != "ping" && !idInPath(_lastPacket.path)) {
         Serial.println("runMamaDuck relayPacket");
         sendPayloadStandard(_lastPacket.payload, _lastPacket.senderId, _lastPacket.messageId, _lastPacket.path);
-        memset(transmission, 0x00, pSize); //Reset transmission
+        memset(transmission, 0x00, CDPCFG_CDP_BUFSIZE); //Reset transmission
         packetIndex = 0;
 
       }
     } else {
       // Serial.println("Byte code not recognized!");
-      memset(transmission, 0x00, 250); //Reset transmission
+      memset(transmission, 0x00, CDPCFG_CDP_BUFSIZE); //Reset transmission
       packetIndex = 0;
 
      }
@@ -499,7 +499,7 @@ void ClusterDuck::runMamaDuck() {
 
 int ClusterDuck::handlePacket() {
   int pSize = lora.getPacketLength();
-  memset(transmission, 0x00, pSize); //Reset transmission
+  memset(transmission, 0x00, CDPCFG_CDP_BUFSIZE); //Reset transmission
   packetIndex = 0;
   int state = lora.readData(transmission, pSize);
 
@@ -540,7 +540,7 @@ void ClusterDuck::sendPayloadStandard(String msg, String senderId, String messag
   }
 
   String total = senderId + messageId + path + msg;
-  if(total.length() + 4 > 250) {
+  if(total.length() + 4 > CDPCFG_CDP_BUFSIZE) {
     Serial.println("Warning: message is too large!"); //TODO: do something
   }
 
@@ -664,7 +664,7 @@ String ClusterDuck::getPacketData(int pSize) {
 
     } else if(transmission[i] == ping_B) {
       if(_deviceId != "Det") {
-        memset(transmission, 0x00, packetIndex);
+        memset(transmission, 0x00, CDPCFG_CDP_BUFSIZE);
         packetIndex = 0;
         couple(iamhere_B, "1");
         startTransmit();
@@ -672,13 +672,13 @@ String ClusterDuck::getPacketData(int pSize) {
         packetData = "ping";
         return packetData;
       }
-      memset(transmission, 0x00, packetIndex);
+      memset(transmission, 0x00, CDPCFG_CDP_BUFSIZE);
       packetIndex = 0;
       packetData = "ping";
 
     } else if(transmission[i] == iamhere_B) {
       Serial.println("getPacketData pong received");
-      memset(transmission, 0x00, packetIndex);
+      memset(transmission, 0x00, CDPCFG_CDP_BUFSIZE);
       packetIndex = 0;
       packetData = "pong";
       return packetData;
@@ -787,7 +787,7 @@ String ClusterDuck::uuidCreator() {
   String msg = "";
   int i;
 
-  for (i = 0; i < 8; i++) {
+  for (i = 0; i < CDPCFG_UUID_LEN; i++) {
       byte randomValue = random(0, 36);
       if (randomValue < 26) {
         msg = msg + char(randomValue + 'a');
@@ -865,7 +865,7 @@ void ClusterDuck::startTransmit() {
   enableInterrupt = false;
   int state = lora.transmit(transmission, packetIndex);
 
-  memset(transmission, 0x00, packetIndex); //Reset transmission
+  memset(transmission, 0x00, CDPCFG_CDP_BUFSIZE); //Reset transmission
   packetIndex = 0; //Reset packetIndex
 
   if (state == ERR_NONE) {
@@ -925,9 +925,9 @@ long ClusterDuck::_freqErr;
 int ClusterDuck::_availableBytes;
 int ClusterDuck::_packetSize = 0;
 // LED
-int ClusterDuck::ledR = 25;
-int ClusterDuck::ledG = 4;
-int ClusterDuck::ledB = 2;
+int ClusterDuck::ledR = CDPCFG_PIN_RGBLED_R;
+int ClusterDuck::ledG = CDPCFG_PIN_RGBLED_G;
+int ClusterDuck::ledB = CDPCFG_PIN_RGBLED_B;
 
 Packet ClusterDuck::_lastPacket;
 
