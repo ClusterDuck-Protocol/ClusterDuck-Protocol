@@ -19,6 +19,8 @@
 
 #include "timer.h"
 
+#include <ArduinoOTA.h>
+
 typedef struct
 {
   String senderId;
@@ -41,6 +43,7 @@ class ClusterDuck {
 		static void setupWifiAp(const char *AP = " 🆘 DUCK EMERGENCY PORTAL");
 		static void setupDns();
 		static void setupInternet(String SSID, String PASSWORD);
+    static void setupOTA();
     static bool runCaptivePortal();
 
     static void setupDuckLink();
