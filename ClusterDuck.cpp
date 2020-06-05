@@ -17,32 +17,6 @@ String password = "";
 
 String ClusterDuck::_deviceId = "";
 
-/* Firmware Page */
-String firmwarePage = 
-"<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>"
-"<form method='POST' action='#' enctype='multipart/form-data' id='upload_form'>"
-   "<input type='file' name='update'>"
-        "<input type='submit' value='Update'>"
-    "</form>"
- "<script>"
-  "$('form').submit(function(e){"
-  "e.preventDefault();"
-  "var form = $('#upload_form')[0];"
-  "var data = new FormData(form);"
-  " $.ajax({"
-  "url: '/update',"
-  "type: 'POST',"
-  "data: data,"
-  "contentType: false,"
-  "processData:false,"
-  "success:function(d, s) {"
-  "console.log('success!')" 
- "},"
- "error: function (a, b, c) {"
- "}"
- "});"
- "});"
- "</script>";
 
 ClusterDuck::ClusterDuck() {
 
@@ -191,6 +165,53 @@ void ClusterDuck::setupWebServer(bool createCaptivePortal) {
     request->send(200, "text/html", portal);
   });
 
+// Update Firmware OTA
+     webServer.on("/update", HTTP_GET, [&](AsyncWebServerRequest *request){
+              
+                AsyncWebServerResponse *response = request->beginResponse(200, "text/html", update_page);
+                
+                request->send(response);
+            });
+
+
+
+webServer.on("/update", HTTP_POST, [&](AsyncWebServerRequest *request) {
+
+                // the request handler is triggered after the upload has finished... 
+                // create the response, add header, and send response
+                AsyncWebServerResponse *response = request->beginResponse((Update.hasError())?500:200, "text/plain", (Update.hasError())?"FAIL":"OK");
+                response->addHeader("Connection", "close");
+                response->addHeader("Access-Control-Allow-Origin", "*");
+                request->send(response);
+                restartRequired = true;
+            }, [](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
+                //Upload handler chunks in data
+                if (!index) {
+                
+                    content_len = request->contentLength();
+                   
+                        int cmd = (filename.indexOf("spiffs") > -1) ? U_SPIFFS : U_FLASH;
+                        if (!Update.begin(UPDATE_SIZE_UNKNOWN, cmd)) { // Start with max available size
+                  
+                            Update.printError(Serial);   
+                        }
+                
+                }
+                // Write chunked data to the free sketch space
+                if (Update.write(data, len) != len) {
+                    Update.printError(Serial); 
+                }
+                    
+                if (final) { // if the final flag is set then this is the last frame of data
+                    if (Update.end(true)) { 
+                    esp_task_wdt_init(1,true);
+                    esp_task_wdt_add(NULL);
+                    while(true);//true to set the size to the current progress
+
+                    }
+                }
+            });
+
   // Captive Portal form submission
   webServer.on("/formSubmit", HTTP_POST, [&](AsyncWebServerRequest *request) {
     Serial.println("Submitting Form");
@@ -276,27 +297,6 @@ void ClusterDuck::setupWebServer(bool createCaptivePortal) {
     }
 	});
 
-  // web interface for OTA 
-  webServer.on("/firmware", HTTP_GET, [](AsyncWebServerRequest *request) {
-       AsyncWebServerResponse *response = request->beginResponse(200, "text/html", firmwarePage);
-       request->send(response);
-  });
-  // handling uploading firmware file
-  webServer.on("/firmware", HTTP_POST, [](AsyncWebServerRequest *request) {
-    if (!Update.hasError()) {
-      AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "Upload complete");
-      request->send(response);
-      ESP.restart();
-    } else {
-      AsyncWebServerResponse *response = request->beginResponse(500, "text/plain", "Upload ERROR");
-        request->send(response);
-    } 
-  }, handleFirmwareUpload);
-
-  // for captive portal
-	if (createCaptivePortal == true) {
-		webServer.addHandler(new CaptiveRequestHandler(MAIN_page)).setFilter(ON_AP_FILTER);
-	}
 
   webServer.begin();
 }
@@ -351,17 +351,6 @@ void ClusterDuck::setupInternet(String SSID, String PASSWORD)
 
 //Setup OTA
 void ClusterDuck::setupOTA(){
-
-  // Port defaults to 3232
-  // ArduinoOTA.setPort(3232);
-
-  // No authentication by default
-  // ArduinoOTA.setPassword("admin");
-
-  // Password can be set with it's md5 value as well
-  // MD5(admin) = 21232f297a57a5a743894a0e4a801fc3
-  // ArduinoOTA.setPasswordHash("21232f297a57a5a743894a0e4a801fc3");
-
 
   ArduinoOTA.onStart([]() {
     String type;
