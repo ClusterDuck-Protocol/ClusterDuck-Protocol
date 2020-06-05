@@ -17,6 +17,9 @@ String password = "";
 
 String ClusterDuck::_deviceId = "";
 
+  bool restartRequired = false;
+  size_t content_len;
+
 
 ClusterDuck::ClusterDuck() {
 
