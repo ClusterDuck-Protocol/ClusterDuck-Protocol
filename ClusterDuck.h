@@ -19,6 +19,11 @@
 #include <ESPmDNS.h>
 #include "index.h"
 
+#include <OTAPage.h>
+#include <Update.h>
+#include <esp_int_wdt.h>
+#include <esp_task_wdt.h>
+
 #include "timer.h"
 
 #include <ArduinoOTA.h>
