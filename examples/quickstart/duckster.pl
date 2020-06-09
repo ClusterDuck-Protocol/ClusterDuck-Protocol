@@ -26,6 +26,8 @@ eval { require Time::HiRes; };
 my $infile;
 my $baud = 115200;
 
+my $sqlite;
+
 my $logfile;
 my $DEBUG = 0;
 
@@ -36,6 +38,7 @@ unless (GetOptions(
         'infile|i=s'    => \$infile,
         'logfile|l=s'   => \$logfile,
         'baud|b=s'      => \$baud,
+        'sqlite|s=s'    => \$sqlite,
         'debug|D+'      => \$DEBUG,
 )) {
         terminate('UNKNOWN', 'FATAL: error parsing options');
@@ -43,6 +46,16 @@ unless (GetOptions(
 
 die "no infile" unless defined $infile && length $infile;
 die "infile '$infile' doesnt exist" unless -e $infile;
+
+# open optional database
+my $dbh;
+if (defined $sqlite && length $sqlite) {
+	require DBI;
+	$dbh = DBI->connect("dbi:SQLite:dbname=$sqlite","","");
+	die "no dbh" unless defined $dbh;
+	$dbh->do("CREATE TABLE IF NOT EXISTS clusterData (timestamp datetime, duck_id TEXT, message_id TEXT, payload TEXT, path TEXT)") or die $dbh->errstr;
+	print "SQLITE: $sqlite up\n" if $DEBUG;
+}
 
 my $lf;
 if (defined $logfile && length $logfile) {
@@ -76,6 +89,9 @@ while (<IF>) {
 
 	# this payload sends the data to grafana via tcp
 	#&hash_to_carb($h);
+
+	# this payload writes data to a database
+	&hash_to_db($h);
 }
 print STDERR "SLEEP $C\n";
 sleep 10;
@@ -275,4 +291,25 @@ sub decarb {
 	%CC = ();
 	$CT = undef;
 }
+## END of carbon / grafana payload
+
+## BEGIN of database payload
+sub hash_to_db {
+	my ($h,) = @_;
+	return unless defined $dbh;
+
+	require POSIX;
+
+	my $sth = $dbh->prepare_cached("INSERT INTO clusterData VALUES (?,?,?,?,?)") or die $dbh->errstr;
+	my $rc = $sth->execute(
+			POSIX::strftime("%Y-%m-%d %H:%M:%S", gmtime($h->{ts})),
+			$h->{cdp_sndid},
+			$h->{cdp_msgid},
+			$h->{cdp_payload},
+			$h->{cdp_path},
+		) or die $sth->errstr;
+
+}
+
+
 
