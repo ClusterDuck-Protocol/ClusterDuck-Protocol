@@ -22,7 +22,7 @@
 #define CDPCFG_AP_IP4 1
 
 
-// Asynwevserver Port
+// Asyncwebserver Port
 #define CDPCFG_WEB_PORT 80
 
 
@@ -49,6 +49,7 @@
 #define CDPCFG_MILLIS_ALIVE   1800000
 #define CDPCFG_MILLIS_REBOOT 43200000
 
+//length of the uuid
 #define CDPCFG_UUID_LEN 8
 
 
