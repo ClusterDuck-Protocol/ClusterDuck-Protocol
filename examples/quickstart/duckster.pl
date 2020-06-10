@@ -89,7 +89,7 @@ while (<IF>) {
 	# this is an example payload that just dumps the hash
 	use Data::Dumper;
 	$Data::Dumper::Sortkeys = 1;
-	print Dumper($h);
+	print STDERR Dumper($h);
 
 	# ADD YOUR PAYLOAD HERE
 
@@ -147,7 +147,8 @@ sub line_to_hash ($) {
 	while ($l =~ s/^(\w+):(-?\d+(\.\d+)?) //) {
 		my ($k,$v,) = ($1,$2,);
 		if (exists $d{$k}) {
-			die "dupe key $k in $o";
+			warn "dupe key $k in $o";
+			return;
 		}
 		$d{$k} = $v;
 	}
@@ -194,7 +195,8 @@ sub line_to_hash ($) {
 		$v =~ s/\x00$//;
 		my $k = "cdp_$T";
 		if (exists $d{$k}) {
-			die "dupe key $k in $o";
+			warn "dupe key $k in $o";
+			return;
 		}
 		$d{$k} = $v;
 
@@ -203,7 +205,8 @@ sub line_to_hash ($) {
 				my ($K,$V)=(lc $1, $2);
 				my $k = "cdp_pl_$K";
 				if (exists $d{$k}) {
-					die "dupe key $k in $o";
+					warn "dupe key $k in $o";
+					return;
 				}
 				$d{$k} = $V;
 			}
@@ -239,11 +242,13 @@ sub hash_to_carb {
 		&carb("lora.$s.pathlen", $pl, $ts);
 	}
 
-	if (defined $d{cdp_sndid} && (!($SEEN{$d{cdp_payload}}++))) {
+	if (defined $d{cdp_sndid} && 
+	    defined $d{cdp_payload} && 
+	    !($SEEN{$d{cdp_payload}}++)) {
 		my $S = $d{cdp_sndid};
 		unless ($S =~ /^\w+$/) {
 			warn "BADSND: '$S'";
-			next;
+			return;
 		}
 		my $QS = quotemeta $S;
 		if ($d{cdp_path} !~ /^$QS(,|$)/) {
