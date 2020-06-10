@@ -27,6 +27,7 @@ my $infile;
 my $baud = 115200;
 
 my $sqlite;
+my $carbon;
 
 my $logfile;
 my $DEBUG = 0;
@@ -39,6 +40,7 @@ unless (GetOptions(
         'logfile|l=s'   => \$logfile,
         'baud|b=s'      => \$baud,
         'sqlite|s=s'    => \$sqlite,
+        'carbon|c=s'    => \$carbon,
         'debug|D+'      => \$DEBUG,
 )) {
         terminate('UNKNOWN', 'FATAL: error parsing options');
@@ -92,7 +94,7 @@ while (<IF>) {
 	# ADD YOUR PAYLOAD HERE
 
 	# this payload sends the data to grafana via tcp
-	#&hash_to_carb($h);
+	&hash_to_carb($h);
 
 	# this payload writes data to a database
 	&hash_to_db($h);
@@ -129,7 +131,7 @@ sub line_to_hash ($) {
 		print $lf "$ts $l\n";
 		$lf->flush() or die "cant flush $logfile";
 	}
-	unless ($l =~ s/^LORA (RCV|SND) //) {
+	unless ($l =~ s/^(?:(?:LORA )?(RCV|SND) )//) {
 		print STDERR "IGNORED: '$o'\n" if $DEBUG;
 		return;
 	}
@@ -212,7 +214,8 @@ sub line_to_hash ($) {
 
 
 my %SEEN;
-sub line_to_carb {
+sub hash_to_carb {
+	return unless defined $carbon && length $carbon;
 	my ($h,) = @_;
 	my %d = %$h;
 	my $ts = $d{ts};
@@ -289,18 +292,23 @@ sub carb {
 
 sub decarb {
 	return unless defined $CT;
+	return unless defined $carbon && length $carbon;
 	use IO::Socket::INET;
+	printf STDERR "CARB: flushing %i keys to '%s'\n",
+				scalar keys %CC, $carbon;
 	for my $k (sort keys %CC) {
-	my $sock = IO::Socket::INET->new(PeerAddr => 'localhost:2003');
-	die "no sock" unless defined $sock && $sock;
+		my $sock = IO::Socket::INET->new(PeerAddr => $carbon);
+		die "no sock" unless defined $sock && $sock;
 		my $K = $CC{$k};
+		printf STDERR "CARB: flushing %i keys for '%s' to '%s'\n",
+				scalar keys %$K, $k, $carbon if $DEBUG;
 		for my $t (sort keys %$K) {
 			my $v = $K->{$t};
-			print "CARB: $k.$t $v $CT\n";
+			print "CARB: $k.$t $v $CT\n" if $DEBUG>1;
 			#print CF "$k.$t $v $CT\n";
 			print $sock "$k.$t $v $CT\n";
 		}
-	close $sock;
+		close $sock;
 	}
 	%CC = ();
 	$CT = undef;
