@@ -64,17 +64,21 @@ if (defined $logfile && length $logfile) {
 }
 
 REOPEN:
-if ( -c $infile && $baud ) {
-	my $cmd = "stty -F $infile $baud raw -echo";
-	print "PORTSETUP: '$cmd'\n" if $DEBUG;
-	my $out = `$cmd`;
-	print "OUTPUT: '$out'\n" if $DEBUG;
-}
+&setup_port($infile,$baud);
 open IF, "<", $infile or die "open($infile): $!";
 my $C=0;
 RETAIL:
+my $c=0;
 while (<IF>) {
 	$C=0;
+	my $x = $_;
+	$x =~ s/[\s\r\n[:print:]]//g;
+	if (length($x) > (length($_)*0.5)) {
+		warn "GIBBERISH: $x";
+		&setup_port($infile,$baud);
+		next;
+	}
+	$c++;
 
 	# parse line
 	my $h = &line_to_hash($_);
@@ -101,6 +105,16 @@ goto RETAIL if $C++ < 30;
 exit 0;
 
 ####
+#
+sub setup_port{
+	my ($infile,$baud,) = @_;
+	if ( -c $infile && $baud ) {
+		my $cmd = "stty -F $infile $baud raw -echo";
+		print "PORTSETUP: '$cmd'\n" if $DEBUG;
+		my $out = `$cmd`;
+		print "OUTPUT: '$out'\n" if $DEBUG;
+	}
+}
 
 sub line_to_hash ($) {
 	my ($l,) = @_;
