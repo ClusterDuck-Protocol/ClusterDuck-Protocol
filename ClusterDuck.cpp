@@ -17,8 +17,12 @@ String password = "";
 
 String ClusterDuck::_deviceId = "";
 
-  bool restartRequired = false;
-  size_t content_len;
+bool restartRequired = false;
+size_t content_len;
+
+//Username and password for /update 
+const char* http_username = CDPCFG_UPDATE_USERNAME;
+const char* http_password = CDPCFG_UPDATE_PASSWORD;
 
 
 ClusterDuck::ClusterDuck() {
@@ -170,6 +174,8 @@ void ClusterDuck::setupWebServer(bool createCaptivePortal) {
 
 // Update Firmware OTA
      webServer.on("/update", HTTP_GET, [&](AsyncWebServerRequest *request){
+               if(!request->authenticate(http_username, http_password))
+               return request->requestAuthentication();
               
                 AsyncWebServerResponse *response = request->beginResponse(200, "text/html", update_page);
                 
@@ -910,6 +916,8 @@ void ClusterDuck::setColor(int red, int green, int blue)
 DNSServer ClusterDuck::dnsServer;
 const char * ClusterDuck::DNS  = "duck";
 const byte ClusterDuck::DNS_PORT = 53;
+
+
 
 int ClusterDuck::_rssi = 0;
 float ClusterDuck::_snr;
