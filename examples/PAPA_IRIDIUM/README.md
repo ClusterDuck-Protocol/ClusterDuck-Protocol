@@ -63,6 +63,9 @@ Note: **All other spare pins are inputs only, best avoided**.
     * TTgo T-Beam 5V  → Iridium 5v IN
 
     * TTgo T-Beam Ground → Iridium Ground
+    
+    
+![](/doc/assets/images/TTgo_rockblock_.jpg)
 
 **This is called the Basic TTL Connection**  You can also add in pin sleep and more to optimize the performance and power saving of the RockBlock.
 
