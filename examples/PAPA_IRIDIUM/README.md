@@ -42,6 +42,7 @@ Note: **All other spare pins are inputs only, best avoided**.
 
 ![](/doc/assets/images/Rockblock_cables.png)
 
+
 [https://www.sparkfun.com/products/14720](https://www.sparkfun.com/products/14720)
 
 1. Wiring the Heltec Esp32 + Lora V.2 Board → RockBlock
