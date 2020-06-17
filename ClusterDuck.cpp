@@ -17,6 +17,14 @@ String password = "";
 
 String ClusterDuck::_deviceId = "";
 
+bool restartRequired = false;
+size_t content_len;
+
+//Username and password for /update 
+const char* http_username = CDPCFG_UPDATE_USERNAME;
+const char* http_password = CDPCFG_UPDATE_PASSWORD;
+
+
 ClusterDuck::ClusterDuck() {
 
 }
@@ -128,8 +136,29 @@ void ClusterDuck::setFlag(void) {
   // we got a packet, set the flag
   receivedFlag = true;
 }
+// =====================================
 
-//=========================================================
+// handle the upload of the firmware
+void handleFirmwareUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t lenght, bool final){
+  // handle upload and update
+  if (!index) {
+    Serial.printf("Update: %s\n", filename.c_str());
+    if (!Update.begin(UPDATE_SIZE_UNKNOWN)) { //start with max available size
+      Update.printError(Serial);
+    }
+  }
+  // flashing firmware to ESP
+  if (lenght){
+    Update.write(data, lenght);
+  }
+  if (final) {
+    if (Update.end(true)) { //true to set the size to the current progress
+      Serial.printf("Update Success: %ub written\nRebooting...\n", index+lenght);
+    } else {
+      Update.printError(Serial);
+    }
+  }
+}
 
 //Setup WebServer
 void ClusterDuck::setupWebServer(bool createCaptivePortal) {
@@ -142,6 +171,60 @@ void ClusterDuck::setupWebServer(bool createCaptivePortal) {
   webServer.on("/", HTTP_GET, [&](AsyncWebServerRequest *request) {
     request->send(200, "text/html", portal);
   });
+
+// Update Firmware OTA
+     webServer.on("/update", HTTP_GET, [&](AsyncWebServerRequest *request){
+               if(!request->authenticate(http_username, http_password))
+               return request->requestAuthentication();
+              
+                AsyncWebServerResponse *response = request->beginResponse(200, "text/html", update_page);
+                
+                request->send(response);
+            });
+
+
+
+webServer.on("/update", HTTP_POST, [&](AsyncWebServerRequest *request) {
+
+              
+                AsyncWebServerResponse *response = request->beginResponse((Update.hasError())?500:200, "text/plain", (Update.hasError())?"FAIL":"OK");
+                response->addHeader("Connection", "close");
+                response->addHeader("Access-Control-Allow-Origin", "*");
+                request->send(response);
+                restartRequired = true;
+            }, [](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
+
+                if (!index) {
+
+                  lora.standby();
+                  Serial.println("Pause Lora");
+                  Serial.println("startint OTA update");
+                
+                    content_len = request->contentLength();
+                   
+                        int cmd = (filename.indexOf("spiffs") > -1) ? U_SPIFFS : U_FLASH;
+                        if (!Update.begin(UPDATE_SIZE_UNKNOWN, cmd)) { 
+                  
+                            Update.printError(Serial);   
+                        }
+                
+                }
+              
+                if (Update.write(data, len) != len) {
+                    Update.printError(Serial); 
+                    lora.startReceive();
+                }
+                    
+                if (final) { 
+                    if (Update.end(true)) { 
+                      ESP.restart();
+                    esp_task_wdt_init(1,true);
+                    esp_task_wdt_add(NULL);
+                    while(true);
+
+                    }
+                }
+            });
 
   // Captive Portal form submission
   webServer.on("/formSubmit", HTTP_POST, [&](AsyncWebServerRequest *request) {
@@ -228,10 +311,6 @@ void ClusterDuck::setupWebServer(bool createCaptivePortal) {
     }
 	});
 
-  // for captive portal
-	if (createCaptivePortal == true) {
-		webServer.addHandler(new CaptiveRequestHandler(MAIN_page)).setFilter(ON_AP_FILTER);
-	}
 
   webServer.begin();
 }
@@ -284,6 +363,37 @@ void ClusterDuck::setupInternet(String SSID, String PASSWORD)
   }
 }
 
+//Setup OTA
+void ClusterDuck::setupOTA(){
+
+  ArduinoOTA.onStart([]() {
+    String type;
+    if (ArduinoOTA.getCommand() == U_FLASH)
+      type = "sketch";
+    else // U_SPIFFS
+      type = "filesystem";
+
+    // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
+    Serial.println("Start updating " + type);
+  });
+  ArduinoOTA.onEnd([]() {
+    Serial.println("\nEnd");
+  });
+  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+  });
+  ArduinoOTA.onError([](ota_error_t error) {
+    Serial.printf("Error[%u]: ", error);
+    if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
+    else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
+    else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
+    else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
+    else if (error == OTA_END_ERROR) Serial.println("End Failed");
+  });
+
+  ArduinoOTA.begin();
+}
+
 //Setup premade DuckLink with default settings
 void ClusterDuck::setupDuckLink() {
   setupDisplay("Duck");
@@ -291,14 +401,14 @@ void ClusterDuck::setupDuckLink() {
 	setupWifiAp();
 	setupDns();
   setupWebServer(true);
+  setupOTA();
 
   Serial.println("Duck Online");
 }
 
 void ClusterDuck::runDuckLink() {
-
+  ArduinoOTA.handle();
   processPortalRequest();
-
 }
 
 void ClusterDuck::setupDetect() {
@@ -307,11 +417,13 @@ void ClusterDuck::setupDetect() {
   setupWifiAp();
 	setupDns();
   setupWebServer(false);
+  setupOTA();
 
   Serial.println("Detector Online");
 }
 
 int ClusterDuck::runDetect() {
+  ArduinoOTA.handle();
   int val = 0;
   if(receivedFlag) {  //If LoRa packet received
     receivedFlag = false;
@@ -345,6 +457,7 @@ void ClusterDuck::setupMamaDuck() {
 	setupWifiAp();
 	setupDns();
   setupWebServer(true);
+  setupOTA();
 
   Serial.println("MamaDuck Online");
 
@@ -353,6 +466,7 @@ void ClusterDuck::setupMamaDuck() {
 }
 
 void ClusterDuck::runMamaDuck() {
+  ArduinoOTA.handle();
   tymer.tick();
 
   if(receivedFlag) {  //If LoRa packet received
@@ -807,6 +921,8 @@ void ClusterDuck::setColor(int red, int green, int blue)
 DNSServer ClusterDuck::dnsServer;
 const char * ClusterDuck::DNS  = "duck";
 const byte ClusterDuck::DNS_PORT = 53;
+
+
 
 int ClusterDuck::_rssi = 0;
 float ClusterDuck::_snr;

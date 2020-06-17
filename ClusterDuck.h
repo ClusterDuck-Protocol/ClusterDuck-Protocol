@@ -19,7 +19,14 @@
 #include <ESPmDNS.h>
 #include "index.h"
 
+#include <OTAPage.h>
+#include <Update.h>
+#include <esp_int_wdt.h>
+#include <esp_task_wdt.h>
+
 #include "timer.h"
+
+#include <ArduinoOTA.h>
 
 typedef struct
 {
@@ -43,6 +50,7 @@ class ClusterDuck {
 		static void setupWifiAp(const char *AP = " 🆘 DUCK EMERGENCY PORTAL");
 		static void setupDns();
 		static void setupInternet(String SSID, String PASSWORD);
+    static void setupOTA();
     static bool runCaptivePortal();
 
     static void setupDuckLink();
@@ -125,6 +133,8 @@ class ClusterDuck {
     static int ledR;
     static int ledG;
     static int ledB;
+
+      
 
 
 };
