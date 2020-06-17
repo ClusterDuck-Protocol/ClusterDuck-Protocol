@@ -40,7 +40,7 @@ Note: **All other spare pins are inputs only, best avoided**.
 
 **When you Purchase a Rockblock you will want to buy this accessory cable to interface with the RockBlock easier**
 
-![image alt text](image_1.png)[https://www.sparkfun.com/products/14720](https://www.sparkfun.com/products/14720)
+[https://www.sparkfun.com/products/14720](https://www.sparkfun.com/products/14720)
 
 1. Wiring the Heltec Esp32 + Lora V.2 Board → RockBlock
 
