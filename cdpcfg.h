@@ -1,3 +1,27 @@
+/*
+ * CDP central compile-time configuration
+ *
+ * it will include optional 
+ * - cdpcfg-pre.h at the beginning
+ * - cdpcfg-post.h at the end
+ *
+ * to customize your build, you could ... 
+ * - edit this file or 
+ * - copy it to cdpcfg-pre.h and edit _that_ or 
+ * - create a from-scratch cdpcfg-pre.h that just overrides f.ex. the board defines or
+ * - create a cdpcfg-post.h to undef/define just parts
+ */
+
+// preload optional pre-cfg
+#ifndef CRPCFG_PRE
+  #define CRPCFG_PRE
+  #if __has_include("cdpcfg-pre.h")
+    #include "cdpcfg-pre.h"
+  #endif
+#endif
+
+
+// this is the actual main configuration section
 #ifndef CDPCFG
 #define CDPCFG
 
@@ -61,3 +85,13 @@
 
 
 #endif // CDPCFG
+
+
+// append optional post-cfg
+#ifndef CRPCFG_POST
+  #define CRPCFG_POST
+  #if __has_include("cdpcfg-post.h")
+    #include "cdpcfg-post.h"
+  #endif
+#endif
+
