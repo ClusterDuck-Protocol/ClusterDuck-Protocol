@@ -500,6 +500,18 @@ void ClusterDuck::runMamaDuck() {
 
 }
 
+String tohex(byte *data, int size) {
+  String buf = "";
+  buf.reserve(size*2);
+  char *cs = "0123456789abcdef";
+  for (int i=0; i<size; i++) {
+    byte val = data[i];
+    buf += cs[(val>>4) & 0x0f];
+    buf += cs[ val     & 0x0f];
+  }
+  return buf;
+}
+
 int ClusterDuck::handlePacket() {
   int pSize = lora.getPacketLength();
   memset(transmission, 0x00, CDPCFG_CDP_BUFSIZE); //Reset transmission
@@ -510,6 +522,21 @@ int ClusterDuck::handlePacket() {
     // packet was successfully received
     Serial.print("handlePacket pSize ");
     Serial.println(pSize);
+
+    // dump received packet stats+data
+    Serial.print("LORA RCV");
+    Serial.print(" millis:");
+    Serial.print(millis());
+    Serial.print(" rssi:");
+    Serial.print(lora.getRSSI());
+    Serial.print(" snr:");
+    Serial.print(lora.getSNR());
+    Serial.print(" fe:");
+    Serial.print(lora.getFrequencyError());
+    Serial.print(" size:");
+    Serial.print(pSize);
+    Serial.print(" data:");
+    Serial.println(tohex(transmission, pSize));
 
     return pSize;
   } else {
@@ -866,6 +893,16 @@ void ClusterDuck::startReceive() {
 void ClusterDuck::startTransmit() {
   bool oldEI = enableInterrupt;
   enableInterrupt = false;
+
+  // dump send packet stats+data
+  Serial.print("LORA SND");
+  Serial.print(" millis:");
+  Serial.print(millis());
+  Serial.print(" size:");
+  Serial.print(packetIndex);
+  Serial.print(" data:");
+  Serial.println(tohex(transmission, packetIndex));
+
   int state = lora.transmit(transmission, packetIndex);
 
   memset(transmission, 0x00, CDPCFG_CDP_BUFSIZE); //Reset transmission
