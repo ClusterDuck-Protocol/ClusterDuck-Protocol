@@ -1,6 +1,14 @@
 #include "ClusterDuck.h"
 
+#if defined(CDPCFG_OLED_NONE)
+// no oled, do nothing
+#elif defined(CDPCFG_OLED_64x32)
+// small oled
+U8X8_SSD1306_64X32_NONAME_SW_I2C u8x8(/* clock=*/ CDPCFG_PIN_OLED_CLOCK, /* data=*/ CDPCFG_PIN_OLED_DATA, /* reset=*/ CDPCFG_PIN_OLED_RESET);
+#else
+// default big oled
 U8X8_SSD1306_128X64_NONAME_SW_I2C u8x8(/* clock=*/ CDPCFG_PIN_OLED_CLOCK, /* data=*/ CDPCFG_PIN_OLED_DATA, /* reset=*/ CDPCFG_PIN_OLED_RESET);
+#endif
 
 IPAddress apIP(CDPCFG_AP_IP1, CDPCFG_AP_IP2, CDPCFG_AP_IP3, CDPCFG_AP_IP4);
 AsyncWebServer webServer(CDPCFG_WEB_PORT);
@@ -41,9 +49,26 @@ void ClusterDuck::begin(int baudRate) {
 }
 
 void ClusterDuck::setupDisplay(String deviceType)  {
+#ifndef CDPCFG_OLED_NONE
   u8x8.begin();
   u8x8.setFont(u8x8_font_chroma48medium8_r);
 
+#ifdef CDPCFG_OLED_64x32
+  // small display 64x32
+  u8x8.setCursor(0, 2);
+  u8x8.print("((>.<))");
+
+  u8x8.setCursor(0, 4);
+  u8x8.print("DT: " + deviceType);
+
+  u8x8.setCursor(0, 5);
+  u8x8.print("ID: " + _deviceId);
+
+//  u8x8.setCursor(0, 4);
+//  u8x8.print("ST: Online");
+
+#else
+  // default display size 128x64
   u8x8.setCursor(0, 1);
   u8x8.print("    ((>.<))    ");
 
@@ -61,6 +86,8 @@ void ClusterDuck::setupDisplay(String deviceType)  {
 
   u8x8.setCursor(0, 7);
   u8x8.print(duckMac(false));
+#endif
+#endif
 }
 
 // Initial LoRa settings
@@ -77,8 +104,10 @@ void ClusterDuck::setupLoRa(long BAND, int SS, int RST, int DI0, int DI1, int Tx
   if (state == ERR_NONE) {
     Serial.println("LoRa online, Quack!");
   } else {
+#ifndef CDPCFG_OLED_NONE
     u8x8.clear();
     u8x8.drawString(0, 0, "Starting LoRa failed!");
+#endif
     Serial.print("Starting LoRa Failed!!!");
     Serial.println(state);
     restartDuck();
