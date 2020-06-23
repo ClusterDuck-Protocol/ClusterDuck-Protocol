@@ -503,7 +503,7 @@ void ClusterDuck::runMamaDuck() {
 String tohex(byte *data, int size) {
   String buf = "";
   buf.reserve(size*2);
-  char *cs = "0123456789abcdef";
+  const char *cs = "0123456789abcdef";
   for (int i=0; i<size; i++) {
     byte val = data[i];
     buf += cs[(val>>4) & 0x0f];
@@ -636,12 +636,10 @@ String ClusterDuck::getPacketData(int pSize) {
   }
   packetIndex = 0;
   int len = 0;
-  byte byteCode;
   bool sId = false;
   bool mId = false;
   bool pLoad = false;
   bool pth = false;
-  bool ping = false;
   String msg = "";
   bool gotLen = false;
 
