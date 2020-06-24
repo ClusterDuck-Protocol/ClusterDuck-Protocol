@@ -2,10 +2,16 @@
 #include <PubSubClient.h>
 #include <IridiumSBD.h>
 #include <ArduinoJson.h>
+#include <WiFiClientSecure.h>
 #include "timer.h"
+
 ClusterDuck duck;
+
 auto timer = timer_create_default(); // create a timer with default settings
+
 byte ping = 0xF4;
+
+//============== IRIDIUM ================
 #define IridiumSerial Serial2
 #define DIAGNOSTICS false// Change this to see diagnostics
 #define rxpin 25
@@ -13,6 +19,26 @@ byte ping = 0xF4;
 
 // Declare the IridiumSBD object
 IridiumSBD modem(IridiumSerial);
+//============== IRIDIUM ================
+
+//============== PAPADUCK ================
+#define SSID        ""
+#define PASSWORD    ""
+
+#define ORG         ""
+#define DEVICE_ID   ""
+#define DEVICE_TYPE ""
+#define TOKEN       ""
+
+char server[]           = ORG ".messaging.internetofthings.ibmcloud.com";
+char topic[]            = "iot-2/evt/status/fmt/json";
+char authMethod[]       = "use-token-auth";
+char token[]            = TOKEN;
+char clientId[]         = "d:" ORG ":" DEVICE_TYPE ":" DEVICE_ID;
+
+WiFiClientSecure wifiClient;
+PubSubClient client(server, 8883, wifiClient);
+//============== PAPADUCK ================
 
 void setup() {
   // put your setup code here, to run once:
@@ -21,10 +47,23 @@ void setup() {
   duck.setupDisplay("Papa");
   setupRockBlock();
   duck.setupLoRa();
+
+
+  if(WiFi.status() != WL_CONNECTED && duck.getSSID() != "")
+  {
+    Serial.print("Connecting to local network: ");
+    Serial.print(duck.getSSID());
+    duck.setupInternet(duck.getSSID(), duck.getPassword());
+		duck.setupDns();
+  }
+
+  setupMQTT();
 //  Serial.println("PAPA Online");
 }
 
 void loop() {
+  if(WiFi.status() != WL_CONNECTED) setupMQTT();
+
   if(duck.getFlag()) {  //If LoRa packet received
     duck.flipFlag();
     duck.flipInterrupt();
@@ -72,6 +111,19 @@ void quackJson() {
     Serial.println("Publish failed");
   }
 
+}
+
+void setupMQTT()
+{
+  if (!!!client.connected()) {
+    Serial.print("Reconnecting client to "); Serial.println(server);
+    while ( ! (ORG == "quickstart" ? client.connect(clientId) : client.connect(clientId, authMethod, token)))
+    {
+      timer.tick(); //Advance timer to reboot after awhile
+      Serial.print("i");
+      delay(500);
+    }
+  }
 }
 
 void quackBeam() {
