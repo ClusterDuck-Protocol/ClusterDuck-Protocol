@@ -30,20 +30,56 @@ void loop() {
     duck.flipInterrupt();
     int pSize = duck.handlePacket();
     if(pSize > 3) {
-     duck.getPacketData(pSize);
-      quackJson();
+      duck.getPacketData(pSize);
+      if(WiFi.status() != WL_CONNECTED) {
+        quackBeam();
+      } else {
+        quackJson();
+      }
+      
     }
     duck.flipInterrupt();
     duck.startReceive();
   }
   timer.tick();
 }
+
 void quackJson() {
+  const int bufferSize = 4*  JSON_OBJECT_SIZE(4);
+  StaticJsonDocument<bufferSize> doc;
+
+  JsonObject root = doc.as<JsonObject>();
+
+  Packet lastPacket = duck.getLastPacket();
+
+  doc["DeviceID"]        = lastPacket.senderId;
+  doc["MessageID"]       = lastPacket.messageId;
+  doc["Payload"]     .set(lastPacket.payload);
+  doc["path"]         .set(lastPacket.path + "," + duck.getDeviceId());
+
+
+  String jsonstat;
+  serializeJson(doc, jsonstat);
+
+  if (client.publish(topic, jsonstat.c_str())) {
+
+    serializeJsonPretty(doc, Serial);
+     Serial.println("");
+    Serial.println("Publish ok");
+
+  }
+  else {
+    Serial.println("Publish failed");
+  }
+
+}
+
+void quackBeam() {
   int err;
   Packet lastPacket = duck.getLastPacket();
   
   //Uncomment the lines below of which data you want to send
-   String data = lastPacket.senderId +  "/" + lastPacket.messageId + "/"+ lastPacket.payload + "/"+  lastPacket.path + "," + duck.getDeviceId() ;
+  String data = lastPacket.senderId +  "/" + lastPacket.messageId + "/"+ lastPacket.payload + "/"+  lastPacket.path + "," + duck.getDeviceId() ;
   // String data = lastPacket.messageId ;
   
   Serial.println(data);
@@ -64,6 +100,8 @@ void quackJson() {
   }
  
 }
+
+
 void setupRockBlock(){
   int signalQuality = -1;
   int err;
