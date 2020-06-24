@@ -43,21 +43,19 @@ PubSubClient client(server, 8883, wifiClient);
 void setup() {
   // put your setup code here, to run once:
   duck.begin();
-  duck.setDeviceId("Papa");
-  duck.setupDisplay("Papa");
+  duck.setDeviceId("PapaDish");
+  duck.setupDisplay("PapaDish");
   setupRockBlock();
   duck.setupLoRa();
 
+  const char * ap = "PapaDuck Setup";
+  duck.setupWifiAp(ap);
+	duck.setupDns();
+  duck.setupWebServer(true);
 
-  if(WiFi.status() != WL_CONNECTED && duck.getSSID() != "")
-  {
-    Serial.print("Connecting to local network: ");
-    Serial.print(duck.getSSID());
-    duck.setupInternet(duck.getSSID(), duck.getPassword());
-		duck.setupDns();
-  }
-
+  duck.setupInternet(SSID, PASSWORD);
   setupMQTT();
+  
 //  Serial.println("PAPA Online");
 }
 
@@ -152,7 +150,6 @@ void quackBeam() {
   }
  
 }
-
 
 void setupRockBlock(){
   int signalQuality = -1;
