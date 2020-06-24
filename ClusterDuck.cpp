@@ -563,6 +563,7 @@ void ClusterDuck::sendPayloadMessage(String msg) {
 void ClusterDuck::sendPayloadStandard(String msg, String senderId, String topic, String messageId, String path) {
   if(senderId == "") senderId = _deviceId;
   if(topic == "") topic = "status";
+  Serial.println("Topic: " + topic);
   if(messageId == "") messageId = uuidCreator();
   if(path == "") {
     path = _deviceId;
@@ -678,6 +679,7 @@ String ClusterDuck::getPacketData(int pSize) {
         Serial.println("getPacketData Path: " + _lastPacket.topic);
         msg = "";
         tpc = false;
+        Serial.println("hit1");
 
       }
     }
@@ -706,6 +708,7 @@ String ClusterDuck::getPacketData(int pSize) {
       tpc = true;
       len = transmission[i+1];
       Serial.println("getPacketData topic_B Len = " + String(len));
+      Serial.println("hit2");
 
     } else if(transmission[i] == ping_B) {
       if(_deviceId != "Det") {
@@ -763,6 +766,7 @@ String ClusterDuck::getPacketData(int pSize) {
       _lastPacket.topic = msg;
       Serial.println("getPacketData len0 Topic: " + _lastPacket.topic);
       msg = "";
+      Serial.println("hit3");
     }
   }
 
@@ -994,7 +998,7 @@ Packet ClusterDuck::_lastPacket;
 
 byte ClusterDuck::ping_B       = 0xF4;
 byte ClusterDuck::senderId_B   = 0xF5;
-byte ClusterDuck::topic_B      = 0xF9;
+byte ClusterDuck::topic_B      = 0xE3;
 byte ClusterDuck::messageId_B  = 0xF6;
 byte ClusterDuck::payload_B    = 0xF7;
 byte ClusterDuck::iamhere_B    = 0xF8;
