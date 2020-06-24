@@ -55,12 +55,12 @@ void setup() {
 
   duck.setupInternet(SSID, PASSWORD);
   setupMQTT();
-  
+
 //  Serial.println("PAPA Online");
 }
 
 void loop() {
-  if(WiFi.status() != WL_CONNECTED) setupMQTT();
+  if(WiFi.status() == WL_CONNECTED) setupMQTT();
 
   if(duck.getFlag()) {  //If LoRa packet received
     duck.flipFlag();
@@ -68,10 +68,10 @@ void loop() {
     int pSize = duck.handlePacket();
     if(pSize > 3) {
       duck.getPacketData(pSize);
-      if(WiFi.status() != WL_CONNECTED) {
-        quackBeam();
-      } else {
+      if(WiFi.status() == WL_CONNECTED) {
         quackJson();
+      } else {
+        quackBeam();
       }
       
     }
