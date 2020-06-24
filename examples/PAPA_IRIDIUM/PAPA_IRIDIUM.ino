@@ -53,8 +53,10 @@ void setup() {
 	duck.setupDns();
   duck.setupWebServer(true);
 
-  duck.setupInternet(SSID, PASSWORD);
-  setupMQTT();
+  if(ssidAvailable(SSID)) {
+    duck.setupInternet(SSID, PASSWORD);
+    setupMQTT();
+  }
 
 //  Serial.println("PAPA Online");
 }
@@ -166,7 +168,7 @@ void quackBeam() {
  
 }
 
-bool ssidAvailable() {
+bool ssidAvailable(String val = "") {
   int n = WiFi.scanNetworks();
   Serial.println("scan done");
   if (n == 0) {
@@ -174,8 +176,11 @@ bool ssidAvailable() {
   } else {
     Serial.print(n);
     Serial.println(" networks found");
+    if(val == "") {
+      val = duck.getSSID();
+    }
     for (int i = 0; i < n; ++i) {
-      if(WiFi.SSID(i) == duck.getSSID()){
+      if(WiFi.SSID(i) == val){
         return true;
       }
       delay(10);
