@@ -480,7 +480,7 @@ void ClusterDuck::runMamaDuck() {
       packetIndex = 0;
       if(msg != "ping" && !idInPath(_lastPacket.path)) {
         Serial.println("runMamaDuck relayPacket");
-        sendPayloadStandard(_lastPacket.payload, _lastPacket.senderId, _lastPacket.messageId, _lastPacket.path);
+        sendPayloadStandard(_lastPacket.payload, _lastPacket.senderId, _lastPacket.topic, _lastPacket.messageId, _lastPacket.path);
         memset(transmission, 0x00, CDPCFG_CDP_BUFSIZE); //Reset transmission
         packetIndex = 0;
 
@@ -560,8 +560,9 @@ void ClusterDuck::sendPayloadMessage(String msg) {
 
 }
 
-void ClusterDuck::sendPayloadStandard(String msg, String senderId, String messageId, String path) {
+void ClusterDuck::sendPayloadStandard(String msg, String senderId, String topic, String messageId, String path) {
   if(senderId == "") senderId = _deviceId;
+  if(topic == "") topic = "status";
   if(messageId == "") messageId = uuidCreator();
   if(path == "") {
     path = _deviceId;
@@ -569,8 +570,8 @@ void ClusterDuck::sendPayloadStandard(String msg, String senderId, String messag
     path = path + "," + _deviceId;
   }
 
-  String total = senderId + messageId + path + msg;
-  if(total.length() + 4 > CDPCFG_CDP_BUFSIZE) {
+  String total = senderId + messageId + path + msg + topic;
+  if(total.length() + 5 > CDPCFG_CDP_BUFSIZE) {
     Serial.println("Warning: message is too large!"); //TODO: do something
   }
 
@@ -578,6 +579,7 @@ void ClusterDuck::sendPayloadStandard(String msg, String senderId, String messag
   couple(messageId_B, messageId);
   couple(payload_B, msg);
   couple(path_B, path);
+  couple(topic_B, topic);
 
   Serial.print("sendPayloadStandard packetIndex ");
   Serial.println(packetIndex);
@@ -640,6 +642,7 @@ String ClusterDuck::getPacketData(int pSize) {
   bool mId = false;
   bool pLoad = false;
   bool pth = false;
+  bool tpc = false;
   String msg = "";
   bool gotLen = false;
 
@@ -657,16 +660,25 @@ String ClusterDuck::getPacketData(int pSize) {
         Serial.println("getPacketData Message ID: " + _lastPacket.messageId);
         msg = "";
         mId = false;
+
       } else if(pLoad) {
         _lastPacket.payload = msg;
         Serial.println("getPacketData Message: " + _lastPacket.payload);
         msg = "";
         pLoad = false;
+
       } else if(pth) {
         _lastPacket.path = msg;
         Serial.println("getPacketData Path: " + _lastPacket.path);
         msg = "";
         pth = false;
+
+      } else if(tpc) {
+        _lastPacket.topic = msg;
+        Serial.println("getPacketData Path: " + _lastPacket.topic);
+        msg = "";
+        tpc = false;
+
       }
     }
     if(transmission[i] == senderId_B){
@@ -689,6 +701,11 @@ String ClusterDuck::getPacketData(int pSize) {
       pth = true;
       len = transmission[i+1];
       Serial.println("getPacketData path_B Len = " + String(len));
+
+    } else if(transmission[i] == topic_B) {
+      tpc = true;
+      len = transmission[i+1];
+      Serial.println("getPacketData topic_B Len = " + String(len));
 
     } else if(transmission[i] == ping_B) {
       if(_deviceId != "Det") {
@@ -741,6 +758,10 @@ String ClusterDuck::getPacketData(int pSize) {
     } else if(pth) {
       _lastPacket.path = msg;
       Serial.println("getPacketData len0 Path: " + _lastPacket.path);
+      msg = "";
+    } else if(tpc) {
+      _lastPacket.topic = msg;
+      Serial.println("getPacketData len0 Topic: " + _lastPacket.topic);
       msg = "";
     }
   }
@@ -836,6 +857,7 @@ String ClusterDuck::getDeviceId() {
 Packet ClusterDuck::getLastPacket() {
   Packet packet = _lastPacket;
   _lastPacket = Packet();
+  _lastPacket.topic = "status";
   return packet;
 }
 
@@ -957,13 +979,12 @@ DNSServer ClusterDuck::dnsServer;
 const char * ClusterDuck::DNS  = "duck";
 const byte ClusterDuck::DNS_PORT = 53;
 
-
-
 int ClusterDuck::_rssi = 0;
 float ClusterDuck::_snr;
 long ClusterDuck::_freqErr;
 int ClusterDuck::_availableBytes;
 int ClusterDuck::_packetSize = 0;
+
 // LED
 int ClusterDuck::ledR = CDPCFG_PIN_RGBLED_R;
 int ClusterDuck::ledG = CDPCFG_PIN_RGBLED_G;
@@ -973,6 +994,7 @@ Packet ClusterDuck::_lastPacket;
 
 byte ClusterDuck::ping_B       = 0xF4;
 byte ClusterDuck::senderId_B   = 0xF5;
+byte ClusterDuck::topic_B      = 0xF9;
 byte ClusterDuck::messageId_B  = 0xF6;
 byte ClusterDuck::payload_B    = 0xF7;
 byte ClusterDuck::iamhere_B    = 0xF8;

@@ -14,7 +14,6 @@
 #define TOKEN       ""
 
 char server[]           = ORG ".messaging.internetofthings.ibmcloud.com";
-char topic[]            = "iot-2/evt/status/fmt/json";
 char authMethod[]       = "use-token-auth";
 char token[]            = TOKEN;
 char clientId[]         = "d:" ORG ":" DEVICE_TYPE ":" DEVICE_ID;
@@ -87,6 +86,7 @@ void setupMQTT()
     }
   }
 }
+
 void quackJson() {
   const int bufferSize = 4*  JSON_OBJECT_SIZE(4);
   StaticJsonDocument<bufferSize> doc;
@@ -100,6 +100,12 @@ void quackJson() {
   doc["Payload"]     .set(lastPacket.payload);
   doc["path"]         .set(lastPacket.path + "," + duck.getDeviceId());
 
+  String loc = "iot-2/evt/"+ lastPacket.topic +"/fmt/json";
+  Serial.print(loc);
+  int len = loc.length();
+
+  char topic[len];
+  loc.toCharArray(topic, len);
 
   String jsonstat;
   serializeJson(doc, jsonstat);

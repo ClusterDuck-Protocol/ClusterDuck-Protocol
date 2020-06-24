@@ -93,13 +93,15 @@ bool runSensor(void *) {
   Serial.print("Speed     : ");
   Serial.println(gps.speed.kmph());
   Serial.println("**********************");
+  
   String sensorVal = "Lat: " + String(gps.location.lat(), 5) + " Lng: " + String(gps.location.lng(), 4);
+  
   if (millis() > 5000 && gps.charsProcessed() < 10)
   {
     Serial.println(F("No GPS data received: check wiring"));
   }
   Serial.println(" ");
   Serial.println(sensorVal);
-  duck.sendPayloadMessage(sensorVal);
+  duck.sendPayloadStandard(sensorVal, "", "gps");
   return true;
 }
