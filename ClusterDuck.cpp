@@ -860,6 +860,14 @@ String ClusterDuck::getPassword() {
 }
 
 //Setter
+void ClusterDuck::setSSID(String val) {
+  ssid = val;
+}
+
+void ClusterDuck::setPassword(String val) {
+  password = val;
+}
+
 void ClusterDuck::flipFlag() {
   if (receivedFlag == true) {
     receivedFlag = false;

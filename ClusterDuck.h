@@ -88,6 +88,8 @@ class ClusterDuck {
     volatile bool getInterrupt();
     void flipFlag();
     void flipInterrupt();
+    static void setSSID(String val);
+    static void setPassword(String val);
     static void startReceive();
     static int getRSSI();
     static void ping();

@@ -56,6 +56,9 @@ void setup() {
   if(ssidAvailable(SSID)) {
     duck.setupInternet(SSID, PASSWORD);
     setupMQTT();
+  } else {
+    duck.setSSID(SSID);
+    duck.setPassword(PASSWORD);
   }
 
 //  Serial.println("PAPA Online");
