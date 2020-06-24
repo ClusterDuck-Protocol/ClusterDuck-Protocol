@@ -71,7 +71,18 @@ void loop() {
       if(WiFi.status() == WL_CONNECTED) {
         quackJson();
       } else {
-        quackBeam();
+        if(ssidAvailable()) {
+          Serial.print("WiFi disconnected, reconnecting to local network: ");
+          Serial.print(duck.getSSID());
+          duck.setupInternet(duck.getSSID(), duck.getPassword());
+          duck.setupDns();
+          setupMQTT();
+
+          quackJson();
+        } else {
+          quackBeam();
+        }
+        
       }
       
     }
@@ -82,6 +93,8 @@ void loop() {
 }
 
 void quackJson() {
+  Serial.print("quackJson");
+
   const int bufferSize = 4*  JSON_OBJECT_SIZE(4);
   StaticJsonDocument<bufferSize> doc;
 
@@ -101,7 +114,7 @@ void quackJson() {
   if (client.publish(topic, jsonstat.c_str())) {
 
     serializeJsonPretty(doc, Serial);
-     Serial.println("");
+    Serial.println("");
     Serial.println("Publish ok");
 
   }
@@ -125,6 +138,8 @@ void setupMQTT()
 }
 
 void quackBeam() {
+  Serial.print("quackBeam");
+
   int err;
   Packet lastPacket = duck.getLastPacket();
   
@@ -149,6 +164,24 @@ void quackBeam() {
     Serial.println("Hey, it worked!");
   }
  
+}
+
+bool ssidAvailable() {
+  int n = WiFi.scanNetworks();
+  Serial.println("scan done");
+  if (n == 0) {
+    Serial.println("no networks found");
+  } else {
+    Serial.print(n);
+    Serial.println(" networks found");
+    for (int i = 0; i < n; ++i) {
+      if(WiFi.SSID(i) == duck.getSSID()){
+        return true;
+      }
+      delay(10);
+    }
+  }
+  return false;
 }
 
 void setupRockBlock(){
