@@ -31,6 +31,7 @@
 typedef struct
 {
   String senderId;
+  String topic;
   String messageId;
   String payload;
   String path;
@@ -71,7 +72,7 @@ class ClusterDuck {
     static long _freqErr;
     static int _availableBytes;
 
-    static void sendPayloadStandard(String msg, String senderId = "", String messageId = "", String path = "");
+    static void sendPayloadStandard(String msg, String topic = "", String senderId = "", String messageId = "", String path = "");
 
     static String uuidCreator();
 
@@ -122,9 +123,9 @@ class ClusterDuck {
     static void restartDuck();
     static bool reboot(void *);
 
-    // QuackPack
     static byte ping_B;
     static byte senderId_B;
+    static byte topic_B;
     static byte messageId_B;
     static byte payload_B;
     static byte iamhere_B;
