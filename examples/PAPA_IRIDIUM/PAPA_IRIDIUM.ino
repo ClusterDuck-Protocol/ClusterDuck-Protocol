@@ -53,7 +53,7 @@ void setup() {
 	duck.setupDns();
   duck.setupWebServer(true);
 
-  if(ssidAvailable(SSID)) {
+  if(duck.ssidAvailable(SSID)) {
     duck.setupInternet(SSID, PASSWORD);
     setupMQTT();
   } else {
@@ -76,7 +76,7 @@ void loop() {
       if(WiFi.status() == WL_CONNECTED) {
         quackJson();
       } else {
-        if(ssidAvailable()) {
+        if(duck.ssidAvailable()) {
           Serial.print("WiFi disconnected, reconnecting to local network: ");
           Serial.print(duck.getSSID());
           duck.setupInternet(duck.getSSID(), duck.getPassword());
@@ -169,27 +169,6 @@ void quackBeam() {
     Serial.println("Hey, it worked!");
   }
  
-}
-
-bool ssidAvailable(String val = "") {
-  int n = WiFi.scanNetworks();
-  Serial.println("scan done");
-  if (n == 0) {
-    Serial.println("no networks found");
-  } else {
-    Serial.print(n);
-    Serial.println(" networks found");
-    if(val == "") {
-      val = duck.getSSID();
-    }
-    for (int i = 0; i < n; ++i) {
-      if(WiFi.SSID(i) == val){
-        return true;
-      }
-      delay(10);
-    }
-  }
-  return false;
 }
 
 void setupRockBlock(){
