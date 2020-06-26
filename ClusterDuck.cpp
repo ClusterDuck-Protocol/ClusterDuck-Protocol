@@ -560,7 +560,7 @@ void ClusterDuck::sendPayloadMessage(String msg) {
 
 }
 
-void ClusterDuck::sendPayloadStandard(String msg, String topic, String senderId, String messageId, String path) {
+void ClusterDuck::sendPayloadStandard(String topic, String msg, String senderId, String messageId, String path) {
   if(senderId == "") senderId = _deviceId;
   if(topic == "") topic = "status";
   Serial.println("Topic: " + topic);
