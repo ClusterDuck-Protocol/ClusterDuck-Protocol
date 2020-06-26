@@ -72,7 +72,7 @@ class ClusterDuck {
     static long _freqErr;
     static int _availableBytes;
 
-    static void sendPayloadStandard(String msg, String topic = "", String senderId = "", String messageId = "", String path = "");
+    static void sendPayloadStandard(String topic = "", String msg, String senderId = "", String messageId = "", String path = "");
 
     static String uuidCreator();
 
