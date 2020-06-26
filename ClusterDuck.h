@@ -50,6 +50,7 @@ class ClusterDuck {
 		static void setupWifiAp(const char *AP = " 🆘 DUCK EMERGENCY PORTAL");
 		static void setupDns();
 		static void setupInternet(String SSID, String PASSWORD);
+    static void ssidAvailable(String val = "");
     static void setupOTA();
     static bool runCaptivePortal();
 
