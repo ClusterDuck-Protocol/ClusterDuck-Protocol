@@ -1,13 +1,13 @@
 /*
  * CDP central compile-time configuration
  *
- * it will include optional 
+ * it will include optional
  * - cdpcfg-pre.h at the beginning
  * - cdpcfg-post.h at the end
  *
- * to customize your build, you could ... 
- * - edit this file or 
- * - copy it to cdpcfg-pre.h and edit _that_ or 
+ * to customize your build, you could ...
+ * - edit this file or
+ * - copy it to cdpcfg-pre.h and edit _that_ or
  * - create a from-scratch cdpcfg-pre.h that just overrides f.ex. the board defines or
  * - create a cdpcfg-post.h to undef/define just parts
  */
@@ -28,10 +28,10 @@
   /*
    * HARDWARE SECTION // BOARD PINS
    * the ARDUINO_* defs are set by the arduino build env
-   */ 
- 
+   */
 
-  /* 
+
+  /*
    * BOARD "ttgo lora" and "heltec lora" v1
    * heltec pcb is white, ttgo pcb has heltec+ttgo markings
    * left top+middle in this picture

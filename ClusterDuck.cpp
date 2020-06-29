@@ -29,7 +29,7 @@ String ClusterDuck::_deviceId = "";
 bool restartRequired = false;
 size_t content_len;
 
-//Username and password for /update 
+//Username and password for /update
 const char* http_username = CDPCFG_UPDATE_USERNAME;
 const char* http_password = CDPCFG_UPDATE_PASSWORD;
 
@@ -210,9 +210,9 @@ void ClusterDuck::setupWebServer(bool createCaptivePortal) {
      webServer.on("/update", HTTP_GET, [&](AsyncWebServerRequest *request){
                if(!request->authenticate(http_username, http_password))
                return request->requestAuthentication();
-              
+
                 AsyncWebServerResponse *response = request->beginResponse(200, "text/html", update_page);
-                
+
                 request->send(response);
             });
 
@@ -220,7 +220,7 @@ void ClusterDuck::setupWebServer(bool createCaptivePortal) {
 
 webServer.on("/update", HTTP_POST, [&](AsyncWebServerRequest *request) {
 
-              
+
                 AsyncWebServerResponse *response = request->beginResponse((Update.hasError())?500:200, "text/plain", (Update.hasError())?"FAIL":"OK");
                 response->addHeader("Connection", "close");
                 response->addHeader("Access-Control-Allow-Origin", "*");
@@ -234,24 +234,24 @@ webServer.on("/update", HTTP_POST, [&](AsyncWebServerRequest *request) {
                   enableInterrupt = false;
                   Serial.println("Pause Lora");
                   Serial.println("startint OTA update");
-                
+
                     content_len = request->contentLength();
-                   
+
                         int cmd = (filename.indexOf("spiffs") > -1) ? U_SPIFFS : U_FLASH;
-                        if (!Update.begin(UPDATE_SIZE_UNKNOWN, cmd)) { 
-                  
-                            Update.printError(Serial);   
+                        if (!Update.begin(UPDATE_SIZE_UNKNOWN, cmd)) {
+
+                            Update.printError(Serial);
                         }
-                
+
                 }
-              
+
                 if (Update.write(data, len) != len) {
-                    Update.printError(Serial); 
+                    Update.printError(Serial);
                     lora.startReceive();
                 }
-                    
-                if (final) { 
-                    if (Update.end(true)) { 
+
+                if (final) {
+                    if (Update.end(true)) {
                       ESP.restart();
                     esp_task_wdt_init(1,true);
                     esp_task_wdt_add(NULL);
@@ -974,8 +974,8 @@ void ClusterDuck::setupLED() {
   ledcAttachPin(ledR, 1); // assign RGB led pins to channels
   ledcAttachPin(ledG, 2);
   ledcAttachPin(ledB, 3);
-  
-// Initialize channels 
+
+// Initialize channels
 // channels 0-15, resolution 1-16 bits, freq limits depend on resolution
 // ledcSetup(uint8_t channel, uint32_t freq, uint8_t resolution_bits);
   ledcSetup(1, 12000, 8); // 12 kHz PWM, 8-bit resolution
@@ -987,7 +987,7 @@ void ClusterDuck::setColor(int red, int green, int blue)
 {
   ledcWrite(1, red);
   ledcWrite(2, green);
-  ledcWrite(3, blue);  
+  ledcWrite(3, blue);
 }
 
 DNSServer ClusterDuck::dnsServer;
