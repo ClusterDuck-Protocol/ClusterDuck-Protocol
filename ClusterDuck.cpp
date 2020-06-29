@@ -93,13 +93,17 @@ void ClusterDuck::setupDisplay(String deviceType)  {
 
 // Initial LoRa settings
 void ClusterDuck::setupLoRa(long BAND, int SS, int RST, int DI0, int DI1, int TxPower) {
-  //LoRa.setSignalBandwidth(62.5E3);
 
+#ifdef CDPCFG_PIN_LORA_SPI_SCK
+  log_n("_spi.begin(CDPCFG_PIN_LORA_SPI_SCK, CDPCFG_PIN_LORA_SPI_MISO, CDPCFG_PIN_LORA_SPI_MOSI, CDPCFG_PIN_LORA_CS)");
+  _spi.begin(CDPCFG_PIN_LORA_SPI_SCK, CDPCFG_PIN_LORA_SPI_MISO, CDPCFG_PIN_LORA_SPI_MOSI, CDPCFG_PIN_LORA_CS);
+  lora = new Module(SS, DI0, RST, DI1, _spi, _spiSettings);
+#else
   lora = new Module(SS, DI0, RST, DI1);
+#endif
 
   Serial.println("Starting LoRa......");
-
-  int state = lora.begin(); //TODO: Make more modular -> Bandwidth, Spreading factor
+  int state = lora.begin();
 
   //Initialize LoRa
   if (state == ERR_NONE) {
