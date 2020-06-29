@@ -226,6 +226,7 @@ webServer.on("/update", HTTP_POST, [&](AsyncWebServerRequest *request) {
                 if (!index) {
 
                   lora.standby();
+                  enableInterrupt = false;
                   Serial.println("Pause Lora");
                   Serial.println("startint OTA update");
                 
@@ -496,7 +497,9 @@ void ClusterDuck::setupMamaDuck() {
 
 void ClusterDuck::runMamaDuck() {
   ArduinoOTA.handle();
-  tymer.tick();
+  if (enableInterrupt) {
+    tymer.tick();
+  }
 
   if(receivedFlag) {  //If LoRa packet received
     receivedFlag = false;
