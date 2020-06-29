@@ -487,6 +487,9 @@ void ClusterDuck::processPortalRequest() {
 }
 
 void ClusterDuck::setupMamaDuck() {
+#ifdef CDPCFG_MESH_DEDUP_BLOOM
+  setupBloomFilters();
+#endif
   setupDisplay("Mama");
   setupLoRa();
 	setupWifiAp();
@@ -498,6 +501,86 @@ void ClusterDuck::setupMamaDuck() {
 
   tymer.every(CDPCFG_MILLIS_ALIVE, imAlive);
   tymer.every(CDPCFG_MILLIS_REBOOT, reboot);
+}
+
+#ifdef CDPCFG_MESH_DEDUP_BLOOM
+void ClusterDuck::setupBloomFilters() {
+  log_n("start");
+  if (_bf == NULL) {
+    log_n("alloc %i",CDPCFG_MESH_DEDUP_BLOOM_COUNT);
+    _bf = (cdp_bf_t *)calloc(CDPCFG_MESH_DEDUP_BLOOM_COUNT,sizeof(cdp_bf_t));
+  }
+  _bf_active = 0;
+  // simply cycle through the whole list to (re)init them all
+  for (int i=0; i<CDPCFG_MESH_DEDUP_BLOOM_COUNT; i++) {
+    log_n("cycle %l",i);
+    cycleBloomFilters();
+  }
+}
+
+void ClusterDuck::cycleBloomFilters() {
+  log_n("start");
+  if (_bf == NULL) {
+    return;
+  }
+  // decide next active filter
+  log_n("old active: %i",_bf_active);
+  _bf_active = (_bf_active + 1) % CDPCFG_MESH_DEDUP_BLOOM_COUNT;
+  log_n("new active: %i",_bf_active);
+  // (re)init filter
+  cdp_bf_init(CDPCFG_MESH_DEDUP_BLOOM_K, CDPCFG_MESH_DEDUP_BLOOM_M, CDPCFG_MESH_DEDUP_BLOOM_SALT, &_bf[_bf_active]);
+}
+
+bool ClusterDuck::checkBloomFilters(String msg) {
+  log_n("start");
+  // check_add to active filter
+  log_n("add bf[%d].n=%d", _bf_active, _bf[_bf_active].n);
+  bool have = cdp_bf_check_add(&_bf[_bf_active],(byte *)msg.c_str(),msg.length());
+  if (have) { // if have, return true
+    log_n("have active %d",_bf_active);
+    return true;
+  } else { // if added, check if full
+    if (_bf[_bf_active].n > CDPCFG_MESH_DEDUP_BLOOM_MAXN) {
+      // if full rotate and return false
+      cycleBloomFilters();
+      log_n("dont cycled");
+      return false;
+    }
+    log_n("dont n=%d", _bf[_bf_active].n);
+  }
+  // check passive filters
+  for (int i=(_bf_active+CDPCFG_MESH_DEDUP_BLOOM_COUNT-1)%CDPCFG_MESH_DEDUP_BLOOM_COUNT; i!=_bf_active; i=(i+CDPCFG_MESH_DEDUP_BLOOM_COUNT-1)%CDPCFG_MESH_DEDUP_BLOOM_COUNT) {
+    // if have, return true
+    log_n("chk bf[%d].n=%d", i, _bf[i].n);
+    if (cdp_bf_check(&_bf[i],(byte *)msg.c_str(),msg.length())) {
+      log_n("have passive %d",i);
+      return true;
+    }
+  }
+  // no matches found: return false
+  log_n("dont final");
+  return false;
+}
+#endif // CDPCFG_MESH_DEDUP_BLOOM
+
+bool ClusterDuck::checkRelayPacket() {
+  bool op = false;
+#ifdef CDPCFG_MESH_DEDUP_PATH
+  bool op1 = op = !idInPath(_lastPacket.path);
+#endif // CDPCFG_MESH_DEDUP_PATH
+#ifdef CDPCFG_MESH_DEDUP_BLOOM
+  bool op2 = op = !checkBloomFilters(_lastPacket.senderId + "::" +
+                                    _lastPacket.messageId + "::" +
+                                    _lastPacket.payload);
+#endif // CDPCFG_MESH_DEDUP_BLOOM
+#if defined(CDPCFG_MESH_DEDUP_PATH) && defined(CDPCFG_MESH_DEDUP_BLOOM)
+  // relay only if both strategies allow relaying
+  op = op1 && op2;
+  if (op1 != op2) {
+    log_e("MISMATCH: path=%d bloom=%d res=%d", op1, op2, op);
+  }
+#endif // PATH + BLOOM
+  return op;
 }
 
 void ClusterDuck::runMamaDuck() {
@@ -515,7 +598,7 @@ void ClusterDuck::runMamaDuck() {
     if(pSize > 0) {
       String msg = getPacketData(pSize);
       packetIndex = 0;
-      if(msg != "ping" && !idInPath(_lastPacket.path)) {
+      if(msg != "ping" && checkRelayPacket()) {
         Serial.println("runMamaDuck relayPacket");
         sendPayloadStandard(_lastPacket.payload, _lastPacket.senderId, _lastPacket.messageId, _lastPacket.path);
         memset(transmission, 0x00, CDPCFG_CDP_BUFSIZE); //Reset transmission
@@ -1016,3 +1099,9 @@ byte ClusterDuck::iamhere_B    = 0xF8;
 byte ClusterDuck::path_B       = 0xF3;
 
 String ClusterDuck::portal = MAIN_page;
+
+#ifdef CDPCFG_MESH_DEDUP_BLOOM
+cdp_bf_t *ClusterDuck::_bf;
+byte ClusterDuck::_bf_active;
+#endif
+

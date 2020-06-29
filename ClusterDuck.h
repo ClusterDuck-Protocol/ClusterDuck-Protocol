@@ -26,6 +26,10 @@
 
 #include "timer.h"
 
+#ifdef CDPCFG_MESH_DEDUP_BLOOM
+#include "cdp-bloom.h"
+#endif
+
 #include <ArduinoOTA.h>
 
 typedef struct
@@ -57,6 +61,7 @@ class ClusterDuck {
     static void setupMamaDuck();
     static void processPortalRequest();
     static int handlePacket();
+    static bool checkRelayPacket();
     static void runDuckLink();
     static void runMamaDuck();
 
@@ -101,9 +106,20 @@ class ClusterDuck {
     static String getSSID();
     static String getPassword();
 
+#ifdef CDPCFG_MESH_DEDUP_BLOOM
+    static void setupBloomFilters();
+    static void cycleBloomFilters();
+    static bool checkBloomFilters(String msg);
+#endif
+
   protected:
     static Packet _lastPacket;
     static String _deviceId;
+
+#ifdef CDPCFG_MESH_DEDUP_BLOOM
+    static cdp_bf_t *_bf;
+    static byte _bf_active;
+#endif
 
   private:
 
