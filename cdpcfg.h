@@ -1,13 +1,13 @@
 /*
  * CDP central compile-time configuration
  *
- * it will include optional 
+ * it will include optional
  * - cdpcfg-pre.h at the beginning
  * - cdpcfg-post.h at the end
  *
- * to customize your build, you could ... 
- * - edit this file or 
- * - copy it to cdpcfg-pre.h and edit _that_ or 
+ * to customize your build, you could ...
+ * - edit this file or
+ * - copy it to cdpcfg-pre.h and edit _that_ or
  * - create a from-scratch cdpcfg-pre.h that just overrides f.ex. the board defines or
  * - create a cdpcfg-post.h to undef/define just parts
  */
@@ -28,10 +28,10 @@
   /*
    * HARDWARE SECTION // BOARD PINS
    * the ARDUINO_* defs are set by the arduino build env
-   */ 
- 
+   */
 
-  /* 
+
+  /*
    * BOARD "ttgo lora" and "heltec lora" v1
    * heltec pcb is white, ttgo pcb has heltec+ttgo markings
    * left top+middle in this picture
@@ -64,6 +64,7 @@
    * pio: board = ttgo-lora32-v2
    */
   #elif defined(ARDUINO_TTGO_LoRa32_V2)
+
     #define CDPCFG_PIN_BAT 35
     #define CDPCFG_BAT_MULDIV 200/100
 
@@ -85,11 +86,124 @@
 
 
   /*
+   * BOARD "heltec wireless stick"
+   * http://www.heltec.cn/project/wireless-stick/
+   * pio: board = heltec_wireless_stick
+   */
+  #elif defined(ARDUINO_HELTEC_WIRELESS_STICK)
+
+    #define CDPCFG_PIN_BAT  37
+    #define CDPCFG_BAT_MULDIV 320/100
+
+    #define CDPCFG_PIN_VEXT 21
+
+    #define CDPCFG_PIN_LED1 25
+
+    //Lora configurations
+    #define CDPCFG_PIN_LORA_CS   18
+    #define CDPCFG_PIN_LORA_DIO0 26
+    #define CDPCFG_PIN_LORA_RST  14
+
+    // Oled Display settings
+    #define CDPCFG_OLED_64x32
+    #define CDPCFG_PIN_OLED_CLOCK 15
+    #define CDPCFG_PIN_OLED_DATA   4
+    #define CDPCFG_PIN_OLED_RESET 16
+
+    // actualy missing
+    #define CDPCFG_PIN_LORA_DIO1 -1
+
+
+
+  /*
+   * BOARD "sparkfun lora gateway 1-channel"
+   * https://www.sparkfun.com/products/15006
+   * pio: board = sparkfun_lora_gateway_1-channel
+   */
+  #elif defined(SPARKFUN_LGW1C)
+    // this is not an official ARDUINO_* define since this board doesnt have one
+
+    //Lora configurations
+    #define CDPCFG_PIN_LORA_CS   16
+    #define CDPCFG_PIN_LORA_DIO0 26
+    #define CDPCFG_PIN_LORA_DIO1 33
+    #define CDPCFG_PIN_LORA_DIO2 32
+    #define CDPCFG_PIN_LORA_RST   5
+
+    // Oled Display settings
+    #define CDPCFG_OLED_NONE
+
+
+
+  /*
+   * BOARD "pycom lopy"
+   * https://docs.pycom.io/datasheets/development/lopy/
+   * pio: board = lopy
+   */
+  #elif defined(ARDUINO_LoPy)
+
+    #define CDPCFG_PIN_ANT 16
+
+    //Lora configurations
+    #define CDPCFG_PIN_LORA_CS   17
+    #define CDPCFG_PIN_LORA_DIO0 23
+    #define CDPCFG_PIN_LORA_RST  18
+
+    //special SPI
+    #define CDPCFG_PIN_LORA_SPI_SCK   5
+    #define CDPCFG_PIN_LORA_SPI_MISO 19
+    #define CDPCFG_PIN_LORA_SPI_MOSI 27
+    #define CDPCFG_LORA_CLASS SX1272
+
+    // Oled Display settings
+    #define CDPCFG_OLED_NONE
+
+    // actualy missing
+    #define CDPCFG_PIN_LORA_DIO1 -1
+
+
+
+  /*
+   * BOARD "pycom lopy4"
+   * https://docs.pycom.io/datasheets/development/lopy4/
+   * pio: board = lopy4
+   */
+  #elif defined(ARDUINO_LoPy4)
+
+    #define CDPCFG_PIN_ANT 16
+
+    //Lora configurations
+    #define CDPCFG_PIN_LORA_CS   18
+    #define CDPCFG_PIN_LORA_DIO0 23
+    #define CDPCFG_PIN_LORA_RST  -1
+
+    //special SPI
+    #define CDPCFG_PIN_LORA_SPI_SCK   5
+    #define CDPCFG_PIN_LORA_SPI_MISO 19
+    #define CDPCFG_PIN_LORA_SPI_MOSI 27
+    #define CDPCFG_LORA_CLASS SX1276
+
+    // Oled Display settings
+    #define CDPCFG_OLED_NONE
+
+    // actualy missing
+    #define CDPCFG_PIN_LORA_DIO1 -1
+
+
+
+  #else
+
+  #if !defined(ARDUINO_HELTEC_WIFI_LORA_32_V2)
+    #warning "NO BOARD DEFINED, DEFAULTING TO HELTEC v2"
+    #define CDPCFG_BOARD_DEFAULT
+  #endif
+
+  /*
    * BOARD "heltec lora v2"
    * https://heltec.org/project/wifi-lora-32/
    * pio: board = heltec_wifi_lora_32_V2
    */
-  #elif defined(ARDUINO_HELTEC_WIFI_LORA_32_V2)
+
 
     #define CDPCFG_PIN_BAT  37
     #define CDPCFG_BAT_MULDIV 320/100
@@ -111,8 +225,6 @@
     // actualy missing
     #define CDPCFG_PIN_LORA_DIO1 -1
 
-  #else
-    #error "no known board defined"
   #endif
 
 
@@ -159,6 +271,27 @@
   #define CDPCFG_PIN_RGBLED_G  4
   #define CDPCFG_PIN_RGBLED_B  2
 
+
+
+  // semiautomatic section for setting defaults
+
+  // set default modem
+  #ifndef CDPCFG_LORA_CLASS
+    #define CDPCFG_LORA_CLASS SX1276
+  #endif
+
+  // set oled class
+  #ifndef CDPCFG_OLED_CLASS
+    #if defined(CDPCFG_OLED_NONE)
+       // do nothing
+    #elif defined(CDPCFG_OLED_64x32)
+       // smaller displays
+       #define CDPCFG_OLED_CLASS U8X8_SSD1306_64X32_NONAME_SW_I2C
+    #else
+       // classic default
+       #define CDPCFG_OLED_CLASS U8X8_SSD1306_128X64_NONAME_SW_I2C
+    #endif
+  #endif
 
 #endif // CDPCFG
 

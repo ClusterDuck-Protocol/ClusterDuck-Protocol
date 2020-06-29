@@ -127,7 +127,7 @@ const char MAIN_page[] PROGMEM = R"=====(
             label  {
                 font-weight: bold;
             }
-            
+
         </style>
         </head>
     <body>
@@ -149,30 +149,30 @@ const char MAIN_page[] PROGMEM = R"=====(
                     <input class="textbox textbox-full" name="city" type="text" placeholder="Mayagüez" /><br><br>
                     <label for="zipcode">Zipcode</label><br>
                     <input class="textbox textbox-full" name="zipcode" type="number" placeholder="00682" /> <br /> <br />
-                    <label for="phone">Phone</label><br /> 
+                    <label for="phone">Phone</label><br />
                     <input class="textbox textbox-full" name="phone" id="phoneNumber" type="number" placeholder="787-123-1234" />
-                    <br /> <br /> 
-                    <label for="status">Current Status</label><br /> 
+                    <br /> <br />
+                    <label for="status">Current Status</label><br />
                     <input name="status" id="currentStatusSos" type="radio" value="sos" /> I'm in immediate danger (SOS)
-                    <br><input name="status" id="currentStatusOk" type="radio" value="ok" /> OK <br />  
-                    <br /> 
-                    <label for="status">Needs</label><br /> 
-                    <input type="checkbox" name="water" id="waterNeed" type="radio" value="water" /> Water
-                    <input name="tansportation" id="transportationNeed" type="checkbox" value="transportation" /> Transportation <br />  
-                    <input type="checkbox" name="food" id="foodNeed" type="radio" value="food" /> Food
-                    <input name="inspection" id="inspectionNeed" type="checkbox" value="inspection" /> Structural Inspection <br />  
-                    <input type="checkbox" name="firstaid" id="firstAidNeed" type="radio" value="firstaid" /> First Aid
-                    <input name="shelter" type="checkbox" id="shelterNeed" value="shelter" /> Shelter <br />  
+                    <br><input name="status" id="currentStatusOk" type="radio" value="ok" /> OK <br />
                     <br />
-                    <label for="status">How many people are with you?</label><br /> 
+                    <label for="status">Needs</label><br />
+                    <input type="checkbox" name="water" id="waterNeed" type="radio" value="water" /> Water
+                    <input name="tansportation" id="transportationNeed" type="checkbox" value="transportation" /> Transportation <br />
+                    <input type="checkbox" name="food" id="foodNeed" type="radio" value="food" /> Food
+                    <input name="inspection" id="inspectionNeed" type="checkbox" value="inspection" /> Structural Inspection <br />
+                    <input type="checkbox" name="firstaid" id="firstAidNeed" type="radio" value="firstaid" /> First Aid
+                    <input name="shelter" type="checkbox" id="shelterNeed" value="shelter" /> Shelter <br />
+                    <br />
+                    <label for="status">How many people are with you?</label><br />
                     <span>Adults </span><input class="textbox textbox-small" name="adults" id="adultsInput" type="number" placeholder="2" />
                     <span>Children </span><input class="textbox textbox-small" name="children" id="childrenInput" type="number" placeholder="2" />
                     <span>Elderly </span><input class="textbox textbox-small" name="elderly" id="elderlyInput" type="number" placeholder="2" /><br><br>
-                    <label for="status">Do you have any pets?</label><br /> 
+                    <label for="status">Do you have any pets?</label><br />
                     <input class="textbox textbox-full" name="pets" id="petsInput" type="text" placeholder="1 gato y 1 perro" />
                     <br /> <br />
-                    <label for="status">Additional Comments</label><br /> 
-                    <textarea class="textbox comments" name="message" id="commentsInput" cols="30" rows="2"></textarea><br /> 
+                    <label for="status">Additional Comments</label><br />
+                    <textarea class="textbox comments" name="message" id="commentsInput" cols="30" rows="2"></textarea><br />
                     <input type="submit" class="sendReportBtn" value="SEND REPORT" />
                 </form>
                 <p style="font-size: 10px; text-align: center;margin-top: 24px;">Powered by the ClusterDuck Protocol</p>
@@ -185,7 +185,7 @@ const char MAIN_page[] PROGMEM = R"=====(
             <div id="bupdate" class="b update">Send Update</div>
          </div>
       </div>
-      <script type="text/javascript">      
+      <script type="text/javascript">
       </script>
     </body>
 </html>
