@@ -382,7 +382,7 @@ void ClusterDuck::setupInternet(String SSID, String PASSWORD)
   Serial.print("Connecting to ");
   Serial.print(SSID);
 
-  if (SSID != "" && PASSWORD != "") {
+  if (SSID != "" && PASSWORD != "" && ssidAvailable(ssid)) {
   // Connect to Access Point
     WiFi.begin(SSID.c_str(), PASSWORD.c_str());
 
@@ -396,6 +396,27 @@ void ClusterDuck::setupInternet(String SSID, String PASSWORD)
     Serial.println("");
     Serial.println("DUCK CONNECTED TO INTERNET");
   }
+}
+
+bool ClusterDuck::ssidAvailable(String val) { //TODO: needs to be cleaned up for null case
+  int n = WiFi.scanNetworks();
+  Serial.println("scan done");
+  if (n == 0 || ssid == "") {
+    Serial.println("no networks found");
+  } else {
+    Serial.print(n);
+    Serial.println(" networks found");
+    if(val == "") {
+      val = ssid;
+    }
+    for (int i = 0; i < n; ++i) {
+      if(WiFi.SSID(i) == val){
+        return true;
+      }
+      delay(10);
+    }
+  }
+  return false;
 }
 
 //Setup OTA
@@ -897,6 +918,14 @@ String ClusterDuck::getPassword() {
 }
 
 //Setter
+void ClusterDuck::setSSID(String val) {
+  ssid = val;
+}
+
+void ClusterDuck::setPassword(String val) {
+  password = val;
+}
+
 void ClusterDuck::flipFlag() {
   if (receivedFlag == true) {
     receivedFlag = false;
