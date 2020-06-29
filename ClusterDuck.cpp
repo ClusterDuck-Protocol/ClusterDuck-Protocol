@@ -1,19 +1,20 @@
 #include "ClusterDuck.h"
 
-#if defined(CDPCFG_OLED_NONE)
-// no oled, do nothing
-#elif defined(CDPCFG_OLED_64x32)
-// small oled
-U8X8_SSD1306_64X32_NONAME_SW_I2C u8x8(/* clock=*/ CDPCFG_PIN_OLED_CLOCK, /* data=*/ CDPCFG_PIN_OLED_DATA, /* reset=*/ CDPCFG_PIN_OLED_RESET);
+#ifdef CDPCFG_OLED_CLASS
+  CDPCFG_OLED_CLASS u8x8(/* clock=*/ CDPCFG_PIN_OLED_CLOCK, /* data=*/ CDPCFG_PIN_OLED_DATA, /* reset=*/ CDPCFG_PIN_OLED_RESET);
+#endif
+
+#ifdef CDPCFG_PIN_LORA_SPI_SCK
+  #include "SPI.h"
+  SPIClass _spi;
+  SPISettings _spiSettings;
+  CDPCFG_LORA_CLASS lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO0, CDPCFG_PIN_LORA_RST, CDPCFG_PIN_LORA_DIO1, _spi, _spiSettings);
 #else
-// default big oled
-U8X8_SSD1306_128X64_NONAME_SW_I2C u8x8(/* clock=*/ CDPCFG_PIN_OLED_CLOCK, /* data=*/ CDPCFG_PIN_OLED_DATA, /* reset=*/ CDPCFG_PIN_OLED_RESET);
+  CDPCFG_LORA_CLASS lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO0, CDPCFG_PIN_LORA_RST, CDPCFG_PIN_LORA_DIO1);
 #endif
 
 IPAddress apIP(CDPCFG_AP_IP1, CDPCFG_AP_IP2, CDPCFG_AP_IP3, CDPCFG_AP_IP4);
 AsyncWebServer webServer(CDPCFG_WEB_PORT);
-
-SX1276 lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO0, CDPCFG_PIN_LORA_RST, CDPCFG_PIN_LORA_DIO1);
 
 auto tymer = timer_create_default();
 

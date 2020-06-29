@@ -191,6 +191,27 @@
   #define CDPCFG_PIN_RGBLED_B  2
 
 
+
+  // semiautomatic section for setting defaults
+
+  // set default modem
+  #ifndef CDPCFG_LORA_CLASS
+    #define CDPCFG_LORA_CLASS SX1276
+  #endif
+
+  // set oled class
+  #ifndef CDPCFG_OLED_CLASS
+    #if defined(CDPCFG_OLED_NONE)
+       // do nothing
+    #elif defined(CDPCFG_OLED_64x32)
+       // smaller displays
+       #define CDPCFG_OLED_CLASS U8X8_SSD1306_64X32_NONAME_SW_I2C
+    #else
+       // classic default
+       #define CDPCFG_OLED_CLASS U8X8_SSD1306_128X64_NONAME_SW_I2C
+    #endif
+  #endif
+
 #endif // CDPCFG
 
 
