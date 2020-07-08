@@ -47,7 +47,7 @@ bool runSensor(void *) {
   
   String sensorVal = "Temp: " + String(T) + " Pres: " + String(P);
 
-  duck.sendPayloadMessage(sensorVal);
+  duck.sendPayloadStandard(sensorVal, "BMP");
 
   
   return true;

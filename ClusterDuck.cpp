@@ -173,58 +173,54 @@ void ClusterDuck::setupWebServer(bool createCaptivePortal) {
   });
 
 // Update Firmware OTA
-     webServer.on("/update", HTTP_GET, [&](AsyncWebServerRequest *request){
-               if(!request->authenticate(http_username, http_password))
-               return request->requestAuthentication();
-              
-                AsyncWebServerResponse *response = request->beginResponse(200, "text/html", update_page);
-                
-                request->send(response);
-            });
+  webServer.on("/update", HTTP_GET, [&](AsyncWebServerRequest *request){
+      if(!request->authenticate(http_username, http_password))
+      return request->requestAuthentication();
+    
+      AsyncWebServerResponse *response = request->beginResponse(200, "text/html", update_page);
+      
+      request->send(response);
+  });
 
+  webServer.on("/update", HTTP_POST, [&](AsyncWebServerRequest *request) {          
+    AsyncWebServerResponse *response = request->beginResponse((Update.hasError())?500:200, "text/plain", (Update.hasError())?"FAIL":"OK");
+    response->addHeader("Connection", "close");
+    response->addHeader("Access-Control-Allow-Origin", "*");
+    request->send(response);
+    restartRequired = true;
+    }, [](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
 
+      if (!index) {
 
-webServer.on("/update", HTTP_POST, [&](AsyncWebServerRequest *request) {
+        lora.standby();
+        Serial.println("Pause Lora");
+        Serial.println("startint OTA update");
+      
+          content_len = request->contentLength();
+          
+              int cmd = (filename.indexOf("spiffs") > -1) ? U_SPIFFS : U_FLASH;
+              if (!Update.begin(UPDATE_SIZE_UNKNOWN, cmd)) { 
+        
+                  Update.printError(Serial);   
+              }
+      
+      }
+    
+      if (Update.write(data, len) != len) {
+          Update.printError(Serial); 
+          lora.startReceive();
+      }
+          
+      if (final) { 
+          if (Update.end(true)) { 
+            ESP.restart();
+          esp_task_wdt_init(1,true);
+          esp_task_wdt_add(NULL);
+          while(true);
 
-              
-                AsyncWebServerResponse *response = request->beginResponse((Update.hasError())?500:200, "text/plain", (Update.hasError())?"FAIL":"OK");
-                response->addHeader("Connection", "close");
-                response->addHeader("Access-Control-Allow-Origin", "*");
-                request->send(response);
-                restartRequired = true;
-            }, [](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
-
-                if (!index) {
-
-                  lora.standby();
-                  Serial.println("Pause Lora");
-                  Serial.println("startint OTA update");
-                
-                    content_len = request->contentLength();
-                   
-                        int cmd = (filename.indexOf("spiffs") > -1) ? U_SPIFFS : U_FLASH;
-                        if (!Update.begin(UPDATE_SIZE_UNKNOWN, cmd)) { 
-                  
-                            Update.printError(Serial);   
-                        }
-                
-                }
-              
-                if (Update.write(data, len) != len) {
-                    Update.printError(Serial); 
-                    lora.startReceive();
-                }
-                    
-                if (final) { 
-                    if (Update.end(true)) { 
-                      ESP.restart();
-                    esp_task_wdt_init(1,true);
-                    esp_task_wdt_add(NULL);
-                    while(true);
-
-                    }
-                }
-            });
+          }
+      }
+  });
 
   // Captive Portal form submission
   webServer.on("/formSubmit", HTTP_POST, [&](AsyncWebServerRequest *request) {
@@ -241,7 +237,7 @@ webServer.on("/update", HTTP_POST, [&](AsyncWebServerRequest *request) {
       val = val + p->value().c_str() + "*";
     }
 
-    sendPayloadStandard(val);
+    sendPayloadStandard(val, "status");
 
     request->send(200, "text/html", portal);
   });
@@ -480,7 +476,7 @@ void ClusterDuck::runMamaDuck() {
       packetIndex = 0;
       if(msg != "ping" && !idInPath(_lastPacket.path)) {
         Serial.println("runMamaDuck relayPacket");
-        sendPayloadStandard(_lastPacket.payload, _lastPacket.senderId, _lastPacket.topic, _lastPacket.messageId, _lastPacket.path);
+        sendPayloadStandard(_lastPacket.payload, _lastPacket.topic, _lastPacket.senderId, _lastPacket.messageId, _lastPacket.path);
         memset(transmission, 0x00, CDPCFG_CDP_BUFSIZE); //Reset transmission
         packetIndex = 0;
 
@@ -548,19 +544,7 @@ int ClusterDuck::handlePacket() {
   }
 }
 
-void ClusterDuck::sendPayloadMessage(String msg) {
-  couple(senderId_B, _deviceId);
-  couple(messageId_B, uuidCreator());
-  couple(payload_B, msg);
-  couple(path_B, _deviceId);
-
-  Serial.print("sendPayloadMessage packetIndex ");
-  Serial.println(packetIndex);
-  startTransmit();
-
-}
-
-void ClusterDuck::sendPayloadStandard(String topic, String msg, String senderId, String messageId, String path) {
+void ClusterDuck::sendPayloadStandard(String msg, String topic, String senderId, String messageId, String path) {
   if(senderId == "") senderId = _deviceId;
   if(topic == "") topic = "status";
   Serial.println("Topic: " + topic);
@@ -787,7 +771,7 @@ void ClusterDuck::restartDuck()
 bool ClusterDuck::reboot(void *) {
   String reboot = "REBOOT";
   Serial.println(reboot);
-  sendPayloadMessage(reboot);
+  sendPayloadStandard(reboot, "boot");
   restartDuck();
 
   return true;
@@ -796,7 +780,7 @@ bool ClusterDuck::reboot(void *) {
 bool ClusterDuck::imAlive(void *) {
   String alive = "Health Quack";
   Serial.print("imAlive sending");
-  sendPayloadMessage(alive);
+  sendPayloadStandard(alive, "health");
 
   return true;
 }
