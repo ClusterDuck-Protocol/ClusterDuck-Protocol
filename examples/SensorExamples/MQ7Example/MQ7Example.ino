@@ -58,7 +58,7 @@ bool runSensor(void *) {
   sensorVal += "Alcohol: ";
   sensorVal += MQ7.readSensor("Alcohol");
 
-  duck.sendPayloadMessage(sensorVal);
+  duck.sendPayloadMessage(sensorVal, "MQ7");
   
   return true;
 }

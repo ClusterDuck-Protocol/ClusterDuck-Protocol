@@ -38,6 +38,7 @@
    * https://github.com/Xinyuan-LilyGO/TTGO-LoRa-Series
    * pio: board = ttgo-lora32-v1
    */
+
   #if defined(ARDUINO_TTGO_LoRa32_V1)
 
     #define CDPCFG_PIN_LED1 25

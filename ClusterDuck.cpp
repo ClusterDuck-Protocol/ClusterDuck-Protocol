@@ -207,59 +207,54 @@ void ClusterDuck::setupWebServer(bool createCaptivePortal) {
   });
 
 // Update Firmware OTA
-     webServer.on("/update", HTTP_GET, [&](AsyncWebServerRequest *request){
-               if(!request->authenticate(http_username, http_password))
-               return request->requestAuthentication();
+  webServer.on("/update", HTTP_GET, [&](AsyncWebServerRequest *request){
+      if(!request->authenticate(http_username, http_password))
+      return request->requestAuthentication();
+    
+      AsyncWebServerResponse *response = request->beginResponse(200, "text/html", update_page);
+      
+      request->send(response);
+  });
 
-                AsyncWebServerResponse *response = request->beginResponse(200, "text/html", update_page);
+  webServer.on("/update", HTTP_POST, [&](AsyncWebServerRequest *request) {          
+    AsyncWebServerResponse *response = request->beginResponse((Update.hasError())?500:200, "text/plain", (Update.hasError())?"FAIL":"OK");
+    response->addHeader("Connection", "close");
+    response->addHeader("Access-Control-Allow-Origin", "*");
+    request->send(response);
+    restartRequired = true;
+    }, [](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
 
-                request->send(response);
-            });
+      if (!index) {
 
+        lora.standby();
+        Serial.println("Pause Lora");
+        Serial.println("startint OTA update");
+      
+          content_len = request->contentLength();
+          
+              int cmd = (filename.indexOf("spiffs") > -1) ? U_SPIFFS : U_FLASH;
+              if (!Update.begin(UPDATE_SIZE_UNKNOWN, cmd)) { 
+        
+                  Update.printError(Serial);   
+              }
+      
+      }
+    
+      if (Update.write(data, len) != len) {
+          Update.printError(Serial); 
+          lora.startReceive();
+      }
+          
+      if (final) { 
+          if (Update.end(true)) { 
+            ESP.restart();
+          esp_task_wdt_init(1,true);
+          esp_task_wdt_add(NULL);
+          while(true);
 
-
-webServer.on("/update", HTTP_POST, [&](AsyncWebServerRequest *request) {
-
-
-                AsyncWebServerResponse *response = request->beginResponse((Update.hasError())?500:200, "text/plain", (Update.hasError())?"FAIL":"OK");
-                response->addHeader("Connection", "close");
-                response->addHeader("Access-Control-Allow-Origin", "*");
-                request->send(response);
-                restartRequired = true;
-            }, [](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
-
-                if (!index) {
-
-                  lora.standby();
-                  enableInterrupt = false;
-                  Serial.println("Pause Lora");
-                  Serial.println("startint OTA update");
-
-                    content_len = request->contentLength();
-
-                        int cmd = (filename.indexOf("spiffs") > -1) ? U_SPIFFS : U_FLASH;
-                        if (!Update.begin(UPDATE_SIZE_UNKNOWN, cmd)) {
-
-                            Update.printError(Serial);
-                        }
-
-                }
-
-                if (Update.write(data, len) != len) {
-                    Update.printError(Serial);
-                    lora.startReceive();
-                }
-
-                if (final) {
-                    if (Update.end(true)) {
-                      ESP.restart();
-                    esp_task_wdt_init(1,true);
-                    esp_task_wdt_add(NULL);
-                    while(true);
-
-                    }
-                }
-            });
+          }
+      }
+  });
 
   // Captive Portal form submission
   webServer.on("/formSubmit", HTTP_POST, [&](AsyncWebServerRequest *request) {
@@ -276,7 +271,7 @@ webServer.on("/update", HTTP_POST, [&](AsyncWebServerRequest *request) {
       val = val + p->value().c_str() + "*";
     }
 
-    sendPayloadStandard(val);
+    sendPayloadStandard(val, "status");
 
     request->send(200, "text/html", portal);
   });
@@ -538,7 +533,7 @@ void ClusterDuck::runMamaDuck() {
       packetIndex = 0;
       if(msg != "ping" && !idInPath(_lastPacket.path)) {
         Serial.println("runMamaDuck relayPacket");
-        sendPayloadStandard(_lastPacket.payload, _lastPacket.senderId, _lastPacket.messageId, _lastPacket.path);
+        sendPayloadStandard(_lastPacket.payload, _lastPacket.topic, _lastPacket.senderId, _lastPacket.messageId, _lastPacket.path);
         memset(transmission, 0x00, CDPCFG_CDP_BUFSIZE); //Reset transmission
         packetIndex = 0;
 
@@ -606,20 +601,10 @@ int ClusterDuck::handlePacket() {
   }
 }
 
-void ClusterDuck::sendPayloadMessage(String msg) {
-  couple(senderId_B, _deviceId);
-  couple(messageId_B, uuidCreator());
-  couple(payload_B, msg);
-  couple(path_B, _deviceId);
-
-  Serial.print("sendPayloadMessage packetIndex ");
-  Serial.println(packetIndex);
-  startTransmit();
-
-}
-
-void ClusterDuck::sendPayloadStandard(String msg, String senderId, String messageId, String path) {
+void ClusterDuck::sendPayloadStandard(String msg, String topic, String senderId, String messageId, String path) {
   if(senderId == "") senderId = _deviceId;
+  if(topic == "") topic = "status";
+  Serial.println("Topic: " + topic);
   if(messageId == "") messageId = uuidCreator();
   if(path == "") {
     path = _deviceId;
@@ -627,8 +612,8 @@ void ClusterDuck::sendPayloadStandard(String msg, String senderId, String messag
     path = path + "," + _deviceId;
   }
 
-  String total = senderId + messageId + path + msg;
-  if(total.length() + 4 > CDPCFG_CDP_BUFSIZE) {
+  String total = senderId + messageId + path + msg + topic;
+  if(total.length() + 5 > CDPCFG_CDP_BUFSIZE) {
     Serial.println("Warning: message is too large!"); //TODO: do something
   }
 
@@ -636,6 +621,7 @@ void ClusterDuck::sendPayloadStandard(String msg, String senderId, String messag
   couple(messageId_B, messageId);
   couple(payload_B, msg);
   couple(path_B, path);
+  couple(topic_B, topic);
 
   Serial.print("sendPayloadStandard packetIndex ");
   Serial.println(packetIndex);
@@ -698,6 +684,7 @@ String ClusterDuck::getPacketData(int pSize) {
   bool mId = false;
   bool pLoad = false;
   bool pth = false;
+  bool tpc = false;
   String msg = "";
   bool gotLen = false;
 
@@ -715,16 +702,26 @@ String ClusterDuck::getPacketData(int pSize) {
         Serial.println("getPacketData Message ID: " + _lastPacket.messageId);
         msg = "";
         mId = false;
+
       } else if(pLoad) {
         _lastPacket.payload = msg;
         Serial.println("getPacketData Message: " + _lastPacket.payload);
         msg = "";
         pLoad = false;
+
       } else if(pth) {
         _lastPacket.path = msg;
         Serial.println("getPacketData Path: " + _lastPacket.path);
         msg = "";
         pth = false;
+
+      } else if(tpc) {
+        _lastPacket.topic = msg;
+        Serial.println("getPacketData Path: " + _lastPacket.topic);
+        msg = "";
+        tpc = false;
+        Serial.println("hit1");
+
       }
     }
     if(transmission[i] == senderId_B){
@@ -747,6 +744,12 @@ String ClusterDuck::getPacketData(int pSize) {
       pth = true;
       len = transmission[i+1];
       Serial.println("getPacketData path_B Len = " + String(len));
+
+    } else if(transmission[i] == topic_B) {
+      tpc = true;
+      len = transmission[i+1];
+      Serial.println("getPacketData topic_B Len = " + String(len));
+      Serial.println("hit2");
 
     } else if(transmission[i] == ping_B) {
       if(_deviceId != "Det") {
@@ -800,6 +803,11 @@ String ClusterDuck::getPacketData(int pSize) {
       _lastPacket.path = msg;
       Serial.println("getPacketData len0 Path: " + _lastPacket.path);
       msg = "";
+    } else if(tpc) {
+      _lastPacket.topic = msg;
+      Serial.println("getPacketData len0 Topic: " + _lastPacket.topic);
+      msg = "";
+      Serial.println("hit3");
     }
   }
 
@@ -820,7 +828,7 @@ void ClusterDuck::restartDuck()
 bool ClusterDuck::reboot(void *) {
   String reboot = "REBOOT";
   Serial.println(reboot);
-  sendPayloadMessage(reboot);
+  sendPayloadStandard(reboot, "boot");
   restartDuck();
 
   return true;
@@ -829,7 +837,7 @@ bool ClusterDuck::reboot(void *) {
 bool ClusterDuck::imAlive(void *) {
   String alive = "Health Quack";
   Serial.print("imAlive sending");
-  sendPayloadMessage(alive);
+  sendPayloadStandard(alive, "health");
 
   return true;
 }
@@ -894,6 +902,7 @@ String ClusterDuck::getDeviceId() {
 Packet ClusterDuck::getLastPacket() {
   Packet packet = _lastPacket;
   _lastPacket = Packet();
+  _lastPacket.topic = "status";
   return packet;
 }
 
@@ -1023,13 +1032,12 @@ DNSServer ClusterDuck::dnsServer;
 const char * ClusterDuck::DNS  = "duck";
 const byte ClusterDuck::DNS_PORT = 53;
 
-
-
 int ClusterDuck::_rssi = 0;
 float ClusterDuck::_snr;
 long ClusterDuck::_freqErr;
 int ClusterDuck::_availableBytes;
 int ClusterDuck::_packetSize = 0;
+
 // LED
 int ClusterDuck::ledR = CDPCFG_PIN_RGBLED_R;
 int ClusterDuck::ledG = CDPCFG_PIN_RGBLED_G;
@@ -1039,6 +1047,7 @@ Packet ClusterDuck::_lastPacket;
 
 byte ClusterDuck::ping_B       = 0xF4;
 byte ClusterDuck::senderId_B   = 0xF5;
+byte ClusterDuck::topic_B      = 0xE3;
 byte ClusterDuck::messageId_B  = 0xF6;
 byte ClusterDuck::payload_B    = 0xF7;
 byte ClusterDuck::iamhere_B    = 0xF8;
