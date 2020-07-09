@@ -39,7 +39,6 @@
    * pio: board = ttgo-lora32-v1
    */
 
-  #define ARDUINO_HELTEC_WIFI_LORA_32_V2
   #if defined(ARDUINO_TTGO_LoRa32_V1)
 
     #define CDPCFG_PIN_LED1 25
