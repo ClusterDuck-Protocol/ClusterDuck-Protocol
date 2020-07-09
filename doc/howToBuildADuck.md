@@ -105,7 +105,8 @@ Download USB to UART Bridge VCP Driver from [here](https://www.silabs.com/produc
 
 #### Ubuntu Linux Platforms: 
 *  The driver is already installed on your machine due to latest kernels. you can check to see by running the following commands. 
-```ls -al /lib/modules/"$(uname -r)"/kernel/drivers/usb/serial/usbserial.ko
+```
+ls -al /lib/modules/"$(uname -r)"/kernel/drivers/usb/serial/usbserial.ko
 ```
 ```
 ls -al /lib/modules/"$(uname -r)"/kernel/drivers/usb/serial/cp210x.ko
@@ -408,7 +409,6 @@ Set device ID and captive portal form length.
 
 ```c
 duck.setDeviceId(String deviceId, const int formLength);
-
 ```
 
 * String deviceId -- input the device ID used to identify your registered device on the web -- do not leave null or empty string

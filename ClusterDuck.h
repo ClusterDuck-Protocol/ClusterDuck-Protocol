@@ -51,6 +51,7 @@ class ClusterDuck {
 		static void setupWifiAp(const char *AP = " 🆘 DUCK EMERGENCY PORTAL");
 		static void setupDns();
 		static void setupInternet(String SSID, String PASSWORD);
+    static bool ssidAvailable(String val = "");
     static void setupOTA();
     static bool runCaptivePortal();
 
@@ -88,6 +89,8 @@ class ClusterDuck {
     volatile bool getInterrupt();
     void flipFlag();
     void flipInterrupt();
+    static void setSSID(String val);
+    static void setPassword(String val);
     static void startReceive();
     static int getRSSI();
     static void ping();
@@ -134,7 +137,7 @@ class ClusterDuck {
     static int ledG;
     static int ledB;
 
-      
+
 
 
 };

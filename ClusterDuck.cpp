@@ -1,11 +1,20 @@
 #include "ClusterDuck.h"
 
-U8X8_SSD1306_128X64_NONAME_SW_I2C u8x8(/* clock=*/ CDPCFG_PIN_OLED_CLOCK, /* data=*/ CDPCFG_PIN_OLED_DATA, /* reset=*/ CDPCFG_PIN_OLED_RESET);
+#ifdef CDPCFG_OLED_CLASS
+  CDPCFG_OLED_CLASS u8x8(/* clock=*/ CDPCFG_PIN_OLED_CLOCK, /* data=*/ CDPCFG_PIN_OLED_DATA, /* reset=*/ CDPCFG_PIN_OLED_RESET);
+#endif
+
+#ifdef CDPCFG_PIN_LORA_SPI_SCK
+  #include "SPI.h"
+  SPIClass _spi;
+  SPISettings _spiSettings;
+  CDPCFG_LORA_CLASS lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO0, CDPCFG_PIN_LORA_RST, CDPCFG_PIN_LORA_DIO1, _spi, _spiSettings);
+#else
+  CDPCFG_LORA_CLASS lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO0, CDPCFG_PIN_LORA_RST, CDPCFG_PIN_LORA_DIO1);
+#endif
 
 IPAddress apIP(CDPCFG_AP_IP1, CDPCFG_AP_IP2, CDPCFG_AP_IP3, CDPCFG_AP_IP4);
 AsyncWebServer webServer(CDPCFG_WEB_PORT);
-
-SX1276 lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO0, CDPCFG_PIN_LORA_RST, CDPCFG_PIN_LORA_DIO1);
 
 auto tymer = timer_create_default();
 
@@ -20,7 +29,7 @@ String ClusterDuck::_deviceId = "";
 bool restartRequired = false;
 size_t content_len;
 
-//Username and password for /update 
+//Username and password for /update
 const char* http_username = CDPCFG_UPDATE_USERNAME;
 const char* http_password = CDPCFG_UPDATE_PASSWORD;
 
@@ -41,9 +50,26 @@ void ClusterDuck::begin(int baudRate) {
 }
 
 void ClusterDuck::setupDisplay(String deviceType)  {
+#ifndef CDPCFG_OLED_NONE
   u8x8.begin();
   u8x8.setFont(u8x8_font_chroma48medium8_r);
 
+#ifdef CDPCFG_OLED_64x32
+  // small display 64x32
+  u8x8.setCursor(0, 2);
+  u8x8.print("((>.<))");
+
+  u8x8.setCursor(0, 4);
+  u8x8.print("DT: " + deviceType);
+
+  u8x8.setCursor(0, 5);
+  u8x8.print("ID: " + _deviceId);
+
+//  u8x8.setCursor(0, 4);
+//  u8x8.print("ST: Online");
+
+#else
+  // default display size 128x64
   u8x8.setCursor(0, 1);
   u8x8.print("    ((>.<))    ");
 
@@ -61,24 +87,32 @@ void ClusterDuck::setupDisplay(String deviceType)  {
 
   u8x8.setCursor(0, 7);
   u8x8.print(duckMac(false));
+#endif
+#endif
 }
 
 // Initial LoRa settings
 void ClusterDuck::setupLoRa(long BAND, int SS, int RST, int DI0, int DI1, int TxPower) {
-  //LoRa.setSignalBandwidth(62.5E3);
 
+#ifdef CDPCFG_PIN_LORA_SPI_SCK
+  log_n("_spi.begin(CDPCFG_PIN_LORA_SPI_SCK, CDPCFG_PIN_LORA_SPI_MISO, CDPCFG_PIN_LORA_SPI_MOSI, CDPCFG_PIN_LORA_CS)");
+  _spi.begin(CDPCFG_PIN_LORA_SPI_SCK, CDPCFG_PIN_LORA_SPI_MISO, CDPCFG_PIN_LORA_SPI_MOSI, CDPCFG_PIN_LORA_CS);
+  lora = new Module(SS, DI0, RST, DI1, _spi, _spiSettings);
+#else
   lora = new Module(SS, DI0, RST, DI1);
+#endif
 
   Serial.println("Starting LoRa......");
-
-  int state = lora.begin(); //TODO: Make more modular -> Bandwidth, Spreading factor
+  int state = lora.begin();
 
   //Initialize LoRa
   if (state == ERR_NONE) {
     Serial.println("LoRa online, Quack!");
   } else {
+#ifndef CDPCFG_OLED_NONE
     u8x8.clear();
     u8x8.drawString(0, 0, "Starting LoRa failed!");
+#endif
     Serial.print("Starting LoRa Failed!!!");
     Serial.println(state);
     restartDuck();
@@ -343,7 +377,7 @@ void ClusterDuck::setupInternet(String SSID, String PASSWORD)
   Serial.print("Connecting to ");
   Serial.print(SSID);
 
-  if (SSID != "" && PASSWORD != "") {
+  if (SSID != "" && PASSWORD != "" && ssidAvailable(ssid)) {
   // Connect to Access Point
     WiFi.begin(SSID.c_str(), PASSWORD.c_str());
 
@@ -357,6 +391,27 @@ void ClusterDuck::setupInternet(String SSID, String PASSWORD)
     Serial.println("");
     Serial.println("DUCK CONNECTED TO INTERNET");
   }
+}
+
+bool ClusterDuck::ssidAvailable(String val) { //TODO: needs to be cleaned up for null case
+  int n = WiFi.scanNetworks();
+  Serial.println("scan done");
+  if (n == 0 || ssid == "") {
+    Serial.println("no networks found");
+  } else {
+    Serial.print(n);
+    Serial.println(" networks found");
+    if(val == "") {
+      val = ssid;
+    }
+    for (int i = 0; i < n; ++i) {
+      if(WiFi.SSID(i) == val){
+        return true;
+      }
+      delay(10);
+    }
+  }
+  return false;
 }
 
 //Setup OTA
@@ -463,7 +518,9 @@ void ClusterDuck::setupMamaDuck() {
 
 void ClusterDuck::runMamaDuck() {
   ArduinoOTA.handle();
-  tymer.tick();
+  if (enableInterrupt) {
+    tymer.tick();
+  }
 
   if(receivedFlag) {  //If LoRa packet received
     receivedFlag = false;
@@ -870,6 +927,14 @@ String ClusterDuck::getPassword() {
 }
 
 //Setter
+void ClusterDuck::setSSID(String val) {
+  ssid = val;
+}
+
+void ClusterDuck::setPassword(String val) {
+  password = val;
+}
+
 void ClusterDuck::flipFlag() {
   if (receivedFlag == true) {
     receivedFlag = false;
@@ -947,8 +1012,8 @@ void ClusterDuck::setupLED() {
   ledcAttachPin(ledR, 1); // assign RGB led pins to channels
   ledcAttachPin(ledG, 2);
   ledcAttachPin(ledB, 3);
-  
-// Initialize channels 
+
+// Initialize channels
 // channels 0-15, resolution 1-16 bits, freq limits depend on resolution
 // ledcSetup(uint8_t channel, uint32_t freq, uint8_t resolution_bits);
   ledcSetup(1, 12000, 8); // 12 kHz PWM, 8-bit resolution
@@ -960,7 +1025,7 @@ void ClusterDuck::setColor(int red, int green, int blue)
 {
   ledcWrite(1, red);
   ledcWrite(2, green);
-  ledcWrite(3, blue);  
+  ledcWrite(3, blue);
 }
 
 DNSServer ClusterDuck::dnsServer;
