@@ -58,7 +58,7 @@ void loop() {
   Serial.println(" ");
   Serial.println(sensorVal);
   Serial.println(" ");
-  duck.sendPayloadStandard("gps", sensorVal);
+  duck.sendPayloadStandard(sensorVal, "gps");
   smartDelay(7500);
   if (millis() > 5000 && gps.charsProcessed() < 10)
     Serial.println(F("No GPS data received: check wiring"));
@@ -102,6 +102,6 @@ bool runSensor(void *) {
   }
   Serial.println(" ");
   Serial.println(sensorVal);
-  duck.sendPayloadStandard("gps", sensorVal);
+  duck.sendPayloadStandard(sensorVal, "gps");
   return true;
 }

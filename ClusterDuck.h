@@ -72,14 +72,13 @@ class ClusterDuck {
     static long _freqErr;
     static int _availableBytes;
 
-    static void sendPayloadStandard(String topic = "", String msg = "", String senderId = "", String messageId = "", String path = "");
+    static void sendPayloadStandard(String msg = "", String topic = "", String senderId = "", String messageId = "", String path = "");
 
     static String uuidCreator();
 
     static String getDeviceId();
     static Packet getLastPacket();
 
-    static void sendPayloadMessage(String msg);
     static bool imAlive(void *);
 
     static void couple(byte byteCode, String outgoing);
