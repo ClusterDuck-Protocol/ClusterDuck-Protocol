@@ -31,6 +31,7 @@
 typedef struct
 {
   String senderId;
+  String topic;
   String messageId;
   String payload;
   String path;
@@ -50,6 +51,7 @@ class ClusterDuck {
 		static void setupWifiAp(const char *AP = " 🆘 DUCK EMERGENCY PORTAL");
 		static void setupDns();
 		static void setupInternet(String SSID, String PASSWORD);
+    static bool ssidAvailable(String val = "");
     static void setupOTA();
     static bool runCaptivePortal();
 
@@ -71,14 +73,13 @@ class ClusterDuck {
     static long _freqErr;
     static int _availableBytes;
 
-    static void sendPayloadStandard(String msg, String senderId = "", String messageId = "", String path = "");
+    static void sendPayloadStandard(String msg = "", String topic = "", String senderId = "", String messageId = "", String path = "");
 
     static String uuidCreator();
 
     static String getDeviceId();
     static Packet getLastPacket();
 
-    static void sendPayloadMessage(String msg);
     static bool imAlive(void *);
 
     static void couple(byte byteCode, String outgoing);
@@ -88,6 +89,8 @@ class ClusterDuck {
     volatile bool getInterrupt();
     void flipFlag();
     void flipInterrupt();
+    static void setSSID(String val);
+    static void setPassword(String val);
     static void startReceive();
     static int getRSSI();
     static void ping();
@@ -122,9 +125,9 @@ class ClusterDuck {
     static void restartDuck();
     static bool reboot(void *);
 
-    // QuackPack
     static byte ping_B;
     static byte senderId_B;
+    static byte topic_B;
     static byte messageId_B;
     static byte payload_B;
     static byte iamhere_B;
@@ -134,7 +137,7 @@ class ClusterDuck {
     static int ledG;
     static int ledB;
 
-      
+
 
 
 };

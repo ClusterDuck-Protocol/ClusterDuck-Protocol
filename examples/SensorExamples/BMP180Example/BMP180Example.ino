@@ -3,9 +3,9 @@
 
 auto timer = timer_create_default(); // create a timer with default settings
 
-//Setup BMP280
-#include <Adafruit_BMP280.h>
-Adafruit_BMP280 bmp;
+//Setup BMP180
+#include <Adafruit_BMP085_U.h>
+Adafruit_BMP085_Unified bmp = Adafruit_BMP085_Unified(10085);
 
 ClusterDuck duck;
 
@@ -20,8 +20,10 @@ void setup() {
   if(!bmp.begin())
   {
     /* There was a problem detecting the BMP085 ... check your connections */
-    Serial.print("Ooops, no BMP208 detected ... Check your wiring or I2C ADDR!");
-    while(1); 
+    Serial.print("Ooops, no BMP085 detected ... Check your wiring or I2C ADDR!");
+    while(1);
+  } else {
+    Serial.println("BMP on");
   }
 
   timer.every(150000, runSensor);
@@ -38,14 +40,15 @@ void loop() {
 bool runSensor(void *) {
   float T,P;
   
-  T = bmp.readTemperature();
+  bmp.getTemperature(&T);
   Serial.println(T);
-  P = bmp.readPressure();
+  bmp.getPressure(&P);
   Serial.println(P);
   
-  String sensorVal = "Temp: " + String(T) + " Pres: " + String(P); //Store Data
+  String sensorVal = "Temp: " + String(T) + " Pres: " + String(P);
 
-  duck.sendPayloadMessage(sensorVal);
+  duck.sendPayloadStandard(sensorVal, "BMP");
 
+  
   return true;
 }
