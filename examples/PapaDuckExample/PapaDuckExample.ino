@@ -55,7 +55,7 @@ void loop() {
     duck.setupInternet(duck.getSSID(), duck.getPassword());
 		duck.setupDns();
   }
-  setupMQTT();
+  if(WiFi.status() == WL_CONNECTED) setupMQTT();
 
   if(duck.getFlag()) {  //If LoRa packet received
     duck.flipFlag();
