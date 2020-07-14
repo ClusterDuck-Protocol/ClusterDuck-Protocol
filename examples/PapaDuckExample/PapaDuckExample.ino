@@ -26,6 +26,7 @@ WiFiClientSecure wifiClient;
 PubSubClient client(server, 8883, wifiClient);
 
 byte ping = 0xF4;
+bool retry = true;
 
 void setup() {
   // put your setup code here, to run once:
@@ -48,12 +49,18 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  if(WiFi.status() != WL_CONNECTED)
+  if(WiFi.status() != WL_CONNECTED && retry)
   {
     Serial.print("WiFi disconnected, reconnecting to local network: ");
     Serial.print(duck.getSSID());
-    duck.setupInternet(duck.getSSID(), duck.getPassword());
-		duck.setupDns();
+    if(duck.ssidAvailable()) {
+      duck.setupInternet(duck.getSSID(), duck.getPassword());
+		  duck.setupDns();
+    } else {
+      retry = false;
+      timer.in(5000, enableRetry);
+    }
+    
   }
   if(WiFi.status() == WL_CONNECTED) setupMQTT();
 
@@ -121,4 +128,8 @@ void quackJson() {
     Serial.println("Publish failed");
   }
 
+}
+
+bool enableRetry(void *) {
+  retry = true;
 }
