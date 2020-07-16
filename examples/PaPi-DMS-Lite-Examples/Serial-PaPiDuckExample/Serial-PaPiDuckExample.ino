@@ -60,7 +60,9 @@ void quackJson() {
 
 
   String jsonstat;
-  serializeJson(doc, Serial);
+  serializeJson(doc, jsonstat);
+
+  Serial.println(jsonstat);
     
 
 }
