@@ -17,7 +17,7 @@ void setup() {
   
   // put your setup code here, to run once:
   duck.begin();
-  duck.setDeviceId("R");
+  duck.setDeviceId("PowerTest");
   duck.setupMamaDuck();
 
 
@@ -30,7 +30,7 @@ void setup() {
         while (1);
      }
 
-  timer.every(300000, runSensor);
+  timer.every(10000, runSensor);
 }
 
 void loop() {
@@ -44,7 +44,7 @@ void loop() {
 
 bool runSensor(void *) {
 float isCharging = axp.isChargeing();
-boolean isFullycharged = axp.isChargingDoneIRQ();
+boolean isFullyCharged = axp.isChargingDoneIRQ();
 float batteryVoltage = axp.getBattVoltage();
 float batteryDischarge = axp.getAcinCurrent();
 float getTemp = axp.getTemp();  
@@ -54,7 +54,7 @@ int battPercentage = axp.getBattPercentage();
     Serial.print("Duck charging (1 = Yes): ");
     Serial.println(isCharging);
     Serial.print("Fully Charged: ");
-    Serial.println(isFullycharged);
+    Serial.println(isFullyCharged);
     Serial.print("Battery Voltage: ");
     Serial.println(batteryVoltage);
     Serial.print("Battery Discharge: ");
@@ -64,15 +64,18 @@ int battPercentage = axp.getBattPercentage();
     Serial.print("battery Percentage: ");
     Serial.println(battPercentage);
    
-  String sensorVal = "Charging: ";
-  sensorVal += isCharging;
-  sensorVal += "FullCharge: ";
-  sensorVal += isFullycharged;
-  sensorVal += "Volatge: ";
-  sensorVal += batteryVoltage;
-  sensorVal += "Temp: ";
-  sensorVal += getTemp;
 
+  String sensorVal = 
+  "Charging: " + 
+  String(isCharging) ; 
+//  " BattFull: " +
+//  String(isFullyCharged)+
+//  " Voltage " +
+//  String(batteryVoltage) ;
+//  " Temp: " +
+//  String(getTemp);
+
+  
   duck.sendPayloadStandard(sensorVal, "power");
   return true;
 }

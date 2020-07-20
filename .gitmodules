@@ -41,3 +41,6 @@
 [submodule "Libraries/MQSensorsLib"]
 	path = Libraries/MQSensorsLib
 	url = https://github.com/miguel5612/MQSensorsLib.git
+[submodule "examples/TTGO-TBeam/AXP202X_Library"]
+	path = examples/TTGO-TBeam/AXP202X_Library
+	url = https://github.com/lewisxhe/AXP202X_Library.git
