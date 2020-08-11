@@ -109,6 +109,7 @@ void quackJson() {
 
   String loc = "iot-2/evt/"+ lastPacket.topic +"/fmt/json";
   Serial.print(loc);
+  // add space for null char
   int len = loc.length() + 1;
 
   char topic[len];
