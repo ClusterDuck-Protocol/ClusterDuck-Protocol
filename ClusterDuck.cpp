@@ -467,10 +467,10 @@ void ClusterDuck::runDuckLink() {
 void ClusterDuck::setupDetect() {
   setupDisplay("Detector");
   setupLoRa();
-  setupWifiAp();
-	setupDns();
-  setupWebServer(false);
-  setupOTA();
+  // setupWifiAp(false);
+	// setupDns();
+  // setupWebServer(false);
+  // setupOTA();
 
   Serial.println("Detector Online");
 }
