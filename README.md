@@ -20,7 +20,7 @@ This is beneficial after events such as earthquakes or hurricanes where traditio
 ![portal](doc/assets/images/cluster_demo_vector.gif)
 
 
-## **NEW** DetectorDuck
+## DetectorDuck
 When setting up a network it can be difficult to figure out where to place Duck devices in the field. A DetectorDuck can be used to easily make sure that Ducks are able to maintain connectivity when deploying *ad hoc*. It works by broadcasing a ping every 3 seconds and takes the **RSSI** value of the *pong* of the nearest Duck device. Based on the **RSSI** value, the attached RGB LED will change color between **Blue** (no devices in range), **Green** (great connection), **Purple** (good connection), and **Red** (fair connection).
 
 # Installation
@@ -130,11 +130,11 @@ If you don't see the captive portal screen, you can force it by accessing [never
 ``void setupInternet(String SSID, String PASSWORD)``
 - Connects device to WiFi using supplied credentails.
 
-``int handlePacket()``
-- Takes received LoRa packet and puts data into **transmission**.
+``bool ssidAvailable(String val)``
+- Does a Wifi scan for available networks. Returns `true` if **val** is one of the scanned SSIDs.
 
-``void processPortalRequest()``
-- Handles incoming and active connections to the captive portal. **Required** for runing captive portal. Use in ``loop()``.
+``void setupOTA()``
+- Sets up Over The Air server for updating firmware on device.
 
 ``void setupDuckLink()``
 - Template for setting up a **DuckLink** device. Use in ``setup()``
@@ -148,17 +148,23 @@ If you don't see the captive portal screen, you can force it by accessing [never
 ``void runDetect()``
 - Template for running core functionality of a **DetectorDuck**. Use in ``loop()``.
 
+``void processPortalRequest()``
+- Handles incoming and active connections to the captive portal. **Required** for runing captive portal. Use in ``loop()``.
+
 ``void setupMamaDuck()``
 - Template for setting up a **MamaDuck** device. Use in ``setup()``.
 
 ``void runMamaDuck()``
 - Template for running core functionality of a **MamaDuck**. Use in ``loop()``.
 
-``void sendPayloadMessage(String msg)``
-- Packages **msg** into a LoRa packet and sends over LoRa. Will automatically set the current device's ID as the sender ID and create a UUID for the message.
+``String tohex(byte *data, int size)``
+- Takes bytes and converts it into hex
 
-``void sendPayloadStandard(String msg, String senderId = "", String messageId = "", String path = "")`` 
-- Similar to and might replace ``sendPayloadMessage()``. **senderId** is the ID of the originator of the message. **messageId** is the UUID of the message. **ms** is the message payload to be sent. **path** is the recorded pathway of the message and is used as a check to prevent the device from sending multiple of the same message.
+``int handlePacket()``
+- Takes received LoRa packet and puts data into **transmission**.
+
+``void sendPayloadStandard(String msg, String topic = "", String senderId = "", String messageId = "", String path = "")`` 
+- Packages **msg** into a LoRa packet and sends over LoRa. **topic** is the topic that the message will be published to over MQTT. If **topic** is not specified it will default to "status". **senderId** is the ID of the originator of the message. Set device id will be used if **senderId** is not specified. **messageId** is the UUID of the message. If **messageId** is not specified **uuidCreator()** will be used to create one. **path** is the recorded pathway of the message and is used as a check to prevent the device from sending multiple of the same message.
 
 ``void couple(byte byteCode, String outgoing)``
 - Writes data to LoRa packet. **outgoing** is the payload data to be sent. **byteCode** is paired with the **outgoing** so it can be used to identify data on an individual level. Reference ``setDeviceId()`` for byte codes. In addition it writes the **outgoing** length to the LoRa packet.
@@ -177,7 +183,7 @@ If you don't see the captive portal screen, you can force it by accessing [never
 - Used to call ``restartDuck()`` when using a timer
 
 ``void imAlive(void *)``
-- Used to send a '1' over LoRa on a timer to signify the device is still on and functional.
+- Used to send a "Health Quack" over LoRa on a timer to signify the device is still on and functional.
 
 ``String duckMac(boolean format)``
 - Returns the MAC address of the device. Using ``true`` as an argument will return the MAC address formatted using ':'
@@ -207,6 +213,12 @@ If you don't see the captive portal screen, you can force it by accessing [never
 ``Sting getPassword()``
 - Returns set password for wifi credentials.
 
+``void setSSID(String val)``
+- Sets value for **ssid** global variable for Wifi.
+
+``void setPassworkd(String val)``
+- Sets value for **password** global variable for Wifi.
+
 ``void flipFlag()``
 - Flips value of bool **receivedFlag**.
 
@@ -221,7 +233,7 @@ If you don't see the captive portal screen, you can force it by accessing [never
 - **TODO:** if there is an error sending packet, the packet is deleted. Add functionalilty to retry, but not create infinite loop. Maybe use interrupt.
 
 ``void ping()``
-- Send a ping using byte code **ping_B**.
+- Ping template using byte code **ping_B** and sends "0" as payload. Devices using CDP will respond to ping with "1".
 
 ``void setupLED()``
 - Setup channel for RGB LED.
