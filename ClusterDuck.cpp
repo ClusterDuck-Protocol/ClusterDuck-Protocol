@@ -397,7 +397,8 @@ bool ClusterDuck::ssidAvailable(String val) { //TODO: needs to be cleaned up for
   int n = WiFi.scanNetworks();
   Serial.println("scan done");
   if (n == 0 || ssid == "") {
-    Serial.println("no networks found");
+    Serial.print(n);
+    Serial.println(" networks found");
   } else {
     Serial.print(n);
     Serial.println(" networks found");
@@ -405,6 +406,7 @@ bool ClusterDuck::ssidAvailable(String val) { //TODO: needs to be cleaned up for
       val = ssid;
     }
     for (int i = 0; i < n; ++i) {
+      Serial.print(WiFi.SSID(i));
       if(WiFi.SSID(i) == val){
         return true;
       }
@@ -465,10 +467,10 @@ void ClusterDuck::runDuckLink() {
 void ClusterDuck::setupDetect() {
   setupDisplay("Detector");
   setupLoRa();
-  setupWifiAp();
-	setupDns();
-  setupWebServer(false);
-  setupOTA();
+  // setupWifiAp(false);
+	// setupDns();
+  // setupWebServer(false);
+  // setupOTA();
 
   Serial.println("Detector Online");
 }
