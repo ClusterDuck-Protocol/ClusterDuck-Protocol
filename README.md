@@ -20,17 +20,15 @@ This is beneficial after events such as earthquakes or hurricanes where traditio
 ![portal](doc/assets/images/cluster_demo_vector.gif)
 
 
-## DetectorDuck
-When setting up a network it can be difficult to figure out where to place Duck devices in the field. A DetectorDuck can be used to easily make sure that Ducks are able to maintain connectivity when deploying *ad hoc*. It works by broadcasing a ping every 3 seconds and takes the **RSSI** value of the *pong* of the nearest Duck device. Based on the **RSSI** value, the attached RGB LED will change color between **Blue** (no devices in range), **Green** (great connection), **Purple** (good connection), and **Red** (fair connection).
 
 # Installation
-Check out the [ClusterDuck Protocol] website for more information and to learn about projects built upon this codebase. You can reach out directly on our [Slack Workspace] for any questions! 
+Check out the WIKI [wiki] to learn how to build your own ClusterDuck Protocol. And go to the [ClusterDuck Protocol] website for more information and to learn about projects built upon this codebase. You can reach out directly on our [Slack Workspace] for any questions and work with the community. 
 
-To use the ClusterDuck Protocol follow the [How To Build a Duck](doc/howToBuildADuck.md) installation guide.
+**To use the ClusterDuck Protocol follow the [Installation Manual](https://github.com/Code-and-Response/ClusterDuck-Protocol/wiki/getting-started).**
 
-- [Use with PlatformIO](doc/howToBuildADuck.md#PlatformIO)
+- [Use with PlatformIO](https://github.com/Code-and-Response/ClusterDuck-Protocol/wiki/software#platformio)
 
-- [Use with the Arduino IDE](doc/howToBuildADuck.md#Arduino-IDE)
+- [Use with the Arduino IDE](https://github.com/Code-and-Response/ClusterDuck-Protocol/wiki/software#arduino-ide)
 
 ## Contributing
 
@@ -45,6 +43,6 @@ v1.1.6
 
 
 [Project OWL]: <https://www.project-owl.com/>
-[ClusterDuck Protocol]: <https://clusterduckprotocol.org/>
+[ClusterDuck Protocol]: <https://github.com/Code-and-Response/ClusterDuck-Protocol/wiki>
 [Slack Workspace]: <https://www.project-owl.com/slack>
 
