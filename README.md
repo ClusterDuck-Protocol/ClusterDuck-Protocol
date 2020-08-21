@@ -22,7 +22,7 @@ This is beneficial after events such as earthquakes or hurricanes where traditio
 
 
 # Installation
-Check out the [WIKI](https://github.com/Code-and-Response/ClusterDuck-Protocol/wiki) to learn how to build your own ClusterDuck Protocol. And go to the [ClusterDuck Protocol] website for more information and to learn about projects built upon this codebase. You can reach out directly on our [Slack Workspace] for any questions and work with the community. 
+Check out the [WIKI](https://github.com/Code-and-Response/ClusterDuck-Protocol/wiki) to learn how to build your own ClusterDuck Protocol Network. And go to the [ClusterDuck Protocol] website for more information and to learn about projects built upon this codebase. You can reach out directly on our [Slack Workspace] for any questions and work with the community. 
 
 **To use the ClusterDuck Protocol follow the [Installation Manual](https://github.com/Code-and-Response/ClusterDuck-Protocol/wiki/getting-started).**
 
