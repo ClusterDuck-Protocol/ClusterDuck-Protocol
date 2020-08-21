@@ -34,6 +34,11 @@ Check out the [WIKI](https://github.com/Code-and-Response/ClusterDuck-Protocol/w
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our Code of Conduct, and the process for submitting ClusterDuck Protocol improvements.
 
+## Contributors
+<a href="https://github.com/code-and-response/clusterduck-protocol/graphs/contributors">
+  <img src="https://contributors-img.web.app/image?repo=code-and-response/clusterduck-protocol" />
+</a>
+
 ## License
 
 This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE) file for details.
