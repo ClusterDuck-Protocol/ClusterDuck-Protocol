@@ -1,7 +1,4 @@
 
-[submodule "Libraries/pubsubclient"]
-	path = Libraries/pubsubclient
-	url = https://github.com/knolleary/pubsubclient
 [submodule "Libraries/RadioLib"]
 	path = Libraries/RadioLib
 	url = https://github.com/jgromes/RadioLib
