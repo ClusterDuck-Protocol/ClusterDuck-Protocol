@@ -722,7 +722,6 @@ String ClusterDuck::getPacketData(int pSize) {
         Serial.println("getPacketData Path: " + _lastPacket.topic);
         msg = "";
         tpc = false;
-        Serial.println("hit1");
 
       }
     }
@@ -751,7 +750,6 @@ String ClusterDuck::getPacketData(int pSize) {
       tpc = true;
       len = transmission[i+1];
       Serial.println("getPacketData topic_B Len = " + String(len));
-      Serial.println("hit2");
 
     } else if(transmission[i] == ping_B) {
       if(_deviceId != "Det") {
@@ -809,7 +807,6 @@ String ClusterDuck::getPacketData(int pSize) {
       _lastPacket.topic = msg;
       Serial.println("getPacketData len0 Topic: " + _lastPacket.topic);
       msg = "";
-      Serial.println("hit3");
     }
   }
 

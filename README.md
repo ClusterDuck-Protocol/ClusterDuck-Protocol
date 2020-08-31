@@ -10,7 +10,7 @@ The ClusterDuck Protocol was created by [Project OWL] to be an easy to use mobil
 ## How does it work?
 The network is made up of multiple nodes called **"Ducks"**. There are 3 core roles in a ClusterDuck network: DuckLink, MamaDuck, and PapaDuck. **DuckLinks** serve as edge nodes that only transmit data. These function as remote sensors or as additional access points to a Captive Portal. **MamaDucks** inherit the same functionality of the DuckLinks, but also receive messages. MamaDucks repeat messages from DuckLinks and other MamaDucks until the message reaches a PapaDuck. **PapaDucks** are the endpoint of the network where all of the data is collected and can be stored or pushed up to the cloud. **(free tier cloud platform coming soon)**
 
-![overview](doc/assets/images/DuckExplain.jpg)
+![overview](https://www.project-owl.com/assets/wiki/cdp-explain-gif.gif)
 
 ## Captive Portal
 The Captive Portal is an important feature in the ClusterDuck Protocol network. The Captive Portal allows devices such as smartphones and laptops to access the network without the need to download additional software as it takes advantage a system that is native to smartphones such as Android and iPhone devices and laptops. 
@@ -20,218 +20,24 @@ This is beneficial after events such as earthquakes or hurricanes where traditio
 ![portal](doc/assets/images/cluster_demo_vector.gif)
 
 
-## **NEW** DetectorDuck
-When setting up a network it can be difficult to figure out where to place Duck devices in the field. A DetectorDuck can be used to easily make sure that Ducks are able to maintain connectivity when deploying *ad hoc*. It works by broadcasing a ping every 3 seconds and takes the **RSSI** value of the *pong* of the nearest Duck device. Based on the **RSSI** value, the attached RGB LED will change color between **Blue** (no devices in range), **Green** (great connection), **Purple** (good connection), and **Red** (fair connection).
 
 # Installation
-Check out the [ClusterDuck Protocol] website for more information and to learn about projects built upon this codebase. You can reach out directly on our [Slack Workspace] for any questions! 
+Check out the [WIKI](https://github.com/Code-and-Response/ClusterDuck-Protocol/wiki) to learn how to build your own ClusterDuck Protocol Network. And go to the [ClusterDuck Protocol] website for more information and to learn about projects built upon this codebase. You can reach out directly on our [Slack Workspace] for any questions and work with the community. 
 
-To use the ClusterDuck Protocol follow the [How To Build a Duck](doc/howToBuildADuck.md) installation guide.
+**To use the ClusterDuck Protocol follow the [Installation Manual](https://github.com/Code-and-Response/ClusterDuck-Protocol/wiki/getting-started).**
 
-- [Use with PlatformIO](doc/howToBuildADuck.md#PlatformIO)
+- [Use with PlatformIO](https://github.com/Code-and-Response/ClusterDuck-Protocol/wiki/software#platformio)
 
-- [Use with the Arduino IDE](doc/howToBuildADuck.md#Arduino-IDE)
-
-
-## Quick Start
-
-Open new sketch in Arduino IDE or create a new project with PlatformIO and include the ClusterDuck library
-
-    #include "ClusterDuck.h"
-Create ClusterDuck object
-
-    ClusterDuck duck;
-Initializes the ClusterDuck class object
-
-#### In setup()
-
-    duck.begin(baudRate);
-Initializes the baud rate for serial printing and messaging. You can adust to your desired baud rate.
-- int baudRate
--- Default is **115200**
-
-Set device ID and captive portal form length.
-    
-    duck.setDeviceId(String deviceId, const int formLength);
-- String deviceId
--- input the device ID used to identify your registered device on the web
--- do not leave null or an empty string
-- const int formLength 
--- (optional) define the number of captive portal form fields
--- Default is **10** to match our default captive portal template
-
-Setup **DuckLink**
-
-    duck.setupDuckLink();
-    
-``duck.setupMamaDuck`` can also be used here to setup a MamaDuck, however you **cannot** use both in the same sketch.
-
-#### In loop()
-
-Add corresponding Duck run code. Must be of the same device type as used in ``setup()``. (e.g. if ``duck.setupMamaDuck()`` is used in ``setup()`` use ``duck.runMamaDuck()``)
-
-    duck.runDuckLink();
-    
-Your sketch should look something like this:
-    
-    #include "ClusterDuck.h"
-    ClusterDuck duck;
-    
-    void setup() {
-    // put your setup code here, to run once:
-        duck.begin();
-        duck.setDeviceId("Z", 10);
-        duck.setupDuckLink();
-    }
-
-    void loop() {
-    // put your main code here, to run repeatedly:
-        duck.runDuckLink();
-    }
-
-Now compile and upload to your device. If using a Heltec LoRa ESP32 board you should see a Duck Online message on the LED screen. You can now open your phone or laptop's Wi-Fi preferences and connect to the ``SOS DuckLink Network``! 
-
-If you don't see the captive portal screen, you can force it by accessing [neverssl.com](http://neverssl.com) which will ensure that the captive portal intercepts the HTTP request.
-
-
-
-## API
-``setDeviceId(String deviceId)``
-- Set device ID that will be used to prevent DDoS (Duck Denial of Service or Duck DoS). Do not leave **deviceId** *null* or as an empty string. Use in ``setup()``.
-
-``void begin(int baudRate)``
-- Initialize baud rate for serial. Use in ``setup()``.
-
-``void setupDisplay(String deviceType)``
-- Initializes LED screen on Heltec LoRa ESP32 and configures it to show status, device ID, and the device type. Use in ``setup()``.
-
-``void setupLoRa(long BAND, int SS, int RST, int DI0, int DI1, int TxPower)``
-- Initializes LoRa radio. Default setting is **Heltec LoRa ESP32** pins (**SS** = 18, **RST** = 14, **DI0** = 26, **DI1** = 25). **TxPower** corresponds to the the transmit power of the radio (max value: 20). Use in ``setup()``.
-
-``void setFlag(void)``
-- On LoRa packet received set **receivedFlag** to *true* if **enableInterrupt** is *false*.
-
-``void setupWebServer(bool createCaptivePortal = false)``
-- Initializes the websever and routes. Setting **createCaptivePortal** to *true* will make the captive portal automatically pop up on connection. If set to *false*, the captive portal can still be accessed by opening a browser and going to **192.168.1.1**. 
-- */* : **HTTP_GET** : Captive Portal.
-- */formSubmit* : **HTTP_POST** : Collects data from all inputs that have a *name* tag in *html*, turns it into a single *String* with each element separated by a *. Then runs ``sendPayloadStandard(String msg)``.
-- */id* : returns **_deviceId**.
-- */restart* : **HTTP_GET** : Restarts Duck.
-- */mac* : **HTTP_GET** : Returns device's mac address
-- */wifi* : **HTTP_GET** : Portal to change wifi credentials
-- */changeSSID* : **HTTP_POST** : Takes input values with **name** tags equal to **ssid** and **pass**. Uses these values to run ``setupInternet(String SSID, String PASSWORD)``
-
-``void setupWifiAp(const char * AP)``
-- Initializes WiFi access point with SSID = **AP**.
-
-``void setupDns()``
-- Initializes DNS server.
-
-``void setupInternet(String SSID, String PASSWORD)``
-- Connects device to WiFi using supplied credentails.
-
-``int handlePacket()``
-- Takes received LoRa packet and puts data into **transmission**.
-
-``void processPortalRequest()``
-- Handles incoming and active connections to the captive portal. **Required** for runing captive portal. Use in ``loop()``.
-
-``void setupDuckLink()``
-- Template for setting up a **DuckLink** device. Use in ``setup()``
-
-``void runDuckLink()``
-- Template for running core functionality of a **DuckLink**. Use in ``loop()``.
-
-``void setupDetect()``
-- Template for settuing up a **DetectorDuck** device. Use in ``setup()``.
-
-``void runDetect()``
-- Template for running core functionality of a **DetectorDuck**. Use in ``loop()``.
-
-``void setupMamaDuck()``
-- Template for setting up a **MamaDuck** device. Use in ``setup()``.
-
-``void runMamaDuck()``
-- Template for running core functionality of a **MamaDuck**. Use in ``loop()``.
-
-``void sendPayloadMessage(String msg)``
-- Packages **msg** into a LoRa packet and sends over LoRa. Will automatically set the current device's ID as the sender ID and create a UUID for the message.
-
-``void sendPayloadStandard(String msg, String senderId = "", String messageId = "", String path = "")`` 
-- Similar to and might replace ``sendPayloadMessage()``. **senderId** is the ID of the originator of the message. **messageId** is the UUID of the message. **ms** is the message payload to be sent. **path** is the recorded pathway of the message and is used as a check to prevent the device from sending multiple of the same message.
-
-``void couple(byte byteCode, String outgoing)``
-- Writes data to LoRa packet. **outgoing** is the payload data to be sent. **byteCode** is paired with the **outgoing** so it can be used to identify data on an individual level. Reference ``setDeviceId()`` for byte codes. In addition it writes the **outgoing** length to the LoRa packet.
-
-``bool idInPath(String path)``
-- Checks if the **path** contains **deviceId**. Returns bool.
-
-``String * getPacketData(int pSize)``
-- Called to iterate through received LoRa packet and return data as an array of Strings.
-- Note: if using standard byte codes it will store **senderId**, **messageId**, **payload**, and **path** in a Packet object. This can be accessed using ``getLastPacket()``
-
-``void restartDuck()``
-- If using the ESP32 architecture, calling this function will reboot the device.
-
-``void reboot(void *)``
-- Used to call ``restartDuck()`` when using a timer
-
-``void imAlive(void *)``
-- Used to send a '1' over LoRa on a timer to signify the device is still on and functional.
-
-``String duckMac(boolean format)``
-- Returns the MAC address of the device. Using ``true`` as an argument will return the MAC address formatted using ':'
-
-``String uuidCreator()``
-- Returns as String of 8 random characters and numbers
-
-``String getDeviceId()``
-- Returns the device ID
-
-``Packet getLastPacket()``
-- Returns a Packet object containing **senderId**, **messageId**, **payload**, and **path** of last packet received.
-- Note: values are updated after running ``getPacketData()``
-
-``volatile bool getFlag()``
-- Returns value of **receivedFlag**.
-
-``volatile bool getInterrupt()``
-- Returns value of **enableInterrupt**.
-
-``int getRSSI()``
-- Returns RSSI for last packet received.
-
-``Sting getSSID()``
-- Returns set SSID for wifi credentials.
-
-``Sting getPassword()``
-- Returns set password for wifi credentials.
-
-``void flipFlag()``
-- Flips value of bool **receivedFlag**.
-
-``void flipInterrupt()``
-- Flips value of bool **enableInterrupt**.
-
-``void startReceive()``
-- Starts LoRa receive mode.
-
-``void startTransmit()``
-- Transmits package stored in **transmission**. Resets both **packetIndex** and **transmission**
-- **TODO:** if there is an error sending packet, the packet is deleted. Add functionalilty to retry, but not create infinite loop. Maybe use interrupt.
-
-``void ping()``
-- Send a ping using byte code **ping_B**.
-
-``void setupLED()``
-- Setup channel for RGB LED.
-
-``void setColor(int red, int green, int blue)``
-- Set color of RGB LED, 0-256.
+- [Use with the Arduino IDE](https://github.com/Code-and-Response/ClusterDuck-Protocol/wiki/software#arduino-ide)
 
 ## Contributing
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our Code of Conduct, and the process for submitting ClusterDuck Protocol improvements.
+
+## Contributors
+<a href="https://github.com/code-and-response/clusterduck-protocol/graphs/contributors">
+  <img src="https://contributors-img.web.app/image?repo=code-and-response/clusterduck-protocol" />
+</a>
 
 ## License
 
@@ -242,6 +48,6 @@ v1.1.6
 
 
 [Project OWL]: <https://www.project-owl.com/>
-[ClusterDuck Protocol]: <https://clusterduckprotocol.org/>
+[ClusterDuck Protocol]: <https://github.com/Code-and-Response/ClusterDuck-Protocol/wiki>
 [Slack Workspace]: <https://www.project-owl.com/slack>
 
