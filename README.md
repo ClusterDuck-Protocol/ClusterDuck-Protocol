@@ -20,7 +20,6 @@ This is beneficial after events such as earthquakes or hurricanes where traditio
 ![portal](doc/assets/images/cluster_demo_vector.gif)
 
 
-
 ## Installation
 Check out the [WIKI](https://github.com/Code-and-Response/ClusterDuck-Protocol/wiki) to learn how to build your own ClusterDuck Protocol Network. And go to the [ClusterDuck Protocol](https://clusterduckprotocol.org/) website for more information and to learn about projects built upon this codebase. You can reach out directly on our [Slack Workspace] for any questions and work with the community. 
 
