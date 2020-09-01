@@ -259,7 +259,7 @@
   #define CDPCFG_RF_LORA_GAIN    0
 
   // cdp configuration
-  #define CDPCFG_CDP_BUFSIZE 250
+  #define CDPCFG_CDP_BUFSIZE 256
   #define CDPCFG_UUID_LEN 8
 
   // Timer in milliseconds
