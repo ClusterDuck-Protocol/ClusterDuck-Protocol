@@ -1,7 +1,4 @@
 
-[submodule "Libraries/pubsubclient"]
-	path = Libraries/pubsubclient
-	url = https://github.com/knolleary/pubsubclient.git
 [submodule "Libraries/RadioLib"]
 	path = Libraries/RadioLib
 	url = https://github.com/jgromes/RadioLib
@@ -41,3 +38,6 @@
 [submodule "Libraries/MQSensorsLib"]
 	path = Libraries/MQSensorsLib
 	url = https://github.com/miguel5612/MQSensorsLib.git
+[submodule "Libraries/pubsubclient"]
+	path = Libraries/pubsubclient
+	url = https://github.com/knolleary/pubsubclient.git
