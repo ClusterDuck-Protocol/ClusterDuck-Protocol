@@ -17,7 +17,7 @@ The Captive Portal is an important feature in the ClusterDuck Protocol network. 
 
 This is beneficial after events such as earthquakes or hurricanes where traditional communication infrastructure is crippled. Users are able to connect to the WiFi access point of a DuckLink or MamaDuck which will in turn relay their message onward.
 
-![portal](doc/assets/images/cluster_demo_vector.gif)
+![portal](https://www.project-owl.com/assets/cluster_demo_vector.gif)
 
 
 ## Installation
