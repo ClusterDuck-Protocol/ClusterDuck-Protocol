@@ -12,7 +12,6 @@
 #include <RadioLib.h>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
-#include <U8x8lib.h>
 
 #include <DNSServer.h>
 #include <ESPAsyncWebServer.h>
@@ -28,138 +27,161 @@
 
 #include <ArduinoOTA.h>
 
+#include "DuckDisplay.h"
+
 typedef struct
 {
-  String senderId;
-  String topic;
-  String messageId;
-  String payload;
-  String path;
+	String senderId;
+	String topic;
+	String messageId;
+	String payload;
+	String path;
 } Packet;
 
 class ClusterDuck {
-  public:
-    //Constructor
-    ClusterDuck();
+public:
 
-    //Exposed Methods
-    static void setDeviceId(String deviceId = "");
-    static void begin(int baudRate = CDPCFG_SERIAL_BAUD);
-    static void setupLoRa(long BAND = CDPCFG_RF_LORA_FREQ, int SS = CDPCFG_PIN_LORA_CS, int RST = CDPCFG_PIN_LORA_RST, int DI0 = CDPCFG_PIN_LORA_DIO0, int DI1 = CDPCFG_PIN_LORA_DIO1, int TxPower = CDPCFG_RF_LORA_TXPOW);
-    static void setupDisplay(String deviceType);
-    static void setupWebServer(bool createCaptivePortal = false);
-		static void setupWifiAp(const char *AP = " 🆘 DUCK EMERGENCY PORTAL");
-		static void setupDns();
-		static void setupInternet(String SSID, String PASSWORD);
-    static bool ssidAvailable(String val = "");
-    static void setupOTA();
-    static bool runCaptivePortal();
+	ClusterDuck();
 
-    static void setupDuckLink();
-    static void setupMamaDuck();
-    static void processPortalRequest();
-    static int handlePacket();
-    static void runDuckLink();
-    static void runMamaDuck();
+	// Public APIs
 
-    static String * getPortalDataArray();
-    static String getPortalDataString();
-    static String getPacketData(int pSize);
+	// Common Duck
+	//-------------------------------------------------------------------------
+	static void setDeviceId(String deviceId = "");
+	static void begin(int baudRate = CDPCFG_SERIAL_BAUD);
+	static String duckMac(boolean format);
+	static String uuidCreator();
+	static String getDeviceId();
+	static bool imAlive(void *);
+	volatile bool getInterrupt();
+	void flipFlag();
+	void flipInterrupt();
+	static void ping();
 
-    static String duckMac(boolean format);
+	// Duck Link
+	//-------------------------------------------------------------------------
+	static void setupDuckLink();
+	static void runDuckLink();
 
-    static int _rssi;
-    static float _snr;
-    static long _freqErr;
-    static int _availableBytes;
+	// Mama Duck
+	//-------------------------------------------------------------------------
+	static void setupMamaDuck();
+	static void runMamaDuck();
 
-    static void sendPayloadStandard(String msg = "", String topic = "", String senderId = "", String messageId = "", String path = "");
+	// Detect Duck
+	//-------------------------------------------------------------------------
+	static void setupDetect();
+	static int runDetect();
 
-    static String uuidCreator();
+	// LoRa
+	//-------------------------------------------------------------------------
+	static void setupLoRa(long BAND = CDPCFG_RF_LORA_FREQ,
+			int SS = CDPCFG_PIN_LORA_CS, int RST = CDPCFG_PIN_LORA_RST,
+			int DI0 = CDPCFG_PIN_LORA_DIO0, int DI1 = CDPCFG_PIN_LORA_DIO1, int TxPower = CDPCFG_RF_LORA_TXPOW);
+	static int handlePacket();
+	static String getPacketData(int pSize);
+	static void sendPayloadStandard(
+			String msg = "", String topic = "",
+			String senderId = "", String messageId = "",
+			String path = "");
+	static Packet getLastPacket();
+	static void couple(byte byteCode, String outgoing); //?! Not public
+	static bool idInPath(String path); // ?! Not public
+	volatile bool getFlag(); // To check if LoRa packet was received
+	static void startReceive();
+	static void startTransmit();
+	static int getRSSI();
 
-    static String getDeviceId();
-    static Packet getLastPacket();
+	// Display
+	//-------------------------------------------------------------------------
+	static void setupDisplay(String deviceType);
 
-    static bool imAlive(void *);
+	// Network
+	//-------------------------------------------------------------------------
+	static void setupWebServer(bool createCaptivePortal = false);
+	static void setupWifiAp(const char *AP = " 🆘 DUCK EMERGENCY PORTAL");
+	static void setupDns();
+	static void setupInternet(String SSID, String PASSWORD);
+	static bool ssidAvailable(String val = "");
+	static void setSSID(String val);
+	static void setPassword(String val);
+	static String getSSID();
+	static String getPassword();
 
-    static void couple(byte byteCode, String outgoing);
-    static bool idInPath(String path);
+	// OTA - Firmware upgrade
+	//-------------------------------------------------------------------------
+	static void setupOTA();
 
-    volatile bool getFlag();
-    volatile bool getInterrupt();
-    void flipFlag();
-    void flipInterrupt();
-    static void setSSID(String val);
-    static void setPassword(String val);
-    static void startReceive();
-    static int getRSSI();
-    static void ping();
-    static void startTransmit();
-    static void setupDetect();
-    static int runDetect();
+	// Portal
+	//-------------------------------------------------------------------------
+	static void processPortalRequest();
+	static String * getPortalDataArray();
+	static String getPortalDataString();
+	static bool runCaptivePortal();
 
-    static void setColor(int ledR = CDPCFG_PIN_RGBLED_R, int ledG = CDPCFG_PIN_RGBLED_G, int ledB = CDPCFG_PIN_RGBLED_B);
-    static void setupLED();
+	// Led
+	//-------------------------------------------------------------------------
+	static void setColor(int ledR = CDPCFG_PIN_RGBLED_R, int ledG = CDPCFG_PIN_RGBLED_G, int ledB = CDPCFG_PIN_RGBLED_B);
+	static void setupLED();
 
-    static String getSSID();
-    static String getPassword();
+protected:
+	static Packet _lastPacket;
+	static String _deviceId;
+	static DuckDisplay _duckDisplay;
 
-  protected:
-    static Packet _lastPacket;
-    static String _deviceId;
+private:
 
-  private:
-
-    static int _packetSize;
-
-    static void setFlag(void);
-
-    static DNSServer dnsServer;
-    static const byte DNS_PORT;
-    static const char *DNS;
-    static const char *AP;
-    static String portal;
-
-    static String runTime;
-
-    static void restartDuck();
-    static bool reboot(void *);
-
-    static byte ping_B;
-    static byte senderId_B;
-    static byte topic_B;
-    static byte messageId_B;
-    static byte payload_B;
-    static byte iamhere_B;
-    static byte path_B;
-
-    static int ledR;
-    static int ledG;
-    static int ledB;
+	static void setFlag(void);
+	static void restartDuck();
+	static bool reboot(void *);
 
 
+	static int _rssi;
+	static float _snr;
+	static long _freqErr;
+	static int _availableBytes;
+
+	static int _packetSize;
+	static DNSServer dnsServer;
+	static const byte DNS_PORT;
+	static const char *DNS;
+	static const char *AP;
+	static String portal;
+
+	static String runTime;
 
 
+	static byte ping_B;
+	static byte senderId_B;
+	static byte topic_B;
+	static byte messageId_B;
+	static byte payload_B;
+	static byte iamhere_B;
+	static byte path_B;
+
+	static int ledR;
+	static int ledG;
+	static int ledB;
 };
 
 class CaptiveRequestHandler: public AsyncWebHandler {
-  public:
-    CaptiveRequestHandler(String portal) {
-      _portal = portal;
-    }
-    virtual ~CaptiveRequestHandler() { }
+public:
+	CaptiveRequestHandler(String portal) {
+		_portal = portal;
+	}
+	virtual ~CaptiveRequestHandler() { }
 
-    bool canHandle(AsyncWebServerRequest *request) {
-      return true;
-    }
+	bool canHandle(AsyncWebServerRequest *request) {
+		return true;
+	}
 
-    void handleRequest(AsyncWebServerRequest *request) {
-      AsyncResponseStream *response = request->beginResponseStream("text/html");
-      response->print(_portal);
-      request->send(response);
-    }
+	void handleRequest(AsyncWebServerRequest *request) {
+		AsyncResponseStream *response = request->beginResponseStream("text/html");
+		response->print(_portal);
+		request->send(response);
+	}
 
-    String _portal;
+	String _portal;
 };
 
 #endif
