@@ -1,8 +1,8 @@
 #include "ClusterDuck.h"
 
-#ifdef CDPCFG_OLED_CLASS
-  CDPCFG_OLED_CLASS u8x8(/* clock=*/ CDPCFG_PIN_OLED_CLOCK, /* data=*/ CDPCFG_PIN_OLED_DATA, /* reset=*/ CDPCFG_PIN_OLED_RESET);
-#endif
+//#ifdef CDPCFG_OLED_CLASS
+//  CDPCFG_OLED_CLASS u8x8(/* clock=*/ CDPCFG_PIN_OLED_CLOCK, /* data=*/ CDPCFG_PIN_OLED_DATA, /* reset=*/ CDPCFG_PIN_OLED_RESET);
+//#endif
 
 #ifdef CDPCFG_PIN_LORA_SPI_SCK
   #include "SPI.h"
@@ -50,44 +50,39 @@ void ClusterDuck::begin(int baudRate) {
 }
 
 void ClusterDuck::setupDisplay(String deviceType)  {
-#ifndef CDPCFG_OLED_NONE
-  u8x8.begin();
-  u8x8.setFont(u8x8_font_chroma48medium8_r);
+
+	_duckDisplay.setupDisplay();
 
 #ifdef CDPCFG_OLED_64x32
   // small display 64x32
-  u8x8.setCursor(0, 2);
-  u8x8.print("((>.<))");
+	_duckDisplay.setCursor(0, 2);
+	_duckDisplay.print("((>.<))");
 
-  u8x8.setCursor(0, 4);
-  u8x8.print("DT: " + deviceType);
+	_duckDisplay.setCursor(0, 4);
+	_duckDisplay.print("DT: " + deviceType);
 
-  u8x8.setCursor(0, 5);
-  u8x8.print("ID: " + _deviceId);
-
-//  u8x8.setCursor(0, 4);
-//  u8x8.print("ST: Online");
+	_duckDisplay.setCursor(0, 5);
+	_duckDisplay.print("ID: " + _deviceId);
 
 #else
   // default display size 128x64
-  u8x8.setCursor(0, 1);
-  u8x8.print("    ((>.<))    ");
+	_duckDisplay.setCursor(0, 1);
+	_duckDisplay.print("    ((>.<))    ");
 
-  u8x8.setCursor(0, 2);
-  u8x8.print("  Project OWL  ");
+	_duckDisplay.setCursor(0, 2);
+	_duckDisplay.print("  Project OWL  ");
 
-  u8x8.setCursor(0, 4);
-  u8x8.print("Device: " + deviceType);
+	_duckDisplay.setCursor(0, 4);
+	_duckDisplay.print("Device: " + deviceType);
 
-  u8x8.setCursor(0, 5);
-  u8x8.print("Status: Online");
+	_duckDisplay.setCursor(0, 5);
+	_duckDisplay.print("Status: Online");
 
-  u8x8.setCursor(0, 6);
-  u8x8.print("ID:     " + _deviceId);
+	_duckDisplay.setCursor(0, 6);
+	_duckDisplay.print("ID:     " + _deviceId);
 
-  u8x8.setCursor(0, 7);
-  u8x8.print(duckMac(false));
-#endif
+	_duckDisplay.setCursor(0, 7);
+	_duckDisplay.print(duckMac(false));
 #endif
 }
 
@@ -109,10 +104,7 @@ void ClusterDuck::setupLoRa(long BAND, int SS, int RST, int DI0, int DI1, int Tx
   if (state == ERR_NONE) {
     Serial.println("LoRa online, Quack!");
   } else {
-#ifndef CDPCFG_OLED_NONE
-    u8x8.clear();
-    u8x8.drawString(0, 0, "Starting LoRa failed!");
-#endif
+	_duckDisplay.drawString(true, 0, 0, "Starting LoRa failed!");
     Serial.print("Starting LoRa Failed!!!");
     Serial.println(state);
     restartDuck();
@@ -1053,3 +1045,4 @@ byte ClusterDuck::iamhere_B    = 0xF8;
 byte ClusterDuck::path_B       = 0xF3;
 
 String ClusterDuck::portal = MAIN_page;
+DuckDisplay ClusterDuck::_duckDisplay;
