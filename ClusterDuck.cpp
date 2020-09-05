@@ -1,8 +1,5 @@
 #include "ClusterDuck.h"
 
-//#ifdef CDPCFG_OLED_CLASS
-//  CDPCFG_OLED_CLASS u8x8(/* clock=*/ CDPCFG_PIN_OLED_CLOCK, /* data=*/ CDPCFG_PIN_OLED_DATA, /* reset=*/ CDPCFG_PIN_OLED_RESET);
-//#endif
 
 #ifdef CDPCFG_PIN_LORA_SPI_SCK
   #include "SPI.h"
@@ -1000,23 +997,12 @@ void ClusterDuck::ping() {
 
 // Setup LED
 void ClusterDuck::setupLED() {
-  ledcAttachPin(ledR, 1); // assign RGB led pins to channels
-  ledcAttachPin(ledG, 2);
-  ledcAttachPin(ledB, 3);
-
-// Initialize channels
-// channels 0-15, resolution 1-16 bits, freq limits depend on resolution
-// ledcSetup(uint8_t channel, uint32_t freq, uint8_t resolution_bits);
-  ledcSetup(1, 12000, 8); // 12 kHz PWM, 8-bit resolution
-  ledcSetup(2, 12000, 8);
-  ledcSetup(3, 12000, 8);
+	_duckLed.setupLED();
 }
 
 void ClusterDuck::setColor(int red, int green, int blue)
 {
-  ledcWrite(1, red);
-  ledcWrite(2, green);
-  ledcWrite(3, blue);
+  _duckLed.setColor(red, green, blue);
 }
 
 DNSServer ClusterDuck::dnsServer;
@@ -1029,10 +1015,6 @@ long ClusterDuck::_freqErr;
 int ClusterDuck::_availableBytes;
 int ClusterDuck::_packetSize = 0;
 
-// LED
-int ClusterDuck::ledR = CDPCFG_PIN_RGBLED_R;
-int ClusterDuck::ledG = CDPCFG_PIN_RGBLED_G;
-int ClusterDuck::ledB = CDPCFG_PIN_RGBLED_B;
 
 Packet ClusterDuck::_lastPacket;
 
@@ -1046,3 +1028,7 @@ byte ClusterDuck::path_B       = 0xF3;
 
 String ClusterDuck::portal = MAIN_page;
 DuckDisplay ClusterDuck::_duckDisplay;
+DuckLed ClusterDuck::_duckLed;
+
+
+

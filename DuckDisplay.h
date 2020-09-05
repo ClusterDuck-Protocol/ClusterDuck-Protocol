@@ -1,10 +1,3 @@
-/*
- * DuckDisplay.h
- *
- *  Created on: Sep 3, 2020
- *      Author: anathoo
- */
-
 #ifndef DUCKDISPLAY_H_
 #define DUCKDISPLAY_H_
 

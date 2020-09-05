@@ -28,6 +28,7 @@
 #include <ArduinoOTA.h>
 
 #include "DuckDisplay.h"
+#include "DuckLed.h"
 
 typedef struct
 {
@@ -128,6 +129,7 @@ protected:
 	static Packet _lastPacket;
 	static String _deviceId;
 	static DuckDisplay _duckDisplay;
+	static DuckLed _duckLed;
 
 private:
 
@@ -158,10 +160,6 @@ private:
 	static byte payload_B;
 	static byte iamhere_B;
 	static byte path_B;
-
-	static int ledR;
-	static int ledG;
-	static int ledB;
 };
 
 class CaptiveRequestHandler: public AsyncWebHandler {
