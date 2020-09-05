@@ -1,11 +1,3 @@
-/*
- * DuckDisplay.cpp
- *
- *  Created on: Sep 3, 2020
- *      Author: anathoo
- */
-
-
 #include "DuckDisplay.h"
 
 #ifdef CDPCFG_OLED_CLASS
