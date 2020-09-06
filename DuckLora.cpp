@@ -28,11 +28,11 @@ int DuckLora::setupLoRa(LoraConfigParams config, String deviceId) {
   lora = new Module(config.ss, config.di0, config.rst, config.di1);
 #endif
 
-  Serial.println("Starting LoRa......");
+  Serial.println("[DuckLora] Starting LoRa......");
   int state = lora.begin();
 
   if (state == ERR_NONE) {
-    Serial.println("LoRa started, Quack!");
+    Serial.println("[DuckLora] LoRa started, Quack!");
   } else {
     return DUCKLORA_ERR_BEGIN;
   }
@@ -72,9 +72,7 @@ int DuckLora::setupLoRa(LoraConfigParams config, String deviceId) {
 
   state = lora.startReceive();
 
-  if (state == ERR_NONE) {
-    Serial.println("[DuckLora] Listening for quacks");
-  } else {
+  if (state != ERR_NONE) {
     Serial.print("[DuckLora] Failed to start receive: ");
     Serial.println(state);
     return DUCKLORA_ERR_RECEIVE;
@@ -83,17 +81,24 @@ int DuckLora::setupLoRa(LoraConfigParams config, String deviceId) {
   return DUCKLORA_ERR_NONE;
 }
 
-void DuckLora::resetTransmission() {
+void DuckLora::resetTransmissionBuffer() {
   memset(_transmission, 0x00, CDPCFG_CDP_BUFSIZE);
   _packetIndex = 0;
 }
 
+// Reads the packet data from LoRa driver and stores it in our
+// transmission buffer.
+// Returns the packet length which should be > 0
+// A DUCKLORA_ERR_HANDLE_PACKET is returned if there was a failure
+// to read the data from the LoRa driver
 int DuckLora::handlePacket() {
-  int pSize = lora.getPacketLength();
-
-  resetTransmission();
-
-  int err = lora.readData(_transmission, pSize);
+  int pSize = 0;
+  int err = 0;
+  
+  pSize = lora.getPacketLength();
+  // we get our packet buffer ready to be populated if packet data is present
+  resetTransmissionBuffer();
+  err = lora.readData(_transmission, pSize);
 
   if (err != ERR_NONE) {
     Serial.print("[DuckLora] handlePacket failed, code ");
@@ -121,10 +126,12 @@ int DuckLora::handlePacket() {
   return pSize;
 }
 
+// Checks the packet buffer and returns its content as string
+// An empty string is returned if buffer was empty
 String DuckLora::getPacketData(int pSize) {
   String packetData = "";
   if (pSize == 0) {
-    Serial.println("getPacketData Packet is empty!");
+    Serial.println("[DuckLora] getPacketData Packet is empty!");
     return packetData;
   }
   _packetIndex = 0;
@@ -142,60 +149,59 @@ String DuckLora::getPacketData(int pSize) {
       gotLen = false;
       if (sId) {
         _lastPacket.senderId = msg;
-        Serial.println("getPacketData User ID: " + _lastPacket.senderId);
+        Serial.println("[DuckLora] getPacketData User ID: " + _lastPacket.senderId);
         msg = "";
         sId = false;
 
       } else if (mId) {
         _lastPacket.messageId = msg;
-        Serial.println("getPacketData Message ID: " + _lastPacket.messageId);
+        Serial.println("[DuckLora] getPacketData Message ID: " + _lastPacket.messageId);
         msg = "";
         mId = false;
 
       } else if (pLoad) {
         _lastPacket.payload = msg;
-        Serial.println("getPacketData Message: " + _lastPacket.payload);
+        Serial.println("[DuckLora] getPacketData Message: " + _lastPacket.payload);
         msg = "";
         pLoad = false;
 
       } else if (pth) {
         _lastPacket.path = msg;
-        Serial.println("getPacketData Path: " + _lastPacket.path);
+        Serial.println("DuckLora] getPacketData Path: " + _lastPacket.path);
         msg = "";
         pth = false;
 
       } else if (tpc) {
         _lastPacket.topic = msg;
-        Serial.println("getPacketData Path: " + _lastPacket.topic);
+        Serial.println("DuckLora] getPacketData Path: " + _lastPacket.topic);
         msg = "";
         tpc = false;
       }
     }
     if (_transmission[i] == senderId_B) {
-      // Serial.println(transmission[1+i]);
       sId = true;
       len = _transmission[i + 1];
-      Serial.println("getPacketData senderId_B Len = " + String(len));
+      Serial.println("DuckLora] getPacketData senderId_B Len = " + String(len));
 
     } else if (_transmission[i] == messageId_B) {
       mId = true;
       len = _transmission[i + 1];
-      Serial.println("_getPacketData messageId_B Len = " + String(len));
+      Serial.println("DuckLora] getPacketData messageId_B Len = " + String(len));
 
     } else if (_transmission[i] == payload_B) {
       pLoad = true;
       len = _transmission[i + 1];
-      Serial.println("_getPacketData payload_B Len = " + String(len));
+      Serial.println("DuckLora] getPacketData payload_B Len = " + String(len));
 
     } else if (_transmission[i] == path_B) {
       pth = true;
       len = _transmission[i + 1];
-      Serial.println("_getPacketData path_B Len = " + String(len));
+      Serial.println("DuckLora] getPacketData path_B Len = " + String(len));
 
     } else if (_transmission[i] == topic_B) {
       tpc = true;
       len = _transmission[i + 1];
-      Serial.println("_getPacketData topic_B Len = " + String(len));
+      Serial.println("DuckLora] getPacketData topic_B Len = " + String(len));
 
     } else if (_transmission[i] == ping_B) {
       if (_deviceId != "Det") {
@@ -203,7 +209,7 @@ String DuckLora::getPacketData(int pSize) {
         _packetIndex = 0;
         couple(iamhere_B, "1");
         startTransmit();
-        Serial.println("getPacketData pong sent");
+        Serial.println("DuckLora] getPacketData pong sent");
         packetData = "ping";
         return packetData;
       }
@@ -212,7 +218,7 @@ String DuckLora::getPacketData(int pSize) {
       packetData = "ping";
 
     } else if (_transmission[i] == iamhere_B) {
-      Serial.println("getPacketData pong received");
+      Serial.println("DuckLora] getPacketData pong received");
       memset(_transmission, 0x00, CDPCFG_CDP_BUFSIZE);
       _packetIndex = 0;
       packetData = "pong";
@@ -231,26 +237,26 @@ String DuckLora::getPacketData(int pSize) {
   if (len == 0) {
     if (sId) {
       _lastPacket.senderId = msg;
-      Serial.println("getPacketData len0 User ID: " + _lastPacket.senderId);
+      Serial.println("DuckLora] getPacketData len0 User ID: " + _lastPacket.senderId);
       msg = "";
 
     } else if (mId) {
       _lastPacket.messageId = msg;
-      Serial.println("getPacketData len0 Message ID: " + _lastPacket.messageId);
+      Serial.println("DuckLora] getPacketData len0 Message ID: " + _lastPacket.messageId);
       msg = "";
 
     } else if (pLoad) {
       _lastPacket.payload = msg;
-      Serial.println("getPacketData len0 Message: " + _lastPacket.payload);
+      Serial.println("DuckLora] getPacketData len0 Message: " + _lastPacket.payload);
       msg = "";
 
     } else if (pth) {
       _lastPacket.path = msg;
-      Serial.println("getPacketData len0 Path: " + _lastPacket.path);
+      Serial.println("DuckLora] getPacketData len0 Path: " + _lastPacket.path);
       msg = "";
     } else if (tpc) {
       _lastPacket.topic = msg;
-      Serial.println("getPacketData len0 Topic: " + _lastPacket.topic);
+      Serial.println("DuckLora] getPacketData len0 Topic: " + _lastPacket.topic);
       msg = "";
     }
   }
@@ -268,7 +274,6 @@ int DuckLora::sendPayloadStandard(String msg, String topic, String senderId,
   if (topic == "") {
     topic = "status";
   }
-  Serial.println("Topic: " + topic);
   if (messageId == "")
     messageId = duckutils::createUuid();
   if (path == "") {
@@ -279,21 +284,21 @@ int DuckLora::sendPayloadStandard(String msg, String topic, String senderId,
 
   String total = senderId + messageId + path + msg + topic;
   if (total.length() + 5 > CDPCFG_CDP_BUFSIZE) {
-    Serial.println(
-        "[DuckLora] Warning: message is too large!"); // TODO: do something
+    Serial.println("[DuckLora] Warning: message ["+ topic + "] is too large!"); // TODO: do something
     return DUCKLORA_ERR_HANDLE_PACKET;
   }
-
-  Serial.print("[DuckLora] sendPayloadStandard senderId  ");
-  Serial.println(senderId);
-  Serial.print("[DuckLora] sendPayloadStandard messageId ");
-  Serial.println(messageId);
-  Serial.print("[DuckLora] sendPayloadStandard msg       ");
-  Serial.println(msg);
-  Serial.print("[DuckLora] sendPayloadStandard path      ");
-  Serial.println(path);
-  Serial.print("[DuckLora] sendPayloadStandard topic     ");
-  Serial.println(topic);
+  
+  Serial.print("[DuckLora] sending");
+  Serial.print(" SENDER_ID:");
+  Serial.print(senderId);
+  Serial.print(" * MSG_ID:");
+  Serial.print(messageId);
+  Serial.print(" * PATH:");
+  Serial.print(path);
+  Serial.print(" * TOPIC:");
+  Serial.print(topic);
+  Serial.print(" * MSG:");
+  Serial.print(msg);
 
   couple(senderId_B, senderId);
   couple(messageId_B, messageId);
@@ -301,7 +306,7 @@ int DuckLora::sendPayloadStandard(String msg, String topic, String senderId,
   couple(path_B, path);
   couple(topic_B, topic);
 
-  Serial.print("[DuckLora] sendPayloadStandard packetIndex ");
+  Serial.print(" * LEN:");
   Serial.println(_packetIndex);
 
   startTransmit();
@@ -352,20 +357,19 @@ int DuckLora::startReceive() {
 int DuckLora::startTransmit() {
   bool oldEI = getDuckInterrupt();
   setDuckInterrupt(false);
+  long t1 = millis();
 
   // dump send packet stats+data
   Serial.print("[DuckLora] SND");
-  Serial.print(" millis:");
-  Serial.print(millis());
-  Serial.print(" size:");
-  Serial.print(_packetIndex);
   Serial.print(" data:");
   Serial.println(duckutils::convertToHex(_transmission, _packetIndex));
 
   int err = lora.transmit(_transmission, _packetIndex);
-
+   
   if (err == ERR_NONE) {
-    Serial.println("[DuckLora] startTransmit Packet sent");
+    Serial.print("[DuckLora] startTransmit Packet sent in: ");
+    Serial.print((millis() - t1));
+    Serial.println("ms");
   } else if (err == ERR_PACKET_TOO_LONG) {
     // the supplied packet was longer than 256 bytes
     Serial.println("[DuckLora] startTransmit too long!");

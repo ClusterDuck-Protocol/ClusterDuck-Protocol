@@ -157,14 +157,6 @@ private:
 
 	static String runTime;
 
-
-	static byte ping_B;
-	static byte senderId_B;
-	static byte topic_B;
-	static byte messageId_B;
-	static byte payload_B;
-	static byte iamhere_B;
-	static byte path_B;
 };
 
 class CaptiveRequestHandler: public AsyncWebHandler {

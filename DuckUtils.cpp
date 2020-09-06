@@ -13,8 +13,6 @@ String createUuid() {
       msg = msg + char((randomValue - 26) + '0');
     }
   }
-  Serial.print("createUuid: ");
-  Serial.println(msg);
   return msg;
 }
 
