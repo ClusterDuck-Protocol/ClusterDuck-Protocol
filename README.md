@@ -1,6 +1,6 @@
 ![Logo](doc/assets/images/CDP_LOGO_small.png)
 
-[![License](https://img.shields.io/badge/License-Apache2-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![Slack](https://img.shields.io/badge/Join-Slack-blue)](https://www.project-owl.com/slack) [![Wiki](https://img.shields.io/badge/Read-Wiki-blue)](https://www.project-owl.com/slack)
+[![License](https://img.shields.io/badge/License-Apache2-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![Slack](https://img.shields.io/badge/Join-Slack-blue)](https://www.project-owl.com/slack) [![Wiki](https://img.shields.io/badge/Read-Wiki-blue)](https://github.com/Code-and-Response/ClusterDuck-Protocol/wiki)
 
 ## What is it?
 In 2017 a category-5 hurricane, Maria, hit Puerto Rico and wreaked havoc on the island's infrastructure. Communication and power were disabled for an extended period of time causing lasting effects long after the hurricane passed. Many of these issues could have been prevented if civilians had access to a basic network where they could send short messages to emergency services and local governments. 
