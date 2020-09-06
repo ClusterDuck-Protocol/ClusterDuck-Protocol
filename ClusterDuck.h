@@ -29,7 +29,9 @@
 
 #include "DuckDisplay.h"
 #include "DuckLed.h"
+#include "DuckLora.h"
 
+/*
 typedef struct
 {
 	String senderId;
@@ -38,6 +40,7 @@ typedef struct
 	String payload;
 	String path;
 } Packet;
+*/
 
 class ClusterDuck {
 public:
@@ -130,6 +133,8 @@ protected:
 	static String _deviceId;
 	static DuckDisplay _duckDisplay;
 	static DuckLed _duckLed;
+	static DuckLora _duckLora;
+	
 
 private:
 
