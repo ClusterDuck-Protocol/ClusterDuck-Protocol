@@ -20,8 +20,8 @@ AsyncWebServer webServer(CDPCFG_WEB_PORT);
 
 auto tymer = timer_create_default();
 
-byte transmission[CDPCFG_CDP_BUFSIZE];
-int packetIndex = 0;
+//byte transmission[CDPCFG_CDP_BUFSIZE];
+//int packetIndex = 0;
 
 String ssid = "";
 String password = "";
@@ -105,15 +105,19 @@ void ClusterDuck::setupLoRa(long BAND, int SS, int RST, int DI0, int DI1,
 
   if (err == DUCKLORA_ERR_BEGIN) {
     _duckDisplay.drawString(true, 0, 0, "Starting LoRa failed!");
-    Serial.print("Starting LoRa Failed!!!");
+    Serial.print("[Duck] Starting LoRa Failed!!!");
     Serial.println(err);
     duckesp::restartDuck();
   }
   if (err == DUCKLORA_ERR_SETUP) {
+    Serial.print("[Duck] Failed to setup Lora. err = ");
+    Serial.println(err);
     while (true)
       ;
   }
   if (err == DUCKLORA_ERR_RECEIVE) {
+    Serial.print("[Duck] Failed to start receive. err = ");
+    Serial.println(err);
     duckesp::restartDuck();
   }
 }
@@ -454,7 +458,8 @@ int ClusterDuck::runDetect() {
     Serial.println(pSize);
     if (pSize > 0) {
       for (int i = 0; i < pSize; i++) {
-        if (transmission[i] == iamhere_B) {
+
+        if (_duckLora.getTransmitedByte(i) == iamhere_B) {
           val = _duckLora.getRSSI();
         }
       }
@@ -491,24 +496,22 @@ void ClusterDuck::runMamaDuck() {
   if (receivedFlag) { // If LoRa packet received
     receivedFlag = false;
     setDuckInterrupt(false);
-    int pSize = handlePacket();
-    Serial.print("runMamaDuck pSize ");
+    int pSize = _duckLora.handlePacket();
+    Serial.print("[Duck] runMamaDuck rcv packet: pSize ");
     Serial.println(pSize);
     if (pSize > 0) {
-      String msg = getPacketData(pSize);
-      packetIndex = 0;
+      String msg = _duckLora.getPacketData(pSize);
+      _duckLora.resetPacketIndex();
       if (msg != "ping" && !idInPath(_lastPacket.path)) {
-        Serial.println("runMamaDuck relayPacket");
+        Serial.println("[Duck] runMamaDuck relay packet");
         _duckLora.sendPayloadStandard(_lastPacket.payload, _lastPacket.topic,
                                       _lastPacket.senderId,
                                       _lastPacket.messageId, _lastPacket.path);
-        memset(transmission, 0x00, CDPCFG_CDP_BUFSIZE); // Reset transmission
-        packetIndex = 0;
+        _duckLora.resetTransmissionBuffer();
       }
     } else {
       // Serial.println("Byte code not recognized!");
-      memset(transmission, 0x00, CDPCFG_CDP_BUFSIZE); // Reset transmission
-      packetIndex = 0;
+      _duckLora.resetTransmissionBuffer();
     }
     setDuckInterrupt(true);
     Serial.println("runMamaDuck startReceive");
@@ -532,20 +535,7 @@ void ClusterDuck::sendPayloadStandard(String msg, String topic, String senderId,
 }
 
 void ClusterDuck::couple(byte byteCode, String outgoing) {
-  int outgoingLen = outgoing.length() + 1;
-  byte byteBuffer[outgoingLen];
-
-  outgoing.getBytes(byteBuffer, outgoingLen);
-
-  transmission[packetIndex] = byteCode; // add byte code
-  packetIndex++;
-  transmission[packetIndex] = (byte)outgoingLen; // add payload length
-  packetIndex++;
-
-  for (int i = 0; i < outgoingLen; i++) { // add payload
-    transmission[packetIndex] = byteBuffer[i];
-    packetIndex++;
-  }
+  _duckLora.couple(byteCode, outgoing);
 }
 
 bool ClusterDuck::idInPath(String path) {
@@ -687,14 +677,6 @@ int ClusterDuck::_availableBytes;
 int ClusterDuck::_packetSize = 0;
 
 Packet ClusterDuck::_lastPacket;
-
-byte ClusterDuck::ping_B = 0xF4;
-byte ClusterDuck::senderId_B = 0xF5;
-byte ClusterDuck::topic_B = 0xE3;
-byte ClusterDuck::messageId_B = 0xF6;
-byte ClusterDuck::payload_B = 0xF7;
-byte ClusterDuck::iamhere_B = 0xF8;
-byte ClusterDuck::path_B = 0xF3;
 
 String ClusterDuck::portal = MAIN_page;
 DuckDisplay ClusterDuck::_duckDisplay;

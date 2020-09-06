@@ -51,10 +51,13 @@ public:
   int startReceive();
   int startTransmit();
   int getRSSI();
+  void resetPacketIndex() { _packetIndex = 0; }
   int getPacketIndex() {return _packetIndex;}
-  byte* getTransmission() {return _transmission;}
+  byte* getTransmissionBuffer() {return _transmission;}
+  byte getTransmitedByte(int index) {return _transmission[index];}
   int ping();
   int standBy();
+  void resetTransmissionBuffer();
 
 private:
   byte _transmission[CDPCFG_CDP_BUFSIZE];
@@ -63,7 +66,6 @@ private:
   String _deviceId = "";
   int _availableBytes = 0;
   int _packetSize = 0;
-  void resetTransmission();
   void resetLastPacket();
 };
 
