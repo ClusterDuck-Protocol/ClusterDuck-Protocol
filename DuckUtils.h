@@ -9,6 +9,10 @@ namespace duckutils {
 
 String createUuid();
 String convertToHex(byte* data, int size);
+extern volatile bool enableDuckInterrupt;
+
+volatile bool getDuckInterrupt();
+void setDuckInterrupt(bool interrupt);
 
 
 } // namespace duckutils

@@ -8,7 +8,7 @@
 #else
 #include "WProgram.h"
 #endif
-
+#include <WString.h>
 #include <RadioLib.h>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
@@ -30,17 +30,6 @@
 #include "DuckDisplay.h"
 #include "DuckLed.h"
 #include "DuckLora.h"
-
-/*
-typedef struct
-{
-	String senderId;
-	String topic;
-	String messageId;
-	String payload;
-	String path;
-} Packet;
-*/
 
 class ClusterDuck {
 public:
@@ -81,7 +70,8 @@ public:
 	//-------------------------------------------------------------------------
 	static void setupLoRa(long BAND = CDPCFG_RF_LORA_FREQ,
 			int SS = CDPCFG_PIN_LORA_CS, int RST = CDPCFG_PIN_LORA_RST,
-			int DI0 = CDPCFG_PIN_LORA_DIO0, int DI1 = CDPCFG_PIN_LORA_DIO1, int TxPower = CDPCFG_RF_LORA_TXPOW);
+			int DI0 = CDPCFG_PIN_LORA_DIO0, int DI1 = CDPCFG_PIN_LORA_DIO1,
+			int TxPower = CDPCFG_RF_LORA_TXPOW);
 	static int handlePacket();
 	static String getPacketData(int pSize);
 	static void sendPayloadStandard(
@@ -125,7 +115,9 @@ public:
 
 	// Led
 	//-------------------------------------------------------------------------
-	static void setColor(int ledR = CDPCFG_PIN_RGBLED_R, int ledG = CDPCFG_PIN_RGBLED_G, int ledB = CDPCFG_PIN_RGBLED_B);
+	static void setColor(int ledR = CDPCFG_PIN_RGBLED_R, 
+						 int ledG = CDPCFG_PIN_RGBLED_G,
+						 int ledB = CDPCFG_PIN_RGBLED_B);
 	static void setupLED();
 
 protected:
@@ -156,7 +148,6 @@ private:
 	static String portal;
 
 	static String runTime;
-
 };
 
 class CaptiveRequestHandler: public AsyncWebHandler {

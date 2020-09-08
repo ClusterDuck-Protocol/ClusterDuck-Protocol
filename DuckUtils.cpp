@@ -1,6 +1,13 @@
 #include "DuckUtils.h"
 
 namespace duckutils {
+
+volatile bool enableDuckInterrupt = true;
+
+volatile bool getDuckInterrupt() { return enableDuckInterrupt; }
+void setDuckInterrupt(bool interrupt) { enableDuckInterrupt = interrupt; }
+
+
 String createUuid() {
   String msg = "";
   int i;

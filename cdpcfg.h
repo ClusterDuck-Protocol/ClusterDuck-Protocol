@@ -114,185 +114,197 @@
     // actualy missing
     #define CDPCFG_PIN_LORA_DIO1 -1
 
+/*
+ * BOARD "heltec wireless stick lite"
+ * ARDUIONO BOARD PACKAGE URL:
+ * https://resource.heltec.cn/download/package_heltec_esp32_index.json
+ * DOCS:
+ * http://www.heltec.cn/project/wireless-stick-lite/
+ * pio: board = WIRELESS_STICK_LITE
+ */
+#elif defined(ARDUINO_WIRELESS_STICK_LITE)
+
+#define CDPCFG_PIN_BAT 37
+#define CDPCFG_BAT_MULDIV 320 / 100
+
+#define CDPCFG_PIN_VEXT 21
+
+#define CDPCFG_PIN_LED1 25
+
+// Lora configurations
+#define CDPCFG_PIN_LORA_CS 18
+#define CDPCFG_PIN_LORA_DIO0 26
+#define CDPCFG_PIN_LORA_RST 14
+
+// Oled Display settings
+#define CDPCFG_OLED_NONE
+
+// actualy missing
+#define CDPCFG_PIN_LORA_DIO1 -1
 
 
-  /*
-   * BOARD "sparkfun lora gateway 1-channel"
-   * https://www.sparkfun.com/products/15006
-   * pio: board = sparkfun_lora_gateway_1-channel
-   */
-  #elif defined(SPARKFUN_LGW1C)
-    // this is not an official ARDUINO_* define since this board doesnt have one
+/*
+ * BOARD "sparkfun lora gateway 1-channel"
+ * https://www.sparkfun.com/products/15006
+ * pio: board = sparkfun_lora_gateway_1-channel
+ */
+#elif defined(SPARKFUN_LGW1C)
+// this is not an official ARDUINO_* define since this board doesnt have one
 
-    //Lora configurations
-    #define CDPCFG_PIN_LORA_CS   16
-    #define CDPCFG_PIN_LORA_DIO0 26
-    #define CDPCFG_PIN_LORA_DIO1 33
-    #define CDPCFG_PIN_LORA_DIO2 32
-    #define CDPCFG_PIN_LORA_RST   5
+// Lora configurations
+#define CDPCFG_PIN_LORA_CS 16
+#define CDPCFG_PIN_LORA_DIO0 26
+#define CDPCFG_PIN_LORA_DIO1 33
+#define CDPCFG_PIN_LORA_DIO2 32
+#define CDPCFG_PIN_LORA_RST 5
 
-    // Oled Display settings
-    #define CDPCFG_OLED_NONE
+// Oled Display settings
+#define CDPCFG_OLED_NONE
 
+/*
+ * BOARD "pycom lopy"
+ * https://docs.pycom.io/datasheets/development/lopy/
+ * pio: board = lopy
+ */
+#elif defined(ARDUINO_LoPy)
 
+#define CDPCFG_PIN_ANT 16
 
-  /*
-   * BOARD "pycom lopy"
-   * https://docs.pycom.io/datasheets/development/lopy/
-   * pio: board = lopy
-   */
-  #elif defined(ARDUINO_LoPy)
+// Lora configurations
+#define CDPCFG_PIN_LORA_CS 17
+#define CDPCFG_PIN_LORA_DIO0 23
+#define CDPCFG_PIN_LORA_RST 18
 
-    #define CDPCFG_PIN_ANT 16
+// special SPI
+#define CDPCFG_PIN_LORA_SPI_SCK 5
+#define CDPCFG_PIN_LORA_SPI_MISO 19
+#define CDPCFG_PIN_LORA_SPI_MOSI 27
+#define CDPCFG_LORA_CLASS SX1272
 
-    //Lora configurations
-    #define CDPCFG_PIN_LORA_CS   17
-    #define CDPCFG_PIN_LORA_DIO0 23
-    #define CDPCFG_PIN_LORA_RST  18
+// Oled Display settings
+#define CDPCFG_OLED_NONE
 
-    //special SPI
-    #define CDPCFG_PIN_LORA_SPI_SCK   5
-    #define CDPCFG_PIN_LORA_SPI_MISO 19
-    #define CDPCFG_PIN_LORA_SPI_MOSI 27
-    #define CDPCFG_LORA_CLASS SX1272
+// actualy missing
+#define CDPCFG_PIN_LORA_DIO1 -1
 
-    // Oled Display settings
-    #define CDPCFG_OLED_NONE
+/*
+ * BOARD "pycom lopy4"
+ * https://docs.pycom.io/datasheets/development/lopy4/
+ * pio: board = lopy4
+ */
+#elif defined(ARDUINO_LoPy4)
 
-    // actualy missing
-    #define CDPCFG_PIN_LORA_DIO1 -1
+#define CDPCFG_PIN_ANT 16
 
+// Lora configurations
+#define CDPCFG_PIN_LORA_CS 18
+#define CDPCFG_PIN_LORA_DIO0 23
+#define CDPCFG_PIN_LORA_RST -1
 
+// special SPI
+#define CDPCFG_PIN_LORA_SPI_SCK 5
+#define CDPCFG_PIN_LORA_SPI_MISO 19
+#define CDPCFG_PIN_LORA_SPI_MOSI 27
+#define CDPCFG_LORA_CLASS SX1276
 
-  /*
-   * BOARD "pycom lopy4"
-   * https://docs.pycom.io/datasheets/development/lopy4/
-   * pio: board = lopy4
-   */
-  #elif defined(ARDUINO_LoPy4)
+// Oled Display settings
+#define CDPCFG_OLED_NONE
 
-    #define CDPCFG_PIN_ANT 16
+// actualy missing
+#define CDPCFG_PIN_LORA_DIO1 -1
 
-    //Lora configurations
-    #define CDPCFG_PIN_LORA_CS   18
-    #define CDPCFG_PIN_LORA_DIO0 23
-    #define CDPCFG_PIN_LORA_RST  -1
+#else
 
-    //special SPI
-    #define CDPCFG_PIN_LORA_SPI_SCK   5
-    #define CDPCFG_PIN_LORA_SPI_MISO 19
-    #define CDPCFG_PIN_LORA_SPI_MOSI 27
-    #define CDPCFG_LORA_CLASS SX1276
+#if !defined(ARDUINO_HELTEC_WIFI_LORA_32_V2)
+#warning "NO BOARD DEFINED, DEFAULTING TO HELTEC v2"
+#define CDPCFG_BOARD_DEFAULT
+#endif
 
-    // Oled Display settings
-    #define CDPCFG_OLED_NONE
+/*
+ * BOARD "heltec lora v2"
+ * https://heltec.org/project/wifi-lora-32/
+ * pio: board = heltec_wifi_lora_32_V2
+ */
 
-    // actualy missing
-    #define CDPCFG_PIN_LORA_DIO1 -1
+#define CDPCFG_PIN_BAT 37
+#define CDPCFG_BAT_MULDIV 320 / 100
 
+#define CDPCFG_PIN_VEXT 21
 
+#define CDPCFG_PIN_LED1 25
 
-  #else
+// Lora configurations
+#define CDPCFG_PIN_LORA_CS 18
+#define CDPCFG_PIN_LORA_DIO0 26
+#define CDPCFG_PIN_LORA_RST 14
 
-  #if !defined(ARDUINO_HELTEC_WIFI_LORA_32_V2)
-    #warning "NO BOARD DEFINED, DEFAULTING TO HELTEC v2"
-    #define CDPCFG_BOARD_DEFAULT
-  #endif
+// Oled Display settings
+#define CDPCFG_PIN_OLED_CLOCK 15
+#define CDPCFG_PIN_OLED_DATA 4
+#define CDPCFG_PIN_OLED_RESET 16
 
-  /*
-   * BOARD "heltec lora v2"
-   * https://heltec.org/project/wifi-lora-32/
-   * pio: board = heltec_wifi_lora_32_V2
-   */
+// actualy missing
+#define CDPCFG_PIN_LORA_DIO1 -1
 
+#endif
 
-    #define CDPCFG_PIN_BAT  37
-    #define CDPCFG_BAT_MULDIV 320/100
+// non BOARD-specific config
 
-    #define CDPCFG_PIN_VEXT 21
+// Username and Password for OTA web page
+#define CDPCFG_UPDATE_USERNAME "username"
+#define CDPCFG_UPDATE_PASSWORD "password"
 
-    #define CDPCFG_PIN_LED1 25
+// Serial Console Baud Rate
+#define CDPCFG_SERIAL_BAUD 115200
 
-    //Lora configurations
-    #define CDPCFG_PIN_LORA_CS   18
-    #define CDPCFG_PIN_LORA_DIO0 26
-    #define CDPCFG_PIN_LORA_RST  14
+// Access point IP adress
+#define CDPCFG_AP_IP1 192
+#define CDPCFG_AP_IP2 168
+#define CDPCFG_AP_IP3 1
+#define CDPCFG_AP_IP4 1
 
-    // Oled Display settings
-    #define CDPCFG_PIN_OLED_CLOCK 15
-    #define CDPCFG_PIN_OLED_DATA   4
-    #define CDPCFG_PIN_OLED_RESET 16
+// Asyncwebserver Port
+#define CDPCFG_WEB_PORT 80
 
-    // actualy missing
-    #define CDPCFG_PIN_LORA_DIO1 -1
+// Lora RF configuration
+#define CDPCFG_RF_LORA_FREQ 915.0
+#define CDPCFG_RF_LORA_BW 125.0
+#define CDPCFG_RF_LORA_SF 7
+#define CDPCFG_RF_LORA_TXPOW 20
+#define CDPCFG_RF_LORA_GAIN 0
 
-  #endif
+// cdp configuration
+#define CDPCFG_CDP_BUFSIZE 256
+#define CDPCFG_UUID_LEN 8
 
+// Timer in milliseconds
+#define CDPCFG_MILLIS_ALIVE 1800000
+#define CDPCFG_MILLIS_REBOOT 43200000
 
+// RGB Led Pins
+#define CDPCFG_PIN_RGBLED_R 25
+#define CDPCFG_PIN_RGBLED_G 4
+#define CDPCFG_PIN_RGBLED_B 2
 
-  // non BOARD-specific config
+// semiautomatic section for setting defaults
 
-  // Username and Password for OTA web page
-  #define CDPCFG_UPDATE_USERNAME "username"
-  #define CDPCFG_UPDATE_PASSWORD "password"
+// set default modem
+#ifndef CDPCFG_LORA_CLASS
+#define CDPCFG_LORA_CLASS SX1276
+#endif
 
-
-  // Serial Console Baud Rate
-  #define CDPCFG_SERIAL_BAUD 115200
-
-
-  // Access point IP adress
-  #define CDPCFG_AP_IP1 192
-  #define CDPCFG_AP_IP2 168
-  #define CDPCFG_AP_IP3 1
-  #define CDPCFG_AP_IP4 1
-
-
-  // Asyncwebserver Port
-  #define CDPCFG_WEB_PORT 80
-
-  // Lora RF configuration
-  #define CDPCFG_RF_LORA_FREQ  915.0
-  #define CDPCFG_RF_LORA_BW    125.0
-  #define CDPCFG_RF_LORA_SF      7
-  #define CDPCFG_RF_LORA_TXPOW  20
-  #define CDPCFG_RF_LORA_GAIN    0
-
-  // cdp configuration
-  #define CDPCFG_CDP_BUFSIZE 256
-  #define CDPCFG_UUID_LEN 8
-
-  // Timer in milliseconds
-  #define CDPCFG_MILLIS_ALIVE   1800000
-  #define CDPCFG_MILLIS_REBOOT 43200000
-
-
-  // RGB Led Pins
-  #define CDPCFG_PIN_RGBLED_R 25
-  #define CDPCFG_PIN_RGBLED_G  4
-  #define CDPCFG_PIN_RGBLED_B  2
-
-
-
-  // semiautomatic section for setting defaults
-
-  // set default modem
-  #ifndef CDPCFG_LORA_CLASS
-    #define CDPCFG_LORA_CLASS SX1276
-  #endif
-
-  // set oled class
-  #ifndef CDPCFG_OLED_CLASS
-    #if defined(CDPCFG_OLED_NONE)
-       // do nothing
-    #elif defined(CDPCFG_OLED_64x32)
-       // smaller displays
-       #define CDPCFG_OLED_CLASS U8X8_SSD1306_64X32_NONAME_SW_I2C
-    #else
-       // classic default
-       #define CDPCFG_OLED_CLASS U8X8_SSD1306_128X64_NONAME_SW_I2C
-    #endif
-  #endif
+// set oled class
+#ifndef CDPCFG_OLED_CLASS
+#if defined(CDPCFG_OLED_NONE)
+// do nothing
+#elif defined(CDPCFG_OLED_64x32)
+// smaller displays
+#define CDPCFG_OLED_CLASS U8X8_SSD1306_64X32_NONAME_SW_I2C
+#else
+// classic default
+#define CDPCFG_OLED_CLASS U8X8_SSD1306_128X64_NONAME_SW_I2C
+#endif
+#endif
 
 #endif // CDPCFG
 
