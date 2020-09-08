@@ -66,7 +66,7 @@ void loop() {
       String msg = duck.getPacketData(pSize); 
 
       //Get _lastPacket data
-      Packet lastPacket = duck.getPacketData(); 
+      Packet lastPacket = duck.getLastPacket(); 
 
       //Check if device ID is in path
       if(msg != "ping" && !duck.idInPath(lastPacket.path)) { 
