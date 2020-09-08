@@ -13,9 +13,6 @@ CDPCFG_LORA_CLASS lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO0,
                                     CDPCFG_PIN_LORA_RST, CDPCFG_PIN_LORA_DIO1);
 #endif
 
-extern volatile bool getDuckInterrupt();
-extern void setDuckInterrupt(bool interrupt);
-
 int DuckLora::setupLoRa(LoraConfigParams config, String deviceId) {
 #ifdef CDPCFG_PIN_LORA_SPI_SCK
   log_n("_spi.begin(CDPCFG_PIN_LORA_SPI_SCK, CDPCFG_PIN_LORA_SPI_MISO, "
@@ -94,24 +91,16 @@ void DuckLora::resetTransmissionBuffer() {
 int DuckLora::handlePacket() {
   int pSize = 0;
   int err = 0;
-  
   pSize = lora.getPacketLength();
   // we get our packet buffer ready to be populated if packet data is present
   resetTransmissionBuffer();
   err = lora.readData(_transmission, pSize);
-
   if (err != ERR_NONE) {
     Serial.print("[DuckLora] handlePacket failed, code ");
     Serial.println(err);
     return DUCKLORA_ERR_HANDLE_PACKET;
   }
-
-  Serial.print("[DuckLora] handlePacket pSize ");
-  Serial.println(pSize);
-
   Serial.print("[DuckLora] RCV");
-  Serial.print(" millis:");
-  Serial.print(millis());
   Serial.print(" rssi:");
   Serial.print(lora.getRSSI());
   Serial.print(" snr:");
@@ -119,8 +108,8 @@ int DuckLora::handlePacket() {
   Serial.print(" fe:");
   Serial.print(lora.getFrequencyError());
   Serial.print(" size:");
-  Serial.print(pSize);
-  Serial.print(" data:");
+  Serial.println(pSize);
+  Serial.print("[DuckLora] DATA:");
   Serial.println(duckutils::convertToHex(_transmission, pSize));
 
   return pSize;
@@ -167,13 +156,13 @@ String DuckLora::getPacketData(int pSize) {
 
       } else if (pth) {
         _lastPacket.path = msg;
-        Serial.println("DuckLora] getPacketData Path: " + _lastPacket.path);
+        Serial.println("[DuckLora] getPacketData Path: " + _lastPacket.path);
         msg = "";
         pth = false;
 
       } else if (tpc) {
         _lastPacket.topic = msg;
-        Serial.println("DuckLora] getPacketData Path: " + _lastPacket.topic);
+        Serial.println("[DuckLora] getPacketData Path: " + _lastPacket.topic);
         msg = "";
         tpc = false;
       }
@@ -181,27 +170,27 @@ String DuckLora::getPacketData(int pSize) {
     if (_transmission[i] == senderId_B) {
       sId = true;
       len = _transmission[i + 1];
-      Serial.println("DuckLora] getPacketData senderId_B Len = " + String(len));
+      Serial.println("[DuckLora] getPacketData senderId_B Len = " + String(len));
 
     } else if (_transmission[i] == messageId_B) {
       mId = true;
       len = _transmission[i + 1];
-      Serial.println("DuckLora] getPacketData messageId_B Len = " + String(len));
+      Serial.println("[DuckLora] getPacketData messageId_B Len = " + String(len));
 
     } else if (_transmission[i] == payload_B) {
       pLoad = true;
       len = _transmission[i + 1];
-      Serial.println("DuckLora] getPacketData payload_B Len = " + String(len));
+      Serial.println("[DuckLora] getPacketData payload_B Len = " + String(len));
 
     } else if (_transmission[i] == path_B) {
       pth = true;
       len = _transmission[i + 1];
-      Serial.println("DuckLora] getPacketData path_B Len = " + String(len));
+      Serial.println("[DuckLora] getPacketData path_B Len = " + String(len));
 
     } else if (_transmission[i] == topic_B) {
       tpc = true;
       len = _transmission[i + 1];
-      Serial.println("DuckLora] getPacketData topic_B Len = " + String(len));
+      Serial.println("[DuckLora] getPacketData topic_B Len = " + String(len));
 
     } else if (_transmission[i] == ping_B) {
       if (_deviceId != "Det") {
@@ -209,7 +198,7 @@ String DuckLora::getPacketData(int pSize) {
         _packetIndex = 0;
         couple(iamhere_B, "1");
         startTransmit();
-        Serial.println("DuckLora] getPacketData pong sent");
+        Serial.println("[DuckLora] getPacketData pong sent");
         packetData = "ping";
         return packetData;
       }
@@ -218,7 +207,7 @@ String DuckLora::getPacketData(int pSize) {
       packetData = "ping";
 
     } else if (_transmission[i] == iamhere_B) {
-      Serial.println("DuckLora] getPacketData pong received");
+      Serial.println("[DuckLora] getPacketData pong received");
       memset(_transmission, 0x00, CDPCFG_CDP_BUFSIZE);
       _packetIndex = 0;
       packetData = "pong";
@@ -237,26 +226,26 @@ String DuckLora::getPacketData(int pSize) {
   if (len == 0) {
     if (sId) {
       _lastPacket.senderId = msg;
-      Serial.println("DuckLora] getPacketData len0 User ID: " + _lastPacket.senderId);
+      Serial.println("[DuckLora] getPacketData len0 User ID: " + _lastPacket.senderId);
       msg = "";
 
     } else if (mId) {
       _lastPacket.messageId = msg;
-      Serial.println("DuckLora] getPacketData len0 Message ID: " + _lastPacket.messageId);
+      Serial.println("[DuckLora] getPacketData len0 Message ID: " + _lastPacket.messageId);
       msg = "";
 
     } else if (pLoad) {
       _lastPacket.payload = msg;
-      Serial.println("DuckLora] getPacketData len0 Message: " + _lastPacket.payload);
+      Serial.println("[DuckLora] getPacketData len0 Message: " + _lastPacket.payload);
       msg = "";
 
     } else if (pth) {
       _lastPacket.path = msg;
-      Serial.println("DuckLora] getPacketData len0 Path: " + _lastPacket.path);
+      Serial.println("[DuckLora] getPacketData len0 Path: " + _lastPacket.path);
       msg = "";
     } else if (tpc) {
       _lastPacket.topic = msg;
-      Serial.println("DuckLora] getPacketData len0 Topic: " + _lastPacket.topic);
+      Serial.println("[DuckLora] getPacketData len0 Topic: " + _lastPacket.topic);
       msg = "";
     }
   }
@@ -355,8 +344,8 @@ int DuckLora::startReceive() {
 }
 
 int DuckLora::startTransmit() {
-  bool oldEI = getDuckInterrupt();
-  setDuckInterrupt(false);
+  bool oldEI = duckutils::getDuckInterrupt();
+  duckutils::setDuckInterrupt(false);
   long t1 = millis();
 
   // dump send packet stats+data
@@ -385,7 +374,7 @@ int DuckLora::startTransmit() {
   // NOTE: Do we need to exit here if transmit failed?
 
   if (oldEI) {
-    setDuckInterrupt(true);
+    duckutils::setDuckInterrupt(true);
     err = startReceive();
   }
 

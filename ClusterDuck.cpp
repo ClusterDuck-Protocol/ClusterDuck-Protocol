@@ -2,19 +2,6 @@
 #include "DuckUtils.h"
 #include "DuckEsp.h"
 
-volatile bool enableDuckInterrupt;
-
-volatile bool getDuckInterrupt() { return enableDuckInterrupt; }
-void setDuckInterrupt(bool interrupt) { enableDuckInterrupt = interrupt; }
-
-void flipInterrupt() {
-  if (enableDuckInterrupt == true) {
-    enableDuckInterrupt = false;
-  } else {
-    enableDuckInterrupt = true;
-  }
-}
-
 IPAddress apIP(CDPCFG_AP_IP1, CDPCFG_AP_IP2, CDPCFG_AP_IP3, CDPCFG_AP_IP4);
 AsyncWebServer webServer(CDPCFG_WEB_PORT);
 
@@ -35,13 +22,13 @@ size_t content_len;
 const char* http_username = CDPCFG_UPDATE_USERNAME;
 const char* http_password = CDPCFG_UPDATE_PASSWORD;
 
-ClusterDuck::ClusterDuck() { setDuckInterrupt(true); }
+ClusterDuck::ClusterDuck() { duckutils::setDuckInterrupt(true); }
 
 void ClusterDuck::setDeviceId(String deviceId) { _deviceId = deviceId; }
 
 void ClusterDuck::begin(int baudRate) {
   Serial.begin(baudRate);
-  Serial.print("Serial start ");
+  Serial.print("[CD] Serial start ");
   Serial.println(baudRate, DEC);
 }
 
@@ -105,18 +92,18 @@ void ClusterDuck::setupLoRa(long BAND, int SS, int RST, int DI0, int DI1,
 
   if (err == DUCKLORA_ERR_BEGIN) {
     _duckDisplay.drawString(true, 0, 0, "Starting LoRa failed!");
-    Serial.print("[Duck] Starting LoRa Failed!!!");
+    Serial.print("[CD] Starting LoRa Failed!!!");
     Serial.println(err);
     duckesp::restartDuck();
   }
   if (err == DUCKLORA_ERR_SETUP) {
-    Serial.print("[Duck] Failed to setup Lora. err = ");
+    Serial.print("[CD] Failed to setup Lora. err = ");
     Serial.println(err);
     while (true)
       ;
   }
   if (err == DUCKLORA_ERR_RECEIVE) {
-    Serial.print("[Duck] Failed to start receive. err = ");
+    Serial.print("[CD] Failed to start receive. err = ");
     Serial.println(err);
     duckesp::restartDuck();
   }
@@ -127,10 +114,12 @@ volatile bool receivedFlag = false;
 
 void ClusterDuck::setFlag(void) {
   // check if the interrupt is enabled
-  if (!getDuckInterrupt()) {
+  if (!duckutils::getDuckInterrupt()) {
     return;
   }
-  // we got a packet, set the flag
+  //TODO: replace with logger  
+  //Serial.println("[ClusterDuck] setFlag() packet received true");
+
   receivedFlag = true;
 }
 // =====================================
@@ -341,7 +330,7 @@ void ClusterDuck::setupInternet(String SSID, String PASSWORD) {
   ssid = SSID;
   password = PASSWORD;
   Serial.println();
-  Serial.print("Connecting to ");
+  Serial.print("[CD] Connecting to ");
   Serial.print(SSID);
 
   if (SSID != "" && PASSWORD != "" && ssidAvailable(ssid)) {
@@ -356,7 +345,7 @@ void ClusterDuck::setupInternet(String SSID, String PASSWORD) {
 
     // Connected to Access Point
     Serial.println("");
-    Serial.println("DUCK CONNECTED TO INTERNET");
+    Serial.println("[CD] DUCK CONNECTED TO INTERNET");
   }
 }
 
@@ -365,11 +354,13 @@ bool ClusterDuck::ssidAvailable(
   int n = WiFi.scanNetworks();
   Serial.println("scan done");
   if (n == 0 || ssid == "") {
-    Serial.print(n);
-    Serial.println(" networks found");
+    Serial.print("[CD] networks found: ");
+    Serial.println(n);
+
   } else {
-    Serial.print(n);
-    Serial.println(" networks found");
+    Serial.print("[CD] networks found: ");
+    Serial.println(n);
+
     if (val == "") {
       val = ssid;
     }
@@ -452,9 +443,9 @@ int ClusterDuck::runDetect() {
   int val = 0;
   if (receivedFlag) { // If LoRa packet received
     receivedFlag = false;
-    setDuckInterrupt(false);
+    duckutils::setDuckInterrupt(false);
     int pSize = handlePacket();
-    Serial.print("runDetect pSize ");
+    Serial.print("Duck] runDetect pSize ");
     Serial.println(pSize);
     if (pSize > 0) {
       for (int i = 0; i < pSize; i++) {
@@ -464,8 +455,8 @@ int ClusterDuck::runDetect() {
         }
       }
     }
-    setDuckInterrupt(true);
-    Serial.println("runDetect startReceive");
+    duckutils::setDuckInterrupt(true);
+    Serial.println("Duck] runDetect startReceive");
     startReceive();
   }
   return val;
@@ -489,13 +480,17 @@ void ClusterDuck::setupMamaDuck() {
 
 void ClusterDuck::runMamaDuck() {
   ArduinoOTA.handle();
-  if (getDuckInterrupt()) {
+  if (duckutils::getDuckInterrupt()) {
     tymer.tick();
   }
 
-  if (receivedFlag) { // If LoRa packet received
+  // Mama ducks can also receive packets from other ducks
+  // Here we check whether a packet needs to be relayed or not
+  // For safe processing of the received packet we make sure
+  // to disable interrupts, before handling the received packet.
+  if (receivedFlag) { 
     receivedFlag = false;
-    setDuckInterrupt(false);
+    duckutils::setDuckInterrupt(false);
     int pSize = _duckLora.handlePacket();
     Serial.print("[Duck] runMamaDuck rcv packet: pSize ");
     Serial.println(pSize);
@@ -510,10 +505,10 @@ void ClusterDuck::runMamaDuck() {
         _duckLora.resetTransmissionBuffer();
       }
     } else {
-      // Serial.println("Byte code not recognized!");
+      // discard any unrecognized packets
       _duckLora.resetTransmissionBuffer();
     }
-    setDuckInterrupt(true);
+    duckutils::setDuckInterrupt(true);
     Serial.println("runMamaDuck startReceive");
     startReceive();
   }
@@ -522,14 +517,15 @@ void ClusterDuck::runMamaDuck() {
 }
 
 int ClusterDuck::handlePacket() {
- return _duckLora.handlePacket();
+  Serial.println("[CD] handling LoRa packet");
+  return _duckLora.handlePacket();
 }
 
 void ClusterDuck::sendPayloadStandard(String msg, String topic, String senderId,
                                       String messageId, String path) {
   int err = _duckLora.sendPayloadStandard(msg, topic, senderId, messageId, path );
   if (err != DUCKLORA_ERR_NONE) {
-    Serial.print("[ClusterDuck] Oops! Something went wrong, err = ");
+    Serial.print("[CD] Oops! Something went wrong, err = ");
     Serial.println(err);
   }
 }
@@ -539,7 +535,7 @@ void ClusterDuck::couple(byte byteCode, String outgoing) {
 }
 
 bool ClusterDuck::idInPath(String path) {
-  Serial.print("idInPath '");
+  Serial.print("[CD] idInPath '");
   Serial.print(path);
   Serial.print("' ");
   String temp = "";
@@ -580,7 +576,7 @@ bool ClusterDuck::reboot(void*) {
 
 bool ClusterDuck::imAlive(void*) {
   String alive = "Health Quack";
-  Serial.print("imAlive sending");
+  Serial.print("[CD] imAlive sending");
   _duckLora.sendPayloadStandard(alive, "health");
 
   return true;
@@ -608,7 +604,7 @@ volatile bool ClusterDuck::getFlag() {
 }
 
 volatile bool ClusterDuck::getInterrupt() {
-  return getDuckInterrupt();
+  return duckutils::getDuckInterrupt();
 }
 
 int ClusterDuck::getRSSI() { return _duckLora.getRSSI(); }
@@ -630,8 +626,8 @@ void ClusterDuck::flipFlag() {
   }
 }
 
-void ClusterDuck::flipInterrupt() { 
-  flipInterrupt();
+void ClusterDuck::flipInterrupt() {
+  duckutils::setDuckInterrupt(!duckutils::getDuckInterrupt());
 }
 
 void ClusterDuck::startReceive() {
@@ -646,7 +642,7 @@ void ClusterDuck::startReceive() {
 void ClusterDuck::startTransmit() {
   int err = _duckLora.startTransmit();
   if (err != DUCKLORA_ERR_NONE) {
-    Serial.print("[ClusterDuck] Oops! Lora transmission failed, err = ");
+    Serial.print("[CD] Oops! Lora transmission failed, err = ");
     Serial.print(err);
   }
 }
@@ -654,7 +650,7 @@ void ClusterDuck::startTransmit() {
 void ClusterDuck::ping() {
   int err = _duckLora.ping();
   if (err != DUCKLORA_ERR_NONE) {
-    Serial.print("[ClusterDuck] Oops! Lora ping failed, err = ");
+    Serial.print("[CD] Oops! Lora ping failed, err = ");
     Serial.print(err);
   }
 }
