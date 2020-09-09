@@ -42,8 +42,8 @@ public:
   int handlePacket();
   String getPacketData(int pSize);
   int sendPayloadStandard(String msg = "", String topic = "",
-                                  String senderId = "", String messageId = "",
-                                  String path = "");
+                          String senderId = "", String messageId = "",
+                          String path = "");
   Packet getLastPacket();
   void couple(byte byteCode, String outgoing);
   bool idInPath(String path);
@@ -53,9 +53,9 @@ public:
   int startTransmit();
   int getRSSI();
   void resetPacketIndex() { _packetIndex = 0; }
-  int getPacketIndex() {return _packetIndex;}
-  byte* getTransmissionBuffer() {return _transmission;}
-  byte getTransmitedByte(int index) {return _transmission[index];}
+  int getPacketIndex() { return _packetIndex; }
+  byte* getTransmissionBuffer() { return _transmission; }
+  byte getTransmitedByte(int index) { return _transmission[index]; }
   int ping();
   int standBy();
   void resetTransmissionBuffer();

@@ -49,7 +49,6 @@ public:
   void flipFlag();
   void flipInterrupt();
   void ping();
-  
 
   // Duck Link
   //-------------------------------------------------------------------------

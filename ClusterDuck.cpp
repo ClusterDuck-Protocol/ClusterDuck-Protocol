@@ -1,10 +1,7 @@
 #include "ClusterDuck.h"
 #include "DuckEsp.h"
 
-
-ClusterDuck::ClusterDuck() {
-   duckutils::setDuckInterrupt(true);
-  }
+ClusterDuck::ClusterDuck() { duckutils::setDuckInterrupt(true); }
 
 void ClusterDuck::begin(int baudRate) {
   Serial.begin(baudRate);
@@ -16,7 +13,6 @@ void ClusterDuck::setDeviceId(String deviceId) {
   _deviceId = deviceId;
   _duckNet->setDeviceId(_deviceId);
 }
-
 
 void ClusterDuck::setupDisplay(String deviceType) {
 
@@ -131,18 +127,13 @@ void handleFirmwareUpload(AsyncWebServerRequest* request, String filename,
   }
 }
 
-
 void ClusterDuck::setupWebServer(bool createCaptivePortal) {
   _duckNet->setupWebServer(createCaptivePortal);
 }
 
-void ClusterDuck::setupWifiAp(const char* AP) {
-  _duckNet->setupWifiAp(AP);
-}
+void ClusterDuck::setupWifiAp(const char* AP) { _duckNet->setupWifiAp(AP); }
 
-void ClusterDuck::setupDns() {
-  _duckNet->setupDns();
-}
+void ClusterDuck::setupDns() { _duckNet->setupDns(); }
 
 void ClusterDuck::setupInternet(String SSID, String PASSWORD) {
   _duckNet->setupInternet(SSID, PASSWORD);
@@ -240,9 +231,9 @@ int ClusterDuck::runDetect() {
   return val;
 }
 
-void ClusterDuck::processPortalRequest() { 
-  _duckNet->getDnsServer().processNextRequest();  
-  }
+void ClusterDuck::processPortalRequest() {
+  _duckNet->getDnsServer().processNextRequest();
+}
 
 void ClusterDuck::setupMamaDuck() {
   setupDisplay("Mama");
@@ -268,7 +259,7 @@ void ClusterDuck::runMamaDuck() {
   // Here we check whether a packet needs to be relayed or not
   // For safe processing of the received packet we make sure
   // to disable interrupts, before handling the received packet.
-  if (receivedFlag) { 
+  if (receivedFlag) {
     receivedFlag = false;
     duckutils::setDuckInterrupt(false);
     int pSize = _duckLora->handlePacket();
@@ -280,8 +271,8 @@ void ClusterDuck::runMamaDuck() {
       if (msg != "ping" && !idInPath(_lastPacket.path)) {
         Serial.println("[Duck] runMamaDuck relay packet");
         _duckLora->sendPayloadStandard(_lastPacket.payload, _lastPacket.topic,
-                                      _lastPacket.senderId,
-                                      _lastPacket.messageId, _lastPacket.path);
+                                       _lastPacket.senderId,
+                                       _lastPacket.messageId, _lastPacket.path);
         _duckLora->resetTransmissionBuffer();
       }
     } else {
@@ -303,7 +294,8 @@ int ClusterDuck::handlePacket() {
 
 void ClusterDuck::sendPayloadStandard(String msg, String topic, String senderId,
                                       String messageId, String path) {
-  int err = _duckLora->sendPayloadStandard(msg, topic, senderId, messageId, path );
+  int err =
+      _duckLora->sendPayloadStandard(msg, topic, senderId, messageId, path);
   if (err != DUCKLORA_ERR_NONE) {
     Serial.print("[ClusterDuck] Oops! Something went wrong, err = ");
     Serial.println(err);
@@ -342,8 +334,6 @@ String ClusterDuck::getPacketData(int pSize) {
   return _duckLora->getPacketData(pSize);
 }
 
-
-
 // Timer reboot
 bool ClusterDuck::reboot(void*) {
   String reboot = "REBOOT";
@@ -368,44 +358,28 @@ String ClusterDuck::duckMac(boolean format) {
 }
 
 // Create a uuid
-String ClusterDuck::uuidCreator() {
-  return duckutils::createUuid();
-}
+String ClusterDuck::uuidCreator() { return duckutils::createUuid(); }
 
 // Getters
 String ClusterDuck::getDeviceId() { return _deviceId; }
 
-Packet ClusterDuck::getLastPacket() {
-  return _duckLora->getLastPacket();
-}
+Packet ClusterDuck::getLastPacket() { return _duckLora->getLastPacket(); }
 
-volatile bool ClusterDuck::getFlag() { 
-  return receivedFlag; 
-}
+volatile bool ClusterDuck::getFlag() { return receivedFlag; }
 
 volatile bool ClusterDuck::getInterrupt() {
   return duckutils::getDuckInterrupt();
 }
 
-int ClusterDuck::getRSSI() { 
-  return _duckLora->getRSSI(); 
-}
+int ClusterDuck::getRSSI() { return _duckLora->getRSSI(); }
 
-String ClusterDuck::getSSID() {
-  return _duckNet->getSsid();
-}
+String ClusterDuck::getSSID() { return _duckNet->getSsid(); }
 
-String ClusterDuck::getPassword() {
-  return _duckNet->getPassword();
-}
+String ClusterDuck::getPassword() { return _duckNet->getPassword(); }
 
-void ClusterDuck::setSSID(String val) {
-  _duckNet->setSsid(val);
-}
+void ClusterDuck::setSSID(String val) { _duckNet->setSsid(val); }
 
-void ClusterDuck::setPassword(String val) {
-  _duckNet->setPassword(val);
-}
+void ClusterDuck::setPassword(String val) { _duckNet->setPassword(val); }
 
 void ClusterDuck::flipFlag() {
   if (receivedFlag == true) {

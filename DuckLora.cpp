@@ -15,8 +15,7 @@ CDPCFG_LORA_CLASS lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO0,
 
 DuckLora* DuckLora::instance = NULL;
 
-DuckLora::DuckLora() {
-}
+DuckLora::DuckLora() {}
 
 DuckLora* DuckLora::getInstance() {
   return (instance == NULL) ? new DuckLora : instance;
@@ -147,19 +146,22 @@ String DuckLora::getPacketData(int pSize) {
       gotLen = false;
       if (sId) {
         _lastPacket.senderId = msg;
-        Serial.println("[DuckLora] getPacketData Sender ID: " + _lastPacket.senderId);
+        Serial.println("[DuckLora] getPacketData Sender ID: " +
+                       _lastPacket.senderId);
         msg = "";
         sId = false;
 
       } else if (mId) {
         _lastPacket.messageId = msg;
-        Serial.println("[DuckLora] getPacketData Message ID: " + _lastPacket.messageId);
+        Serial.println("[DuckLora] getPacketData Message ID: " +
+                       _lastPacket.messageId);
         msg = "";
         mId = false;
 
       } else if (pLoad) {
         _lastPacket.payload = msg;
-        Serial.println("[DuckLora] getPacketData Message: " + _lastPacket.payload);
+        Serial.println("[DuckLora] getPacketData Message: " +
+                       _lastPacket.payload);
         msg = "";
         pLoad = false;
 
@@ -179,12 +181,14 @@ String DuckLora::getPacketData(int pSize) {
     if (_transmission[i] == senderId_B) {
       sId = true;
       len = _transmission[i + 1];
-      Serial.println("[DuckLora] getPacketData senderId_B Len = " + String(len));
+      Serial.println("[DuckLora] getPacketData senderId_B Len = " +
+                     String(len));
 
     } else if (_transmission[i] == messageId_B) {
       mId = true;
       len = _transmission[i + 1];
-      Serial.println("[DuckLora] getPacketData messageId_B Len = " + String(len));
+      Serial.println("[DuckLora] getPacketData messageId_B Len = " +
+                     String(len));
 
     } else if (_transmission[i] == payload_B) {
       pLoad = true;
@@ -232,17 +236,20 @@ String DuckLora::getPacketData(int pSize) {
   if (len == 0) {
     if (sId) {
       _lastPacket.senderId = msg;
-      Serial.println("[DuckLora] getPacketData len0 Sender ID: " + _lastPacket.senderId);
+      Serial.println("[DuckLora] getPacketData len0 Sender ID: " +
+                     _lastPacket.senderId);
       msg = "";
 
     } else if (mId) {
       _lastPacket.messageId = msg;
-      Serial.println("[DuckLora] getPacketData len0 Message ID: " + _lastPacket.messageId);
+      Serial.println("[DuckLora] getPacketData len0 Message ID: " +
+                     _lastPacket.messageId);
       msg = "";
 
     } else if (pLoad) {
       _lastPacket.payload = msg;
-      Serial.println("[DuckLora] getPacketData len0 Message: " + _lastPacket.payload);
+      Serial.println("[DuckLora] getPacketData len0 Message: " +
+                     _lastPacket.payload);
       msg = "";
 
     } else if (pth) {
@@ -251,7 +258,8 @@ String DuckLora::getPacketData(int pSize) {
       msg = "";
     } else if (tpc) {
       _lastPacket.topic = msg;
-      Serial.println("[DuckLora] getPacketData len0 Topic: " + _lastPacket.topic);
+      Serial.println("[DuckLora] getPacketData len0 Topic: " +
+                     _lastPacket.topic);
       msg = "";
     }
   }
@@ -280,10 +288,11 @@ int DuckLora::sendPayloadStandard(String msg, String topic, String senderId,
 
   String total = senderId + messageId + path + msg + topic;
   if (total.length() + 5 > CDPCFG_CDP_BUFSIZE) {
-    Serial.println("[DuckLora] Warning: message ["+ topic + "] is too large!"); // TODO: do something
+    Serial.println("[DuckLora] Warning: message [" + topic +
+                   "] is too large!"); // TODO: do something
     return DUCKLORA_ERR_HANDLE_PACKET;
   }
-  
+
   Serial.print("[DuckLora] sending");
   Serial.print(" SENDER_ID:");
   Serial.print(senderId);
@@ -362,7 +371,7 @@ int DuckLora::startTransmit() {
   Serial.println(duckutils::convertToHex(_transmission, _packetIndex));
 
   int err = lora.transmit(_transmission, _packetIndex);
-   
+
   if (err == ERR_NONE) {
     Serial.print("[DuckLora] startTransmit Packet sent in: ");
     Serial.print((millis() - t1));

@@ -15,8 +15,8 @@
 
 #include "DuckEsp.h"
 #include "DuckLora.h"
-#include "OTAPage.h"
 #include "DuckUtils.h"
+#include "OTAPage.h"
 
 #define AP_SCAN_INTERVAL_MS 10
 
@@ -34,11 +34,9 @@ public:
   String getSsid();
   String getPassword();
   void setDeviceId(String deviceId);
-  DNSServer getDnsServer() {
-      return dnsServer;
-  }
-private:
+  DNSServer getDnsServer() { return dnsServer; }
 
+private:
   DuckNet();
   DuckNet(DuckNet const&) = delete;
   DuckNet& operator=(DuckNet const&) = delete;

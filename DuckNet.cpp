@@ -1,6 +1,5 @@
 #include "DuckNet.h"
 
-
 IPAddress apIP(CDPCFG_AP_IP1, CDPCFG_AP_IP2, CDPCFG_AP_IP3, CDPCFG_AP_IP4);
 AsyncWebServer webServer(CDPCFG_WEB_PORT);
 DNSServer DuckNet::dnsServer;
@@ -18,16 +17,12 @@ size_t content_len;
 
 DuckNet* DuckNet::instance = NULL;
 
-DuckNet::DuckNet() {
-  _duckLora = DuckLora::getInstance();
-}
+DuckNet::DuckNet() { _duckLora = DuckLora::getInstance(); }
 DuckNet* DuckNet::getInstance() {
   return (instance == NULL) ? new DuckNet : instance;
 }
 
-void DuckNet::setDeviceId(String deviceId) {
-    this->_deviceId = deviceId ;
-}
+void DuckNet::setDeviceId(String deviceId) { this->_deviceId = deviceId; }
 
 void DuckNet::setupWebServer(bool createCaptivePortal) {
   Serial.println("[DuckNet] Setting up Web Server");
@@ -254,6 +249,6 @@ void DuckNet::setSsid(String val) { ssid = val; }
 
 void DuckNet::setPassword(String val) { password = val; }
 
-String DuckNet::getSsid() { return ssid;}
+String DuckNet::getSsid() { return ssid; }
 
-String DuckNet::getPassword() { return password;}
+String DuckNet::getPassword() { return password; }
