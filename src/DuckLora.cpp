@@ -1,5 +1,5 @@
-#include "DuckLora.h"
-#include "DuckUtils.h"
+#include "include/DuckLora.h"
+#include "include/DuckUtils.h"
 
 #ifdef CDPCFG_PIN_LORA_SPI_SCK
 #include "SPI.h"
