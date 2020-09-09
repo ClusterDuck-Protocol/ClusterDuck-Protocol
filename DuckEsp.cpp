@@ -1,7 +1,7 @@
 #include "DuckEsp.h"
 
 namespace duckesp {
-    
+
 void restartDuck() { ESP.restart(); }
 
 String getDuckMacAddress(boolean format) {
@@ -34,5 +34,5 @@ String getDuckMacAddress(boolean format) {
   } else {
     return unformattedMac;
   }
-  }
-  } // namespace duckesp
+}
+} // namespace duckesp

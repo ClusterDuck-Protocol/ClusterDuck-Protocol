@@ -2,9 +2,7 @@
 
 DuckLed* DuckLed::instance = NULL;
 
-DuckLed::DuckLed() {
-
-}
+DuckLed::DuckLed() {}
 
 DuckLed* DuckLed::getInstance() {
   return (instance == NULL) ? new DuckLed : instance;

@@ -2,7 +2,6 @@
 
 namespace duckutils {
 
-
 volatile bool enableDuckInterrupt = true;
 Timer<> duckTimer = timer_create_default();
 
@@ -37,4 +36,4 @@ String convertToHex(byte* data, int size) {
   }
   return buf;
 }
-}
+} // namespace duckutils

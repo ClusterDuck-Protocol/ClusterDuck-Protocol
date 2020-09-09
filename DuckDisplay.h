@@ -10,7 +10,6 @@
 class DuckDisplay {
 public:
   static DuckDisplay* getInstance();
-  
 
   void setupDisplay();
   void powerSave(bool save);
@@ -22,8 +21,8 @@ public:
 
 private:
   DuckDisplay();
-  DuckDisplay(DuckDisplay const&) = delete;   
-  DuckDisplay&operator=(DuckDisplay const&) = delete; 
+  DuckDisplay(DuckDisplay const&) = delete;
+  DuckDisplay& operator=(DuckDisplay const&) = delete;
   static DuckDisplay* instance;
 };
 
