@@ -9,15 +9,22 @@
 
 class DuckDisplay {
 public:
-  DuckDisplay();
+  static DuckDisplay* getInstance();
+  
 
-  static void setupDisplay();
-  static void powerSave(bool save);
-  static void drawString(uint8_t x, uint8_t y, const char* text);
-  static void drawString(bool cls, uint8_t x, uint8_t y, const char* text);
-  static void setCursor(uint8_t x, uint8_t y);
-  static void print(String text);
-  static void clear(void);
+  void setupDisplay();
+  void powerSave(bool save);
+  void drawString(uint8_t x, uint8_t y, const char* text);
+  void drawString(bool cls, uint8_t x, uint8_t y, const char* text);
+  void setCursor(uint8_t x, uint8_t y);
+  void print(String text);
+  void clear(void);
+
+private:
+  DuckDisplay();
+  DuckDisplay(DuckDisplay const&) = delete;   
+  DuckDisplay&operator=(DuckDisplay const&) = delete; 
+  static DuckDisplay* instance;
 };
 
 #endif /* DUCKDISPLAY_H_ */

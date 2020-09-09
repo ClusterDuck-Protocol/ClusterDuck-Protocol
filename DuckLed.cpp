@@ -1,11 +1,13 @@
 #include "DuckLed.h"
 
-DuckLed::DuckLed() {}
+DuckLed* DuckLed::instance = NULL;
 
-DuckLed::DuckLed(int redPin, int greenPin, int bluePin) {
-  this->redPin = redPin;
-  this->greenPin = greenPin;
-  this->bluePin = bluePin;
+DuckLed::DuckLed() {
+
+}
+
+DuckLed* DuckLed::getInstance() {
+  return (instance == NULL) ? new DuckLed : instance;
 }
 
 void DuckLed::setupLED(int redPin, int greenPin, int bluePin) {

@@ -6,7 +6,17 @@ CDPCFG_OLED_CLASS u8x8(/* clock=*/CDPCFG_PIN_OLED_CLOCK,
                        /* reset=*/CDPCFG_PIN_OLED_RESET);
 #endif
 
-DuckDisplay::DuckDisplay() {}
+DuckDisplay* DuckDisplay::instance = NULL;
+
+DuckDisplay::DuckDisplay() {
+
+}
+
+DuckDisplay* DuckDisplay::getInstance() {
+  if (!instance)
+    instance = new DuckDisplay;
+  return instance;
+}
 
 void DuckDisplay::setupDisplay() {
 #ifndef CDPCFG_OLED_NONE
