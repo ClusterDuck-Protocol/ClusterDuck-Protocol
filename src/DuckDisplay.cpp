@@ -1,4 +1,4 @@
-#include "DuckDisplay.h"
+#include "include/DuckDisplay.h"
 
 #ifdef CDPCFG_OLED_CLASS
 CDPCFG_OLED_CLASS u8x8(/* clock=*/CDPCFG_PIN_OLED_CLOCK,

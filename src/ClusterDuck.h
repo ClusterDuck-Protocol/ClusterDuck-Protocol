@@ -1,7 +1,7 @@
 #ifndef CD
 #define CD
 
-#include "cdpcfg.h"
+#include "include/cdpcfg.h"
 
 #if (ARDUINO >= 100)
 #include "Arduino.h"
@@ -10,20 +10,20 @@
 #endif
 #include <WString.h>
 
-#include <OTAPage.h>
 #include <Update.h>
 #include <esp_int_wdt.h>
 #include <esp_task_wdt.h>
+#include <include/OTAPage.h>
 
 #include "timer.h"
 
 #include <ArduinoOTA.h>
 
-#include "DuckDisplay.h"
-#include "DuckLed.h"
-#include "DuckLora.h"
-#include "DuckNet.h"
-#include "DuckUtils.h"
+#include "include/DuckDisplay.h"
+#include "include/DuckLed.h"
+#include "include/DuckLora.h"
+#include "include/DuckNet.h"
+#include "include/DuckUtils.h"
 
 class ClusterDuck {
 public:

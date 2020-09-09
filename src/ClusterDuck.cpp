@@ -1,5 +1,5 @@
 #include "ClusterDuck.h"
-#include "DuckEsp.h"
+#include "include/DuckEsp.h"
 
 ClusterDuck::ClusterDuck() { duckutils::setDuckInterrupt(true); }
 
