@@ -13,6 +13,15 @@ CDPCFG_LORA_CLASS lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO0,
                                     CDPCFG_PIN_LORA_RST, CDPCFG_PIN_LORA_DIO1);
 #endif
 
+DuckLora* DuckLora::instance = NULL;
+
+DuckLora::DuckLora() {
+}
+
+DuckLora* DuckLora::getInstance() {
+  return (instance == NULL) ? new DuckLora : instance;
+}
+
 int DuckLora::setupLoRa(LoraConfigParams config, String deviceId) {
 #ifdef CDPCFG_PIN_LORA_SPI_SCK
   log_n("_spi.begin(CDPCFG_PIN_LORA_SPI_SCK, CDPCFG_PIN_LORA_SPI_MISO, "
@@ -138,7 +147,7 @@ String DuckLora::getPacketData(int pSize) {
       gotLen = false;
       if (sId) {
         _lastPacket.senderId = msg;
-        Serial.println("[DuckLora] getPacketData User ID: " + _lastPacket.senderId);
+        Serial.println("[DuckLora] getPacketData Sender ID: " + _lastPacket.senderId);
         msg = "";
         sId = false;
 
@@ -194,22 +203,19 @@ String DuckLora::getPacketData(int pSize) {
 
     } else if (_transmission[i] == ping_B) {
       if (_deviceId != "Det") {
-        memset(_transmission, 0x00, CDPCFG_CDP_BUFSIZE);
-        _packetIndex = 0;
+        resetTransmissionBuffer();
         couple(iamhere_B, "1");
         startTransmit();
         Serial.println("[DuckLora] getPacketData pong sent");
         packetData = "ping";
         return packetData;
       }
-      memset(_transmission, 0x00, CDPCFG_CDP_BUFSIZE);
-      _packetIndex = 0;
+      resetTransmissionBuffer();
       packetData = "ping";
 
     } else if (_transmission[i] == iamhere_B) {
       Serial.println("[DuckLora] getPacketData pong received");
-      memset(_transmission, 0x00, CDPCFG_CDP_BUFSIZE);
-      _packetIndex = 0;
+      resetTransmissionBuffer();
       packetData = "pong";
       return packetData;
 
@@ -221,12 +227,12 @@ String DuckLora::getPacketData(int pSize) {
       gotLen = true;
     }
     _packetIndex++;
-  }
+  } // for loop
 
   if (len == 0) {
     if (sId) {
       _lastPacket.senderId = msg;
-      Serial.println("[DuckLora] getPacketData len0 User ID: " + _lastPacket.senderId);
+      Serial.println("[DuckLora] getPacketData len0 Sender ID: " + _lastPacket.senderId);
       msg = "";
 
     } else if (mId) {
@@ -263,8 +269,9 @@ int DuckLora::sendPayloadStandard(String msg, String topic, String senderId,
   if (topic == "") {
     topic = "status";
   }
-  if (messageId == "")
+  if (messageId == "") {
     messageId = duckutils::createUuid();
+  }
   if (path == "") {
     path = _deviceId;
   } else {
@@ -331,6 +338,7 @@ void DuckLora::couple(byte byteCode, String outgoing) {
     _packetIndex++;
   }
 }
+
 int DuckLora::startReceive() {
   int state = lora.startReceive();
 

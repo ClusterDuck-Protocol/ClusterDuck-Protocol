@@ -1,30 +1,10 @@
 #include "ClusterDuck.h"
-#include "DuckUtils.h"
 #include "DuckEsp.h"
 
-IPAddress apIP(CDPCFG_AP_IP1, CDPCFG_AP_IP2, CDPCFG_AP_IP3, CDPCFG_AP_IP4);
-AsyncWebServer webServer(CDPCFG_WEB_PORT);
 
-auto tymer = timer_create_default();
-
-//byte transmission[CDPCFG_CDP_BUFSIZE];
-//int packetIndex = 0;
-
-String ssid = "";
-String password = "";
-
-String ClusterDuck::_deviceId = "";
-
-bool restartRequired = false;
-size_t content_len;
-
-// Username and password for /update
-const char* http_username = CDPCFG_UPDATE_USERNAME;
-const char* http_password = CDPCFG_UPDATE_PASSWORD;
-
-ClusterDuck::ClusterDuck() { duckutils::setDuckInterrupt(true); }
-
-void ClusterDuck::setDeviceId(String deviceId) { _deviceId = deviceId; }
+ClusterDuck::ClusterDuck() {
+   duckutils::setDuckInterrupt(true);
+  }
 
 void ClusterDuck::begin(int baudRate) {
   Serial.begin(baudRate);
@@ -32,40 +12,46 @@ void ClusterDuck::begin(int baudRate) {
   Serial.println(baudRate, DEC);
 }
 
+void ClusterDuck::setDeviceId(String deviceId) {
+  _deviceId = deviceId;
+  _duckNet->setDeviceId(_deviceId);
+}
+
+
 void ClusterDuck::setupDisplay(String deviceType) {
 
-  _duckDisplay.setupDisplay();
+  _duckDisplay->setupDisplay();
 
 #ifdef CDPCFG_OLED_64x32
   // small display 64x32
-  _duckDisplay.setCursor(0, 2);
-  _duckDisplay.print("((>.<))");
+  _duckDisplay->setCursor(0, 2);
+  _duckDisplay->print("((>.<))");
 
-  _duckDisplay.setCursor(0, 4);
-  _duckDisplay.print("DT: " + deviceType);
+  _duckDisplay->setCursor(0, 4);
+  _duckDisplay->print("DT: " + deviceType);
 
-  _duckDisplay.setCursor(0, 5);
-  _duckDisplay.print("ID: " + _deviceId);
+  _duckDisplay->setCursor(0, 5);
+  _duckDisplay->print("ID: " + _deviceId);
 
 #else
   // default display size 128x64
-  _duckDisplay.setCursor(0, 1);
-  _duckDisplay.print("    ((>.<))    ");
+  _duckDisplay->setCursor(0, 1);
+  _duckDisplay->print("    ((>.<))    ");
 
-  _duckDisplay.setCursor(0, 2);
-  _duckDisplay.print("  Project OWL  ");
+  _duckDisplay->setCursor(0, 2);
+  _duckDisplay->print("  Project OWL  ");
 
-  _duckDisplay.setCursor(0, 4);
-  _duckDisplay.print("Device: " + deviceType);
+  _duckDisplay->setCursor(0, 4);
+  _duckDisplay->print("Device: " + deviceType);
 
-  _duckDisplay.setCursor(0, 5);
-  _duckDisplay.print("Status: Online");
+  _duckDisplay->setCursor(0, 5);
+  _duckDisplay->print("Status: Online");
 
-  _duckDisplay.setCursor(0, 6);
-  _duckDisplay.print("ID:     " + _deviceId);
+  _duckDisplay->setCursor(0, 6);
+  _duckDisplay->print("ID:     " + _deviceId);
 
-  _duckDisplay.setCursor(0, 7);
-  _duckDisplay.print(duckMac(false));
+  _duckDisplay->setCursor(0, 7);
+  _duckDisplay->print(duckMac(false));
 #endif
 }
 
@@ -83,7 +69,7 @@ void ClusterDuck::setupLoRa(long BAND, int SS, int RST, int DI0, int DI1,
   config.txPower = TxPower;
   config.func = setFlag;
 
-  int err = _duckLora.setupLoRa(config, _deviceId);
+  int err = _duckLora->setupLoRa(config, _deviceId);
 
   if (err == ERR_NONE) {
     Serial.println("[Duck] Listening for quacks");
@@ -91,20 +77,17 @@ void ClusterDuck::setupLoRa(long BAND, int SS, int RST, int DI0, int DI1,
   }
 
   if (err == DUCKLORA_ERR_BEGIN) {
-    _duckDisplay.drawString(true, 0, 0, "Starting LoRa failed!");
-    Serial.print("[CD] Starting LoRa Failed!!!");
-    Serial.println(err);
+    _duckDisplay->drawString(true, 0, 0, "Starting LoRa failed!");
+    Serial.printf("[CD] Starting LoRa Failed. err: %d\n", err);
     duckesp::restartDuck();
   }
   if (err == DUCKLORA_ERR_SETUP) {
-    Serial.print("[CD] Failed to setup Lora. err = ");
-    Serial.println(err);
+    Serial.printf("[CD] Failed to setup Lora. err: %d\n", err);
     while (true)
       ;
   }
   if (err == DUCKLORA_ERR_RECEIVE) {
-    Serial.print("[CD] Failed to start receive. err = ");
-    Serial.println(err);
+    Serial.printf("[CD] Failed to start receive. err: %d\n", err);
     duckesp::restartDuck();
   }
 }
@@ -117,8 +100,7 @@ void ClusterDuck::setFlag(void) {
   if (!duckutils::getDuckInterrupt()) {
     return;
   }
-  //TODO: replace with logger  
-  //Serial.println("[ClusterDuck] setFlag() packet received true");
+  Serial.println("[CD] setFlag: packet received");
 
   receivedFlag = true;
 }
@@ -149,230 +131,26 @@ void handleFirmwareUpload(AsyncWebServerRequest* request, String filename,
   }
 }
 
-// Setup WebServer
+
 void ClusterDuck::setupWebServer(bool createCaptivePortal) {
-  Serial.println("Setting up Web Server");
-
-  webServer.onNotFound([&](AsyncWebServerRequest* request) {
-    request->send(200, "text/html", portal);
-  });
-
-  webServer.on("/", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    request->send(200, "text/html", portal);
-  });
-
-  // Update Firmware OTA
-  webServer.on("/update", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    if (!request->authenticate(http_username, http_password))
-      return request->requestAuthentication();
-
-    AsyncWebServerResponse* response =
-        request->beginResponse(200, "text/html", update_page);
-
-    request->send(response);
-  });
-
-  webServer.on(
-      "/update", HTTP_POST,
-      [&](AsyncWebServerRequest* request) {
-        AsyncWebServerResponse* response = request->beginResponse(
-            (Update.hasError()) ? 500 : 200, "text/plain",
-            (Update.hasError()) ? "FAIL" : "OK");
-        response->addHeader("Connection", "close");
-        response->addHeader("Access-Control-Allow-Origin", "*");
-        request->send(response);
-        restartRequired = true;
-      },
-      [](AsyncWebServerRequest* request, String filename, size_t index,
-         uint8_t* data, size_t len, bool final) {
-        if (!index) {
-
-          _duckLora.standBy();
-          Serial.println("Pause Lora");
-          Serial.println("startint OTA update");
-
-          content_len = request->contentLength();
-
-          int cmd = (filename.indexOf("spiffs") > -1) ? U_SPIFFS : U_FLASH;
-          if (!Update.begin(UPDATE_SIZE_UNKNOWN, cmd)) {
-
-            Update.printError(Serial);
-          }
-        }
-
-        if (Update.write(data, len) != len) {
-          Update.printError(Serial);
-          _duckLora.startReceive();
-        }
-
-        if (final) {
-          if (Update.end(true)) {
-            ESP.restart();
-            esp_task_wdt_init(1, true);
-            esp_task_wdt_add(NULL);
-            while (true)
-              ;
-          }
-        }
-      });
-
-  // Captive Portal form submission
-  webServer.on("/formSubmit", HTTP_POST, [&](AsyncWebServerRequest* request) {
-    Serial.println("Submitting Form");
-
-    int paramsNumber = request->params();
-    String val = "";
-
-    for (int i = 0; i < paramsNumber; i++) {
-      AsyncWebParameter* p = request->getParam(i);
-      Serial.printf("%s: %s", p->name().c_str(), p->value().c_str());
-      Serial.println();
-
-      val = val + p->value().c_str() + "*";
-    }
-
-    _duckLora.sendPayloadStandard(val, "status");
-
-    request->send(200, "text/html", portal);
-  });
-
-  webServer.on("/id", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    request->send(200, "text/html", _deviceId);
-  });
-
-  webServer.on("/restart", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    request->send(200, "text/plain", "Restarting...");
-    delay(1000);
-    duckesp::restartDuck();
-  });
-
-  webServer.on("/mac", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    String mac = duckMac(true);
-    request->send(200, "text/html", mac);
-  });
-
-  webServer.on("/wifi", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    AsyncResponseStream* response = request->beginResponseStream("text/html");
-    response->print("<!DOCTYPE html><html><head><title>Update Wifi "
-                    "Credentials</title></head><body>");
-    response->print("<p>Use this page to update your Wifi credentials</p>");
-
-    response->print("<form action='/changeSSID' method='post'>");
-
-    response->print("<label for='ssid'>SSID:</label><br>");
-    response->print(
-        "<input name='ssid' type='text' placeholder='SSID' /><br><br>");
-
-    response->print("<label for='pass'>Password:</label><br>");
-    response->print(
-        "<input name='pass' type='text' placeholder='Password' /><br><br>");
-
-    response->print("<input type='submit' value='Submit' />");
-
-    response->print("</form>");
-
-    response->print("</body></html>");
-    request->send(response);
-  });
-
-  webServer.on("/changeSSID", HTTP_POST, [&](AsyncWebServerRequest* request) {
-    int paramsNumber = request->params();
-    String val = "";
-    String SSID = "";
-    String PASSWORD = "";
-
-    for (int i = 0; i < paramsNumber; i++) {
-      AsyncWebParameter* p = request->getParam(i);
-
-      String name = String(p->name());
-      String value = String(p->value());
-
-      if (name == "ssid") {
-        SSID = String(p->value());
-      } else if (name == "pass") {
-        PASSWORD = String(p->value());
-      }
-    }
-
-    if (SSID != "" && PASSWORD != "") {
-      setupInternet(SSID, PASSWORD);
-      request->send(200, "text/plain", "Success");
-    } else {
-      request->send(500, "text/plain", "There was an error");
-    }
-  });
-
-  webServer.begin();
+  _duckNet->setupWebServer(createCaptivePortal);
 }
 
 void ClusterDuck::setupWifiAp(const char* AP) {
-  WiFi.mode(WIFI_AP);
-  WiFi.softAP(AP);
-  delay(200); // wait for 200ms for the access point to start before configuring
-
-  WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
-
-  Serial.println("Created Wifi Access Point");
+  _duckNet->setupWifiAp(AP);
 }
 
 void ClusterDuck::setupDns() {
-  dnsServer.start(DNS_PORT, "*", apIP);
-
-  if (!MDNS.begin(DNS)) {
-    Serial.println("Error setting up MDNS responder!");
-  } else {
-    Serial.println("Created local DNS");
-    MDNS.addService("http", "tcp", CDPCFG_WEB_PORT);
-  }
+  _duckNet->setupDns();
 }
 
 void ClusterDuck::setupInternet(String SSID, String PASSWORD) {
-  ssid = SSID;
-  password = PASSWORD;
-  Serial.println();
-  Serial.print("[CD] Connecting to ");
-  Serial.print(SSID);
-
-  if (SSID != "" && PASSWORD != "" && ssidAvailable(ssid)) {
-    // Connect to Access Point
-    WiFi.begin(SSID.c_str(), PASSWORD.c_str());
-
-    while (WiFi.status() != WL_CONNECTED) {
-      tymer.tick(); // Advance timer to reboot after awhile
-      // TODO: Change this to make sure it is non-blocking for all other
-      // processes
-    }
-
-    // Connected to Access Point
-    Serial.println("");
-    Serial.println("[CD] DUCK CONNECTED TO INTERNET");
-  }
+  _duckNet->setupInternet(SSID, PASSWORD);
 }
 
-bool ClusterDuck::ssidAvailable(
-    String val) { // TODO: needs to be cleaned up for null case
-  int n = WiFi.scanNetworks();
-  Serial.println("scan done");
-  if (n == 0 || ssid == "") {
-    Serial.print("[CD] networks found: ");
-    Serial.println(n);
-
-  } else {
-    Serial.print("[CD] networks found: ");
-    Serial.println(n);
-
-    if (val == "") {
-      val = ssid;
-    }
-    for (int i = 0; i < n; ++i) {
-      Serial.print(WiFi.SSID(i));
-      if (WiFi.SSID(i) == val) {
-        return true;
-      }
-      delay(10);
-    }
-  }
-  return false;
+bool ClusterDuck::ssidAvailable(String val) {
+  bool available = _duckNet->ssidAvailable(val);
+  return (available);
 }
 
 // Setup OTA
@@ -450,8 +228,8 @@ int ClusterDuck::runDetect() {
     if (pSize > 0) {
       for (int i = 0; i < pSize; i++) {
 
-        if (_duckLora.getTransmitedByte(i) == iamhere_B) {
-          val = _duckLora.getRSSI();
+        if (_duckLora->getTransmitedByte(i) == iamhere_B) {
+          val = _duckLora->getRSSI();
         }
       }
     }
@@ -462,7 +240,9 @@ int ClusterDuck::runDetect() {
   return val;
 }
 
-void ClusterDuck::processPortalRequest() { dnsServer.processNextRequest(); }
+void ClusterDuck::processPortalRequest() { 
+  _duckNet->getDnsServer().processNextRequest();  
+  }
 
 void ClusterDuck::setupMamaDuck() {
   setupDisplay("Mama");
@@ -474,14 +254,14 @@ void ClusterDuck::setupMamaDuck() {
 
   Serial.println("MamaDuck Online");
 
-  tymer.every(CDPCFG_MILLIS_ALIVE, imAlive);
-  tymer.every(CDPCFG_MILLIS_REBOOT, reboot);
+  duckutils::getTimer().every(CDPCFG_MILLIS_ALIVE, imAlive);
+  duckutils::getTimer().every(CDPCFG_MILLIS_REBOOT, reboot);
 }
 
 void ClusterDuck::runMamaDuck() {
   ArduinoOTA.handle();
   if (duckutils::getDuckInterrupt()) {
-    tymer.tick();
+    duckutils::getTimer().tick();
   }
 
   // Mama ducks can also receive packets from other ducks
@@ -491,22 +271,22 @@ void ClusterDuck::runMamaDuck() {
   if (receivedFlag) { 
     receivedFlag = false;
     duckutils::setDuckInterrupt(false);
-    int pSize = _duckLora.handlePacket();
+    int pSize = _duckLora->handlePacket();
     Serial.print("[Duck] runMamaDuck rcv packet: pSize ");
     Serial.println(pSize);
     if (pSize > 0) {
-      String msg = _duckLora.getPacketData(pSize);
-      _duckLora.resetPacketIndex();
+      String msg = _duckLora->getPacketData(pSize);
+      _duckLora->resetPacketIndex();
       if (msg != "ping" && !idInPath(_lastPacket.path)) {
         Serial.println("[Duck] runMamaDuck relay packet");
-        _duckLora.sendPayloadStandard(_lastPacket.payload, _lastPacket.topic,
+        _duckLora->sendPayloadStandard(_lastPacket.payload, _lastPacket.topic,
                                       _lastPacket.senderId,
                                       _lastPacket.messageId, _lastPacket.path);
-        _duckLora.resetTransmissionBuffer();
+        _duckLora->resetTransmissionBuffer();
       }
     } else {
       // discard any unrecognized packets
-      _duckLora.resetTransmissionBuffer();
+      _duckLora->resetTransmissionBuffer();
     }
     duckutils::setDuckInterrupt(true);
     Serial.println("runMamaDuck startReceive");
@@ -517,25 +297,25 @@ void ClusterDuck::runMamaDuck() {
 }
 
 int ClusterDuck::handlePacket() {
-  Serial.println("[CD] handling LoRa packet");
-  return _duckLora.handlePacket();
+  Serial.println("[ClusterDuck] handling LoRa packet");
+  return _duckLora->handlePacket();
 }
 
 void ClusterDuck::sendPayloadStandard(String msg, String topic, String senderId,
                                       String messageId, String path) {
-  int err = _duckLora.sendPayloadStandard(msg, topic, senderId, messageId, path );
+  int err = _duckLora->sendPayloadStandard(msg, topic, senderId, messageId, path );
   if (err != DUCKLORA_ERR_NONE) {
-    Serial.print("[CD] Oops! Something went wrong, err = ");
+    Serial.print("[ClusterDuck] Oops! Something went wrong, err = ");
     Serial.println(err);
   }
 }
 
 void ClusterDuck::couple(byte byteCode, String outgoing) {
-  _duckLora.couple(byteCode, outgoing);
+  _duckLora->couple(byteCode, outgoing);
 }
 
 bool ClusterDuck::idInPath(String path) {
-  Serial.print("[CD] idInPath '");
+  Serial.print("[ClusterDuck] idInPath '");
   Serial.print(path);
   Serial.print("' ");
   String temp = "";
@@ -559,7 +339,7 @@ bool ClusterDuck::idInPath(String path) {
 }
 
 String ClusterDuck::getPacketData(int pSize) {
-  return _duckLora.getPacketData(pSize);
+  return _duckLora->getPacketData(pSize);
 }
 
 
@@ -568,7 +348,8 @@ String ClusterDuck::getPacketData(int pSize) {
 bool ClusterDuck::reboot(void*) {
   String reboot = "REBOOT";
   Serial.println(reboot);
-  _duckLora.sendPayloadStandard(reboot, "boot");
+  // this is needed because reboot() is used  by the timer object as a handler
+  DuckLora::getInstance()->sendPayloadStandard(reboot, "boot");
   duckesp::restartDuck();
 
   return true;
@@ -576,9 +357,8 @@ bool ClusterDuck::reboot(void*) {
 
 bool ClusterDuck::imAlive(void*) {
   String alive = "Health Quack";
-  Serial.print("[CD] imAlive sending");
-  _duckLora.sendPayloadStandard(alive, "health");
-
+  Serial.println(alive);
+  DuckLora::getInstance()->sendPayloadStandard(alive, "health");
   return true;
 }
 
@@ -596,7 +376,7 @@ String ClusterDuck::uuidCreator() {
 String ClusterDuck::getDeviceId() { return _deviceId; }
 
 Packet ClusterDuck::getLastPacket() {
-  return _duckLora.getLastPacket();
+  return _duckLora->getLastPacket();
 }
 
 volatile bool ClusterDuck::getFlag() { 
@@ -607,16 +387,25 @@ volatile bool ClusterDuck::getInterrupt() {
   return duckutils::getDuckInterrupt();
 }
 
-int ClusterDuck::getRSSI() { return _duckLora.getRSSI(); }
+int ClusterDuck::getRSSI() { 
+  return _duckLora->getRSSI(); 
+}
 
-String ClusterDuck::getSSID() { return ssid; }
+String ClusterDuck::getSSID() {
+  return _duckNet->getSsid();
+}
 
-String ClusterDuck::getPassword() { return password; }
+String ClusterDuck::getPassword() {
+  return _duckNet->getPassword();
+}
 
-// Setter
-void ClusterDuck::setSSID(String val) { ssid = val; }
+void ClusterDuck::setSSID(String val) {
+  _duckNet->setSsid(val);
+}
 
-void ClusterDuck::setPassword(String val) { password = val; }
+void ClusterDuck::setPassword(String val) {
+  _duckNet->setPassword(val);
+}
 
 void ClusterDuck::flipFlag() {
   if (receivedFlag == true) {
@@ -631,7 +420,7 @@ void ClusterDuck::flipInterrupt() {
 }
 
 void ClusterDuck::startReceive() {
-  int err = _duckLora.startReceive();
+  int err = _duckLora->startReceive();
 
   if (err != DUCKLORA_ERR_NONE) {
     Serial.println("[ClusterDuck] Restarting Duck...");
@@ -640,7 +429,7 @@ void ClusterDuck::startReceive() {
 }
 
 void ClusterDuck::startTransmit() {
-  int err = _duckLora.startTransmit();
+  int err = _duckLora->startTransmit();
   if (err != DUCKLORA_ERR_NONE) {
     Serial.print("[CD] Oops! Lora transmission failed, err = ");
     Serial.print(err);
@@ -648,7 +437,7 @@ void ClusterDuck::startTransmit() {
 }
 
 void ClusterDuck::ping() {
-  int err = _duckLora.ping();
+  int err = _duckLora->ping();
   if (err != DUCKLORA_ERR_NONE) {
     Serial.print("[CD] Oops! Lora ping failed, err = ");
     Serial.print(err);
@@ -656,15 +445,11 @@ void ClusterDuck::ping() {
 }
 
 // Setup LED
-void ClusterDuck::setupLED() { _duckLed.setupLED(); }
+void ClusterDuck::setupLED() { _duckLed->setupLED(); }
 
 void ClusterDuck::setColor(int red, int green, int blue) {
-  _duckLed.setColor(red, green, blue);
+  _duckLed->setColor(red, green, blue);
 }
-
-DNSServer ClusterDuck::dnsServer;
-const char* ClusterDuck::DNS = "duck";
-const byte ClusterDuck::DNS_PORT = 53;
 
 int ClusterDuck::_rssi = 0;
 float ClusterDuck::_snr;
@@ -675,6 +460,3 @@ int ClusterDuck::_packetSize = 0;
 Packet ClusterDuck::_lastPacket;
 
 String ClusterDuck::portal = MAIN_page;
-DuckDisplay ClusterDuck::_duckDisplay;
-DuckLed ClusterDuck::_duckLed;
-DuckLora ClusterDuck::_duckLora;

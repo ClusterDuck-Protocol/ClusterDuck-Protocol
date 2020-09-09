@@ -2,11 +2,14 @@
 
 namespace duckutils {
 
+
 volatile bool enableDuckInterrupt = true;
+Timer<> duckTimer = timer_create_default();
 
 volatile bool getDuckInterrupt() { return enableDuckInterrupt; }
 void setDuckInterrupt(bool interrupt) { enableDuckInterrupt = interrupt; }
 
+Timer<> getTimer() { return duckTimer; }
 
 String createUuid() {
   String msg = "";

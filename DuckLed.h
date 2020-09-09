@@ -7,8 +7,8 @@
 
 class DuckLed {
 public:
-  DuckLed(int redPin, int greenPin, int bluePin);
-  DuckLed();
+  static DuckLed* getInstance();
+  
   void setColor(int ledR = CDPCFG_PIN_RGBLED_R,
                        int ledG = CDPCFG_PIN_RGBLED_G,
                        int ledB = CDPCFG_PIN_RGBLED_B);
@@ -21,6 +21,11 @@ private:
   int redPin;
   int greenPin;
   int bluePin;
+
+  DuckLed();
+  DuckLed(DuckLed const&) = delete;
+  DuckLed& operator=(DuckLed const&) = delete;
+  static DuckLed* instance;
 };
 
 #endif /* DUCKLED_H_ */

@@ -15,6 +15,7 @@
 
 #define DUCKLORA_ERR_HANDLE_PACKET -100
 #define DUCKLORA_ERR_MSG_TOO_LARGE -101
+
 const byte ping_B = 0xF4;
 const byte senderId_B = 0xF5;
 const byte topic_B = 0xE3;
@@ -35,7 +36,7 @@ typedef struct {
 
 class DuckLora {
 public:
-  DuckLora(){};
+  static DuckLora* getInstance();
 
   int setupLoRa(LoraConfigParams config, String deviceId);
   int handlePacket();
@@ -67,6 +68,11 @@ private:
   int _availableBytes = 0;
   int _packetSize = 0;
   void resetLastPacket();
+
+  DuckLora();
+  DuckLora(DuckLora const&) = delete;
+  DuckLora& operator=(DuckLora const&) = delete;
+  static DuckLora* instance;
 };
 
 #endif
