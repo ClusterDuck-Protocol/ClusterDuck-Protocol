@@ -156,6 +156,7 @@ public:
     _duck.setupMamaDuck();
     return _duck;
   }
+
   auto createDuckLinkAs(String id) -> ClusterDuck& {
     _duck.begin();
     _duck.setDeviceId(id);
@@ -169,6 +170,7 @@ public:
     _duck.setupDetect();
     return _duck;
   }
+  
   auto withLora(long BAND = CDPCFG_RF_LORA_FREQ, int SS = CDPCFG_PIN_LORA_CS,
                 int RST = CDPCFG_PIN_LORA_RST, int DI0 = CDPCFG_PIN_LORA_DIO0,
                 int DI1 = CDPCFG_PIN_LORA_DIO1,

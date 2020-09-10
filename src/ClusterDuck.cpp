@@ -232,7 +232,7 @@ int ClusterDuck::runDetect() {
 }
 
 void ClusterDuck::processPortalRequest() {
-  _duckNet->getDnsServer().processNextRequest();
+  _duckNet->dnsServer.processNextRequest();
 }
 
 void ClusterDuck::setupMamaDuck() {
