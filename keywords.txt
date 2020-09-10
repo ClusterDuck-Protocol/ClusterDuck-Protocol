@@ -1,5 +1,19 @@
 ClusterDuck	KEYWORD1
+DuckBuilder KEYWORD1
 
+createAs	KEYWORD2
+createMamaDuckAs	KEYWORD2
+createDuckLinkAs	KEYWORD2
+createDectorDuckAs	KEYWORD2
+withLora	KEYWORD2
+withDisplay	KEYWORD2
+withWifi	KEYWORD2
+withDns	KEYWORD2
+withInternet	KEYWORD2
+withOta	KEYWORD2
+withWebServer	KEYWORD2
+withLed	KEYWORD2
+done	KEYWORD2
 setDeviceId	KEYWORD2
 begin	KEYWORD2
 setupDisplay	KEYWORD2
