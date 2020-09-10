@@ -160,7 +160,7 @@ const char MAIN_page[] PROGMEM = R"=====(
                     <label for="zipcode">Zipcode</label><br>
                     <input class="textbox textbox-full" name="zipcode" type="number" placeholder="00682" /> <br /> <br />
                     <label for="phone">Phone</label><br />
-                    <input class="textbox textbox-full" name="phone" id="phoneNumber" type="number" placeholder="787-123-1234" />
+                    <input class="textbox textbox-full" name="phone" id="phoneNumber" type="tel" placeholder="787-123-1234" />
                     <br /> <br />
                     <label for="status">Current Status</label><br />
                     <input name="status" id="currentStatusSos" type="radio" value="sos" /> I'm in immediate danger (SOS)
@@ -186,7 +186,7 @@ const char MAIN_page[] PROGMEM = R"=====(
                     <div id="count">
                     
                     </div>
-                    <input type="submit"  class=" button-on" id="sendReportBtn" value="SEND REPORT" />
+                    <input type="submit"  class="button-on" id="sendReportBtn" value="SEND REPORT" />
                 </form>
                 <p style="font-size: 10px; text-align: center;margin-top: 24px;">Powered by the ClusterDuck Protocol</p>
             </div>
