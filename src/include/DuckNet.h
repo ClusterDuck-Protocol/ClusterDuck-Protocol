@@ -34,7 +34,7 @@ public:
   String getSsid();
   String getPassword();
   void setDeviceId(String deviceId);
-  DNSServer getDnsServer() { return dnsServer; }
+  static DNSServer dnsServer;
 
 private:
   DuckNet();
@@ -45,7 +45,7 @@ private:
   DuckLora* _duckLora;
   String _deviceId;
 
-  static DNSServer dnsServer;
+  
   static const byte DNS_PORT;
   static const char* DNS;
   static const char* AP;
