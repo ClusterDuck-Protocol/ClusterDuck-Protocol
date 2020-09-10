@@ -288,9 +288,10 @@ int DuckLora::sendPayloadStandard(String msg, String topic, String senderId,
 
   String total = senderId + messageId + path + msg + topic;
   if (total.length() + 5 > CDPCFG_CDP_BUFSIZE) {
-    Serial.println("[DuckLora] Warning: message [" + topic +
-                   "] is too large!"); // TODO: do something
-    return DUCKLORA_ERR_HANDLE_PACKET;
+    Serial.println(
+      "[DuckLora] Warning: message [" + topic + "] is too large!"); 
+
+    return DUCKLORA_ERR_MSG_TOO_LARGE;
   }
 
   Serial.print("[DuckLora] sending");
@@ -360,45 +361,60 @@ int DuckLora::startReceive() {
 }
 
 int DuckLora::startTransmit() {
+  
   bool oldEI = duckutils::getDuckInterrupt();
   duckutils::setDuckInterrupt(false);
   long t1 = millis();
+  
+  int err = DUCKLORA_ERR_NONE;
+  int tx_err = ERR_NONE;
+  int rx_err = ERR_NONE;
 
-  // dump send packet stats+data
   Serial.print("[DuckLora] SND");
   Serial.print(" data:");
   Serial.println(duckutils::convertToHex(_transmission, _packetIndex));
 
-  int err = lora.transmit(_transmission, _packetIndex);
+  tx_err = lora.transmit(_transmission, _packetIndex);
 
-  if (err == ERR_NONE) {
-    Serial.print("[DuckLora] startTransmit Packet sent in: ");
-    Serial.print((millis() - t1));
-    Serial.println("ms");
-  } else if (err == ERR_PACKET_TOO_LONG) {
-    // the supplied packet was longer than 256 bytes
-    Serial.println("[DuckLora] startTransmit too long!");
-  } else if (err == ERR_TX_TIMEOUT) {
-    Serial.println("[DuckLora] startTransmit timeout!");
-  } else {
-    Serial.print(F("[DuckLora] startTransmit failed, code "));
-    Serial.println(err);
+  switch (tx_err) {
+    case ERR_NONE:
+      Serial.print("[DuckLora] startTransmit Packet sent in: ");
+      Serial.print((millis() - t1));
+      Serial.println("ms");
+      break;
+
+    case ERR_PACKET_TOO_LONG:
+      // the supplied packet was longer than 256 bytes
+      Serial.println("[DuckLora] startTransmit too long!");
+      err = DUCKLORA_ERR_MSG_TOO_LARGE;
+      break;
+
+    case ERR_TX_TIMEOUT:
+      Serial.println("[DuckLora] startTransmit timeout!");
+      err = DUCKLORA_ERR_TIMEOUT;
+      break;
+
+    default:
+      Serial.print(F("[DuckLora] startTransmit failed, code "));
+      Serial.println(err);
+      err = DUCKLORA_ERR_TRANSMIT;
+      break;
   }
 
-  memset(_transmission, 0x00, CDPCFG_CDP_BUFSIZE);
-  _packetIndex = 0;
-  // NOTE: Do we need to exit here if transmit failed?
+  if (err != DUCKLORA_ERR_NONE) {
+    resetTransmissionBuffer();
+    return err;
+  }
 
   if (oldEI) {
     duckutils::setDuckInterrupt(true);
-    err = startReceive();
+    rx_err = startReceive();
+    if (rx_err != ERR_NONE) {
+      err = DUCKLORA_ERR_RECEIVE;
+    }
   }
-
-  if (err != ERR_NONE) {
-    return DUCKLORA_ERR_RECEIVE;
-  }
-
-  return DUCKLORA_ERR_NONE;
+  
+  return err;
 }
 
 int DuckLora::getRSSI() { return lora.getRSSI(); }
