@@ -314,8 +314,7 @@ int DuckLora::sendPayloadStandard(String msg, String topic, String senderId,
   Serial.print(" * LEN:");
   Serial.println(_packetIndex);
 
-  startTransmit();
-  return DUCKLORA_ERR_NONE;
+  return startTransmit();
 }
 
 void DuckLora::resetLastPacket() {
