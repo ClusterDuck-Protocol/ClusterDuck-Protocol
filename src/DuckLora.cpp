@@ -400,9 +400,9 @@ int DuckLora::startTransmit() {
       err = DUCKLORA_ERR_TRANSMIT;
       break;
   }
+  resetTransmissionBuffer();
 
   if (err != DUCKLORA_ERR_NONE) {
-    resetTransmissionBuffer();
     return err;
   }
 
