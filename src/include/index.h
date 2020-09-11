@@ -158,7 +158,7 @@ const char MAIN_page[] PROGMEM = R"=====(
                     <br />
                     <label for="status">Needs</label><br />
                     <input type="checkbox" name="water" id="waterNeed" type="radio" value="water" /> Water
-                    <input name="tansportation" id="transportationNeed" type="checkbox" value="transportation" /> Transportation <br />
+                    <input name="transportation" id="transportationNeed" type="checkbox" value="transportation" /> Transportation <br />
                     <input type="checkbox" name="food" id="foodNeed" type="radio" value="food" /> Food
                     <input name="inspection" id="inspectionNeed" type="checkbox" value="inspection" /> Structural Inspection <br />
                     <input type="checkbox" name="firstaid" id="firstAidNeed" type="radio" value="firstaid" /> First Aid

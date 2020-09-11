@@ -87,7 +87,7 @@ public:
   void setupDisplay(String deviceType);
 
   // Network
-  void setupWebServer(bool createCaptivePortal = false);
+  void setupWebServer(bool createCaptivePortal = false, String html = "");
   void setupWifiAp(const char* AP = " 🆘 DUCK EMERGENCY PORTAL");
   void setupDns();
   void setupInternet(String SSID, String PASSWORD);
@@ -204,8 +204,8 @@ public:
     return *this;
   }
 
-  auto withWebServer(bool createCaptivePortal = false) -> DuckBuilder& {
-    _duck.setupWebServer(createCaptivePortal);
+  auto withWebServer(bool createCaptivePortal = false, String html = "") -> DuckBuilder& {
+    _duck.setupWebServer(createCaptivePortal, html);
     return *this;
   }
   auto withLed()->DuckBuilder& {

@@ -127,8 +127,8 @@ void handleFirmwareUpload(AsyncWebServerRequest* request, String filename,
   }
 }
 
-void ClusterDuck::setupWebServer(bool createCaptivePortal) {
-  _duckNet->setupWebServer(createCaptivePortal);
+void ClusterDuck::setupWebServer(bool createCaptivePortal, String html) {
+  _duckNet->setupWebServer(createCaptivePortal, html);
 }
 
 void ClusterDuck::setupWifiAp(const char* AP) { _duckNet->setupWifiAp(AP); }
@@ -432,5 +432,3 @@ int ClusterDuck::_availableBytes;
 int ClusterDuck::_packetSize = 0;
 
 Packet ClusterDuck::_lastPacket;
-
-String ClusterDuck::portal = MAIN_page;

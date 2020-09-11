@@ -6,8 +6,6 @@ DNSServer DuckNet::dnsServer;
 const char* DuckNet::DNS = "duck";
 const byte DuckNet::DNS_PORT = 53;
 
-String DuckNet::portal = MAIN_page;
-
 // Username and password for /update
 const char* http_username = CDPCFG_UPDATE_USERNAME;
 const char* http_password = CDPCFG_UPDATE_PASSWORD;
@@ -24,11 +22,17 @@ DuckNet* DuckNet::getInstance() {
 
 void DuckNet::setDeviceId(String deviceId) { this->_deviceId = deviceId; }
 
-void DuckNet::setupWebServer(bool createCaptivePortal) {
-  Serial.println("[DuckNet] Setting up Web Server");
-
+void DuckNet::setupWebServer(bool createCaptivePortal, String html) {
+  
+  if (html == "") {
+    Serial.println("[DuckNet] Setting up Web Server with default main page");
+    portal = MAIN_page;
+  } else {
+    Serial.println("[DuckNet] Setting up Web Server with custom main page");
+    portal = html;
+  }
   webServer.onNotFound([&](AsyncWebServerRequest* request) {
-    request->send(200, "text/html", portal);
+      request->send(200, "text/html", portal);
   });
 
   webServer.on("/", HTTP_GET, [&](AsyncWebServerRequest* request) {
@@ -122,7 +126,6 @@ void DuckNet::setupWebServer(bool createCaptivePortal) {
         request->send(400, "text/html", "Oops! Unknown error."); 
         break;    
     }
-
   });
 
   webServer.on("/id", HTTP_GET, [&](AsyncWebServerRequest* request) {

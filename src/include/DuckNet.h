@@ -24,7 +24,7 @@ class DuckNet {
 public:
   static DuckNet* getInstance();
 
-  void setupWebServer(bool createCaptivePortal = false);
+  void setupWebServer(bool createCaptivePortal = false, String html = "");
   void setupWifiAp(const char* accessPoint = " 🆘 DUCK EMERGENCY PORTAL");
   void setupDns();
   void setupInternet(String ssid, String password);
@@ -49,7 +49,7 @@ private:
   static const byte DNS_PORT;
   static const char* DNS;
   static const char* AP;
-  static String portal;
+  String portal = "";
   String ssid = "";
   String password = "";
 };
