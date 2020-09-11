@@ -137,6 +137,28 @@
 // actualy missing
 #define CDPCFG_PIN_LORA_DIO1 -1
 
+
+/*
+ * BOARD "rocket scream Mini Ultra Pro v3"
+ * https://www.rocketscream.com/blog/docs-item/mini-ultra-pro-hookup-guide/
+ * pio: board = arduino_zero
+ */
+#elif defined(ARDUINO_SAMD_ZERO)
+// This is not an official ARDUINO_* but uses the same bootloader
+// as the SAMD21 based Arduino Zero
+//
+// Lora configurations (HopeRF RFM95W chip)
+#define CDPCFG_PIN_LORA_CS 5
+#define CDPCFG_PIN_LORA_DIO0 2
+#define CDPCFG_PIN_LORA_DIO1 6
+#define CDPCFG_PIN_LORA_DIO2 -1 // Unused
+#define CDPCFG_PIN_LORA_RST 3
+// Oled Display settings
+#define CDPCFG_OLED_NONE
+// Wifi module
+#define CDPCFG_WIFI_NONE
+
+
 /*
  * BOARD "sparkfun lora gateway 1-channel"
  * https://www.sparkfun.com/products/15006
