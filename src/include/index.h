@@ -9,7 +9,7 @@ const char MAIN_page[] PROGMEM = R"=====(
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
             body {
-                background-color: black;
+                background-color: red;
                 font: 14px "Avenir", helvetica, sans-serif;
                 color: white;
                 -webkit-font-smoothing: antialiased;
@@ -150,7 +150,7 @@ const char MAIN_page[] PROGMEM = R"=====(
                     <label for="zipcode">Zipcode</label><br>
                     <input class="textbox textbox-full" name="zipcode" type="number" placeholder="00682" /> <br /> <br />
                     <label for="phone">Phone</label><br />
-                    <input class="textbox textbox-full" name="phone" id="phoneNumber" type="number" placeholder="787-123-1234" />
+                    <input class="textbox textbox-full" name="phone" id="phoneNumber" type="tel" placeholder="787-123-1234" />
                     <br /> <br />
                     <label for="status">Current Status</label><br />
                     <input name="status" id="currentStatusSos" type="radio" value="sos" /> I'm in immediate danger (SOS)
@@ -158,7 +158,7 @@ const char MAIN_page[] PROGMEM = R"=====(
                     <br />
                     <label for="status">Needs</label><br />
                     <input type="checkbox" name="water" id="waterNeed" type="radio" value="water" /> Water
-                    <input name="tansportation" id="transportationNeed" type="checkbox" value="transportation" /> Transportation <br />
+                    <input name="transportation" id="transportationNeed" type="checkbox" value="transportation" /> Transportation <br />
                     <input type="checkbox" name="food" id="foodNeed" type="radio" value="food" /> Food
                     <input name="inspection" id="inspectionNeed" type="checkbox" value="inspection" /> Structural Inspection <br />
                     <input type="checkbox" name="firstaid" id="firstAidNeed" type="radio" value="firstaid" /> First Aid
