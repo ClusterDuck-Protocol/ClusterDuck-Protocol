@@ -7,8 +7,6 @@ long ClusterDuck::_freqErr;
 int ClusterDuck::_availableBytes;
 int ClusterDuck::_packetSize = 0;
 
-Packet ClusterDuck::_lastPacket;
-
 ClusterDuck::ClusterDuck() { duckutils::setDuckInterrupt(true); }
 
 #ifdef CDPCFG_WIFI_NONE
@@ -20,11 +18,13 @@ void ClusterDuck::handleOta() { ArduinoOTA.handle(); }
 
 void ClusterDuck::begin(int baudRate) {
   Serial.begin(baudRate);
-  Serial.print("[CD] Serial start ");
+  Serial.print("[ClusterDuck] Serial start ");
   Serial.println(baudRate, DEC);
 }
 
 void ClusterDuck::setDeviceId(String deviceId) {
+  Serial.print("[ClusterDuck] setDeviceId:  ");
+  Serial.println(deviceId);
   _deviceId = deviceId;
   _duckNet->setDeviceId(_deviceId);
 }
@@ -115,8 +115,6 @@ void ClusterDuck::setFlag(void) {
   if (!duckutils::getDuckInterrupt()) {
     return;
   }
-  Serial.println("[CD] setFlag: packet received");
-
   receivedFlag = true;
 }
 // =====================================
@@ -277,24 +275,32 @@ void ClusterDuck::runMamaDuck() {
     receivedFlag = false;
     duckutils::setDuckInterrupt(false);
     int pSize = _duckLora->handlePacket();
-    Serial.print("[Duck] runMamaDuck rcv packet: pSize ");
+    Serial.print("[ClusterDuck] runMamaDuck rcv packet. pSize = ");
     Serial.println(pSize);
+    
     if (pSize > 0) {
+      // These 2 methods should be combined in one.
+      // the string returned by getPacketData() is only the message topic
+      // it could instead return the whole packet and we can get the topic from the
+      // Packet data structure
       String msg = _duckLora->getPacketData(pSize);
+      Packet lastPacket = _duckLora->getLastPacket();
       _duckLora->resetPacketIndex();
-      if (msg != "ping" && !idInPath(_lastPacket.path)) {
-        Serial.println("[Duck] runMamaDuck relay packet");
-        _duckLora->sendPayloadStandard(_lastPacket.payload, _lastPacket.topic,
-                                       _lastPacket.senderId,
-                                       _lastPacket.messageId, _lastPacket.path);
+      
+      if (msg != "ping" && !idInPath(lastPacket.path)) {
+        Serial.print("[ClusterDuck] runMamaDuck relay packet msg: ");
+        Serial.println(msg);
+        
+        _duckLora->sendPayloadStandard(lastPacket.payload, lastPacket.topic, lastPacket.senderId,
+                                       lastPacket.messageId, lastPacket.path);
         _duckLora->resetTransmissionBuffer();
       }
-    } else {
+    }
+    else {
       // discard any unrecognized packets
       _duckLora->resetTransmissionBuffer();
     }
     duckutils::setDuckInterrupt(true);
-    Serial.println("runMamaDuck startReceive");
     startReceive();
   }
 

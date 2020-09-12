@@ -10,13 +10,13 @@
 #include "DuckUtils.h"
 
 #else
-
-#include <WiFi.h>
-#include <WiFiClientSecure.h>
+#include <ArduinoOTA.h>
 #include <DNSServer.h>
 #include <ESPAsyncWebServer.h>
 #include <ESPmDNS.h>
 #include <Update.h>
+#include <WiFi.h>
+#include <WiFiClientSecure.h>
 #include <esp_int_wdt.h>
 #include <esp_task_wdt.h>
 

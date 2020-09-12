@@ -1,8 +1,6 @@
 #ifndef CD
 #define CD
 
-#include "include/cdpcfg.h"
-
 #if (ARDUINO >= 100)
 #include "Arduino.h"
 #else
@@ -10,13 +8,13 @@
 #endif
 #include <WString.h>
 
-#include "timer.h"
-
 #include "include/DuckDisplay.h"
 #include "include/DuckLed.h"
 #include "include/DuckLora.h"
 #include "include/DuckNet.h"
 #include "include/DuckUtils.h"
+#include "include/cdpcfg.h"
+#include "timer.h"
 
 class ClusterDuck {
 public:
@@ -105,7 +103,6 @@ public:
   void setupLED();
 
 protected:
-  static Packet _lastPacket;
   String _deviceId = "";
   DuckDisplay* _duckDisplay = DuckDisplay::getInstance();
   DuckLed* _duckLed = DuckLed::getInstance();
