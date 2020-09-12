@@ -10,14 +10,7 @@
 #endif
 #include <WString.h>
 
-#include <Update.h>
-#include <esp_int_wdt.h>
-#include <esp_task_wdt.h>
-#include <include/OTAPage.h>
-
 #include "timer.h"
-
-#include <ArduinoOTA.h>
 
 #include "include/DuckDisplay.h"
 #include "include/DuckLed.h"
@@ -122,21 +115,16 @@ protected:
 
 private:
   static void setFlag(void);
-  static void restartDuck();
+  //static void restartDuck();
 
   static int _rssi;
   static float _snr;
   static long _freqErr;
   static int _availableBytes;
-
   static int _packetSize;
-  static DNSServer dnsServer;
-  static const byte DNS_PORT;
-  static const char* DNS;
-  static const char* AP;
-  static String portal;
-
   static String runTime;
+
+  static void handleOta();
 };
 
 class DuckBuilder {
@@ -218,20 +206,23 @@ private:
   ClusterDuck _duck;
   };
 
-class CaptiveRequestHandler : public AsyncWebHandler {
-public:
-  CaptiveRequestHandler(String portal) { _portal = portal; }
-  virtual ~CaptiveRequestHandler() {}
+#ifndef CDPCFG_WIFI_NONE
 
-  bool canHandle(AsyncWebServerRequest* request) { return true; }
+  class CaptiveRequestHandler : public AsyncWebHandler {
+  public:
+    CaptiveRequestHandler(String portal) { _portal = portal; }
+    virtual ~CaptiveRequestHandler() {}
 
-  void handleRequest(AsyncWebServerRequest* request) {
-    AsyncResponseStream* response = request->beginResponseStream("text/html");
-    response->print(_portal);
-    request->send(response);
-  }
+    bool canHandle(AsyncWebServerRequest* request) { return true; }
 
-  String _portal;
+    void handleRequest(AsyncWebServerRequest* request) {
+      AsyncResponseStream* response = request->beginResponseStream("text/html");
+      response->print(_portal);
+      request->send(response);
+    }
+
+    String _portal;
 };
+#endif
 
 #endif

@@ -153,8 +153,10 @@
 #define CDPCFG_PIN_LORA_DIO1 6
 #define CDPCFG_PIN_LORA_DIO2 -1 // Unused
 #define CDPCFG_PIN_LORA_RST 3
+
 // Oled Display settings
 #define CDPCFG_OLED_NONE
+
 // Wifi module
 #define CDPCFG_WIFI_NONE
 

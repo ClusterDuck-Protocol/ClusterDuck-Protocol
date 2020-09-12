@@ -1,9 +1,13 @@
 #include "include/DuckEsp.h"
 
 namespace duckesp {
-
+#ifdef ESP32
 void restartDuck() { ESP.restart(); }
+#else 
+void restartDuck() {}
+#endif
 
+#ifdef ESP32
 String getDuckMacAddress(boolean format) {
   char id1[15];
   char id2[15];
@@ -35,4 +39,7 @@ String getDuckMacAddress(boolean format) {
     return unformattedMac;
   }
 }
+#else
+String getDuckMacAddress(boolean format) {return "";}
+#endif
 } // namespace duckesp

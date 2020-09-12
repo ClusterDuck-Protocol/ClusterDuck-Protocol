@@ -1,7 +1,22 @@
 #include "ClusterDuck.h"
 #include "include/DuckEsp.h"
 
+int ClusterDuck::_rssi = 0;
+float ClusterDuck::_snr;
+long ClusterDuck::_freqErr;
+int ClusterDuck::_availableBytes;
+int ClusterDuck::_packetSize = 0;
+
+Packet ClusterDuck::_lastPacket;
+
 ClusterDuck::ClusterDuck() { duckutils::setDuckInterrupt(true); }
+
+#ifdef CDPCFG_WIFI_NONE
+void ClusterDuck::handleOta() {}
+#else
+void ClusterDuck::handleOta() { ArduinoOTA.handle(); }
+#endif
+
 
 void ClusterDuck::begin(int baudRate) {
   Serial.begin(baudRate);
@@ -55,6 +70,7 @@ void ClusterDuck::setupDisplay(String deviceType) {
 void ClusterDuck::setupLoRa(long BAND, int SS, int RST, int DI0, int DI1,
                             int TxPower) {
 
+  Serial.println("[Duck] Setting up Lora");
   LoraConfigParams config;
 
   config.band = BAND;
@@ -74,16 +90,19 @@ void ClusterDuck::setupLoRa(long BAND, int SS, int RST, int DI0, int DI1,
 
   if (err == DUCKLORA_ERR_BEGIN) {
     _duckDisplay->drawString(true, 0, 0, "Starting LoRa failed!");
-    Serial.printf("[CD] Starting LoRa Failed. err: %d\n", err);
+    Serial.print("[CD] Starting LoRa Failed. err: ");
+    Serial.println(err);
     duckesp::restartDuck();
   }
   if (err == DUCKLORA_ERR_SETUP) {
-    Serial.printf("[CD] Failed to setup Lora. err: %d\n", err);
+    Serial.print("[CD] Failed to setup Lora. err: ");
+    Serial.println(err);
     while (true)
       ;
   }
   if (err == DUCKLORA_ERR_RECEIVE) {
-    Serial.printf("[CD] Failed to start receive. err: %d\n", err);
+    Serial.print("[CD] Failed to start receive. err: ");
+    Serial.println(err);
     duckesp::restartDuck();
   }
 }
@@ -102,38 +121,17 @@ void ClusterDuck::setFlag(void) {
 }
 // =====================================
 
-// handle the upload of the firmware
-void handleFirmwareUpload(AsyncWebServerRequest* request, String filename,
-                          size_t index, uint8_t* data, size_t lenght,
-                          bool final) {
-  // handle upload and update
-  if (!index) {
-    Serial.printf("Update: %s\n", filename.c_str());
-    if (!Update.begin(UPDATE_SIZE_UNKNOWN)) { // start with max available size
-      Update.printError(Serial);
-    }
-  }
-  // flashing firmware to ESP
-  if (lenght) {
-    Update.write(data, lenght);
-  }
-  if (final) {
-    if (Update.end(true)) { // true to set the size to the current progress
-      Serial.printf("Update Success: %ub written\nRebooting...\n",
-                    index + lenght);
-    } else {
-      Update.printError(Serial);
-    }
-  }
-}
-
 void ClusterDuck::setupWebServer(bool createCaptivePortal, String html) {
   _duckNet->setupWebServer(createCaptivePortal, html);
 }
 
-void ClusterDuck::setupWifiAp(const char* AP) { _duckNet->setupWifiAp(AP); }
+void ClusterDuck::setupWifiAp(const char* AP) { 
+  _duckNet->setupWifiAp(AP); 
+}
 
-void ClusterDuck::setupDns() { _duckNet->setupDns(); }
+void ClusterDuck::setupDns() {
+  _duckNet->setupDns(); 
+}
 
 void ClusterDuck::setupInternet(String SSID, String PASSWORD) {
   _duckNet->setupInternet(SSID, PASSWORD);
@@ -141,10 +139,16 @@ void ClusterDuck::setupInternet(String SSID, String PASSWORD) {
 
 bool ClusterDuck::ssidAvailable(String val) {
   bool available = _duckNet->ssidAvailable(val);
-  return (available);
+  return available;
 }
 
 // Setup OTA
+//TODO: Move implementation to DuckNet.cpp module
+#ifdef CDPCFG_WIFI_NONE
+
+void ClusterDuck::setupOTA()  {}
+
+#else
 void ClusterDuck::setupOTA() {
 
   ArduinoOTA.onStart([]() {
@@ -178,6 +182,7 @@ void ClusterDuck::setupOTA() {
 
   ArduinoOTA.begin();
 }
+#endif
 
 // Setup premade DuckLink with default settings
 void ClusterDuck::setupDuckLink() {
@@ -192,23 +197,25 @@ void ClusterDuck::setupDuckLink() {
 }
 
 void ClusterDuck::runDuckLink() {
-  ArduinoOTA.handle();
+  handleOta();
   processPortalRequest();
 }
 
+//#define USE_NETWORK
 void ClusterDuck::setupDetect() {
   setupDisplay("Detector");
   setupLoRa();
-  // setupWifiAp(false);
-  // setupDns();
-  // setupWebServer(false);
-  // setupOTA();
-
+#ifdef USE_NETWORK
+  setupWifiAp(false);
+  setupDns();
+  setupWebServer(false);
+  setupOTA();
+#endif
   Serial.println("Detector Online");
 }
 
 int ClusterDuck::runDetect() {
-  ArduinoOTA.handle();
+  handleOta();
   int val = 0;
   if (receivedFlag) { // If LoRa packet received
     receivedFlag = false;
@@ -231,9 +238,16 @@ int ClusterDuck::runDetect() {
   return val;
 }
 
+
+// TODO: Move this outside ClusterDuck
+// The method should probably call into a Portal Object or maybe a Webserver object
+#ifdef CDPCFG_WIFI_NONE
+void ClusterDuck::processPortalRequest() {}
+#else
 void ClusterDuck::processPortalRequest() {
   _duckNet->dnsServer.processNextRequest();
 }
+#endif
 
 void ClusterDuck::setupMamaDuck() {
   setupDisplay("Mama");
@@ -250,7 +264,7 @@ void ClusterDuck::setupMamaDuck() {
 }
 
 void ClusterDuck::runMamaDuck() {
-  ArduinoOTA.handle();
+  handleOta();
   if (duckutils::getDuckInterrupt()) {
     duckutils::getTimer().tick();
   }
@@ -425,10 +439,31 @@ void ClusterDuck::setColor(int red, int green, int blue) {
   _duckLed->setColor(red, green, blue);
 }
 
-int ClusterDuck::_rssi = 0;
-float ClusterDuck::_snr;
-long ClusterDuck::_freqErr;
-int ClusterDuck::_availableBytes;
-int ClusterDuck::_packetSize = 0;
 
-Packet ClusterDuck::_lastPacket;
+//TODO: Move this in a separate module. Either DuckOta or DuckNet
+#ifndef CDPCFG_WIFI_NONE
+// handle the upload of the firmware
+void handleFirmwareUpload(AsyncWebServerRequest* request, String filename,
+                          size_t index, uint8_t* data, size_t lenght,
+                          bool final) {
+  // handle upload and update
+  if (!index) {
+    Serial.printf("Update: %s\n", filename.c_str());
+    if (!Update.begin(UPDATE_SIZE_UNKNOWN)) { // start with max available size
+      Update.printError(Serial);
+    }
+  }
+  // flashing firmware to ESP
+  if (lenght) {
+    Update.write(data, lenght);
+  }
+  if (final) {
+    if (Update.end(true)) { // true to set the size to the current progress
+      Serial.printf("Update Success: %ub written\nRebooting...\n",
+                    index + lenght);
+    } else {
+      Update.printError(Serial);
+    }
+  }
+}
+#endif
