@@ -112,7 +112,6 @@ public:
   void setupLED();
 
 protected:
-  static Packet _lastPacket;
   String _deviceId = "";
   DuckDisplay* _duckDisplay = DuckDisplay::getInstance();
   DuckLed* _duckLed = DuckLed::getInstance();

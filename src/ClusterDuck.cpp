@@ -5,7 +5,7 @@ ClusterDuck::ClusterDuck() { duckutils::setDuckInterrupt(true); }
 
 void ClusterDuck::begin(int baudRate) {
   Serial.begin(baudRate);
-  Serial.print("[CD] Serial start ");
+  Serial.print("[ClusterDuck] Serial start ");
   Serial.println(baudRate, DEC);
 }
 
@@ -68,22 +68,22 @@ void ClusterDuck::setupLoRa(long BAND, int SS, int RST, int DI0, int DI1,
   int err = _duckLora->setupLoRa(config, _deviceId);
 
   if (err == ERR_NONE) {
-    Serial.println("[Duck] Listening for quacks");
+    Serial.println("[ClusterDuck] Listening for quacks");
     return;
   }
 
   if (err == DUCKLORA_ERR_BEGIN) {
     _duckDisplay->drawString(true, 0, 0, "Starting LoRa failed!");
-    Serial.printf("[CD] Starting LoRa Failed. err: %d\n", err);
+    Serial.printf("[ClusterDuck] Starting LoRa Failed. err: %d\n", err);
     duckesp::restartDuck();
   }
   if (err == DUCKLORA_ERR_SETUP) {
-    Serial.printf("[CD] Failed to setup Lora. err: %d\n", err);
+    Serial.printf("[ClusterDuck] Failed to setup Lora. err: %d\n", err);
     while (true)
       ;
   }
   if (err == DUCKLORA_ERR_RECEIVE) {
-    Serial.printf("[CD] Failed to start receive. err: %d\n", err);
+    Serial.printf("[ClusterDuck] Failed to start receive. err: %d\n", err);
     duckesp::restartDuck();
   }
 }
@@ -96,7 +96,7 @@ void ClusterDuck::setFlag(void) {
   if (!duckutils::getDuckInterrupt()) {
     return;
   }
-  Serial.println("[CD] setFlag: packet received");
+  Serial.println("[ClusterDuck] setFlag: packet received");
 
   receivedFlag = true;
 }
@@ -266,13 +266,21 @@ void ClusterDuck::runMamaDuck() {
     Serial.print("[Duck] runMamaDuck rcv packet: pSize ");
     Serial.println(pSize);
     if (pSize > 0) {
+      // These 2 methods should be combined in one.
+      // the string returned by getPacketData() is only the message topic
+      // it could instead return the whole packet and we can get the topic from
+      // the Packet data structure
       String msg = _duckLora->getPacketData(pSize);
+      Packet lastPacket = _duckLora->getLastPacket();
       _duckLora->resetPacketIndex();
-      if (msg != "ping" && !idInPath(_lastPacket.path)) {
-        Serial.println("[Duck] runMamaDuck relay packet");
-        _duckLora->sendPayloadStandard(_lastPacket.payload, _lastPacket.topic,
-                                       _lastPacket.senderId,
-                                       _lastPacket.messageId, _lastPacket.path);
+
+      if (msg != "ping" && !idInPath(lastPacket.path)) {
+        Serial.print("[ClusterDuck] runMamaDuck relay packet msg: ");
+        Serial.println(msg);
+
+        _duckLora->sendPayloadStandard(lastPacket.payload, lastPacket.topic,
+                                       lastPacket.senderId,
+                                       lastPacket.messageId, lastPacket.path);
         _duckLora->resetTransmissionBuffer();
       }
     } else {
@@ -405,7 +413,7 @@ void ClusterDuck::startReceive() {
 void ClusterDuck::startTransmit() {
   int err = _duckLora->startTransmit();
   if (err != DUCKLORA_ERR_NONE) {
-    Serial.print("[CD] Oops! Lora transmission failed, err = ");
+    Serial.print("[ClusterDuck] Oops! Lora transmission failed, err = ");
     Serial.print(err);
   }
 }
@@ -413,7 +421,7 @@ void ClusterDuck::startTransmit() {
 void ClusterDuck::ping() {
   int err = _duckLora->ping();
   if (err != DUCKLORA_ERR_NONE) {
-    Serial.print("[CD] Oops! Lora ping failed, err = ");
+    Serial.print("[ClusterDuck] Oops! Lora ping failed, err = ");
     Serial.print(err);
   }
 }
@@ -430,5 +438,3 @@ float ClusterDuck::_snr;
 long ClusterDuck::_freqErr;
 int ClusterDuck::_availableBytes;
 int ClusterDuck::_packetSize = 0;
-
-Packet ClusterDuck::_lastPacket;
