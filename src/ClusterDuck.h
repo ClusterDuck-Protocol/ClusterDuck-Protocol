@@ -28,7 +28,7 @@
 #include "timer.h"
 
 /**
- * @brief ClusterDuck class is the external to interface with the Duck application.
+ * @brief External APIs to build and control a duck device.
  * 
  * This class exposes all the necessary APIs to setup/build a duck as well as
  * customizig the duck's behavior.
@@ -57,8 +57,7 @@ public:
   /**
    * @brief Set the device id of a Duck.
    * 
-   * @param deviceId to set. It must be a unique id. If none is provided, a random value will be assigned to the duck
-   * by the CDP
+   * @param deviceId a string representing the device id (optional: if none is provided, a random value is generated) by the library
    */
   void setDeviceId(String deviceId = "");
 
@@ -193,12 +192,6 @@ public:
    */
   int runDetect();
 
-  float band;  // radio frequency (i.e US915Mhz)
-  int ss;      // slave select pin
-  int rst;     // chip reset pin
-  int di0;     // dio0 interrupt pin
-  int di1;     // dio1 interrupt pin
-  int txPower; // transmit power
   /**
    * @brief Setup the Lora module (default values are defined in cdpcfg.h)
    *
