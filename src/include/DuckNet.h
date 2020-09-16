@@ -1,3 +1,15 @@
+/**
+ * @file DuckNet.h
+ * @author
+ * @brief This file is internal to CDP and provides the library access to
+ * networking functions. The implementation is conditioned by the
+ * CDPCFG_WIFI_NONE flag which may be defined in cdpcfh.h if the device does not support WiFi.
+ * @version
+ * @date 2020-09-16
+ *
+ * @copyright
+ */
+
 #ifndef DUCKNET_H_
 #define DUCKNET_H_
 
@@ -31,7 +43,7 @@
 #define AP_SCAN_INTERVAL_MS 10
 /**
  * @brief Network abstraction.
- * 
+ *
  * Provides access to Webserver, DNS, WiFi and OTA update functionalities.
  */
 class DuckNet {

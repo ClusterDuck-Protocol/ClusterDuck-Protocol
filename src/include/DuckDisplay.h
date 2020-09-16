@@ -1,3 +1,16 @@
+/**
+ * @file DuckDisplay.h
+ * @author
+ * @brief This file is internal to CDP and provides the library access to
+ * display device functions. The implementation is conditioned by the
+ * CDPCFG_OLED_NONE flag which may be defined in cdpcfh.h if the device does not
+ * have any display.
+ * @version
+ * @date 2020-09-16
+ *
+ * @copyright
+ */
+
 #ifndef DUCKDISPLAY_H_
 #define DUCKDISPLAY_H_
 
@@ -31,7 +44,7 @@ public:
   /**
    * @brief Toggle the display in or out of power saving mode.
    * 
-   * @params save Set to true to enable power saving, false to disable
+   * @param save Set to true to enable power saving, false to disable
    */
   void powerSave(bool save);
 

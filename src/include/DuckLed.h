@@ -1,3 +1,13 @@
+/**
+ * @file DuckLed.h
+ * @author
+ * @brief This file is internal to CDP and provides the library access to onboard LED functions
+ * @version
+ * @date 2020-09-16
+ *
+ * @copyright
+ */
+
 #ifndef DUCKLED_H_
 #define DUCKLED_H_
 

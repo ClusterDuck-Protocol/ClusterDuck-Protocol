@@ -1,3 +1,14 @@
+/**
+ * @file DuckLora.h
+ * @author
+ * @brief This file is internal to CDP and provides the library access to
+ * onboard LoRa module functions as well as packet management.
+ * @version
+ * @date 2020-09-16
+ *
+ * @copyright
+ */
+
 #ifndef DUCKLORA_H_
 #define DUCKLORA_H_
 
