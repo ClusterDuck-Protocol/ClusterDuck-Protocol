@@ -67,7 +67,7 @@ void ClusterDuck::setupDisplay(String deviceType) {
 }
 
 // Initial LoRa settings
-void ClusterDuck::setupLoRa(long BAND, int SS, int RST, int DI0, int DI1,
+void ClusterDuck::setupLoRa(float BAND, int SS, int RST, int DI0, int DI1,
                             int TxPower) {
 
   Serial.println("[Duck] Setting up Lora");
@@ -203,6 +203,7 @@ void ClusterDuck::runDuckLink() {
 void ClusterDuck::setupDetect() {
   setupDisplay("Detector");
   setupLoRa();
+  setupOTA();
 #ifdef USE_NETWORK
   setupWifiAp(false);
   setupDns();
@@ -258,7 +259,7 @@ void ClusterDuck::setupMamaDuck() {
   Serial.println("MamaDuck Online");
 
   duckutils::getTimer().every(CDPCFG_MILLIS_ALIVE, imAlive);
-  duckutils::getTimer().every(CDPCFG_MILLIS_REBOOT, reboot);
+  //duckutils::getTimer().every(CDPCFG_MILLIS_REBOOT, reboot);
 }
 
 void ClusterDuck::runMamaDuck() {
@@ -413,29 +414,31 @@ void ClusterDuck::flipInterrupt() {
   duckutils::setDuckInterrupt(!duckutils::getDuckInterrupt());
 }
 
-void ClusterDuck::startReceive() {
+int ClusterDuck::startReceive() {
   int err = _duckLora->startReceive();
-
   if (err != DUCKLORA_ERR_NONE) {
     Serial.println("[ClusterDuck] Restarting Duck...");
     duckesp::restartDuck();
   }
+  return err;
 }
 
-void ClusterDuck::startTransmit() {
+int ClusterDuck::startTransmit() {
   int err = _duckLora->startTransmit();
   if (err != DUCKLORA_ERR_NONE) {
-    Serial.print("[CD] Oops! Lora transmission failed, err = ");
+    Serial.print("[ClusterDuck] Oops! Lora transmission failed, err = ");
     Serial.print(err);
   }
+  return err;
 }
 
-void ClusterDuck::ping() {
+int ClusterDuck::ping() {
   int err = _duckLora->ping();
   if (err != DUCKLORA_ERR_NONE) {
-    Serial.print("[CD] Oops! Lora ping failed, err = ");
+    Serial.print("[ClusterDuck] Oops! Lora ping failed, err = ");
     Serial.print(err);
   }
+  return err;
 }
 
 // Setup LED
@@ -454,6 +457,7 @@ void handleFirmwareUpload(AsyncWebServerRequest* request, String filename,
                           bool final) {
   // handle upload and update
   if (!index) {
+    //FIXME: printf may not be implemented on some Arduiono platforms
     Serial.printf("Update: %s\n", filename.c_str());
     if (!Update.begin(UPDATE_SIZE_UNKNOWN)) { // start with max available size
       Update.printError(Serial);

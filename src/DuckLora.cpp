@@ -34,7 +34,7 @@ int DuckLora::setupLoRa(LoraConfigParams config, String deviceId) {
 #endif
 
   Serial.println("[DuckLora] Starting LoRa......");
-  int state = lora.begin();
+  int state = lora.begin(config.band);
 
   if (state == ERR_NONE) {
     Serial.println("[DuckLora] LoRa started, Quack!");
@@ -443,4 +443,5 @@ int DuckLora::ping() {
   couple(ping_B, "0");
   return startTransmit();
 }
+
 int DuckLora::standBy() { return lora.standby(); }

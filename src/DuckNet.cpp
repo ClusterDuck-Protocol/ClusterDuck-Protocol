@@ -127,7 +127,7 @@ void DuckNet::setupWebServer(bool createCaptivePortal, String html) {
         request->send(400, "text/html", "BadRequest");
         break;
       default:
-        request->send(400, "text/html", "Oops! Unknown error."); 
+        request->send(500, "text/html", "Oops! Unknown error."); 
         break;    
     }
   });

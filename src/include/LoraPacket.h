@@ -4,6 +4,10 @@
 #include <Arduino.h>
 #include <WString.h>
 
+/**
+ * @brief A duck LoRa Packet
+ * 
+ */
 typedef struct {
   String senderId;
   String topic;

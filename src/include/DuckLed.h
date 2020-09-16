@@ -5,13 +5,39 @@
 
 #include <Arduino.h>
 
+/**
+ * On board LED abstraction.
+ *
+ * Provides internal access to the onboard LED, so CDP can show useful
+ * status information about the network and the device.
+ *
+ */
 class DuckLed {
 public:
+  /**
+   * @brief Get a singletom instance of the DuckLed class
+   *
+   * @return A pointer to DuckLed object.
+   */
   static DuckLed* getInstance();
 
+  /**
+   * @brief Set the Color object.
+   *
+   * @param ledR  value of the Red component. Defaults to CDPCFG_PIN_RGBLED_R
+   * @param ledG  value of the Green component. Defaults to CDPCFG_PIN_RGBLED_G
+   * @param ledB  value of the Blue component. Defaults to CDPCFG_PIN_RGBLED_B
+   */
   void setColor(int ledR = CDPCFG_PIN_RGBLED_R, int ledG = CDPCFG_PIN_RGBLED_G,
                 int ledB = CDPCFG_PIN_RGBLED_B);
 
+  /**
+   * @brief Initialize access to the LED.
+   *
+   * @param redPin    value of the Red pin. Defaults to CDPCFG_PIN_RGBLED_R
+   * @param greenPin  value of the Green pin. Defaults to CDPCFG_PIN_RGBLED_G
+   * @param bluePin   value of the Blue pin. Defaults to CDPCFG_PIN_RGBLED_B
+   */
   void setupLED(int redPin = CDPCFG_PIN_RGBLED_R,
                 int greenPin = CDPCFG_PIN_RGBLED_G,
                 int bluePin = CDPCFG_PIN_RGBLED_B);
