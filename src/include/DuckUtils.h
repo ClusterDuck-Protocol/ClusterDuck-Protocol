@@ -22,7 +22,7 @@ extern Timer<> duckTimer;
 /**
  * @brief Create a uuid string.
  * 
- * @return A string representing a unique id.
+ * @returns A string representing a unique id.
  */
 String createUuid();
 
@@ -31,14 +31,14 @@ String createUuid();
  * 
  * @param data a byte array to convert
  * @param size the size of the array
- * @return A string representating the by array in hexadecimal.
+ * @returns A string representating the by array in hexadecimal.
  */
 String convertToHex(byte* data, int size);
 
 /**
  * @brief Get the Duck Interrupt state
  * 
- * @return true if interrupt is enabled, false otherwise.
+ * @returns true if interrupt is enabled, false otherwise.
  */
 volatile bool getDuckInterrupt();
 

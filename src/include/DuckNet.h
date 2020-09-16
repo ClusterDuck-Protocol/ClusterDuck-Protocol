@@ -51,7 +51,7 @@ public:
   /**
    * @brief Get a singletom instance of the DuckNet class.
    *
-   * @return A pointer to DuckNet object.
+   * @returns A pointer to DuckNet object.
    */
   static DuckNet* getInstance();
   
@@ -101,7 +101,7 @@ public:
    * @brief  Checks if the given ssid is available.
    * 
    * @param val     ssid to check, default is an empty string and will use the internal default ssid
-   * @return true if the ssid is available, false otherwise.
+   * @returns true if the ssid is available, false otherwise.
    */
   bool ssidAvailable(String val = "");
 
@@ -122,14 +122,14 @@ public:
   /**
    * @brief Get the WiFi network ssid.
    * 
-   * @return a string representing the current network ssid
+   * @returns a string representing the current network ssid
    */
   String getSsid();
 
   /**
    * @brief Get the WiFi password ssid.
    *
-   * @return a string representing the current network password
+   * @returns a string representing the current network password
    */
   String getPassword();
 

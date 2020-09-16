@@ -69,7 +69,7 @@ public:
   /**
    * @brief Get a singletom instance of the DuckLora class,\.
    *
-   * @return A pointer to a DuckLora object
+   * @returns A pointer to a DuckLora object
    */
   static DuckLora* getInstance();
 
@@ -78,14 +78,14 @@ public:
    * 
    * @param config    lora configurstion parameters
    * @param deviceId  device id
-   * @return 0 if initialization was successful, an error code otherwise. 
+   * @returns 0 if initialization was successful, an error code otherwise. 
    */
   int setupLoRa(LoraConfigParams config, String deviceId);
   
   /**
    * @brief Handle a Duck LoRa packet.
    * 
-   * @return 0 if handling was successful, an error code otherwise. 
+   * @returns 0 if handling was successful, an error code otherwise. 
    */
   int handlePacket();
 
@@ -93,7 +93,7 @@ public:
    * @brief Get the last received LoRa packet.
    * 
    * @param pSize size of the packet
-   * @return A string representing the last received message.
+   * @returns A string representing the last received message.
    */
   String getPacketData(int pSize);
 
@@ -105,7 +105,7 @@ public:
    * @param senderId    the device_id of the sender 
    * @param messageId   the id of the message 
    * @param path        a comma separated list of devide ids having seens the message
-   * @return 0 if the message was sent successfully, an error code otherwise. 
+   * @returns 0 if the message was sent successfully, an error code otherwise. 
    */
   int sendPayloadStandard(String msg = "", String topic = "",
                           String senderId = "", String messageId = "",
@@ -114,7 +114,7 @@ public:
   /**
    * @brief Get the last received LoRa packet.
    * 
-   * @return A Packet object containing the last received message.
+   * @returns A Packet object containing the last received message.
    */
   Packet getLastPacket();
 
@@ -141,35 +141,35 @@ public:
    * @brief Determine if a Duck device_id is present in the path.
    * 
    * @param path  path retrieved from the LoRa packet
-   * @return true if the id is in the path, false otherwise.
+   * @returns true if the id is in the path, false otherwise.
    */
   bool idInPath(String path);
 
   /**
    * @brief Check if a received packet is available for processing.
    * 
-   * @return true if a packet was available, false otherwise.
+   * @returns true if a packet was available, false otherwise.
    */
   bool loraPacketReceived();
   
   /**
    * @brief Set the Duck to be ready to recieve LoRa packets.
    * 
-   * @return 0 if the call was successful, an error code otherwise.
+   * @returns 0 if the call was successful, an error code otherwise.
    */
   int startReceive();
 
   /**
    * @brief Set the Duck to be ready to transmit LoRa packets.
    *
-   * @return 0 if the call was successful, an error code otherwise.
+   * @returns 0 if the call was successful, an error code otherwise.
    */
   int startTransmit();
 
   /**
    * @brief Get the current RSSI value.
    * 
-   * @return An integer representing the rssi value.
+   * @returns An integer representing the rssi value.
    */
   int getRSSI();
 
@@ -182,14 +182,14 @@ public:
   /**
    * @brief Get the current packet buffer index.
    * 
-   * @return Current index in the transmission buffer.
+   * @returns Current index in the transmission buffer.
    */
   int getPacketIndex() { return _packetIndex; }
   
   /**
    * @brief Get the transmission buffer.
    * 
-   * @return An array of bytes containing the transmission packet
+   * @returns An array of bytes containing the transmission packet
    */
   byte* getTransmissionBuffer() { return _transmission; }
 
@@ -197,21 +197,21 @@ public:
    * @brief Get the transmited byte at the given index in the transmission buffer.
    * 
    * @param index position in the transmission buffer
-   * @return The byte value in the transmission buffer at the given index.
+   * @returns The byte value in the transmission buffer at the given index.
    */
   byte getTransmitedByte(int index) { return _transmission[index]; }
 
   /**
    * @brief Transmit a ping message.
    * 
-   * @return 0 if the message was sent sucessfully, an error code otherwise. 
+   * @returns 0 if the message was sent sucessfully, an error code otherwise. 
    */
   int ping();
 
   /**
    * @brief Set the LoRa chip in standby mode.
    *
-   * @return 0 if the chip is sucessfuly set in standby mode, an error code otherwise.
+   * @returns 0 if the chip is sucessfuly set in standby mode, an error code otherwise.
    */
   int standBy();
 

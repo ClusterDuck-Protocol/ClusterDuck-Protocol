@@ -32,7 +32,7 @@ public:
   /**
    * @brief Get the Singletom instance of the DuckDisplay class.
    * 
-   * @return A pointer to a DuckDisplay object.
+   * @returns A pointer to a DuckDisplay object.
    */
   static DuckDisplay* getInstance();
 

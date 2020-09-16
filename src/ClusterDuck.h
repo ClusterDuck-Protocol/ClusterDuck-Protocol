@@ -520,12 +520,12 @@ public:
   /**
    * @brief Setup LoRa configuration
    *
-   * @param BAND      LoRa module frequency band, (optional) @see CDPCFG_RF_LORA_FREQ for default setting
-   * @param SS        LoRa module slave select pin, (optional) @see CDPCFG_PIN_LORA_CS for default setting
-   * @param RST       LoRa module reset pin, (optional) @see CDPCFG_PIN_LORA_RST for default setting
-   * @param DI0       LoRa module dio0 interrupt pin, (optional) @see CDPCFG_PIN_LORA_DIO0 for default setting
-   * @param DI1       LoRa module dio1 interrupt pin, (optional) @see CDPCFG_PIN_LORA_DIO1 for default setting
-   * @param TxPower   LoRa module transmit power, (optional) @see CDPCFG_RF_LORA_TXPOW for default setting
+   * @param BAND      LoRa module frequency band, (optional) default: CDPCFG_RF_LORA_FREQ
+   * @param SS        LoRa module slave select pin, (optional) default: CDPCFG_PIN_LORA_CS
+   * @param RST       LoRa module reset pin, (optional) default: CDPCFG_PIN_LORA_RST
+   * @param DI0       LoRa module dio0 interrupt pin, (optional) default: CDPCFG_PIN_LORA_DIO0
+   * @param DI1       LoRa module dio1 interrupt pin, (optional) default: CDPCFG_PIN_LORA_DIO1
+   * @param TxPower   LoRa module transmit power, (optional) default: CDPCFG_RF_LORA_TXPOW
    * @return An updated reference to a DuckBuilder object.
    */
   auto withLora(long BAND = CDPCFG_RF_LORA_FREQ, int SS = CDPCFG_PIN_LORA_CS,
@@ -539,8 +539,11 @@ public:
   /**
    * @brief Setup Display configuration
    *
-   * This method does nothing if display is disabled in the @see cdpcfg.h configuration file
-   * @param deviceType  A string representing the device type (e.g "Mama", "Duck",...)
+   * This method does nothing if display is disabled in the `cdpcfg.h`
+   * configuration file
+   * 
+   * @param deviceType  A string representing the device type (e.g "Mama",
+   * "Duck",...)
    * @return An updated reference to a DuckBuilder object.
    */
   auto withDisplay(String deviceType) -> DuckBuilder& {
@@ -551,9 +554,9 @@ public:
   /**
    * @brief Setup WiFi configuration.
    *
-   * This method does nothing if there is WiFi is disabled in the @see cdpcfg.h
+   * This method does nothing if there is WiFi is disabled in the `cdpcfg.h`
    * configuration file.
-   * 
+   *
    * @param ap a string representing the wifi access point.
    * @return An updated reference to a DuckBuilder object.
    */
@@ -565,7 +568,7 @@ public:
   /**
    * @brief Setup DNS configuration.
    *
-   * This method does nothing if there is WiFi is disabled in the @see cdpcfg.h
+   * This method does nothing if there is WiFi is disabled in the `cdpcfg.h`
    * configuration file.
    *
    * @return An updated reference to a DuckBuilder object.
@@ -578,7 +581,7 @@ public:
   /**
    * @brief Setup internet configuration.
    *
-   * This method does nothing if there is WiFi is disabled in the @see cdpcfg.h
+   * This method does nothing if there is WiFi is disabled in the `cdpcfg.h`
    * configuration file.
    *
    * @param ssid      ssid of the wifi network
@@ -593,7 +596,7 @@ public:
   /**
    * @brief Setup Over The Air (OTA) update.
    *
-   * This method does nothing if there is WiFi is disabled in the @see cdpcfg.h
+   * This method does nothing if there is WiFi is disabled in the `cdpcfg.h`
    * configuration file.
    * 
    * @return An updated reference to a DuckBuilder object.
@@ -606,11 +609,13 @@ public:
   /**
    * @brief
    *
-   * This method does nothing if there is WiFi is disabled in the @see cdpcfg.h 
+   * This method does nothing if there is WiFi is disabled in the `cdpcfg.h`
    * configuration file.
-   * 
-   * @param createCaptivePortal true if the captive portal is used, (optional: default is false)
-   * @param html  a string that represents the portal HTML page, (optional: if not provided, will use a default webpage)
+   *
+   * @param createCaptivePortal true if the captive portal is used, (optional:
+   * default is false)
+   * @param html  a string that represents the portal HTML page, (optional: if
+   * not provided, will use a default webpage)
    * @return An updated reference to a DuckBuilder object.
    */
   auto withWebServer(bool createCaptivePortal = false, String html = "") -> DuckBuilder& {
@@ -637,7 +642,8 @@ public:
 
 private:
   ClusterDuck _duck;
-  };
+  
+};
 
 #ifndef CDPCFG_WIFI_NONE
 

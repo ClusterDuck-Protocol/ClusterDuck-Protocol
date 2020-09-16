@@ -26,7 +26,7 @@ public:
   /**
    * @brief Get a singletom instance of the DuckLed class
    *
-   * @return A pointer to DuckLed object.
+   * @returns A pointer to DuckLed object.
    */
   static DuckLed* getInstance();
 
