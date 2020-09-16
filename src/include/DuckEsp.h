@@ -1,6 +1,5 @@
 /**
  * @file DuckEsp.h
- * @author 
  * @brief This file is internal to CDP and provides ESP32 specific implementations.
  * @version 
  * @date 2020-09-16

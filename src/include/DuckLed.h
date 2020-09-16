@@ -1,7 +1,6 @@
 /**
  * @file DuckLed.h
- * @author
- * @brief This file is internal to CDP and provides the library access to onboard LED functions
+ * @brief This file is internal to CDP and provides the library access to onboard LED functions.
  * @version
  * @date 2020-09-16
  *
@@ -16,7 +15,7 @@
 #include <Arduino.h>
 
 /**
- * On board LED abstraction.
+ * @brief Internal on board LED abstraction.
  *
  * Provides internal access to the onboard LED, so CDP can show useful
  * status information about the network and the device.

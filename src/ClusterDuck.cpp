@@ -203,7 +203,6 @@ void ClusterDuck::runDuckLink() {
 void ClusterDuck::setupDetect() {
   setupDisplay("Detector");
   setupLoRa();
-  setupOTA();
 #ifdef USE_NETWORK
   setupWifiAp(false);
   setupDns();

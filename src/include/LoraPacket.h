@@ -5,7 +5,7 @@
 #include <WString.h>
 
 /**
- * @brief A cluster duck LoRa message structure
+ * @brief Internal cluster duck LoRa message structure
  * 
  */
 typedef struct {

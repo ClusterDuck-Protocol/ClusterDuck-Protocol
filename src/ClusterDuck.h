@@ -271,7 +271,6 @@ public:
    */
   bool idInPath(String path);   
 
-
   /**
    * @brief Get the packet receive flag status
    * 
@@ -415,17 +414,52 @@ private:
   static void handleOta();
 };
 
+/**
+ * @brief External duck builder APIs to setup a duck device
+ * 
+ */
 class DuckBuilder {
 public:
-  DuckBuilder(){
+  /**
+   * @brief Construct a new Duck Builder object
+   * 
+   */
+  DuckBuilder() {
   }
 
+  /**
+   * @brief Initialize and setup a basic duck
+   * 
+   * Initialize a duck and set its device id, but does not setup any other components
+   * such as the LoRa module, a display, etc...
+   * 
+   * @param id a string representing the duck's unique id
+   * @return An updated reference to a DuckBuilder object.
+   */
   auto createAs(String id) -> DuckBuilder& {
     _duck.begin();
     _duck.setDeviceId(id);
     return *this;
   }
 
+  /**
+   * @brief Initialize and setup a Mama Duck.
+   *
+   * The duck is initialized as a Mama Duck and will perform the following setups.
+   * If the duck hardware does not have WiFi or a Display, these 
+   * setups (or related setups) will be skipped.
+   * ```
+   * setupDisplay("Mama");
+   * setupLoRa();
+   * setupWifiAp();
+   * setupDns();
+   * setupWebServer(true);
+   * setupOTA();
+   * ```
+   *
+   * @param id a string representing the duck's unique id
+   * @return An updated reference to a DuckBuilder object.
+   */
   auto createMamaDuckAs(String id) -> ClusterDuck& {
     _duck.begin();
     _duck.setDeviceId(id);
@@ -433,6 +467,24 @@ public:
     return _duck;
   }
 
+  /**
+   * @brief Initialize and setup a Duck Link.
+   *
+   * The duck is initialized as a DuckLink and will perform the following
+   * setups. If the duck hardware does not have WiFi or a Display, these
+   * setups (or related setups) will be skipped.
+   * ```
+   * setupDisplay("Duck");
+   * setupLoRa();
+   * setupWifiAp();
+   * setupDns();
+   * setupWebServer(true);
+   * setupOTA();
+   * ```
+   *
+   * @param id a string representing the duck's unique id
+   * @return An updated reference to a DuckBuilder object.
+   */
   auto createDuckLinkAs(String id) -> ClusterDuck& {
     _duck.begin();
     _duck.setDeviceId(id);
@@ -440,13 +492,42 @@ public:
     return _duck;
   }
 
+  /**
+   * @brief Initialize and setup a Duck Detector.
+   *
+   * The duck is initialized as a DuckDetector and will perform the following
+   * setups. If the duck hardware does not have WiFi or a Display, these
+   * setups (or related setups) will be skipped.
+   * ```
+   * setupDisplay("Duck");
+   * setupLoRa();
+   * setupWifiAp();
+   * setupDns();
+   * setupWebServer(true);
+   * setupOTA();
+   * ```
+   *
+   * @param id a string representing the duck's unique id
+   * @return An updated reference to a DuckBuilder object.
+   */
   auto createDectorDuckAs(String id) -> ClusterDuck& {
     _duck.begin();
     _duck.setDeviceId(id);
     _duck.setupDetect();
     return _duck;
   }
-  
+
+  /**
+   * @brief Setup LoRa configuration
+   *
+   * @param BAND      LoRa module frequency band, (optional) @see CDPCFG_RF_LORA_FREQ for default setting
+   * @param SS        LoRa module slave select pin, (optional) @see CDPCFG_PIN_LORA_CS for default setting
+   * @param RST       LoRa module reset pin, (optional) @see CDPCFG_PIN_LORA_RST for default setting
+   * @param DI0       LoRa module dio0 interrupt pin, (optional) @see CDPCFG_PIN_LORA_DIO0 for default setting
+   * @param DI1       LoRa module dio1 interrupt pin, (optional) @see CDPCFG_PIN_LORA_DIO1 for default setting
+   * @param TxPower   LoRa module transmit power, (optional) @see CDPCFG_RF_LORA_TXPOW for default setting
+   * @return An updated reference to a DuckBuilder object.
+   */
   auto withLora(long BAND = CDPCFG_RF_LORA_FREQ, int SS = CDPCFG_PIN_LORA_CS,
                 int RST = CDPCFG_PIN_LORA_RST, int DI0 = CDPCFG_PIN_LORA_DIO0,
                 int DI1 = CDPCFG_PIN_LORA_DIO1,
@@ -455,39 +536,103 @@ public:
     return *this;
   }
 
+  /**
+   * @brief Setup Display configuration
+   *
+   * This method does nothing if display is disabled in the @see cdpcfg.h configuration file
+   * @param deviceType  A string representing the device type (e.g "Mama", "Duck",...)
+   * @return An updated reference to a DuckBuilder object.
+   */
   auto withDisplay(String deviceType) -> DuckBuilder& {
     _duck.setupDisplay(deviceType);
     return *this;
   }
 
-  auto withWifi(const char* ap = " 🆘 DUCK EMERGENCY PORTAL") -> DuckBuilder& {
+  /**
+   * @brief Setup WiFi configuration.
+   *
+   * This method does nothing if there is WiFi is disabled in the @see cdpcfg.h
+   * configuration file.
+   * 
+   * @param ap a string representing the wifi access point.
+   * @return An updated reference to a DuckBuilder object.
+   */
+  auto withWifi(const char* ap = "🆘 DUCK EMERGENCY PORTAL") -> DuckBuilder& {
     _duck.setupWifiAp(ap);
     return *this;
   }
 
+  /**
+   * @brief Setup DNS configuration.
+   *
+   * This method does nothing if there is WiFi is disabled in the @see cdpcfg.h
+   * configuration file.
+   *
+   * @return An updated reference to a DuckBuilder object.
+   */
   auto withDns() -> DuckBuilder& {
     _duck.setupDns();
     return *this;
   }
 
+  /**
+   * @brief Setup internet configuration.
+   *
+   * This method does nothing if there is WiFi is disabled in the @see cdpcfg.h
+   * configuration file.
+   *
+   * @param ssid      ssid of the wifi network
+   * @param password  password to access the wifi network
+   * @return An updated reference to a DuckBuilder object.
+   */
   auto withInternet(String ssid, String password) -> DuckBuilder& {
     _duck.setupInternet(ssid, password);
     return *this;
   }
 
+  /**
+   * @brief Setup Over The Air (OTA) update.
+   *
+   * This method does nothing if there is WiFi is disabled in the @see cdpcfg.h
+   * configuration file.
+   * 
+   * @return An updated reference to a DuckBuilder object.
+   */
   auto withOta() -> DuckBuilder& {
     _duck.setupOTA();
     return *this;
   }
 
+  /**
+   * @brief
+   *
+   * This method does nothing if there is WiFi is disabled in the @see cdpcfg.h 
+   * configuration file.
+   * 
+   * @param createCaptivePortal true if the captive portal is used, (optional: default is false)
+   * @param html  a string that represents the portal HTML page, (optional: if not provided, will use a default webpage)
+   * @return An updated reference to a DuckBuilder object.
+   */
   auto withWebServer(bool createCaptivePortal = false, String html = "") -> DuckBuilder& {
     _duck.setupWebServer(createCaptivePortal, html);
     return *this;
   }
+
+  /**
+   * @brief Setup onboard LED.
+   *
+   * @return An updated reference to a DuckBuilder object.
+   */
   auto withLed()->DuckBuilder& {
     _duck.setupLED();
     return *this;
   }
+
+  /**
+   * @brief Tell the builder the setup is complete
+   * 
+   * @return A setup duck ready to go.
+   */
   auto done() -> ClusterDuck& { return _duck; }
 
 private:

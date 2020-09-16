@@ -1,10 +1,10 @@
 /**
  * @file DuckDisplay.h
- * @author
  * @brief This file is internal to CDP and provides the library access to
- * display device functions. The implementation is conditioned by the
- * CDPCFG_OLED_NONE flag which may be defined in cdpcfh.h if the device does not
- * have any display.
+ * display device functions. 
+ * 
+ * The implementation is conditioned by the `CDPCFG_OLED_NONE` flag
+ * which may be defined in `cdpcfh.h` if the device display is disabled.
  * @version
  * @date 2020-09-16
  *
@@ -21,7 +21,7 @@
 #include "cdpcfg.h"
 
 /**
- * OLED Display abstraction.
+ * @brief Internal OLED Display abstraction.
  *
  * Provides internal access to the OLED Display, so CDP can show useful
  * status information about the network and the device.

@@ -1,6 +1,5 @@
 /**
  * @file DuckLora.h
- * @author
  * @brief This file is internal to CDP and provides the library access to
  * onboard LoRa module functions as well as packet management.
  * @version
@@ -37,21 +36,32 @@ const byte payload_B = 0xF7;
 const byte iamhere_B = 0xF8;
 const byte path_B = 0xF3;
 
+/**
+ * @brief Internal structure to hold the LoRa module configuration
+ * 
+ */
 typedef struct {
-  float band; // radio frequency (i.e US915Mhz)
-  int ss;     // slave select pin
-  int rst;    // chip reset pin
-  int di0;    // dio0 interrupt pin 
-  int di1;    // dio1 interrupt pin
-  int txPower;// transmit power
-  void (*func)(void); // interrupt service routine function when di0 activates
+  /// radio frequency (i.e US915Mhz)
+  float band;
+  /// slave select pin
+  int ss;
+  /// chip reset pin
+  int rst;
+  /// dio0 interrupt pin
+  int di0;
+  /// dio1 interrupt pin
+  int di1;
+  /// transmit power
+  int txPower;
+  /// interrupt service routine function when di0 activates
+  void (*func)(void); 
 } LoraConfigParams;
 
 /**
- * LoRa chip abstraction.
+ * @brief Internal LoRa chip abstraction.
  *
- * Provides internal access to the LoRa chip driver. This class is used by other components
- * of the CDP implementation.
+ * Provides internal access to the LoRa chip driver. This class is used by other
+ * components of the CDP implementation.
  *
  */
 class DuckLora {
@@ -83,7 +93,7 @@ public:
    * @brief Get the last received LoRa packet.
    * 
    * @param pSize size of the packet
-   * @return A string representing the last received message .
+   * @return A string representing the last received message.
    */
   String getPacketData(int pSize);
 

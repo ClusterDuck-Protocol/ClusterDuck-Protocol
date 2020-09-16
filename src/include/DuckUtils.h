@@ -1,6 +1,5 @@
 /**
  * @file DuckUtils.h
- * @author
  * @brief This file is internal to CDP and provides some common utility methods.
  * @version
  * @date 2020-09-16
