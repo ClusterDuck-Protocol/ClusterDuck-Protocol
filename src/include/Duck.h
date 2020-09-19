@@ -17,7 +17,6 @@ public:
   ~Duck() {
   }
 
-  virtual int run() = 0;
   void setupSerial(int baudRate = 115200);
   void setupRadio(float band = CDPCFG_RF_LORA_FREQ, int ss = CDPCFG_PIN_LORA_CS,
                   int rst = CDPCFG_PIN_LORA_RST, int di0 = CDPCFG_PIN_LORA_DIO0,
@@ -60,29 +59,6 @@ public:
   void setupInternet(String ssid, String password);
   void setupOTA();
 
-protected:
-  String deviceId;
-  DuckLora* duckLora = DuckLora::getInstance();
-  DuckNet* duckNet = DuckNet::getInstance();
-
-  virtual int startReceive() { return DUCKLORA_ERR_RECEIVE; }
-  virtual int startTransmit() { return DUCKLORA_ERR_TRANSMIT; }
-  virtual void setup() {}
-
-  static volatile bool receivedFlag;
-  /**
-   * @brief Interrupt service routing when LoRa chip di0 pin is active
-   * 
-   */
-  static void onPacketReceived();
-
-  static bool imAlive(void*);
-  static bool reboot(void*);
-  
-  void processPortalRequest();
-  void handleOtaUpdate();
-
-
   /**
    * @brief Sends a Duck LoRa message.
    *
@@ -100,6 +76,35 @@ protected:
   void sendPayloadStandard(String msg = "", String topic = "",
                            String senderId = "", String messageId = "",
                            String path = "");
+
+protected:
+  String deviceId;
+  DuckLora* duckLora = DuckLora::getInstance();
+  DuckNet* duckNet = DuckNet::getInstance();
+
+  int startReceive();
+  int startTransmit();
+
+  virtual int run() = 0;
+
+  virtual void setup() {
+    duckNet->setDeviceId(deviceId);
+  }
+
+  static volatile bool receivedFlag;
+  void toggleReceiveFlag() { receivedFlag = !receivedFlag; }
+
+  /**
+   * @brief Interrupt service routing when LoRa chip di0 pin is active
+   * 
+   */
+  static void onPacketReceived();
+
+  static bool imAlive(void*);
+  static bool reboot(void*);
+
+  void processPortalRequest();
+  void handleOtaUpdate();
 };
 
 #endif

@@ -41,33 +41,8 @@ public:
    */
   ClusterDuck();
 
-  ~ClusterDuck() {
-    delete _duckDisplay;
-    delete _duckLed;
-    delete _duckLora;
-    delete _duckNet;
-  };
+  ~ClusterDuck() {}
   
-  /**
-   * @brief A Builder interface through which a Duck can be setup.
-   * 
-   */
-  friend class DuckBuilder;
-
-  /**
-   * @brief Set the device id of a Duck.
-   * 
-   * @param deviceId a string representing the device id (optional: if none is provided, a random value is generated) by the library
-   */
-  void setDeviceId(String deviceId = "");
-
-  /**
-   * @brief Initialize the duck.
-   *
-   * @param baudRate the serial interface baud rate. Default value is
-   * set to CDPCFG_SERIAL_BAUD
-   */
-  void begin(int baudRate = CDPCFG_SERIAL_BAUD);
 
   /**
    * @brief Get the Duck Mac Address.
@@ -83,12 +58,6 @@ public:
    * @return A string representing a unique identifier.
    */
   String uuidCreator();
-  /**
-   * @brief Get the duck's device id.
-   * 
-   * @return A string representing the duck's device id 
-   */
-  String getDeviceId();
 
   /**
    * @brief Get the interrupt state.
@@ -139,21 +108,6 @@ public:
    */
   int runDetect();
 
-  /**
-   * @brief Setup the Lora module (default values are defined in cdpcfg.h)
-   *
-   * @param BAND    radio frequency (default CDPCFG_RF_LORA_FREQ
-   * e.g 915.0 forthe US)
-   * @param SS      slave select pin (default CDPCFG_PIN_LORA_CS)
-   * @param RST     chip reset pin. (default CDPCFG_PIN_LORA_RST)
-   * @param DI0     dio0 interrupt pin (default CDPCFG_PIN_LORA_DIO0)
-   * @param DI1     dio1 interrupt pin (default CDPCFG_PIN_LORA_DIO1)
-   * @param TxPower transmit power (default CDPCFG_RF_LORA_TXPOW)
-   */
-  void setupLoRa(float BAND = CDPCFG_RF_LORA_FREQ, int SS = CDPCFG_PIN_LORA_CS,
-                 int RST = CDPCFG_PIN_LORA_RST, int DI0 = CDPCFG_PIN_LORA_DIO0,
-                 int DI1 = CDPCFG_PIN_LORA_DIO1,
-                 int TxPower = CDPCFG_RF_LORA_TXPOW);
 
   /**
    * @brief Handles a received LoRa packet.
@@ -171,18 +125,6 @@ public:
    */
   String getPacketData(int pSize);
 
-  /**
-   * @brief Sends a Duck LoRa message.
-   * 
-   * @param msg         the message payload (optional: if not provided, it will be set to an empty string)
-   * @param topic       the message topic (optional: if not provided, it will be set to "status")
-   * @param senderId    the sender id (optional: if not provided, it will be set to the duck device id) 
-   * @param messageId   the message id (optional: if not provided, a unique id will be generated)
-   * @param path        the message path to append the device id to (optional: if not provided, the path will only contain the duck's device id) 
-   */
-  void sendPayloadStandard(String msg="", String topic = "",
-                           String senderId = "", String messageId = "",
-                           String path = "");
 
   /** 
    * @brief Get the last received LoRa packet.
@@ -292,282 +234,11 @@ public:
   String getPortalDataString();
   bool runCaptivePortal();
 
-  // Led
-  void setColor(int ledR = CDPCFG_PIN_RGBLED_R, int ledG = CDPCFG_PIN_RGBLED_G,
-                int ledB = CDPCFG_PIN_RGBLED_B);
-  void setupLED();
-
 protected:
   String _deviceId = "";
-  DuckDisplay* _duckDisplay = DuckDisplay::getInstance();
-  DuckLed* _duckLed = DuckLed::getInstance();
-
-  DuckLora* _duckLora = DuckLora::getInstance();
-  DuckNet* _duckNet = DuckNet::getInstance();
 
 private:
   static void setFlag(void);
-  //static void restartDuck();
 
-  static int _rssi;
-  static float _snr;
-  static long _freqErr;
-  static int _availableBytes;
-  static int _packetSize;
-  static String runTime;
-
-  static void handleOta();
 };
-
-#if 0
-/**
- * @brief External duck builder APIs to setup a duck device
- * 
- */
-class DuckBuilder {
-public:
-  /**
-   * @brief Construct a new Duck Builder object
-   * 
-   */
-  DuckBuilder() {
-  }
-
-  /**
-   * @brief Initialize and setup a basic duck
-   * 
-   * Initialize a duck and set its device id, but does not setup any other components
-   * such as the LoRa module, a display, etc...
-   * 
-   * @param id a string representing the duck's unique id
-   * @return An updated reference to a DuckBuilder object.
-   */
-  auto createAs(String id) -> DuckBuilder& {
-    _duck.begin();
-    _duck.setDeviceId(id);
-    return *this;
-  }
-
-  /**
-   * @brief Initialize and setup a Mama Duck.
-   *
-   * The duck is initialized as a Mama Duck and will perform the following setups.
-   * If the duck hardware does not have WiFi or a Display, these 
-   * setups (or related setups) will be skipped.
-   * ```
-   * setupDisplay("Mama");
-   * setupLoRa();
-   * setupWifiAp();
-   * setupDns();
-   * setupWebServer(true);
-   * setupOTA();
-   * ```
-   *
-   * @param id a string representing the duck's unique id
-   * @return An updated reference to a DuckBuilder object.
-   */
-  auto createMamaDuckAs(String id) -> ClusterDuck& {
-    _duck.begin();
-    _duck.setDeviceId(id);
-    _duck.setupMamaDuck();
-    return _duck;
-  }
-
-  /**
-   * @brief Initialize and setup a Duck Link.
-   *
-   * The duck is initialized as a DuckLink and will perform the following
-   * setups. If the duck hardware does not have WiFi or a Display, these
-   * setups (or related setups) will be skipped.
-   * ```
-   * setupDisplay("Duck");
-   * setupLoRa();
-   * setupWifiAp();
-   * setupDns();
-   * setupWebServer(true);
-   * setupOTA();
-   * ```
-   *
-   * @param id a string representing the duck's unique id
-   * @return An updated reference to a DuckBuilder object.
-   */
-  auto createDuckLinkAs(String id) -> ClusterDuck& {
-    _duck.begin();
-    _duck.setDeviceId(id);
-    _duck.setupDuckLink();
-    return _duck;
-  }
-
-  /**
-   * @brief Initialize and setup a Duck Detector.
-   *
-   * The duck is initialized as a DuckDetector and will perform the following
-   * setups. If the duck hardware does not have WiFi or a Display, these
-   * setups (or related setups) will be skipped.
-   * ```
-   * setupDisplay("Duck");
-   * setupLoRa();
-   * setupWifiAp();
-   * setupDns();
-   * setupWebServer(true);
-   * setupOTA();
-   * ```
-   *
-   * @param id a string representing the duck's unique id
-   * @return An updated reference to a DuckBuilder object.
-   */
-  auto createDectorDuckAs(String id) -> ClusterDuck& {
-    _duck.begin();
-    _duck.setDeviceId(id);
-    _duck.setupDetect();
-    return _duck;
-  }
-
-  /**
-   * @brief Setup LoRa configuration
-   *
-   * @param BAND      LoRa module frequency band, (optional) default: CDPCFG_RF_LORA_FREQ
-   * @param SS        LoRa module slave select pin, (optional) default: CDPCFG_PIN_LORA_CS
-   * @param RST       LoRa module reset pin, (optional) default: CDPCFG_PIN_LORA_RST
-   * @param DI0       LoRa module dio0 interrupt pin, (optional) default: CDPCFG_PIN_LORA_DIO0
-   * @param DI1       LoRa module dio1 interrupt pin, (optional) default: CDPCFG_PIN_LORA_DIO1
-   * @param TxPower   LoRa module transmit power, (optional) default: CDPCFG_RF_LORA_TXPOW
-   * @return An updated reference to a DuckBuilder object.
-   */
-  auto withLora(long BAND = CDPCFG_RF_LORA_FREQ, int SS = CDPCFG_PIN_LORA_CS,
-                int RST = CDPCFG_PIN_LORA_RST, int DI0 = CDPCFG_PIN_LORA_DIO0,
-                int DI1 = CDPCFG_PIN_LORA_DIO1,
-                int TxPower = CDPCFG_RF_LORA_TXPOW) -> DuckBuilder& {
-    _duck.setupLoRa(BAND, SS, RST, DI0, DI1, TxPower);
-    return *this;
-  }
-
-  /**
-   * @brief Setup Display configuration
-   *
-   * This method does nothing if display is disabled in the `cdpcfg.h`
-   * configuration file
-   * 
-   * @param deviceType  A string representing the device type (e.g "Mama",
-   * "Duck",...)
-   * @return An updated reference to a DuckBuilder object.
-   */
-  auto withDisplay(String deviceType) -> DuckBuilder& {
-    _duck.setupDisplay(deviceType);
-    return *this;
-  }
-
-  /**
-   * @brief Setup WiFi configuration.
-   *
-   * This method does nothing if there is WiFi is disabled in the `cdpcfg.h`
-   * configuration file.
-   *
-   * @param ap a string representing the wifi access point.
-   * @return An updated reference to a DuckBuilder object.
-   */
-  auto withWifi(const char* ap = "🆘 DUCK EMERGENCY PORTAL") -> DuckBuilder& {
-    _duck.setupWifiAp(ap);
-    return *this;
-  }
-
-  /**
-   * @brief Setup DNS configuration.
-   *
-   * This method does nothing if there is WiFi is disabled in the `cdpcfg.h`
-   * configuration file.
-   *
-   * @return An updated reference to a DuckBuilder object.
-   */
-  auto withDns() -> DuckBuilder& {
-    _duck.setupDns();
-    return *this;
-  }
-
-  /**
-   * @brief Setup internet configuration.
-   *
-   * This method does nothing if there is WiFi is disabled in the `cdpcfg.h`
-   * configuration file.
-   *
-   * @param ssid      ssid of the wifi network
-   * @param password  password to access the wifi network
-   * @return An updated reference to a DuckBuilder object.
-   */
-  auto withInternet(String ssid, String password) -> DuckBuilder& {
-    _duck.setupInternet(ssid, password);
-    return *this;
-  }
-
-  /**
-   * @brief Setup Over The Air (OTA) update.
-   *
-   * This method does nothing if there is WiFi is disabled in the `cdpcfg.h`
-   * configuration file.
-   * 
-   * @return An updated reference to a DuckBuilder object.
-   */
-  auto withOta() -> DuckBuilder& {
-    _duck.setupOTA();
-    return *this;
-  }
-
-  /**
-   * @brief
-   *
-   * This method does nothing if there is WiFi is disabled in the `cdpcfg.h`
-   * configuration file.
-   *
-   * @param createCaptivePortal true if the captive portal is used, (optional:
-   * default is false)
-   * @param html  a string that represents the portal HTML page, (optional: if
-   * not provided, will use a default webpage)
-   * @return An updated reference to a DuckBuilder object.
-   */
-  auto withWebServer(bool createCaptivePortal = false, String html = "") -> DuckBuilder& {
-    _duck.setupWebServer(createCaptivePortal, html);
-    return *this;
-  }
-
-  /**
-   * @brief Setup onboard LED.
-   *
-   * @return An updated reference to a DuckBuilder object.
-   */
-  auto withLed()->DuckBuilder& {
-    _duck.setupLED();
-    return *this;
-  }
-
-  /**
-   * @brief Tell the builder the setup is complete
-   * 
-   * @return A setup duck ready to go.
-   */
-  auto done() -> ClusterDuck& { return _duck; }
-
-private:
-  ClusterDuck _duck;
-  
-};
-
-#ifndef CDPCFG_WIFI_NONE
-
-  class CaptiveRequestHandler : public AsyncWebHandler {
-  public:
-    CaptiveRequestHandler(String portal) { _portal = portal; }
-    virtual ~CaptiveRequestHandler() {}
-
-    bool canHandle(AsyncWebServerRequest* request) { return true; }
-
-    void handleRequest(AsyncWebServerRequest* request) {
-      AsyncResponseStream* response = request->beginResponseStream("text/html");
-      response->print(_portal);
-      request->send(response);
-    }
-
-    String _portal;
-};
-#endif
-#endif // #if 0
 #endif

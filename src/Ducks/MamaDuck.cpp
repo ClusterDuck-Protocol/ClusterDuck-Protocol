@@ -1,4 +1,4 @@
-#include "MamaDuck.h"
+#include "../MamaDuck.h"
 
 bool MamaDuck::idInPath(String path) {
   Serial.print("[MamaDuck] idInPath '");
@@ -25,6 +25,7 @@ bool MamaDuck::idInPath(String path) {
 }
 
 void MamaDuck::setup() {
+  Duck::setup();
   setupRadio();
   setupWifi();
   setupDns();

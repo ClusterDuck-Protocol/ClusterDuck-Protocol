@@ -8,6 +8,8 @@ Duck::Duck(String id, int baudRate) {
     Serial.begin(baudRate);
     Serial.print("[DuckLink] Serial start ");
     Serial.println(baudRate, DEC);
+    
+    duckutils::setDuckInterrupt(true);
 }
 
 void Duck::setupSerial(int baudRate) {
@@ -156,4 +158,22 @@ bool Duck::imAlive(void*) {
   Serial.println(alive);
   DuckLora::getInstance()->sendPayloadStandard(alive, "health");
   return true;
+}
+
+int Duck::startReceive() {
+  int err = duckLora->startReceive();
+  if (err != DUCKLORA_ERR_NONE) {
+    Serial.println("[Duck] Restarting Duck...");
+    duckesp::restartDuck();
+  }
+  return err;
+}
+
+int Duck::startTransmit() {
+  int err = duckLora->transmitData();
+  if (err != DUCKLORA_ERR_NONE) {
+    Serial.print("[Duck] Oops! Lora transmission failed, err = ");
+    Serial.print(err);
+  }
+  return err;
 }
