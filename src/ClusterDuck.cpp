@@ -29,43 +29,6 @@ void ClusterDuck::setDeviceId(String deviceId) {
   _duckNet->setDeviceId(_deviceId);
 }
 
-void ClusterDuck::setupDisplay(String deviceType) {
-
-  _duckDisplay->setupDisplay();
-
-#ifdef CDPCFG_OLED_64x32
-  // small display 64x32
-  _duckDisplay->setCursor(0, 2);
-  _duckDisplay->print("((>.<))");
-
-  _duckDisplay->setCursor(0, 4);
-  _duckDisplay->print("DT: " + deviceType);
-
-  _duckDisplay->setCursor(0, 5);
-  _duckDisplay->print("ID: " + _deviceId);
-
-#else
-  // default display size 128x64
-  _duckDisplay->setCursor(0, 1);
-  _duckDisplay->print("    ((>.<))    ");
-
-  _duckDisplay->setCursor(0, 2);
-  _duckDisplay->print("  Project OWL  ");
-
-  _duckDisplay->setCursor(0, 4);
-  _duckDisplay->print("Device: " + deviceType);
-
-  _duckDisplay->setCursor(0, 5);
-  _duckDisplay->print("Status: Online");
-
-  _duckDisplay->setCursor(0, 6);
-  _duckDisplay->print("ID:     " + _deviceId);
-
-  _duckDisplay->setCursor(0, 7);
-  _duckDisplay->print(duckMac(false));
-#endif
-}
-
 // Initial LoRa settings
 void ClusterDuck::setupLoRa(float BAND, int SS, int RST, int DI0, int DI1,
                             int TxPower) {
@@ -119,22 +82,6 @@ void ClusterDuck::setFlag(void) {
 }
 // =====================================
 
-void ClusterDuck::setupWebServer(bool createCaptivePortal, String html) {
-  _duckNet->setupWebServer(createCaptivePortal, html);
-}
-
-void ClusterDuck::setupWifiAp(const char* AP) { 
-  _duckNet->setupWifiAp(AP); 
-}
-
-void ClusterDuck::setupDns() {
-  _duckNet->setupDns(); 
-}
-
-void ClusterDuck::setupInternet(String SSID, String PASSWORD) {
-  _duckNet->setupInternet(SSID, PASSWORD);
-}
-
 bool ClusterDuck::ssidAvailable(String val) {
   bool available = _duckNet->ssidAvailable(val);
   return available;
@@ -182,26 +129,9 @@ void ClusterDuck::setupOTA() {
 }
 #endif
 
-// Setup premade DuckLink with default settings
-void ClusterDuck::setupDuckLink() {
-  setupDisplay("Duck");
-  setupLoRa();
-  setupWifiAp();
-  setupDns();
-  setupWebServer(true);
-  setupOTA();
-
-  Serial.println("Duck Online");
-}
-
-void ClusterDuck::runDuckLink() {
-  handleOta();
-  processPortalRequest();
-}
 
 //#define USE_NETWORK
 void ClusterDuck::setupDetect() {
-  setupDisplay("Detector");
   setupLoRa();
 #ifdef USE_NETWORK
   setupWifiAp(false);
@@ -246,66 +176,6 @@ void ClusterDuck::processPortalRequest() {
   _duckNet->dnsServer.processNextRequest();
 }
 #endif
-
-void ClusterDuck::setupMamaDuck() {
-  setupDisplay("Mama");
-  setupLoRa();
-  setupWifiAp();
-  setupDns();
-  setupWebServer(true);
-  setupOTA();
-
-  Serial.println("MamaDuck Online");
-
-  duckutils::getTimer().every(CDPCFG_MILLIS_ALIVE, imAlive);
-  //duckutils::getTimer().every(CDPCFG_MILLIS_REBOOT, reboot);
-}
-
-void ClusterDuck::runMamaDuck() {
-  handleOta();
-  if (duckutils::getDuckInterrupt()) {
-    duckutils::getTimer().tick();
-  }
-
-  // Mama ducks can also receive packets from other ducks
-  // Here we check whether a packet needs to be relayed or not
-  // For safe processing of the received packet we make sure
-  // to disable interrupts, before handling the received packet.
-  if (receivedFlag) {
-    receivedFlag = false;
-    duckutils::setDuckInterrupt(false);
-    int pSize = _duckLora->handlePacket();
-    Serial.print("[ClusterDuck] runMamaDuck rcv packet. pSize = ");
-    Serial.println(pSize);
-    
-    if (pSize > 0) {
-      // These 2 methods should be combined in one.
-      // the string returned by getPacketData() is only the message topic
-      // it could instead return the whole packet and we can get the topic from the
-      // Packet data structure
-      String msg = _duckLora->getPacketData(pSize);
-      Packet lastPacket = _duckLora->getLastPacket();
-      _duckLora->resetPacketIndex();
-      
-      if (msg != "ping" && !idInPath(lastPacket.path)) {
-        Serial.print("[ClusterDuck] runMamaDuck relay packet msg: ");
-        Serial.println(msg);
-        
-        _duckLora->sendPayloadStandard(lastPacket.payload, lastPacket.topic, lastPacket.senderId,
-                                       lastPacket.messageId, lastPacket.path);
-        _duckLora->resetTransmissionBuffer();
-      }
-    }
-    else {
-      // discard any unrecognized packets
-      _duckLora->resetTransmissionBuffer();
-    }
-    duckutils::setDuckInterrupt(true);
-    startReceive();
-  }
-
-  processPortalRequest();
-}
 
 int ClusterDuck::handlePacket() {
   Serial.println("[ClusterDuck] handling LoRa packet");
@@ -423,7 +293,7 @@ int ClusterDuck::startReceive() {
 }
 
 int ClusterDuck::startTransmit() {
-  int err = _duckLora->startTransmit();
+  int err = _duckLora->transmitData();
   if (err != DUCKLORA_ERR_NONE) {
     Serial.print("[ClusterDuck] Oops! Lora transmission failed, err = ");
     Serial.print(err);

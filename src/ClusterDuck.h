@@ -90,9 +90,6 @@ public:
    */
   String getDeviceId();
 
-  static bool imAlive(void*);
-  static bool reboot(void*);
-
   /**
    * @brief Get the interrupt state.
    * 
@@ -118,56 +115,6 @@ public:
    * @return 0 if the message was sent sucessfully, an error code otherwise.
    */
   int ping();
-
-  /**
-   * @brief Shortcut to setup a Duck Link.
-   *
-   * This function will setup a Duck Link and is equivalent to call these
-   * individual methods: 
-   * ```
-   * setupDisplay("Duck");
-   * setupLoRa();
-   * setupWifiAp();
-   * setupDns();
-   * setupWebServer(true);
-   * setupOTA();
-   * ```
-   * It is assumed that the DuckLink hardware has a display and a wifi component.
-   */
-  void setupDuckLink();
-  /**
-   * @brief starts the DuckLink run thread.
-   * 
-   * - listens for OTA messages and performs OTA update if needed
-   * - listens for portal messages and trasmits them.
-   */
-  void runDuckLink();
-
-  /**
-   * @brief Shortcut to setup a MamaDuck.
-   *
-   * This function will setup a Mama Duck and is equivalent to call these
-   * individual methods:
-   * ```
-   * setupDisplay("Duck");
-   * setupLoRa();
-   * setupWifiAp();
-   * setupDns();
-   * setupWebServer(true);
-   * setupOTA();
-   * ```
-   * It is assumed that the MamaDuck hardware has a display and a wifi component.
-   */
-  void setupMamaDuck();
-
-  /**
-   * @brief starts the Mama Duck run thread.
-   *
-   * - listens for OTA messages and performs OTA update if needed
-   * - listens for portal messages and trasmits them.
-   * - checks for received message and relay them if needed
-   */
-  void runMamaDuck();
 
   /**
    * @brief Shortcut to setup a Duck Detector
@@ -300,48 +247,6 @@ public:
   int getRSSI();
 
   /**
-   * @brief Initialize the display component.
-   *
-   * @param deviceType a string representing the device type (e.g "Papa")
-   */
-  void setupDisplay(String deviceType);
-
-  /**
-   * @brief Set up the WebServer.
-   *
-   * The WebServer is used to communicate with the Duck over ad-hoc WiFi
-   * connection.
-   *
-   * @param createCaptivePortal set to true if Captive WiFi connection is
-   * needed. Defaults to false
-   * @param html A string representing custom HTML code used for the portal.
-   * Default is an empty string Default portal web page is used if the string is
-   * empty
-   */
-  void setupWebServer(bool createCaptivePortal = false, String html = "");
-
-  /**
-   * @brief Set up the WiFi access point.
-   *
-   * @param accessPoint a string representing the access point. Default to  "🆘 DUCK EMERGENCY PORTAL"
-   */
-  void setupWifiAp(const char* accessPoint = "🆘 DUCK EMERGENCY PORTAL");
-
-  /**
-   * @brief Set up DNS.
-   *
-   */
-  void setupDns();
-
-  /**
-   * @brief Set up internet access.
-   *
-   * @param ssid        the ssid of the WiFi network
-   * @param password    password to join the network
-   */
-  void setupInternet(String ssid, String password);
-
-  /**
    * @brief  Checks if the given ssid is available.
    *
    * @param val     ssid to check, default is an empty string and will use the
@@ -414,6 +319,7 @@ private:
   static void handleOta();
 };
 
+#if 0
 /**
  * @brief External duck builder APIs to setup a duck device
  * 
@@ -663,5 +569,5 @@ private:
     String _portal;
 };
 #endif
-
+#endif // #if 0
 #endif

@@ -14,7 +14,6 @@
 #include <Arduino.h>
 #include <RadioLib.h>
 
-#include "DuckDisplay.h"
 #include "LoraPacket.h"
 #include "cdpcfg.h"
 
@@ -164,7 +163,7 @@ public:
    *
    * @returns 0 if the call was successful, an error code otherwise.
    */
-  int startTransmit();
+  int transmitData();
 
   /**
    * @brief Get the current RSSI value.

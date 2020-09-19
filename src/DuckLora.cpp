@@ -211,7 +211,7 @@ String DuckLora::getPacketData(int pSize) {
       if (_deviceId != "Det") {
         resetTransmissionBuffer();
         couple(iamhere_B, "1");
-        startTransmit();
+        transmitData();
         Serial.println("[DuckLora] Packet pong sent");
         packetData = "ping";
         return packetData;
@@ -335,7 +335,7 @@ int DuckLora::sendPayloadStandard(String msg, String topic, String senderId,
   Serial.print(" * LEN:");
   Serial.println(_packetIndex);
 
-  return startTransmit();
+  return transmitData();
 }
 
 void DuckLora::resetLastPacket() {
@@ -380,7 +380,7 @@ int DuckLora::startReceive() {
   return DUCKLORA_ERR_NONE;
 }
 
-int DuckLora::startTransmit() {
+int DuckLora::transmitData() {
   
   bool oldEI = duckutils::getDuckInterrupt();
   duckutils::setDuckInterrupt(false);
@@ -398,24 +398,24 @@ int DuckLora::startTransmit() {
 
   switch (tx_err) {
     case ERR_NONE:
-      Serial.print("[DuckLora] startTransmit Packet sent in: ");
+      Serial.print("[DuckLora] transmitData Packet sent in: ");
       Serial.print((millis() - t1));
       Serial.println("ms");
       break;
 
     case ERR_PACKET_TOO_LONG:
       // the supplied packet was longer than 256 bytes
-      Serial.println("[DuckLora] startTransmit too long!");
+      Serial.println("[DuckLora] transmitData too long!");
       err = DUCKLORA_ERR_MSG_TOO_LARGE;
       break;
 
     case ERR_TX_TIMEOUT:
-      Serial.println("[DuckLora] startTransmit timeout!");
+      Serial.println("[DuckLora] transmitData timeout!");
       err = DUCKLORA_ERR_TIMEOUT;
       break;
 
     default:
-      Serial.print(F("[DuckLora] startTransmit failed, code "));
+      Serial.print(F("[DuckLora] transmitData failed, code "));
       Serial.println(err);
       err = DUCKLORA_ERR_TRANSMIT;
       break;
@@ -441,7 +441,7 @@ int DuckLora::getRSSI() { return lora.getRSSI(); }
 
 int DuckLora::ping() {
   couple(ping_B, "0");
-  return startTransmit();
+  return transmitData();
 }
 
 int DuckLora::standBy() { return lora.standby(); }
