@@ -11,8 +11,6 @@ class MamaDuck : public Duck {
 public:
   using Duck::Duck;
   int run();
-  int startReceive();
-  int startTransmit();
   void setup();
 private:
   bool idInPath(String path);

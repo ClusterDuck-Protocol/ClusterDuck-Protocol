@@ -85,21 +85,3 @@ int MamaDuck::run() {
   processPortalRequest();
   return 0;
 }
-
-int MamaDuck::startReceive() {
-  int err = duckLora->startReceive();
-  if (err != DUCKLORA_ERR_NONE) {
-    Serial.println("[MamaDuck] Restarting Duck...");
-    duckesp::restartDuck();
-  }
-  return err;
-}
-
-int MamaDuck::startTransmit() {
-  int err = duckLora->transmitData();
-  if (err != DUCKLORA_ERR_NONE) {
-    Serial.print("[MamaDuck] Oops! Lora transmission failed, err = ");
-    Serial.print(err);
-  }
-  return err;
-}

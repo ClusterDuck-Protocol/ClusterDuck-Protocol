@@ -11,7 +11,6 @@ class DuckLink : public Duck {
 public:
   using Duck::Duck;
   int run();
-  int startTransmit();
   void setup();
 };
 
