@@ -8,16 +8,16 @@
  * To customize your build, you could ...
  * - Edit this file or
  * - Copy it to `cdpcfg-pre.h` and edit _that_ or
- * - Create a from-scratch `cdpcfg-pre.h` that just overrides f.ex. the board defines or
+ * - Create a from-scratch `cdpcfg-pre.h` that just overrides f.ex. the board
+ * defines or
  * - Create a `cdpcfg-post.h` to undef/define just parts
- * 
+ *
  * @version
  * @date 2020-09-16
  *
  * @copyright
  *
  */
-
 
 // preload optional pre-cfg
 #ifndef CRPCFG_PRE
@@ -38,7 +38,7 @@
 
 /**
  * BOARD "ttgo lora" and "heltec lora" v1
- * 
+ *
  * heltec pcb is white, ttgo pcb has heltec+ttgo markings
  * left top+middle in this picture
  * https://github.com/Xinyuan-LilyGO/TTGO-LoRa-Series
@@ -63,7 +63,7 @@
 
 /**
  * BOARD "ttgo lora v2"
- * 
+ *
  * Top right in this picture
  * https://github.com/Xinyuan-LilyGO/TTGO-LoRa-Series
  * pio: board = ttgo-lora32-v2
@@ -144,7 +144,6 @@
 // actualy missing
 #define CDPCFG_PIN_LORA_DIO1 -1
 
-
 /*
  * BOARD "rocket scream Mini Ultra Pro v3"
  * https://www.rocketscream.com/blog/docs-item/mini-ultra-pro-hookup-guide/
@@ -170,7 +169,6 @@
 // Required for Serial on Zero based boards
 #define Serial SERIAL_PORT_USBVIRTUAL
 //===== BOARD "rocket scream Mini Ultra Pro v3" =====
-
 
 /*
  * BOARD "sparkfun lora gateway 1-channel"
@@ -279,7 +277,7 @@
 
 /**
  * @brief Non board specific configuration
- * 
+ *
  */
 
 // Username and Password for OTA web page
@@ -326,7 +324,6 @@
 #define CDPCFG_PIN_RGBLED_G 4
 /// CDP RGB Led BLUE Pin default value
 #define CDPCFG_PIN_RGBLED_B 2
-
 
 #ifndef CDPCFG_LORA_CLASS
 /// Default LoRa Module supported chipset

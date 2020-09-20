@@ -5,10 +5,6 @@ volatile bool Duck::receivedFlag = false;
 
 Duck::Duck(String id, int baudRate) {
     deviceId = id;
-    Serial.begin(baudRate);
-    Serial.print("[DuckLink] Serial start ");
-    Serial.println(baudRate, DEC);
-    
     duckutils::setDuckInterrupt(true);
 }
 
