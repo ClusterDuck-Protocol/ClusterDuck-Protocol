@@ -13,6 +13,7 @@ Duck::Duck(String id, int baudRate) {
 }
 
 void Duck::setupSerial(int baudRate) {
+  while (!Serial && millis() < 10000);
   Serial.begin(baudRate);
   Serial.print("[DuckLink] Serial start ");
   Serial.println(baudRate, DEC);
@@ -134,7 +135,7 @@ void Duck::processPortalRequest() {
 }
 #endif
 
-void Duck::sendPayloadStandard(String msg, String topic, String senderId,
+int Duck::sendPayloadStandard(String msg, String topic, String senderId,
                                String messageId, String path) {
   int err =
       duckLora->sendPayloadStandard(msg, topic, senderId, messageId, path);
@@ -142,6 +143,7 @@ void Duck::sendPayloadStandard(String msg, String topic, String senderId,
     Serial.print("[Duck] Oops! Something went wrong, err = ");
     Serial.println(err);
   }
+  return err;
 }
 
 bool Duck::reboot(void*) {

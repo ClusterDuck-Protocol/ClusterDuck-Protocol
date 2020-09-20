@@ -72,12 +72,15 @@ public:
    * will be generated)
    * @param path        the message path to append the device id to (optional:
    * if not provided, the path will only contain the duck's device id)
+   * @returns 0 if success, an error code otherwise
    */
-  void sendPayloadStandard(String msg = "", String topic = "",
+
+  int sendPayloadStandard(String msg = "", String topic = "",
                            String senderId = "", String messageId = "",
                            String path = "");
 
 protected:
+
   String deviceId;
   DuckLora* duckLora = DuckLora::getInstance();
   DuckNet* duckNet = DuckNet::getInstance();
@@ -86,8 +89,7 @@ protected:
   int startTransmit();
 
   virtual int run() = 0;
-
-  virtual void setup() {
+  virtual void setupWithDefaults() {
     duckNet->setDeviceId(deviceId);
   }
 

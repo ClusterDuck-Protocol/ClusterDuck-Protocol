@@ -10,9 +10,11 @@
 class MamaDuck : public Duck {
 public:
   using Duck::Duck;
+
   int run();
-  void setup();
-private:
+  void setupWithDefaults();
+
+private :
   bool idInPath(String path);
 };
 

@@ -1,7 +1,9 @@
 #include "../DuckLink.h"
 
-void DuckLink::setup() {
-    Duck::setup();
+void DuckLink::setupWithDefaults() {
+    Duck::setupWithDefaults();
+    setupSerial();
+    setupRadio();
 }
 
 int DuckLink::run() {

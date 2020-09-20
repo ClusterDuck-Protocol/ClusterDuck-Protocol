@@ -11,8 +11,13 @@ class DuckDetect : public Duck {
 public:
   using Duck::Duck;
   int run();
-  int startReceive();
-  int startTransmit();
-  void setup();
+  void sendPing(bool startReceive);
+  void setupWithDefaults();
+
+  using MessageRxCallback = void (*)(const byte*);
+  void registerRecvCallback(MessageRxCallback rxCb) { this->rxCb = rxCb; }
+
+private:
+  MessageRxCallback rxCb;
 };
 #endif

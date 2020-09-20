@@ -26,6 +26,7 @@
 
 #define DUCKLORA_ERR_HANDLE_PACKET -100
 #define DUCKLORA_ERR_MSG_TOO_LARGE -101
+#define DUCKLORA_ERR_MSG_EMPTY -102
 
 const byte ping_B = 0xF4;
 const byte senderId_B = 0xF5;

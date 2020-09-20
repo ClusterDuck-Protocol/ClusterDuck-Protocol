@@ -1,6 +1,6 @@
 #include "../DuckDetect.h"
 
-void DuckDetect::setup() {
+void DuckDetect::setupWithDefaults() {
   setupRadio();
   /*
   setupWifi(false);
@@ -19,6 +19,9 @@ int DuckDetect::run() {
     int pSize = duckLora->handlePacket();
     Serial.print("DuckDetect] run pSize ");
     Serial.println(pSize);
+    rxCb(duckLora->getTransmissionBuffer());
+
+    /*
     if (pSize > 0) {
       for (int i = 0; i < pSize; i++) {
         if (duckLora->getTransmitedByte(i) == iamhere_B) {
@@ -26,9 +29,20 @@ int DuckDetect::run() {
         }
       }
     }
+    */
     duckutils::setDuckInterrupt(true);
     Serial.println("DuckDetect] run startReceive");
     startReceive();
   }
   return val;
+}
+
+
+void DuckDetect::sendPing(bool startReceive) {
+  duckLora->couple(ping_B, "0");
+  startTransmit();
+  
+  if (startReceive) {
+    this->startReceive();
+    }
 }
