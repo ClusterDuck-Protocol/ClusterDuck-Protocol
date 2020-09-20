@@ -2,7 +2,6 @@
 
 void DuckLink::setupWithDefaults() {
     Duck::setupWithDefaults();
-    setupSerial();
     setupRadio();
 }
 

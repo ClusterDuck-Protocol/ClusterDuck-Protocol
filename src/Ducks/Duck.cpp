@@ -3,15 +3,16 @@
 
 volatile bool Duck::receivedFlag = false;
 
-Duck::Duck(String id, int baudRate) {
+Duck::Duck(String id) {
     deviceId = id;
     duckutils::setDuckInterrupt(true);
 }
 
 void Duck::setupSerial(int baudRate) {
   while (!Serial && millis() < 10000);
+
   Serial.begin(baudRate);
-  Serial.print("[DuckLink] Serial start ");
+  Serial.print("[Duck] Serial start: ");
   Serial.println(baudRate, DEC);
 }
 
@@ -21,7 +22,7 @@ void Duck::onPacketReceived(void) {
   if (!duckutils::getDuckInterrupt()) {
     return;
   }
-  receivedFlag = true;
+  setReceiveFlag(true);
 }
 
 void Duck::setupRadio(float band, int ss, int rst, int di0, int di1, int txPower) {

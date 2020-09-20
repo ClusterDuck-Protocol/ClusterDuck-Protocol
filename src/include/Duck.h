@@ -12,19 +12,44 @@
 class Duck {
 
 public:
+  /**
+   * @brief Construct a new Duck object.
+   * 
+   */
   Duck(){}
-  Duck(String id, int baudRate = 115200);
-  ~Duck() {
-  }
+  /**
+   * @brief Construct a new Duck object.
+   * 
+   * @param id a unique id
+   */
+  Duck(String id);
 
+  ~Duck() {}
+
+  /**
+   * @brief Setup serial connection.
+   * 
+   * @param baudRate default: 115200
+   */
   void setupSerial(int baudRate = 115200);
+
+  /**
+   * @brief Setup the radio component
+   *
+   * @param band      radio frequency in Mhz (default: 915.0)
+   * @param ss        slave select pin (default CDPCFG_PIN_LORA_CS)
+   * @param rst       reset pin  (default: CDPCFG_PIN_LORA_RST)
+   * @param di0       dio0 interrupt pin (default: CDPCFG_PIN_LORA_DIO0)
+   * @param di1       dio1 interrupt pin (default: CDPCFG_PIN_LORA_DIO1)
+   * @param txPower   transmit power (default: CDPCFG_RF_LORA_TXPOW)
+   */
   void setupRadio(float band = CDPCFG_RF_LORA_FREQ, int ss = CDPCFG_PIN_LORA_CS,
                   int rst = CDPCFG_PIN_LORA_RST, int di0 = CDPCFG_PIN_LORA_DIO0,
                   int di1 = CDPCFG_PIN_LORA_DIO1,
                   int txPower = CDPCFG_RF_LORA_TXPOW);
 
   /**
-   * @brief Set up the WiFi access point.
+   * @brief Setup WiFi access point.
    *
    * @param accessPoint a string representing the access point. Default to  
    * "🆘 DUCK EMERGENCY PORTAL"
@@ -32,12 +57,13 @@ public:
   void setupWifi(const char* ap = "🆘 DUCK EMERGENCY PORTAL");
 
   /**
-   * @brief Set up DNS.
+   * @brief Setup DNS.
    *
    */
   void setupDns();
+  
   /**
-   * @brief Set up the WebServer.
+   * @brief Setup web server.
    *
    * The WebServer is used to communicate with the Duck over ad-hoc WiFi
    * connection.
@@ -51,16 +77,21 @@ public:
   void setupWebServer(bool createCaptivePortal = false, String html = "");
 
   /**
-   * @brief Set up internet access.
+   * @brief Setup internet access.
    *
    * @param ssid        the ssid of the WiFi network
    * @param password    password to join the network
    */
   void setupInternet(String ssid, String password);
+
+  /**
+   * @brief 
+   * 
+   */
   void setupOTA();
 
   /**
-   * @brief Sends a Duck LoRa message.
+   * @brief Send a duck LoRa message.
    *
    * @param msg         the message payload (optional: if not provided, it will
    * be set to an empty string)
@@ -91,21 +122,33 @@ protected:
   virtual int run() = 0;
   virtual void setupWithDefaults() {
     duckNet->setDeviceId(deviceId);
+    setupSerial();
   }
 
   static volatile bool receivedFlag;
-  void toggleReceiveFlag() { receivedFlag = !receivedFlag; }
+  static void toggleReceiveFlag() { receivedFlag = !receivedFlag; }
+  static void setReceiveFlag(bool value) { receivedFlag = value; }
+  static bool getReceiveFlag() {return receivedFlag;}
 
-  /**
-   * @brief Interrupt service routing when LoRa chip di0 pin is active
-   * 
-   */
-  static void onPacketReceived();
+      /**
+       * @brief Interrupt service routing when LoRa chip di0 pin is active.
+       *
+       */
+      static void onPacketReceived();
 
   static bool imAlive(void*);
   static bool reboot(void*);
-
+  
+  /**
+   * @brief Handle request from emergency portal.
+   * 
+   */
   void processPortalRequest();
+
+  /**
+   * @brief Handle over the air firmware update.
+   * 
+   */
   void handleOtaUpdate();
 };
 

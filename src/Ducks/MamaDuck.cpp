@@ -49,11 +49,11 @@ int MamaDuck::run() {
   // Here we check whether a packet needs to be relayed or not
   // For safe processing of the received packet we make sure
   // to disable interrupts, before handling the received packet.
-  if (receivedFlag) {
-    receivedFlag = false;
+  if (getReceiveFlag()) {
+    setReceiveFlag(false);
     duckutils::setDuckInterrupt(false);
     int pSize = duckLora->handlePacket();
-    Serial.print("[MamaDuck] run rcv packet. pSize = ");
+    Serial.print("[MamaDuck] run() rcv packet. pSize = ");
     Serial.println(pSize);
 
     if (pSize > 0) {
@@ -66,7 +66,7 @@ int MamaDuck::run() {
       duckLora->resetPacketIndex();
 
       if (msg != "ping" && !idInPath(lastPacket.path)) {
-        Serial.print("[MamaDuck] run relay packet msg: ");
+        Serial.print("[MamaDuck] run() relay packet msg: ");
         Serial.println(msg);
 
         duckLora->sendPayloadStandard(lastPacket.payload, lastPacket.topic,

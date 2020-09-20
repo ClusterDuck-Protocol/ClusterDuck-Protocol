@@ -14,10 +14,10 @@ public:
   void sendPing(bool startReceive);
   void setupWithDefaults();
 
-  using MessageRxCallback = void (*)(const byte*);
-  void registerRecvCallback(MessageRxCallback rxCb) { this->rxCb = rxCb; }
+  using rssiCallback = void (*)(const int);
+  void onReceiveRssi(rssiCallback rssiCb) { this->rssiCb = rssiCb; }
 
 private:
-  MessageRxCallback rxCb;
+  rssiCallback rssiCb;
 };
 #endif
