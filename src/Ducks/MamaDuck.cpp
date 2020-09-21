@@ -24,8 +24,8 @@ bool MamaDuck::idInPath(String path) {
   return false;
 }
 
-void MamaDuck::setupWithDefaults() {
-  Duck::setupWithDefaults();
+void MamaDuck::setupWithDefaults(String ssid, String password) {
+  Duck::setupWithDefaults(ssid, password);
   setupRadio();
   setupWifi();
   setupDns();

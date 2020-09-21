@@ -12,7 +12,7 @@ public:
   using Duck::Duck;
   void run();
   void sendPing(bool startReceive);
-  void setupWithDefaults();
+  void setupWithDefaults(String ssid = "", String password = "");
 
   using rssiCallback = void (*)(const int);
   void onReceiveRssi(rssiCallback rssiCb) { this->rssiCb = rssiCb; }

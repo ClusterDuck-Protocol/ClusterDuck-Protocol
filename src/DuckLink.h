@@ -11,7 +11,7 @@ class DuckLink : public Duck {
 public:
   using Duck::Duck;
   void run();
-  void setupWithDefaults();
+  void setupWithDefaults(String ssid="", String password="");
 };
 
 #endif

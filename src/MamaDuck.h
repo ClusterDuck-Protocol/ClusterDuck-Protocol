@@ -12,7 +12,7 @@ public:
   using Duck::Duck;
 
   void run();
-  void setupWithDefaults();
+  void setupWithDefaults(String ssid = "", String password = "");
 
 private :
   bool idInPath(String path);

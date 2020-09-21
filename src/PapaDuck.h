@@ -15,7 +15,7 @@ public:
    * @brief Papa Duck callback function signature.
    * 
    */
-  using callbackFunc = void (*)(const Packet);
+  using callbackFunc = void (*)(Packet );
   
   /**
    * @brief Register callback for handling data received from duck devices
@@ -25,7 +25,7 @@ public:
   void onReceiveDuckData(callbackFunc cb) { this->recvDataCallback = cb; }
 
   void run();
-  void setupWithDefaults();
+  void setupWithDefaults(String ssid = "", String password = "");
   int reconnectWifi(String ssid, String password);
 
 private:

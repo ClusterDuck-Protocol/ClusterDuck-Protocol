@@ -1,7 +1,7 @@
 #include "../DuckDetect.h"
 
-void DuckDetect::setupWithDefaults() {
-  Duck::setupWithDefaults();
+void DuckDetect::setupWithDefaults(String ssid, String password) {
+  Duck::setupWithDefaults(ssid, password);
   setupRadio();
 }
 

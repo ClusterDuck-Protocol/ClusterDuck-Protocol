@@ -125,15 +125,14 @@ protected:
   int startReceive();
   int startTransmit();
 
-  
   virtual void run() = 0;
-  
-  virtual void setupWithDefaults() {
+
+  virtual void setupWithDefaults(String ssid, String password) {
     duckNet->setDeviceId(deviceId);
     setupSerial();
   }
 
-  virtual int reconnectWifi(String ssid, String password) {return 0;}
+  virtual int reconnectWifi(String ssid, String password) { return 0; }
 
   static volatile bool receivedFlag;
   static void toggleReceiveFlag() { receivedFlag = !receivedFlag; }
