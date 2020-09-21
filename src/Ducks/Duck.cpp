@@ -63,6 +63,7 @@ void Duck::setupRadio(float band, int ss, int rst, int di0, int di1, int txPower
 }
 
 void Duck::setupWebServer(bool createCaptivePortal, String html) {
+  duckNet->setDeviceId(deviceId);
   duckNet->setupWebServer(createCaptivePortal, html);
 }
 

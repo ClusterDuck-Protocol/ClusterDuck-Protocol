@@ -108,7 +108,6 @@ public:
    */
   int runDetect();
 
-
   /**
    * @brief Handles a received LoRa packet.
    *
