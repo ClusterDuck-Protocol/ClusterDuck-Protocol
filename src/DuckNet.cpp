@@ -102,7 +102,7 @@ void DuckNet::setupWebServer(bool createCaptivePortal, String html) {
   webServer.on("/formSubmit", HTTP_POST, [&](AsyncWebServerRequest* request) {
     Serial.println("Submitting Form");
 
-    int err = DUCKLORA_ERR_NONE;
+    int err = DUCK_ERR_NONE;
 
     int paramsNumber = request->params();
     String val = "";
@@ -117,7 +117,7 @@ void DuckNet::setupWebServer(bool createCaptivePortal, String html) {
 
     err = _duckLora->sendPayloadStandard(val, "status");
     switch (err) {
-      case DUCKLORA_ERR_NONE:
+      case DUCK_ERR_NONE:
         request->send(200, "text/html", portal);
         break;
       case DUCKLORA_ERR_MSG_TOO_LARGE:

@@ -83,7 +83,7 @@ int DuckLora::setupLoRa(LoraConfigParams config, String deviceId) {
     return DUCKLORA_ERR_RECEIVE;
   }
   _deviceId = deviceId;
-  return DUCKLORA_ERR_NONE;
+  return DUCK_ERR_NONE;
 }
 
 void DuckLora::resetTransmissionBuffer() {
@@ -377,7 +377,7 @@ int DuckLora::startReceive() {
     return DUCKLORA_ERR_RECEIVE;
   }
 
-  return DUCKLORA_ERR_NONE;
+  return DUCK_ERR_NONE;
 }
 
 int DuckLora::transmitData() {
@@ -385,8 +385,8 @@ int DuckLora::transmitData() {
   bool oldEI = duckutils::getDuckInterrupt();
   duckutils::setDuckInterrupt(false);
   long t1 = millis();
-  
-  int err = DUCKLORA_ERR_NONE;
+
+  int err = DUCK_ERR_NONE;
   int tx_err = ERR_NONE;
   int rx_err = ERR_NONE;
 
@@ -422,7 +422,7 @@ int DuckLora::transmitData() {
   }
   resetTransmissionBuffer();
 
-  if (err != DUCKLORA_ERR_NONE) {
+  if (err != DUCK_ERR_NONE) {
     return err;
   }
 
