@@ -32,6 +32,7 @@
 #include <esp_int_wdt.h>
 #include <esp_task_wdt.h>
 
+#include "../DuckError.h"
 #include "DuckEsp.h"
 #include "DuckLora.h"
 #include "DuckUtils.h"
@@ -41,6 +42,7 @@
 #endif
 
 #define AP_SCAN_INTERVAL_MS 10
+ 
 /**
  * @brief Internal network abstraction.
  *
@@ -66,6 +68,7 @@ public:
   String getSsid() {return "";}
   String getPassword() {return "";}
   void setDeviceId(String deviceId) {}
+  bool isWifiConnect() {return false;}
 #else 
   /**
    * @brief Set up the WebServer.
@@ -84,11 +87,14 @@ public:
    * @param accessPoint a string representing the access point. Default to  "🆘 DUCK EMERGENCY PORTAL"
    */
   void setupWifiAp(const char* accessPoint = "🆘 DUCK EMERGENCY PORTAL");
+  
   /**
    * @brief Set up DNS.
-   * 
+   *
+   * @returns 0 if sucessful, an error code otherwise
    */
-  void setupDns();
+  int setupDns();
+
   /**
    * @brief Set up internet access.
    * 
@@ -140,11 +146,12 @@ public:
    */
   void setDeviceId(String deviceId);
 
+  bool isWifiConnected() { return (WiFi.status() == WL_CONNECTED); }
+
   static DNSServer dnsServer;
 #endif
 
-private:
-  DuckNet();
+      private : DuckNet();
   DuckNet(DuckNet const&) = delete;
   DuckNet& operator=(DuckNet const&) = delete;
   static DuckNet* instance;

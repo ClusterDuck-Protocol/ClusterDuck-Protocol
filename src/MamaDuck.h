@@ -11,7 +11,7 @@ class MamaDuck : public Duck {
 public:
   using Duck::Duck;
 
-  int run();
+  void run();
   void setupWithDefaults();
 
 private :

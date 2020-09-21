@@ -37,7 +37,7 @@ void MamaDuck::setupWithDefaults() {
   duckutils::getTimer().every(CDPCFG_MILLIS_ALIVE, imAlive);
 }
 
-int MamaDuck::run() {
+void MamaDuck::run() {
 
   handleOtaUpdate();
 
@@ -81,7 +81,5 @@ int MamaDuck::run() {
     duckutils::setDuckInterrupt(true);
     startReceive();
   }
-
   processPortalRequest();
-  return 0;
 }

@@ -14,19 +14,10 @@
 #include <Arduino.h>
 #include <RadioLib.h>
 
+#include "../DuckError.h"
+
 #include "LoraPacket.h"
 #include "cdpcfg.h"
-
-#define DUCKLORA_ERR_NONE 0
-#define DUCKLORA_ERR_BEGIN -1
-#define DUCKLORA_ERR_SETUP -2
-#define DUCKLORA_ERR_RECEIVE -3
-#define DUCKLORA_ERR_TIMEOUT -4
-#define DUCKLORA_ERR_TRANSMIT -5
-
-#define DUCKLORA_ERR_HANDLE_PACKET -100
-#define DUCKLORA_ERR_MSG_TOO_LARGE -101
-#define DUCKLORA_ERR_MSG_EMPTY -102
 
 const byte ping_B = 0xF4;
 const byte senderId_B = 0xF5;

@@ -70,8 +70,8 @@ void Duck::setupWifi(const char* ap) {
     duckNet->setupWifiAp(ap);
 }
 
-void Duck::setupDns() { 
-    duckNet->setupDns(); 
+int Duck::setupDns() { 
+    return duckNet->setupDns(); 
 }
 
 void Duck::setupInternet(String ssid, String password) {

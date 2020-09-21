@@ -10,7 +10,7 @@
 class DuckDetect : public Duck {
 public:
   using Duck::Duck;
-  int run();
+  void run();
   void sendPing(bool startReceive);
   void setupWithDefaults();
 

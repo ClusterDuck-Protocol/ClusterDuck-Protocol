@@ -5,8 +5,7 @@ void DuckDetect::setupWithDefaults() {
   setupRadio();
 }
 
-int DuckDetect::run() {
-  int val = 0;
+void DuckDetect::run() {
   handleOtaUpdate();
   if (getReceiveFlag()) {
     setReceiveFlag(false);
@@ -23,7 +22,6 @@ int DuckDetect::run() {
     duckutils::setDuckInterrupt(true);
     startReceive();
   }
-  return val;
 }
 
 void DuckDetect::sendPing(bool startReceive) {

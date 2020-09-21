@@ -5,8 +5,7 @@ void DuckLink::setupWithDefaults() {
     setupRadio();
 }
 
-int DuckLink::run() {
+void DuckLink::run() {
   handleOtaUpdate();
   processPortalRequest();
-  return 0;
 }

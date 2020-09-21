@@ -211,15 +211,19 @@ void DuckNet::setupWifiAp(const char* accessPoint) {
   Serial.println("[DuckNet] Created Wifi Access Point");
 }
 
-void DuckNet::setupDns() {
+int DuckNet::setupDns() {
   dnsServer.start(DNS_PORT, "*", apIP);
 
   if (!MDNS.begin(DNS)) {
     Serial.println("[DuckNet] Error setting up MDNS responder!");
-  } else {
-    Serial.println("[DuckNet] Created local DNS");
-    MDNS.addService("http", "tcp", CDPCFG_WEB_PORT);
+    return DUCKDNS_ERR_STARTING;
   }
+  
+  Serial.println("[DuckNet] Created local DNS");
+  MDNS.addService("http", "tcp", CDPCFG_WEB_PORT);
+  
+  return DUCK_ERR_NONE;
+
 }
 
 void DuckNet::setupInternet(String ssid, String password) {
@@ -244,6 +248,7 @@ void DuckNet::setupInternet(String ssid, String password) {
     Serial.println("[DuckNet] DUCK CONNECTED TO INTERNET");
   }
 }
+
 
 bool DuckNet::ssidAvailable(String val) {
   // TODO: needs to be cleaned up for null case
