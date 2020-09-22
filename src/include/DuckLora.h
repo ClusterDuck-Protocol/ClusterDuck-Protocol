@@ -90,13 +90,14 @@ public:
 
   /**
    * @brief  Send a message out into the LoRa mesh network.
-   * 
+   *
    * @param msg         payload representing the message
-   * @param topic       the message topic 
-   * @param senderId    the device_id of the sender 
-   * @param messageId   the id of the message 
+   * @param topic       the message topic
+   * @param senderId    the device_id of the sender
+   * @param messageId   the id of the message
    * @param path        a comma separated list of devide ids having seens the message
-   * @returns 0 if the message was sent successfully, an error code otherwise. 
+   * @returns DUCK_ERR_NONE if the message was sent successfully, an error code
+   * otherwise.
    */
   int sendPayloadStandard(String msg = "", String topic = "",
                           String senderId = "", String messageId = "",
@@ -142,18 +143,18 @@ public:
    * @returns true if a packet was available, false otherwise.
    */
   bool loraPacketReceived();
-  
+
   /**
    * @brief Set the Duck to be ready to recieve LoRa packets.
-   * 
-   * @returns 0 if the call was successful, an error code otherwise.
+   *
+   * @returns DUCK_ERR_NONE if the call was successful, an error code otherwise.
    */
   int startReceive();
 
   /**
    * @brief Set the Duck to be ready to transmit LoRa packets.
    *
-   * @returns 0 if the call was successful, an error code otherwise.
+   * @returns DUCK_ERR_NONE if the call was successful, an error code otherwise.
    */
   int transmitData();
 
@@ -202,7 +203,8 @@ public:
   /**
    * @brief Set the LoRa chip in standby mode.
    *
-   * @returns 0 if the chip is sucessfuly set in standby mode, an error code otherwise.
+   * @returns DUCK_ERR_NONE if the chip is sucessfuly set in standby mode, an
+   * error code otherwise.
    */
   int standBy();
 

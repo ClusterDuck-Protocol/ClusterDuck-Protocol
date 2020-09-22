@@ -87,11 +87,11 @@ public:
    * @param accessPoint a string representing the access point. Default to  "🆘 DUCK EMERGENCY PORTAL"
    */
   void setupWifiAp(const char* accessPoint = "🆘 DUCK EMERGENCY PORTAL");
-  
+
   /**
    * @brief Set up DNS.
    *
-   * @returns 0 if sucessful, an error code otherwise
+   * @returns DUCK_ERR_NONE if sucessful, an error code otherwise
    */
   int setupDns();
 
@@ -146,12 +146,18 @@ public:
    */
   void setDeviceId(String deviceId);
 
+  /**
+   * @brief Provide Wifi connection status.
+   * 
+   * @returns true if wifi is connected, false otherwise.  
+   */
   bool isWifiConnected() { return (WiFi.status() == WL_CONNECTED); }
 
   static DNSServer dnsServer;
 #endif
 
-      private : DuckNet();
+private : 
+  DuckNet();
   DuckNet(DuckNet const&) = delete;
   DuckNet& operator=(DuckNet const&) = delete;
   static DuckNet* instance;

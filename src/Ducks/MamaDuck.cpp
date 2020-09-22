@@ -27,15 +27,17 @@ bool MamaDuck::idInPath(String path) {
 void MamaDuck::setupWithDefaults(String ssid, String password) {
   Duck::setupWithDefaults(ssid, password);
   setupRadio();
-  setupWifi();
-  setupDns();
-  setupWebServer(true);
-  setupOTA();
 
-  Serial.println("MamaDuck Online");
+  if (!ssid.isEmpty() && !password.isEmpty()) {
+    setupWifi();
+    setupDns();
+    setupWebServer(true);
+    setupOTA();
+  }
+  Serial.println("MamaDuck setup done");
 
   duckutils::getTimer().every(CDPCFG_MILLIS_ALIVE, imAlive);
-}
+  }
 
 void MamaDuck::run() {
 

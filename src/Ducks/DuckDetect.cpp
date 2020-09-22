@@ -3,6 +3,13 @@
 void DuckDetect::setupWithDefaults(String ssid, String password) {
   Duck::setupWithDefaults(ssid, password);
   setupRadio();
+  if (!ssid.isEmpty() && !password.isEmpty()) {
+    setupWifi();
+    setupDns();
+    setupWebServer(true);
+    setupOTA();
+  }
+  Serial.println("DuckDetect setup done");
 }
 
 void DuckDetect::run() {

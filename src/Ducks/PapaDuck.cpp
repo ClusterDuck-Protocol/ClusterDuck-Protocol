@@ -3,12 +3,15 @@
 void PapaDuck::setupWithDefaults(String ssid, String password) {
   Duck::setupWithDefaults(ssid, password);
   setupRadio();
-  setupWifi("PapaDuck Setup");
-  setupDns();
-  setupInternet(ssid, password);
-  setupWebServer(false);
-  setupOTA();
-  Serial.println("PapaDuck Online");
+  
+  if (!ssid.isEmpty() && !password.isEmpty()) {
+    setupWifi("PapaDuck Setup");
+    setupDns();
+    setupInternet(ssid, password);
+    setupWebServer(false);
+    setupOTA();
+  }
+  Serial.println("PapaDuck setup done");
 }
 
 void PapaDuck::run() {

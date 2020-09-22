@@ -104,45 +104,85 @@ public:
    * will be generated)
    * @param path        the message path to append the device id to (optional:
    * if not provided, the path will only contain the duck's device id)
-   * @returns 0 if success, an error code otherwise
+   * @returns DUCK_ERR_NONE if success, an error code otherwise.
    */
 
   int sendPayloadStandard(String msg = "", String topic = "",
                           String senderId = "", String messageId = "",
                           String path = "");
 
+  /**
+   * @brief Check wifi connection status
+   * 
+   * @returns true if device wifi is connected, false otherwise. 
+   */
   bool isWifiConnected() { return duckNet->isWifiConnected(); }
+  /**
+   * @brief Check if the give access point is available.
+   * 
+   * @param ssid access point to check
+   * @returns true if the access point is available, false otherwise.
+   */
   bool ssidAvailable(String ssid) { return duckNet->ssidAvailable(ssid); }
 
+  /**
+   * @brief Get the access point ssid
+   * 
+   * @returns the wifi access point as a string
+   */
   String getSsid() { return duckNet->getSsid(); }
-
+  /**
+   * @brief Get the wifi access point password.
+   * 
+   * @returns the wifi access point password as a string. 
+   */
   String getPassword() { return duckNet->getPassword(); }
 
 protected:
   String deviceId;
   DuckLora* duckLora = DuckLora::getInstance();
   DuckNet* duckNet = DuckNet::getInstance();
+
+  /**
+   * @brief Tell the duck radio to start receiving packets from the mesh network
+   *
+   * @return DUCK_ERR_NONE if successful, an error code otherwise
+   */
   int startReceive();
+  
+  /**
+   * @brief Tell the duck radio to start receiving packets from the mesh network
+   *
+   * @return DUCK_ERR_NONE if successful, an error code otherwise
+   */
   int startTransmit();
 
+  /**
+   * @brief Implement the duck's specific behavior.
+   * 
+   * This method must be implemented by the Duck's concrete classes such as DuckLink, MamaDuck,...
+   */
   virtual void run() = 0;
 
+  /**
+   * @brief Setup a duck with default settings
+   *
+   * The default implementation simply initializes the serial interface.
+   * It can be overriden by each concrete Duck class implementation.
+   */
   virtual void setupWithDefaults(String ssid, String password) {
     duckNet->setDeviceId(deviceId);
     setupSerial();
   }
-
+  
   virtual int reconnectWifi(String ssid, String password) { return 0; }
+
 
   static volatile bool receivedFlag;
   static void toggleReceiveFlag() { receivedFlag = !receivedFlag; }
   static void setReceiveFlag(bool value) { receivedFlag = value; }
   static bool getReceiveFlag() { return receivedFlag; }
 
-  /**
-   * @brief Interrupt service routing when LoRa chip di0 pin is active.
-   *
-   */
   static void onPacketReceived();
 
   static bool imAlive(void*);
