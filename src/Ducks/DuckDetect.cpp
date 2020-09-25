@@ -17,7 +17,7 @@ void DuckDetect::run() {
   if (getReceiveFlag()) {
     setReceiveFlag(false);
     duckutils::setDuckInterrupt(false);
-    int pSize = duckLora->handlePacket();
+    int pSize = duckLora->storePacketData();
     if (pSize > 0) {
       for (int i = 0; i < pSize; i++) {
         if (duckLora->getTransmitedByte(i) == iamhere_B) {

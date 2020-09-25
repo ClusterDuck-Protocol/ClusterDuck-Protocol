@@ -26,7 +26,10 @@
 // Wifi is disconnected
 #define DUCKWIFI_ERR_DISCONNECTED   -2001
 // DNS initialization failed
-#define  DUCKDNS_ERR_STARTING       -3000
+#define DUCKDNS_ERR_STARTING        -3000
 
+#define DUCKPACKET_ERR_SIZE_INVALID  -4000
+#define DUCKPACKET_ERR_TOPIC_INVALID -4001
+#define DUCKPACKET_ERR_MAX_HOPS      -4002
 
 #endif

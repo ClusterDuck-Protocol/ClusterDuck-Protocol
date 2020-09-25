@@ -96,7 +96,7 @@ void DuckLora::resetTransmissionBuffer() {
 // Returns the packet length which should be > 0
 // A DUCKLORA_ERR_HANDLE_PACKET is returned if there was a failure
 // to read the data from the LoRa driver
-int DuckLora::handlePacket() {
+int DuckLora::storePacketData() {
   int pSize = 0;
   int err = 0;
   pSize = lora.getPacketLength();
@@ -275,8 +275,14 @@ String DuckLora::getPacketData(int pSize) {
   return packetData;
 }
 
-int DuckLora::sendPayloadStandard(String msg, String topic, String senderId,
-                                  String messageId, String path) {
+int DuckLora::sendData(byte* data, int length) { 
+  return transmitData(data, length); 
+}
+
+int DuckLora::sendPayloadStandard(String msg, String topic,
+                                                   String senderId,
+                                                   String messageId,
+                                                   String path) {
 
   Serial.print("[DuckLora] sendPayloadStandard got: ");
   Serial.print(" SENDER_ID:");
@@ -445,3 +451,59 @@ int DuckLora::ping() {
 }
 
 int DuckLora::standBy() { return lora.standby(); }
+
+int DuckLora::transmitData(byte* data, int length) {
+
+  bool oldEI = duckutils::getDuckInterrupt();
+  duckutils::setDuckInterrupt(false);
+  long t1 = millis();
+
+  int err = DUCK_ERR_NONE;
+  int tx_err = ERR_NONE;
+  int rx_err = ERR_NONE;
+
+  Serial.print("[DuckLora] SND");
+  Serial.print(" data:");
+  Serial.println(duckutils::convertToHex(data, length));
+
+  tx_err = lora.transmit(_transmission, length);
+
+  switch (tx_err) {
+    case ERR_NONE:
+      Serial.print("[DuckLora] transmitData Packet sent in: ");
+      Serial.print((millis() - t1));
+      Serial.println("ms");
+      break;
+
+    case ERR_PACKET_TOO_LONG:
+      // the supplied packet was longer than 256 bytes
+      Serial.println("[DuckLora] transmitData too long!");
+      err = DUCKLORA_ERR_MSG_TOO_LARGE;
+      break;
+
+    case ERR_TX_TIMEOUT:
+      Serial.println("[DuckLora] transmitData timeout!");
+      err = DUCKLORA_ERR_TIMEOUT;
+      break;
+
+    default:
+      Serial.print(F("[DuckLora] transmitData failed, code "));
+      Serial.println(err);
+      err = DUCKLORA_ERR_TRANSMIT;
+      break;
+  }
+  
+  if (err != DUCK_ERR_NONE) {
+    return err;
+  }
+
+  if (oldEI) {
+    duckutils::setDuckInterrupt(true);
+    rx_err = startReceive();
+    if (rx_err != ERR_NONE) {
+      err = DUCKLORA_ERR_RECEIVE;
+    }
+  }
+
+  return err;
+}

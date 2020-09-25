@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <WString.h>
 
+#include "DuckPacket.h"
 #include "../DuckError.h"
 #include "DuckLora.h"
 #include "DuckNet.h"
@@ -24,7 +25,11 @@ public:
    */
   Duck(String id);
 
-  ~Duck() {}
+  ~Duck() {
+    if (packet != NULL) {
+      delete packet;
+    }
+  }
 
   /**
    * @brief Setup serial connection.
@@ -111,6 +116,9 @@ public:
                           String senderId = "", String messageId = "",
                           String path = "");
 
+  
+  int sendData(byte topic, byte data[]);
+
   /**
    * @brief Check wifi connection status
    * 
@@ -142,7 +150,7 @@ protected:
   String deviceId;
   DuckLora* duckLora = DuckLora::getInstance();
   DuckNet* duckNet = DuckNet::getInstance();
-
+  DuckPacket* packet = NULL; 
   /**
    * @brief Tell the duck radio to start receiving packets from the mesh network
    *

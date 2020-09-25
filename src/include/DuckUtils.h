@@ -21,10 +21,11 @@ extern Timer<> duckTimer;
 
 /**
  * @brief Create a uuid string.
- * 
+ *
+ * @param length the length of the UUID (defaults to CDPCFG_UUID_LEN)
  * @returns A string representing a unique id.
  */
-String createUuid();
+String createUuid(int length = CDPCFG_UUID_LEN);
 
 /**
  * @brief Convert a byte array into a hex string.

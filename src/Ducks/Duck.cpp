@@ -6,6 +6,7 @@ volatile bool Duck::receivedFlag = false;
 Duck::Duck(String id) {
     deviceId = id;
     duckutils::setDuckInterrupt(true);
+    packet = new DuckPacket(id);
 }
 
 void Duck::setupSerial(int baudRate) {
@@ -132,6 +133,19 @@ void Duck::processPortalRequest() {
   duckNet->dnsServer.processNextRequest();
 }
 #endif
+
+int Duck::sendData(byte topic, byte data[]) {
+  
+  int err = packet->buildDataBuffer(topic, data);
+  if ( err != DUCK_ERR_NONE) {
+    return err;
+  }
+  
+  int length = packet->getBufferLength();
+  err = duckLora->sendData(packet->getBuffer(), length);
+
+  return err;
+}
 
 int Duck::sendPayloadStandard(String msg, String topic, String senderId,
                                String messageId, String path) {

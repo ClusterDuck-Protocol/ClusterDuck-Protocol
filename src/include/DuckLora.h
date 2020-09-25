@@ -16,6 +16,7 @@
 
 #include "../DuckError.h"
 
+#include "DuckPacket.h"
 #include "LoraPacket.h"
 #include "cdpcfg.h"
 
@@ -78,7 +79,7 @@ public:
    * 
    * @returns 0 if handling was successful, an error code otherwise. 
    */
-  int handlePacket();
+  int storePacketData();
 
   /**
    * @brief Get the last received LoRa packet.
@@ -103,9 +104,10 @@ public:
                           String senderId = "", String messageId = "",
                           String path = "");
 
+  int sendData(byte* packet, int size);
   /**
    * @brief Get the last received LoRa packet.
-   * 
+   *
    * @returns A Packet object containing the last received message.
    */
   Packet getLastPacket();
@@ -157,6 +159,16 @@ public:
    * @returns DUCK_ERR_NONE if the call was successful, an error code otherwise.
    */
   int transmitData();
+
+  /**
+   * @brief Set the Duck to be ready to transmit the given data
+   *
+   * @param data the data buffer to transmit
+   * @param size the size of the data buffer
+   * @return DUCK_ERR_NONE if the call was successful, an error code otherwise.
+   */
+  int transmitData(byte* data, int size);
+
 
   /**
    * @brief Get the current RSSI value.

@@ -10,11 +10,11 @@ void setDuckInterrupt(bool interrupt) { enableDuckInterrupt = interrupt; }
 
 Timer<> getTimer() { return duckTimer; }
 
-String createUuid() {
+String createUuid(int length) {
   String msg = "";
   int i;
 
-  for (i = 0; i < CDPCFG_UUID_LEN; i++) {
+  for (i = 0; i < length; i++) {
     byte randomValue = random(0, 36);
     if (randomValue < 26) {
       msg = msg + char(randomValue + 'a');

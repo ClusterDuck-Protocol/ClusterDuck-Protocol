@@ -34,6 +34,7 @@ public:
 
 private :
   bool idInPath(String path);
+  void handleReceivedMessage();
 };
 
 #endif

@@ -20,7 +20,7 @@ void PapaDuck::run() {
   if (getReceiveFlag()) {
     setReceiveFlag(false);
     duckutils::setDuckInterrupt(false);
-    int pSize = duckLora->handlePacket();
+    int pSize = duckLora->storePacketData();
     // FIXME: This needs a design review.
     // What message topics Papa Duck is supposed to send out?
     // what is this pSize > 3 supposed to achieve ?

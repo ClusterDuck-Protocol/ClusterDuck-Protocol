@@ -39,36 +39,24 @@ void MamaDuck::setupWithDefaults(String ssid, String password) {
   duckutils::getTimer().every(CDPCFG_MILLIS_ALIVE, imAlive);
   }
 
-void MamaDuck::run() {
+  void MamaDuck::handleReceivedMessage() {
 
-  handleOtaUpdate();
-
-  if (duckutils::getDuckInterrupt()) {
-    duckutils::getTimer().tick();
-  }
-
-  // Mama ducks can also receive packets from other ducks
-  // Here we check whether a packet needs to be relayed or not
-  // For safe processing of the received packet we make sure
-  // to disable interrupts, before handling the received packet.
-  if (getReceiveFlag()) {
-    setReceiveFlag(false);
-    duckutils::setDuckInterrupt(false);
-    int pSize = duckLora->handlePacket();
-    Serial.print("[MamaDuck] run() rcv packet. pSize = ");
+    // read the lora message and transfer it to the transmission buffer
+    int pSize = duckLora->storePacketData();
+    Serial.print("[MamaDuck] handleReceivedMessage() pSize = ");
     Serial.println(pSize);
 
     if (pSize > 0) {
       // These 2 methods should be combined in one.
       // the string returned by getPacketData() is only the message topic
-      // it could instead return the whole packet and we can get the topic from
-      // the Packet data structure
+      // it could instead return the whole packet and we can get the topic
+      // from the Packet data structure
       String msg = duckLora->getPacketData(pSize);
       Packet lastPacket = duckLora->getLastPacket();
       duckLora->resetPacketIndex();
 
       if (msg != "ping" && !idInPath(lastPacket.path)) {
-        Serial.print("[MamaDuck] run() relay packet msg: ");
+        Serial.print("[MamaDuck] handleReceivedMessage() send: ");
         Serial.println(msg);
 
         duckLora->sendPayloadStandard(lastPacket.payload, lastPacket.topic,
@@ -80,8 +68,28 @@ void MamaDuck::run() {
       // discard any unrecognized packets
       duckLora->resetTransmissionBuffer();
     }
-    duckutils::setDuckInterrupt(true);
-    startReceive();
   }
-  processPortalRequest();
-}
+  
+  void MamaDuck::run() {
+
+    handleOtaUpdate();
+
+    if (duckutils::getDuckInterrupt()) {
+      duckutils::getTimer().tick();
+    }
+
+    // Mama ducks can also receive packets from other ducks
+    // For safe processing of the received packet we make sure
+    // to disable interrupts, before handling the received packet.
+    if (getReceiveFlag()) {
+      setReceiveFlag(false);
+      duckutils::setDuckInterrupt(false);
+
+      // Here we check whether a packet needs to be relayed or not
+      handleReceivedMessage();
+
+      duckutils::setDuckInterrupt(true);
+      startReceive();
+    }
+    processPortalRequest();
+  }
