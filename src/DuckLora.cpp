@@ -464,7 +464,8 @@ int DuckLora::transmitData(byte* data, int length) {
 
   Serial.print("[DuckLora] SND");
   Serial.print(" data:");
-  Serial.println(duckutils::convertToHex(data, length));
+  Serial.print(duckutils::convertToHex(data, length));
+  Serial.println(" :length = "+String(length));
 
   tx_err = lora.transmit(_transmission, length);
 
@@ -492,7 +493,7 @@ int DuckLora::transmitData(byte* data, int length) {
       err = DUCKLORA_ERR_TRANSMIT;
       break;
   }
-  
+
   if (err != DUCK_ERR_NONE) {
     return err;
   }

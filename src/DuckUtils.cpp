@@ -10,6 +10,16 @@ void setDuckInterrupt(bool interrupt) { enableDuckInterrupt = interrupt; }
 
 Timer<> getTimer() { return duckTimer; }
 
+void  getRandomBytes(int length, byte* bytes) {
+  const char* digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  int i;
+
+
+  for (i = 0; i < length; i++) {
+    bytes[i] = digits[random(0, 35)];
+  }
+}
+
 String createUuid(int length) {
   String msg = "";
   int i;
@@ -27,13 +37,14 @@ String createUuid(int length) {
 
 String convertToHex(byte* data, int size) {
   String buf = "";
-  buf.reserve(size * 2);
-  const char* cs = "0123456789abcdef";
+  buf.reserve(size * 4);
+  const char* cs = "0123456789ABCDEF";
   for (int i = 0; i < size; i++) {
     byte val = data[i];
-    buf += cs[(val >> 4) & 0x0f];
-    buf += cs[val & 0x0f];
+    buf += cs[(val >> 4) & 0x0F];
+    buf += cs[val & 0x0F];
   }
   return buf;
 }
+
 } // namespace duckutils

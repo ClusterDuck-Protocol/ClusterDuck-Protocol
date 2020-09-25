@@ -50,6 +50,19 @@ enum resevedTopic {
   gps       = 0x03,
   max_topic = 0x0F
 };
+typedef struct {
+  byte duid[DUID_LENGTH];
+  byte muid[MUID_LENGTH];
+  byte topic;
+  byte path_offset;
+  byte reserved[RESERVED_LENGTH];
+} DataHeader;
+
+typedef struct {
+  DataHeader header;
+  byte data[MAX_DATA_LENGTH];
+  byte path[MAX_PATH_LENGTH];
+} DataPacket;
 
 class DuckPacket {
 
@@ -69,7 +82,10 @@ public:
     int getBufferLength() {
       return buffer.size();
     }
-    
+    void clearBuffer() {
+      bufferLength = 0;
+      buffer.clear();
+    }
     int updatePath();
 
 private:

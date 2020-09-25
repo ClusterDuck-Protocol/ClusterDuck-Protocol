@@ -140,10 +140,10 @@ int Duck::sendData(byte topic, byte data[]) {
   if ( err != DUCK_ERR_NONE) {
     return err;
   }
-  
+
   int length = packet->getBufferLength();
   err = duckLora->sendData(packet->getBuffer(), length);
-
+  packet->clearBuffer();
   return err;
 }
 

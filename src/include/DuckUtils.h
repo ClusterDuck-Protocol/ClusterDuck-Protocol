@@ -20,6 +20,14 @@ extern volatile bool enableDuckInterrupt;
 extern Timer<> duckTimer;
 
 /**
+ * @brief Creates a byte array with random alpha numerical values.
+ *
+ * @param length the array length
+ * @param bytes array of bytes of the specified length
+ */ 
+void getRandomBytes(int length, byte* bytes);
+
+/**
  * @brief Create a uuid string.
  *
  * @param length the length of the UUID (defaults to CDPCFG_UUID_LEN)
