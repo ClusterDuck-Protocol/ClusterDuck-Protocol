@@ -2,10 +2,22 @@
 #include "include/DuckUtils.h"
 #include "DuckError.h"
 
-int DuckPacket::buildDataBuffer(byte topic, byte* app_data) {
-  uint8_t app_data_length = sizeof(app_data) / sizeof(byte);
+enum resevedTopic {
+  unused        = 0x00,
+  ping          = 0x01,
+  pong          = 0x02,
+  max_reserved  = 0x0F
+};
 
-  if (topic < resevedTopic::max_topic) {
+
+int DuckPacket::buildDataBuffer(byte topic, std::vector<byte> app_data) {
+
+  int app_data_length = app_data.size();
+
+  Serial.print("buildDataBuffer() msg len: ");
+  Serial.println(app_data_length);
+
+  if (topic < resevedTopic::max_reserved) {
     return DUCKPACKET_ERR_TOPIC_INVALID;
   }
 
@@ -28,28 +40,14 @@ int DuckPacket::buildDataBuffer(byte topic, byte* app_data) {
   buffer.insert(buffer.end(), 0x00);
   buffer.insert(buffer.end(), 0x00);
   // insert data
-  buffer.insert(buffer.end(), &app_data[0], &app_data[app_data_length-1]);
+  buffer.insert(buffer.end(), app_data.begin(), app_data.end());
   // insert path
   buffer.insert(buffer.end(), deviceId.begin(), deviceId.end());
 
   Serial.println("msg:" + String(duckutils::convertToHex(buffer.data(), buffer.size())));
-  /*
-  DataPacket packet = DataPacket();
-  std::copy(buffer.begin(), buffer.begin()+HEADER_LENGTH, &packet.header);
-  Serial.print("duid:");
-  Serial.println(duckutils::convertToHex(packet.header.duid, DUID_LENGTH));
-  Serial.print("muid:");
-  Serial.println(duckutils::convertToHex(packet.header.muid, MUID_LENGTH));
-  Serial.print("topic:");
-  Serial.println(packet.header.topic);
-  Serial.print("path offset:");
-  Serial.println(packet.header.path_offset);
-  Serial.print("reserved:");
-  Serial.println(duckutils::convertToHex(packet.header.reserved, RESERVED_LENGTH));
-  */
-
+  
   return DUCK_ERR_NONE;
-} 
+}
 
 int DuckPacket::updatePath() {
   byte path_offset = buffer[PATH_OFFSET_POS];

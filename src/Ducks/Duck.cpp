@@ -134,7 +134,7 @@ void Duck::processPortalRequest() {
 }
 #endif
 
-int Duck::sendData(byte topic, byte data[]) {
+int Duck::sendData(byte topic, std::vector<byte> data) {
   
   int err = packet->buildDataBuffer(topic, data);
   if ( err != DUCK_ERR_NONE) {

@@ -43,13 +43,17 @@
 
 #define RESERVED_LENGTH 2
 
-enum resevedTopic {
-  health    = 0x00,
-  ping      = 0x01,
-  pong      = 0x02,
-  gps       = 0x03,
-  max_topic = 0x0F
+#define ARRAY_LENGTH(array) (sizeof(array) / sizeof((array)[0]))
+
+enum topics {
+  status      = 0x10, // generic message
+  cpm         = 0x11, // captive portal message
+  location    = 0x12, // a gps or geo location (i.e longitude/latitude)
+  sensor      = 0x13, // sensor data
+  alert       = 0x14, // alert message should be given immediate attention
+  max_topics  = 0xFF
 };
+
 typedef struct {
   byte duid[DUID_LENGTH];
   byte muid[MUID_LENGTH];
@@ -73,8 +77,8 @@ public:
     ~DuckPacket() {}
 
     void setDeviceId(String device_id) { this->deviceId = device_id; }
-    int buildDataBuffer(byte topic, byte* app_data);
-    
+    int buildDataBuffer(byte topic, std::vector<byte> app_data);
+
     byte* getBuffer() {
       return buffer.data();
     }

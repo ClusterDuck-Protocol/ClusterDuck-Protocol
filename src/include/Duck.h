@@ -117,7 +117,7 @@ public:
                           String path = "");
 
   
-  int sendData(byte topic, byte data[]);
+  int sendData(byte topic, std::vector<byte> data);
 
   /**
    * @brief Check wifi connection status
