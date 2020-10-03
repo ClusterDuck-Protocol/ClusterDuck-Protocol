@@ -87,8 +87,62 @@ int DuckLora::setupLoRa(LoraConfigParams config, String deviceId) {
 }
 
 void DuckLora::resetTransmissionBuffer() {
-  memset(_transmission, 0x00, CDPCFG_CDP_BUFSIZE);
+  memset(transmission, 0x00, CDPCFG_CDP_BUFSIZE);
   _packetIndex = 0;
+}
+
+int DuckLora::getReceivedPacket(CDP_Packet *packet) {
+  int pSize = 0;
+  int err = 0;
+  byte buffer[PACKET_LENGTH];
+  
+  if (packet == NULL) {
+    return DUCKLORA_ERR_HANDLE_PACKET;
+  }
+
+  pSize = lora.getPacketLength();
+  err = lora.readData(buffer, pSize);
+  if (err != ERR_NONE) {
+    Serial.print("[DuckLora] handlePacket failed, code ");
+    Serial.println(err);
+    return DUCKLORA_ERR_HANDLE_PACKET;
+  }
+
+  // TODO: Store this in a Duck Packet meta data
+  Serial.print("[DuckLora] RCV");
+  Serial.print(" rssi:");
+  Serial.print(lora.getRSSI());
+  Serial.print(" snr:");
+  Serial.print(lora.getSNR());
+  Serial.print(" fe:");
+  Serial.print(lora.getFrequencyError());
+  Serial.print(" size:");
+  Serial.println(pSize);
+
+  // map received buffer to a cdp packet
+  byte path_offset = buffer[PATH_OFFSET_POS];
+  packet->duid.insert(packet->duid.end(), &buffer[0], &buffer[DUID_LENGTH]);
+  packet->muid.insert(packet->muid.end(), &buffer[MUID_POS], &buffer[TOPIC_POS]);
+  packet->topic = buffer[TOPIC_POS];
+  packet->path_offset = buffer[PATH_OFFSET_POS];
+  packet->reserved.insert(packet->reserved.end(), &buffer[RESERVED_POS], &buffer[DATA_POS]);
+  packet->data.insert(packet->data.end(), &buffer[DATA_POS], &buffer[path_offset]);
+  packet->path.insert(packet->path.end(), &buffer[path_offset], &buffer[pSize]);
+  
+
+  Serial.print("DUID: ");
+  Serial.println(duckutils::convertToHex(packet->duid.data(), DUID_LENGTH));
+  Serial.print("MUID: ");
+  Serial.println(duckutils::convertToHex(packet->muid.data(), MUID_LENGTH));
+  Serial.print("TOPIC: ");
+  Serial.println(packet->topic, HEX);
+  Serial.print("DATA: ");
+  Serial.println(duckutils::convertToHex(packet->data.data(), packet->data.size()));
+  Serial.print("PATH: ");
+  Serial.println(duckutils::convertToHex(packet->path.data(), packet->path.size()));
+
+
+  return pSize;
 }
 
 // Reads the packet data from LoRa driver and stores it in our
@@ -102,7 +156,7 @@ int DuckLora::storePacketData() {
   pSize = lora.getPacketLength();
   // we get our packet buffer ready to be populated if packet data is present
   resetTransmissionBuffer();
-  err = lora.readData(_transmission, pSize);
+  err = lora.readData(transmission, pSize);
   if (err != ERR_NONE) {
     Serial.print("[DuckLora] handlePacket failed, code ");
     Serial.println(err);
@@ -117,10 +171,17 @@ int DuckLora::storePacketData() {
   Serial.print(lora.getFrequencyError());
   Serial.print(" size:");
   Serial.println(pSize);
-  Serial.print("[DuckLora] DATA:");
-  Serial.println(duckutils::convertToHex(_transmission, pSize));
+  Serial.print("[DuckLora] PACKET PATH Offset: ");
+  Serial.println(transmission[PATH_OFFSET_POS]);
+  Serial.print("[DuckLora] PACKET PATH: ");
 
-  return pSize;
+   byte offset = transmission[PATH_OFFSET_POS];
+   std::vector<byte> path;
+   path.insert(path.end(), &transmission[offset], &transmission[pSize]);
+
+   // Serial.println(duckutils::convertToHex(transmission, pSize));
+   Serial.println(duckutils::convertToHex(path.data(), path.size()));
+   return pSize;
 }
 
 
@@ -182,32 +243,32 @@ String DuckLora::getPacketData(int pSize) {
       }
     }
     
-    if (_transmission[i] == senderId_B) {
+    if (transmission[i] == senderId_B) {
       sId = true;
-      len = _transmission[i + 1];
+      len = transmission[i + 1];
       Serial.println("Packet SENDER_ID Len: " + String(len));
 
-    } else if (_transmission[i] == messageId_B) {
+    } else if (transmission[i] == messageId_B) {
       mId = true;
-      len = _transmission[i + 1];
+      len = transmission[i + 1];
       Serial.println("Packet MSG_ID Len:    " + String(len));
 
-    } else if (_transmission[i] == payload_B) {
+    } else if (transmission[i] == payload_B) {
       pLoad = true;
-      len = _transmission[i + 1];
+      len = transmission[i + 1];
       Serial.println("Packet MSG Len:       " + String(len));
 
-    } else if (_transmission[i] == path_B) {
+    } else if (transmission[i] == path_B) {
       pth = true;
-      len = _transmission[i + 1];
+      len = transmission[i + 1];
       Serial.println("Packet PATH Len:      " + String(len));
 
-    } else if (_transmission[i] == topic_B) {
+    } else if (transmission[i] == topic_B) {
       tpc = true;
-      len = _transmission[i + 1];
+      len = transmission[i + 1];
       Serial.println("Packet TOPIC Len:     " + String(len));
 
-    } else if (_transmission[i] == ping_B) {
+    } else if (transmission[i] == ping_B) {
       if (_deviceId != "Det") {
         resetTransmissionBuffer();
         couple(iamhere_B, "1");
@@ -219,14 +280,14 @@ String DuckLora::getPacketData(int pSize) {
       resetTransmissionBuffer();
       packetData = "ping";
 
-    } else if (_transmission[i] == iamhere_B) {
+    } else if (transmission[i] == iamhere_B) {
       Serial.println("[DuckLora] Packet pong received");
       resetTransmissionBuffer();
       packetData = "pong";
       return packetData;
 
     } else if (len > 0 && gotLen) {
-      msg = msg + String((char)_transmission[i]);
+      msg = msg + String((char)transmission[i]);
       len--;
     } else {
       gotLen = true;
@@ -363,13 +424,13 @@ void DuckLora::couple(byte byteCode, String outgoing) {
 
   outgoing.getBytes(byteBuffer, outgoingLen);
 
-  _transmission[_packetIndex] = byteCode; // add byte code
+  transmission[_packetIndex] = byteCode; // add byte code
   _packetIndex++;
-  _transmission[_packetIndex] = (byte)outgoingLen; // add payload length
+  transmission[_packetIndex] = (byte)outgoingLen; // add payload length
   _packetIndex++;
 
   for (int i = 0; i < outgoingLen; i++) { // add payload
-    _transmission[_packetIndex] = byteBuffer[i];
+    transmission[_packetIndex] = byteBuffer[i];
     _packetIndex++;
   }
 }
@@ -398,9 +459,9 @@ int DuckLora::transmitData() {
 
   Serial.print("[DuckLora] SND");
   Serial.print(" data:");
-  Serial.println(duckutils::convertToHex(_transmission, _packetIndex));
+  Serial.println(duckutils::convertToHex(transmission, _packetIndex));
 
-  tx_err = lora.transmit(_transmission, _packetIndex);
+  tx_err = lora.transmit(transmission, _packetIndex);
 
   switch (tx_err) {
     case ERR_NONE:
@@ -467,7 +528,7 @@ int DuckLora::transmitData(byte* data, int length) {
   Serial.print(duckutils::convertToHex(data, length));
   Serial.println(" :length = "+String(length));
 
-  tx_err = lora.transmit(_transmission, length);
+  tx_err = lora.transmit(data, length);
 
   switch (tx_err) {
     case ERR_NONE:

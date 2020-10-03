@@ -4,6 +4,7 @@
 
 /// No Error
 #define DUCK_ERR_NONE 0
+#define DUCK_ERR_NOT_SUPPORTED -5000
 
 /// Lora module initialization error
 #define DUCKLORA_ERR_BEGIN          -1000

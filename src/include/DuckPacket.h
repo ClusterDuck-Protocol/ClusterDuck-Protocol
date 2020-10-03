@@ -1,16 +1,17 @@
 #ifndef DUCKPACKET_H_
 #define DUCKPACKET_H_
+#include <vector>
 #include "Arduino.h"
 #include "cdpcfg.h"
 #include <WString.h>
-#include <array>
+
 
 #define MAX_HOPS        6
 
 // PACKET FORMAT (v1.0)
 //
-// 0       07          15                       PO                   255
-// |        |           |                       |                     |
+// 0        07   12     15                      PO                    255
+// |        |    |      |                       |                     |
 // +--------+----+-+-+--+-----------------------+---------------------+
 // |  DUID  |MUID|T|P| R| DATA (max 192 bytes)  | PATH (max 48 bytes) |
 // |        |    | |O|  |                       |                     |
@@ -19,7 +20,7 @@
 // DUID:      08  byte array          - Device Unique ID    
 // MUID:      04  byte array          - Message unique ID
 // T   :      01  byte value          - Topic (topic 0..15 are reserved for internal use)
-// PO  :      02  byte array          - Offset to the start of the PATH section in the packet 
+// PO  :      01  byte array          - Offset to the start of the PATH section in the packet 
 // R   :      02  byte array          - Reserved for internal use
 // DATA:      192 byte array          - Data payload (e.g sensor read, text,...)
 // PATH:      048 byte array of DUIDs - Device UIDs having seen this packet    
@@ -38,12 +39,15 @@
 #define TOPIC_POS           12
 #define PATH_OFFSET_POS     13
 #define RESERVED_POS        14
-#define DATA_OFFSET_POS     HEADER_LENGTH
+#define DATA_POS            HEADER_LENGTH
 #define PATH_POS            208
 
 #define RESERVED_LENGTH 2
 
 #define ARRAY_LENGTH(array) (sizeof(array) / sizeof((array)[0]))
+
+typedef byte duid_t[DUID_LENGTH];
+typedef byte muid_t[MUID_LENGTH];
 
 enum topics {
   status      = 0x10, // generic message
@@ -55,18 +59,14 @@ enum topics {
 };
 
 typedef struct {
-  byte duid[DUID_LENGTH];
-  byte muid[MUID_LENGTH];
+  std::vector<byte> duid;
+  std::vector<byte> muid;
   byte topic;
   byte path_offset;
-  byte reserved[RESERVED_LENGTH];
-} DataHeader;
-
-typedef struct {
-  DataHeader header;
-  byte data[MAX_DATA_LENGTH];
-  byte path[MAX_PATH_LENGTH];
-} DataPacket;
+  std::vector<byte> reserved;
+  std::vector<byte> data;
+  std::vector<byte> path;
+} CDP_Packet;
 
 class DuckPacket {
 
@@ -90,6 +90,8 @@ public:
       bufferLength = 0;
       buffer.clear();
     }
+    bool hasMaxHops();
+
     int updatePath();
 
 private:

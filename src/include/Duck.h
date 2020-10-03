@@ -52,7 +52,7 @@ public:
                   int rst = CDPCFG_PIN_LORA_RST, int di0 = CDPCFG_PIN_LORA_DIO0,
                   int di1 = CDPCFG_PIN_LORA_DIO1,
                   int txPower = CDPCFG_RF_LORA_TXPOW);
-
+                  
   /**
    * @brief Setup WiFi access point.
    *

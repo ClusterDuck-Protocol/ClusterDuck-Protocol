@@ -1,4 +1,6 @@
 #include "include/DuckUtils.h"
+#include <iomanip>
+#include <sstream>
 
 namespace duckutils {
 
@@ -13,8 +15,6 @@ Timer<> getTimer() { return duckTimer; }
 void  getRandomBytes(int length, byte* bytes) {
   const char* digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   int i;
-
-
   for (i = 0; i < length; i++) {
     bytes[i] = digits[random(0, 35)];
   }
@@ -34,15 +34,17 @@ String createUuid(int length) {
   }
   return msg;
 }
-
 String convertToHex(byte* data, int size) {
   String buf = "";
-  buf.reserve(size * 4);
+  buf.reserve(size * 3); // 2 digit hex + separator
   const char* cs = "0123456789ABCDEF";
   for (int i = 0; i < size; i++) {
     byte val = data[i];
     buf += cs[(val >> 4) & 0x0F];
     buf += cs[val & 0x0F];
+    if(i < size - 1) {
+      buf += ':';
+    }
   }
   return buf;
 }

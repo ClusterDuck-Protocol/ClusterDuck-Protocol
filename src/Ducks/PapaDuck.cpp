@@ -37,6 +37,9 @@ void PapaDuck::run() {
 }
 
 int PapaDuck::reconnectWifi(String ssid, String password) {
+#ifdef CDPCFG_WIFI_NONE
+  return DUCK_ERR_NOT_SUPPORTED;
+#else
   if (!duckNet->ssidAvailable(ssid)) {
     return DUCKWIFI_ERR_NOT_AVAILABLE;
   }
@@ -46,6 +49,6 @@ int PapaDuck::reconnectWifi(String ssid, String password) {
     Serial.print("[PapaDuck] WiFi reconnection failed!");
     return DUCKWIFI_ERR_DISCONNECTED;
   }
-
   return DUCK_ERR_NONE;
+#endif
 }

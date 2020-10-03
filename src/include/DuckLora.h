@@ -82,6 +82,14 @@ public:
   int storePacketData();
 
   /**
+   * @brief Get the Received Packet object
+   *
+   * @param[out] packet a pointer to the CDP_Packet
+   * @return 0 if handling was successful, an error code otherwise.
+   */
+  int getReceivedPacket(CDP_Packet *packet);
+
+  /**
    * @brief Get the last received LoRa packet.
    * 
    * @param pSize size of the packet
@@ -195,7 +203,7 @@ public:
    * 
    * @returns An array of bytes containing the transmission packet
    */
-  byte* getTransmissionBuffer() { return _transmission; }
+  byte* getTransmissionBuffer() { return transmission; }
 
   /**
    * @brief Get the transmited byte at the given index in the transmission buffer.
@@ -203,7 +211,7 @@ public:
    * @param index position in the transmission buffer
    * @returns The byte value in the transmission buffer at the given index.
    */
-  byte getTransmitedByte(int index) { return _transmission[index]; }
+  byte getTransmitedByte(int index) { return transmission[index]; }
 
   /**
    * @brief Transmit a ping message.
@@ -227,14 +235,14 @@ public:
   void resetTransmissionBuffer();
 
 private:
-  byte _transmission[CDPCFG_CDP_BUFSIZE];
+  byte transmission[CDPCFG_CDP_BUFSIZE];
+  CDP_Packet packet;
   int _packetIndex = 0;
   Packet _lastPacket;
   String _deviceId = "";
   int _availableBytes = 0;
   int _packetSize = 0;
   void resetLastPacket();
-
   DuckLora();
   DuckLora(DuckLora const&) = delete;
   DuckLora& operator=(DuckLora const&) = delete;

@@ -40,11 +40,41 @@ void MamaDuck::setupWithDefaults(String ssid, String password) {
 
 void MamaDuck::handleReceivedMessage() {
 
+  Serial.println("[MamaDuck] handleReceivedMessage()...");
+
+  CDP_Packet packet;
+  int pSize = duckLora->getReceivedPacket(&packet);
+
+  if (pSize > 0) {
+    if (packet.path.size() == MAX_PATH_LENGTH) {
+      Serial.println("Oops. Max hops reached. Packet may be lost");
+      return;
+    }
+    
+    String paths = duckutils::convertToHex(packet.path.data(), packet.path.size());
+    if (paths.indexOf(deviceId) < 0) {
+      Serial.println("mama duck duid not found in path. adding it");
+      packet.path.insert(packet.path.end(), deviceId.begin(), deviceId.end());
+    }
+    Serial.print("PATH = ");
+    Serial.println(duckutils::convertToHex(packet.path.data(), packet.path.size()));
+  } else {
+    // discard any unrecognized packets
+    Serial.println("[MamaDuck] handleReceivedMessage() messaage is empty");
+
+    duckLora->resetTransmissionBuffer();
+  }
+}
+
+/*
+void MamaDuck::handleReceivedMessage() {
+
+  CDP_Packet packet;
+  int pSize = duckLora->getReceivedPacket(&packet);
   // read the lora message and transfer it to the transmission buffer
-  int pSize = duckLora->storePacketData();
+  //int pSize = duckLora->storePacketData();
   Serial.print("[MamaDuck] handleReceivedMessage() pSize = ");
   Serial.println(pSize);
-
   if (pSize > 0) {
     // These 2 methods should be combined in one.
     // the string returned by getPacketData() is only the message topic
@@ -68,6 +98,7 @@ void MamaDuck::handleReceivedMessage() {
     duckLora->resetTransmissionBuffer();
   }
 }
+*/
 
 void MamaDuck::run() {
 
