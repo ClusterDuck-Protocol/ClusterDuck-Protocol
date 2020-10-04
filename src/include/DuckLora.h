@@ -112,7 +112,17 @@ public:
                           String senderId = "", String messageId = "",
                           String path = "");
 
+  /**
+   * @brief Send packet data out into the LoRa mesh network
+   *
+   * @param data  data bytes to send
+   * @returns DUCK_ERR_NONE if the message was sent successfully, an error code otherwise.
+   */
+  int sendData(std::vector<byte> data);
+
+
   int sendData(byte* packet, int size);
+
   /**
    * @brief Get the last received LoRa packet.
    *
@@ -233,6 +243,8 @@ public:
    * 
    */
   void resetTransmissionBuffer();
+
+  int getReceivedData(std::vector<byte>* packetBytes);
 
 private:
   byte transmission[CDPCFG_CDP_BUFSIZE];

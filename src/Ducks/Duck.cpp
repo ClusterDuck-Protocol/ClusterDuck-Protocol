@@ -5,8 +5,10 @@ volatile bool Duck::receivedFlag = false;
 
 Duck::Duck(String id) {
     deviceId = id;
+    duid.insert(duid.end(), id.begin(), id.end());
     duckutils::setDuckInterrupt(true);
-    packet = new DuckPacket(id);
+    txPacket = new DuckPacket(id);
+    rxPacket = new DuckPacket();
 }
 
 void Duck::setupSerial(int baudRate) {
@@ -136,14 +138,14 @@ void Duck::processPortalRequest() {
 
 int Duck::sendData(byte topic, std::vector<byte> data) {
   
-  int err = packet->buildDataBuffer(topic, data);
+  int err = txPacket->buildPacketBuffer(topic, data);
   if ( err != DUCK_ERR_NONE) {
     return err;
   }
 
-  int length = packet->getBufferLength();
-  err = duckLora->sendData(packet->getBuffer(), length);
-  packet->clearBuffer();
+  int length = txPacket->getBufferLength();
+  err = duckLora->sendData(txPacket->getDataByteBuffer(), length);
+  txPacket->reset();
   return err;
 }
 

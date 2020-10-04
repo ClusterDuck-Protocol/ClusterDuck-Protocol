@@ -26,8 +26,11 @@ public:
   Duck(String id);
 
   ~Duck() {
-    if (packet != NULL) {
-      delete packet;
+    if (txPacket != NULL) {
+      delete txPacket;
+    }
+    if (rxPacket != NULL) {
+      delete rxPacket;
     }
   }
 
@@ -148,9 +151,12 @@ public:
 
 protected:
   String deviceId;
+  std::vector<byte> duid;
   DuckLora* duckLora = DuckLora::getInstance();
   DuckNet* duckNet = DuckNet::getInstance();
-  DuckPacket* packet = NULL; 
+  DuckPacket* txPacket = NULL;
+  DuckPacket* rxPacket = NULL;
+
   /**
    * @brief Tell the duck radio to start receiving packets from the mesh network
    *

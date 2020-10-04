@@ -91,6 +91,32 @@ void DuckLora::resetTransmissionBuffer() {
   _packetIndex = 0;
 }
 
+int DuckLora::getReceivedData(std::vector<byte>* packetBytes) {
+
+  int pSize = 0;
+  int err = DUCK_ERR_NONE;
+
+  pSize = lora.getPacketLength();
+  
+  if (pSize == 0) {
+    Serial.println("[DuckLora] handlePacket rx data length is 0");
+    return DUCKLORA_ERR_HANDLE_PACKET;
+  }
+
+  packetBytes->resize(pSize);
+
+  err = lora.readData(packetBytes->data(), pSize);
+  if (err != ERR_NONE) {
+    Serial.print("[DuckLora] handlePacket failed. err: ");
+    Serial.println(err);
+    return DUCKLORA_ERR_HANDLE_PACKET;
+  }
+  Serial.print("[DuckLora] read data into buffer. size: ");
+  Serial.println(pSize);
+
+  return err;
+}
+
 int DuckLora::getReceivedPacket(CDP_Packet *packet) {
   int pSize = 0;
   int err = 0;
@@ -140,8 +166,6 @@ int DuckLora::getReceivedPacket(CDP_Packet *packet) {
   Serial.println(duckutils::convertToHex(packet->data.data(), packet->data.size()));
   Serial.print("PATH: ");
   Serial.println(duckutils::convertToHex(packet->path.data(), packet->path.size()));
-
-
   return pSize;
 }
 
@@ -340,6 +364,9 @@ int DuckLora::sendData(byte* data, int length) {
   return transmitData(data, length); 
 }
 
+int DuckLora::sendData(std::vector<byte> data) {
+  return transmitData(data.data(), data.size());
+}
 int DuckLora::sendPayloadStandard(String msg, String topic,
                                                    String senderId,
                                                    String messageId,
