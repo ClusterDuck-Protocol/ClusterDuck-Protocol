@@ -18,7 +18,7 @@
 #include <U8x8lib.h>
 #include <WString.h>
 
-#include "cdpcfg.h"
+#include "include/cdpcfg.h"
 
 /**
  * @brief Internal OLED Display abstraction.

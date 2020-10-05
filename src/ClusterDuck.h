@@ -19,7 +19,7 @@
 #endif
 #include <WString.h>
 
-#include "include/DuckDisplay.h"
+#include "DuckDisplay.h"
 #include "include/DuckLed.h"
 #include "include/DuckLora.h"
 #include "include/DuckNet.h"
