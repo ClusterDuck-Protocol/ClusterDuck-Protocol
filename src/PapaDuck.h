@@ -29,7 +29,7 @@ public:
   void run();
 
   /**
-   * @brief Override the default setup method to match MamaDuck specific
+   * @brief Override the default setup method to match the Duck specific
    * defaults.
    *
    * In addition to Serial component, the Radio component is also initialized.

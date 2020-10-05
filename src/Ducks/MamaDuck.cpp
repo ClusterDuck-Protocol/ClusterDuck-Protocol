@@ -1,29 +1,5 @@
 #include "../MamaDuck.h"
 
-bool MamaDuck::idInPath(String path) {
-  Serial.print("[MamaDuck] idInPath '");
-  Serial.print(path);
-  Serial.print("' ");
-  String temp = "";
-  int len = path.length() + 1;
-  char arr[len];
-  path.toCharArray(arr, len);
-
-  for (int i = 0; i < len; i++) {
-    if (arr[i] == ',' || i == len - 1) {
-      if (temp == deviceId) {
-        Serial.println("true");
-        return true;
-      }
-      temp = "";
-    } else {
-      temp += arr[i];
-    }
-  }
-  Serial.println("false");
-  return false;
-}
-
 void MamaDuck::setupWithDefaults(String ssid, String password) {
   Duck::setupWithDefaults(ssid, password);
   setupRadio();
@@ -42,16 +18,13 @@ void MamaDuck::handleReceivedMessage() {
 
   Serial.println("[MamaDuck] handleReceivedMessage()...");
   
-  // start with a clean rx duck packet
-  // get  data from the lora driver
-  // update the rx duck packet
-  // add our duid to the path if not already present
-  // send the message back into the mesh if it needs to be relayed
   rxPacket->reset();
+  
   std::vector<byte> data;
   int err = duckLora->getReceivedData(&data);
+
   if (err != DUCK_ERR_NONE) {
-    Serial.print("[MamaDuck] >> could not get received data from DuckLora. err = ");
+    Serial.print("[MamaDuck] ERROR - failed to get data from DuckLora. rc = ");
     Serial.println(err);
     return;
   }

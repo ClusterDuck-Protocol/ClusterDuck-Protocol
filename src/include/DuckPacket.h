@@ -47,7 +47,7 @@
 #define ARRAY_LENGTH(array) (sizeof(array) / sizeof((array)[0]))
 
 /**
- * @brief Defines preset topic tags for duck packets.
+ * @brief Defines preset topics for duck packets.
  * 
  */
 enum topics {
@@ -61,14 +61,11 @@ enum topics {
   sensor = 0x13,
   /// an allert message that should be given immediate attention
   alert = 0x14,
-  /// Max supported topic tags
+  /// Max supported topics
   max_topics = 0xFF
 };
 
-/**
- * @brief Duck packet format.
- *
- * PACKET FORMAT (v1.0)
+/* PACKET FORMAT (v1.0)
  * 0        07   12     15                      PO                    255
  * |        |    |      |                       |                     |
  * +--------+----+-+-+--+-----------------------+---------------------+
@@ -83,16 +80,23 @@ enum topics {
  * R   :      02  byte array          - Reserved for internal use
  * DATA:      192 byte array          - Data payload (e.g sensor read, text,...). Max is 192 bytes.
  * PATH:      048 byte array of DUIDs - Device UIDs having seen this packet. Max is 48 bytes (6 hops)
- *
  */
+
 #pragma pack(1)
 typedef struct {
+  /// Device UID (8 bytes)
   std::vector<byte> duid;
+  /// Message UID (4 bytes)
   std::vector<byte> muid;
+  /// Message topic (1 byte)
   byte topic;
+  /// Offset to the Path section (1 byte)
   byte path_offset;
+  /// Reserved (2 bytes)
   std::vector<byte> reserved;
+  /// Data section (192 bytes max)
   std::vector<byte> data;
+  /// Path section (48 bytes ma)
   std::vector<byte> path;
 } CDP_Packet;
 
@@ -104,7 +108,7 @@ class DuckPacket {
 
 public:
     DuckPacket() {}
-    DuckPacket(String device_id) { this->deviceId = device_id;}
+    //DuckPacket(String device_id) { this->deviceId = device_id;}
 
     DuckPacket(std::vector<byte> duid) { this->duid = duid; }
 

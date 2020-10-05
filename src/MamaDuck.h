@@ -33,7 +33,6 @@ public:
   void setupWithDefaults(String ssid = "", String password = "");
 
 private :
-  bool idInPath(String path);
   void handleReceivedMessage();
 };
 

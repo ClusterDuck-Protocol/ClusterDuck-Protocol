@@ -3,11 +3,12 @@
 
 volatile bool Duck::receivedFlag = false;
 
+// TODO: deprecate String id. Replace with a byte array or byte vector
 Duck::Duck(String id) {
     deviceId = id;
     duid.insert(duid.end(), id.begin(), id.end());
     duckutils::setDuckInterrupt(true);
-    txPacket = new DuckPacket(id);
+    txPacket = new DuckPacket(duid);
     rxPacket = new DuckPacket();
 }
 

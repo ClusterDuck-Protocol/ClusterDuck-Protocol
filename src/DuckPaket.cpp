@@ -48,28 +48,27 @@ int DuckPacket::buildPacketBuffer(byte topic, std::vector<byte> app_data) {
   byte message_id[MUID_LENGTH];
 
   duckutils::getRandomBytes(MUID_LENGTH, message_id);
-  // insert packet header
+  // ----- insert packet header  -----
   // device uid
   buffer.insert(buffer.end(), deviceId.begin(), deviceId.end());
   // message uid
   buffer.insert(buffer.end(), &message_id[0], &message_id[MUID_LENGTH]);
   // topic
   buffer.insert(buffer.end(), topic);
-
   // path offset
   byte offset = HEADER_LENGTH + app_data_length;
   buffer.insert(buffer.end(), offset);
-
   // reserved
   buffer.insert(buffer.end(), 0x00);
   buffer.insert(buffer.end(), 0x00);
 
-  // insert data
+  // ----- insert data -----
   buffer.insert(buffer.end(), app_data.begin(), app_data.end());
 
-  // insert path
+  // ----- insert path -----
   buffer.insert(buffer.end(), deviceId.begin(), deviceId.end());
-  Serial.println("packet buffer:" + String(duckutils::convertToHex(buffer.data(), buffer.size())));
+
+  Serial.println("[DuckPacket] packet: " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
   return DUCK_ERR_NONE;
 }
 
