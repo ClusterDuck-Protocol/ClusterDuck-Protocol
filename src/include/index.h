@@ -12,7 +12,7 @@ const char MAIN_page[] PROGMEM = R"=====(
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
             body {
-                background-color: red;
+                background-color: black;
                 font: 14px "Avenir", helvetica, sans-serif;
                 color: white;
                 -webkit-font-smoothing: antialiased;
