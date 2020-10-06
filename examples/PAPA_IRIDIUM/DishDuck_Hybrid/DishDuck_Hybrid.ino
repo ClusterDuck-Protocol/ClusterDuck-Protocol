@@ -1,15 +1,23 @@
-#include <ClusterDuck.h>
+/**
+ * @file papa-duck-with-callback.ino
+ * @author 
+ * @brief Uses built-in PapaDuck from the SDK to create a WiFi enabled Papa Duck
+ * 
+ * This example will configure and run a Papa Duck that connects to the cloud
+ * and forwards all messages (except  pings) to the cloud.
+ * 
+ * @date 2020-09-21
+ * 
+ */
+#include <PapaDuck.h>
+
 #include <PubSubClient.h>
-#include <IridiumSBD.h>
 #include <ArduinoJson.h>
 #include <WiFiClientSecure.h>
 #include "timer.h"
 
-ClusterDuck duck;
-
-auto timer = timer_create_default(); // create a timer with default settings
-
-byte ping = 0xF4;
+// Add Iridium Lib
+#include <IridiumSBD.h>
 
 //============== IRIDIUM ================
 #define IridiumSerial Serial2
@@ -19,128 +27,167 @@ byte ping = 0xF4;
 
 // Declare the IridiumSBD object
 IridiumSBD modem(IridiumSerial);
-//============== IRIDIUM ================
 
-//============== PAPADUCK ================
-#define SSID        ""
-#define PASSWORD    ""
+#define SSID ""
+#define PASSWORD ""
 
+// Used for Mqtt client connection
+// Provided when a Papa Duck device is created in DMS
 #define ORG         ""
 #define DEVICE_ID   ""
 #define DEVICE_TYPE ""
 #define TOKEN       ""
 
+// Use pre-built papa duck: the duck ID is provided by DMS
+PapaDuck duck = PapaDuck(DEVICE_ID);
+
 char server[]           = ORG ".messaging.internetofthings.ibmcloud.com";
-char topic[]            = "iot-2/evt/status/fmt/json";
 char authMethod[]       = "use-token-auth";
 char token[]            = TOKEN;
 char clientId[]         = "d:" ORG ":" DEVICE_TYPE ":" DEVICE_ID;
 
+// Set this to false if testing quickstart on IBM IoT Platform
+bool use_auth_method = true;
+
+auto timer = timer_create_default(); // create a timer with default settings
+
 WiFiClientSecure wifiClient;
 PubSubClient client(server, 8883, wifiClient);
-//============== PAPADUCK ================
+
+bool retry = true;
 
 void setup() {
-  // put your setup code here, to run once:
-  duck.begin();
-  duck.setDeviceId("PapaDish");
-  duck.setupDisplay("PapaDish");
+  
+
+  /**
+   * duck.setupSerial()
+   * duck.setupRadio();
+   * duck.setupWifi("PapaDuck Setup"); 
+   * duck.setupDns();
+   * duck.setupInternet(SSID, PASSWORD);
+   * duck.setupWebServer(false);
+   * duck.setupOTA();
+   */
+  // the default setup is equivalent to the above setup sequence
+  duck.setupWithDefaults(SSID, PASSWORD);
   setupRockBlock();
-  duck.setupLoRa();
 
-  const char * ap = "PapaDuck Setup";
-  duck.setupWifiAp(ap);
-	duck.setupDns();
-  duck.setupWebServer(true);
+  
+  // register a callback to handle incoming data from duck in the network
+  duck.onReceiveDuckData(handleDuckData);
+  
+  Serial.println("[PAPA] Setup OK!");
+}
 
-  if(duck.ssidAvailable(SSID)) {
-    duck.setupInternet(SSID, PASSWORD);
-    setupMQTT();
-  } else {
-    duck.setSSID(SSID);
-    duck.setPassword(PASSWORD);
-  }
-
-//  Serial.println("PAPA Online");
+// The callback method simply takes the incoming packet and
+// converts it to a JSON string, before sending it out over WiFi
+void handleDuckData(Packet packet) {
+  quackJson(packet);
 }
 
 void loop() {
-  if(WiFi.status() == WL_CONNECTED) setupMQTT();
 
-  if(duck.getFlag()) {  //If LoRa packet received
-    duck.flipFlag();
-    duck.flipInterrupt();
-    int pSize = duck.handlePacket();
-    if(pSize > 3) {
-      duck.getPacketData(pSize);
-      if(WiFi.status() == WL_CONNECTED) {
-        quackJson();
-      } else {
-        if(duck.ssidAvailable()) {
-          Serial.print("WiFi disconnected, reconnecting to local network: ");
-          Serial.print(duck.getSSID());
-          duck.setupInternet(duck.getSSID(), duck.getPassword());
-          duck.setupDns();
-          setupMQTT();
+  if (!duck.isWifiConnected() && retry) {
+    String ssid = duck.getSsid();
+    String password = duck.getPassword();
+    
+    Serial.print("[PAPA] WiFi disconnected, reconnecting to local network: ");
+    Serial.print(ssid);
 
-          quackJson();
-        } else {
+    int err = duck.reconnectWifi(ssid, password);
+
+    if (err != DUCK_ERR_NONE) {
+      retry = false;
+      timer.in(5000, enableRetry);
+    }
+  }
+  if (duck.isWifiConnected()) {
+    setup_mqtt(use_auth_method);
+  }
+  else {
           quackBeam();
         }
-        
-      }
-      
-    }
-    duck.flipInterrupt();
-    duck.startReceive();
-  }
+
+  duck.run();
   timer.tick();
 }
 
-void quackJson() {
-  Serial.print("quackJson");
 
-  const int bufferSize = 4*  JSON_OBJECT_SIZE(4);
+
+
+
+
+void setup_mqtt(bool use_auth)
+{
+  bool connected = client.connected();
+  if (connected) {
+    return;
+  }
+  
+  for (;;) {
+    if (use_auth) {
+      connected = client.connect(clientId, authMethod, token);
+    } else {
+      connected = client.connect(clientId);
+    }
+    if (connected) {
+      Serial.println("[PAPA] mqtt client is connected!");
+      break;
+    }
+    retry_mqtt_connection(500);
+  }
+}
+
+void quackJson(Packet packet) {
+
+  if (packet.topic == "ping") {
+    return;
+  }
+  
+  const int bufferSize = 4 *  JSON_OBJECT_SIZE(4);
   StaticJsonDocument<bufferSize> doc;
 
-  JsonObject root = doc.as<JsonObject>();
+  doc["DeviceID"]  = packet.senderId;
+  doc["MessageID"] = packet.messageId;
+  doc["Payload"].set(packet.payload);
 
-  Packet lastPacket = duck.getLastPacket();
+  // FIXME: Path shouldn't be altered by the application
+  // It should done in the library PapaDuck component
+  doc["path"].set(packet.path + "," + DEVICE_ID);
 
-  doc["DeviceID"]        = lastPacket.senderId;
-  doc["MessageID"]       = lastPacket.messageId;
-  doc["Payload"]     .set(lastPacket.payload);
-  doc["path"]         .set(lastPacket.path + "," + duck.getDeviceId());
+  String loc = "iot-2/evt/" + packet.topic + "/fmt/json";
+  Serial.print(loc);
+  // add space for null char
+  int len = loc.length() + 1;
 
+  char topic[len];
+  loc.toCharArray(topic, len);
 
   String jsonstat;
   serializeJson(doc, jsonstat);
 
   if (client.publish(topic, jsonstat.c_str())) {
-
     serializeJsonPretty(doc, Serial);
     Serial.println("");
-    Serial.println("Publish ok");
-
+    Serial.println("[PAPA] Publish ok");
   }
   else {
-    Serial.println("Publish failed");
-  }
-
-}
-
-void setupMQTT()
-{
-  if (!!!client.connected()) {
-    Serial.print("Reconnecting client to "); Serial.println(server);
-    while ( ! (ORG == "quickstart" ? client.connect(clientId) : client.connect(clientId, authMethod, token)))
-    {
-      timer.tick(); //Advance timer to reboot after awhile
-      Serial.print("i");
-      delay(500);
-    }
+    Serial.println("[PAPA] Publish failed");
   }
 }
+
+bool enableRetry(void *) {
+  retry = true;
+  return retry;
+}
+
+void retry_mqtt_connection(int delay_ms) {
+  timer.tick();
+  Serial.print(".");
+  delay(delay_ms);
+}
+
+
 
 void quackBeam() {
   Serial.print("quackBeam");

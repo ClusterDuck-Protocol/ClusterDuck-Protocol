@@ -1,21 +1,46 @@
-#include <ClusterDuck.h>
-//#include "timer.h"
-//auto timer = timer_create_default(); // create a timer with default settings
+/**
+ * @file mamaduck-send-message.ino
+ * @brief Uses the built in Mama Duck with some customatizations.
+ * 
+ * This example is a Mama Duck, but it is also periodically sending a message in the Mesh
+ * It is setup to provide a custom Emergency portal, instead of using the one provided by the SDK.
+ * Notice the background color of the captive portal is Black instead of the default Red.
+ * 
+ * @date 2020-09-21
+ * 
+ * @copyright Copyright (c) 2020
+ * 
+ */
+
+#include "timer.h"
+#include <MamaDuck.h>
+
+#ifdef SERIAL_PORT_USBVIRTUAL
+#define Serial SERIAL_PORT_USBVIRTUAL
+#endif
+
+
+//GPS
 #include <TinyGPS++.h>
 #include <axp20x.h>
 
 TinyGPSPlus gps;
 HardwareSerial GPS(1);
 AXP20X_Class axp;
-ClusterDuck duck;
+
+
+MamaDuck duck = MamaDuck("BETA");
+
+auto timer = timer_create_default();
+const int INTERVAL_MS = 20000;
+char message[32]; 
+int counter = 1;
 
 void setup() {
-  // put your setup code here, to run once:
-  duck.begin();
-  duck.setDeviceId("X");
-  duck.setupMamaDuck();
-  //GPS Setup
-  Wire.begin(21, 22);
+  // Use the default setup provided by the SDK
+  duck.setupWithDefaults();
+  Serial.println("MAMA-DUCK...READY!");
+   Wire.begin(21, 22);
   if (!axp.begin(Wire, AXP192_SLAVE_ADDRESS)) {
     Serial.println("AXP192 Begin PASS");
   } else {
@@ -27,15 +52,18 @@ void setup() {
   axp.setPowerOutPut(AXP192_EXTEN, AXP202_ON);
   axp.setPowerOutPut(AXP192_DCDC1, AXP202_ON);
   GPS.begin(9600, SERIAL_8N1, 34, 12);   //17-TX 18-RX
-  //// every 5 seconds run sensor
-  // timer.every(5000, runSensor);
+
+  // initialize the timer. The timer thread runs separately from the main loop
+  // and will trigger sending a counter message.
+  timer.every(INTERVAL_MS, runSensor);
 }
 
 void loop() {
-  // tick the timer
-  // timer.tick();
-  // put your main code here, to run repeatedly:
-  duck.runMamaDuck();
+  timer.tick();
+  // Use the default run(). The Mama duck is designed to also forward data it receives
+  // from other ducks, across the network. It has a basic routing mechanism built-in
+  // to prevent messages from hoping endlessly.
+  duck.run();
   Serial.print("Latitude  : ");
   Serial.println(gps.location.lat(), 5);
   Serial.print("Longitude : ");
@@ -63,6 +91,7 @@ void loop() {
   if (millis() > 5000 && gps.charsProcessed() < 10)
     Serial.println(F("No GPS data received: check wiring"));
 }
+
 
 static void smartDelay(unsigned long ms)
 {
