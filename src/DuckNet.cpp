@@ -1,8 +1,19 @@
 #include "include/DuckNet.h"
 
+DuckNet* DuckNet::instance = NULL;
+
+DuckNet::DuckNet() { _duckLora = DuckLora::getInstance(); }
+DuckNet* DuckNet::getInstance() {
+  return (instance == NULL) ? new DuckNet : instance;
+}
+
+
+#ifndef CDPCFG_WIFI_NONE
 IPAddress apIP(CDPCFG_AP_IP1, CDPCFG_AP_IP2, CDPCFG_AP_IP3, CDPCFG_AP_IP4);
 AsyncWebServer webServer(CDPCFG_WEB_PORT);
 DNSServer DuckNet::dnsServer;
+
+
 const char* DuckNet::DNS = "duck";
 const byte DuckNet::DNS_PORT = 53;
 
@@ -12,13 +23,6 @@ const char* http_password = CDPCFG_UPDATE_PASSWORD;
 
 bool restartRequired = false;
 size_t content_len;
-
-DuckNet* DuckNet::instance = NULL;
-
-DuckNet::DuckNet() { _duckLora = DuckLora::getInstance(); }
-DuckNet* DuckNet::getInstance() {
-  return (instance == NULL) ? new DuckNet : instance;
-}
 
 void DuckNet::setDeviceId(String deviceId) { this->_deviceId = deviceId; }
 
@@ -98,7 +102,7 @@ void DuckNet::setupWebServer(bool createCaptivePortal, String html) {
   webServer.on("/formSubmit", HTTP_POST, [&](AsyncWebServerRequest* request) {
     Serial.println("Submitting Form");
 
-    int err = DUCKLORA_ERR_NONE;
+    int err = DUCK_ERR_NONE;
 
     int paramsNumber = request->params();
     String val = "";
@@ -113,7 +117,7 @@ void DuckNet::setupWebServer(bool createCaptivePortal, String html) {
 
     err = _duckLora->sendPayloadStandard(val, "status");
     switch (err) {
-      case DUCKLORA_ERR_NONE:
+      case DUCK_ERR_NONE:
         request->send(200, "text/html", portal);
         break;
       case DUCKLORA_ERR_MSG_TOO_LARGE:
@@ -123,7 +127,7 @@ void DuckNet::setupWebServer(bool createCaptivePortal, String html) {
         request->send(400, "text/html", "BadRequest");
         break;
       default:
-        request->send(400, "text/html", "Oops! Unknown error."); 
+        request->send(500, "text/html", "Oops! Unknown error."); 
         break;    
     }
   });
@@ -207,15 +211,19 @@ void DuckNet::setupWifiAp(const char* accessPoint) {
   Serial.println("[DuckNet] Created Wifi Access Point");
 }
 
-void DuckNet::setupDns() {
+int DuckNet::setupDns() {
   dnsServer.start(DNS_PORT, "*", apIP);
 
   if (!MDNS.begin(DNS)) {
     Serial.println("[DuckNet] Error setting up MDNS responder!");
-  } else {
-    Serial.println("[DuckNet] Created local DNS");
-    MDNS.addService("http", "tcp", CDPCFG_WEB_PORT);
+    return DUCKDNS_ERR_STARTING;
   }
+  
+  Serial.println("[DuckNet] Created local DNS");
+  MDNS.addService("http", "tcp", CDPCFG_WEB_PORT);
+  
+  return DUCK_ERR_NONE;
+
 }
 
 void DuckNet::setupInternet(String ssid, String password) {
@@ -240,6 +248,7 @@ void DuckNet::setupInternet(String ssid, String password) {
     Serial.println("[DuckNet] DUCK CONNECTED TO INTERNET");
   }
 }
+
 
 bool DuckNet::ssidAvailable(String val) {
   // TODO: needs to be cleaned up for null case
@@ -270,3 +279,5 @@ void DuckNet::setPassword(String val) { password = val; }
 String DuckNet::getSsid() { return ssid; }
 
 String DuckNet::getPassword() { return password; }
+
+#endif

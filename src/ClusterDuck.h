@@ -1,7 +1,16 @@
+/**
+ * @file ClusterDuck.h
+ * @author 
+ * @brief This file defines the cluster duck public APIs.
+ * 
+ * @version 
+ * @date 2020-09-15
+ * 
+ * @copyright
+ * 
+ */
 #ifndef CD
 #define CD
-
-#include "include/cdpcfg.h"
 
 #if (ARDUINO >= 100)
 #include "Arduino.h"
@@ -10,91 +19,209 @@
 #endif
 #include <WString.h>
 
-#include <Update.h>
-#include <esp_int_wdt.h>
-#include <esp_task_wdt.h>
-#include <include/OTAPage.h>
-
-#include "timer.h"
-
-#include <ArduinoOTA.h>
-
-#include "include/DuckDisplay.h"
+#include "DuckDisplay.h"
 #include "include/DuckLed.h"
 #include "include/DuckLora.h"
 #include "include/DuckNet.h"
 #include "include/DuckUtils.h"
+#include "include/cdpcfg.h"
+#include "timer.h"
 
+/**
+ * @brief External APIs to build and control a duck device.
+ * 
+ * This class exposes all the necessary APIs to setup/build a duck as well as
+ * customizig the duck's behavior.
+ */
 class ClusterDuck {
 public:
+  /**
+   * @brief Construct a new Cluster Duck object.
+   * 
+   */
   ClusterDuck();
-  ~ClusterDuck() {
-    delete _duckDisplay;
-    delete _duckLed;
-    delete _duckLora;
-    delete _duckNet;
-  };
-  
-  friend class DuckBuilder;
 
-  // Public APIs
+  ~ClusterDuck() {}
   
-  // Common Duck
-  void setDeviceId(String deviceId = "");
-  void begin(int baudRate = CDPCFG_SERIAL_BAUD);
+
+  /**
+   * @brief Get the Duck Mac Address.
+   *
+   * @param format    true if the mac address is formated as MM:MM:MM:SS:SS:SS
+   * @return A string representing the duck mac address
+   */
   String duckMac(boolean format);
+
+  /**
+   * @brief Create a uuid string.
+   *
+   * @return A string representing a unique identifier.
+   */
   String uuidCreator();
-  String getDeviceId();
-  static bool imAlive(void*);
-  static bool reboot(void*);
 
+  /**
+   * @brief Get the interrupt state.
+   * 
+   * @return true if interrupt is enabled, false otherwise.
+   */
   volatile bool getInterrupt();
+
+  /**
+   * @brief Toggle the flag that indicates a message is received.
+   * 
+   */
   void flipFlag();
+
+  /**
+   * @brief Toggle the interrupt state flag.
+   * 
+   */
   void flipInterrupt();
-  void ping();
 
-  // Duck Link
-  void setupDuckLink();
-  void runDuckLink();
+  /**
+   * @brief Transmit a ping message.
+   *
+   * @return 0 if the message was sent sucessfully, an error code otherwise.
+   */
+  int ping();
 
-  // Mama Duck
-  void setupMamaDuck();
-  void runMamaDuck();
-
-  // Detect Duck
+  /**
+   * @brief Shortcut to setup a Duck Detector
+   *
+   * This function will setup a Duck Detector and is equivalent to call these
+   * individual methods:
+   * ```
+   * setupDisplay("Duck");
+   * setupLoRa();
+   * setupOTA()
+   * ```
+   * It is assumed that the Duck Detector hardware has a display and a wifi
+   * component
+   */
   void setupDetect();
+
+  /**
+   * @brief starts the Duck Detector run thread.
+   *
+   * - checks for "health" message received and returns the LoRa RSSI value
+   * @return an integer value representing the LoRa RSSI value
+   */
   int runDetect();
 
-  // LoRa
-  void setupLoRa(long BAND = CDPCFG_RF_LORA_FREQ, int SS = CDPCFG_PIN_LORA_CS,
-                 int RST = CDPCFG_PIN_LORA_RST, int DI0 = CDPCFG_PIN_LORA_DIO0,
-                 int DI1 = CDPCFG_PIN_LORA_DIO1,
-                 int TxPower = CDPCFG_RF_LORA_TXPOW);
+  /**
+   * @brief Handles a received LoRa packet.
+   *
+   * @return The packet length which should be > 0. An error code is returned if there was a failure to read the data
+   * from the LoRa driver.
+   */
   int handlePacket();
+
+  /**
+   * @brief Get the Packet data.
+   * 
+   * @param pSize the length of the packet
+   * @return A string representing the content of the packet 
+   */
   String getPacketData(int pSize);
-  void sendPayloadStandard(String msg = "", String topic = "",
-                           String senderId = "", String messageId = "",
-                           String path = "");
+
+
+  /** 
+   * @brief Get the last received LoRa packet.
+   * 
+   * @return A Packet object containing the last received message.
+   */
   Packet getLastPacket();
-  void couple(byte byteCode, String outgoing); //?! Not public
-  bool idInPath(String path);                  // ?! Not public
-  volatile bool getFlag(); // To check if LoRa packet was received
-  void startReceive();
-  void startTransmit();
+
+  /**
+   * @brief  Append a chunk to the packet.
+   *
+   * A chunk is part of the Duck LoRa packet and is formated as
+   * [tag][length][payload] where a tag is a single byte identifying the chunk.
+   * Currently supported tags:
+   * ```
+   * ping
+   * sender_id
+   * topic
+   * message_id
+   * payload
+   * iamhere
+   * ```
+   * @param byteCode identifies the tag to append
+   * @param outgoing the payload for the tag to be appended to the LoRa packet
+   */
+  void couple(byte byteCode, String outgoing);
+
+  /**
+   * @brief Determine if a Duck device_id is present in the path.
+   *
+   * @param path  path retrieved from the LoRa packet
+   * @return true if the id is in the path, false otherwise.
+   */
+  bool idInPath(String path);   
+
+  /**
+   * @brief Get the packet receive flag status
+   * 
+   * @return true if a received packet is available, false otherwise. 
+   */
+  volatile bool getFlag();
+
+  /**
+   * @brief Set the Duck to be ready to recieve LoRa packets.
+   *
+   * @return 0 if the call was successful, an error code otherwise.
+   */
+  int startReceive();
+
+  /**
+   * @brief Set the Duck to be ready to transmit LoRa packets.
+   *
+   * @return 0 if the call was successful, an error code otherwise.
+   */
+  int startTransmit();
+
+  /**
+   * @brief Get the current RSSI value.
+   *
+   * @return An integer representing the rssi value.
+   */
   int getRSSI();
 
-  // Display
-  void setupDisplay(String deviceType);
-
-  // Network
-  void setupWebServer(bool createCaptivePortal = false, String html = "");
-  void setupWifiAp(const char* AP = " 🆘 DUCK EMERGENCY PORTAL");
-  void setupDns();
-  void setupInternet(String SSID, String PASSWORD);
+  /**
+   * @brief  Checks if the given ssid is available.
+   *
+   * @param val     ssid to check, default is an empty string and will use the
+   * internal default ssid
+   * @return true if the ssid is available, false otherwise.
+   */
   bool ssidAvailable(String val = "");
+
+  /**
+   * @brief Set the WiFi network ssid.
+   *
+   * @param val the ssid string to set
+   */
   void setSSID(String val);
+
+  /**
+   * @brief Set the WiFi password.
+   *
+   * @param val  the password string to set
+   */
   void setPassword(String val);
+
+  /**
+   * @brief Get the WiFi network ssid.
+   *
+   * @return a string representing the current network ssid
+   */
   String getSSID();
+
+  /**
+   * @brief Get the WiFi password ssid.
+   *
+   * @return a string representing the current network password
+   */
   String getPassword();
 
   // OTA - Firmware upgrade
@@ -106,131 +233,11 @@ public:
   String getPortalDataString();
   bool runCaptivePortal();
 
-  // Led
-  void setColor(int ledR = CDPCFG_PIN_RGBLED_R, int ledG = CDPCFG_PIN_RGBLED_G,
-                int ledB = CDPCFG_PIN_RGBLED_B);
-  void setupLED();
-
 protected:
   String _deviceId = "";
-  DuckDisplay* _duckDisplay = DuckDisplay::getInstance();
-  DuckLed* _duckLed = DuckLed::getInstance();
-
-  DuckLora* _duckLora = DuckLora::getInstance();
-  DuckNet* _duckNet = DuckNet::getInstance();
 
 private:
   static void setFlag(void);
-  static void restartDuck();
 
-  static int _rssi;
-  static float _snr;
-  static long _freqErr;
-  static int _availableBytes;
-
-  static int _packetSize;
-  static DNSServer dnsServer;
-  static const byte DNS_PORT;
-  static const char* DNS;
-  static const char* AP;
-  static String portal;
-
-  static String runTime;
 };
-
-class DuckBuilder {
-public:
-  DuckBuilder(){
-  }
-
-  auto createAs(String id) -> DuckBuilder& {
-    _duck.begin();
-    _duck.setDeviceId(id);
-    return *this;
-  }
-
-  auto createMamaDuckAs(String id) -> ClusterDuck& {
-    _duck.begin();
-    _duck.setDeviceId(id);
-    _duck.setupMamaDuck();
-    return _duck;
-  }
-
-  auto createDuckLinkAs(String id) -> ClusterDuck& {
-    _duck.begin();
-    _duck.setDeviceId(id);
-    _duck.setupDuckLink();
-    return _duck;
-  }
-
-  auto createDectorDuckAs(String id) -> ClusterDuck& {
-    _duck.begin();
-    _duck.setDeviceId(id);
-    _duck.setupDetect();
-    return _duck;
-  }
-  
-  auto withLora(long BAND = CDPCFG_RF_LORA_FREQ, int SS = CDPCFG_PIN_LORA_CS,
-                int RST = CDPCFG_PIN_LORA_RST, int DI0 = CDPCFG_PIN_LORA_DIO0,
-                int DI1 = CDPCFG_PIN_LORA_DIO1,
-                int TxPower = CDPCFG_RF_LORA_TXPOW) -> DuckBuilder& {
-    _duck.setupLoRa(BAND, SS, RST, DI0, DI1, TxPower);
-    return *this;
-  }
-
-  auto withDisplay(String deviceType) -> DuckBuilder& {
-    _duck.setupDisplay(deviceType);
-    return *this;
-  }
-
-  auto withWifi(const char* ap = " 🆘 DUCK EMERGENCY PORTAL") -> DuckBuilder& {
-    _duck.setupWifiAp(ap);
-    return *this;
-  }
-
-  auto withDns() -> DuckBuilder& {
-    _duck.setupDns();
-    return *this;
-  }
-
-  auto withInternet(String ssid, String password) -> DuckBuilder& {
-    _duck.setupInternet(ssid, password);
-    return *this;
-  }
-
-  auto withOta() -> DuckBuilder& {
-    _duck.setupOTA();
-    return *this;
-  }
-
-  auto withWebServer(bool createCaptivePortal = false, String html = "") -> DuckBuilder& {
-    _duck.setupWebServer(createCaptivePortal, html);
-    return *this;
-  }
-  auto withLed()->DuckBuilder& {
-    _duck.setupLED();
-    return *this;
-  }
-  auto done() -> ClusterDuck& { return _duck; }
-
-private:
-  ClusterDuck _duck;
-  };
-
-class CaptiveRequestHandler : public AsyncWebHandler {
-public:
-  CaptiveRequestHandler(String portal) { _portal = portal; }
-  virtual ~CaptiveRequestHandler() {}
-
-  bool canHandle(AsyncWebServerRequest* request) { return true; }
-
-  void handleRequest(AsyncWebServerRequest* request) {
-    AsyncResponseStream* response = request->beginResponseStream("text/html");
-    response->print(_portal);
-    request->send(response);
-  }
-
-  String _portal;
-};
-
 #endif

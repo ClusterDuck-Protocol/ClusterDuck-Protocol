@@ -1,16 +1,22 @@
-/*
- * CDP central compile-time configuration
+/**
+ * @file cdpcfg.h
+ * @brief CDP central compile-time configuration file.
  *
- * it will include optional
- * - cdpcfg-pre.h at the beginning
- * - cdpcfg-post.h at the end
+ * - `cdpcfg-pre.h` at the beginning
+ * - `cdpcfg-post.h` at the end
  *
- * to customize your build, you could ...
- * - edit this file or
- * - copy it to cdpcfg-pre.h and edit _that_ or
- * - create a from-scratch cdpcfg-pre.h that just overrides f.ex. the board
+ * To customize your build, you could ...
+ * - Edit this file or
+ * - Copy it to `cdpcfg-pre.h` and edit _that_ or
+ * - Create a from-scratch `cdpcfg-pre.h` that just overrides f.ex. the board
  * defines or
- * - create a cdpcfg-post.h to undef/define just parts
+ * - Create a `cdpcfg-post.h` to undef/define just parts
+ *
+ * @version
+ * @date 2020-09-16
+ *
+ * @copyright
+ *
  */
 
 // preload optional pre-cfg
@@ -30,14 +36,14 @@
  * the ARDUINO_* defs are set by the arduino build env
  */
 
-/*
+/**
  * BOARD "ttgo lora" and "heltec lora" v1
+ *
  * heltec pcb is white, ttgo pcb has heltec+ttgo markings
  * left top+middle in this picture
  * https://github.com/Xinyuan-LilyGO/TTGO-LoRa-Series
  * pio: board = ttgo-lora32-v1
  */
-
 #if defined(ARDUINO_TTGO_LoRa32_V1)
 
 #define CDPCFG_PIN_LED1 25
@@ -55,9 +61,10 @@
 // actualy missing
 #define CDPCFG_PIN_LORA_DIO1 -1
 
-/*
+/**
  * BOARD "ttgo lora v2"
- * top right in this picture
+ *
+ * Top right in this picture
  * https://github.com/Xinyuan-LilyGO/TTGO-LoRa-Series
  * pio: board = ttgo-lora32-v2
  */
@@ -136,6 +143,32 @@
 
 // actualy missing
 #define CDPCFG_PIN_LORA_DIO1 -1
+
+/*
+ * BOARD "rocket scream Mini Ultra Pro v3"
+ * https://www.rocketscream.com/blog/docs-item/mini-ultra-pro-hookup-guide/
+ * pio: board = arduino_zero
+ */
+#elif defined(ARDUINO_SAMD_ZERO)
+// This is not an official ARDUINO_* but uses the same bootloader
+// as the SAMD21 based Arduino Zero
+//
+// Lora configurations (HopeRF RFM95W chip)
+#define CDPCFG_PIN_LORA_CS 5
+#define CDPCFG_PIN_LORA_DIO0 2
+#define CDPCFG_PIN_LORA_DIO1 6
+#define CDPCFG_PIN_LORA_DIO2 -1 // Unused
+#define CDPCFG_PIN_LORA_RST 3
+
+// Oled Display settings
+#define CDPCFG_OLED_NONE
+
+// Wifi module
+#define CDPCFG_WIFI_NONE
+
+// Required for Serial on Zero based boards
+#define Serial SERIAL_PORT_USBVIRTUAL
+//===== BOARD "rocket scream Mini Ultra Pro v3" =====
 
 /*
  * BOARD "sparkfun lora gateway 1-channel"
@@ -242,52 +275,61 @@
 
 #endif
 
-// non BOARD-specific config
+/**
+ * @brief Non board specific configuration
+ *
+ */
 
 // Username and Password for OTA web page
 #define CDPCFG_UPDATE_USERNAME "username"
 #define CDPCFG_UPDATE_PASSWORD "password"
 
-// Serial Console Baud Rate
+/// Serial Console Baud Rate
 #define CDPCFG_SERIAL_BAUD 115200
 
 // Access point IP adress
+
 #define CDPCFG_AP_IP1 192
 #define CDPCFG_AP_IP2 168
 #define CDPCFG_AP_IP3 1
 #define CDPCFG_AP_IP4 1
 
-// Asyncwebserver Port
+/** @brief Asyncwebserver Port */
 #define CDPCFG_WEB_PORT 80
 
-// Lora RF configuration
+/// Frequency Range. Set for US Region 915.0Mhz
 #define CDPCFG_RF_LORA_FREQ 915.0
+/// Bandwidth. Default is 125Mhz
 #define CDPCFG_RF_LORA_BW 125.0
+/// Spread Factor
 #define CDPCFG_RF_LORA_SF 7
+/// Transmit Power
 #define CDPCFG_RF_LORA_TXPOW 20
+/// Antenna Gain correction
 #define CDPCFG_RF_LORA_GAIN 0
 
-// cdp configuration
+/// CDP message buffer max length
 #define CDPCFG_CDP_BUFSIZE 256
+/// CDP UUID generator max length
 #define CDPCFG_UUID_LEN 8
 
-// Timer in milliseconds
+/// CDP ALIVE timer duration in milliseconds
 #define CDPCFG_MILLIS_ALIVE 1800000
+/// CDP REBOOT timer duration in milliseconds
 #define CDPCFG_MILLIS_REBOOT 43200000
 
-// RGB Led Pins
+/// CDP RGB Led RED Pin default value
 #define CDPCFG_PIN_RGBLED_R 25
+/// CDP RGB Led GREEN Pin default value
 #define CDPCFG_PIN_RGBLED_G 4
+/// CDP RGB Led BLUE Pin default value
 #define CDPCFG_PIN_RGBLED_B 2
 
-// semiautomatic section for setting defaults
-
-// set default modem
 #ifndef CDPCFG_LORA_CLASS
+/// Default LoRa Module supported chipset
 #define CDPCFG_LORA_CLASS SX1276
 #endif
 
-// set oled class
 #ifndef CDPCFG_OLED_CLASS
 #if defined(CDPCFG_OLED_NONE)
 // do nothing
