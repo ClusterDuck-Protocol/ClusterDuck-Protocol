@@ -17,13 +17,20 @@ public:
    * @brief Construct a new Duck object.
    *
    */
-  Duck() {}
+  Duck();
   /**
    * @brief Construct a new Duck object.
    *
    * @param id a unique id
    */
   Duck(String id);
+
+  /**
+   * @brief Construct a new Duck object.
+   *
+   * @param duid a unique id
+   */
+  Duck(std::vector<byte> duid);
 
   ~Duck() {
     if (txPacket != NULL) {
@@ -33,6 +40,23 @@ public:
       delete rxPacket;
     }
   }
+
+  /**
+   * @brief setup the duck unique ID
+   * 
+   * @param an 8 byte unique id 
+   * @return DUCK_ERR_NONE if successful, an error code otherwise 
+   */
+  int setupDeviceId(std::vector<byte> id);
+
+  /**
+   * @brief setup the duck unique ID
+   *
+   * @param an 8 byte unique id
+   * @return DUCK_ERR_NONE if successful, an error code otherwise
+   */
+  int setupDeviceId(byte* id);
+
 
   /**
    * @brief Setup serial connection.

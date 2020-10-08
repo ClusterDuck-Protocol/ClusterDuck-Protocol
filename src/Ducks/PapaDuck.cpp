@@ -14,23 +14,37 @@ void PapaDuck::setupWithDefaults(String ssid, String password) {
   Serial.println("PapaDuck setup done");
 }
 
+void PapaDuck::handleReceivedPacket() {
+
+  Serial.println("[PapaDuck] handleReceivedPacket()...");
+
+  rxPacket->reset();
+
+  std::vector<byte> data;
+  int err = duckLora->getReceivedData(&data);
+
+  if (err != DUCK_ERR_NONE) {
+    Serial.print("[PapaDuck] ERROR - failed to get data from DuckLora. rc = ");
+    Serial.println(err);
+    return;
+  }
+
+  bool relay = rxPacket->update(duid, data);
+  if (relay) {
+    Serial.println("[PapaDuck] relaying packet " +
+                   rxPacket->getPathAsHexString());
+    recvDataCallback(rxPacket->getCdpPacket());
+  }
+}
 void PapaDuck::run() {
 
   handleOtaUpdate();
   if (getReceiveFlag()) {
     setReceiveFlag(false);
     duckutils::setDuckInterrupt(false);
-    int pSize = duckLora->storePacketData();
-    // FIXME: This needs a design review.
-    // What message topics Papa Duck is supposed to send out?
-    // what is this pSize > 3 supposed to achieve ?
-    if (pSize > 3) {
-      // Feed the data into our internal buffer. 
-      // FIXME: This is lame! The data should already in the buffer the moment
-      // we receive somethng from the lora module.
-      duckLora->getPacketData(pSize);
-      recvDataCallback(duckLora->getLastPacket());
-    }
+    
+    handleReceivedPacket();
+
     duckutils::setDuckInterrupt(true);
     startReceive();
   }

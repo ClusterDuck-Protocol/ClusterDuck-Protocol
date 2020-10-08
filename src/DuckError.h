@@ -5,6 +5,8 @@
 /// No Error
 #define DUCK_ERR_NONE 0
 #define DUCK_ERR_NOT_SUPPORTED -5000
+#define DUCK_ERR_SETUP         -5100
+#define DUCK_ERR_ID_TOO_LONG   -5101
 
 /// Lora module initialization error
 #define DUCKLORA_ERR_BEGIN          -1000
@@ -32,5 +34,6 @@
 #define DUCKPACKET_ERR_SIZE_INVALID  -4000
 #define DUCKPACKET_ERR_TOPIC_INVALID -4001
 #define DUCKPACKET_ERR_MAX_HOPS      -4002
+
 
 #endif

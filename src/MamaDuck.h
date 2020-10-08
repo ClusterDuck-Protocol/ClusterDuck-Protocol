@@ -33,7 +33,7 @@ public:
   void setupWithDefaults(String ssid = "", String password = "");
 
 private :
-  void handleReceivedMessage();
+  void handleReceivedPacket();
 };
 
 #endif

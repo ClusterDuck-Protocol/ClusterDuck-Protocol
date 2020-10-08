@@ -3,13 +3,43 @@
 
 volatile bool Duck::receivedFlag = false;
 
+Duck::Duck() {
+  duckutils::setDuckInterrupt(true);
+}
+
 // TODO: deprecate String id. Replace with a byte array or byte vector
 Duck::Duck(String id) {
     deviceId = id;
     duid.insert(duid.end(), id.begin(), id.end());
     duckutils::setDuckInterrupt(true);
-    txPacket = new DuckPacket(duid);
-    rxPacket = new DuckPacket();
+}
+
+Duck::Duck(std::vector<byte> id) {
+  duid.insert(duid.end(), id.begin(), id.end());
+  duckutils::setDuckInterrupt(true);
+}
+
+int Duck::setupDeviceId(std::vector<byte> id) {
+  if (id.size() > DUID_LENGTH) {
+    return DUCK_ERR_ID_TOO_LONG;
+  }
+  if (duid.size() > 0) {
+    duid.clear();
+  }
+  duid.insert(duid.end(), id.begin(), id.end());
+  return DUCK_ERR_NONE;
+}
+
+int Duck::setupDeviceId(byte* id) {
+  if (id == NULL) {
+    return DUCK_ERR_SETUP;
+  }
+  int len = *(&id + 1) - id;
+  if (len > DUID_LENGTH) {
+    return DUCK_ERR_ID_TOO_LONG;
+  }
+  duid.assign(id, id + len);
+  return DUCK_ERR_NONE;
 }
 
 void Duck::setupSerial(int baudRate) {
@@ -41,7 +71,7 @@ void Duck::setupRadio(float band, int ss, int rst, int di0, int di1, int txPower
   config.txPower = txPower;
   config.func = Duck::onPacketReceived;
   
-   int err = duckLora->setupLoRa(config, deviceId);
+  int err = duckLora->setupLoRa(config, deviceId);
 
   if (err == ERR_NONE) {
     Serial.println("[Duck] Listening for quacks");
@@ -64,6 +94,9 @@ void Duck::setupRadio(float band, int ss, int rst, int di0, int di1, int txPower
     Serial.println(err);
     duckesp::restartDuck();
   }
+
+  txPacket = new DuckPacket(duid);
+  rxPacket = new DuckPacket();
 }
 
 void Duck::setupWebServer(bool createCaptivePortal, String html) {

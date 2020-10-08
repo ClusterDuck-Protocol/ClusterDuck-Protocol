@@ -12,11 +12,12 @@ public:
   using Duck::Duck;
   
   /// Papa Duck callback function signature.
-  using callbackFunc = void (*)(Packet );
+  using callbackFunc = void (*)(CDP_Packet );
   
   /**
    * @brief Register callback for handling data received from duck devices
    * 
+   * The callback will be invoked if the packet needs to be relayed (i.e not seen before)
    * @param cb a callback to handle data received by the papa duck
    */
   void onReceiveDuckData(callbackFunc cb) { this->recvDataCallback = cb; }
@@ -55,9 +56,10 @@ public:
    */
   int reconnectWifi(String ssid, String password);
 
-
+  
 private:
   callbackFunc recvDataCallback;
+  void handleReceivedPacket();
 };
 
 #endif

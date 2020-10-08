@@ -14,10 +14,10 @@ void MamaDuck::setupWithDefaults(String ssid, String password) {
   duckutils::getTimer().every(CDPCFG_MILLIS_ALIVE, imAlive);
 }
 
-void MamaDuck::handleReceivedMessage() {
+void MamaDuck::handleReceivedPacket() {
 
-  Serial.println("[MamaDuck] handleReceivedMessage()...");
-  
+  Serial.println("[MamaDuck] handleReceivedPacket()...");
+
   rxPacket->reset();
   
   std::vector<byte> data;
@@ -31,7 +31,7 @@ void MamaDuck::handleReceivedMessage() {
 
   bool relay = rxPacket->update(duid, data);
   if (relay) {
-    Serial.println(rxPacket->getPathAsHexString());
+    Serial.println("[MamaDuck] path updated: " + rxPacket->getPathAsHexString());
     duckLora->sendData(rxPacket->getCdpPacketBuffer());
   }
 }
@@ -52,7 +52,7 @@ void MamaDuck::run() {
     duckutils::setDuckInterrupt(false);
 
     // Here we check whether a packet needs to be relayed or not
-    handleReceivedMessage();
+    handleReceivedPacket();
 
     duckutils::setDuckInterrupt(true);
     startReceive();
