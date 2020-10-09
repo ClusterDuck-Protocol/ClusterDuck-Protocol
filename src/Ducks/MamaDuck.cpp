@@ -1,17 +1,45 @@
 #include "../MamaDuck.h"
 
-void MamaDuck::setupWithDefaults(String ssid, String password) {
-  Duck::setupWithDefaults(ssid, password);
-  setupRadio();
+int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String password) {
+  int err = Duck::setupWithDefaults(deviceId, ssid, password);
 
-  setupWifi();
-  setupDns();
-  setupWebServer(true);
-  setupOTA();
+  if (err != DUCK_ERR_NONE) {
+    Serial.println("[MamaDuck] setupWithDefaults rc = " + String(err));
+    return err;
+  }
 
-  Serial.println("MamaDuck setup done");
+  err = setupRadio();
+  if (err != DUCK_ERR_NONE) {
+    Serial.println("[MamaDuck] setupWithDefaults rc = " + String(err));
+    return err;
+  }
 
+  err = setupWifi();
+  if (err != DUCK_ERR_NONE) {
+    Serial.println("[MamaDuck] setupWithDefaults rc = " + String(err));
+    return err;
+  }
+
+  err = setupDns();
+  if (err != DUCK_ERR_NONE) {
+    Serial.println("[MamaDuck] setupWithDefaults rc = " + String(err));
+    return err;
+  }
+
+  err = setupWebServer(true);
+  if (err != DUCK_ERR_NONE) {
+    Serial.println("[MamaDuck] setupWithDefaults rc = " + String(err));
+    return err;
+  }
+
+  err = setupOTA();
+  if (err != DUCK_ERR_NONE) {
+    Serial.println("[MamaDuck] setupWithDefaults rc = " + String(err));
+    return err;
+  }
   duckutils::getTimer().every(CDPCFG_MILLIS_ALIVE, imAlive);
+  Serial.println("MamaDuck setup done");
+  return DUCK_ERR_NONE;
 }
 
 void MamaDuck::handleReceivedPacket() {

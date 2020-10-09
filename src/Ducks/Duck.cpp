@@ -27,6 +27,7 @@ int Duck::setupDeviceId(std::vector<byte> id) {
     duid.clear();
   }
   duid.insert(duid.end(), id.begin(), id.end());
+  Serial.println("[Duck] setupDeviceId rc = " + String(DUCK_ERR_NONE));
   return DUCK_ERR_NONE;
 }
 
@@ -39,15 +40,17 @@ int Duck::setupDeviceId(byte* id) {
     return DUCK_ERR_ID_TOO_LONG;
   }
   duid.assign(id, id + len);
+  Serial.println("[Duck] setupDeviceId rc = " + String(DUCK_ERR_NONE));
+
   return DUCK_ERR_NONE;
 }
 
-void Duck::setupSerial(int baudRate) {
+int Duck::setupSerial(int baudRate) {
   while (!Serial && millis() < 10000);
 
   Serial.begin(baudRate);
-  Serial.print("[Duck] Serial start: ");
-  Serial.println(baudRate, DEC);
+  Serial.println("[Duck] setupSerial rc = " + String(DUCK_ERR_NONE));
+  return DUCK_ERR_NONE;
 }
 
 void Duck::onPacketReceived(void) {
@@ -59,8 +62,7 @@ void Duck::onPacketReceived(void) {
   setReceiveFlag(true);
 }
 
-void Duck::setupRadio(float band, int ss, int rst, int di0, int di1, int txPower) {
-  Serial.println("[Duck] Setting up Lora");
+int Duck::setupRadio(float band, int ss, int rst, int di0, int di1, int txPower) {
   LoraConfigParams config;
 
   config.band = band;
@@ -73,53 +75,62 @@ void Duck::setupRadio(float band, int ss, int rst, int di0, int di1, int txPower
   
   int err = duckLora->setupLoRa(config, deviceId);
 
-  if (err == ERR_NONE) {
-    Serial.println("[Duck] Listening for quacks");
-    return;
-  }
-
   if (err == DUCKLORA_ERR_BEGIN) {
-    Serial.print("[DuckLink] Starting LoRa Failed. err: ");
+    Serial.print("[Duck] setupRadio. Starting LoRa Failed. rc = ");
     Serial.println(err);
-    duckesp::restartDuck();
+    return err;
   }
   if (err == DUCKLORA_ERR_SETUP) {
-    Serial.print("[DuckLink] Failed to setup Lora. err: ");
+    Serial.print("[Duck] setupRadio. Failed to setup Lora. rc = ");
     Serial.println(err);
-    while (true)
-      ;
+    return err;
   }
   if (err == DUCKLORA_ERR_RECEIVE) {
-    Serial.print("[DuckLink] Failed to start receive. err: ");
+    Serial.print("[Duck] setupRadio. Failed to start receive. rc = ");
     Serial.println(err);
-    duckesp::restartDuck();
+    return err;
   }
 
   txPacket = new DuckPacket(duid);
   rxPacket = new DuckPacket();
+  Serial.println("[Duck] setupRadio rc = " + String(DUCK_ERR_NONE));
+
+  return DUCK_ERR_NONE;
 }
 
-void Duck::setupWebServer(bool createCaptivePortal, String html) {
-  duckNet->setDeviceId(deviceId);
+int Duck::setupWebServer(bool createCaptivePortal, String html) {
+  int err = DUCK_ERR_NONE;
+  duckNet->setDeviceId(duid);
   duckNet->setupWebServer(createCaptivePortal, html);
+  Serial.println("[Duck] setupWebServer rc = " + String(err));
+  return DUCK_ERR_NONE;
 }
 
-void Duck::setupWifi(const char* ap) {
-    duckNet->setupWifiAp(ap);
+int Duck::setupWifi(const char* ap) {
+  int err = duckNet->setupWifiAp(ap);
+  Serial.println("[Duck] setupWifi rc = " + String(err));
+
+  return err;
 }
 
-int Duck::setupDns() { 
-    return duckNet->setupDns(); 
+int Duck::setupDns() {
+  int err = duckNet->setupDns();
+  Serial.println("[Duck] setupDns rc = " + String(err));
+
+  return err;
 }
 
-void Duck::setupInternet(String ssid, String password) {
-  duckNet->setupInternet(ssid, password);
+int Duck::setupInternet(String ssid, String password) {
+  int err = duckNet->setupInternet(ssid, password);
+  Serial.println("[Duck] setupInternet rc = "+String(err));
+
+  return err;
 }
 
 #ifdef CDPCFG_WIFI_NONE
-void Duck::setupOTA() {}
+int Duck::setupOTA() {return DUCK_ERR_NONE;}
 #else
-void Duck::setupOTA() {
+int Duck::setupOTA() {
 
   ArduinoOTA.onStart([]() {
     String type;
@@ -130,27 +141,39 @@ void Duck::setupOTA() {
 
     // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using
     // SPIFFS.end()
-    Serial.println("Start updating " + type);
+    Serial.println("[Duck] setupOTA. Start updating " + type);
   });
   ArduinoOTA.onEnd([]() { Serial.println("\nEnd"); });
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
     Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
   });
+
   ArduinoOTA.onError([](ota_error_t error) {
     Serial.printf("Error[%u]: ", error);
-    if (error == OTA_AUTH_ERROR)
-      Serial.println("Auth Failed");
-    else if (error == OTA_BEGIN_ERROR)
-      Serial.println("Begin Failed");
-    else if (error == OTA_CONNECT_ERROR)
-      Serial.println("Connect Failed");
-    else if (error == OTA_RECEIVE_ERROR)
-      Serial.println("Receive Failed");
-    else if (error == OTA_END_ERROR)
-      Serial.println("End Failed");
+    switch(error) {
+      case OTA_AUTH_ERROR:
+        Serial.println("[Duck] setupOTA. Auth Failed");
+        break;
+      case OTA_BEGIN_ERROR:
+        Serial.println("[Duck] setupOTA. Begin Failed");
+        break;
+      case OTA_CONNECT_ERROR:
+        Serial.println("[Duck] setupOTA. Connect Failed");
+        break;
+      case OTA_RECEIVE_ERROR:
+        Serial.println("[Duck] setupOTA. Receive Failed");
+        break;
+      case OTA_END_ERROR:
+        Serial.println("[Duck] setupOTA. End Failed");
+        break;
+      default:
+        Serial.println("[Duck] setupOTA. Unknown Error");
+    }
   });
 
   ArduinoOTA.begin();
+  Serial.println("[Duck] setupOTA rc = " + String(DUCK_ERR_NONE));
+  return DUCK_ERR_NONE;
 }
 #endif
 

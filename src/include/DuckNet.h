@@ -58,10 +58,10 @@ public:
   static DuckNet* getInstance();
   
 #ifdef CDPCFG_WIFI_NONE
-  void setupWebServer(bool createCaptivePortal = false, String html = "") {}
-  void setupWifiAp(const char* accessPoint = "🆘 DUCK EMERGENCY PORTAL") {}
-  int setupDns() {}
-  void setupInternet(String ssid, String password) {}
+  int setupWebServer(bool createCaptivePortal = false, String html = "") {return DUCK_ERR_NOT_SUPPORTED;}
+  int setupWifiAp(const char* accessPoint = "🆘 DUCK EMERGENCY PORTAL") {return DUCK_ERR_NOT_SUPPORTED;}
+  int setupDns() { return DUCK_ERR_NOT_SUPPORTED; }
+  int setupInternet(String ssid, String password) {return DUCK_ERR_NOT_SUPPORTED;}
   bool ssidAvailable(String val = "") {return false;}
   void setSsid(String val) {}
   void setPassword(String val) {}
@@ -85,8 +85,10 @@ public:
    * @brief Set up the WiFi access point.
    *
    * @param accessPoint a string representing the access point. Default to  "🆘 DUCK EMERGENCY PORTAL"
+   * 
+   * @returns DUCK_ERR_NONE if successful, an error code otherwise.
    */
-  void setupWifiAp(const char* accessPoint = "🆘 DUCK EMERGENCY PORTAL");
+  int setupWifiAp(const char* accessPoint = "🆘 DUCK EMERGENCY PORTAL");
 
   /**
    * @brief Set up DNS.
@@ -101,7 +103,7 @@ public:
    * @param ssid        the ssid of the WiFi network
    * @param password    password to join the network 
    */
-  void setupInternet(String ssid, String password);
+  int setupInternet(String ssid, String password);
 
   /**
    * @brief  Checks if the given ssid is available.
@@ -144,7 +146,7 @@ public:
    * 
    * @param deviceId Duck's device ID string to set
    */
-  void setDeviceId(String deviceId);
+  void setDeviceId(std::vector<byte> deviceId);
 
   /**
    * @brief Provide Wifi connection status.
@@ -163,7 +165,7 @@ private :
   static DuckNet* instance;
 
   DuckLora* _duckLora;
-  String _deviceId;
+  std::vector<byte> deviceId;
 
   static const byte DNS_PORT;
   static const char* DNS;

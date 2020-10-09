@@ -36,8 +36,11 @@ public:
    * @param ssid wifi access point ssid (defaults to an empty string if not
    * provided)
    * @param password wifi password (defaults to an empty string if not provided)
+   * 
+   * @returns DUCK_ERR_NONE if setup is successfull, an error code otherwise.
    */
-  void setupWithDefaults(String ssid = "", String password = "");
+  int setupWithDefaults(std::vector<byte> deviceId, String ssid = "",
+                        String password = "");
 
   /// callback definition for receiving RSSI value
   using rssiCallback = void (*)(const int);

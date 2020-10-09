@@ -1,17 +1,52 @@
 #include "../PapaDuck.h"
 
-void PapaDuck::setupWithDefaults(String ssid, String password) {
-  Duck::setupWithDefaults(ssid, password);
-  setupRadio();
-  
-  if (!ssid.isEmpty() && !password.isEmpty()) {
-    setupWifi("PapaDuck Setup");
-    setupDns();
-    setupInternet(ssid, password);
-    setupWebServer(false);
-    setupOTA();
+int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String password) {
+  Serial.println("[PapaDuck] setupWithDefaults...");
+
+  int err = Duck::setupWithDefaults(deviceId, ssid, password);
+
+  if (err != DUCK_ERR_NONE) {
+    Serial.println("[PapaDuck] setupWithDefaults rc = " + String(err));
+    return err;
   }
-  Serial.println("PapaDuck setup done");
+
+  err = setupRadio();
+  if (err != DUCK_ERR_NONE) {
+    return err;
+  }
+  if (!ssid.isEmpty() && !password.isEmpty()) {
+    err = setupWifi("PapaDuck Setup");
+    if (err != DUCK_ERR_NONE) {
+      Serial.println("[PapaDuck] setupWithDefaults rc = " + String(err));
+      return err;
+    }
+
+    err = setupDns();
+    if (err != DUCK_ERR_NONE) {
+      Serial.println("[PapaDuck] setupWithDefaults rc = " + String(err));
+      return err;
+    }
+
+    err = setupInternet(ssid, password);
+    if (err != DUCK_ERR_NONE) {
+      Serial.println("[PapaDuck] setupWithDefaults rc = " + String(err));
+      return err;
+    }
+
+    err = setupWebServer(false);
+    if (err != DUCK_ERR_NONE) {
+      Serial.println("[PapaDuck] setupWithDefaults rc = " + String(err));
+      return err;
+    }
+
+    err = setupOTA();
+    if (err != DUCK_ERR_NONE) {
+      Serial.println("[PapaDuck] setupWithDefaults rc = " + String(err));
+      return err;
+    }
+  }
+  Serial.println("[PapaDuck] setupWithDefaults done");
+  return DUCK_ERR_NONE;
 }
 
 void PapaDuck::handleReceivedPacket() {
@@ -24,15 +59,13 @@ void PapaDuck::handleReceivedPacket() {
   int err = duckLora->getReceivedData(&data);
 
   if (err != DUCK_ERR_NONE) {
-    Serial.print("[PapaDuck] ERROR - failed to get data from DuckLora. rc = ");
-    Serial.println(err);
+    Serial.println("[PapaDuck] handleReceivedPacket. Failed to get data. rc = " + err);
     return;
   }
 
   bool relay = rxPacket->update(duid, data);
   if (relay) {
-    Serial.println("[PapaDuck] relaying packet " +
-                   rxPacket->getPathAsHexString());
+    Serial.println("[PapaDuck] relaying packet " + rxPacket->getPathAsHexString());
     recvDataCallback(rxPacket->getCdpPacket());
   }
 }

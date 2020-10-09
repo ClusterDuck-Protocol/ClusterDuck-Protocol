@@ -63,7 +63,7 @@ public:
    *
    * @param baudRate default: 115200
    */
-  void setupSerial(int baudRate = 115200);
+  int setupSerial(int baudRate = 115200);
 
   /**
    * @brief Setup the radio component
@@ -75,7 +75,7 @@ public:
    * @param di1       dio1 interrupt pin (default: CDPCFG_PIN_LORA_DIO1)
    * @param txPower   transmit power (default: CDPCFG_RF_LORA_TXPOW)
    */
-  void setupRadio(float band = CDPCFG_RF_LORA_FREQ, int ss = CDPCFG_PIN_LORA_CS,
+  int setupRadio(float band = CDPCFG_RF_LORA_FREQ, int ss = CDPCFG_PIN_LORA_CS,
                   int rst = CDPCFG_PIN_LORA_RST, int di0 = CDPCFG_PIN_LORA_DIO0,
                   int di1 = CDPCFG_PIN_LORA_DIO1,
                   int txPower = CDPCFG_RF_LORA_TXPOW);
@@ -86,7 +86,7 @@ public:
    * @param accessPoint a string representing the access point. Default to
    * "🆘 DUCK EMERGENCY PORTAL"
    */
-  void setupWifi(const char* ap = "🆘 DUCK EMERGENCY PORTAL");
+  int setupWifi(const char* ap = "🆘 DUCK EMERGENCY PORTAL");
 
   /**
    * @brief Setup DNS.
@@ -107,7 +107,7 @@ public:
    * Default is an empty string Default portal web page is used if the string is
    * empty
    */
-  void setupWebServer(bool createCaptivePortal = false, String html = "");
+  int setupWebServer(bool createCaptivePortal = false, String html = "");
 
   /**
    * @brief Setup internet access.
@@ -115,13 +115,13 @@ public:
    * @param ssid        the ssid of the WiFi network
    * @param password    password to join the network
    */
-  void setupInternet(String ssid, String password);
+  int setupInternet(String ssid, String password);
 
   /**
    * @brief
    *
    */
-  void setupOTA();
+  int setupOTA();
 
   /**
    * @brief Send a duck LoRa message.
@@ -208,9 +208,19 @@ protected:
    * The default implementation simply initializes the serial interface.
    * It can be overriden by each concrete Duck class implementation.
    */
-  virtual void setupWithDefaults(String ssid, String password) {
+  virtual int setupWithDefaults(std::vector<byte> deviceId, String ssid, String password) {
+    int err = setupSerial();
+    if (err != DUCK_ERR_NONE) {
+      return err;
+    }
+
+    err = setupDeviceId(deviceId);
+    if (err != DUCK_ERR_NONE) {
+      return err;
+    }
+
     duckNet->setDeviceId(deviceId);
-    setupSerial();
+    return DUCK_ERR_NONE;
   }
   
   virtual int reconnectWifi(String ssid, String password) { return 0; }

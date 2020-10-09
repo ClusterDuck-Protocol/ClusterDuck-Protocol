@@ -7,12 +7,10 @@ DuckNet* DuckNet::getInstance() {
   return (instance == NULL) ? new DuckNet : instance;
 }
 
-
 #ifndef CDPCFG_WIFI_NONE
 IPAddress apIP(CDPCFG_AP_IP1, CDPCFG_AP_IP2, CDPCFG_AP_IP3, CDPCFG_AP_IP4);
 AsyncWebServer webServer(CDPCFG_WEB_PORT);
 DNSServer DuckNet::dnsServer;
-
 
 const char* DuckNet::DNS = "duck";
 const byte DuckNet::DNS_PORT = 53;
@@ -24,10 +22,12 @@ const char* http_password = CDPCFG_UPDATE_PASSWORD;
 bool restartRequired = false;
 size_t content_len;
 
-void DuckNet::setDeviceId(String deviceId) { this->_deviceId = deviceId; }
+void DuckNet::setDeviceId(std::vector<byte> deviceId) {
+  this->deviceId.insert(this->deviceId.end(), deviceId.begin(), deviceId.end());
+}
 
 void DuckNet::setupWebServer(bool createCaptivePortal, String html) {
-  
+
   if (html == "") {
     Serial.println("[DuckNet] Setting up Web Server with default main page");
     portal = MAIN_page;
@@ -36,7 +36,7 @@ void DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     portal = html;
   }
   webServer.onNotFound([&](AsyncWebServerRequest* request) {
-      request->send(200, "text/html", portal);
+    request->send(200, "text/html", portal);
   });
 
   webServer.on("/", HTTP_GET, [&](AsyncWebServerRequest* request) {
@@ -127,13 +127,14 @@ void DuckNet::setupWebServer(bool createCaptivePortal, String html) {
         request->send(400, "text/html", "BadRequest");
         break;
       default:
-        request->send(500, "text/html", "Oops! Unknown error."); 
-        break;    
+        request->send(500, "text/html", "Oops! Unknown error.");
+        break;
     }
   });
 
   webServer.on("/id", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    request->send(200, "text/html", _deviceId);
+    std::string id(deviceId.begin(), deviceId.end());
+    request->send(200, "text/html", id.c_str());
   });
 
   webServer.on("/restart", HTTP_GET, [&](AsyncWebServerRequest* request) {
@@ -201,14 +202,28 @@ void DuckNet::setupWebServer(bool createCaptivePortal, String html) {
   webServer.begin();
 }
 
-void DuckNet::setupWifiAp(const char* accessPoint) {
-  WiFi.mode(WIFI_AP);
-  WiFi.softAP(accessPoint);
+int DuckNet::setupWifiAp(const char* accessPoint) {
+
+  bool success = true;
+
+  success = WiFi.mode(WIFI_AP);
+  if (!success) {
+    return DUCKWIFI_ERR_AP_CONFIG;
+  }
+
+  success = WiFi.softAP(accessPoint);
+  if (!success) {
+    return DUCKWIFI_ERR_AP_CONFIG;
+  }
   delay(200); // wait for 200ms for the access point to start before configuring
 
-  WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
+  success = WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
+  if (!success) {
+    return DUCKWIFI_ERR_AP_CONFIG;
+  }
 
   Serial.println("[DuckNet] Created Wifi Access Point");
+  return DUCK_ERR_NONE;
 }
 
 int DuckNet::setupDns() {
@@ -218,57 +233,59 @@ int DuckNet::setupDns() {
     Serial.println("[DuckNet] Error setting up MDNS responder!");
     return DUCKDNS_ERR_STARTING;
   }
-  
+
   Serial.println("[DuckNet] Created local DNS");
   MDNS.addService("http", "tcp", CDPCFG_WEB_PORT);
-  
-  return DUCK_ERR_NONE;
 
+  return DUCK_ERR_NONE;
 }
 
-void DuckNet::setupInternet(String ssid, String password) {
+int DuckNet::setupInternet(String ssid, String password) {
   this->ssid = ssid;
   this->password = password;
-  Serial.println();
-  Serial.print("[DuckNet] setupInternet: Connecting to ");
-  Serial.println(ssid);
+  // Serial.println("[DuckNet] connecting to ssid: " + ssid);
 
-  if (ssid != "" && password != "" && ssidAvailable(ssid)) {
-    // Connect to Access Point
-    WiFi.begin(ssid.c_str(), password.c_str());
-
-    while (WiFi.status() != WL_CONNECTED) {
-      duckutils::getTimer().tick(); // Advance timer to reboot after awhile
-      // TODO: Change this to make sure it is non-blocking for all other
-      // processes
-    }
-
-    // Connected to Access Point
-    Serial.println("");
-    Serial.println("[DuckNet] DUCK CONNECTED TO INTERNET");
+  if (ssid == "" || password == "" || !ssidAvailable(ssid)) {
+    return DUCK_ERR_SETUP;
   }
+  // Connect to Access Point
+  WiFi.begin(ssid.c_str(), password.c_str());
+
+  // TODO: we should probably simply fail here and let the app decide what to do
+  // Continuous retry could deplete the battery
+  while (WiFi.status() != WL_CONNECTED) {
+    duckutils::getTimer().tick(); // Advance timer to reboot after awhile
+  }
+
+  // Connected to Access Point
+  Serial.println("[DuckNet] DUCK CONNECTED TO INTERNET");
+
+  return DUCK_ERR_NONE;
 }
 
-
 bool DuckNet::ssidAvailable(String val) {
-  // TODO: needs to be cleaned up for null case
+
   int n = WiFi.scanNetworks();
-  Serial.println("[DuckNet] scan done");
+  Serial.print("[DuckNet] scan done. ");
   if (n == 0 || ssid == "") {
-    Serial.printf("[DuckNet] networks found: %d\n", n);
+    Serial.print("networks found: ");
+    Serial.println(n);
   } else {
-    Serial.printf("[DuckNet] networks found: %d\n", n);
+    Serial.print("networks found: ");
+    Serial.println(n);
     if (val == "") {
       val = ssid;
     }
     for (int i = 0; i < n; ++i) {
-      Serial.print(WiFi.SSID(i) + " ");
       if (WiFi.SSID(i) == val) {
+        Serial.println("[DuckNet] given ssid is available!");
         return true;
       }
       delay(AP_SCAN_INTERVAL_MS);
     }
   }
+  Serial.println("[DuckNet] no ssid available");
+
   return false;
 }
 

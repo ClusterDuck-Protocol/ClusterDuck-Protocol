@@ -7,6 +7,7 @@
 #define DUCK_ERR_NOT_SUPPORTED -5000
 #define DUCK_ERR_SETUP         -5100
 #define DUCK_ERR_ID_TOO_LONG   -5101
+#define DUCK_ERR_OTA           -5200
 
 /// Lora module initialization error
 #define DUCKLORA_ERR_BEGIN          -1000
@@ -28,6 +29,8 @@
 #define DUCKWIFI_ERR_NOT_AVAILABLE  -2000
 // Wifi is disconnected
 #define DUCKWIFI_ERR_DISCONNECTED   -2001
+// Wifi generic setup error
+#define DUCKWIFI_ERR_AP_CONFIG      -2002
 // DNS initialization failed
 #define DUCKDNS_ERR_STARTING        -3000
 

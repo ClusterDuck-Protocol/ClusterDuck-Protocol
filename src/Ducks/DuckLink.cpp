@@ -1,15 +1,45 @@
 #include "../DuckLink.h"
 
-void DuckLink::setupWithDefaults(String ssid, String password) {
-  Duck::setupWithDefaults(ssid, password);
-  setupRadio();
+int DuckLink::setupWithDefaults(std::vector<byte> deviceId, String ssid,
+                                String password) {
+  int err = Duck::setupWithDefaults(deviceId, ssid, password);
+  if (err != DUCK_ERR_NONE) {
+    Serial.println("[DuckLink] setupWithDefaults rc = " + String(err));
+    return err;
+  }
+  
+  err = setupRadio();
+  if (err != DUCK_ERR_NONE) {
+    Serial.println("[DuckLink] setupWithDefaults rc = " + String(err));
+    return err;
+  }
   if( !ssid.isEmpty() && !password.isEmpty()) {
-    setupWifi();
-    setupDns();
-    setupWebServer(true);
-    setupOTA();
+    err = setupWifi();
+    if (err != DUCK_ERR_NONE) {
+      Serial.println("[DuckLink] setupWithDefaults rc = " + String(err));
+      return err;
+    }
+
+    err = setupDns();
+    if (err != DUCK_ERR_NONE) {
+      Serial.println("[DuckLink] setupWithDefaults rc = " + String(err));
+      return err;
+    }
+
+    err = setupWebServer(true);
+    if (err != DUCK_ERR_NONE) {
+      Serial.println("[DuckLink] setupWithDefaults rc = " + String(err));
+      return err;
+    }
+
+    err = setupOTA();
+    if (err != DUCK_ERR_NONE) {
+      Serial.println("[DuckLink] setupWithDefaults rc = " + String(err));
+      return err;
+    }
   }
   Serial.println("DuckLink setup done");
+  return DUCK_ERR_NONE;
 }
 
 void DuckLink::run() {

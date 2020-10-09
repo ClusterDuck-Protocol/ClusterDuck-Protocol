@@ -33,14 +33,14 @@ int DuckLora::setupLoRa(LoraConfigParams config, String deviceId) {
   lora = new Module(config.ss, config.di0, config.rst, config.di1);
 #endif
 
-  Serial.println("[DuckLora] Starting LoRa......");
   int state = lora.begin(config.band);
-
-  if (state == ERR_NONE) {
-    Serial.println("[DuckLora] LoRa started, Quack!");
-  } else {
+  
+  if (state != ERR_NONE) {
+    Serial.print("[DuckLora] Failed to start. state = ");
+    Serial.println(state);
     return DUCKLORA_ERR_BEGIN;
   }
+  
   // Lora is started, we need to set all the radio parameters, before it can
   // start receiving packets
   if (lora.setFrequency(CDPCFG_RF_LORA_FREQ) == ERR_INVALID_FREQUENCY) {
