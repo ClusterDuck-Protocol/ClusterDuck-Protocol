@@ -67,7 +67,7 @@ public:
   void setPassword(String val) {}
   String getSsid() {return "";}
   String getPassword() {return "";}
-  void setDeviceId(String deviceId) {}
+  void setDeviceId(std::vector<byte> deviceId) {}
   bool isWifiConnected() {return false;}
 #else 
   /**
