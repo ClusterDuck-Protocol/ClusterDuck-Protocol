@@ -66,22 +66,6 @@ public:
   int setupLoRa(LoraConfigParams config);
   
   /**
-   * @brief Get the Received Packet object
-   *
-   * @param[out] packet a pointer to the CDP_Packet
-   * @return 0 if handling was successful, an error code otherwise.
-   */
-  int getReceivedPacket(CDP_Packet *packet);
-
-  /**
-   * @brief Get the last received LoRa packet.
-   * 
-   * @param pSize size of the packet
-   * @returns A string representing the last received message.
-   */
-  String getPacketData(int pSize);
-
-  /**
    * @brief Send packet data out into the LoRa mesh network
    *
    * @param data byte buffer to send
@@ -97,7 +81,8 @@ public:
    * @returns DUCK_ERR_NONE if the message was sent successfully, an error code otherwise.
    */
   int sendData(std::vector<byte> data);
-
+  int sendData(DuckPacket packet);
+  
   /**
    * @brief Check if a received packet is available for processing.
    * 

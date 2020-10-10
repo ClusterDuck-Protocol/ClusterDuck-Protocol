@@ -27,7 +27,7 @@ public:
 
     int buildPacketBuffer(byte topic, std::vector<byte> app_data);
     bool update(std::vector<byte> duid, std::vector<byte> dataBuffer);
-
+    
     byte* getDataByteBuffer() { return buffer.data(); }
     
     std::vector<byte> getCdpPacketBuffer() { return buffer;}
@@ -53,7 +53,7 @@ public:
       buffer.clear();
     }
 
-    private : 
+private : 
     String deviceId;
     std::vector<byte> duid;
     std::vector<byte> buffer;

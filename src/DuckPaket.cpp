@@ -8,7 +8,7 @@ bool DuckPacket::update(std::vector<byte> duid, std::vector<byte> dataBuffer) {
 
   byte packet_length = dataBuffer.size();
   byte path_offset = dataBuffer[PATH_OFFSET_POS];
-
+  // build an rxPacket with data we have received
   packet.duid.insert(packet.duid.end(), &dataBuffer[0], &dataBuffer[DUID_LENGTH]);
   packet.muid.insert(packet.muid.end(), &dataBuffer[MUID_POS], &dataBuffer[TOPIC_POS]);
   packet.topic = dataBuffer[TOPIC_POS];
@@ -16,9 +16,14 @@ bool DuckPacket::update(std::vector<byte> duid, std::vector<byte> dataBuffer) {
   packet.reserved.insert(packet.reserved.end(), &dataBuffer[RESERVED_POS], &dataBuffer[DATA_POS]);
   packet.data.insert(packet.data.end(), &dataBuffer[DATA_POS], &dataBuffer[path_offset]);
   packet.path.insert(packet.path.end(), &dataBuffer[path_offset], &dataBuffer[packet_length]);
+  // update the rx packet byte buffer
   buffer.insert(buffer.end(), dataBuffer.begin(), dataBuffer.end());
+  //Serial.println("[DuckPacket] current path: " + String(duckutils::convertToHex(packet.path.data(), packet.path.size())));
 
+  // check if we need to relay the packet
   relaying = relay(duid);
+  //Serial.println("[DuckPacket] updated path: " + String(duckutils::convertToHex(packet.path.data(), packet.path.size())));
+  Serial.println("[DuckPacket] updated buffer: " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
   return relaying;
 }
 
@@ -84,15 +89,16 @@ bool  DuckPacket::relay(std::vector<byte> duid) {
     return false;
   }
 
-  String id = duckutils::convertToHex(duid.data(), duid.size());
-  String paths = duckutils::convertToHex(packet.path.data(), packet.path.size());
-
-  // we don't have a contains() method. but we can use indexOf
+  // we don't have a contains() method but we can use indexOf()
   // if the result is 0 or greater then the substring was found
   // starting at the returned index value.
-  if (paths.indexOf(id) >= 0) {
+  String id = duckutils::convertToHex(duid.data(), duid.size());
+  String path = duckutils::convertToHex(packet.path.data(), packet.path.size());
+  if (path.indexOf(id) >= 0) {
+    Serial.println("[DuckPacket] packet already seen. ignore it.");
     return false;
   }
+
   // update the path so we are good to send the packet back into the mesh
   packet.path.insert(packet.path.end(), duid.begin(), duid.end());
   buffer.insert(buffer.end(), duid.begin(), duid.end());

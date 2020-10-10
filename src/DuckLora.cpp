@@ -105,30 +105,7 @@ int DuckLora::getReceivedData(std::vector<byte>* packetBytes) {
     Serial.println(err);
     return DUCKLORA_ERR_HANDLE_PACKET;
   }
-  Serial.print("[DuckLora] read data into buffer. size: ");
-  Serial.println(pSize);
 
-  return err;
-}
-
-int DuckLora::getReceivedPacket(CDP_Packet *packet) {
-  int pSize = 0;
-  int err = 0;
-  byte buffer[PACKET_LENGTH];
-  
-  if (packet == NULL) {
-    return DUCKLORA_ERR_HANDLE_PACKET;
-  }
-
-  pSize = lora.getPacketLength();
-  err = lora.readData(buffer, pSize);
-  if (err != ERR_NONE) {
-    Serial.print("[DuckLora] handlePacket failed, code ");
-    Serial.println(err);
-    return DUCKLORA_ERR_HANDLE_PACKET;
-  }
-
-  // TODO: Store this in a Duck Packet meta data
   Serial.print("[DuckLora] RCV");
   Serial.print(" rssi:");
   Serial.print(lora.getRSSI());
@@ -138,32 +115,17 @@ int DuckLora::getReceivedPacket(CDP_Packet *packet) {
   Serial.print(lora.getFrequencyError());
   Serial.print(" size:");
   Serial.println(pSize);
-
-  // map received buffer to a cdp packet
-  byte path_offset = buffer[PATH_OFFSET_POS];
-  packet->duid.insert(packet->duid.end(), &buffer[0], &buffer[DUID_LENGTH]);
-  packet->muid.insert(packet->muid.end(), &buffer[MUID_POS], &buffer[TOPIC_POS]);
-  packet->topic = buffer[TOPIC_POS];
-  packet->path_offset = buffer[PATH_OFFSET_POS];
-  packet->reserved.insert(packet->reserved.end(), &buffer[RESERVED_POS], &buffer[DATA_POS]);
-  packet->data.insert(packet->data.end(), &buffer[DATA_POS], &buffer[path_offset]);
-  packet->path.insert(packet->path.end(), &buffer[path_offset], &buffer[pSize]);
-
-  Serial.print("DUID: ");
-  Serial.println(duckutils::convertToHex(packet->duid.data(), DUID_LENGTH));
-  Serial.print("MUID: ");
-  Serial.println(duckutils::convertToHex(packet->muid.data(), MUID_LENGTH));
-  Serial.print("TOPIC: ");
-  Serial.println(packet->topic, HEX);
-  Serial.print("DATA: ");
-  Serial.println(duckutils::convertToHex(packet->data.data(), packet->data.size()));
-  Serial.print("PATH: ");
-  Serial.println(duckutils::convertToHex(packet->path.data(), packet->path.size()));
-  return pSize;
+  Serial.println("[DuckLora] packet:  " + String(duckutils::convertToHex(packetBytes->data(), packetBytes->size())));
+  return err;
 }
+
 
 int DuckLora::sendData(byte* data, int length) {
   return transmitData(data, length);
+}
+
+int DuckLora::sendData(DuckPacket packet) {
+  return transmitData(packet.getCdpPacketBuffer().data(), packet.getCdpPacketBuffer().size());
 }
 
 int DuckLora::sendData(std::vector<byte> data) {
@@ -201,9 +163,9 @@ int DuckLora::transmitData(byte* data, int length) {
   int tx_err = ERR_NONE;
   int rx_err = ERR_NONE;
 
-  //Serial.print("[DuckLora] SND data: ");
-  //Serial.print(duckutils::convertToHex(data, length));
-  //Serial.println(" :length = "+String(length));
+  Serial.print("[DuckLora] SND data: ");
+  Serial.print(duckutils::convertToHex(data, length));
+  Serial.println(" :length = "+String(length));
 
   tx_err = lora.transmit(data, length);
 

@@ -47,7 +47,7 @@ void MamaDuck::handleReceivedPacket() {
   Serial.println("[MamaDuck] handleReceivedPacket()...");
 
   rxPacket->reset();
-  
+
   std::vector<byte> data;
   int err = duckLora->getReceivedData(&data);
 
@@ -59,8 +59,7 @@ void MamaDuck::handleReceivedPacket() {
 
   bool relay = rxPacket->update(duid, data);
   if (relay) {
-    Serial.println("[MamaDuck] path updated: " + rxPacket->getPathAsHexString());
-    duckLora->sendData(rxPacket->getCdpPacketBuffer());
+    duckLora->sendData(rxPacket->getDataByteBuffer(), rxPacket->getBufferLength());
   }
 }
 

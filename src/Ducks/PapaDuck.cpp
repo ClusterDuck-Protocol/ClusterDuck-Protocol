@@ -62,10 +62,12 @@ void PapaDuck::handleReceivedPacket() {
     Serial.println("[PapaDuck] handleReceivedPacket. Failed to get data. rc = " + err);
     return;
   }
-
   bool relay = rxPacket->update(duid, data);
   if (relay) {
-    Serial.println("[PapaDuck] relaying packet " + rxPacket->getPathAsHexString());
+    Serial.println("[PapaDuck] sending:  " +
+                   String(duckutils::convertToHex(
+                       rxPacket->getCdpPacketBuffer().data(),
+                       rxPacket->getCdpPacketBuffer().size())));
     recvDataCallback(rxPacket->getCdpPacket());
   }
 }
