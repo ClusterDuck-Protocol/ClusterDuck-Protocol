@@ -64,7 +64,7 @@ void MamaDuck::handleReceivedPacket() {
     // packet being sent below will never be received, especially if the cluster is small
     // there are not many alternative paths to reach other mama ducks that could relay the packet.
     // We could add some kind of random delay before the message is sent, but that's not really a generic solution
-    // delay(500)
+    // delay(500);
     duckLora->sendData(rxPacket->getDataByteBuffer(), rxPacket->getBufferLength());
   }
 }
