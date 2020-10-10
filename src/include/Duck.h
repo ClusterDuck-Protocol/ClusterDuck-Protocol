@@ -18,13 +18,7 @@ public:
    *
    */
   Duck();
-  /**
-   * @brief Construct a new Duck object.
-   *
-   * @param id a unique id
-   */
-  Duck(String id);
-
+ 
   /**
    * @brief Construct a new Duck object.
    *
@@ -47,7 +41,7 @@ public:
    * @param an 8 byte unique id 
    * @return DUCK_ERR_NONE if successful, an error code otherwise 
    */
-  int setupDeviceId(std::vector<byte> id);
+  int setDeviceId(std::vector<byte> id);
 
   /**
    * @brief setup the duck unique ID
@@ -55,7 +49,7 @@ public:
    * @param an 8 byte unique id
    * @return DUCK_ERR_NONE if successful, an error code otherwise
    */
-  int setupDeviceId(byte* id);
+  int setDeviceId(byte* id);
 
 
   /**
@@ -214,7 +208,7 @@ protected:
       return err;
     }
 
-    err = setupDeviceId(deviceId);
+    err = setDeviceId(deviceId);
     if (err != DUCK_ERR_NONE) {
       return err;
     }

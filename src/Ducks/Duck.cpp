@@ -7,19 +7,12 @@ Duck::Duck() {
   duckutils::setDuckInterrupt(true);
 }
 
-// TODO: deprecate String id. Replace with a byte array or byte vector
-Duck::Duck(String id) {
-    deviceId = id;
-    duid.insert(duid.end(), id.begin(), id.end());
-    duckutils::setDuckInterrupt(true);
-}
-
 Duck::Duck(std::vector<byte> id) {
   duid.insert(duid.end(), id.begin(), id.end());
   duckutils::setDuckInterrupt(true);
 }
 
-int Duck::setupDeviceId(std::vector<byte> id) {
+int Duck::setDeviceId(std::vector<byte> id) {
   if (id.size() > DUID_LENGTH) {
     Serial.println("[Duck] ERROR device id too long rc = " + String(DUCK_ERR_NONE));
     return DUCK_ERR_ID_TOO_LONG;
@@ -32,7 +25,7 @@ int Duck::setupDeviceId(std::vector<byte> id) {
   return DUCK_ERR_NONE;
 }
 
-int Duck::setupDeviceId(byte* id) {
+int Duck::setDeviceId(byte* id) {
   if (id == NULL) {
     return DUCK_ERR_SETUP;
   }
@@ -74,7 +67,7 @@ int Duck::setupRadio(float band, int ss, int rst, int di0, int di1, int txPower)
   config.txPower = txPower;
   config.func = Duck::onPacketReceived;
   
-  int err = duckLora->setupLoRa(config, deviceId);
+  int err = duckLora->setupLoRa(config);
 
   if (err == DUCKLORA_ERR_BEGIN) {
     Serial.print("[Duck] setupRadio. Starting LoRa Failed. rc = ");
@@ -207,30 +200,24 @@ int Duck::sendData(byte topic, std::vector<byte> data) {
   return err;
 }
 
-int Duck::sendPayloadStandard(String msg, String topic, String senderId,
-                               String messageId, String path) {
-  int err =
-      duckLora->sendPayloadStandard(msg, topic, senderId, messageId, path);
-  if (err != DUCK_ERR_NONE) {
-    Serial.print("[Duck] Oops! Something went wrong, err = ");
-    Serial.println(err);
-  }
-  return err;
-}
-
+// TODO: implement this using new packet format
 bool Duck::reboot(void*) {
+/*
   String reboot = "REBOOT";
   Serial.println(reboot);
   DuckLora::getInstance()->sendPayloadStandard(reboot, "boot");
   duckesp::restartDuck();
-
+*/
   return true;
 }
 
+// TODO: implement this using new packet format
 bool Duck::imAlive(void*) {
+  /*
   String alive = "Health Quack";
   Serial.println(alive);
   DuckLora::getInstance()->sendPayloadStandard(alive, "health");
+  */
   return true;
 }
 

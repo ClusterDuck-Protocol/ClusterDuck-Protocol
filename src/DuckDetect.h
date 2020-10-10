@@ -53,5 +53,6 @@ public:
 
 private:
   rssiCallback rssiCb;
+  void handleReceivedPacket();
 };
 #endif

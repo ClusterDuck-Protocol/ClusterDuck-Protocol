@@ -20,14 +20,6 @@
 #include "LoraPacket.h"
 #include "cdpcfg.h"
 
-const byte ping_B = 0xF4;
-const byte senderId_B = 0xF5;
-const byte topic_B = 0xE3;
-const byte messageId_B = 0xF6;
-const byte payload_B = 0xF7;
-const byte iamhere_B = 0xF8;
-const byte path_B = 0xF3;
-
 /**
  * @brief Internal structure to hold the LoRa module configuration
  * 
@@ -69,18 +61,10 @@ public:
    * @brief Initialize the LoRa chip.
    * 
    * @param config    lora configurstion parameters
-   * @param deviceId  device id
    * @returns 0 if initialization was successful, an error code otherwise. 
    */
-  int setupLoRa(LoraConfigParams config, String deviceId);
+  int setupLoRa(LoraConfigParams config);
   
-  /**
-   * @brief Handle a Duck LoRa packet.
-   * 
-   * @returns 0 if handling was successful, an error code otherwise. 
-   */
-  int storePacketData();
-
   /**
    * @brief Get the Received Packet object
    *
@@ -98,64 +82,21 @@ public:
   String getPacketData(int pSize);
 
   /**
-   * @brief  Send a message out into the LoRa mesh network.
+   * @brief Send packet data out into the LoRa mesh network
    *
-   * @param msg         payload representing the message
-   * @param topic       the message topic
-   * @param senderId    the device_id of the sender
-   * @param messageId   the id of the message
-   * @param path        a comma separated list of devide ids having seens the message
-   * @returns DUCK_ERR_NONE if the message was sent successfully, an error code
-   * otherwise.
+   * @param data byte buffer to send
+   * @param length length of the byte buffer
+   * @return int
    */
-  int sendPayloadStandard(String msg = "", String topic = "",
-                          String senderId = "", String messageId = "",
-                          String path = "");
+  int sendData(byte* data, int length);
 
   /**
    * @brief Send packet data out into the LoRa mesh network
    *
-   * @param data  data bytes to send
+   * @param data byte vector to send
    * @returns DUCK_ERR_NONE if the message was sent successfully, an error code otherwise.
    */
   int sendData(std::vector<byte> data);
-
-
-  int sendData(byte* packet, int size);
-
-  /**
-   * @brief Get the last received LoRa packet.
-   *
-   * @returns A Packet object containing the last received message.
-   */
-  Packet getLastPacket();
-
-  /**
-   * @brief  Append a chunk to the packet.
-   * 
-   * A chunk is part of the Duck LoRa packet and is formated as
-   * [tag][length][payload] where a tag is a single byte identifying the chunk.
-   * Currently supported tags:
-   * ```
-   * ping
-   * sender_id
-   * topic
-   * message_id
-   * payload
-   * iamhere
-   * ```
-   * @param byteCode identifies the tag to append
-   * @param outgoing the payload for the tag to be appended to the LoRa packet
-   */
-  void couple(byte byteCode, String outgoing);
-
-  /**
-   * @brief Determine if a Duck device_id is present in the path.
-   * 
-   * @param path  path retrieved from the LoRa packet
-   * @returns true if the id is in the path, false otherwise.
-   */
-  bool idInPath(String path);
 
   /**
    * @brief Check if a received packet is available for processing.
@@ -195,18 +136,6 @@ public:
    */
   int getRSSI();
 
-  /**
-   * @brief Reset the index of the received Packet buffer.
-   * 
-   */
-  void resetPacketIndex() { _packetIndex = 0; }
-
-  /**
-   * @brief Get the current packet buffer index.
-   * 
-   * @returns Current index in the transmission buffer.
-   */
-  int getPacketIndex() { return _packetIndex; }
   
   /**
    * @brief Get the transmission buffer.
@@ -214,14 +143,6 @@ public:
    * @returns An array of bytes containing the transmission packet
    */
   byte* getTransmissionBuffer() { return transmission; }
-
-  /**
-   * @brief Get the transmited byte at the given index in the transmission buffer.
-   * 
-   * @param index position in the transmission buffer
-   * @returns The byte value in the transmission buffer at the given index.
-   */
-  byte getTransmitedByte(int index) { return transmission[index]; }
 
   /**
    * @brief Transmit a ping message.
@@ -238,27 +159,16 @@ public:
    */
   int standBy();
 
-  /**
-   * @brief Clear and Reset the transmission buffer.
-   * 
-   */
-  void resetTransmissionBuffer();
-
   int getReceivedData(std::vector<byte>* packetBytes);
 
 private:
-  byte transmission[CDPCFG_CDP_BUFSIZE];
-  CDP_Packet packet;
-  int _packetIndex = 0;
-  Packet _lastPacket;
-  String _deviceId = "";
-  int _availableBytes = 0;
-  int _packetSize = 0;
-  void resetLastPacket();
   DuckLora();
   DuckLora(DuckLora const&) = delete;
   DuckLora& operator=(DuckLora const&) = delete;
   static DuckLora* instance;
+
+  byte transmission[CDPCFG_CDP_BUFSIZE];
+  CDP_Packet packet;
 };
 
 #endif

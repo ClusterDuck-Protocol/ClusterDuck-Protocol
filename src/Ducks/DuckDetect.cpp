@@ -43,30 +43,33 @@ int DuckDetect::setupWithDefaults(std::vector<byte> deviceId, String ssid,
   return DUCK_ERR_NONE;
 }
 
+void DuckDetect::handleReceivedPacket() {
+  /*
+   int pSize = duckLora->storePacketData();
+   if (pSize > 0) {
+     for (int i = 0; i < pSize; i++) {
+       if (duckLora->getTransmitedByte(i) == iamhere_B) {
+         Serial.println("[DuckDetect] run() - got ping response!");
+         rssiCb(duckLora->getRSSI());
+       }
+     }
+   }
+   */
+}
 void DuckDetect::run() {
   handleOtaUpdate();
   if (getReceiveFlag()) {
     setReceiveFlag(false);
     duckutils::setDuckInterrupt(false);
-    int pSize = duckLora->storePacketData();
-    if (pSize > 0) {
-      for (int i = 0; i < pSize; i++) {
-        if (duckLora->getTransmitedByte(i) == iamhere_B) {
-          Serial.println("[DuckDetect] run() - got ping response!");
-          rssiCb(duckLora->getRSSI());
-        }
-      }
-    }
+
+    handleReceivedPacket();
+
     duckutils::setDuckInterrupt(true);
     startReceive();
   }
 }
 
+// TODO: implement with new packet format 
 void DuckDetect::sendPing(bool startReceive) {
-  duckLora->couple(ping_B, "0");
-  startTransmit();
-
-  if (startReceive) {
-    this->startReceive();
-  }
+  
 }

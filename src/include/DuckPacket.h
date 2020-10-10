@@ -29,7 +29,7 @@ public:
     bool update(std::vector<byte> duid, std::vector<byte> dataBuffer);
 
     byte* getDataByteBuffer() { return buffer.data(); }
-
+    
     std::vector<byte> getCdpPacketBuffer() { return buffer;}
     CDP_Packet getCdpPacket() { return packet; }
 

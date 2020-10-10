@@ -166,6 +166,7 @@ private :
 
   DuckLora* _duckLora;
   std::vector<byte> deviceId;
+  DuckPacket* txPacket = NULL;
 
   static const byte DNS_PORT;
   static const char* DNS;

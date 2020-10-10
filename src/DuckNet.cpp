@@ -28,6 +28,10 @@ void DuckNet::setDeviceId(std::vector<byte> deviceId) {
 
 void DuckNet::setupWebServer(bool createCaptivePortal, String html) {
 
+  if (txPacket == NULL) {
+    txPacket = new DuckPacket(deviceId);
+  }
+
   if (html == "") {
     Serial.println("[DuckNet] Setting up Web Server with default main page");
     portal = MAIN_page;
@@ -115,7 +119,11 @@ void DuckNet::setupWebServer(bool createCaptivePortal, String html) {
       val = val + p->value().c_str() + "*";
     }
 
-    err = _duckLora->sendPayloadStandard(val, "status");
+    std::vector<byte> data;
+    data.insert(data.end(), val.begin(), val.end());
+    txPacket->buildPacketBuffer(topics::status, data );
+    err = _duckLora->sendData(txPacket->getCdpPacketBuffer());
+    
     switch (err) {
       case DUCK_ERR_NONE:
         request->send(200, "text/html", portal);
