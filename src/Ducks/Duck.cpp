@@ -21,6 +21,7 @@ Duck::Duck(std::vector<byte> id) {
 
 int Duck::setupDeviceId(std::vector<byte> id) {
   if (id.size() > DUID_LENGTH) {
+    Serial.println("[Duck] ERROR device id too long rc = " + String(DUCK_ERR_NONE));
     return DUCK_ERR_ID_TOO_LONG;
   }
   if (duid.size() > 0) {

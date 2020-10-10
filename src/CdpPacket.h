@@ -89,8 +89,6 @@ enum resevedTopic {
  * read, text,...). Max is 192 bytes. PATH:      048 byte array of DUIDs -
  * Device UIDs having seen this packet. Max is 48 bytes (6 hops)
  */
-
-#pragma pack(1)
 typedef struct {
   /// Device UID (8 bytes)
   std::vector<byte> duid;
