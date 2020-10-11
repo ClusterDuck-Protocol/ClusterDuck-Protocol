@@ -174,6 +174,13 @@ protected:
   DuckNet* duckNet = DuckNet::getInstance();
   DuckPacket* txPacket = NULL;
   DuckPacket* rxPacket = NULL;
+  
+  /**
+   * @brief sends a pong message
+   * 
+   * @return DUCK_ERR_NONE if successfull. An error code otherwise 
+   */
+  int sendPong();
 
   /**
    * @brief Tell the duck radio to start receiving packets from the mesh network

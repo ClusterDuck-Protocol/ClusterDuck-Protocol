@@ -188,7 +188,10 @@ void Duck::processPortalRequest() {
 #endif
 
 int Duck::sendData(byte topic, std::vector<byte> data) {
-  
+  if (topic < reservedTopic::max_reserved) {
+    Serial.println("[Duck] send data failed, topic is reserved.");
+    return DUCKPACKET_ERR_TOPIC_INVALID;
+  }
   int err = txPacket->buildPacketBuffer(topic, data);
   if ( err != DUCK_ERR_NONE) {
     return err;
@@ -235,6 +238,23 @@ int Duck::startTransmit() {
   if (err != DUCK_ERR_NONE) {
     Serial.print("[Duck] Oops! Lora transmission failed, err = ");
     Serial.print(err);
+  }
+  return err;
+}
+
+int Duck::sendPong() {
+  int err = DUCK_ERR_NONE;
+  std::vector<byte> data(1, 0);
+  txPacket->reset();
+  err = txPacket->buildPacketBuffer(reservedTopic::pong, data);
+  if (err != DUCK_ERR_NONE) {
+    Serial.println("[Duck] Oops! failed to build pong packet, err = "+err);
+    return err;
+  }
+  err = duckLora->sendData(txPacket->getDataByteBuffer(), txPacket->getBufferLength());
+  if (err != DUCK_ERR_NONE) {
+    Serial.println("[Duck] Oops! Lora sendData failed, err = "+err);
+    return err;
   }
   return err;
 }

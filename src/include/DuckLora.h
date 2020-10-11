@@ -81,7 +81,7 @@ public:
    * @returns DUCK_ERR_NONE if the message was sent successfully, an error code otherwise.
    */
   int sendData(std::vector<byte> data);
-  int sendData(DuckPacket packet);
+  int sendData(DuckPacket* packet);
   
   /**
    * @brief Check if a received packet is available for processing.

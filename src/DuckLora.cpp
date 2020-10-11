@@ -124,8 +124,8 @@ int DuckLora::sendData(byte* data, int length) {
   return transmitData(data, length);
 }
 
-int DuckLora::sendData(DuckPacket packet) {
-  return transmitData(packet.getCdpPacketBuffer().data(), packet.getCdpPacketBuffer().size());
+int DuckLora::sendData(DuckPacket* packet) {
+  return transmitData(packet->getCdpPacketBuffer().data(), packet->getCdpPacketBuffer().size());
 }
 
 int DuckLora::sendData(std::vector<byte> data) {

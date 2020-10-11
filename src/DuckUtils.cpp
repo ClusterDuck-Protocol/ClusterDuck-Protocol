@@ -42,9 +42,11 @@ String convertToHex(byte* data, int size) {
     byte val = data[i];
     buf += cs[(val >> 4) & 0x0F];
     buf += cs[val & 0x0F];
+    /*
     if(i < size - 1) {
       buf += ':';
     }
+    */
   }
   return buf;
 }

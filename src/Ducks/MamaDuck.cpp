@@ -56,7 +56,6 @@ void MamaDuck::handleReceivedPacket() {
     Serial.println(err);
     return;
   }
-
   bool relay = rxPacket->update(duid, data);
   if (relay) {
     // NOTE:
@@ -65,7 +64,23 @@ void MamaDuck::handleReceivedPacket() {
     // there are not many alternative paths to reach other mama ducks that could relay the packet.
     // We could add some kind of random delay before the message is sent, but that's not really a generic solution
     // delay(500);
-    duckLora->sendData(rxPacket->getDataByteBuffer(), rxPacket->getBufferLength());
+    if (rxPacket->getCdpPacket().topic == reservedTopic::ping) {
+      err = sendPong();
+      if (err != DUCK_ERR_NONE) {
+        Serial.print("[MamaDuck] ERROR - failed to send pong message. rc = ");
+        Serial.println(err);
+        return;
+      }
+    } else {
+      //err = duckLora->sendData(rxPacket->getDataByteBuffer(), rxPacket->getBufferLength());
+      err = duckLora->sendData(rxPacket);
+
+      if (err != DUCK_ERR_NONE) {
+        Serial.print("[MamaDuck] ERROR - failed to send data. rc = ");
+        Serial.println(err);
+        return;
+      }
+    }
   }
 }
 

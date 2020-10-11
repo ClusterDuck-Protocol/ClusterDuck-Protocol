@@ -64,7 +64,7 @@ enum topics {
   max_topics = 0xFF
 };
 
-enum resevedTopic {
+enum reservedTopic {
   unused = 0x00,
   ping = 0x01,
   pong = 0x02,

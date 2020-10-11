@@ -62,12 +62,16 @@ void PapaDuck::handleReceivedPacket() {
     Serial.println("[PapaDuck] handleReceivedPacket. Failed to get data. rc = " + err);
     return;
   }
+  // ignore pings
+  if (data[TOPIC_POS] == reservedTopic::ping) {
+    return;
+  }
+
   bool relay = rxPacket->update(duid, data);
   if (relay) {
-    Serial.println("[PapaDuck] sending:  " +
-                   String(duckutils::convertToHex(
-                       rxPacket->getCdpPacketBuffer().data(),
-                       rxPacket->getCdpPacketBuffer().size())));
+    String data = duckutils::convertToHex(rxPacket->getCdpPacketBuffer().data(),
+                                          rxPacket->getCdpPacketBuffer().size());
+    Serial.println("[PapaDuck] relaying:  " + data);
     recvDataCallback(rxPacket->getCdpPacket());
   }
 }
