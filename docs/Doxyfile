@@ -1,35 +1,3 @@
-Skip to content
-Search or jump to…
-
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@TimoWielink 
-TimoWielink
-/
-ClusterDuck-Protocol
-forked from Call-for-Code/ClusterDuck-Protocol
-0
-0
-27
-Code
-Pull requests
-Actions
-Projects
-Wiki
-Security
-Insights
-Settings
-ClusterDuck-Protocol/Doxyfile
-
-Amir Nathoo Update documentation to include top level file description
-Latest commit 422b291 26 days ago
- History
- 0 contributors
-2576 lines (2008 sloc)  110 KB
-CLion   
 # Doxyfile 1.8.20
 
 # This file describes the settings to be used by the documentation system
@@ -90,7 +58,7 @@ PROJECT_LOGO           =
 # entered, it will be relative to the location where doxygen was started. If
 # left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = 
+OUTPUT_DIRECTORY       =
 
 # If the CREATE_SUBDIRS tag is set to YES then doxygen will create 4096 sub-
 # directories (in 2 levels) under the output directory of each output format and
@@ -2606,15 +2574,3 @@ GENERATE_LEGEND        = YES
 # This tag requires that the tag HAVE_DOT is set to YES.
 
 DOT_CLEANUP            = YES
-© 2020 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Help
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
