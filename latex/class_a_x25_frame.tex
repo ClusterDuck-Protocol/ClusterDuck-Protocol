@@ -1,0 +1,226 @@
+\hypertarget{class_a_x25_frame}{}\doxysection{A\+X25\+Frame Class Reference}
+\label{class_a_x25_frame}\index{AX25Frame@{AX25Frame}}
+
+
+Abstraction of A\+X.\+25 frame format.  
+
+
+
+
+{\ttfamily \#include $<$A\+X25.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_a_x25_frame_a138d97d90a371bef7ebd86cce1cc4979}{A\+X25\+Frame}} (const char $\ast$\mbox{\hyperlink{class_a_x25_frame_a78e72871e3a9370675318876f4a4b432}{dest\+Callsign}}, uint8\+\_\+t \mbox{\hyperlink{class_a_x25_frame_af62935e56dc24bca5d2e2aeb932b63f8}{dest\+S\+S\+ID}}, const char $\ast$\mbox{\hyperlink{class_a_x25_frame_ab76eaa8445e7953059a46bb78082dd5a}{src\+Callsign}}, uint8\+\_\+t \mbox{\hyperlink{class_a_x25_frame_a50c63276facf8126f0f8555b1fc6b2c9}{src\+S\+S\+ID}}, uint8\+\_\+t \mbox{\hyperlink{class_a_x25_frame_a5b196079b539dc417ca65dd4ad622f8f}{control}})
+\begin{DoxyCompactList}\small\item\em Overloaded constructor, for frames without info field. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_a_x25_frame_a60e1b318d6e4b9299a4eab72e40877fc}{A\+X25\+Frame}} (const char $\ast$\mbox{\hyperlink{class_a_x25_frame_a78e72871e3a9370675318876f4a4b432}{dest\+Callsign}}, uint8\+\_\+t \mbox{\hyperlink{class_a_x25_frame_af62935e56dc24bca5d2e2aeb932b63f8}{dest\+S\+S\+ID}}, const char $\ast$\mbox{\hyperlink{class_a_x25_frame_ab76eaa8445e7953059a46bb78082dd5a}{src\+Callsign}}, uint8\+\_\+t \mbox{\hyperlink{class_a_x25_frame_a50c63276facf8126f0f8555b1fc6b2c9}{src\+S\+S\+ID}}, uint8\+\_\+t \mbox{\hyperlink{class_a_x25_frame_a5b196079b539dc417ca65dd4ad622f8f}{control}}, uint8\+\_\+t \mbox{\hyperlink{class_a_x25_frame_aa8895fea37220c82f68bd320331595c8}{protocol\+ID}}, const char $\ast$\mbox{\hyperlink{class_a_x25_frame_aa82f006b84b71b9c5d036a4946a65988}{info}})
+\begin{DoxyCompactList}\small\item\em Overloaded constructor, for frames with C-\/string info field. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_a_x25_frame_a3899b8698d772b8285629d6a4f2a642a}{A\+X25\+Frame}} (const char $\ast$\mbox{\hyperlink{class_a_x25_frame_a78e72871e3a9370675318876f4a4b432}{dest\+Callsign}}, uint8\+\_\+t \mbox{\hyperlink{class_a_x25_frame_af62935e56dc24bca5d2e2aeb932b63f8}{dest\+S\+S\+ID}}, const char $\ast$\mbox{\hyperlink{class_a_x25_frame_ab76eaa8445e7953059a46bb78082dd5a}{src\+Callsign}}, uint8\+\_\+t \mbox{\hyperlink{class_a_x25_frame_a50c63276facf8126f0f8555b1fc6b2c9}{src\+S\+S\+ID}}, uint8\+\_\+t \mbox{\hyperlink{class_a_x25_frame_a5b196079b539dc417ca65dd4ad622f8f}{control}}, uint8\+\_\+t \mbox{\hyperlink{class_a_x25_frame_aa8895fea37220c82f68bd320331595c8}{protocol\+ID}}, uint8\+\_\+t $\ast$\mbox{\hyperlink{class_a_x25_frame_aa82f006b84b71b9c5d036a4946a65988}{info}}, uint16\+\_\+t \mbox{\hyperlink{class_a_x25_frame_a75e8ad33c2540ede5bb130050f6ffc41}{info\+Len}})
+\begin{DoxyCompactList}\small\item\em Default constructor. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_a_x25_frame_ab84a13f720ada37aee6201a560d9dc5a}\label{class_a_x25_frame_ab84a13f720ada37aee6201a560d9dc5a}} 
+\mbox{\hyperlink{class_a_x25_frame_ab84a13f720ada37aee6201a560d9dc5a}{$\sim$\+A\+X25\+Frame}} ()
+\begin{DoxyCompactList}\small\item\em Default destructor. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_a_x25_frame_a7f2d9f4f1ba29d0fd9f9f3f2cf03f797}{set\+Repeaters}} (char $\ast$$\ast$\mbox{\hyperlink{class_a_x25_frame_a29eb08c9e72bbaced8d37dcb2343ee94}{repeater\+Callsigns}}, uint8\+\_\+t $\ast$\mbox{\hyperlink{class_a_x25_frame_a5b63c6b6f69e0ac47ba9230ad39c6830}{repeater\+S\+S\+I\+Ds}}, uint8\+\_\+t \mbox{\hyperlink{class_a_x25_frame_ad27453a838ba90f917a1a9853358bb9a}{num\+Repeaters}})
+\begin{DoxyCompactList}\small\item\em Method to set the repeater callsigns and S\+S\+I\+Ds. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_a_x25_frame_a4696a8eede8bac85f0ee6de6fee79ea8}{set\+Recv\+Sequence}} (uint8\+\_\+t seq\+Number)
+\begin{DoxyCompactList}\small\item\em Method to set receive sequence number. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_a_x25_frame_a026e9b96fa69018590fcf6842df8be70}{set\+Send\+Sequence}} (uint8\+\_\+t seq\+Number)
+\begin{DoxyCompactList}\small\item\em Method to set send sequence number. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_a_x25_frame_a78e72871e3a9370675318876f4a4b432}\label{class_a_x25_frame_a78e72871e3a9370675318876f4a4b432}} 
+char \mbox{\hyperlink{class_a_x25_frame_a78e72871e3a9370675318876f4a4b432}{dest\+Callsign}} \mbox{[}A\+X25\+\_\+\+M\+A\+X\+\_\+\+C\+A\+L\+L\+S\+I\+G\+N\+\_\+\+L\+EN+1\mbox{]}
+\begin{DoxyCompactList}\small\item\em Callsign of the destination station. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_a_x25_frame_af62935e56dc24bca5d2e2aeb932b63f8}\label{class_a_x25_frame_af62935e56dc24bca5d2e2aeb932b63f8}} 
+uint8\+\_\+t \mbox{\hyperlink{class_a_x25_frame_af62935e56dc24bca5d2e2aeb932b63f8}{dest\+S\+S\+ID}}
+\begin{DoxyCompactList}\small\item\em S\+S\+ID of the destination station. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_a_x25_frame_ab76eaa8445e7953059a46bb78082dd5a}\label{class_a_x25_frame_ab76eaa8445e7953059a46bb78082dd5a}} 
+char \mbox{\hyperlink{class_a_x25_frame_ab76eaa8445e7953059a46bb78082dd5a}{src\+Callsign}} \mbox{[}A\+X25\+\_\+\+M\+A\+X\+\_\+\+C\+A\+L\+L\+S\+I\+G\+N\+\_\+\+L\+EN+1\mbox{]}
+\begin{DoxyCompactList}\small\item\em Callsign of the source station. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_a_x25_frame_a50c63276facf8126f0f8555b1fc6b2c9}\label{class_a_x25_frame_a50c63276facf8126f0f8555b1fc6b2c9}} 
+uint8\+\_\+t \mbox{\hyperlink{class_a_x25_frame_a50c63276facf8126f0f8555b1fc6b2c9}{src\+S\+S\+ID}}
+\begin{DoxyCompactList}\small\item\em S\+S\+ID of the source station. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_a_x25_frame_ad27453a838ba90f917a1a9853358bb9a}\label{class_a_x25_frame_ad27453a838ba90f917a1a9853358bb9a}} 
+uint8\+\_\+t \mbox{\hyperlink{class_a_x25_frame_ad27453a838ba90f917a1a9853358bb9a}{num\+Repeaters}}
+\begin{DoxyCompactList}\small\item\em Number of repeaters to be used. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_a_x25_frame_a5b196079b539dc417ca65dd4ad622f8f}\label{class_a_x25_frame_a5b196079b539dc417ca65dd4ad622f8f}} 
+uint8\+\_\+t \mbox{\hyperlink{class_a_x25_frame_a5b196079b539dc417ca65dd4ad622f8f}{control}}
+\begin{DoxyCompactList}\small\item\em The control field. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_a_x25_frame_aa8895fea37220c82f68bd320331595c8}\label{class_a_x25_frame_aa8895fea37220c82f68bd320331595c8}} 
+uint8\+\_\+t \mbox{\hyperlink{class_a_x25_frame_aa8895fea37220c82f68bd320331595c8}{protocol\+ID}}
+\begin{DoxyCompactList}\small\item\em The protocol identifier (P\+ID) field. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_a_x25_frame_a75e8ad33c2540ede5bb130050f6ffc41}\label{class_a_x25_frame_a75e8ad33c2540ede5bb130050f6ffc41}} 
+uint16\+\_\+t \mbox{\hyperlink{class_a_x25_frame_a75e8ad33c2540ede5bb130050f6ffc41}{info\+Len}}
+\begin{DoxyCompactList}\small\item\em Number of bytes in the information field. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_a_x25_frame_adce5294af25f09df752997d33ac0e87f}\label{class_a_x25_frame_adce5294af25f09df752997d33ac0e87f}} 
+uint8\+\_\+t \mbox{\hyperlink{class_a_x25_frame_adce5294af25f09df752997d33ac0e87f}{rcv\+Seq\+Number}}
+\begin{DoxyCompactList}\small\item\em Receive sequence number. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_a_x25_frame_a4c0fdf148d3b779d48441d45af87add2}\label{class_a_x25_frame_a4c0fdf148d3b779d48441d45af87add2}} 
+uint16\+\_\+t \mbox{\hyperlink{class_a_x25_frame_a4c0fdf148d3b779d48441d45af87add2}{send\+Seq\+Number}}
+\begin{DoxyCompactList}\small\item\em Send sequence number. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_a_x25_frame_aa82f006b84b71b9c5d036a4946a65988}\label{class_a_x25_frame_aa82f006b84b71b9c5d036a4946a65988}} 
+uint8\+\_\+t $\ast$ \mbox{\hyperlink{class_a_x25_frame_aa82f006b84b71b9c5d036a4946a65988}{info}}
+\begin{DoxyCompactList}\small\item\em The info field. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_a_x25_frame_a29eb08c9e72bbaced8d37dcb2343ee94}\label{class_a_x25_frame_a29eb08c9e72bbaced8d37dcb2343ee94}} 
+char $\ast$$\ast$ \mbox{\hyperlink{class_a_x25_frame_a29eb08c9e72bbaced8d37dcb2343ee94}{repeater\+Callsigns}}
+\begin{DoxyCompactList}\small\item\em Array of repeater callsigns. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_a_x25_frame_a5b63c6b6f69e0ac47ba9230ad39c6830}\label{class_a_x25_frame_a5b63c6b6f69e0ac47ba9230ad39c6830}} 
+uint8\+\_\+t $\ast$ \mbox{\hyperlink{class_a_x25_frame_a5b63c6b6f69e0ac47ba9230ad39c6830}{repeater\+S\+S\+I\+Ds}}
+\begin{DoxyCompactList}\small\item\em Array of repeater S\+S\+I\+Ds. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_a_x25_frame_a7e36302ae0bc8b1b4d0fa423f44eb1e3}\label{class_a_x25_frame_a7e36302ae0bc8b1b4d0fa423f44eb1e3}} 
+uint8\+\_\+t \mbox{\hyperlink{class_a_x25_frame_a7e36302ae0bc8b1b4d0fa423f44eb1e3}{info}} \mbox{[}R\+A\+D\+I\+O\+L\+I\+B\+\_\+\+S\+T\+A\+T\+I\+C\+\_\+\+A\+R\+R\+A\+Y\+\_\+\+S\+I\+ZE\mbox{]}
+\begin{DoxyCompactList}\small\item\em The info field. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_a_x25_frame_ad3962bb00d93875e7fdad49f0629f1b0}\label{class_a_x25_frame_ad3962bb00d93875e7fdad49f0629f1b0}} 
+char \mbox{\hyperlink{class_a_x25_frame_ad3962bb00d93875e7fdad49f0629f1b0}{repeater\+Callsigns}} \mbox{[}8\mbox{]}\mbox{[}A\+X25\+\_\+\+M\+A\+X\+\_\+\+C\+A\+L\+L\+S\+I\+G\+N\+\_\+\+L\+EN+1\mbox{]}
+\begin{DoxyCompactList}\small\item\em Array of repeater callsigns. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_a_x25_frame_a05044d8062e182d3a0b87abb54d71858}\label{class_a_x25_frame_a05044d8062e182d3a0b87abb54d71858}} 
+uint8\+\_\+t \mbox{\hyperlink{class_a_x25_frame_a05044d8062e182d3a0b87abb54d71858}{repeater\+S\+S\+I\+Ds}} \mbox{[}8\mbox{]}
+\begin{DoxyCompactList}\small\item\em Array of repeater S\+S\+I\+Ds. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Abstraction of A\+X.\+25 frame format. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{class_a_x25_frame_a138d97d90a371bef7ebd86cce1cc4979}\label{class_a_x25_frame_a138d97d90a371bef7ebd86cce1cc4979}} 
+\index{AX25Frame@{AX25Frame}!AX25Frame@{AX25Frame}}
+\index{AX25Frame@{AX25Frame}!AX25Frame@{AX25Frame}}
+\doxysubsubsection{\texorpdfstring{AX25Frame()}{AX25Frame()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily A\+X25\+Frame\+::\+A\+X25\+Frame (\begin{DoxyParamCaption}\item[{const char $\ast$}]{dest\+Callsign,  }\item[{uint8\+\_\+t}]{dest\+S\+S\+ID,  }\item[{const char $\ast$}]{src\+Callsign,  }\item[{uint8\+\_\+t}]{src\+S\+S\+ID,  }\item[{uint8\+\_\+t}]{control }\end{DoxyParamCaption})}
+
+
+
+Overloaded constructor, for frames without info field. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em dest\+Callsign} & Callsign of the destination station.\\
+\hline
+{\em dest\+S\+S\+ID} & S\+S\+ID of the destination station.\\
+\hline
+{\em src\+Callsign} & Callsign of the source station.\\
+\hline
+{\em src\+S\+S\+ID} & S\+S\+ID of the source station.\\
+\hline
+{\em control} & The control field. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_a_x25_frame_a60e1b318d6e4b9299a4eab72e40877fc}\label{class_a_x25_frame_a60e1b318d6e4b9299a4eab72e40877fc}} 
+\index{AX25Frame@{AX25Frame}!AX25Frame@{AX25Frame}}
+\index{AX25Frame@{AX25Frame}!AX25Frame@{AX25Frame}}
+\doxysubsubsection{\texorpdfstring{AX25Frame()}{AX25Frame()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily A\+X25\+Frame\+::\+A\+X25\+Frame (\begin{DoxyParamCaption}\item[{const char $\ast$}]{dest\+Callsign,  }\item[{uint8\+\_\+t}]{dest\+S\+S\+ID,  }\item[{const char $\ast$}]{src\+Callsign,  }\item[{uint8\+\_\+t}]{src\+S\+S\+ID,  }\item[{uint8\+\_\+t}]{control,  }\item[{uint8\+\_\+t}]{protocol\+ID,  }\item[{const char $\ast$}]{info }\end{DoxyParamCaption})}
+
+
+
+Overloaded constructor, for frames with C-\/string info field. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em dest\+Callsign} & Callsign of the destination station.\\
+\hline
+{\em dest\+S\+S\+ID} & S\+S\+ID of the destination station.\\
+\hline
+{\em src\+Callsign} & Callsign of the source station.\\
+\hline
+{\em src\+S\+S\+ID} & S\+S\+ID of the source station.\\
+\hline
+{\em control} & The control field.\\
+\hline
+{\em protocol\+ID} & The protocol identifier (P\+ID) field. Set to zero if the frame doesn\textquotesingle{}t have this field.\\
+\hline
+{\em info} & Information field, in the form of null-\/terminated C-\/string. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_a_x25_frame_a3899b8698d772b8285629d6a4f2a642a}\label{class_a_x25_frame_a3899b8698d772b8285629d6a4f2a642a}} 
+\index{AX25Frame@{AX25Frame}!AX25Frame@{AX25Frame}}
+\index{AX25Frame@{AX25Frame}!AX25Frame@{AX25Frame}}
+\doxysubsubsection{\texorpdfstring{AX25Frame()}{AX25Frame()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily A\+X25\+Frame\+::\+A\+X25\+Frame (\begin{DoxyParamCaption}\item[{const char $\ast$}]{dest\+Callsign,  }\item[{uint8\+\_\+t}]{dest\+S\+S\+ID,  }\item[{const char $\ast$}]{src\+Callsign,  }\item[{uint8\+\_\+t}]{src\+S\+S\+ID,  }\item[{uint8\+\_\+t}]{control,  }\item[{uint8\+\_\+t}]{protocol\+ID,  }\item[{uint8\+\_\+t $\ast$}]{info,  }\item[{uint16\+\_\+t}]{info\+Len }\end{DoxyParamCaption})}
+
+
+
+Default constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em dest\+Callsign} & Callsign of the destination station.\\
+\hline
+{\em dest\+S\+S\+ID} & S\+S\+ID of the destination station.\\
+\hline
+{\em src\+Callsign} & Callsign of the source station.\\
+\hline
+{\em src\+S\+S\+ID} & S\+S\+ID of the source station.\\
+\hline
+{\em control} & The control field.\\
+\hline
+{\em protocol\+ID} & The protocol identifier (P\+ID) field. Set to zero if the frame doesn\textquotesingle{}t have this field.\\
+\hline
+{\em info} & Information field, in the form of arbitrary binary buffer.\\
+\hline
+{\em info\+Len} & Number of bytes in the information field. \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_a_x25_frame_a4696a8eede8bac85f0ee6de6fee79ea8}\label{class_a_x25_frame_a4696a8eede8bac85f0ee6de6fee79ea8}} 
+\index{AX25Frame@{AX25Frame}!setRecvSequence@{setRecvSequence}}
+\index{setRecvSequence@{setRecvSequence}!AX25Frame@{AX25Frame}}
+\doxysubsubsection{\texorpdfstring{setRecvSequence()}{setRecvSequence()}}
+{\footnotesize\ttfamily void A\+X25\+Frame\+::set\+Recv\+Sequence (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{seq\+Number }\end{DoxyParamCaption})}
+
+
+
+Method to set receive sequence number. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em seq\+Number} & Sequence number to set, 0 to 7. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_a_x25_frame_a7f2d9f4f1ba29d0fd9f9f3f2cf03f797}\label{class_a_x25_frame_a7f2d9f4f1ba29d0fd9f9f3f2cf03f797}} 
+\index{AX25Frame@{AX25Frame}!setRepeaters@{setRepeaters}}
+\index{setRepeaters@{setRepeaters}!AX25Frame@{AX25Frame}}
+\doxysubsubsection{\texorpdfstring{setRepeaters()}{setRepeaters()}}
+{\footnotesize\ttfamily int16\+\_\+t A\+X25\+Frame\+::set\+Repeaters (\begin{DoxyParamCaption}\item[{char $\ast$$\ast$}]{repeater\+Callsigns,  }\item[{uint8\+\_\+t $\ast$}]{repeater\+S\+S\+I\+Ds,  }\item[{uint8\+\_\+t}]{num\+Repeaters }\end{DoxyParamCaption})}
+
+
+
+Method to set the repeater callsigns and S\+S\+I\+Ds. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em repeater\+Callsigns} & Array of repeater callsigns in the form of null-\/terminated C-\/strings.\\
+\hline
+{\em repeater\+S\+S\+I\+Ds} & Array of repeater S\+S\+I\+Ds.\\
+\hline
+{\em num\+Repeaters} & Number of repeaters, maximum is 8.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_a_x25_frame_a026e9b96fa69018590fcf6842df8be70}\label{class_a_x25_frame_a026e9b96fa69018590fcf6842df8be70}} 
+\index{AX25Frame@{AX25Frame}!setSendSequence@{setSendSequence}}
+\index{setSendSequence@{setSendSequence}!AX25Frame@{AX25Frame}}
+\doxysubsubsection{\texorpdfstring{setSendSequence()}{setSendSequence()}}
+{\footnotesize\ttfamily void A\+X25\+Frame\+::set\+Send\+Sequence (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{seq\+Number }\end{DoxyParamCaption})}
+
+
+
+Method to set send sequence number. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em seq\+Number} & Sequence number to set, 0 to 7. \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+Libraries/\+Radio\+Lib/src/protocols/\+A\+X25/A\+X25.\+h\item 
+Libraries/\+Radio\+Lib/src/protocols/\+A\+X25/A\+X25.\+cpp\end{DoxyCompactItemize}

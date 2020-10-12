@@ -1,0 +1,96 @@
+\hypertarget{class_i_t_a2_string}{}\doxysection{I\+T\+A2\+String Class Reference}
+\label{class_i_t_a2_string}\index{ITA2String@{ITA2String}}
+
+
+I\+T\+A2-\/encoded string.  
+
+
+
+
+{\ttfamily \#include $<$R\+T\+T\+Y.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_i_t_a2_string_addb6c39167aa5da53fb72e9a94c9c8f5}{I\+T\+A2\+String}} (char c)
+\begin{DoxyCompactList}\small\item\em Default single-\/character constructor. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_i_t_a2_string_a92ca563bdc2ae4d05ee91ce9372e7a55}{I\+T\+A2\+String}} (const char $\ast$str)
+\begin{DoxyCompactList}\small\item\em Default string constructor. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_i_t_a2_string_afde24c931997581878953660192e09a2}\label{class_i_t_a2_string_afde24c931997581878953660192e09a2}} 
+\mbox{\hyperlink{class_i_t_a2_string_afde24c931997581878953660192e09a2}{$\sim$\+I\+T\+A2\+String}} ()
+\begin{DoxyCompactList}\small\item\em Default destructor. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{class_i_t_a2_string_a79b48f6e1eab664b841f3fd20c333e8e}{length}} ()
+\begin{DoxyCompactList}\small\item\em Gets the length of the I\+T\+A2 string. This number is not the same as the length of A\+S\+C\+I\+I-\/encoded string! \end{DoxyCompactList}\item 
+uint8\+\_\+t $\ast$ \mbox{\hyperlink{class_i_t_a2_string_a3f42f7ad98473dbe36515e676622ed3d}{byte\+Arr}} ()
+\begin{DoxyCompactList}\small\item\em Gets the I\+T\+A2 representation of the A\+S\+C\+II string set in constructor. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+I\+T\+A2-\/encoded string. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{class_i_t_a2_string_addb6c39167aa5da53fb72e9a94c9c8f5}\label{class_i_t_a2_string_addb6c39167aa5da53fb72e9a94c9c8f5}} 
+\index{ITA2String@{ITA2String}!ITA2String@{ITA2String}}
+\index{ITA2String@{ITA2String}!ITA2String@{ITA2String}}
+\doxysubsubsection{\texorpdfstring{ITA2String()}{ITA2String()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily I\+T\+A2\+String\+::\+I\+T\+A2\+String (\begin{DoxyParamCaption}\item[{char}]{c }\end{DoxyParamCaption})}
+
+
+
+Default single-\/character constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em c} & A\+S\+C\+I\+I-\/encoded character to encode as I\+T\+A2. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_i_t_a2_string_a92ca563bdc2ae4d05ee91ce9372e7a55}\label{class_i_t_a2_string_a92ca563bdc2ae4d05ee91ce9372e7a55}} 
+\index{ITA2String@{ITA2String}!ITA2String@{ITA2String}}
+\index{ITA2String@{ITA2String}!ITA2String@{ITA2String}}
+\doxysubsubsection{\texorpdfstring{ITA2String()}{ITA2String()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily I\+T\+A2\+String\+::\+I\+T\+A2\+String (\begin{DoxyParamCaption}\item[{const char $\ast$}]{str }\end{DoxyParamCaption})}
+
+
+
+Default string constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em str} & A\+S\+C\+I\+I-\/encoded string to encode as I\+T\+A2. \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_i_t_a2_string_a3f42f7ad98473dbe36515e676622ed3d}\label{class_i_t_a2_string_a3f42f7ad98473dbe36515e676622ed3d}} 
+\index{ITA2String@{ITA2String}!byteArr@{byteArr}}
+\index{byteArr@{byteArr}!ITA2String@{ITA2String}}
+\doxysubsubsection{\texorpdfstring{byteArr()}{byteArr()}}
+{\footnotesize\ttfamily uint8\+\_\+t $\ast$ I\+T\+A2\+String\+::byte\+Arr (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Gets the I\+T\+A2 representation of the A\+S\+C\+II string set in constructor. 
+
+\begin{DoxyReturn}{Returns}
+Pointer to dynamically allocated array, which contains I\+T\+A2-\/encoded bytes. It is the caller\textquotesingle{}s responsibility to deallocate this memory! 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_i_t_a2_string_a79b48f6e1eab664b841f3fd20c333e8e}\label{class_i_t_a2_string_a79b48f6e1eab664b841f3fd20c333e8e}} 
+\index{ITA2String@{ITA2String}!length@{length}}
+\index{length@{length}!ITA2String@{ITA2String}}
+\doxysubsubsection{\texorpdfstring{length()}{length()}}
+{\footnotesize\ttfamily size\+\_\+t I\+T\+A2\+String\+::length (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Gets the length of the I\+T\+A2 string. This number is not the same as the length of A\+S\+C\+I\+I-\/encoded string! 
+
+\begin{DoxyReturn}{Returns}
+Length of I\+T\+A2-\/encoded string. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+Libraries/\+Radio\+Lib/src/protocols/\+R\+T\+T\+Y/R\+T\+T\+Y.\+h\item 
+Libraries/\+Radio\+Lib/src/protocols/\+R\+T\+T\+Y/R\+T\+T\+Y.\+cpp\end{DoxyCompactItemize}

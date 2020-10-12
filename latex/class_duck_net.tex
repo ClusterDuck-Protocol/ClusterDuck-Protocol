@@ -1,0 +1,274 @@
+\hypertarget{class_duck_net}{}\doxysection{Duck\+Net Class Reference}
+\label{class_duck_net}\index{DuckNet@{DuckNet}}
+
+
+Internal network abstraction.  
+
+
+
+
+{\ttfamily \#include $<$Duck\+Net.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_duck_net_ab9844f05f1bd951e0661d21c161bf393}\label{class_duck_net_ab9844f05f1bd951e0661d21c161bf393}} 
+void {\bfseries setup\+Web\+Server} (bool create\+Captive\+Portal=false, String html=\char`\"{}\char`\"{})
+\item 
+\mbox{\Hypertarget{class_duck_net_ab8110f22f23e91cca341296bfa9d147a}\label{class_duck_net_ab8110f22f23e91cca341296bfa9d147a}} 
+void {\bfseries setup\+Wifi\+Ap} (const char $\ast$access\+Point=\char`\"{}🆘 D\+U\+CK E\+M\+E\+R\+G\+E\+N\+CY P\+O\+R\+T\+AL\char`\"{})
+\item 
+\mbox{\Hypertarget{class_duck_net_adf1b556e746790e133583abb73329cb0}\label{class_duck_net_adf1b556e746790e133583abb73329cb0}} 
+void {\bfseries setup\+Dns} ()
+\item 
+\mbox{\Hypertarget{class_duck_net_ab3124994bb8d9b13109b513dde7a1f0e}\label{class_duck_net_ab3124994bb8d9b13109b513dde7a1f0e}} 
+void {\bfseries setup\+Internet} (String ssid, String password)
+\item 
+\mbox{\Hypertarget{class_duck_net_a31177d7df7993a80c24d9f076420d20d}\label{class_duck_net_a31177d7df7993a80c24d9f076420d20d}} 
+bool {\bfseries ssid\+Available} (String val=\char`\"{}\char`\"{})
+\item 
+\mbox{\Hypertarget{class_duck_net_ae63fc1f14a23720b188b0cc086193090}\label{class_duck_net_ae63fc1f14a23720b188b0cc086193090}} 
+void {\bfseries set\+Ssid} (String val)
+\item 
+\mbox{\Hypertarget{class_duck_net_ae345c3caeff634d0ddb95203181b2fa5}\label{class_duck_net_ae345c3caeff634d0ddb95203181b2fa5}} 
+void {\bfseries set\+Password} (String val)
+\item 
+\mbox{\Hypertarget{class_duck_net_a118d833abc97de5713b5d4b874e13304}\label{class_duck_net_a118d833abc97de5713b5d4b874e13304}} 
+String {\bfseries get\+Ssid} ()
+\item 
+\mbox{\Hypertarget{class_duck_net_a42964c0c02292c1ae64e04fcc4e6b041}\label{class_duck_net_a42964c0c02292c1ae64e04fcc4e6b041}} 
+String {\bfseries get\+Password} ()
+\item 
+\mbox{\Hypertarget{class_duck_net_a14bd891ce84c320913b0d50b01440e8e}\label{class_duck_net_a14bd891ce84c320913b0d50b01440e8e}} 
+void {\bfseries set\+Device\+Id} (String device\+Id)
+\item 
+\mbox{\Hypertarget{class_duck_net_a6f232c083c527ac92becf9898553ff20}\label{class_duck_net_a6f232c083c527ac92becf9898553ff20}} 
+bool {\bfseries is\+Wifi\+Connect} ()
+\item 
+void \mbox{\hyperlink{class_duck_net_ab9844f05f1bd951e0661d21c161bf393}{setup\+Web\+Server}} (bool create\+Captive\+Portal=false, String html=\char`\"{}\char`\"{})
+\begin{DoxyCompactList}\small\item\em Set up the Web\+Server. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_duck_net_ab8110f22f23e91cca341296bfa9d147a}{setup\+Wifi\+Ap}} (const char $\ast$access\+Point=\char`\"{}🆘 D\+U\+CK E\+M\+E\+R\+G\+E\+N\+CY P\+O\+R\+T\+AL\char`\"{})
+\begin{DoxyCompactList}\small\item\em Set up the Wi\+Fi access point. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_duck_net_adf1b556e746790e133583abb73329cb0}{setup\+Dns}} ()
+\begin{DoxyCompactList}\small\item\em Set up D\+NS. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_duck_net_ab3124994bb8d9b13109b513dde7a1f0e}{setup\+Internet}} (String ssid, String password)
+\begin{DoxyCompactList}\small\item\em Set up internet access. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_duck_net_a31177d7df7993a80c24d9f076420d20d}{ssid\+Available}} (String val=\char`\"{}\char`\"{})
+\begin{DoxyCompactList}\small\item\em Checks if the given ssid is available. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_duck_net_ae63fc1f14a23720b188b0cc086193090}{set\+Ssid}} (String val)
+\begin{DoxyCompactList}\small\item\em Set the Wi\+Fi network ssid. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_duck_net_ae345c3caeff634d0ddb95203181b2fa5}{set\+Password}} (String val)
+\begin{DoxyCompactList}\small\item\em Set the Wi\+Fi password. \end{DoxyCompactList}\item 
+String \mbox{\hyperlink{class_duck_net_a118d833abc97de5713b5d4b874e13304}{get\+Ssid}} ()
+\begin{DoxyCompactList}\small\item\em Get the Wi\+Fi network ssid. \end{DoxyCompactList}\item 
+String \mbox{\hyperlink{class_duck_net_a42964c0c02292c1ae64e04fcc4e6b041}{get\+Password}} ()
+\begin{DoxyCompactList}\small\item\em Get the Wi\+Fi password ssid. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_duck_net_a14bd891ce84c320913b0d50b01440e8e}{set\+Device\+Id}} (String device\+Id)
+\begin{DoxyCompactList}\small\item\em Set the \mbox{\hyperlink{class_duck}{Duck}}\textquotesingle{}s device id. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_duck_net_a393440e488e564a2269bdec8a218f1a2}{is\+Wifi\+Connected}} ()
+\begin{DoxyCompactList}\small\item\em Provide Wifi connection status. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{class_duck_net}{Duck\+Net}} $\ast$ \mbox{\hyperlink{class_duck_net_a0decd190c629925b9f0f624319401374}{get\+Instance}} ()
+\begin{DoxyCompactList}\small\item\em Get a singletom instance of the \mbox{\hyperlink{class_duck_net}{Duck\+Net}} class. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_duck_net_ab3c9f38500b2f4f242a4c40d2b889463}\label{class_duck_net_ab3c9f38500b2f4f242a4c40d2b889463}} 
+static D\+N\+S\+Server {\bfseries dns\+Server}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Internal network abstraction. 
+
+Provides access to Webserver, D\+NS, Wi\+Fi and O\+TA update functionalities. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_duck_net_a0decd190c629925b9f0f624319401374}\label{class_duck_net_a0decd190c629925b9f0f624319401374}} 
+\index{DuckNet@{DuckNet}!getInstance@{getInstance}}
+\index{getInstance@{getInstance}!DuckNet@{DuckNet}}
+\doxysubsubsection{\texorpdfstring{getInstance()}{getInstance()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_duck_net}{Duck\+Net}} $\ast$ Duck\+Net\+::get\+Instance (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Get a singletom instance of the \mbox{\hyperlink{class_duck_net}{Duck\+Net}} class. 
+
+\begin{DoxyReturn}{Returns}
+A pointer to \mbox{\hyperlink{class_duck_net}{Duck\+Net}} object. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_duck_net_a42964c0c02292c1ae64e04fcc4e6b041}\label{class_duck_net_a42964c0c02292c1ae64e04fcc4e6b041}} 
+\index{DuckNet@{DuckNet}!getPassword@{getPassword}}
+\index{getPassword@{getPassword}!DuckNet@{DuckNet}}
+\doxysubsubsection{\texorpdfstring{getPassword()}{getPassword()}}
+{\footnotesize\ttfamily String Duck\+Net\+::get\+Password (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Get the Wi\+Fi password ssid. 
+
+\begin{DoxyReturn}{Returns}
+a string representing the current network password 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_duck_net_a118d833abc97de5713b5d4b874e13304}\label{class_duck_net_a118d833abc97de5713b5d4b874e13304}} 
+\index{DuckNet@{DuckNet}!getSsid@{getSsid}}
+\index{getSsid@{getSsid}!DuckNet@{DuckNet}}
+\doxysubsubsection{\texorpdfstring{getSsid()}{getSsid()}}
+{\footnotesize\ttfamily String Duck\+Net\+::get\+Ssid (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Get the Wi\+Fi network ssid. 
+
+\begin{DoxyReturn}{Returns}
+a string representing the current network ssid 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_duck_net_a393440e488e564a2269bdec8a218f1a2}\label{class_duck_net_a393440e488e564a2269bdec8a218f1a2}} 
+\index{DuckNet@{DuckNet}!isWifiConnected@{isWifiConnected}}
+\index{isWifiConnected@{isWifiConnected}!DuckNet@{DuckNet}}
+\doxysubsubsection{\texorpdfstring{isWifiConnected()}{isWifiConnected()}}
+{\footnotesize\ttfamily bool Duck\+Net\+::is\+Wifi\+Connected (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Provide Wifi connection status. 
+
+\begin{DoxyReturn}{Returns}
+true if wifi is connected, false otherwise. ~\newline
+ 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_duck_net_a14bd891ce84c320913b0d50b01440e8e}\label{class_duck_net_a14bd891ce84c320913b0d50b01440e8e}} 
+\index{DuckNet@{DuckNet}!setDeviceId@{setDeviceId}}
+\index{setDeviceId@{setDeviceId}!DuckNet@{DuckNet}}
+\doxysubsubsection{\texorpdfstring{setDeviceId()}{setDeviceId()}}
+{\footnotesize\ttfamily void Duck\+Net\+::set\+Device\+Id (\begin{DoxyParamCaption}\item[{String}]{device\+Id }\end{DoxyParamCaption})}
+
+
+
+Set the \mbox{\hyperlink{class_duck}{Duck}}\textquotesingle{}s device id. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em device\+Id} & \mbox{\hyperlink{class_duck}{Duck}}\textquotesingle{}s device ID string to set \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_duck_net_ae345c3caeff634d0ddb95203181b2fa5}\label{class_duck_net_ae345c3caeff634d0ddb95203181b2fa5}} 
+\index{DuckNet@{DuckNet}!setPassword@{setPassword}}
+\index{setPassword@{setPassword}!DuckNet@{DuckNet}}
+\doxysubsubsection{\texorpdfstring{setPassword()}{setPassword()}}
+{\footnotesize\ttfamily void Duck\+Net\+::set\+Password (\begin{DoxyParamCaption}\item[{String}]{val }\end{DoxyParamCaption})}
+
+
+
+Set the Wi\+Fi password. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em val} & the password string to set \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_duck_net_ae63fc1f14a23720b188b0cc086193090}\label{class_duck_net_ae63fc1f14a23720b188b0cc086193090}} 
+\index{DuckNet@{DuckNet}!setSsid@{setSsid}}
+\index{setSsid@{setSsid}!DuckNet@{DuckNet}}
+\doxysubsubsection{\texorpdfstring{setSsid()}{setSsid()}}
+{\footnotesize\ttfamily void Duck\+Net\+::set\+Ssid (\begin{DoxyParamCaption}\item[{String}]{val }\end{DoxyParamCaption})}
+
+
+
+Set the Wi\+Fi network ssid. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em val} & the ssid string to set \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_duck_net_adf1b556e746790e133583abb73329cb0}\label{class_duck_net_adf1b556e746790e133583abb73329cb0}} 
+\index{DuckNet@{DuckNet}!setupDns@{setupDns}}
+\index{setupDns@{setupDns}!DuckNet@{DuckNet}}
+\doxysubsubsection{\texorpdfstring{setupDns()}{setupDns()}}
+{\footnotesize\ttfamily int Duck\+Net\+::setup\+Dns (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Set up D\+NS. 
+
+\begin{DoxyReturn}{Returns}
+D\+U\+C\+K\+\_\+\+E\+R\+R\+\_\+\+N\+O\+NE if sucessful, an error code otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_duck_net_ab3124994bb8d9b13109b513dde7a1f0e}\label{class_duck_net_ab3124994bb8d9b13109b513dde7a1f0e}} 
+\index{DuckNet@{DuckNet}!setupInternet@{setupInternet}}
+\index{setupInternet@{setupInternet}!DuckNet@{DuckNet}}
+\doxysubsubsection{\texorpdfstring{setupInternet()}{setupInternet()}}
+{\footnotesize\ttfamily void Duck\+Net\+::setup\+Internet (\begin{DoxyParamCaption}\item[{String}]{ssid,  }\item[{String}]{password }\end{DoxyParamCaption})}
+
+
+
+Set up internet access. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ssid} & the ssid of the Wi\+Fi network \\
+\hline
+{\em password} & password to join the network \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_duck_net_ab9844f05f1bd951e0661d21c161bf393}\label{class_duck_net_ab9844f05f1bd951e0661d21c161bf393}} 
+\index{DuckNet@{DuckNet}!setupWebServer@{setupWebServer}}
+\index{setupWebServer@{setupWebServer}!DuckNet@{DuckNet}}
+\doxysubsubsection{\texorpdfstring{setupWebServer()}{setupWebServer()}}
+{\footnotesize\ttfamily void Duck\+Net\+::setup\+Web\+Server (\begin{DoxyParamCaption}\item[{bool}]{create\+Captive\+Portal = {\ttfamily false},  }\item[{String}]{html = {\ttfamily \char`\"{}\char`\"{}} }\end{DoxyParamCaption})}
+
+
+
+Set up the Web\+Server. 
+
+The Web\+Server is used to communicate with the \mbox{\hyperlink{class_duck}{Duck}} over ad-\/hoc Wi\+Fi connection.
+
+
+\begin{DoxyParams}{Parameters}
+{\em create\+Captive\+Portal} & set to true if Captive Wi\+Fi connection is needed. Defaults to false \\
+\hline
+{\em html} & A string representing custom H\+T\+ML code used for the portal. Default is an empty string Default portal web page is used if the string is empty \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_duck_net_ab8110f22f23e91cca341296bfa9d147a}\label{class_duck_net_ab8110f22f23e91cca341296bfa9d147a}} 
+\index{DuckNet@{DuckNet}!setupWifiAp@{setupWifiAp}}
+\index{setupWifiAp@{setupWifiAp}!DuckNet@{DuckNet}}
+\doxysubsubsection{\texorpdfstring{setupWifiAp()}{setupWifiAp()}}
+{\footnotesize\ttfamily void Duck\+Net\+::setup\+Wifi\+Ap (\begin{DoxyParamCaption}\item[{const char $\ast$}]{access\+Point = {\ttfamily \char`\"{}🆘~DUCK~EMERGENCY~PORTAL\char`\"{}} }\end{DoxyParamCaption})}
+
+
+
+Set up the Wi\+Fi access point. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em access\+Point} & a string representing the access point. Default to \char`\"{}🆘 D\+U\+C\+K E\+M\+E\+R\+G\+E\+N\+C\+Y P\+O\+R\+T\+A\+L\char`\"{} \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_duck_net_a31177d7df7993a80c24d9f076420d20d}\label{class_duck_net_a31177d7df7993a80c24d9f076420d20d}} 
+\index{DuckNet@{DuckNet}!ssidAvailable@{ssidAvailable}}
+\index{ssidAvailable@{ssidAvailable}!DuckNet@{DuckNet}}
+\doxysubsubsection{\texorpdfstring{ssidAvailable()}{ssidAvailable()}}
+{\footnotesize\ttfamily bool Duck\+Net\+::ssid\+Available (\begin{DoxyParamCaption}\item[{String}]{val = {\ttfamily \char`\"{}\char`\"{}} }\end{DoxyParamCaption})}
+
+
+
+Checks if the given ssid is available. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em val} & ssid to check, default is an empty string and will use the internal default ssid \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true if the ssid is available, false otherwise. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/include/\mbox{\hyperlink{_duck_net_8h}{Duck\+Net.\+h}}\item 
+src/Duck\+Net.\+cpp\end{DoxyCompactItemize}

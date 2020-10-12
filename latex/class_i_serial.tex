@@ -1,0 +1,140 @@
+\hypertarget{class_i_serial}{}\doxysection{I\+Serial Class Reference}
+\label{class_i_serial}\index{ISerial@{ISerial}}
+
+
+Interface class for Arduino Serial. Only calls the appropriate methods for the active U\+A\+RT interface.  
+
+
+
+
+{\ttfamily \#include $<$I\+Serial.\+h$>$}
+
+Inheritance diagram for I\+Serial\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_i_serial}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_i_serial_ae40ab8688a45d252264a45fe7eeb1fec}\label{class_i_serial_ae40ab8688a45d252264a45fe7eeb1fec}} 
+{\bfseries I\+Serial} (\mbox{\hyperlink{class_module}{Module}} $\ast$mod)
+\item 
+\mbox{\Hypertarget{class_i_serial_ac88cbd52dd52081012c7ebc5e4877a71}\label{class_i_serial_ac88cbd52dd52081012c7ebc5e4877a71}} 
+void {\bfseries begin} (long)
+\item 
+\mbox{\Hypertarget{class_i_serial_a2fa237fec86b8aa38d9aa7c43f46b897}\label{class_i_serial_a2fa237fec86b8aa38d9aa7c43f46b897}} 
+bool {\bfseries listen} ()
+\item 
+\mbox{\Hypertarget{class_i_serial_a9ab275543e32bbd26093936e93901a64}\label{class_i_serial_a9ab275543e32bbd26093936e93901a64}} 
+void {\bfseries end} ()
+\item 
+\mbox{\Hypertarget{class_i_serial_ad1feecdc069507a8936bdee4258868ff}\label{class_i_serial_ad1feecdc069507a8936bdee4258868ff}} 
+bool {\bfseries is\+Listening} ()
+\item 
+\mbox{\Hypertarget{class_i_serial_adb17d4510a5e3226aa694132a3617ab6}\label{class_i_serial_adb17d4510a5e3226aa694132a3617ab6}} 
+bool {\bfseries stop\+Listening} ()
+\item 
+\mbox{\Hypertarget{class_i_serial_a27aa7bc73bb338e26bc757ab82ce4452}\label{class_i_serial_a27aa7bc73bb338e26bc757ab82ce4452}} 
+bool {\bfseries overflow} ()
+\item 
+\mbox{\Hypertarget{class_i_serial_aaec3e37c852ab96dc0cb406f25927020}\label{class_i_serial_aaec3e37c852ab96dc0cb406f25927020}} 
+int {\bfseries peek} ()
+\item 
+\mbox{\Hypertarget{class_i_serial_a0e3eac99b53d90cd8c725a5cc409e438}\label{class_i_serial_a0e3eac99b53d90cd8c725a5cc409e438}} 
+size\+\_\+t {\bfseries write} (uint8\+\_\+t)
+\item 
+\mbox{\Hypertarget{class_i_serial_a59bdc39fa8633f3bb6154dacb043ae10}\label{class_i_serial_a59bdc39fa8633f3bb6154dacb043ae10}} 
+int {\bfseries read} ()
+\item 
+\mbox{\Hypertarget{class_i_serial_a7dfceaa2cb8f849211e64ffbb26a9ccb}\label{class_i_serial_a7dfceaa2cb8f849211e64ffbb26a9ccb}} 
+int {\bfseries available} ()
+\item 
+\mbox{\Hypertarget{class_i_serial_a5073d939918c6ae56e1eb28da4362fc8}\label{class_i_serial_a5073d939918c6ae56e1eb28da4362fc8}} 
+void {\bfseries flush} ()
+\item 
+\mbox{\Hypertarget{class_i_serial_a71ff41667bb4cb865fae0cb392ba2480}\label{class_i_serial_a71ff41667bb4cb865fae0cb392ba2480}} 
+size\+\_\+t {\bfseries print} (const \+\_\+\+\_\+\+Flash\+String\+Helper $\ast$)
+\item 
+\mbox{\Hypertarget{class_i_serial_afa73455a632e6c6819a2552ad58d3e4a}\label{class_i_serial_afa73455a632e6c6819a2552ad58d3e4a}} 
+size\+\_\+t {\bfseries print} (const String \&)
+\item 
+\mbox{\Hypertarget{class_i_serial_a50a1a3292b06f0b0283bb365e4274e74}\label{class_i_serial_a50a1a3292b06f0b0283bb365e4274e74}} 
+size\+\_\+t {\bfseries print} (const char\mbox{[}$\,$\mbox{]})
+\item 
+\mbox{\Hypertarget{class_i_serial_a37e78871669df20cc65ddd0b3f98eba4}\label{class_i_serial_a37e78871669df20cc65ddd0b3f98eba4}} 
+size\+\_\+t {\bfseries print} (char)
+\item 
+\mbox{\Hypertarget{class_i_serial_aa7de5539ed01b0abd7c3c5c5767b855a}\label{class_i_serial_aa7de5539ed01b0abd7c3c5c5767b855a}} 
+size\+\_\+t {\bfseries print} (unsigned char, int=D\+EC)
+\item 
+\mbox{\Hypertarget{class_i_serial_a6cbd12b7b47005ab0153066c34f28426}\label{class_i_serial_a6cbd12b7b47005ab0153066c34f28426}} 
+size\+\_\+t {\bfseries print} (int, int=D\+EC)
+\item 
+\mbox{\Hypertarget{class_i_serial_a86997b02021c420e2c1bd7fdd11b1e14}\label{class_i_serial_a86997b02021c420e2c1bd7fdd11b1e14}} 
+size\+\_\+t {\bfseries print} (unsigned int, int=D\+EC)
+\item 
+\mbox{\Hypertarget{class_i_serial_a8e5003afc67d7488af5c546f51c9222c}\label{class_i_serial_a8e5003afc67d7488af5c546f51c9222c}} 
+size\+\_\+t {\bfseries print} (long, int=D\+EC)
+\item 
+\mbox{\Hypertarget{class_i_serial_a466ab09bad9fbcb514ffef6528de5d7f}\label{class_i_serial_a466ab09bad9fbcb514ffef6528de5d7f}} 
+size\+\_\+t {\bfseries print} (unsigned long, int=D\+EC)
+\item 
+\mbox{\Hypertarget{class_i_serial_af66546833df21b2949b26e4771a9f9d6}\label{class_i_serial_af66546833df21b2949b26e4771a9f9d6}} 
+size\+\_\+t {\bfseries print} (double, int=2)
+\item 
+\mbox{\Hypertarget{class_i_serial_a54f478dbde6921d212fe5b2159f4ee93}\label{class_i_serial_a54f478dbde6921d212fe5b2159f4ee93}} 
+size\+\_\+t {\bfseries print} (const Printable \&)
+\item 
+\mbox{\Hypertarget{class_i_serial_a16eaec118c2c38db031cc0e9b641b203}\label{class_i_serial_a16eaec118c2c38db031cc0e9b641b203}} 
+size\+\_\+t {\bfseries println} (const \+\_\+\+\_\+\+Flash\+String\+Helper $\ast$)
+\item 
+\mbox{\Hypertarget{class_i_serial_a94f1c1b1e6a94ea418251c666b72eac5}\label{class_i_serial_a94f1c1b1e6a94ea418251c666b72eac5}} 
+size\+\_\+t {\bfseries println} (const String \&s)
+\item 
+\mbox{\Hypertarget{class_i_serial_a7a91c6fc4dd9e70b438a4ebc2c62b881}\label{class_i_serial_a7a91c6fc4dd9e70b438a4ebc2c62b881}} 
+size\+\_\+t {\bfseries println} (const char\mbox{[}$\,$\mbox{]})
+\item 
+\mbox{\Hypertarget{class_i_serial_a0ab1d33067885e6456ab61b3b51f07b4}\label{class_i_serial_a0ab1d33067885e6456ab61b3b51f07b4}} 
+size\+\_\+t {\bfseries println} (char)
+\item 
+\mbox{\Hypertarget{class_i_serial_a0b669c99851a4a36945bc7d9b26f1c15}\label{class_i_serial_a0b669c99851a4a36945bc7d9b26f1c15}} 
+size\+\_\+t {\bfseries println} (unsigned char, int=D\+EC)
+\item 
+\mbox{\Hypertarget{class_i_serial_ae96f7b598e2e9bdb5f8bf5b7feb56983}\label{class_i_serial_ae96f7b598e2e9bdb5f8bf5b7feb56983}} 
+size\+\_\+t {\bfseries println} (int, int=D\+EC)
+\item 
+\mbox{\Hypertarget{class_i_serial_a85f3dff9f42387e12be59049cb020a88}\label{class_i_serial_a85f3dff9f42387e12be59049cb020a88}} 
+size\+\_\+t {\bfseries println} (unsigned int, int=D\+EC)
+\item 
+\mbox{\Hypertarget{class_i_serial_aaa489fda4cc41dac95ed157105f08de6}\label{class_i_serial_aaa489fda4cc41dac95ed157105f08de6}} 
+size\+\_\+t {\bfseries println} (long, int=D\+EC)
+\item 
+\mbox{\Hypertarget{class_i_serial_ac46c8197c06b703bcb83ed3947492a4f}\label{class_i_serial_ac46c8197c06b703bcb83ed3947492a4f}} 
+size\+\_\+t {\bfseries println} (unsigned long, int=D\+EC)
+\item 
+\mbox{\Hypertarget{class_i_serial_a5e25366fa6386a413bb46dd4a62e1931}\label{class_i_serial_a5e25366fa6386a413bb46dd4a62e1931}} 
+size\+\_\+t {\bfseries println} (double, int=2)
+\item 
+\mbox{\Hypertarget{class_i_serial_a0607b2c508006f1e43d685404be50f23}\label{class_i_serial_a0607b2c508006f1e43d685404be50f23}} 
+size\+\_\+t {\bfseries println} (const Printable \&)
+\item 
+\mbox{\Hypertarget{class_i_serial_ab9bb40acf5dd420afed4ea80d7989a20}\label{class_i_serial_ab9bb40acf5dd420afed4ea80d7989a20}} 
+size\+\_\+t {\bfseries println} (void)
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_i_serial_a59b7807c08f8bdc4c8612fe02ee528c1}\label{class_i_serial_a59b7807c08f8bdc4c8612fe02ee528c1}} 
+\mbox{\hyperlink{class_module}{Module}} $\ast$ {\bfseries \+\_\+mod}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Interface class for Arduino Serial. Only calls the appropriate methods for the active U\+A\+RT interface. 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+Libraries/\+Radio\+Lib/src/I\+Serial.\+h\item 
+Libraries/\+Radio\+Lib/src/I\+Serial.\+cpp\end{DoxyCompactItemize}

@@ -1,0 +1,1066 @@
+\hypertarget{class_r_f69}{}\doxysection{R\+F69 Class Reference}
+\label{class_r_f69}\index{RF69@{RF69}}
+
+
+Control class for R\+F69 module. Also serves as base class for \mbox{\hyperlink{class_s_x1231}{S\+X1231}}.  
+
+
+
+
+{\ttfamily \#include $<$R\+F69.\+h$>$}
+
+Inheritance diagram for R\+F69\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{class_r_f69}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_r_f69_afbc84d4f91502bcbe12ddda2fde51448}{R\+F69}} (\mbox{\hyperlink{class_module}{Module}} $\ast$module)
+\begin{DoxyCompactList}\small\item\em Default constructor. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_a6016588aa7bf7b5a4a3aa38cd2081d0e}{begin}} (float freq=434.\+0, float br=48.\+0, float freq\+Dev=50.\+0, float rx\+Bw=125.\+0, int8\+\_\+t power=13)
+\begin{DoxyCompactList}\small\item\em Initialization method. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_r_f69_af953ee17aca5392f1e62ea4fe690550a}\label{class_r_f69_af953ee17aca5392f1e62ea4fe690550a}} 
+void \mbox{\hyperlink{class_r_f69_af953ee17aca5392f1e62ea4fe690550a}{reset}} ()
+\begin{DoxyCompactList}\small\item\em Reset method. Will reset the chip to the default state using R\+ST pin. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_a93205712f70bb6544c96e6730d5d12c5}{transmit}} (uint8\+\_\+t $\ast$data, size\+\_\+t len, uint8\+\_\+t addr=0)
+\begin{DoxyCompactList}\small\item\em Blocking binary transmit method. Overloads for string-\/based transmissions are implemented in \mbox{\hyperlink{class_physical_layer}{Physical\+Layer}}. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_abdad1415f0ad0046af0e95460ebf99cd}{receive}} (uint8\+\_\+t $\ast$data, size\+\_\+t len)
+\begin{DoxyCompactList}\small\item\em Blocking binary receive method. Overloads for string-\/based transmissions are implemented in \mbox{\hyperlink{class_physical_layer}{Physical\+Layer}}. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_a472a04041551cb38d2223fb34f71d8eb}{sleep}} ()
+\begin{DoxyCompactList}\small\item\em Sets the module to sleep mode. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_a8d47038b4143b5c775c4405e5a2654e9}{standby}} ()
+\begin{DoxyCompactList}\small\item\em Sets the module to standby mode. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_a8d5eefa01f3c8dcaab325b36b52364fe}{transmit\+Direct}} (uint32\+\_\+t frf=0)
+\begin{DoxyCompactList}\small\item\em Starts direct mode transmission. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_a43884d34ce2f9042fc94f93c89692ef2}{receive\+Direct}} ()
+\begin{DoxyCompactList}\small\item\em Starts direct mode reception. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_r_f69_a6a67dd698b3cc6afcaf18c3710ad5f0f}\label{class_r_f69_a6a67dd698b3cc6afcaf18c3710ad5f0f}} 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_a6a67dd698b3cc6afcaf18c3710ad5f0f}{packet\+Mode}} ()
+\begin{DoxyCompactList}\small\item\em Stops direct mode. It is required to call this method to switch from direct transmissions to packet-\/based transmissions. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_r_f69_abe5b378d7cc274fd8b75881e7d604bf3}{set\+A\+E\+S\+Key}} (uint8\+\_\+t $\ast$key)
+\begin{DoxyCompactList}\small\item\em Sets A\+ES key. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_a1fd4609f419d8b0213ee39b05dd40b69}{enable\+A\+ES}} ()
+\begin{DoxyCompactList}\small\item\em Enables A\+ES encryption. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_a15fafb6c24a8b5721623be447628bbaa}{disable\+A\+ES}} ()
+\begin{DoxyCompactList}\small\item\em Disables A\+ES encryption. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_r_f69_a9e50a1183d13ff9984f8438a7e9e4a77}{set\+Dio0\+Action}} (void($\ast$func)(void))
+\begin{DoxyCompactList}\small\item\em Sets interrupt service routine to call when D\+I\+O0 activates. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_r_f69_a9721d2a3ed9fa8dd878575d71d5a4942}\label{class_r_f69_a9721d2a3ed9fa8dd878575d71d5a4942}} 
+void \mbox{\hyperlink{class_r_f69_a9721d2a3ed9fa8dd878575d71d5a4942}{clear\+Dio0\+Action}} ()
+\begin{DoxyCompactList}\small\item\em Clears interrupt service routine to call when D\+I\+O0 activates. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_r_f69_aa72ad2ac5238bd87886684064b7494cf}{set\+Dio1\+Action}} (void($\ast$func)(void))
+\begin{DoxyCompactList}\small\item\em Sets interrupt service routine to call when D\+I\+O1 activates. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_r_f69_ade1f9a7a603d712c480ed5e9a8d1bf51}\label{class_r_f69_ade1f9a7a603d712c480ed5e9a8d1bf51}} 
+void \mbox{\hyperlink{class_r_f69_ade1f9a7a603d712c480ed5e9a8d1bf51}{clear\+Dio1\+Action}} ()
+\begin{DoxyCompactList}\small\item\em Clears interrupt service routine to call when D\+I\+O1 activates. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_a734b946b18f33ab4afa34398d4615425}{start\+Transmit}} (uint8\+\_\+t $\ast$data, size\+\_\+t len, uint8\+\_\+t addr=0)
+\begin{DoxyCompactList}\small\item\em Interrupt-\/driven binary transmit method. Overloads for string-\/based transmissions are implemented in \mbox{\hyperlink{class_physical_layer}{Physical\+Layer}}. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_afae38fa64242043de34096bf497725f1}{start\+Receive}} ()
+\begin{DoxyCompactList}\small\item\em Interrupt-\/driven receive method. G\+D\+O0 will be activated when full packet is received. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_a46a48364090194ef2a5d2989fd168897}{read\+Data}} (uint8\+\_\+t $\ast$data, size\+\_\+t len)
+\begin{DoxyCompactList}\small\item\em Reads data received after calling start\+Receive method. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_ab467f0fc318e651d0cdfbc0399d4c34b}{set\+Frequency}} (float freq)
+\begin{DoxyCompactList}\small\item\em Sets carrier frequency. Allowed values are in bands 290.\+0 to 340.\+0 M\+Hz, 431.\+0 to 510.\+0 M\+Hz and 862.\+0 to 1020.\+0 M\+Hz. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_ad7f8132912a5dbf38c5cf676ac167d13}{set\+Bit\+Rate}} (float br)
+\begin{DoxyCompactList}\small\item\em Sets bit rate. Allowed values range from 1.\+2 to 300.\+0 kbps. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_a735d8f22095a7e69471d73ca021b9d1a}{set\+Rx\+Bandwidth}} (float rx\+Bw)
+\begin{DoxyCompactList}\small\item\em Sets receiver bandwidth. Allowed values are 2.\+6, 3.\+1, 3.\+9, 5.\+2, 6.\+3, 7.\+8, 10.\+4, 12.\+5, 15.\+6, 20.\+8, 25.\+0, 31.\+3, 41.\+7, 50.\+0, 62.\+5, 83.\+3, 100.\+0, 125.\+0, 166.\+7, 200.\+0, 250.\+0, 333.\+3, 400.\+0 and 500.\+0 k\+Hz. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_ae00506a8031c3893f96407f97ac438fe}{set\+Frequency\+Deviation}} (float freq\+Dev)
+\begin{DoxyCompactList}\small\item\em Sets frequency deviation. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_a5244d436da6a7a86f3a8303b55dba30c}{set\+Output\+Power}} (int8\+\_\+t power)
+\begin{DoxyCompactList}\small\item\em Sets output power. Allowed values are -\/30, -\/20, -\/15, -\/10, 0, 5, 7 or 10 d\+Bm. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_a26667d50ec845c28e17236c69c886561}{set\+Sync\+Word}} (uint8\+\_\+t $\ast$sync\+Word, size\+\_\+t len, uint8\+\_\+t max\+Err\+Bits=0)
+\begin{DoxyCompactList}\small\item\em Sets sync word. Up to 8 bytes can be set as sync word. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_ab9c217d5ece259950780a05c6e41f75c}{set\+Node\+Address}} (uint8\+\_\+t node\+Addr)
+\begin{DoxyCompactList}\small\item\em Sets node address. Calling this method will also enable address filtering for node address only. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_a1b7598b87ffaabdbe733c47317fa91d8}{set\+Broadcast\+Address}} (uint8\+\_\+t broad\+Addr)
+\begin{DoxyCompactList}\small\item\em Sets broadcast address. Calling this method will also enable address filtering for node and broadcast address. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_a5996fc1751e7542baafa0d6c0a6c78ee}{disable\+Address\+Filtering}} ()
+\begin{DoxyCompactList}\small\item\em Disables address filtering. Calling this method will also erase previously set addresses. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_r_f69_ac37d9ddee2adcc8876a182b8ebc3e703}{set\+Ambient\+Temperature}} (int16\+\_\+t temp\+Ambient)
+\begin{DoxyCompactList}\small\item\em Sets ambient temperature. Required to correct values from on-\/board temperature sensor. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_a0526ce6ea3722fd258f96d9677a60853}{get\+Temperature}} ()
+\begin{DoxyCompactList}\small\item\em Measures temperature. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{class_r_f69_a40c08bdfc0e105dfcb870258f2a7cb34}{get\+Packet\+Length}} (bool update=true)
+\begin{DoxyCompactList}\small\item\em Query modem for the packet length of received payload. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_a4c9dcbd7e44bc5e46d9f10ae276a0c5f}{fixed\+Packet\+Length\+Mode}} (uint8\+\_\+t len=R\+F69\+\_\+\+M\+A\+X\+\_\+\+P\+A\+C\+K\+E\+T\+\_\+\+L\+E\+N\+G\+TH)
+\begin{DoxyCompactList}\small\item\em Set modem in fixed packet length mode. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_af62ebde1ea34a394b9781a21ae348c39}{variable\+Packet\+Length\+Mode}} (uint8\+\_\+t max\+Len=R\+F69\+\_\+\+M\+A\+X\+\_\+\+P\+A\+C\+K\+E\+T\+\_\+\+L\+E\+N\+G\+TH)
+\begin{DoxyCompactList}\small\item\em Set modem in variable packet length mode. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_a643a711bcb4b7771a7ab1f457e61a417}{enable\+Sync\+Word\+Filtering}} (uint8\+\_\+t max\+Err\+Bits=0)
+\begin{DoxyCompactList}\small\item\em Enable sync word filtering and generation. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_a400bb57d2353b57c29cf41a6d9497c80}{disable\+Sync\+Word\+Filtering}} ()
+\begin{DoxyCompactList}\small\item\em Disable preamble and sync word filtering and generation. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_ac205bc487833dc4eae4bb0069c0c4d1e}{set\+Crc\+Filtering}} (bool crc\+On=true)
+\begin{DoxyCompactList}\small\item\em Enable C\+RC filtering and generation. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_a6d90ad1d455de045c53c5758babd876c}{set\+Promiscuous\+Mode}} (bool promiscuous=true)
+\begin{DoxyCompactList}\small\item\em Set modem in \char`\"{}sniff\char`\"{} mode\+: no packet filtering (e.\+g., no preamble, sync word, address, C\+RC). \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_a1ace73dfbcc95767a0d92fbb7a68e66c}{set\+Data\+Shaping}} (float sh)
+\begin{DoxyCompactList}\small\item\em Sets Gaussian filter bandwidth-\/time product that will be used for data shaping. Allowed values are 0.\+3, 0.\+5 or 1.\+0. Set to 0 to disable data shaping. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_a15d4df5f1b4f38733038c3ae5a2e58fa}{set\+Encoding}} (uint8\+\_\+t encoding)
+\begin{DoxyCompactList}\small\item\em Sets transmission encoding. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_ab139a34e03a6fd5a781cd54da21d308f}{transmit}} (\+\_\+\+\_\+\+Flash\+String\+Helper $\ast$fstr, uint8\+\_\+t addr=0)
+\begin{DoxyCompactList}\small\item\em Arduino Flash String transmit method. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_aeb62c5a521aafc1e0525c58e9364482b}{transmit}} (String \&str, uint8\+\_\+t addr=0)
+\begin{DoxyCompactList}\small\item\em Arduino String transmit method. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_a492b2d057dd803c3884fa1adc8e22534}{transmit}} (const char $\ast$str, uint8\+\_\+t addr=0)
+\begin{DoxyCompactList}\small\item\em C-\/string transmit method. \end{DoxyCompactList}\item 
+virtual int16\+\_\+t \mbox{\hyperlink{class_r_f69_af81565ee82ef9a7de9c5663c745f4ef7}{transmit}} (uint8\+\_\+t $\ast$data, size\+\_\+t len, uint8\+\_\+t addr=0)=0
+\begin{DoxyCompactList}\small\item\em Binary transmit method. Must be implemented in module class. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_afb1b090348d9091bfa3a0b5ba3d85b36}{receive}} (String \&str, size\+\_\+t len=0)
+\begin{DoxyCompactList}\small\item\em Arduino String receive method. \end{DoxyCompactList}\item 
+virtual int16\+\_\+t \mbox{\hyperlink{class_r_f69_a2ad4c6a8ac267f8ac590260414ffcda3}{receive}} (uint8\+\_\+t $\ast$data, size\+\_\+t len)=0
+\begin{DoxyCompactList}\small\item\em Binary receive method. Must be implemented in module class. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_af068e6e862c99e39d0261a7971dd56db}{start\+Transmit}} (String \&str, uint8\+\_\+t addr=0)
+\begin{DoxyCompactList}\small\item\em Interrupt-\/driven Arduino String transmit method. Unlike the standard transmit method, this one is non-\/blocking. Interrupt pin will be activated when transmission finishes. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_a923654706eff5118ef6e84214e837f27}{start\+Transmit}} (const char $\ast$str, uint8\+\_\+t addr=0)
+\begin{DoxyCompactList}\small\item\em Interrupt-\/driven Arduino String transmit method. Unlike the standard transmit method, this one is non-\/blocking. Interrupt pin will be activated when transmission finishes. \end{DoxyCompactList}\item 
+virtual int16\+\_\+t \mbox{\hyperlink{class_r_f69_a41a1de0ebffe7b65de6fd8cceb9a5123}{start\+Transmit}} (uint8\+\_\+t $\ast$data, size\+\_\+t len, uint8\+\_\+t addr=0)=0
+\begin{DoxyCompactList}\small\item\em Interrupt-\/driven binary transmit method. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_f69_ae8eed0e888a7c8742e89d2b850977de2}{read\+Data}} (String \&str, size\+\_\+t len=0)
+\begin{DoxyCompactList}\small\item\em Reads data that was received after calling start\+Receive method. \end{DoxyCompactList}\item 
+virtual int16\+\_\+t \mbox{\hyperlink{class_r_f69_ae8b6c756eb4b92855433ca389d73c632}{read\+Data}} (uint8\+\_\+t $\ast$data, size\+\_\+t len)=0
+\begin{DoxyCompactList}\small\item\em Reads data that was received after calling start\+Receive method. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_r_f69_a7760fe8d62f33dd9d1f30acf648dc839}\label{class_r_f69_a7760fe8d62f33dd9d1f30acf648dc839}} 
+float \mbox{\hyperlink{class_r_f69_a7760fe8d62f33dd9d1f30acf648dc839}{last\+Packet\+R\+S\+SI}}
+\begin{DoxyCompactList}\small\item\em R\+S\+SI value of the last received packet. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_r_f69_a95efa13de23e33fb322963b7de7212c9}\label{class_r_f69_a95efa13de23e33fb322963b7de7212c9}} 
+int16\+\_\+t {\bfseries config} ()
+\item 
+\mbox{\Hypertarget{class_r_f69_a50c6bfeefdb83f5c75743fd68840a760}\label{class_r_f69_a50c6bfeefdb83f5c75743fd68840a760}} 
+int16\+\_\+t {\bfseries direct\+Mode} ()
+\item 
+\mbox{\Hypertarget{class_r_f69_ad1511b548aff8081aa5c639f686278f3}\label{class_r_f69_ad1511b548aff8081aa5c639f686278f3}} 
+int16\+\_\+t {\bfseries set\+Packet\+Mode} (uint8\+\_\+t mode, uint8\+\_\+t len)
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_r_f69_a78c5f2dd6e74e3918b66b2d5442800d2}\label{class_r_f69_a78c5f2dd6e74e3918b66b2d5442800d2}} 
+\mbox{\hyperlink{class_module}{Module}} $\ast$ {\bfseries \+\_\+mod}
+\item 
+\mbox{\Hypertarget{class_r_f69_aa04368534cfc3f3f944fc816201fec04}\label{class_r_f69_aa04368534cfc3f3f944fc816201fec04}} 
+float {\bfseries \+\_\+br}
+\item 
+\mbox{\Hypertarget{class_r_f69_af7d45c569dc1465d3b22db3005db8010}\label{class_r_f69_af7d45c569dc1465d3b22db3005db8010}} 
+float {\bfseries \+\_\+rx\+Bw}
+\item 
+\mbox{\Hypertarget{class_r_f69_a8a9e2a67be922146a5d15e2a5697c07f}\label{class_r_f69_a8a9e2a67be922146a5d15e2a5697c07f}} 
+int16\+\_\+t {\bfseries \+\_\+temp\+Offset}
+\item 
+\mbox{\Hypertarget{class_r_f69_acab41f96f2a980f804f154f0be0d1c22}\label{class_r_f69_acab41f96f2a980f804f154f0be0d1c22}} 
+size\+\_\+t {\bfseries \+\_\+packet\+Length}
+\item 
+\mbox{\Hypertarget{class_r_f69_aa5af65c14a2e332ba798fdd96d160c0c}\label{class_r_f69_aa5af65c14a2e332ba798fdd96d160c0c}} 
+bool {\bfseries \+\_\+packet\+Length\+Queried}
+\item 
+\mbox{\Hypertarget{class_r_f69_aa7926191e730f7d954b85684ae0ae162}\label{class_r_f69_aa7926191e730f7d954b85684ae0ae162}} 
+uint8\+\_\+t {\bfseries \+\_\+packet\+Length\+Config}
+\item 
+\mbox{\Hypertarget{class_r_f69_a743acafb694af1cf41933c84b7c091c6}\label{class_r_f69_a743acafb694af1cf41933c84b7c091c6}} 
+bool {\bfseries \+\_\+promiscuous}
+\item 
+\mbox{\Hypertarget{class_r_f69_a1cd3ecd06cbb115fe1122c13f9f444a6}\label{class_r_f69_a1cd3ecd06cbb115fe1122c13f9f444a6}} 
+uint8\+\_\+t {\bfseries \+\_\+sync\+Word\+Length}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Control class for R\+F69 module. Also serves as base class for \mbox{\hyperlink{class_s_x1231}{S\+X1231}}. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{class_r_f69_afbc84d4f91502bcbe12ddda2fde51448}\label{class_r_f69_afbc84d4f91502bcbe12ddda2fde51448}} 
+\index{RF69@{RF69}!RF69@{RF69}}
+\index{RF69@{RF69}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{RF69()}{RF69()}}
+{\footnotesize\ttfamily R\+F69\+::\+R\+F69 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_module}{Module}} $\ast$}]{module }\end{DoxyParamCaption})}
+
+
+
+Default constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em mod} & Instance of \mbox{\hyperlink{class_module}{Module}} that will be used to communicate with the radio. \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_r_f69_a6016588aa7bf7b5a4a3aa38cd2081d0e}\label{class_r_f69_a6016588aa7bf7b5a4a3aa38cd2081d0e}} 
+\index{RF69@{RF69}!begin@{begin}}
+\index{begin@{begin}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{begin()}{begin()}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::begin (\begin{DoxyParamCaption}\item[{float}]{freq = {\ttfamily 434.0},  }\item[{float}]{br = {\ttfamily 48.0},  }\item[{float}]{freq\+Dev = {\ttfamily 50.0},  }\item[{float}]{rx\+Bw = {\ttfamily 125.0},  }\item[{int8\+\_\+t}]{power = {\ttfamily 13} }\end{DoxyParamCaption})}
+
+
+
+Initialization method. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em freq} & Carrier frequency in M\+Hz. Defaults to 434.\+0 M\+Hz.\\
+\hline
+{\em br} & Bit rate to be used in kbps. Defaults to 48.\+0 kbps.\\
+\hline
+{\em freq\+Dev} & Frequency deviation from carrier frequency in k\+Hz Defaults to 50.\+0 k\+Hz.\\
+\hline
+{\em rx\+Bw} & Receiver bandwidth in k\+Hz. Defaults to 125.\+0 k\+Hz.\\
+\hline
+{\em power} & Output power in d\+Bm. Defaults to 13 d\+Bm.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_a5996fc1751e7542baafa0d6c0a6c78ee}\label{class_r_f69_a5996fc1751e7542baafa0d6c0a6c78ee}} 
+\index{RF69@{RF69}!disableAddressFiltering@{disableAddressFiltering}}
+\index{disableAddressFiltering@{disableAddressFiltering}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{disableAddressFiltering()}{disableAddressFiltering()}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::disable\+Address\+Filtering (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Disables address filtering. Calling this method will also erase previously set addresses. 
+
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_a15fafb6c24a8b5721623be447628bbaa}\label{class_r_f69_a15fafb6c24a8b5721623be447628bbaa}} 
+\index{RF69@{RF69}!disableAES@{disableAES}}
+\index{disableAES@{disableAES}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{disableAES()}{disableAES()}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::disable\+A\+ES (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Disables A\+ES encryption. 
+
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_a400bb57d2353b57c29cf41a6d9497c80}\label{class_r_f69_a400bb57d2353b57c29cf41a6d9497c80}} 
+\index{RF69@{RF69}!disableSyncWordFiltering@{disableSyncWordFiltering}}
+\index{disableSyncWordFiltering@{disableSyncWordFiltering}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{disableSyncWordFiltering()}{disableSyncWordFiltering()}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::disable\+Sync\+Word\+Filtering (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Disable preamble and sync word filtering and generation. 
+
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_a1fd4609f419d8b0213ee39b05dd40b69}\label{class_r_f69_a1fd4609f419d8b0213ee39b05dd40b69}} 
+\index{RF69@{RF69}!enableAES@{enableAES}}
+\index{enableAES@{enableAES}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{enableAES()}{enableAES()}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::enable\+A\+ES (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Enables A\+ES encryption. 
+
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_a643a711bcb4b7771a7ab1f457e61a417}\label{class_r_f69_a643a711bcb4b7771a7ab1f457e61a417}} 
+\index{RF69@{RF69}!enableSyncWordFiltering@{enableSyncWordFiltering}}
+\index{enableSyncWordFiltering@{enableSyncWordFiltering}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{enableSyncWordFiltering()}{enableSyncWordFiltering()}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::enable\+Sync\+Word\+Filtering (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{max\+Err\+Bits = {\ttfamily 0} }\end{DoxyParamCaption})}
+
+
+
+Enable sync word filtering and generation. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em num\+Bits} & Sync word length in bits.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_a4c9dcbd7e44bc5e46d9f10ae276a0c5f}\label{class_r_f69_a4c9dcbd7e44bc5e46d9f10ae276a0c5f}} 
+\index{RF69@{RF69}!fixedPacketLengthMode@{fixedPacketLengthMode}}
+\index{fixedPacketLengthMode@{fixedPacketLengthMode}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{fixedPacketLengthMode()}{fixedPacketLengthMode()}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::fixed\+Packet\+Length\+Mode (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{len = {\ttfamily RF69\+\_\+MAX\+\_\+PACKET\+\_\+LENGTH} }\end{DoxyParamCaption})}
+
+
+
+Set modem in fixed packet length mode. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em len} & \mbox{\hyperlink{struct_packet}{Packet}} length.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_a40c08bdfc0e105dfcb870258f2a7cb34}\label{class_r_f69_a40c08bdfc0e105dfcb870258f2a7cb34}} 
+\index{RF69@{RF69}!getPacketLength@{getPacketLength}}
+\index{getPacketLength@{getPacketLength}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{getPacketLength()}{getPacketLength()}}
+{\footnotesize\ttfamily size\+\_\+t R\+F69\+::get\+Packet\+Length (\begin{DoxyParamCaption}\item[{bool}]{update = {\ttfamily true} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Query modem for the packet length of received payload. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em update} & Update received packet length. Will return cached value when set to false.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Length of last received packet in bytes. 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{class_physical_layer_a0bd6046e068ef63e3f2b6bead48e02a7}{Physical\+Layer}}.
+
+\mbox{\Hypertarget{class_r_f69_a0526ce6ea3722fd258f96d9677a60853}\label{class_r_f69_a0526ce6ea3722fd258f96d9677a60853}} 
+\index{RF69@{RF69}!getTemperature@{getTemperature}}
+\index{getTemperature@{getTemperature}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{getTemperature()}{getTemperature()}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::get\+Temperature (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Measures temperature. 
+
+\begin{DoxyReturn}{Returns}
+Measured temperature in degrees Celsius. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_ae8eed0e888a7c8742e89d2b850977de2}\label{class_r_f69_ae8eed0e888a7c8742e89d2b850977de2}} 
+\index{RF69@{RF69}!readData@{readData}}
+\index{readData@{readData}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{readData()}{readData()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily int16\+\_\+t Physical\+Layer\+::read\+Data}
+
+
+
+Reads data that was received after calling start\+Receive method. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em str} & Address of Arduino String to save the received data.\\
+\hline
+{\em len} & Expected number of characters in the message.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_a46a48364090194ef2a5d2989fd168897}\label{class_r_f69_a46a48364090194ef2a5d2989fd168897}} 
+\index{RF69@{RF69}!readData@{readData}}
+\index{readData@{readData}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{readData()}{readData()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::read\+Data (\begin{DoxyParamCaption}\item[{uint8\+\_\+t $\ast$}]{data,  }\item[{size\+\_\+t}]{len }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Reads data received after calling start\+Receive method. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & Pointer to array to save the received binary data.\\
+\hline
+{\em len} & Number of bytes that will be received. Must be known in advance for binary transmissions.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{class_physical_layer_ae8b6c756eb4b92855433ca389d73c632}{Physical\+Layer}}.
+
+\mbox{\Hypertarget{class_r_f69_ae8b6c756eb4b92855433ca389d73c632}\label{class_r_f69_ae8b6c756eb4b92855433ca389d73c632}} 
+\index{RF69@{RF69}!readData@{readData}}
+\index{readData@{readData}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{readData()}{readData()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily virtual int16\+\_\+t Physical\+Layer\+::read\+Data}
+
+
+
+Reads data that was received after calling start\+Receive method. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & Pointer to array to save the received binary data.\\
+\hline
+{\em len} & Number of bytes that will be received. Must be known in advance for binary transmissions.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_afb1b090348d9091bfa3a0b5ba3d85b36}\label{class_r_f69_afb1b090348d9091bfa3a0b5ba3d85b36}} 
+\index{RF69@{RF69}!receive@{receive}}
+\index{receive@{receive}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{receive()}{receive()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily int16\+\_\+t Physical\+Layer\+::receive}
+
+
+
+Arduino String receive method. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em str} & Address of Arduino String to save the received data.\\
+\hline
+{\em len} & Expected number of characters in the message. Leave as 0 if expecting a unknown size packet\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_abdad1415f0ad0046af0e95460ebf99cd}\label{class_r_f69_abdad1415f0ad0046af0e95460ebf99cd}} 
+\index{RF69@{RF69}!receive@{receive}}
+\index{receive@{receive}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{receive()}{receive()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::receive (\begin{DoxyParamCaption}\item[{uint8\+\_\+t $\ast$}]{data,  }\item[{size\+\_\+t}]{len }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Blocking binary receive method. Overloads for string-\/based transmissions are implemented in \mbox{\hyperlink{class_physical_layer}{Physical\+Layer}}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & Binary data to be sent.\\
+\hline
+{\em len} & Number of bytes to send.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{class_physical_layer_a2ad4c6a8ac267f8ac590260414ffcda3}{Physical\+Layer}}.
+
+\mbox{\Hypertarget{class_r_f69_a2ad4c6a8ac267f8ac590260414ffcda3}\label{class_r_f69_a2ad4c6a8ac267f8ac590260414ffcda3}} 
+\index{RF69@{RF69}!receive@{receive}}
+\index{receive@{receive}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{receive()}{receive()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily virtual int16\+\_\+t Physical\+Layer\+::receive}
+
+
+
+Binary receive method. Must be implemented in module class. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & Pointer to array to save the received binary data.\\
+\hline
+{\em len} & Number of bytes that will be received. Must be known in advance for binary transmissions.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_a43884d34ce2f9042fc94f93c89692ef2}\label{class_r_f69_a43884d34ce2f9042fc94f93c89692ef2}} 
+\index{RF69@{RF69}!receiveDirect@{receiveDirect}}
+\index{receiveDirect@{receiveDirect}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{receiveDirect()}{receiveDirect()}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::receive\+Direct (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Starts direct mode reception. 
+
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{class_physical_layer_a46b22145b33e97cf6065ed826799b6b4}{Physical\+Layer}}.
+
+\mbox{\Hypertarget{class_r_f69_abe5b378d7cc274fd8b75881e7d604bf3}\label{class_r_f69_abe5b378d7cc274fd8b75881e7d604bf3}} 
+\index{RF69@{RF69}!setAESKey@{setAESKey}}
+\index{setAESKey@{setAESKey}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{setAESKey()}{setAESKey()}}
+{\footnotesize\ttfamily void R\+F69\+::set\+A\+E\+S\+Key (\begin{DoxyParamCaption}\item[{uint8\+\_\+t $\ast$}]{key }\end{DoxyParamCaption})}
+
+
+
+Sets A\+ES key. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em Key} & to be used for A\+ES encryption. Must be exactly 16 bytes long. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_r_f69_ac37d9ddee2adcc8876a182b8ebc3e703}\label{class_r_f69_ac37d9ddee2adcc8876a182b8ebc3e703}} 
+\index{RF69@{RF69}!setAmbientTemperature@{setAmbientTemperature}}
+\index{setAmbientTemperature@{setAmbientTemperature}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{setAmbientTemperature()}{setAmbientTemperature()}}
+{\footnotesize\ttfamily void R\+F69\+::set\+Ambient\+Temperature (\begin{DoxyParamCaption}\item[{int16\+\_\+t}]{temp\+Ambient }\end{DoxyParamCaption})}
+
+
+
+Sets ambient temperature. Required to correct values from on-\/board temperature sensor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em temp\+Ambient} & Ambient temperature in degrees Celsius. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_r_f69_ad7f8132912a5dbf38c5cf676ac167d13}\label{class_r_f69_ad7f8132912a5dbf38c5cf676ac167d13}} 
+\index{RF69@{RF69}!setBitRate@{setBitRate}}
+\index{setBitRate@{setBitRate}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{setBitRate()}{setBitRate()}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::set\+Bit\+Rate (\begin{DoxyParamCaption}\item[{float}]{br }\end{DoxyParamCaption})}
+
+
+
+Sets bit rate. Allowed values range from 1.\+2 to 300.\+0 kbps. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em br} & Bit rate to be set in kbps.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_a1b7598b87ffaabdbe733c47317fa91d8}\label{class_r_f69_a1b7598b87ffaabdbe733c47317fa91d8}} 
+\index{RF69@{RF69}!setBroadcastAddress@{setBroadcastAddress}}
+\index{setBroadcastAddress@{setBroadcastAddress}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{setBroadcastAddress()}{setBroadcastAddress()}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::set\+Broadcast\+Address (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{broad\+Addr }\end{DoxyParamCaption})}
+
+
+
+Sets broadcast address. Calling this method will also enable address filtering for node and broadcast address. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em broad\+Addr} & Node address to be set.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_ac205bc487833dc4eae4bb0069c0c4d1e}\label{class_r_f69_ac205bc487833dc4eae4bb0069c0c4d1e}} 
+\index{RF69@{RF69}!setCrcFiltering@{setCrcFiltering}}
+\index{setCrcFiltering@{setCrcFiltering}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{setCrcFiltering()}{setCrcFiltering()}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::set\+Crc\+Filtering (\begin{DoxyParamCaption}\item[{bool}]{crc\+On = {\ttfamily true} }\end{DoxyParamCaption})}
+
+
+
+Enable C\+RC filtering and generation. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em crc\+On} & Set or unset promiscuous mode.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_a1ace73dfbcc95767a0d92fbb7a68e66c}\label{class_r_f69_a1ace73dfbcc95767a0d92fbb7a68e66c}} 
+\index{RF69@{RF69}!setDataShaping@{setDataShaping}}
+\index{setDataShaping@{setDataShaping}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{setDataShaping()}{setDataShaping()}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::set\+Data\+Shaping (\begin{DoxyParamCaption}\item[{float}]{sh }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Sets Gaussian filter bandwidth-\/time product that will be used for data shaping. Allowed values are 0.\+3, 0.\+5 or 1.\+0. Set to 0 to disable data shaping. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sh} & Gaussian shaping bandwidth-\/time product that will be used for data shaping\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{class_physical_layer_a24758d0300b46aa4fcaed86f5a621191}{Physical\+Layer}}.
+
+\mbox{\Hypertarget{class_r_f69_a9e50a1183d13ff9984f8438a7e9e4a77}\label{class_r_f69_a9e50a1183d13ff9984f8438a7e9e4a77}} 
+\index{RF69@{RF69}!setDio0Action@{setDio0Action}}
+\index{setDio0Action@{setDio0Action}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{setDio0Action()}{setDio0Action()}}
+{\footnotesize\ttfamily void R\+F69\+::set\+Dio0\+Action (\begin{DoxyParamCaption}\item[{void($\ast$)(void)}]{func }\end{DoxyParamCaption})}
+
+
+
+Sets interrupt service routine to call when D\+I\+O0 activates. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em func} & I\+SR to call. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_r_f69_aa72ad2ac5238bd87886684064b7494cf}\label{class_r_f69_aa72ad2ac5238bd87886684064b7494cf}} 
+\index{RF69@{RF69}!setDio1Action@{setDio1Action}}
+\index{setDio1Action@{setDio1Action}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{setDio1Action()}{setDio1Action()}}
+{\footnotesize\ttfamily void R\+F69\+::set\+Dio1\+Action (\begin{DoxyParamCaption}\item[{void($\ast$)(void)}]{func }\end{DoxyParamCaption})}
+
+
+
+Sets interrupt service routine to call when D\+I\+O1 activates. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em func} & I\+SR to call. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_r_f69_a15d4df5f1b4f38733038c3ae5a2e58fa}\label{class_r_f69_a15d4df5f1b4f38733038c3ae5a2e58fa}} 
+\index{RF69@{RF69}!setEncoding@{setEncoding}}
+\index{setEncoding@{setEncoding}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{setEncoding()}{setEncoding()}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::set\+Encoding (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{encoding }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Sets transmission encoding. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em encoding} & Encoding to be used. Set to 0 for N\+RZ, 1 for Manchester and 2 for whitening.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{class_physical_layer_a7d3419227d201d6912b77784636d437d}{Physical\+Layer}}.
+
+\mbox{\Hypertarget{class_r_f69_ab467f0fc318e651d0cdfbc0399d4c34b}\label{class_r_f69_ab467f0fc318e651d0cdfbc0399d4c34b}} 
+\index{RF69@{RF69}!setFrequency@{setFrequency}}
+\index{setFrequency@{setFrequency}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{setFrequency()}{setFrequency()}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::set\+Frequency (\begin{DoxyParamCaption}\item[{float}]{freq }\end{DoxyParamCaption})}
+
+
+
+Sets carrier frequency. Allowed values are in bands 290.\+0 to 340.\+0 M\+Hz, 431.\+0 to 510.\+0 M\+Hz and 862.\+0 to 1020.\+0 M\+Hz. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em freq} & Carrier frequency to be set in M\+Hz.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_ae00506a8031c3893f96407f97ac438fe}\label{class_r_f69_ae00506a8031c3893f96407f97ac438fe}} 
+\index{RF69@{RF69}!setFrequencyDeviation@{setFrequencyDeviation}}
+\index{setFrequencyDeviation@{setFrequencyDeviation}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{setFrequencyDeviation()}{setFrequencyDeviation()}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::set\+Frequency\+Deviation (\begin{DoxyParamCaption}\item[{float}]{freq\+Dev }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Sets frequency deviation. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em freq\+Dev} & Frequency deviation to be set in k\+Hz.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{class_physical_layer_ab9060e8ab7a2da192b3bf53b3501553b}{Physical\+Layer}}.
+
+\mbox{\Hypertarget{class_r_f69_ab9c217d5ece259950780a05c6e41f75c}\label{class_r_f69_ab9c217d5ece259950780a05c6e41f75c}} 
+\index{RF69@{RF69}!setNodeAddress@{setNodeAddress}}
+\index{setNodeAddress@{setNodeAddress}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{setNodeAddress()}{setNodeAddress()}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::set\+Node\+Address (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{node\+Addr }\end{DoxyParamCaption})}
+
+
+
+Sets node address. Calling this method will also enable address filtering for node address only. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em node\+Addr} & Node address to be set.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_a5244d436da6a7a86f3a8303b55dba30c}\label{class_r_f69_a5244d436da6a7a86f3a8303b55dba30c}} 
+\index{RF69@{RF69}!setOutputPower@{setOutputPower}}
+\index{setOutputPower@{setOutputPower}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{setOutputPower()}{setOutputPower()}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::set\+Output\+Power (\begin{DoxyParamCaption}\item[{int8\+\_\+t}]{power }\end{DoxyParamCaption})}
+
+
+
+Sets output power. Allowed values are -\/30, -\/20, -\/15, -\/10, 0, 5, 7 or 10 d\+Bm. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em power} & Output power to be set in d\+Bm.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_a6d90ad1d455de045c53c5758babd876c}\label{class_r_f69_a6d90ad1d455de045c53c5758babd876c}} 
+\index{RF69@{RF69}!setPromiscuousMode@{setPromiscuousMode}}
+\index{setPromiscuousMode@{setPromiscuousMode}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{setPromiscuousMode()}{setPromiscuousMode()}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::set\+Promiscuous\+Mode (\begin{DoxyParamCaption}\item[{bool}]{promiscuous = {\ttfamily true} }\end{DoxyParamCaption})}
+
+
+
+Set modem in \char`\"{}sniff\char`\"{} mode\+: no packet filtering (e.\+g., no preamble, sync word, address, C\+RC). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em promiscuous} & Set or unset promiscuous mode.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_a735d8f22095a7e69471d73ca021b9d1a}\label{class_r_f69_a735d8f22095a7e69471d73ca021b9d1a}} 
+\index{RF69@{RF69}!setRxBandwidth@{setRxBandwidth}}
+\index{setRxBandwidth@{setRxBandwidth}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{setRxBandwidth()}{setRxBandwidth()}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::set\+Rx\+Bandwidth (\begin{DoxyParamCaption}\item[{float}]{rx\+Bw }\end{DoxyParamCaption})}
+
+
+
+Sets receiver bandwidth. Allowed values are 2.\+6, 3.\+1, 3.\+9, 5.\+2, 6.\+3, 7.\+8, 10.\+4, 12.\+5, 15.\+6, 20.\+8, 25.\+0, 31.\+3, 41.\+7, 50.\+0, 62.\+5, 83.\+3, 100.\+0, 125.\+0, 166.\+7, 200.\+0, 250.\+0, 333.\+3, 400.\+0 and 500.\+0 k\+Hz. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em rx\+Bw} & Receiver bandwidth to be set in k\+Hz.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_a26667d50ec845c28e17236c69c886561}\label{class_r_f69_a26667d50ec845c28e17236c69c886561}} 
+\index{RF69@{RF69}!setSyncWord@{setSyncWord}}
+\index{setSyncWord@{setSyncWord}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{setSyncWord()}{setSyncWord()}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::set\+Sync\+Word (\begin{DoxyParamCaption}\item[{uint8\+\_\+t $\ast$}]{sync\+Word,  }\item[{size\+\_\+t}]{len,  }\item[{uint8\+\_\+t}]{max\+Err\+Bits = {\ttfamily 0} }\end{DoxyParamCaption})}
+
+
+
+Sets sync word. Up to 8 bytes can be set as sync word. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sync\+Word} & Pointer to the array of sync word bytes.\\
+\hline
+{\em len} & Sync word length in bytes.\\
+\hline
+{\em max\+Err\+Bits} & Maximum allowed number of bit errors in received sync word. Defaults to 0. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_r_f69_a472a04041551cb38d2223fb34f71d8eb}\label{class_r_f69_a472a04041551cb38d2223fb34f71d8eb}} 
+\index{RF69@{RF69}!sleep@{sleep}}
+\index{sleep@{sleep}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{sleep()}{sleep()}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::sleep (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Sets the module to sleep mode. 
+
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_a8d47038b4143b5c775c4405e5a2654e9}\label{class_r_f69_a8d47038b4143b5c775c4405e5a2654e9}} 
+\index{RF69@{RF69}!standby@{standby}}
+\index{standby@{standby}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{standby()}{standby()}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::standby (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Sets the module to standby mode. 
+
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{class_physical_layer_a0e77da761a2cbb5c9535df0bdea993f9}{Physical\+Layer}}.
+
+\mbox{\Hypertarget{class_r_f69_afae38fa64242043de34096bf497725f1}\label{class_r_f69_afae38fa64242043de34096bf497725f1}} 
+\index{RF69@{RF69}!startReceive@{startReceive}}
+\index{startReceive@{startReceive}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{startReceive()}{startReceive()}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::start\+Receive (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Interrupt-\/driven receive method. G\+D\+O0 will be activated when full packet is received. 
+
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_a923654706eff5118ef6e84214e837f27}\label{class_r_f69_a923654706eff5118ef6e84214e837f27}} 
+\index{RF69@{RF69}!startTransmit@{startTransmit}}
+\index{startTransmit@{startTransmit}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{startTransmit()}{startTransmit()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily int16\+\_\+t Physical\+Layer\+::start\+Transmit}
+
+
+
+Interrupt-\/driven Arduino String transmit method. Unlike the standard transmit method, this one is non-\/blocking. Interrupt pin will be activated when transmission finishes. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em str} & C-\/string that will be transmitted.\\
+\hline
+{\em addr} & Node address to transmit the packet to. Only used in F\+SK mode.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_af068e6e862c99e39d0261a7971dd56db}\label{class_r_f69_af068e6e862c99e39d0261a7971dd56db}} 
+\index{RF69@{RF69}!startTransmit@{startTransmit}}
+\index{startTransmit@{startTransmit}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{startTransmit()}{startTransmit()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily int16\+\_\+t Physical\+Layer\+::start\+Transmit}
+
+
+
+Interrupt-\/driven Arduino String transmit method. Unlike the standard transmit method, this one is non-\/blocking. Interrupt pin will be activated when transmission finishes. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em str} & Address of Arduino String that will be transmitted.\\
+\hline
+{\em addr} & Node address to transmit the packet to. Only used in F\+SK mode.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_a734b946b18f33ab4afa34398d4615425}\label{class_r_f69_a734b946b18f33ab4afa34398d4615425}} 
+\index{RF69@{RF69}!startTransmit@{startTransmit}}
+\index{startTransmit@{startTransmit}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{startTransmit()}{startTransmit()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::start\+Transmit (\begin{DoxyParamCaption}\item[{uint8\+\_\+t $\ast$}]{data,  }\item[{size\+\_\+t}]{len,  }\item[{uint8\+\_\+t}]{addr = {\ttfamily 0} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Interrupt-\/driven binary transmit method. Overloads for string-\/based transmissions are implemented in \mbox{\hyperlink{class_physical_layer}{Physical\+Layer}}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & Binary data to be sent.\\
+\hline
+{\em len} & Number of bytes to send.\\
+\hline
+{\em addr} & Address to send the data to. Will only be added if address filtering was enabled.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{class_physical_layer_a41a1de0ebffe7b65de6fd8cceb9a5123}{Physical\+Layer}}.
+
+\mbox{\Hypertarget{class_r_f69_a41a1de0ebffe7b65de6fd8cceb9a5123}\label{class_r_f69_a41a1de0ebffe7b65de6fd8cceb9a5123}} 
+\index{RF69@{RF69}!startTransmit@{startTransmit}}
+\index{startTransmit@{startTransmit}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{startTransmit()}{startTransmit()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily virtual int16\+\_\+t Physical\+Layer\+::start\+Transmit}
+
+
+
+Interrupt-\/driven binary transmit method. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & Binary data that will be transmitted.\\
+\hline
+{\em len} & Length of binary data to transmit (in bytes).\\
+\hline
+{\em addr} & Node address to transmit the packet to. Only used in F\+SK mode.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_ab139a34e03a6fd5a781cd54da21d308f}\label{class_r_f69_ab139a34e03a6fd5a781cd54da21d308f}} 
+\index{RF69@{RF69}!transmit@{transmit}}
+\index{transmit@{transmit}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{transmit()}{transmit()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily int16\+\_\+t Physical\+Layer\+::transmit}
+
+
+
+Arduino Flash String transmit method. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em str} & Pointer to Arduino Flash String that will be transmitted.\\
+\hline
+{\em addr} & Node address to transmit the packet to. Only used in F\+SK mode.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_a492b2d057dd803c3884fa1adc8e22534}\label{class_r_f69_a492b2d057dd803c3884fa1adc8e22534}} 
+\index{RF69@{RF69}!transmit@{transmit}}
+\index{transmit@{transmit}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{transmit()}{transmit()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily int16\+\_\+t Physical\+Layer\+::transmit}
+
+
+
+C-\/string transmit method. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em str} & C-\/string that will be transmitted.\\
+\hline
+{\em addr} & Node address to transmit the packet to. Only used in F\+SK mode.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_aeb62c5a521aafc1e0525c58e9364482b}\label{class_r_f69_aeb62c5a521aafc1e0525c58e9364482b}} 
+\index{RF69@{RF69}!transmit@{transmit}}
+\index{transmit@{transmit}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{transmit()}{transmit()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily int16\+\_\+t Physical\+Layer\+::transmit}
+
+
+
+Arduino String transmit method. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em str} & Address of Arduino string that will be transmitted.\\
+\hline
+{\em addr} & Node address to transmit the packet to. Only used in F\+SK mode.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_a93205712f70bb6544c96e6730d5d12c5}\label{class_r_f69_a93205712f70bb6544c96e6730d5d12c5}} 
+\index{RF69@{RF69}!transmit@{transmit}}
+\index{transmit@{transmit}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{transmit()}{transmit()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::transmit (\begin{DoxyParamCaption}\item[{uint8\+\_\+t $\ast$}]{data,  }\item[{size\+\_\+t}]{len,  }\item[{uint8\+\_\+t}]{addr = {\ttfamily 0} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Blocking binary transmit method. Overloads for string-\/based transmissions are implemented in \mbox{\hyperlink{class_physical_layer}{Physical\+Layer}}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & Binary data to be sent.\\
+\hline
+{\em len} & Number of bytes to send.\\
+\hline
+{\em addr} & Address to send the data to. Will only be added if address filtering was enabled.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{class_physical_layer_af81565ee82ef9a7de9c5663c745f4ef7}{Physical\+Layer}}.
+
+\mbox{\Hypertarget{class_r_f69_af81565ee82ef9a7de9c5663c745f4ef7}\label{class_r_f69_af81565ee82ef9a7de9c5663c745f4ef7}} 
+\index{RF69@{RF69}!transmit@{transmit}}
+\index{transmit@{transmit}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{transmit()}{transmit()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily virtual int16\+\_\+t Physical\+Layer\+::transmit}
+
+
+
+Binary transmit method. Must be implemented in module class. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & Binary data that will be transmitted.\\
+\hline
+{\em len} & Length of binary data to transmit (in bytes).\\
+\hline
+{\em addr} & Node address to transmit the packet to. Only used in F\+SK mode.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_r_f69_a8d5eefa01f3c8dcaab325b36b52364fe}\label{class_r_f69_a8d5eefa01f3c8dcaab325b36b52364fe}} 
+\index{RF69@{RF69}!transmitDirect@{transmitDirect}}
+\index{transmitDirect@{transmitDirect}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{transmitDirect()}{transmitDirect()}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::transmit\+Direct (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{frf = {\ttfamily 0} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Starts direct mode transmission. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em frf} & Raw RF frequency value. Defaults to 0, required for quick frequency shifts in R\+T\+TY.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{class_physical_layer_a2e453686d7c11763a2a1737707e3b3a5}{Physical\+Layer}}.
+
+\mbox{\Hypertarget{class_r_f69_af62ebde1ea34a394b9781a21ae348c39}\label{class_r_f69_af62ebde1ea34a394b9781a21ae348c39}} 
+\index{RF69@{RF69}!variablePacketLengthMode@{variablePacketLengthMode}}
+\index{variablePacketLengthMode@{variablePacketLengthMode}!RF69@{RF69}}
+\doxysubsubsection{\texorpdfstring{variablePacketLengthMode()}{variablePacketLengthMode()}}
+{\footnotesize\ttfamily int16\+\_\+t R\+F69\+::variable\+Packet\+Length\+Mode (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{max\+Len = {\ttfamily RF69\+\_\+MAX\+\_\+PACKET\+\_\+LENGTH} }\end{DoxyParamCaption})}
+
+
+
+Set modem in variable packet length mode. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em len} & Maximum packet length.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+Libraries/\+Radio\+Lib/src/modules/\+R\+F69/R\+F69.\+h\item 
+Libraries/\+Radio\+Lib/src/modules/\+R\+F69/R\+F69.\+cpp\end{DoxyCompactItemize}

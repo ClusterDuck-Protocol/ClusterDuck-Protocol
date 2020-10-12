@@ -1,0 +1,209 @@
+\hypertarget{class_m_q_t_t_client}{}\doxysection{M\+Q\+T\+T\+Client Class Reference}
+\label{class_m_q_t_t_client}\index{MQTTClient@{MQTTClient}}
+
+
+Client for simple M\+Q\+TT communication.  
+
+
+
+
+{\ttfamily \#include $<$M\+Q\+T\+T.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_m_q_t_t_client_a6ecdbc80b76ae32b926e84af620dacb6}{M\+Q\+T\+T\+Client}} (\mbox{\hyperlink{class_transport_layer}{Transport\+Layer}} $\ast$tl, uint16\+\_\+t port=1883)
+\begin{DoxyCompactList}\small\item\em Default constructor. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_m_q_t_t_client_ac15b32e89df903b20b066113bf8c4a88}{connect}} (const char $\ast$host, const char $\ast$client\+Id, const char $\ast$user\+Name=\char`\"{}\char`\"{}, const char $\ast$password=\char`\"{}\char`\"{}, uint16\+\_\+t keep\+Alive=60, bool clean\+Session=true, const char $\ast$will\+Topic=\char`\"{}\char`\"{}, const char $\ast$will\+Message=\char`\"{}\char`\"{})
+\begin{DoxyCompactList}\small\item\em Connects to M\+Q\+TT broker (/server). \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_m_q_t_t_client_af10176e2cf67bd652823d44f3203a96e}{disconnect}} ()
+\begin{DoxyCompactList}\small\item\em Disconnect from M\+Q\+TT broker. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_m_q_t_t_client_ace3ee45313dea2f853207accf20b7c87}{publish}} (String \&topic, String \&message)
+\begin{DoxyCompactList}\small\item\em Publish M\+Q\+TT message. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_m_q_t_t_client_ab59a1174098dfdf514d8ec6d0bd9d015}{publish}} (const char $\ast$topic, const char $\ast$message)
+\begin{DoxyCompactList}\small\item\em Publish M\+Q\+TT message. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_m_q_t_t_client_a9488df90534953c33d76e9183965a300}{subscribe}} (const char $\ast$topic\+Filter)
+\begin{DoxyCompactList}\small\item\em Subscribe to M\+Q\+TT topic. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_m_q_t_t_client_a782158f20b289746b7b6884fd922a22c}{unsubscribe}} (const char $\ast$topic\+Filter)
+\begin{DoxyCompactList}\small\item\em Unsubscribe from M\+Q\+TT topic. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_m_q_t_t_client_aea3fb930ed43a0b3122ccc90efebb99d}{ping}} ()
+\begin{DoxyCompactList}\small\item\em Ping M\+Q\+TT broker. This method can be used to keep connection open. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_m_q_t_t_client_a49cb16ef730ad50ba5dc472ac10d933e}{check}} (void($\ast$func)(const char $\ast$, const char $\ast$))
+\begin{DoxyCompactList}\small\item\em Set function to be called when checking new messages in subscribed topics. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Client for simple M\+Q\+TT communication. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{class_m_q_t_t_client_a6ecdbc80b76ae32b926e84af620dacb6}\label{class_m_q_t_t_client_a6ecdbc80b76ae32b926e84af620dacb6}} 
+\index{MQTTClient@{MQTTClient}!MQTTClient@{MQTTClient}}
+\index{MQTTClient@{MQTTClient}!MQTTClient@{MQTTClient}}
+\doxysubsubsection{\texorpdfstring{MQTTClient()}{MQTTClient()}}
+{\footnotesize\ttfamily M\+Q\+T\+T\+Client\+::\+M\+Q\+T\+T\+Client (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_transport_layer}{Transport\+Layer}} $\ast$}]{tl,  }\item[{uint16\+\_\+t}]{port = {\ttfamily 1883} }\end{DoxyParamCaption})}
+
+
+
+Default constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tl} & Pointer to the wireless module providing \mbox{\hyperlink{class_transport_layer}{Transport\+Layer}} communication. \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_m_q_t_t_client_a49cb16ef730ad50ba5dc472ac10d933e}\label{class_m_q_t_t_client_a49cb16ef730ad50ba5dc472ac10d933e}} 
+\index{MQTTClient@{MQTTClient}!check@{check}}
+\index{check@{check}!MQTTClient@{MQTTClient}}
+\doxysubsubsection{\texorpdfstring{check()}{check()}}
+{\footnotesize\ttfamily int16\+\_\+t M\+Q\+T\+T\+Client\+::check (\begin{DoxyParamCaption}\item[{void($\ast$)(const char $\ast$, const char $\ast$)}]{func }\end{DoxyParamCaption})}
+
+
+
+Set function to be called when checking new messages in subscribed topics. 
+
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_m_q_t_t_client_ac15b32e89df903b20b066113bf8c4a88}\label{class_m_q_t_t_client_ac15b32e89df903b20b066113bf8c4a88}} 
+\index{MQTTClient@{MQTTClient}!connect@{connect}}
+\index{connect@{connect}!MQTTClient@{MQTTClient}}
+\doxysubsubsection{\texorpdfstring{connect()}{connect()}}
+{\footnotesize\ttfamily int16\+\_\+t M\+Q\+T\+T\+Client\+::connect (\begin{DoxyParamCaption}\item[{const char $\ast$}]{host,  }\item[{const char $\ast$}]{client\+Id,  }\item[{const char $\ast$}]{user\+Name = {\ttfamily \char`\"{}\char`\"{}},  }\item[{const char $\ast$}]{password = {\ttfamily \char`\"{}\char`\"{}},  }\item[{uint16\+\_\+t}]{keep\+Alive = {\ttfamily 60},  }\item[{bool}]{clean\+Session = {\ttfamily true},  }\item[{const char $\ast$}]{will\+Topic = {\ttfamily \char`\"{}\char`\"{}},  }\item[{const char $\ast$}]{will\+Message = {\ttfamily \char`\"{}\char`\"{}} }\end{DoxyParamCaption})}
+
+
+
+Connects to M\+Q\+TT broker (/server). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em host} & U\+RL of the M\+Q\+TT broker.\\
+\hline
+{\em client\+Id} & ID of the client.\\
+\hline
+{\em username} & Username to be used in the connection. Defaults to empty string (no username).\\
+\hline
+{\em password} & Password to be used in the connection. Defaults to empty string (no password).\\
+\hline
+{\em keep\+Alive} & Connection keep-\/alive period in seconds. Defaults to 60.\\
+\hline
+{\em clean\+Session} & M\+Q\+TT Clean\+Session flag. Defaults to true.\\
+\hline
+{\em will\+Topic} & M\+Q\+TT will topic. Defaults to empty string (no will topic).\\
+\hline
+{\em will\+Message} & M\+Q\+TT will message. Defaults to empty string (no will message).\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_m_q_t_t_client_af10176e2cf67bd652823d44f3203a96e}\label{class_m_q_t_t_client_af10176e2cf67bd652823d44f3203a96e}} 
+\index{MQTTClient@{MQTTClient}!disconnect@{disconnect}}
+\index{disconnect@{disconnect}!MQTTClient@{MQTTClient}}
+\doxysubsubsection{\texorpdfstring{disconnect()}{disconnect()}}
+{\footnotesize\ttfamily int16\+\_\+t M\+Q\+T\+T\+Client\+::disconnect (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Disconnect from M\+Q\+TT broker. 
+
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_m_q_t_t_client_aea3fb930ed43a0b3122ccc90efebb99d}\label{class_m_q_t_t_client_aea3fb930ed43a0b3122ccc90efebb99d}} 
+\index{MQTTClient@{MQTTClient}!ping@{ping}}
+\index{ping@{ping}!MQTTClient@{MQTTClient}}
+\doxysubsubsection{\texorpdfstring{ping()}{ping()}}
+{\footnotesize\ttfamily int16\+\_\+t M\+Q\+T\+T\+Client\+::ping (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Ping M\+Q\+TT broker. This method can be used to keep connection open. 
+
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_m_q_t_t_client_ab59a1174098dfdf514d8ec6d0bd9d015}\label{class_m_q_t_t_client_ab59a1174098dfdf514d8ec6d0bd9d015}} 
+\index{MQTTClient@{MQTTClient}!publish@{publish}}
+\index{publish@{publish}!MQTTClient@{MQTTClient}}
+\doxysubsubsection{\texorpdfstring{publish()}{publish()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily int16\+\_\+t M\+Q\+T\+T\+Client\+::publish (\begin{DoxyParamCaption}\item[{const char $\ast$}]{topic,  }\item[{const char $\ast$}]{message }\end{DoxyParamCaption})}
+
+
+
+Publish M\+Q\+TT message. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em topic} & M\+Q\+TT topic to which the message will be published.\\
+\hline
+{\em message} & Message to be published.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_m_q_t_t_client_ace3ee45313dea2f853207accf20b7c87}\label{class_m_q_t_t_client_ace3ee45313dea2f853207accf20b7c87}} 
+\index{MQTTClient@{MQTTClient}!publish@{publish}}
+\index{publish@{publish}!MQTTClient@{MQTTClient}}
+\doxysubsubsection{\texorpdfstring{publish()}{publish()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily int16\+\_\+t M\+Q\+T\+T\+Client\+::publish (\begin{DoxyParamCaption}\item[{String \&}]{topic,  }\item[{String \&}]{message }\end{DoxyParamCaption})}
+
+
+
+Publish M\+Q\+TT message. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em topic} & M\+Q\+TT topic to which the message will be published.\\
+\hline
+{\em message} & Message to be published.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_m_q_t_t_client_a9488df90534953c33d76e9183965a300}\label{class_m_q_t_t_client_a9488df90534953c33d76e9183965a300}} 
+\index{MQTTClient@{MQTTClient}!subscribe@{subscribe}}
+\index{subscribe@{subscribe}!MQTTClient@{MQTTClient}}
+\doxysubsubsection{\texorpdfstring{subscribe()}{subscribe()}}
+{\footnotesize\ttfamily int16\+\_\+t M\+Q\+T\+T\+Client\+::subscribe (\begin{DoxyParamCaption}\item[{const char $\ast$}]{topic\+Filter }\end{DoxyParamCaption})}
+
+
+
+Subscribe to M\+Q\+TT topic. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em topic\+Filter} & Topic to subscribe to.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_m_q_t_t_client_a782158f20b289746b7b6884fd922a22c}\label{class_m_q_t_t_client_a782158f20b289746b7b6884fd922a22c}} 
+\index{MQTTClient@{MQTTClient}!unsubscribe@{unsubscribe}}
+\index{unsubscribe@{unsubscribe}!MQTTClient@{MQTTClient}}
+\doxysubsubsection{\texorpdfstring{unsubscribe()}{unsubscribe()}}
+{\footnotesize\ttfamily int16\+\_\+t M\+Q\+T\+T\+Client\+::unsubscribe (\begin{DoxyParamCaption}\item[{const char $\ast$}]{topic\+Filter }\end{DoxyParamCaption})}
+
+
+
+Unsubscribe from M\+Q\+TT topic. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em topic\+Filter} & Topic to unsubscribe from.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+Libraries/\+Radio\+Lib/src/protocols/\+M\+Q\+T\+T/M\+Q\+T\+T.\+h\item 
+Libraries/\+Radio\+Lib/src/protocols/\+M\+Q\+T\+T/M\+Q\+T\+T.\+cpp\end{DoxyCompactItemize}

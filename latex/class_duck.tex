@@ -1,0 +1,368 @@
+\hypertarget{class_duck}{}\doxysection{Duck Class Reference}
+\label{class_duck}\index{Duck@{Duck}}
+Inheritance diagram for Duck\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_duck}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_duck_a65753b7b6eb80c4639f6bf165b8db9a6}\label{class_duck_a65753b7b6eb80c4639f6bf165b8db9a6}} 
+\mbox{\hyperlink{class_duck_a65753b7b6eb80c4639f6bf165b8db9a6}{Duck}} ()
+\begin{DoxyCompactList}\small\item\em Construct a new \mbox{\hyperlink{class_duck}{Duck}} object. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_duck_a53c9e7278c98060cc03c7d9efd402df8}{Duck}} (String id)
+\begin{DoxyCompactList}\small\item\em Construct a new \mbox{\hyperlink{class_duck}{Duck}} object. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_duck_af21e327ac74b8c38defcce772064890e}{setup\+Serial}} (int baud\+Rate=115200)
+\begin{DoxyCompactList}\small\item\em Setup serial connection. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_duck_a2ac6f4f81fb173c5a20a36024d5e1c13}{setup\+Radio}} (float band=C\+D\+P\+C\+F\+G\+\_\+\+R\+F\+\_\+\+L\+O\+R\+A\+\_\+\+F\+R\+EQ, int ss=C\+D\+P\+C\+F\+G\+\_\+\+P\+I\+N\+\_\+\+L\+O\+R\+A\+\_\+\+CS, int rst=C\+D\+P\+C\+F\+G\+\_\+\+P\+I\+N\+\_\+\+L\+O\+R\+A\+\_\+\+R\+ST, int di0=C\+D\+P\+C\+F\+G\+\_\+\+P\+I\+N\+\_\+\+L\+O\+R\+A\+\_\+\+D\+I\+O0, int di1=C\+D\+P\+C\+F\+G\+\_\+\+P\+I\+N\+\_\+\+L\+O\+R\+A\+\_\+\+D\+I\+O1, int tx\+Power=C\+D\+P\+C\+F\+G\+\_\+\+R\+F\+\_\+\+L\+O\+R\+A\+\_\+\+T\+X\+P\+OW)
+\begin{DoxyCompactList}\small\item\em Setup the radio component. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_duck_a6f05948b80c3a5a735b32618f31f283c}{setup\+Wifi}} (const char $\ast$ap=\char`\"{}🆘 D\+U\+CK E\+M\+E\+R\+G\+E\+N\+CY P\+O\+R\+T\+AL\char`\"{})
+\begin{DoxyCompactList}\small\item\em Setup Wi\+Fi access point. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_duck_a700288bc23bff9f2ccbcad2b06c55311}{setup\+Dns}} ()
+\begin{DoxyCompactList}\small\item\em Setup D\+NS. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_duck_ad6611c327b6551b067d44be180a7e4a5}{setup\+Web\+Server}} (bool create\+Captive\+Portal=false, String html=\char`\"{}\char`\"{})
+\begin{DoxyCompactList}\small\item\em Setup web server. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_duck_af95754483f70d1e05ecc9bad9e148c5a}{setup\+Internet}} (String ssid, String password)
+\begin{DoxyCompactList}\small\item\em Setup internet access. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_duck_a33ef6e5493ccc7ff0278683c39552d50}\label{class_duck_a33ef6e5493ccc7ff0278683c39552d50}} 
+void {\bfseries setup\+O\+TA} ()
+\item 
+int \mbox{\hyperlink{class_duck_a429ee7aae1ae89416b5b233aeff03d00}{send\+Payload\+Standard}} (String msg=\char`\"{}\char`\"{}, String topic=\char`\"{}\char`\"{}, String sender\+Id=\char`\"{}\char`\"{}, String message\+Id=\char`\"{}\char`\"{}, String path=\char`\"{}\char`\"{})
+\begin{DoxyCompactList}\small\item\em Send a duck Lo\+Ra message. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_duck_a09149de412d44bc20792b6412e296c13}{is\+Wifi\+Connected}} ()
+\begin{DoxyCompactList}\small\item\em Check wifi connection status. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_duck_a9ec9747fba6a5b2875c4c63e33038967}{ssid\+Available}} (String ssid)
+\begin{DoxyCompactList}\small\item\em Check if the give access point is available. \end{DoxyCompactList}\item 
+String \mbox{\hyperlink{class_duck_a6bc88355d237c36072a1570d541c08a8}{get\+Ssid}} ()
+\begin{DoxyCompactList}\small\item\em Get the access point ssid. \end{DoxyCompactList}\item 
+String \mbox{\hyperlink{class_duck_a40318739955b37e81995bd50b62f18e0}{get\+Password}} ()
+\begin{DoxyCompactList}\small\item\em Get the wifi access point password. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{class_duck_a4a6e0d24b829a3b9760d94b1095a4d02}{start\+Receive}} ()
+\begin{DoxyCompactList}\small\item\em Tell the duck radio to start receiving packets from the mesh network. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_duck_a95fe4f407a37978088d354a575456d4a}{start\+Transmit}} ()
+\begin{DoxyCompactList}\small\item\em Tell the duck radio to start receiving packets from the mesh network. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{class_duck_ae563c92e38f7f99412eb4445f6429366}{run}} ()=0
+\begin{DoxyCompactList}\small\item\em Implement the duck\textquotesingle{}s specific behavior. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{class_duck_a86786a759eb87e0ef1714b09a09947a1}{setup\+With\+Defaults}} (String ssid, String password)
+\begin{DoxyCompactList}\small\item\em Setup a duck with default settings. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_duck_a7b6fc02f2c084790b0646d1772b89124}\label{class_duck_a7b6fc02f2c084790b0646d1772b89124}} 
+virtual int {\bfseries reconnect\+Wifi} (String ssid, String password)
+\item 
+\mbox{\Hypertarget{class_duck_a8fde44959e2ca108af1799f87f754336}\label{class_duck_a8fde44959e2ca108af1799f87f754336}} 
+void \mbox{\hyperlink{class_duck_a8fde44959e2ca108af1799f87f754336}{process\+Portal\+Request}} ()
+\begin{DoxyCompactList}\small\item\em Handle request from emergency portal. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_duck_ac9407d040d345391b1aecfb18404542f}\label{class_duck_ac9407d040d345391b1aecfb18404542f}} 
+void \mbox{\hyperlink{class_duck_ac9407d040d345391b1aecfb18404542f}{handle\+Ota\+Update}} ()
+\begin{DoxyCompactList}\small\item\em Handle over the air firmware update. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Static Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_duck_a6c165684af138d33424ecb32cf70f53f}\label{class_duck_a6c165684af138d33424ecb32cf70f53f}} 
+static void {\bfseries toggle\+Receive\+Flag} ()
+\item 
+\mbox{\Hypertarget{class_duck_a1e5134b421eff4e928725272519c0dc8}\label{class_duck_a1e5134b421eff4e928725272519c0dc8}} 
+static void {\bfseries set\+Receive\+Flag} (bool value)
+\item 
+\mbox{\Hypertarget{class_duck_a07a7e5238f99bea8ee50f4f92f74e9ce}\label{class_duck_a07a7e5238f99bea8ee50f4f92f74e9ce}} 
+static bool {\bfseries get\+Receive\+Flag} ()
+\item 
+\mbox{\Hypertarget{class_duck_ad727e3f8972a5fcf18c05f942741c841}\label{class_duck_ad727e3f8972a5fcf18c05f942741c841}} 
+static void {\bfseries on\+Packet\+Received} ()
+\item 
+\mbox{\Hypertarget{class_duck_a9b5501043f7804263b391555f33aa986}\label{class_duck_a9b5501043f7804263b391555f33aa986}} 
+static bool {\bfseries im\+Alive} (void $\ast$)
+\item 
+\mbox{\Hypertarget{class_duck_a64f61f312f2e077477369750188bfccf}\label{class_duck_a64f61f312f2e077477369750188bfccf}} 
+static bool {\bfseries reboot} (void $\ast$)
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_duck_add299090cbf7d6f7c781e0df02ef42a2}\label{class_duck_add299090cbf7d6f7c781e0df02ef42a2}} 
+String {\bfseries device\+Id}
+\item 
+\mbox{\Hypertarget{class_duck_af2acc4c8be4f327e0975c1b9ee905fe0}\label{class_duck_af2acc4c8be4f327e0975c1b9ee905fe0}} 
+\mbox{\hyperlink{class_duck_lora}{Duck\+Lora}} $\ast$ {\bfseries duck\+Lora} = \mbox{\hyperlink{class_duck_lora_a1cea316e6f0c21c27ee35d6c59620e41}{Duck\+Lora\+::get\+Instance}}()
+\item 
+\mbox{\Hypertarget{class_duck_a500e245c094e78454c235277193bae5d}\label{class_duck_a500e245c094e78454c235277193bae5d}} 
+\mbox{\hyperlink{class_duck_net}{Duck\+Net}} $\ast$ {\bfseries duck\+Net} = \mbox{\hyperlink{class_duck_net_a0decd190c629925b9f0f624319401374}{Duck\+Net\+::get\+Instance}}()
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_duck_af25a74328e0706ee318ac0bff4d0b66c}\label{class_duck_af25a74328e0706ee318ac0bff4d0b66c}} 
+static volatile bool {\bfseries received\+Flag} = false
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{class_duck_a53c9e7278c98060cc03c7d9efd402df8}\label{class_duck_a53c9e7278c98060cc03c7d9efd402df8}} 
+\index{Duck@{Duck}!Duck@{Duck}}
+\index{Duck@{Duck}!Duck@{Duck}}
+\doxysubsubsection{\texorpdfstring{Duck()}{Duck()}}
+{\footnotesize\ttfamily Duck\+::\+Duck (\begin{DoxyParamCaption}\item[{String}]{id }\end{DoxyParamCaption})}
+
+
+
+Construct a new \mbox{\hyperlink{class_duck}{Duck}} object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em id} & a unique id \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_duck_a40318739955b37e81995bd50b62f18e0}\label{class_duck_a40318739955b37e81995bd50b62f18e0}} 
+\index{Duck@{Duck}!getPassword@{getPassword}}
+\index{getPassword@{getPassword}!Duck@{Duck}}
+\doxysubsubsection{\texorpdfstring{getPassword()}{getPassword()}}
+{\footnotesize\ttfamily String Duck\+::get\+Password (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Get the wifi access point password. 
+
+\begin{DoxyReturn}{Returns}
+the wifi access point password as a string. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_duck_a6bc88355d237c36072a1570d541c08a8}\label{class_duck_a6bc88355d237c36072a1570d541c08a8}} 
+\index{Duck@{Duck}!getSsid@{getSsid}}
+\index{getSsid@{getSsid}!Duck@{Duck}}
+\doxysubsubsection{\texorpdfstring{getSsid()}{getSsid()}}
+{\footnotesize\ttfamily String Duck\+::get\+Ssid (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Get the access point ssid. 
+
+\begin{DoxyReturn}{Returns}
+the wifi access point as a string 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_duck_a09149de412d44bc20792b6412e296c13}\label{class_duck_a09149de412d44bc20792b6412e296c13}} 
+\index{Duck@{Duck}!isWifiConnected@{isWifiConnected}}
+\index{isWifiConnected@{isWifiConnected}!Duck@{Duck}}
+\doxysubsubsection{\texorpdfstring{isWifiConnected()}{isWifiConnected()}}
+{\footnotesize\ttfamily bool Duck\+::is\+Wifi\+Connected (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Check wifi connection status. 
+
+\begin{DoxyReturn}{Returns}
+true if device wifi is connected, false otherwise. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_duck_ae563c92e38f7f99412eb4445f6429366}\label{class_duck_ae563c92e38f7f99412eb4445f6429366}} 
+\index{Duck@{Duck}!run@{run}}
+\index{run@{run}!Duck@{Duck}}
+\doxysubsubsection{\texorpdfstring{run()}{run()}}
+{\footnotesize\ttfamily virtual void Duck\+::run (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [pure virtual]}}
+
+
+
+Implement the duck\textquotesingle{}s specific behavior. 
+
+This method must be implemented by the \mbox{\hyperlink{class_duck}{Duck}}\textquotesingle{}s concrete classes such as \mbox{\hyperlink{class_duck_link}{Duck\+Link}}, \mbox{\hyperlink{class_mama_duck}{Mama\+Duck}},... 
+
+Implemented in \mbox{\hyperlink{class_papa_duck_a43bba7c33d1a146175cc1e3cc3f5f139}{Papa\+Duck}}, \mbox{\hyperlink{class_mama_duck_ac7754a9b1d9cb627b3c08d7987d57509}{Mama\+Duck}}, \mbox{\hyperlink{class_duck_link_a6c77dd16076ba66cfdf348b2d641946b}{Duck\+Link}}, and \mbox{\hyperlink{class_duck_detect_a0b5e9a7427fb318848f06b461c7203a3}{Duck\+Detect}}.
+
+\mbox{\Hypertarget{class_duck_a429ee7aae1ae89416b5b233aeff03d00}\label{class_duck_a429ee7aae1ae89416b5b233aeff03d00}} 
+\index{Duck@{Duck}!sendPayloadStandard@{sendPayloadStandard}}
+\index{sendPayloadStandard@{sendPayloadStandard}!Duck@{Duck}}
+\doxysubsubsection{\texorpdfstring{sendPayloadStandard()}{sendPayloadStandard()}}
+{\footnotesize\ttfamily int Duck\+::send\+Payload\+Standard (\begin{DoxyParamCaption}\item[{String}]{msg = {\ttfamily \char`\"{}\char`\"{}},  }\item[{String}]{topic = {\ttfamily \char`\"{}\char`\"{}},  }\item[{String}]{sender\+Id = {\ttfamily \char`\"{}\char`\"{}},  }\item[{String}]{message\+Id = {\ttfamily \char`\"{}\char`\"{}},  }\item[{String}]{path = {\ttfamily \char`\"{}\char`\"{}} }\end{DoxyParamCaption})}
+
+
+
+Send a duck Lo\+Ra message. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em msg} & the message payload (optional\+: if not provided, it will be set to an empty string) \\
+\hline
+{\em topic} & the message topic (optional\+: if not provided, it will be set to \char`\"{}status\char`\"{}) \\
+\hline
+{\em sender\+Id} & the sender id (optional\+: if not provided, it will be set to the duck device id) \\
+\hline
+{\em message\+Id} & the message id (optional\+: if not provided, a unique id will be generated) \\
+\hline
+{\em path} & the message path to append the device id to (optional\+: if not provided, the path will only contain the duck\textquotesingle{}s device id) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+D\+U\+C\+K\+\_\+\+E\+R\+R\+\_\+\+N\+O\+NE if success, an error code otherwise. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_duck_a700288bc23bff9f2ccbcad2b06c55311}\label{class_duck_a700288bc23bff9f2ccbcad2b06c55311}} 
+\index{Duck@{Duck}!setupDns@{setupDns}}
+\index{setupDns@{setupDns}!Duck@{Duck}}
+\doxysubsubsection{\texorpdfstring{setupDns()}{setupDns()}}
+{\footnotesize\ttfamily int Duck\+::setup\+Dns (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Setup D\+NS. 
+
+\begin{DoxyReturn}{Returns}
+D\+U\+C\+K\+\_\+\+E\+R\+R\+O\+R\+\_\+\+N\+O\+NE if successful, an error code otherwise. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_duck_af95754483f70d1e05ecc9bad9e148c5a}\label{class_duck_af95754483f70d1e05ecc9bad9e148c5a}} 
+\index{Duck@{Duck}!setupInternet@{setupInternet}}
+\index{setupInternet@{setupInternet}!Duck@{Duck}}
+\doxysubsubsection{\texorpdfstring{setupInternet()}{setupInternet()}}
+{\footnotesize\ttfamily void Duck\+::setup\+Internet (\begin{DoxyParamCaption}\item[{String}]{ssid,  }\item[{String}]{password }\end{DoxyParamCaption})}
+
+
+
+Setup internet access. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ssid} & the ssid of the Wi\+Fi network \\
+\hline
+{\em password} & password to join the network \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_duck_a2ac6f4f81fb173c5a20a36024d5e1c13}\label{class_duck_a2ac6f4f81fb173c5a20a36024d5e1c13}} 
+\index{Duck@{Duck}!setupRadio@{setupRadio}}
+\index{setupRadio@{setupRadio}!Duck@{Duck}}
+\doxysubsubsection{\texorpdfstring{setupRadio()}{setupRadio()}}
+{\footnotesize\ttfamily void Duck\+::setup\+Radio (\begin{DoxyParamCaption}\item[{float}]{band = {\ttfamily CDPCFG\+\_\+RF\+\_\+LORA\+\_\+FREQ},  }\item[{int}]{ss = {\ttfamily CDPCFG\+\_\+PIN\+\_\+LORA\+\_\+CS},  }\item[{int}]{rst = {\ttfamily CDPCFG\+\_\+PIN\+\_\+LORA\+\_\+RST},  }\item[{int}]{di0 = {\ttfamily CDPCFG\+\_\+PIN\+\_\+LORA\+\_\+DIO0},  }\item[{int}]{di1 = {\ttfamily CDPCFG\+\_\+PIN\+\_\+LORA\+\_\+DIO1},  }\item[{int}]{tx\+Power = {\ttfamily CDPCFG\+\_\+RF\+\_\+LORA\+\_\+TXPOW} }\end{DoxyParamCaption})}
+
+
+
+Setup the radio component. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em band} & radio frequency in Mhz (default\+: 915.\+0) \\
+\hline
+{\em ss} & slave select pin (default C\+D\+P\+C\+F\+G\+\_\+\+P\+I\+N\+\_\+\+L\+O\+R\+A\+\_\+\+CS) \\
+\hline
+{\em rst} & reset pin (default\+: C\+D\+P\+C\+F\+G\+\_\+\+P\+I\+N\+\_\+\+L\+O\+R\+A\+\_\+\+R\+ST) \\
+\hline
+{\em di0} & dio0 interrupt pin (default\+: C\+D\+P\+C\+F\+G\+\_\+\+P\+I\+N\+\_\+\+L\+O\+R\+A\+\_\+\+D\+I\+O0) \\
+\hline
+{\em di1} & dio1 interrupt pin (default\+: C\+D\+P\+C\+F\+G\+\_\+\+P\+I\+N\+\_\+\+L\+O\+R\+A\+\_\+\+D\+I\+O1) \\
+\hline
+{\em tx\+Power} & transmit power (default\+: C\+D\+P\+C\+F\+G\+\_\+\+R\+F\+\_\+\+L\+O\+R\+A\+\_\+\+T\+X\+P\+OW) \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_duck_af21e327ac74b8c38defcce772064890e}\label{class_duck_af21e327ac74b8c38defcce772064890e}} 
+\index{Duck@{Duck}!setupSerial@{setupSerial}}
+\index{setupSerial@{setupSerial}!Duck@{Duck}}
+\doxysubsubsection{\texorpdfstring{setupSerial()}{setupSerial()}}
+{\footnotesize\ttfamily void Duck\+::setup\+Serial (\begin{DoxyParamCaption}\item[{int}]{baud\+Rate = {\ttfamily 115200} }\end{DoxyParamCaption})}
+
+
+
+Setup serial connection. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em baud\+Rate} & default\+: 115200 \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_duck_ad6611c327b6551b067d44be180a7e4a5}\label{class_duck_ad6611c327b6551b067d44be180a7e4a5}} 
+\index{Duck@{Duck}!setupWebServer@{setupWebServer}}
+\index{setupWebServer@{setupWebServer}!Duck@{Duck}}
+\doxysubsubsection{\texorpdfstring{setupWebServer()}{setupWebServer()}}
+{\footnotesize\ttfamily void Duck\+::setup\+Web\+Server (\begin{DoxyParamCaption}\item[{bool}]{create\+Captive\+Portal = {\ttfamily false},  }\item[{String}]{html = {\ttfamily \char`\"{}\char`\"{}} }\end{DoxyParamCaption})}
+
+
+
+Setup web server. 
+
+The Web\+Server is used to communicate with the \mbox{\hyperlink{class_duck}{Duck}} over ad-\/hoc Wi\+Fi connection.
+
+
+\begin{DoxyParams}{Parameters}
+{\em create\+Captive\+Portal} & set to true if Captive Wi\+Fi connection is needed. Defaults to false \\
+\hline
+{\em html} & A string representing custom H\+T\+ML code used for the portal. Default is an empty string Default portal web page is used if the string is empty \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_duck_a6f05948b80c3a5a735b32618f31f283c}\label{class_duck_a6f05948b80c3a5a735b32618f31f283c}} 
+\index{Duck@{Duck}!setupWifi@{setupWifi}}
+\index{setupWifi@{setupWifi}!Duck@{Duck}}
+\doxysubsubsection{\texorpdfstring{setupWifi()}{setupWifi()}}
+{\footnotesize\ttfamily void Duck\+::setup\+Wifi (\begin{DoxyParamCaption}\item[{const char $\ast$}]{ap = {\ttfamily \char`\"{}🆘~DUCK~EMERGENCY~PORTAL\char`\"{}} }\end{DoxyParamCaption})}
+
+
+
+Setup Wi\+Fi access point. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em access\+Point} & a string representing the access point. Default to \char`\"{}🆘 D\+U\+C\+K E\+M\+E\+R\+G\+E\+N\+C\+Y P\+O\+R\+T\+A\+L\char`\"{} \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_duck_a86786a759eb87e0ef1714b09a09947a1}\label{class_duck_a86786a759eb87e0ef1714b09a09947a1}} 
+\index{Duck@{Duck}!setupWithDefaults@{setupWithDefaults}}
+\index{setupWithDefaults@{setupWithDefaults}!Duck@{Duck}}
+\doxysubsubsection{\texorpdfstring{setupWithDefaults()}{setupWithDefaults()}}
+{\footnotesize\ttfamily virtual void Duck\+::setup\+With\+Defaults (\begin{DoxyParamCaption}\item[{String}]{ssid,  }\item[{String}]{password }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Setup a duck with default settings. 
+
+The default implementation simply initializes the serial interface. It can be overriden by each concrete \mbox{\hyperlink{class_duck}{Duck}} class implementation. 
+
+Reimplemented in \mbox{\hyperlink{class_papa_duck_a539e86e44cd915c19dde6b5bbe8cd092}{Papa\+Duck}}, \mbox{\hyperlink{class_mama_duck_a7cbac8bd061d9c99607f92733c3b548b}{Mama\+Duck}}, \mbox{\hyperlink{class_duck_link_a219e2db7e3e864883d5083ac879b751b}{Duck\+Link}}, and \mbox{\hyperlink{class_duck_detect_a2331c49bb550efc8306219331cb65360}{Duck\+Detect}}.
+
+\mbox{\Hypertarget{class_duck_a9ec9747fba6a5b2875c4c63e33038967}\label{class_duck_a9ec9747fba6a5b2875c4c63e33038967}} 
+\index{Duck@{Duck}!ssidAvailable@{ssidAvailable}}
+\index{ssidAvailable@{ssidAvailable}!Duck@{Duck}}
+\doxysubsubsection{\texorpdfstring{ssidAvailable()}{ssidAvailable()}}
+{\footnotesize\ttfamily bool Duck\+::ssid\+Available (\begin{DoxyParamCaption}\item[{String}]{ssid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Check if the give access point is available. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ssid} & access point to check \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true if the access point is available, false otherwise. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_duck_a4a6e0d24b829a3b9760d94b1095a4d02}\label{class_duck_a4a6e0d24b829a3b9760d94b1095a4d02}} 
+\index{Duck@{Duck}!startReceive@{startReceive}}
+\index{startReceive@{startReceive}!Duck@{Duck}}
+\doxysubsubsection{\texorpdfstring{startReceive()}{startReceive()}}
+{\footnotesize\ttfamily int Duck\+::start\+Receive (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Tell the duck radio to start receiving packets from the mesh network. 
+
+\begin{DoxyReturn}{Returns}
+D\+U\+C\+K\+\_\+\+E\+R\+R\+\_\+\+N\+O\+NE if successful, an error code otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_duck_a95fe4f407a37978088d354a575456d4a}\label{class_duck_a95fe4f407a37978088d354a575456d4a}} 
+\index{Duck@{Duck}!startTransmit@{startTransmit}}
+\index{startTransmit@{startTransmit}!Duck@{Duck}}
+\doxysubsubsection{\texorpdfstring{startTransmit()}{startTransmit()}}
+{\footnotesize\ttfamily int Duck\+::start\+Transmit (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Tell the duck radio to start receiving packets from the mesh network. 
+
+\begin{DoxyReturn}{Returns}
+D\+U\+C\+K\+\_\+\+E\+R\+R\+\_\+\+N\+O\+NE if successful, an error code otherwise 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/include/Duck.\+h\item 
+src/\+Ducks/Duck.\+cpp\end{DoxyCompactItemize}

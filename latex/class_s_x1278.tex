@@ -1,0 +1,340 @@
+\hypertarget{class_s_x1278}{}\doxysection{S\+X1278 Class Reference}
+\label{class_s_x1278}\index{SX1278@{SX1278}}
+
+
+Derived class for S\+X1278 modules. Also used as base class for \mbox{\hyperlink{class_s_x1276}{S\+X1276}}, \mbox{\hyperlink{class_s_x1277}{S\+X1277}}, \mbox{\hyperlink{class_s_x1279}{S\+X1279}}, \mbox{\hyperlink{class_r_f_m95}{R\+F\+M95}} and \mbox{\hyperlink{class_r_f_m96}{R\+F\+M96}}. All of these modules use the same basic hardware and only differ in parameter ranges (and names).  
+
+
+
+
+{\ttfamily \#include $<$S\+X1278.\+h$>$}
+
+Inheritance diagram for S\+X1278\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=5.000000cm]{class_s_x1278}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_s_x1278_a00ebd3e60a66056940b241b13da0c68e}{S\+X1278}} (\mbox{\hyperlink{class_module}{Module}} $\ast$mod)
+\begin{DoxyCompactList}\small\item\em Default constructor. Called from Arduino sketch when creating new Lo\+Ra instance. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_s_x1278_ab4609e7f8feb40a1eae9d449fd9d457b}{begin}} (float freq=434.\+0, float bw=125.\+0, uint8\+\_\+t sf=9, uint8\+\_\+t cr=7, uint8\+\_\+t sync\+Word=S\+X127\+X\+\_\+\+S\+Y\+N\+C\+\_\+\+W\+O\+RD, int8\+\_\+t power=17, uint8\+\_\+t current\+Limit=100, uint16\+\_\+t preamble\+Length=8, uint8\+\_\+t gain=0)
+\begin{DoxyCompactList}\small\item\em Lo\+Ra modem initialization method. Must be called at least once from Arduino sketch to initialize the module. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_s_x1278_aefaa14095aeabb1ddb6736eb3bd50a82}{begin\+F\+SK}} (float freq=434.\+0, float br=48.\+0, float freq\+Dev=50.\+0, float rx\+Bw=125.\+0, int8\+\_\+t power=13, uint8\+\_\+t current\+Limit=100, uint16\+\_\+t preamble\+Length=16, bool enable\+O\+OK=false)
+\begin{DoxyCompactList}\small\item\em F\+SK modem initialization method. Must be called at least once from Arduino sketch to initialize the module. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_s_x1278_ac98c55690cec2fba8796323438311bae}\label{class_s_x1278_ac98c55690cec2fba8796323438311bae}} 
+void \mbox{\hyperlink{class_s_x1278_ac98c55690cec2fba8796323438311bae}{reset}} ()
+\begin{DoxyCompactList}\small\item\em Reset method. Will reset the chip to the default state using R\+ST pin. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_s_x1278_a4b14d432ef1bd72982f4771cac5b62e4}{set\+Frequency}} (float freq)
+\begin{DoxyCompactList}\small\item\em Sets carrier frequency. Allowed values range from 137.\+0 M\+Hz to 525.\+0 M\+Hz. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_s_x1278_a46c27ed1ebaae4e3ed8afe3ae6941dd6}{set\+Bandwidth}} (float bw)
+\begin{DoxyCompactList}\small\item\em Sets Lo\+Ra link bandwidth. Allowed values are 10.\+4, 15.\+6, 20.\+8, 31.\+25, 41.\+7, 62.\+5, 125, 250 and 500 k\+Hz. Only available in Lo\+Ra mode. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_s_x1278_af70c22fe38bc3b944070ccbc083fed08}{set\+Spreading\+Factor}} (uint8\+\_\+t sf)
+\begin{DoxyCompactList}\small\item\em Sets Lo\+Ra link spreading factor. Allowed values range from 6 to 12. Only available in Lo\+Ra mode. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_s_x1278_a834f26a0bd3fc8a03fa7e68aa4daf9e1}{set\+Coding\+Rate}} (uint8\+\_\+t cr)
+\begin{DoxyCompactList}\small\item\em Sets Lo\+Ra link coding rate denominator. Allowed values range from 5 to 8. Only available in Lo\+Ra mode. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_s_x1278_a8eeac64472fa70ed5e51f35d581f37ea}{set\+Output\+Power}} (int8\+\_\+t power)
+\begin{DoxyCompactList}\small\item\em Sets transmission output power. Allowed values range from 2 to 17 d\+Bm. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_s_x1278_aa57b713988cfa224a6db2ff325052931}{set\+Gain}} (uint8\+\_\+t gain)
+\begin{DoxyCompactList}\small\item\em Sets gain of receiver L\+NA (low-\/noise amplifier). Can be set to any integer in range 1 to 6 where 1 is the highest gain. Set to 0 to enable automatic gain control (recommended). Only available in Lo\+Ra mode. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_s_x1278_ae5e5baf0417e50421797edfc60906a1b}{set\+Data\+Shaping}} (float sh)
+\begin{DoxyCompactList}\small\item\em Sets Gaussian filter bandwidth-\/time product that will be used for data shaping. Allowed values are 0.\+3, 0.\+5 or 1.\+0. Set to 0 to disable data shaping. Only available in F\+SK mode with F\+SK modulation. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_s_x1278_a1ccc4d5062f739d534ab22562c7efca4}{set\+Data\+Shaping\+O\+OK}} (uint8\+\_\+t sh)
+\begin{DoxyCompactList}\small\item\em Sets filter cutoff frequency that will be used for data shaping. Allowed values are 1 for frequency equal to bit rate and 2 for frequency equal to 2x bit rate. Set to 0 to disable data shaping. Only available in F\+SK mode with O\+OK modulation. \end{DoxyCompactList}\item 
+float \mbox{\hyperlink{class_s_x1278_a0b1fe4d0b1acfa454d7bab59cdf319fe}{get\+R\+S\+SI}} ()
+\begin{DoxyCompactList}\small\item\em Gets recorded signal strength indicator of the latest received packet for Lo\+Ra modem, or current R\+S\+SI level for F\+SK modem. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_s_x1278_adf0b0d628c7f7479f19c153732363462}{set\+C\+RC}} (bool enable\+C\+RC)
+\begin{DoxyCompactList}\small\item\em Enables/disables C\+RC check of received packets. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_s_x1278_a49dfacbbcde5ae4dbe56ed4a15444eb7}\label{class_s_x1278_a49dfacbbcde5ae4dbe56ed4a15444eb7}} 
+int16\+\_\+t {\bfseries set\+Bandwidth\+Raw} (uint8\+\_\+t new\+Bandwidth)
+\item 
+\mbox{\Hypertarget{class_s_x1278_a38c2196faef42b3866a9d8eeed3b1170}\label{class_s_x1278_a38c2196faef42b3866a9d8eeed3b1170}} 
+int16\+\_\+t {\bfseries set\+Spreading\+Factor\+Raw} (uint8\+\_\+t new\+Spreading\+Factor)
+\item 
+\mbox{\Hypertarget{class_s_x1278_adb3f10e798f399a9b6d58e38a7ba7b94}\label{class_s_x1278_adb3f10e798f399a9b6d58e38a7ba7b94}} 
+int16\+\_\+t {\bfseries set\+Coding\+Rate\+Raw} (uint8\+\_\+t new\+Coding\+Rate)
+\item 
+\mbox{\Hypertarget{class_s_x1278_a3badc1dc3b67139cd1a56931da2aca5d}\label{class_s_x1278_a3badc1dc3b67139cd1a56931da2aca5d}} 
+int16\+\_\+t {\bfseries config\+F\+SK} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+\doxysubsection{Detailed Description}
+Derived class for S\+X1278 modules. Also used as base class for \mbox{\hyperlink{class_s_x1276}{S\+X1276}}, \mbox{\hyperlink{class_s_x1277}{S\+X1277}}, \mbox{\hyperlink{class_s_x1279}{S\+X1279}}, \mbox{\hyperlink{class_r_f_m95}{R\+F\+M95}} and \mbox{\hyperlink{class_r_f_m96}{R\+F\+M96}}. All of these modules use the same basic hardware and only differ in parameter ranges (and names). 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{class_s_x1278_a00ebd3e60a66056940b241b13da0c68e}\label{class_s_x1278_a00ebd3e60a66056940b241b13da0c68e}} 
+\index{SX1278@{SX1278}!SX1278@{SX1278}}
+\index{SX1278@{SX1278}!SX1278@{SX1278}}
+\doxysubsubsection{\texorpdfstring{SX1278()}{SX1278()}}
+{\footnotesize\ttfamily S\+X1278\+::\+S\+X1278 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_module}{Module}} $\ast$}]{mod }\end{DoxyParamCaption})}
+
+
+
+Default constructor. Called from Arduino sketch when creating new Lo\+Ra instance. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em mod} & Instance of \mbox{\hyperlink{class_module}{Module}} that will be used to communicate with the Lo\+Ra chip. \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_s_x1278_ab4609e7f8feb40a1eae9d449fd9d457b}\label{class_s_x1278_ab4609e7f8feb40a1eae9d449fd9d457b}} 
+\index{SX1278@{SX1278}!begin@{begin}}
+\index{begin@{begin}!SX1278@{SX1278}}
+\doxysubsubsection{\texorpdfstring{begin()}{begin()}}
+{\footnotesize\ttfamily int16\+\_\+t S\+X1278\+::begin (\begin{DoxyParamCaption}\item[{float}]{freq = {\ttfamily 434.0},  }\item[{float}]{bw = {\ttfamily 125.0},  }\item[{uint8\+\_\+t}]{sf = {\ttfamily 9},  }\item[{uint8\+\_\+t}]{cr = {\ttfamily 7},  }\item[{uint8\+\_\+t}]{sync\+Word = {\ttfamily SX127X\+\_\+SYNC\+\_\+WORD},  }\item[{int8\+\_\+t}]{power = {\ttfamily 17},  }\item[{uint8\+\_\+t}]{current\+Limit = {\ttfamily 100},  }\item[{uint16\+\_\+t}]{preamble\+Length = {\ttfamily 8},  }\item[{uint8\+\_\+t}]{gain = {\ttfamily 0} }\end{DoxyParamCaption})}
+
+
+
+Lo\+Ra modem initialization method. Must be called at least once from Arduino sketch to initialize the module. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em freq} & Carrier frequency in M\+Hz. Allowed values range from 137.\+0 M\+Hz to 525.\+0 M\+Hz.\\
+\hline
+{\em bw} & Lo\+Ra link bandwidth in k\+Hz. Allowed values are 10.\+4, 15.\+6, 20.\+8, 31.\+25, 41.\+7, 62.\+5, 125, 250 and 500 k\+Hz.\\
+\hline
+{\em sf} & Lo\+Ra link spreading factor. Allowed values range from 6 to 12.\\
+\hline
+{\em cr} & Lo\+Ra link coding rate denominator. Allowed values range from 5 to 8.\\
+\hline
+{\em sync\+Word} & Lo\+Ra sync word. Can be used to distinguish different networks. Note that value 0x34 is reserved for Lo\+Ra\+W\+AN networks.\\
+\hline
+{\em power} & Transmission output power in d\+Bm. Allowed values range from 2 to 17 d\+Bm.\\
+\hline
+{\em current\+Limit} & Trim value for O\+CP (over current protection) in mA. Can be set to multiplies of 5 in range 45 to 120 mA and to multiples of 10 in range 120 to 240 mA. Set to 0 to disable O\+CP (not recommended).\\
+\hline
+{\em preamble\+Length} & Length of Lo\+Ra transmission preamble in symbols. The actual preamble length is 4.\+25 symbols longer than the set number. Allowed values range from 6 to 65535.\\
+\hline
+{\em gain} & Gain of receiver L\+NA (low-\/noise amplifier). Can be set to any integer in range 1 to 6 where 1 is the highest gain. Set to 0 to enable automatic gain control (recommended).\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_s_x1278_aefaa14095aeabb1ddb6736eb3bd50a82}\label{class_s_x1278_aefaa14095aeabb1ddb6736eb3bd50a82}} 
+\index{SX1278@{SX1278}!beginFSK@{beginFSK}}
+\index{beginFSK@{beginFSK}!SX1278@{SX1278}}
+\doxysubsubsection{\texorpdfstring{beginFSK()}{beginFSK()}}
+{\footnotesize\ttfamily int16\+\_\+t S\+X1278\+::begin\+F\+SK (\begin{DoxyParamCaption}\item[{float}]{freq = {\ttfamily 434.0},  }\item[{float}]{br = {\ttfamily 48.0},  }\item[{float}]{freq\+Dev = {\ttfamily 50.0},  }\item[{float}]{rx\+Bw = {\ttfamily 125.0},  }\item[{int8\+\_\+t}]{power = {\ttfamily 13},  }\item[{uint8\+\_\+t}]{current\+Limit = {\ttfamily 100},  }\item[{uint16\+\_\+t}]{preamble\+Length = {\ttfamily 16},  }\item[{bool}]{enable\+O\+OK = {\ttfamily false} }\end{DoxyParamCaption})}
+
+
+
+F\+SK modem initialization method. Must be called at least once from Arduino sketch to initialize the module. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em freq} & Carrier frequency in M\+Hz. Allowed values range from 137.\+0 M\+Hz to 525.\+0 M\+Hz.\\
+\hline
+{\em br} & Bit rate of the F\+SK transmission in kbps (kilobits per second). Allowed values range from 1.\+2 to 300.\+0 kbps.\\
+\hline
+{\em freq\+Dev} & Frequency deviation of the F\+SK transmission in k\+Hz. Allowed values range from 0.\+6 to 200.\+0 k\+Hz. Note that the allowed range changes based on bit rate setting, so that the condition Freq\+Dev + Bit\+Rate/2 $<$= 250 k\+Hz is always met.\\
+\hline
+{\em rx\+Bw} & Receiver bandwidth in k\+Hz. Allowed values are 2.\+6, 3.\+1, 3.\+9, 5.\+2, 6.\+3, 7.\+8, 10.\+4, 12.\+5, 15.\+6, 20.\+8, 25, 31.\+3, 41.\+7, 50, 62.\+5, 83.\+3, 100, 125, 166.\+7, 200 and 250 k\+Hz.\\
+\hline
+{\em power} & Transmission output power in d\+Bm. Allowed values range from 2 to 17 d\+Bm.\\
+\hline
+{\em current\+Limit} & Trim value for O\+CP (over current protection) in mA. Can be set to multiplies of 5 in range 45 to 120 mA and to multiples of 10 in range 120 to 240 mA. Set to 0 to disable O\+CP (not recommended).\\
+\hline
+{\em preamble\+Length} & Length of F\+SK preamble in bits.\\
+\hline
+{\em enable\+O\+OK} & Use O\+OK modulation instead of F\+SK.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_s_x1278_a0b1fe4d0b1acfa454d7bab59cdf319fe}\label{class_s_x1278_a0b1fe4d0b1acfa454d7bab59cdf319fe}} 
+\index{SX1278@{SX1278}!getRSSI@{getRSSI}}
+\index{getRSSI@{getRSSI}!SX1278@{SX1278}}
+\doxysubsubsection{\texorpdfstring{getRSSI()}{getRSSI()}}
+{\footnotesize\ttfamily float S\+X1278\+::get\+R\+S\+SI (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Gets recorded signal strength indicator of the latest received packet for Lo\+Ra modem, or current R\+S\+SI level for F\+SK modem. 
+
+\begin{DoxyReturn}{Returns}
+Last packet R\+S\+SI for Lo\+Ra modem, or current R\+S\+SI level for F\+SK modem. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_s_x1278_a46c27ed1ebaae4e3ed8afe3ae6941dd6}\label{class_s_x1278_a46c27ed1ebaae4e3ed8afe3ae6941dd6}} 
+\index{SX1278@{SX1278}!setBandwidth@{setBandwidth}}
+\index{setBandwidth@{setBandwidth}!SX1278@{SX1278}}
+\doxysubsubsection{\texorpdfstring{setBandwidth()}{setBandwidth()}}
+{\footnotesize\ttfamily int16\+\_\+t S\+X1278\+::set\+Bandwidth (\begin{DoxyParamCaption}\item[{float}]{bw }\end{DoxyParamCaption})}
+
+
+
+Sets Lo\+Ra link bandwidth. Allowed values are 10.\+4, 15.\+6, 20.\+8, 31.\+25, 41.\+7, 62.\+5, 125, 250 and 500 k\+Hz. Only available in Lo\+Ra mode. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em bw} & Lo\+Ra link bandwidth to be set in k\+Hz.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_s_x1278_a834f26a0bd3fc8a03fa7e68aa4daf9e1}\label{class_s_x1278_a834f26a0bd3fc8a03fa7e68aa4daf9e1}} 
+\index{SX1278@{SX1278}!setCodingRate@{setCodingRate}}
+\index{setCodingRate@{setCodingRate}!SX1278@{SX1278}}
+\doxysubsubsection{\texorpdfstring{setCodingRate()}{setCodingRate()}}
+{\footnotesize\ttfamily int16\+\_\+t S\+X1278\+::set\+Coding\+Rate (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{cr }\end{DoxyParamCaption})}
+
+
+
+Sets Lo\+Ra link coding rate denominator. Allowed values range from 5 to 8. Only available in Lo\+Ra mode. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em cr} & Lo\+Ra link coding rate denominator to be set.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_s_x1278_adf0b0d628c7f7479f19c153732363462}\label{class_s_x1278_adf0b0d628c7f7479f19c153732363462}} 
+\index{SX1278@{SX1278}!setCRC@{setCRC}}
+\index{setCRC@{setCRC}!SX1278@{SX1278}}
+\doxysubsubsection{\texorpdfstring{setCRC()}{setCRC()}}
+{\footnotesize\ttfamily int16\+\_\+t S\+X1278\+::set\+C\+RC (\begin{DoxyParamCaption}\item[{bool}]{enable\+C\+RC }\end{DoxyParamCaption})}
+
+
+
+Enables/disables C\+RC check of received packets. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em enable\+C\+RC} & Enable (true) or disable (false) C\+RC.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_s_x1278_ae5e5baf0417e50421797edfc60906a1b}\label{class_s_x1278_ae5e5baf0417e50421797edfc60906a1b}} 
+\index{SX1278@{SX1278}!setDataShaping@{setDataShaping}}
+\index{setDataShaping@{setDataShaping}!SX1278@{SX1278}}
+\doxysubsubsection{\texorpdfstring{setDataShaping()}{setDataShaping()}}
+{\footnotesize\ttfamily int16\+\_\+t S\+X1278\+::set\+Data\+Shaping (\begin{DoxyParamCaption}\item[{float}]{sh }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Sets Gaussian filter bandwidth-\/time product that will be used for data shaping. Allowed values are 0.\+3, 0.\+5 or 1.\+0. Set to 0 to disable data shaping. Only available in F\+SK mode with F\+SK modulation. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sh} & Gaussian shaping bandwidth-\/time product that will be used for data shaping\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{class_physical_layer_a24758d0300b46aa4fcaed86f5a621191}{Physical\+Layer}}.
+
+\mbox{\Hypertarget{class_s_x1278_a1ccc4d5062f739d534ab22562c7efca4}\label{class_s_x1278_a1ccc4d5062f739d534ab22562c7efca4}} 
+\index{SX1278@{SX1278}!setDataShapingOOK@{setDataShapingOOK}}
+\index{setDataShapingOOK@{setDataShapingOOK}!SX1278@{SX1278}}
+\doxysubsubsection{\texorpdfstring{setDataShapingOOK()}{setDataShapingOOK()}}
+{\footnotesize\ttfamily int16\+\_\+t S\+X1278\+::set\+Data\+Shaping\+O\+OK (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{sh }\end{DoxyParamCaption})}
+
+
+
+Sets filter cutoff frequency that will be used for data shaping. Allowed values are 1 for frequency equal to bit rate and 2 for frequency equal to 2x bit rate. Set to 0 to disable data shaping. Only available in F\+SK mode with O\+OK modulation. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sh} & Cutoff frequency that will be used for data shaping\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_s_x1278_a4b14d432ef1bd72982f4771cac5b62e4}\label{class_s_x1278_a4b14d432ef1bd72982f4771cac5b62e4}} 
+\index{SX1278@{SX1278}!setFrequency@{setFrequency}}
+\index{setFrequency@{setFrequency}!SX1278@{SX1278}}
+\doxysubsubsection{\texorpdfstring{setFrequency()}{setFrequency()}}
+{\footnotesize\ttfamily int16\+\_\+t S\+X1278\+::set\+Frequency (\begin{DoxyParamCaption}\item[{float}]{freq }\end{DoxyParamCaption})}
+
+
+
+Sets carrier frequency. Allowed values range from 137.\+0 M\+Hz to 525.\+0 M\+Hz. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em freq} & Carrier frequency to be set in M\+Hz.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_s_x1278_aa57b713988cfa224a6db2ff325052931}\label{class_s_x1278_aa57b713988cfa224a6db2ff325052931}} 
+\index{SX1278@{SX1278}!setGain@{setGain}}
+\index{setGain@{setGain}!SX1278@{SX1278}}
+\doxysubsubsection{\texorpdfstring{setGain()}{setGain()}}
+{\footnotesize\ttfamily int16\+\_\+t S\+X1278\+::set\+Gain (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{gain }\end{DoxyParamCaption})}
+
+
+
+Sets gain of receiver L\+NA (low-\/noise amplifier). Can be set to any integer in range 1 to 6 where 1 is the highest gain. Set to 0 to enable automatic gain control (recommended). Only available in Lo\+Ra mode. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em gain} & Gain of receiver L\+NA (low-\/noise amplifier) to be set.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_s_x1278_a8eeac64472fa70ed5e51f35d581f37ea}\label{class_s_x1278_a8eeac64472fa70ed5e51f35d581f37ea}} 
+\index{SX1278@{SX1278}!setOutputPower@{setOutputPower}}
+\index{setOutputPower@{setOutputPower}!SX1278@{SX1278}}
+\doxysubsubsection{\texorpdfstring{setOutputPower()}{setOutputPower()}}
+{\footnotesize\ttfamily int16\+\_\+t S\+X1278\+::set\+Output\+Power (\begin{DoxyParamCaption}\item[{int8\+\_\+t}]{power }\end{DoxyParamCaption})}
+
+
+
+Sets transmission output power. Allowed values range from 2 to 17 d\+Bm. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em power} & Transmission output power in d\+Bm.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_s_x1278_af70c22fe38bc3b944070ccbc083fed08}\label{class_s_x1278_af70c22fe38bc3b944070ccbc083fed08}} 
+\index{SX1278@{SX1278}!setSpreadingFactor@{setSpreadingFactor}}
+\index{setSpreadingFactor@{setSpreadingFactor}!SX1278@{SX1278}}
+\doxysubsubsection{\texorpdfstring{setSpreadingFactor()}{setSpreadingFactor()}}
+{\footnotesize\ttfamily int16\+\_\+t S\+X1278\+::set\+Spreading\+Factor (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{sf }\end{DoxyParamCaption})}
+
+
+
+Sets Lo\+Ra link spreading factor. Allowed values range from 6 to 12. Only available in Lo\+Ra mode. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sf} & Lo\+Ra link spreading factor to be set.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+Libraries/\+Radio\+Lib/src/modules/\+S\+X127x/S\+X1278.\+h\item 
+Libraries/\+Radio\+Lib/src/modules/\+S\+X127x/S\+X1278.\+cpp\end{DoxyCompactItemize}

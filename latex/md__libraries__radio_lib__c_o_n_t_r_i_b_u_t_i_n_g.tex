@@ -1,0 +1,82 @@
+First of all, thank you very much for taking the time to contribute! All feedback and ideas are greatly appreciated. To keep this library organized, please follow these rules.\hypertarget{md__libraries__radio_lib__c_o_n_t_r_i_b_u_t_i_n_g_autotoc_md55}{}\doxysection{Issues}\label{md__libraries__radio_lib__c_o_n_t_r_i_b_u_t_i_n_g_autotoc_md55}
+The following rules guide submission of new issues. These rules are in place mainly so that the issue author can get help as quickly as possible.
+
+
+\begin{DoxyEnumerate}
+\item {\bfseries{Questions are welcome, spam is not.}} ~\newline
+ Any issues without description will be considered spam and as such will be {\bfseries{C\+L\+O\+S\+ED}} and {\bfseries{L\+O\+C\+K\+ED}} immediately!
+\item {\bfseries{This repository has issue templates.}} ~\newline
+ To report bugs or suggest new features, use the provided issue templates. Use the default issue only if the templates do not fit your issue type.
+\item {\bfseries{Be as clear as possible when creating issues.}} ~\newline
+ Issues with generic titles (e.\+g. \char`\"{}not working\char`\"{}, \char`\"{}lora\char`\"{}, etc.) will be {\bfseries{C\+L\+O\+S\+ED}} until the title is fixed, since the title is supposed to categorize the issue. The same applies for issues with very little information and extensive grammatical or formatting errors that make it difficult to find out what is the actual issue.
+\item {\bfseries{Issues deserve some attention too.}} ~\newline
+ Issues that are left for 2 weeks without response by the original author when asked for further information will be closed due to inactivity. This is to keep track of important issues, the author is encouraged to reopen the issue at a later date.
+\end{DoxyEnumerate}\hypertarget{md__libraries__radio_lib__c_o_n_t_r_i_b_u_t_i_n_g_autotoc_md56}{}\doxysection{Code style guidelines}\label{md__libraries__radio_lib__c_o_n_t_r_i_b_u_t_i_n_g_autotoc_md56}
+I like pretty code! Or at least, I like {\itshape consistent} code style. When creating pull requests, please follow these style guidelines, they\textquotesingle{}re in place to keep high code readability.
+
+
+\begin{DoxyEnumerate}
+\item {\bfseries{Bracket style}} ~\newline
+ This library uses the following style of bracket indentation (1T\+BS, or \char`\"{}javascript\char`\"{} style)\+:
+\end{DoxyEnumerate}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{ \{c++\}}
+\DoxyCodeLine{if (foo) \{}
+\DoxyCodeLine{  bar();}
+\DoxyCodeLine{\} else \{}
+\DoxyCodeLine{  baz();}
+\DoxyCodeLine{\}}
+\end{DoxyCode}
+
+
+
+\begin{DoxyEnumerate}
+\item {\bfseries{Tabs}} ~\newline
+ Use 2 space characters for tabs.
+\item {\bfseries{Single-\/line comments}} ~\newline
+ Comments can be very useful -\/ and they can become the bane of readability. Every single-\/line comment should start at new line, have one space between comment delimiter {\ttfamily //} and the start of the comment itself. The comment should also start with a lower-\/case letter.
+\end{DoxyEnumerate}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{ \{c++\}}
+\DoxyCodeLine{// this function does something}
+\DoxyCodeLine{foo("{}bar"{});}
+\DoxyCodeLine{}
+\DoxyCodeLine{// here it does something else}
+\DoxyCodeLine{foo(12345);}
+\end{DoxyCode}
+
+
+
+\begin{DoxyEnumerate}
+\item {\bfseries{Split code into blocks}} ~\newline
+ It is very easy to write code that machine can read. It is much harder to write one that humans can read. That\textquotesingle{}s why it\textquotesingle{}s a great idea to split code into blocks -\/ even if the block is just a single line!
+\end{DoxyEnumerate}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{ \{c++\}}
+\DoxyCodeLine{// build a temporary buffer (first block)}
+\DoxyCodeLine{uint8\_t* data = new uint8\_t[len + 1];}
+\DoxyCodeLine{if(!data) \{}
+\DoxyCodeLine{  return(ERR\_MEMORY\_ALLOCATION\_FAILED);}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{// read the received data (second block)}
+\DoxyCodeLine{state = readData(data, len);}
+\DoxyCodeLine{}
+\DoxyCodeLine{// add null terminator (third block)}
+\DoxyCodeLine{data[len] = 0;}
+\end{DoxyCode}
+
+
+
+\begin{DoxyEnumerate}
+\item {\bfseries{Doxygen}} ~\newline
+ If you\textquotesingle{}re adding a new method, make sure to add appropriate Doxygen comments, so that the documentation is always complete.
+\item {\bfseries{Keywords}} ~\newline
+ This is an Arduino library, so it needs to comply with the Arduino library specification. To add a new keyword to the Arduino I\+DE syntax highlighting, add it to the keywords.\+txt file. {\bfseries{Use true tabs in keywords.\+txt! No spaces there!}} 
+\end{DoxyEnumerate}

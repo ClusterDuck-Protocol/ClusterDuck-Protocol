@@ -1,0 +1,898 @@
+\hypertarget{classn_r_f24}{}\doxysection{n\+R\+F24 Class Reference}
+\label{classn_r_f24}\index{nRF24@{nRF24}}
+
+
+Control class for n\+R\+F24 module.  
+
+
+
+
+{\ttfamily \#include $<$n\+R\+F24.\+h$>$}
+
+Inheritance diagram for n\+R\+F24\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classn_r_f24}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classn_r_f24_a113f5c11077549e18b2023d52a13c99e}{n\+R\+F24}} (\mbox{\hyperlink{class_module}{Module}} $\ast$module)
+\begin{DoxyCompactList}\small\item\em Default constructor. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_a60eb59262c5004b587b1d8177706ff28}{begin}} (int16\+\_\+t freq=2400, int16\+\_\+t data\+Rate=1000, int8\+\_\+t power=-\/12, uint8\+\_\+t addr\+Width=5)
+\begin{DoxyCompactList}\small\item\em Initialization method. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_a033287e33c532638c11e2775a073f297}{sleep}} ()
+\begin{DoxyCompactList}\small\item\em Sets the module to sleep mode. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_a225c19fda7bf705f4f2652c71214adff}{standby}} ()
+\begin{DoxyCompactList}\small\item\em Sets the module to standby mode. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_af83d2ee7c9195f4ce9cd12df798ff869}{transmit}} (uint8\+\_\+t $\ast$data, size\+\_\+t len, uint8\+\_\+t addr)
+\begin{DoxyCompactList}\small\item\em Blocking binary transmit method. Overloads for string-\/based transmissions are implemented in \mbox{\hyperlink{class_physical_layer}{Physical\+Layer}}. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_ad84595667957d2899d571e10c6495634}{receive}} (uint8\+\_\+t $\ast$data, size\+\_\+t len)
+\begin{DoxyCompactList}\small\item\em Blocking binary receive method. Overloads for string-\/based transmissions are implemented in \mbox{\hyperlink{class_physical_layer}{Physical\+Layer}}. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_af328670d7c35c4b11b4c8f59f21d0716}{transmit\+Direct}} (uint32\+\_\+t frf=0)
+\begin{DoxyCompactList}\small\item\em Starts direct mode transmission. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_ac7f201f69756784b56c9998d7332e9a1}{receive\+Direct}} ()
+\begin{DoxyCompactList}\small\item\em Dummy direct mode reception method, to ensure \mbox{\hyperlink{class_physical_layer}{Physical\+Layer}} compatibility. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classn_r_f24_abf9323748b1a850e6ddc6f6d48f4cfb3}{set\+Irq\+Action}} (void($\ast$func)(void))
+\begin{DoxyCompactList}\small\item\em Sets interrupt service routine to call when I\+RQ activates. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_a25cb986cab78ea92ceab76fec70713d9}{start\+Transmit}} (uint8\+\_\+t $\ast$data, size\+\_\+t len, uint8\+\_\+t addr)
+\begin{DoxyCompactList}\small\item\em Interrupt-\/driven binary transmit method. I\+RQ will be activated when full packet is transmitted. Overloads for string-\/based transmissions are implemented in \mbox{\hyperlink{class_physical_layer}{Physical\+Layer}}. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_af4f443da5d90e032e5f2f65420515f9c}{start\+Receive}} ()
+\begin{DoxyCompactList}\small\item\em Interrupt-\/driven receive method. I\+RQ will be activated when full packet is received. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_ad1941fce4de97c5050eba341763e95ac}{read\+Data}} (uint8\+\_\+t $\ast$data, size\+\_\+t len)
+\begin{DoxyCompactList}\small\item\em Reads data received after calling start\+Receive method. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_abec5f9dba44a019e23c8bf516f104fad}{set\+Frequency}} (int16\+\_\+t freq)
+\begin{DoxyCompactList}\small\item\em Sets carrier frequency. Allowed values range from 2400 M\+Hz to 2525 M\+Hz. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_a1f3ec2196733a2e2476f50690967f285}{set\+Data\+Rate}} (int16\+\_\+t data\+Rate)
+\begin{DoxyCompactList}\small\item\em Sets data rate. Allowed values are 2000, 1000 or 250 kbps. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_a824453d547c0b42ac1988acb42032ca4}{set\+Output\+Power}} (int8\+\_\+t power)
+\begin{DoxyCompactList}\small\item\em Sets output power. Allowed values are -\/18, -\/12, -\/6 or 0 d\+Bm. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_a5b01677f5ce6bee54da8fc7098c339f4}{set\+Address\+Width}} (uint8\+\_\+t addr\+Width)
+\begin{DoxyCompactList}\small\item\em Sets address width of transmit and receive pipes in bytes. Allowed values are 3, 4 or 5 bytes. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_aa0e1f2dddf810213410a420205bbd8af}{set\+Transmit\+Pipe}} (uint8\+\_\+t $\ast$addr)
+\begin{DoxyCompactList}\small\item\em Sets address of transmit pipe. The address width must be the same as the same as the configured in set\+Address\+Width. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_a31bcc5a8c3747bf08a273dbdadc5481a}{set\+Receive\+Pipe}} (uint8\+\_\+t pipe\+Num, uint8\+\_\+t $\ast$addr)
+\begin{DoxyCompactList}\small\item\em Sets address of receive pipes 0 or 1. The address width must be the same as the same as the configured in set\+Address\+Width. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_ab5bc08aef88d8cf41c38369044005da8}{set\+Receive\+Pipe}} (uint8\+\_\+t pipe\+Num, uint8\+\_\+t addr\+Byte)
+\begin{DoxyCompactList}\small\item\em Sets address of receive pipes 2 -\/ 5. The first 2 -\/ 4 address bytes for these pipes are the same as for address pipe 1, only the last byte can be set. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_a4dd39e5c0efee1f0c2a14f729eb4426a}{disable\+Pipe}} (uint8\+\_\+t pipe\+Num)
+\begin{DoxyCompactList}\small\item\em Disables specified receive pipe. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_a3f0b08fd8e58db36f6c1926cc3eac6a9}{get\+Status}} (uint8\+\_\+t mask=0x\+FF)
+\begin{DoxyCompactList}\small\item\em Gets \mbox{\hyperlink{classn_r_f24}{n\+R\+F24}} status register. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classn_r_f24_ad9204ee787b425e2c9e8422bb7939a37}{is\+Carrier\+Detected}} ()
+\begin{DoxyCompactList}\small\item\em Checks if carrier was detected during last RX. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_a7d11ab2459bd03ee0df98f769c3b24c8}{set\+Frequency\+Deviation}} (float freq\+Dev)
+\begin{DoxyCompactList}\small\item\em Dummy configuration method, to ensure \mbox{\hyperlink{class_physical_layer}{Physical\+Layer}} compatibility. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{classn_r_f24_a60d2bb5f12cb226e7bd2435f6acd0aba}{get\+Packet\+Length}} (bool update=true)
+\begin{DoxyCompactList}\small\item\em Query modem for the packet length of received payload. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_a3eb45884a5730ac1c339c7ba4f7b5282}{set\+Crc\+Filtering}} (bool crc\+On=true)
+\begin{DoxyCompactList}\small\item\em Enable C\+RC filtering and generation. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_aca941c9235ba1212257288554eb4b7fe}{set\+Auto\+Ack}} (bool auto\+Ack\+On=true)
+\begin{DoxyCompactList}\small\item\em Enable or disable auto-\/acknowlede packets on all pipes. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_ac1c3419442d93abeede39e7fda4db62e}{set\+Auto\+Ack}} (uint8\+\_\+t pipe\+Num, bool auto\+Ack\+On)
+\begin{DoxyCompactList}\small\item\em Enable or disable auto-\/acknowlede packets on given pipe. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_a91b93d1b98f572a0ff49cb452a416a35}{set\+Data\+Shaping}} (float sh)
+\begin{DoxyCompactList}\small\item\em Dummy data shaping configuration method, to ensure \mbox{\hyperlink{class_physical_layer}{Physical\+Layer}} compatibility. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_a7c3ad3d7517e07197ab92a209938ea15}{set\+Encoding}} (uint8\+\_\+t encoding)
+\begin{DoxyCompactList}\small\item\em Dummy encoding configuration method, to ensure \mbox{\hyperlink{class_physical_layer}{Physical\+Layer}} compatibility. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_ab139a34e03a6fd5a781cd54da21d308f}{transmit}} (\+\_\+\+\_\+\+Flash\+String\+Helper $\ast$fstr, uint8\+\_\+t addr=0)
+\begin{DoxyCompactList}\small\item\em Arduino Flash String transmit method. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_aeb62c5a521aafc1e0525c58e9364482b}{transmit}} (String \&str, uint8\+\_\+t addr=0)
+\begin{DoxyCompactList}\small\item\em Arduino String transmit method. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_a492b2d057dd803c3884fa1adc8e22534}{transmit}} (const char $\ast$str, uint8\+\_\+t addr=0)
+\begin{DoxyCompactList}\small\item\em C-\/string transmit method. \end{DoxyCompactList}\item 
+virtual int16\+\_\+t \mbox{\hyperlink{classn_r_f24_af81565ee82ef9a7de9c5663c745f4ef7}{transmit}} (uint8\+\_\+t $\ast$data, size\+\_\+t len, uint8\+\_\+t addr=0)=0
+\begin{DoxyCompactList}\small\item\em Binary transmit method. Must be implemented in module class. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_afb1b090348d9091bfa3a0b5ba3d85b36}{receive}} (String \&str, size\+\_\+t len=0)
+\begin{DoxyCompactList}\small\item\em Arduino String receive method. \end{DoxyCompactList}\item 
+virtual int16\+\_\+t \mbox{\hyperlink{classn_r_f24_a2ad4c6a8ac267f8ac590260414ffcda3}{receive}} (uint8\+\_\+t $\ast$data, size\+\_\+t len)=0
+\begin{DoxyCompactList}\small\item\em Binary receive method. Must be implemented in module class. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_af068e6e862c99e39d0261a7971dd56db}{start\+Transmit}} (String \&str, uint8\+\_\+t addr=0)
+\begin{DoxyCompactList}\small\item\em Interrupt-\/driven Arduino String transmit method. Unlike the standard transmit method, this one is non-\/blocking. Interrupt pin will be activated when transmission finishes. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_a923654706eff5118ef6e84214e837f27}{start\+Transmit}} (const char $\ast$str, uint8\+\_\+t addr=0)
+\begin{DoxyCompactList}\small\item\em Interrupt-\/driven Arduino String transmit method. Unlike the standard transmit method, this one is non-\/blocking. Interrupt pin will be activated when transmission finishes. \end{DoxyCompactList}\item 
+virtual int16\+\_\+t \mbox{\hyperlink{classn_r_f24_a41a1de0ebffe7b65de6fd8cceb9a5123}{start\+Transmit}} (uint8\+\_\+t $\ast$data, size\+\_\+t len, uint8\+\_\+t addr=0)=0
+\begin{DoxyCompactList}\small\item\em Interrupt-\/driven binary transmit method. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{classn_r_f24_ae8eed0e888a7c8742e89d2b850977de2}{read\+Data}} (String \&str, size\+\_\+t len=0)
+\begin{DoxyCompactList}\small\item\em Reads data that was received after calling start\+Receive method. \end{DoxyCompactList}\item 
+virtual int16\+\_\+t \mbox{\hyperlink{classn_r_f24_ae8b6c756eb4b92855433ca389d73c632}{read\+Data}} (uint8\+\_\+t $\ast$data, size\+\_\+t len)=0
+\begin{DoxyCompactList}\small\item\em Reads data that was received after calling start\+Receive method. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Control class for n\+R\+F24 module. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classn_r_f24_a113f5c11077549e18b2023d52a13c99e}\label{classn_r_f24_a113f5c11077549e18b2023d52a13c99e}} 
+\index{nRF24@{nRF24}!nRF24@{nRF24}}
+\index{nRF24@{nRF24}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{nRF24()}{nRF24()}}
+{\footnotesize\ttfamily n\+R\+F24\+::n\+R\+F24 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_module}{Module}} $\ast$}]{module }\end{DoxyParamCaption})}
+
+
+
+Default constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em mod} & Instance of \mbox{\hyperlink{class_module}{Module}} that will be used to communicate with the radio. \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classn_r_f24_a60eb59262c5004b587b1d8177706ff28}\label{classn_r_f24_a60eb59262c5004b587b1d8177706ff28}} 
+\index{nRF24@{nRF24}!begin@{begin}}
+\index{begin@{begin}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{begin()}{begin()}}
+{\footnotesize\ttfamily int16\+\_\+t n\+R\+F24\+::begin (\begin{DoxyParamCaption}\item[{int16\+\_\+t}]{freq = {\ttfamily 2400},  }\item[{int16\+\_\+t}]{data\+Rate = {\ttfamily 1000},  }\item[{int8\+\_\+t}]{power = {\ttfamily -\/12},  }\item[{uint8\+\_\+t}]{addr\+Width = {\ttfamily 5} }\end{DoxyParamCaption})}
+
+
+
+Initialization method. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em freq} & Carrier frequency in M\+Hz. Defaults to 2400 M\+Hz.\\
+\hline
+{\em data\+Rate} & Data rate to be used in kbps. Defaults to 1000 kbps.\\
+\hline
+{\em power} & Output power in d\+Bm. Defaults to -\/12 d\+Bm.\\
+\hline
+{\em addr\+Width} & Address width in bytes. Defaults to 5 bytes.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classn_r_f24_a4dd39e5c0efee1f0c2a14f729eb4426a}\label{classn_r_f24_a4dd39e5c0efee1f0c2a14f729eb4426a}} 
+\index{nRF24@{nRF24}!disablePipe@{disablePipe}}
+\index{disablePipe@{disablePipe}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{disablePipe()}{disablePipe()}}
+{\footnotesize\ttfamily int16\+\_\+t n\+R\+F24\+::disable\+Pipe (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{pipe\+Num }\end{DoxyParamCaption})}
+
+
+
+Disables specified receive pipe. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pipe\+Num} & Receive pipe to be disabled.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classn_r_f24_a60d2bb5f12cb226e7bd2435f6acd0aba}\label{classn_r_f24_a60d2bb5f12cb226e7bd2435f6acd0aba}} 
+\index{nRF24@{nRF24}!getPacketLength@{getPacketLength}}
+\index{getPacketLength@{getPacketLength}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{getPacketLength()}{getPacketLength()}}
+{\footnotesize\ttfamily size\+\_\+t n\+R\+F24\+::get\+Packet\+Length (\begin{DoxyParamCaption}\item[{bool}]{update = {\ttfamily true} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Query modem for the packet length of received payload. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em update} & Update received packet length. Will return cached value when set to false.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Length of last received packet in bytes. 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{class_physical_layer_a0bd6046e068ef63e3f2b6bead48e02a7}{Physical\+Layer}}.
+
+\mbox{\Hypertarget{classn_r_f24_a3f0b08fd8e58db36f6c1926cc3eac6a9}\label{classn_r_f24_a3f0b08fd8e58db36f6c1926cc3eac6a9}} 
+\index{nRF24@{nRF24}!getStatus@{getStatus}}
+\index{getStatus@{getStatus}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{getStatus()}{getStatus()}}
+{\footnotesize\ttfamily int16\+\_\+t n\+R\+F24\+::get\+Status (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{mask = {\ttfamily 0xFF} }\end{DoxyParamCaption})}
+
+
+
+Gets \mbox{\hyperlink{classn_r_f24}{n\+R\+F24}} status register. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em mask} & Bit mask to be used on the returned register value.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Status register value or \mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classn_r_f24_ad9204ee787b425e2c9e8422bb7939a37}\label{classn_r_f24_ad9204ee787b425e2c9e8422bb7939a37}} 
+\index{nRF24@{nRF24}!isCarrierDetected@{isCarrierDetected}}
+\index{isCarrierDetected@{isCarrierDetected}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{isCarrierDetected()}{isCarrierDetected()}}
+{\footnotesize\ttfamily bool n\+R\+F24\+::is\+Carrier\+Detected (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Checks if carrier was detected during last RX. 
+
+\begin{DoxyReturn}{Returns}
+Whatever the carrier was above threshold. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classn_r_f24_ae8eed0e888a7c8742e89d2b850977de2}\label{classn_r_f24_ae8eed0e888a7c8742e89d2b850977de2}} 
+\index{nRF24@{nRF24}!readData@{readData}}
+\index{readData@{readData}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{readData()}{readData()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily int16\+\_\+t Physical\+Layer\+::read\+Data}
+
+
+
+Reads data that was received after calling start\+Receive method. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em str} & Address of Arduino String to save the received data.\\
+\hline
+{\em len} & Expected number of characters in the message.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classn_r_f24_ad1941fce4de97c5050eba341763e95ac}\label{classn_r_f24_ad1941fce4de97c5050eba341763e95ac}} 
+\index{nRF24@{nRF24}!readData@{readData}}
+\index{readData@{readData}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{readData()}{readData()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily int16\+\_\+t n\+R\+F24\+::read\+Data (\begin{DoxyParamCaption}\item[{uint8\+\_\+t $\ast$}]{data,  }\item[{size\+\_\+t}]{len }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Reads data received after calling start\+Receive method. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & Pointer to array to save the received binary data.\\
+\hline
+{\em len} & Number of bytes that will be received. Must be known in advance for binary transmissions.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{class_physical_layer_ae8b6c756eb4b92855433ca389d73c632}{Physical\+Layer}}.
+
+\mbox{\Hypertarget{classn_r_f24_ae8b6c756eb4b92855433ca389d73c632}\label{classn_r_f24_ae8b6c756eb4b92855433ca389d73c632}} 
+\index{nRF24@{nRF24}!readData@{readData}}
+\index{readData@{readData}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{readData()}{readData()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily virtual int16\+\_\+t Physical\+Layer\+::read\+Data}
+
+
+
+Reads data that was received after calling start\+Receive method. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & Pointer to array to save the received binary data.\\
+\hline
+{\em len} & Number of bytes that will be received. Must be known in advance for binary transmissions.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classn_r_f24_afb1b090348d9091bfa3a0b5ba3d85b36}\label{classn_r_f24_afb1b090348d9091bfa3a0b5ba3d85b36}} 
+\index{nRF24@{nRF24}!receive@{receive}}
+\index{receive@{receive}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{receive()}{receive()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily int16\+\_\+t Physical\+Layer\+::receive}
+
+
+
+Arduino String receive method. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em str} & Address of Arduino String to save the received data.\\
+\hline
+{\em len} & Expected number of characters in the message. Leave as 0 if expecting a unknown size packet\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classn_r_f24_ad84595667957d2899d571e10c6495634}\label{classn_r_f24_ad84595667957d2899d571e10c6495634}} 
+\index{nRF24@{nRF24}!receive@{receive}}
+\index{receive@{receive}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{receive()}{receive()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily int16\+\_\+t n\+R\+F24\+::receive (\begin{DoxyParamCaption}\item[{uint8\+\_\+t $\ast$}]{data,  }\item[{size\+\_\+t}]{len }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Blocking binary receive method. Overloads for string-\/based transmissions are implemented in \mbox{\hyperlink{class_physical_layer}{Physical\+Layer}}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & Binary data to be sent.\\
+\hline
+{\em len} & Number of bytes to send.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{class_physical_layer_a2ad4c6a8ac267f8ac590260414ffcda3}{Physical\+Layer}}.
+
+\mbox{\Hypertarget{classn_r_f24_a2ad4c6a8ac267f8ac590260414ffcda3}\label{classn_r_f24_a2ad4c6a8ac267f8ac590260414ffcda3}} 
+\index{nRF24@{nRF24}!receive@{receive}}
+\index{receive@{receive}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{receive()}{receive()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily virtual int16\+\_\+t Physical\+Layer\+::receive}
+
+
+
+Binary receive method. Must be implemented in module class. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & Pointer to array to save the received binary data.\\
+\hline
+{\em len} & Number of bytes that will be received. Must be known in advance for binary transmissions.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classn_r_f24_ac7f201f69756784b56c9998d7332e9a1}\label{classn_r_f24_ac7f201f69756784b56c9998d7332e9a1}} 
+\index{nRF24@{nRF24}!receiveDirect@{receiveDirect}}
+\index{receiveDirect@{receiveDirect}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{receiveDirect()}{receiveDirect()}}
+{\footnotesize\ttfamily int16\+\_\+t n\+R\+F24\+::receive\+Direct (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Dummy direct mode reception method, to ensure \mbox{\hyperlink{class_physical_layer}{Physical\+Layer}} compatibility. 
+
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{class_physical_layer_a46b22145b33e97cf6065ed826799b6b4}{Physical\+Layer}}.
+
+\mbox{\Hypertarget{classn_r_f24_a5b01677f5ce6bee54da8fc7098c339f4}\label{classn_r_f24_a5b01677f5ce6bee54da8fc7098c339f4}} 
+\index{nRF24@{nRF24}!setAddressWidth@{setAddressWidth}}
+\index{setAddressWidth@{setAddressWidth}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{setAddressWidth()}{setAddressWidth()}}
+{\footnotesize\ttfamily int16\+\_\+t n\+R\+F24\+::set\+Address\+Width (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{addr\+Width }\end{DoxyParamCaption})}
+
+
+
+Sets address width of transmit and receive pipes in bytes. Allowed values are 3, 4 or 5 bytes. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em addr\+Width} & Address width to be set in bytes.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classn_r_f24_aca941c9235ba1212257288554eb4b7fe}\label{classn_r_f24_aca941c9235ba1212257288554eb4b7fe}} 
+\index{nRF24@{nRF24}!setAutoAck@{setAutoAck}}
+\index{setAutoAck@{setAutoAck}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{setAutoAck()}{setAutoAck()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily int16\+\_\+t n\+R\+F24\+::set\+Auto\+Ack (\begin{DoxyParamCaption}\item[{bool}]{auto\+Ack\+On = {\ttfamily true} }\end{DoxyParamCaption})}
+
+
+
+Enable or disable auto-\/acknowlede packets on all pipes. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em auto\+Ack\+On} & Enable (true) or disable (false) auto-\/acks.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classn_r_f24_ac1c3419442d93abeede39e7fda4db62e}\label{classn_r_f24_ac1c3419442d93abeede39e7fda4db62e}} 
+\index{nRF24@{nRF24}!setAutoAck@{setAutoAck}}
+\index{setAutoAck@{setAutoAck}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{setAutoAck()}{setAutoAck()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily int16\+\_\+t n\+R\+F24\+::set\+Auto\+Ack (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{pipe\+Num,  }\item[{bool}]{auto\+Ack\+On }\end{DoxyParamCaption})}
+
+
+
+Enable or disable auto-\/acknowlede packets on given pipe. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pipe\+Num} & Number of pipe to which enable / disable auto-\/acks.\\
+\hline
+{\em auto\+Ack\+On} & Enable (true) or disable (false) auto-\/acks.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classn_r_f24_a3eb45884a5730ac1c339c7ba4f7b5282}\label{classn_r_f24_a3eb45884a5730ac1c339c7ba4f7b5282}} 
+\index{nRF24@{nRF24}!setCrcFiltering@{setCrcFiltering}}
+\index{setCrcFiltering@{setCrcFiltering}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{setCrcFiltering()}{setCrcFiltering()}}
+{\footnotesize\ttfamily int16\+\_\+t n\+R\+F24\+::set\+Crc\+Filtering (\begin{DoxyParamCaption}\item[{bool}]{crc\+On = {\ttfamily true} }\end{DoxyParamCaption})}
+
+
+
+Enable C\+RC filtering and generation. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em crc\+On} & Set or unset C\+RC check.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classn_r_f24_a1f3ec2196733a2e2476f50690967f285}\label{classn_r_f24_a1f3ec2196733a2e2476f50690967f285}} 
+\index{nRF24@{nRF24}!setDataRate@{setDataRate}}
+\index{setDataRate@{setDataRate}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{setDataRate()}{setDataRate()}}
+{\footnotesize\ttfamily int16\+\_\+t n\+R\+F24\+::set\+Data\+Rate (\begin{DoxyParamCaption}\item[{int16\+\_\+t}]{data\+Rate }\end{DoxyParamCaption})}
+
+
+
+Sets data rate. Allowed values are 2000, 1000 or 250 kbps. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data\+Rate} & Data rate to be set in kbps.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classn_r_f24_a91b93d1b98f572a0ff49cb452a416a35}\label{classn_r_f24_a91b93d1b98f572a0ff49cb452a416a35}} 
+\index{nRF24@{nRF24}!setDataShaping@{setDataShaping}}
+\index{setDataShaping@{setDataShaping}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{setDataShaping()}{setDataShaping()}}
+{\footnotesize\ttfamily int16\+\_\+t n\+R\+F24\+::set\+Data\+Shaping (\begin{DoxyParamCaption}\item[{float}]{sh }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Dummy data shaping configuration method, to ensure \mbox{\hyperlink{class_physical_layer}{Physical\+Layer}} compatibility. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sh} & Ignored.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{class_physical_layer_a24758d0300b46aa4fcaed86f5a621191}{Physical\+Layer}}.
+
+\mbox{\Hypertarget{classn_r_f24_a7c3ad3d7517e07197ab92a209938ea15}\label{classn_r_f24_a7c3ad3d7517e07197ab92a209938ea15}} 
+\index{nRF24@{nRF24}!setEncoding@{setEncoding}}
+\index{setEncoding@{setEncoding}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{setEncoding()}{setEncoding()}}
+{\footnotesize\ttfamily int16\+\_\+t n\+R\+F24\+::set\+Encoding (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{encoding }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Dummy encoding configuration method, to ensure \mbox{\hyperlink{class_physical_layer}{Physical\+Layer}} compatibility. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sh} & Ignored.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{class_physical_layer_a7d3419227d201d6912b77784636d437d}{Physical\+Layer}}.
+
+\mbox{\Hypertarget{classn_r_f24_abec5f9dba44a019e23c8bf516f104fad}\label{classn_r_f24_abec5f9dba44a019e23c8bf516f104fad}} 
+\index{nRF24@{nRF24}!setFrequency@{setFrequency}}
+\index{setFrequency@{setFrequency}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{setFrequency()}{setFrequency()}}
+{\footnotesize\ttfamily int16\+\_\+t n\+R\+F24\+::set\+Frequency (\begin{DoxyParamCaption}\item[{int16\+\_\+t}]{freq }\end{DoxyParamCaption})}
+
+
+
+Sets carrier frequency. Allowed values range from 2400 M\+Hz to 2525 M\+Hz. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em freq} & Carrier frequency to be set in M\+Hz.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classn_r_f24_a7d11ab2459bd03ee0df98f769c3b24c8}\label{classn_r_f24_a7d11ab2459bd03ee0df98f769c3b24c8}} 
+\index{nRF24@{nRF24}!setFrequencyDeviation@{setFrequencyDeviation}}
+\index{setFrequencyDeviation@{setFrequencyDeviation}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{setFrequencyDeviation()}{setFrequencyDeviation()}}
+{\footnotesize\ttfamily int16\+\_\+t n\+R\+F24\+::set\+Frequency\+Deviation (\begin{DoxyParamCaption}\item[{float}]{freq\+Dev }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Dummy configuration method, to ensure \mbox{\hyperlink{class_physical_layer}{Physical\+Layer}} compatibility. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em freq\+Dev} & Dummy frequency deviation parameter, no configuration will be changed.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{class_physical_layer_ab9060e8ab7a2da192b3bf53b3501553b}{Physical\+Layer}}.
+
+\mbox{\Hypertarget{classn_r_f24_abf9323748b1a850e6ddc6f6d48f4cfb3}\label{classn_r_f24_abf9323748b1a850e6ddc6f6d48f4cfb3}} 
+\index{nRF24@{nRF24}!setIrqAction@{setIrqAction}}
+\index{setIrqAction@{setIrqAction}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{setIrqAction()}{setIrqAction()}}
+{\footnotesize\ttfamily void n\+R\+F24\+::set\+Irq\+Action (\begin{DoxyParamCaption}\item[{void($\ast$)(void)}]{func }\end{DoxyParamCaption})}
+
+
+
+Sets interrupt service routine to call when I\+RQ activates. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em func} & I\+SR to call. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classn_r_f24_a824453d547c0b42ac1988acb42032ca4}\label{classn_r_f24_a824453d547c0b42ac1988acb42032ca4}} 
+\index{nRF24@{nRF24}!setOutputPower@{setOutputPower}}
+\index{setOutputPower@{setOutputPower}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{setOutputPower()}{setOutputPower()}}
+{\footnotesize\ttfamily int16\+\_\+t n\+R\+F24\+::set\+Output\+Power (\begin{DoxyParamCaption}\item[{int8\+\_\+t}]{power }\end{DoxyParamCaption})}
+
+
+
+Sets output power. Allowed values are -\/18, -\/12, -\/6 or 0 d\+Bm. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em power} & Output power to be set in d\+Bm.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classn_r_f24_a31bcc5a8c3747bf08a273dbdadc5481a}\label{classn_r_f24_a31bcc5a8c3747bf08a273dbdadc5481a}} 
+\index{nRF24@{nRF24}!setReceivePipe@{setReceivePipe}}
+\index{setReceivePipe@{setReceivePipe}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{setReceivePipe()}{setReceivePipe()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily int16\+\_\+t n\+R\+F24\+::set\+Receive\+Pipe (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{pipe\+Num,  }\item[{uint8\+\_\+t $\ast$}]{addr }\end{DoxyParamCaption})}
+
+
+
+Sets address of receive pipes 0 or 1. The address width must be the same as the same as the configured in set\+Address\+Width. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pipe\+Num} & Number of pipe to which the address shall be set. Either 0 or 1, other pipes are handled using overloaded method.\\
+\hline
+{\em addr} & Address from which n\+R\+F24 shall receive new packets on the specified pipe.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classn_r_f24_ab5bc08aef88d8cf41c38369044005da8}\label{classn_r_f24_ab5bc08aef88d8cf41c38369044005da8}} 
+\index{nRF24@{nRF24}!setReceivePipe@{setReceivePipe}}
+\index{setReceivePipe@{setReceivePipe}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{setReceivePipe()}{setReceivePipe()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily int16\+\_\+t n\+R\+F24\+::set\+Receive\+Pipe (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{pipe\+Num,  }\item[{uint8\+\_\+t}]{addr\+Byte }\end{DoxyParamCaption})}
+
+
+
+Sets address of receive pipes 2 -\/ 5. The first 2 -\/ 4 address bytes for these pipes are the same as for address pipe 1, only the last byte can be set. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pipe\+Num} & Number of pipe to which the address shall be set. Allowed values range from 2 to 5.\\
+\hline
+{\em addr\+Byte} & L\+SB of address from which n\+R\+F24 shall receive new packets on the specified pipe.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classn_r_f24_aa0e1f2dddf810213410a420205bbd8af}\label{classn_r_f24_aa0e1f2dddf810213410a420205bbd8af}} 
+\index{nRF24@{nRF24}!setTransmitPipe@{setTransmitPipe}}
+\index{setTransmitPipe@{setTransmitPipe}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{setTransmitPipe()}{setTransmitPipe()}}
+{\footnotesize\ttfamily int16\+\_\+t n\+R\+F24\+::set\+Transmit\+Pipe (\begin{DoxyParamCaption}\item[{uint8\+\_\+t $\ast$}]{addr }\end{DoxyParamCaption})}
+
+
+
+Sets address of transmit pipe. The address width must be the same as the same as the configured in set\+Address\+Width. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em addr} & Address to which the next packet shall be transmitted.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classn_r_f24_a033287e33c532638c11e2775a073f297}\label{classn_r_f24_a033287e33c532638c11e2775a073f297}} 
+\index{nRF24@{nRF24}!sleep@{sleep}}
+\index{sleep@{sleep}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{sleep()}{sleep()}}
+{\footnotesize\ttfamily int16\+\_\+t n\+R\+F24\+::sleep (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Sets the module to sleep mode. 
+
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classn_r_f24_a225c19fda7bf705f4f2652c71214adff}\label{classn_r_f24_a225c19fda7bf705f4f2652c71214adff}} 
+\index{nRF24@{nRF24}!standby@{standby}}
+\index{standby@{standby}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{standby()}{standby()}}
+{\footnotesize\ttfamily int16\+\_\+t n\+R\+F24\+::standby (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Sets the module to standby mode. 
+
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{class_physical_layer_a0e77da761a2cbb5c9535df0bdea993f9}{Physical\+Layer}}.
+
+\mbox{\Hypertarget{classn_r_f24_af4f443da5d90e032e5f2f65420515f9c}\label{classn_r_f24_af4f443da5d90e032e5f2f65420515f9c}} 
+\index{nRF24@{nRF24}!startReceive@{startReceive}}
+\index{startReceive@{startReceive}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{startReceive()}{startReceive()}}
+{\footnotesize\ttfamily int16\+\_\+t n\+R\+F24\+::start\+Receive (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Interrupt-\/driven receive method. I\+RQ will be activated when full packet is received. 
+
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classn_r_f24_a923654706eff5118ef6e84214e837f27}\label{classn_r_f24_a923654706eff5118ef6e84214e837f27}} 
+\index{nRF24@{nRF24}!startTransmit@{startTransmit}}
+\index{startTransmit@{startTransmit}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{startTransmit()}{startTransmit()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily int16\+\_\+t Physical\+Layer\+::start\+Transmit}
+
+
+
+Interrupt-\/driven Arduino String transmit method. Unlike the standard transmit method, this one is non-\/blocking. Interrupt pin will be activated when transmission finishes. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em str} & C-\/string that will be transmitted.\\
+\hline
+{\em addr} & Node address to transmit the packet to. Only used in F\+SK mode.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classn_r_f24_af068e6e862c99e39d0261a7971dd56db}\label{classn_r_f24_af068e6e862c99e39d0261a7971dd56db}} 
+\index{nRF24@{nRF24}!startTransmit@{startTransmit}}
+\index{startTransmit@{startTransmit}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{startTransmit()}{startTransmit()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily int16\+\_\+t Physical\+Layer\+::start\+Transmit}
+
+
+
+Interrupt-\/driven Arduino String transmit method. Unlike the standard transmit method, this one is non-\/blocking. Interrupt pin will be activated when transmission finishes. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em str} & Address of Arduino String that will be transmitted.\\
+\hline
+{\em addr} & Node address to transmit the packet to. Only used in F\+SK mode.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classn_r_f24_a25cb986cab78ea92ceab76fec70713d9}\label{classn_r_f24_a25cb986cab78ea92ceab76fec70713d9}} 
+\index{nRF24@{nRF24}!startTransmit@{startTransmit}}
+\index{startTransmit@{startTransmit}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{startTransmit()}{startTransmit()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily int16\+\_\+t n\+R\+F24\+::start\+Transmit (\begin{DoxyParamCaption}\item[{uint8\+\_\+t $\ast$}]{data,  }\item[{size\+\_\+t}]{len,  }\item[{uint8\+\_\+t}]{addr }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Interrupt-\/driven binary transmit method. I\+RQ will be activated when full packet is transmitted. Overloads for string-\/based transmissions are implemented in \mbox{\hyperlink{class_physical_layer}{Physical\+Layer}}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & Binary data to be sent.\\
+\hline
+{\em len} & Number of bytes to send.\\
+\hline
+{\em addr} & Dummy address parameter, to ensure \mbox{\hyperlink{class_physical_layer}{Physical\+Layer}} compatibility.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{class_physical_layer_a41a1de0ebffe7b65de6fd8cceb9a5123}{Physical\+Layer}}.
+
+\mbox{\Hypertarget{classn_r_f24_a41a1de0ebffe7b65de6fd8cceb9a5123}\label{classn_r_f24_a41a1de0ebffe7b65de6fd8cceb9a5123}} 
+\index{nRF24@{nRF24}!startTransmit@{startTransmit}}
+\index{startTransmit@{startTransmit}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{startTransmit()}{startTransmit()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily virtual int16\+\_\+t Physical\+Layer\+::start\+Transmit}
+
+
+
+Interrupt-\/driven binary transmit method. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & Binary data that will be transmitted.\\
+\hline
+{\em len} & Length of binary data to transmit (in bytes).\\
+\hline
+{\em addr} & Node address to transmit the packet to. Only used in F\+SK mode.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classn_r_f24_ab139a34e03a6fd5a781cd54da21d308f}\label{classn_r_f24_ab139a34e03a6fd5a781cd54da21d308f}} 
+\index{nRF24@{nRF24}!transmit@{transmit}}
+\index{transmit@{transmit}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{transmit()}{transmit()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily int16\+\_\+t Physical\+Layer\+::transmit}
+
+
+
+Arduino Flash String transmit method. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em str} & Pointer to Arduino Flash String that will be transmitted.\\
+\hline
+{\em addr} & Node address to transmit the packet to. Only used in F\+SK mode.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classn_r_f24_a492b2d057dd803c3884fa1adc8e22534}\label{classn_r_f24_a492b2d057dd803c3884fa1adc8e22534}} 
+\index{nRF24@{nRF24}!transmit@{transmit}}
+\index{transmit@{transmit}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{transmit()}{transmit()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily int16\+\_\+t Physical\+Layer\+::transmit}
+
+
+
+C-\/string transmit method. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em str} & C-\/string that will be transmitted.\\
+\hline
+{\em addr} & Node address to transmit the packet to. Only used in F\+SK mode.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classn_r_f24_aeb62c5a521aafc1e0525c58e9364482b}\label{classn_r_f24_aeb62c5a521aafc1e0525c58e9364482b}} 
+\index{nRF24@{nRF24}!transmit@{transmit}}
+\index{transmit@{transmit}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{transmit()}{transmit()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily int16\+\_\+t Physical\+Layer\+::transmit}
+
+
+
+Arduino String transmit method. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em str} & Address of Arduino string that will be transmitted.\\
+\hline
+{\em addr} & Node address to transmit the packet to. Only used in F\+SK mode.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classn_r_f24_af83d2ee7c9195f4ce9cd12df798ff869}\label{classn_r_f24_af83d2ee7c9195f4ce9cd12df798ff869}} 
+\index{nRF24@{nRF24}!transmit@{transmit}}
+\index{transmit@{transmit}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{transmit()}{transmit()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily int16\+\_\+t n\+R\+F24\+::transmit (\begin{DoxyParamCaption}\item[{uint8\+\_\+t $\ast$}]{data,  }\item[{size\+\_\+t}]{len,  }\item[{uint8\+\_\+t}]{addr }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Blocking binary transmit method. Overloads for string-\/based transmissions are implemented in \mbox{\hyperlink{class_physical_layer}{Physical\+Layer}}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & Binary data to be sent.\\
+\hline
+{\em len} & Number of bytes to send.\\
+\hline
+{\em addr} & Dummy address parameter, to ensure \mbox{\hyperlink{class_physical_layer}{Physical\+Layer}} compatibility.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{class_physical_layer_af81565ee82ef9a7de9c5663c745f4ef7}{Physical\+Layer}}.
+
+\mbox{\Hypertarget{classn_r_f24_af81565ee82ef9a7de9c5663c745f4ef7}\label{classn_r_f24_af81565ee82ef9a7de9c5663c745f4ef7}} 
+\index{nRF24@{nRF24}!transmit@{transmit}}
+\index{transmit@{transmit}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{transmit()}{transmit()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily virtual int16\+\_\+t Physical\+Layer\+::transmit}
+
+
+
+Binary transmit method. Must be implemented in module class. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & Binary data that will be transmitted.\\
+\hline
+{\em len} & Length of binary data to transmit (in bytes).\\
+\hline
+{\em addr} & Node address to transmit the packet to. Only used in F\+SK mode.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classn_r_f24_af328670d7c35c4b11b4c8f59f21d0716}\label{classn_r_f24_af328670d7c35c4b11b4c8f59f21d0716}} 
+\index{nRF24@{nRF24}!transmitDirect@{transmitDirect}}
+\index{transmitDirect@{transmitDirect}!nRF24@{nRF24}}
+\doxysubsubsection{\texorpdfstring{transmitDirect()}{transmitDirect()}}
+{\footnotesize\ttfamily int16\+\_\+t n\+R\+F24\+::transmit\+Direct (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{frf = {\ttfamily 0} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Starts direct mode transmission. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em frf} & Raw RF frequency value. Defaults to 0, required for quick frequency shifts in R\+T\+TY.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{class_physical_layer_a2e453686d7c11763a2a1737707e3b3a5}{Physical\+Layer}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+Libraries/\+Radio\+Lib/src/modules/n\+R\+F24/n\+R\+F24.\+h\item 
+Libraries/\+Radio\+Lib/src/modules/n\+R\+F24/n\+R\+F24.\+cpp\end{DoxyCompactItemize}
