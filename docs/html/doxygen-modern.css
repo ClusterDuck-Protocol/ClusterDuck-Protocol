@@ -1,0 +1,260 @@
+/* http://www.colourlovers.com/palette/2787323/Flat_UI_Design */
+@font-face {
+    font-family: Inconsolata;
+    src: url(inconsolata.woff) format(woff);
+}
+
+@font-face {
+    font-family: SourceCodePro;
+    src: url(SourceCodePro-Regular-webfont.woff) format(woff);
+}
+
+@font-face {
+    font-family: RobotoLight;
+    src: url(Roboto-Light-webfont.woff) format(woff);
+}
+
+@font-face {
+    font-family: RobotoRegular;
+    src: url(Roboto-Regular-webfont.woff) format(woff);
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    min-height: 100%;
+}
+
+body, table, div, p, dl {
+	font: inherit;
+}
+
+.tabs,.tabs2,.tabs3,.tablist li,.tablist li.current a,.tablist a,.tablist a:hover,.ui-resizable-e,div.header,#nav-tree .selected,#nav-tree,.memproto,dl.reflist dt,.memdoc,dl.reflist dd,#MSearchField,#MSearchBox .left,#MSearchBox .right, div.ah {
+    background-image: none;
+    font-family: RobotoLight;
+}
+
+.tablist li.current a,.tablist a,.tablist a:hover,#nav-tree .selected {
+    color: #283A5D;
+    text-shadow: none;
+}
+
+.tablist a:hover {
+    color: #FFF;
+    background-color: #9A9B9A;
+}
+
+.tablist li.current a {
+    color: #FFF;
+    background-color: #9A9B9A;
+}
+
+.tabs,.tabs2,.tabs3 {
+    font-size: 15px;
+    font-family: Inconsolata;
+}
+
+.tabs2 {
+    font-size: 12px;
+}
+
+.ui-resizable-e {
+    background-color: #414040;
+    width: 1px;
+}
+
+#titlearea {
+    border-bottom: none;
+    background-color: #FFF;
+    color: #A2A2A2;
+    display: none;
+}
+
+div.header {
+    color: #414040;
+    border-top: 2px solid #848079;
+    font-family: RobotoRegular;
+    clear: both;
+}
+
+#navrow1 {
+    width: 40%;
+    float: left;
+}
+
+#navrow2 {
+    width: 40%;
+    float: right;
+    margin-right: 170px;
+}
+
+#navrow1 > ul {
+    justify-content: flex-start;
+}
+
+#navrow2 > ul {
+    justify-content: flex-end;
+}
+
+#navrow3 > ul {
+    clear: both;
+}
+
+#nav-tree {
+    background-color: #292929;
+}
+
+a {
+    color: #353534;
+}
+
+#side-nav {
+    top: 36px;
+}
+
+div.navpath {
+    display: none;
+}
+
+.tablist {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.memproto,dl.reflist dt {
+    border: none;
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+    text-shadow: none;
+    background-color: inherit;
+    color: #353534;
+}
+
+.memdoc,dl.reflist dd {
+    border: none;
+    text-shadow: none;
+}
+
+.memname {
+    font-family: SourceCodePro;
+    font-size: 1em;
+}
+
+.paramname {
+    color: #353534;
+}
+
+.directory table {
+    border-collapse: initial;
+    font-family: RobotoLight;
+}
+
+.directory tr.even {
+    background-color: #E6E7E9;
+}
+
+.directory tr {
+    padding: 2px 0;
+}
+
+.directory td.entry {
+    padding-bottom: 3px;
+}
+
+div.directory {
+    border-top: none;
+    border-bottom: none;
+}
+
+.contents a:visited {
+    color: #353534;
+}
+
+h2.groupheader {
+    border-bottom: 1px solid #9A9B9A;
+    color: #353534;
+}
+
+hr {
+    border-top: none;
+}
+
+div.qindex,div.navtab {
+    background-color: #9A9B9A;
+    border: none;
+    color: #FFF;
+}
+
+div.line {
+    font-family: SourceCodePro;
+}
+
+div.ah {
+	box-shadow: none;
+	-webkit-box-shadow: none;
+}
+
+.icon {
+	background-color: #2aa198;
+	color: white;
+}
+
+.iconfopen, .iconfclosed {
+	background-image: url('folder.png');
+	background-size: contain;
+	background-position: center;
+}
+
+.icondoc {
+	background-image: url('code.png');
+	background-size: contain;
+	background-position: center;
+}
+
+#navrow1 > .tablist > .current > a {
+	background-color: #2aa198;
+}
+
+.directory .levels span {
+	color: #2aa198;
+}
+
+div.line {
+	color: #839496;
+}
+
+span.lineno {
+	background-color: white;
+	border-right: 2px solid #2aa198;
+}
+
+div.fragment {
+	background-color: #002b36;
+}
+
+span.keyword {
+	color: #859900;
+}
+
+span.keywordflow {
+	color: #268bd2;
+}
+
+span.keywordtype {
+	color: #b58900;
+}
+
+span.comment {
+	color: #586e75;
+}
+
+span.stringliteral {
+	color: #2aa198;
+}
+
+a.code, a.code:visited, a.line, a.line:visited {
+	color: inherit; !important
+}
