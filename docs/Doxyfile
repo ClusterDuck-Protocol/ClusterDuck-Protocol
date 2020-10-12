@@ -22,7 +22,7 @@ Wiki
 Security
 Insights
 Settings
-ClusterDuck-Protocol/docs/Doxyfile
+ClusterDuck-Protocol/Doxyfile
 
 Amir Nathoo Update documentation to include top level file description
 Latest commit 422b291 26 days ago
@@ -90,7 +90,7 @@ PROJECT_LOGO           =
 # entered, it will be relative to the location where doxygen was started. If
 # left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       =
+OUTPUT_DIRECTORY       = docs
 
 # If the CREATE_SUBDIRS tag is set to YES then doxygen will create 4096 sub-
 # directories (in 2 levels) under the output directory of each output format and
