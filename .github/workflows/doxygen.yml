@@ -17,7 +17,7 @@ jobs:
     - name: Doxygen Action
       uses: mattnotmitt/doxygen-action@v1.1.0
       with:
-          doxyfile-path: /docs/Doxyfile
+          doxyfile-path: ./docs/Doxyfile
           working-directory: .
     
     # Deploy the HTML documentation to GitHub Pages
@@ -25,7 +25,7 @@ jobs:
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: /docs/html/
+        publish_dir: ./docs/html/
         enable_jekyll: false
         allow_empty_commit: false
         force_orphan: true
