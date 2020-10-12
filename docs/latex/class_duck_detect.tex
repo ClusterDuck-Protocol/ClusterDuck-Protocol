@@ -1,0 +1,109 @@
+\hypertarget{class_duck_detect}{}\doxysection{Duck\+Detect Class Reference}
+\label{class_duck_detect}\index{DuckDetect@{DuckDetect}}
+Inheritance diagram for Duck\+Detect\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_duck_detect}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_duck_detect_a174911d1aadb93dbd2195b0f8538e2b4}\label{class_duck_detect_a174911d1aadb93dbd2195b0f8538e2b4}} 
+using \mbox{\hyperlink{class_duck_detect_a174911d1aadb93dbd2195b0f8538e2b4}{rssi\+Callback}} = void($\ast$)(const int)
+\begin{DoxyCompactList}\small\item\em callback definition for receiving R\+S\+SI value \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{class_duck_detect_a8c60a2f85aefd3dcf238bb7865336e7a}{send\+Ping}} (bool \mbox{\hyperlink{class_duck_a4a6e0d24b829a3b9760d94b1095a4d02}{start\+Receive}})
+\begin{DoxyCompactList}\small\item\em Send a ping message to devices in the mesh network. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_duck_detect_a0b5e9a7427fb318848f06b461c7203a3}\label{class_duck_detect_a0b5e9a7427fb318848f06b461c7203a3}} 
+void \mbox{\hyperlink{class_duck_detect_a0b5e9a7427fb318848f06b461c7203a3}{run}} ()
+\begin{DoxyCompactList}\small\item\em Provide the \mbox{\hyperlink{class_duck_detect}{Duck\+Detect}} specific implementation of the base {\ttfamily \mbox{\hyperlink{class_duck_detect_a0b5e9a7427fb318848f06b461c7203a3}{run()}}} method. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_duck_detect_a2331c49bb550efc8306219331cb65360}{setup\+With\+Defaults}} (String ssid=\char`\"{}\char`\"{}, String password=\char`\"{}\char`\"{})
+\begin{DoxyCompactList}\small\item\em Override the default setup method to match \mbox{\hyperlink{class_duck_detect}{Duck\+Detect}} specific defaults. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_duck_detect_a4aebfa47f65fe594d25fc67e9624175d}{on\+Receive\+Rssi}} (\mbox{\hyperlink{class_duck_detect_a174911d1aadb93dbd2195b0f8538e2b4}{rssi\+Callback}} rssi\+Cb)
+\begin{DoxyCompactList}\small\item\em Regsiter a callback for receiving and handling R\+S\+SI value. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_duck_detect_a65753b7b6eb80c4639f6bf165b8db9a6}\label{class_duck_detect_a65753b7b6eb80c4639f6bf165b8db9a6}} 
+\mbox{\hyperlink{class_duck_detect_a65753b7b6eb80c4639f6bf165b8db9a6}{Duck}} ()
+\begin{DoxyCompactList}\small\item\em Construct a new \mbox{\hyperlink{class_duck}{Duck}} object. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_duck_detect_a53c9e7278c98060cc03c7d9efd402df8}{Duck}} (String id)
+\begin{DoxyCompactList}\small\item\em Construct a new \mbox{\hyperlink{class_duck}{Duck}} object. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_duck_detect_a53c9e7278c98060cc03c7d9efd402df8}\label{class_duck_detect_a53c9e7278c98060cc03c7d9efd402df8}} 
+\index{DuckDetect@{DuckDetect}!Duck@{Duck}}
+\index{Duck@{Duck}!DuckDetect@{DuckDetect}}
+\doxysubsubsection{\texorpdfstring{Duck()}{Duck()}}
+{\footnotesize\ttfamily Duck\+::\+Duck}
+
+
+
+Construct a new \mbox{\hyperlink{class_duck}{Duck}} object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em id} & a unique id \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_duck_detect_a4aebfa47f65fe594d25fc67e9624175d}\label{class_duck_detect_a4aebfa47f65fe594d25fc67e9624175d}} 
+\index{DuckDetect@{DuckDetect}!onReceiveRssi@{onReceiveRssi}}
+\index{onReceiveRssi@{onReceiveRssi}!DuckDetect@{DuckDetect}}
+\doxysubsubsection{\texorpdfstring{onReceiveRssi()}{onReceiveRssi()}}
+{\footnotesize\ttfamily void Duck\+Detect\+::on\+Receive\+Rssi (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_duck_detect_a174911d1aadb93dbd2195b0f8538e2b4}{rssi\+Callback}}}]{rssi\+Cb }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Regsiter a callback for receiving and handling R\+S\+SI value. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em rssi\+Cb} & a call back defined with the following signature\+: {\ttfamily void ($\ast$)(const int)} \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_duck_detect_a8c60a2f85aefd3dcf238bb7865336e7a}\label{class_duck_detect_a8c60a2f85aefd3dcf238bb7865336e7a}} 
+\index{DuckDetect@{DuckDetect}!sendPing@{sendPing}}
+\index{sendPing@{sendPing}!DuckDetect@{DuckDetect}}
+\doxysubsubsection{\texorpdfstring{sendPing()}{sendPing()}}
+{\footnotesize\ttfamily void Duck\+Detect\+::send\+Ping (\begin{DoxyParamCaption}\item[{bool}]{start\+Receive }\end{DoxyParamCaption})}
+
+
+
+Send a ping message to devices in the mesh network. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em start\+Receive} & {\ttfamily true} if the device must to be ready to receive a response immediately, {\ttfamily false} if response needs to be deffered. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_duck_detect_a2331c49bb550efc8306219331cb65360}\label{class_duck_detect_a2331c49bb550efc8306219331cb65360}} 
+\index{DuckDetect@{DuckDetect}!setupWithDefaults@{setupWithDefaults}}
+\index{setupWithDefaults@{setupWithDefaults}!DuckDetect@{DuckDetect}}
+\doxysubsubsection{\texorpdfstring{setupWithDefaults()}{setupWithDefaults()}}
+{\footnotesize\ttfamily void Duck\+Detect\+::setup\+With\+Defaults (\begin{DoxyParamCaption}\item[{String}]{ssid = {\ttfamily \char`\"{}\char`\"{}},  }\item[{String}]{password = {\ttfamily \char`\"{}\char`\"{}} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Override the default setup method to match \mbox{\hyperlink{class_duck_detect}{Duck\+Detect}} specific defaults. 
+
+In addition to Serial component, the \mbox{\hyperlink{class_radio}{Radio}} component is also initialized. When ssid and password are provided the duck will setup the wifi related components.
+
+
+\begin{DoxyParams}{Parameters}
+{\em ssid} & wifi access point ssid (defaults to an empty string if not provided) \\
+\hline
+{\em password} & wifi password (defaults to an empty string if not provided) \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from \mbox{\hyperlink{class_duck_a86786a759eb87e0ef1714b09a09947a1}{Duck}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/Duck\+Detect.\+h\item 
+src/\+Ducks/Duck\+Detect.\+cpp\end{DoxyCompactItemize}

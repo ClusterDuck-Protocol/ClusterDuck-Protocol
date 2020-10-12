@@ -1,0 +1,81 @@
+\hypertarget{class_s_x1231}{}\doxysection{S\+X1231 Class Reference}
+\label{class_s_x1231}\index{SX1231@{SX1231}}
+
+
+Control class for S\+X1231 module. Overrides some methods from \mbox{\hyperlink{class_r_f69}{R\+F69}} due to different register values.  
+
+
+
+
+{\ttfamily \#include $<$S\+X1231.\+h$>$}
+
+Inheritance diagram for S\+X1231\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{class_s_x1231}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_s_x1231_a9f39cd41fa0c934fe871b6cbfa7ce269}{S\+X1231}} (\mbox{\hyperlink{class_module}{Module}} $\ast$mod)
+\begin{DoxyCompactList}\small\item\em Default constructor. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_s_x1231_a42dc7a185a5f8ca3dbc5ca47956ce6d5}{begin}} (float freq=434.\+0, float br=48.\+0, float rx\+Bw=125.\+0, float freq\+Dev=50.\+0, int8\+\_\+t power=13)
+\begin{DoxyCompactList}\small\item\em Initialization method. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+\doxysubsection{Detailed Description}
+Control class for S\+X1231 module. Overrides some methods from \mbox{\hyperlink{class_r_f69}{R\+F69}} due to different register values. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{class_s_x1231_a9f39cd41fa0c934fe871b6cbfa7ce269}\label{class_s_x1231_a9f39cd41fa0c934fe871b6cbfa7ce269}} 
+\index{SX1231@{SX1231}!SX1231@{SX1231}}
+\index{SX1231@{SX1231}!SX1231@{SX1231}}
+\doxysubsubsection{\texorpdfstring{SX1231()}{SX1231()}}
+{\footnotesize\ttfamily S\+X1231\+::\+S\+X1231 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_module}{Module}} $\ast$}]{mod }\end{DoxyParamCaption})}
+
+
+
+Default constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em mod} & Instance of \mbox{\hyperlink{class_module}{Module}} that will be used to communicate with the radio. \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_s_x1231_a42dc7a185a5f8ca3dbc5ca47956ce6d5}\label{class_s_x1231_a42dc7a185a5f8ca3dbc5ca47956ce6d5}} 
+\index{SX1231@{SX1231}!begin@{begin}}
+\index{begin@{begin}!SX1231@{SX1231}}
+\doxysubsubsection{\texorpdfstring{begin()}{begin()}}
+{\footnotesize\ttfamily int16\+\_\+t S\+X1231\+::begin (\begin{DoxyParamCaption}\item[{float}]{freq = {\ttfamily 434.0},  }\item[{float}]{br = {\ttfamily 48.0},  }\item[{float}]{rx\+Bw = {\ttfamily 125.0},  }\item[{float}]{freq\+Dev = {\ttfamily 50.0},  }\item[{int8\+\_\+t}]{power = {\ttfamily 13} }\end{DoxyParamCaption})}
+
+
+
+Initialization method. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em freq} & Carrier frequency in M\+Hz. Defaults to 434.\+0 M\+Hz.\\
+\hline
+{\em br} & Bit rate to be used in kbps. Defaults to 48.\+0 kbps.\\
+\hline
+{\em rx\+Bw} & Receiver bandwidth in k\+Hz. Defaults to 125.\+0 k\+Hz.\\
+\hline
+{\em freq\+Dev} & Frequency deviation from carrier frequency in k\+Hz Defaults to 50.\+0 k\+Hz.\\
+\hline
+{\em power} & Output power in d\+Bm. Defaults to 13 d\+Bm.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+Libraries/\+Radio\+Lib/src/modules/\+S\+X1231/S\+X1231.\+h\item 
+Libraries/\+Radio\+Lib/src/modules/\+S\+X1231/S\+X1231.\+cpp\end{DoxyCompactItemize}

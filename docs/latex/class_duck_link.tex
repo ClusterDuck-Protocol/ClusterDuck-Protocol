@@ -1,0 +1,69 @@
+\hypertarget{class_duck_link}{}\doxysection{Duck\+Link Class Reference}
+\label{class_duck_link}\index{DuckLink@{DuckLink}}
+Inheritance diagram for Duck\+Link\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_duck_link}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_duck_link_a6c77dd16076ba66cfdf348b2d641946b}\label{class_duck_link_a6c77dd16076ba66cfdf348b2d641946b}} 
+void \mbox{\hyperlink{class_duck_link_a6c77dd16076ba66cfdf348b2d641946b}{run}} ()
+\begin{DoxyCompactList}\small\item\em Provide the \mbox{\hyperlink{class_duck_link}{Duck\+Link}} specific implementation of the base {\ttfamily \mbox{\hyperlink{class_duck_link_a6c77dd16076ba66cfdf348b2d641946b}{run()}}} method. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_duck_link_a219e2db7e3e864883d5083ac879b751b}{setup\+With\+Defaults}} (String ssid=\char`\"{}\char`\"{}, String password=\char`\"{}\char`\"{})
+\begin{DoxyCompactList}\small\item\em Override the default setup method to match \mbox{\hyperlink{class_duck_link}{Duck\+Link}} specific defaults. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_duck_link_a65753b7b6eb80c4639f6bf165b8db9a6}\label{class_duck_link_a65753b7b6eb80c4639f6bf165b8db9a6}} 
+\mbox{\hyperlink{class_duck_link_a65753b7b6eb80c4639f6bf165b8db9a6}{Duck}} ()
+\begin{DoxyCompactList}\small\item\em Construct a new \mbox{\hyperlink{class_duck}{Duck}} object. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_duck_link_a53c9e7278c98060cc03c7d9efd402df8}{Duck}} (String id)
+\begin{DoxyCompactList}\small\item\em Construct a new \mbox{\hyperlink{class_duck}{Duck}} object. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_duck_link_a53c9e7278c98060cc03c7d9efd402df8}\label{class_duck_link_a53c9e7278c98060cc03c7d9efd402df8}} 
+\index{DuckLink@{DuckLink}!Duck@{Duck}}
+\index{Duck@{Duck}!DuckLink@{DuckLink}}
+\doxysubsubsection{\texorpdfstring{Duck()}{Duck()}}
+{\footnotesize\ttfamily Duck\+::\+Duck}
+
+
+
+Construct a new \mbox{\hyperlink{class_duck}{Duck}} object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em id} & a unique id \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_duck_link_a219e2db7e3e864883d5083ac879b751b}\label{class_duck_link_a219e2db7e3e864883d5083ac879b751b}} 
+\index{DuckLink@{DuckLink}!setupWithDefaults@{setupWithDefaults}}
+\index{setupWithDefaults@{setupWithDefaults}!DuckLink@{DuckLink}}
+\doxysubsubsection{\texorpdfstring{setupWithDefaults()}{setupWithDefaults()}}
+{\footnotesize\ttfamily void Duck\+Link\+::setup\+With\+Defaults (\begin{DoxyParamCaption}\item[{String}]{ssid = {\ttfamily \char`\"{}\char`\"{}},  }\item[{String}]{password = {\ttfamily \char`\"{}\char`\"{}} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Override the default setup method to match \mbox{\hyperlink{class_duck_link}{Duck\+Link}} specific defaults. 
+
+In addition to Serial component, the \mbox{\hyperlink{class_radio}{Radio}} component is also initialized. When ssid and password are provided the duck will setup the wifi related components.
+
+
+\begin{DoxyParams}{Parameters}
+{\em ssid} & wifi access point ssid (defaults to an empty string if not provided) \\
+\hline
+{\em password} & wifi password (defaults to an empty string if not provided) \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from \mbox{\hyperlink{class_duck_a86786a759eb87e0ef1714b09a09947a1}{Duck}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/Duck\+Link.\+h\item 
+src/\+Ducks/Duck\+Link.\+cpp\end{DoxyCompactItemize}

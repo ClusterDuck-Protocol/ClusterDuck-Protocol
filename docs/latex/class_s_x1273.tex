@@ -1,0 +1,109 @@
+\hypertarget{class_s_x1273}{}\doxysection{S\+X1273 Class Reference}
+\label{class_s_x1273}\index{SX1273@{SX1273}}
+
+
+Derived class for S\+X1273 modules. Overrides some methods from \mbox{\hyperlink{class_s_x1272}{S\+X1272}} due to different parameter ranges.  
+
+
+
+
+{\ttfamily \#include $<$S\+X1273.\+h$>$}
+
+Inheritance diagram for S\+X1273\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=4.000000cm]{class_s_x1273}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_s_x1273_ad0387b22d6dcc876bc5f85174714149b}{S\+X1273}} (\mbox{\hyperlink{class_module}{Module}} $\ast$mod)
+\begin{DoxyCompactList}\small\item\em Default constructor. Called from Arduino sketch when creating new Lo\+Ra instance. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_s_x1273_a25b3ef7b7207ca413b272b76aa277d8b}{begin}} (float freq=915.\+0, float bw=125.\+0, uint8\+\_\+t sf=9, uint8\+\_\+t cr=7, uint8\+\_\+t sync\+Word=S\+X127\+X\+\_\+\+S\+Y\+N\+C\+\_\+\+W\+O\+RD, int8\+\_\+t power=17, uint8\+\_\+t current\+Limit=100, uint16\+\_\+t preamble\+Length=8, uint8\+\_\+t gain=0)
+\begin{DoxyCompactList}\small\item\em Lo\+Ra modem initialization method. Must be called at least once from Arduino sketch to initialize the module. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_s_x1273_a1dbc5a0847c2b62d2ec5fc439ddfec3f}{set\+Spreading\+Factor}} (uint8\+\_\+t sf)
+\begin{DoxyCompactList}\small\item\em Sets Lo\+Ra link spreading factor. Allowed values range from 6 to 9. Only available in Lo\+Ra mode. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+\doxysubsection{Detailed Description}
+Derived class for S\+X1273 modules. Overrides some methods from \mbox{\hyperlink{class_s_x1272}{S\+X1272}} due to different parameter ranges. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{class_s_x1273_ad0387b22d6dcc876bc5f85174714149b}\label{class_s_x1273_ad0387b22d6dcc876bc5f85174714149b}} 
+\index{SX1273@{SX1273}!SX1273@{SX1273}}
+\index{SX1273@{SX1273}!SX1273@{SX1273}}
+\doxysubsubsection{\texorpdfstring{SX1273()}{SX1273()}}
+{\footnotesize\ttfamily S\+X1273\+::\+S\+X1273 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_module}{Module}} $\ast$}]{mod }\end{DoxyParamCaption})}
+
+
+
+Default constructor. Called from Arduino sketch when creating new Lo\+Ra instance. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em mod} & Instance of \mbox{\hyperlink{class_module}{Module}} that will be used to communicate with the Lo\+Ra chip. \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_s_x1273_a25b3ef7b7207ca413b272b76aa277d8b}\label{class_s_x1273_a25b3ef7b7207ca413b272b76aa277d8b}} 
+\index{SX1273@{SX1273}!begin@{begin}}
+\index{begin@{begin}!SX1273@{SX1273}}
+\doxysubsubsection{\texorpdfstring{begin()}{begin()}}
+{\footnotesize\ttfamily int16\+\_\+t S\+X1273\+::begin (\begin{DoxyParamCaption}\item[{float}]{freq = {\ttfamily 915.0},  }\item[{float}]{bw = {\ttfamily 125.0},  }\item[{uint8\+\_\+t}]{sf = {\ttfamily 9},  }\item[{uint8\+\_\+t}]{cr = {\ttfamily 7},  }\item[{uint8\+\_\+t}]{sync\+Word = {\ttfamily SX127X\+\_\+SYNC\+\_\+WORD},  }\item[{int8\+\_\+t}]{power = {\ttfamily 17},  }\item[{uint8\+\_\+t}]{current\+Limit = {\ttfamily 100},  }\item[{uint16\+\_\+t}]{preamble\+Length = {\ttfamily 8},  }\item[{uint8\+\_\+t}]{gain = {\ttfamily 0} }\end{DoxyParamCaption})}
+
+
+
+Lo\+Ra modem initialization method. Must be called at least once from Arduino sketch to initialize the module. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em freq} & Carrier frequency in M\+Hz. Allowed values range from 860.\+0 M\+Hz to 1020.\+0 M\+Hz.\\
+\hline
+{\em bw} & Lo\+Ra link bandwidth in k\+Hz. Allowed values are 125, 250 and 500 k\+Hz.\\
+\hline
+{\em sf} & Lo\+Ra link spreading factor. Allowed values range from 6 to 9.\\
+\hline
+{\em cr} & Lo\+Ra link coding rate denominator. Allowed values range from 5 to 8.\\
+\hline
+{\em sync\+Word} & Lo\+Ra sync word. Can be used to distinguish different networks. Note that value 0x34 is reserved for Lo\+Ra\+W\+AN networks.\\
+\hline
+{\em power} & Transmission output power in d\+Bm. Allowed values range from 2 to 17 d\+Bm.\\
+\hline
+{\em current\+Limit} & Trim value for O\+CP (over current protection) in mA. Can be set to multiplies of 5 in range 45 to 120 mA and to multiples of 10 in range 120 to 240 mA. Set to 0 to disable O\+CP (not recommended).\\
+\hline
+{\em preamble\+Length} & Length of Lo\+Ra transmission preamble in symbols. The actual preamble length is 4.\+25 symbols longer than the set number. Allowed values range from 6 to 65535.\\
+\hline
+{\em gain} & Gain of receiver L\+NA (low-\/noise amplifier). Can be set to any integer in range 1 to 6 where 1 is the highest gain. Set to 0 to enable automatic gain control (recommended).\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_s_x1273_a1dbc5a0847c2b62d2ec5fc439ddfec3f}\label{class_s_x1273_a1dbc5a0847c2b62d2ec5fc439ddfec3f}} 
+\index{SX1273@{SX1273}!setSpreadingFactor@{setSpreadingFactor}}
+\index{setSpreadingFactor@{setSpreadingFactor}!SX1273@{SX1273}}
+\doxysubsubsection{\texorpdfstring{setSpreadingFactor()}{setSpreadingFactor()}}
+{\footnotesize\ttfamily int16\+\_\+t S\+X1273\+::set\+Spreading\+Factor (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{sf }\end{DoxyParamCaption})}
+
+
+
+Sets Lo\+Ra link spreading factor. Allowed values range from 6 to 9. Only available in Lo\+Ra mode. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sf} & Lo\+Ra link spreading factor to be set.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+Libraries/\+Radio\+Lib/src/modules/\+S\+X127x/S\+X1273.\+h\item 
+Libraries/\+Radio\+Lib/src/modules/\+S\+X127x/S\+X1273.\+cpp\end{DoxyCompactItemize}

@@ -1,0 +1,170 @@
+\hypertarget{class_s_x1268}{}\doxysection{S\+X1268 Class Reference}
+\label{class_s_x1268}\index{SX1268@{SX1268}}
+
+
+Derived class for S\+X1268 modules.  
+
+
+
+
+{\ttfamily \#include $<$S\+X1268.\+h$>$}
+
+Inheritance diagram for S\+X1268\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{class_s_x1268}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_s_x1268_a6bc50597d50fd9a2387628e452eac42f}{S\+X1268}} (\mbox{\hyperlink{class_module}{Module}} $\ast$mod)
+\begin{DoxyCompactList}\small\item\em Default constructor. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_s_x1268_a855e4e0a06850e0df8e437cdffd969a9}{begin}} (float freq=434.\+0, float bw=125.\+0, uint8\+\_\+t sf=9, uint8\+\_\+t cr=7, uint8\+\_\+t sync\+Word=S\+X126\+X\+\_\+\+S\+Y\+N\+C\+\_\+\+W\+O\+R\+D\+\_\+\+P\+R\+I\+V\+A\+TE, int8\+\_\+t power=14, float current\+Limit=60.\+0, uint16\+\_\+t preamble\+Length=8, float tcxo\+Voltage=1.\+6, bool use\+Regulator\+L\+DO=false)
+\begin{DoxyCompactList}\small\item\em Initialization method for Lo\+Ra modem. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_s_x1268_a61685f6afc5052c697fd9387eafd6b50}{begin\+F\+SK}} (float freq=434.\+0, float br=48.\+0, float freq\+Dev=50.\+0, float rx\+Bw=156.\+2, int8\+\_\+t power=14, float current\+Limit=60.\+0, uint16\+\_\+t preamble\+Length=16, float data\+Shaping=0.\+5, float tcxo\+Voltage=1.\+6, bool use\+Regulator\+L\+DO=false)
+\begin{DoxyCompactList}\small\item\em Initialization method for F\+SK modem. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_s_x1268_a6ad998275281de5c6f24f8a64db88052}{set\+Frequency}} (float freq, bool calibrate=true)
+\begin{DoxyCompactList}\small\item\em Sets carrier frequency. Allowed values are in range from 410.\+0 to 810.\+0 M\+Hz. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_s_x1268_a5b0744aa46fbb4f8c738b010dfcc9b45}{set\+Output\+Power}} (int8\+\_\+t power)
+\begin{DoxyCompactList}\small\item\em Sets output power. Allowed values are in range from -\/9 to 22 d\+Bm. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+\doxysubsection{Detailed Description}
+Derived class for S\+X1268 modules. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{class_s_x1268_a6bc50597d50fd9a2387628e452eac42f}\label{class_s_x1268_a6bc50597d50fd9a2387628e452eac42f}} 
+\index{SX1268@{SX1268}!SX1268@{SX1268}}
+\index{SX1268@{SX1268}!SX1268@{SX1268}}
+\doxysubsubsection{\texorpdfstring{SX1268()}{SX1268()}}
+{\footnotesize\ttfamily S\+X1268\+::\+S\+X1268 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_module}{Module}} $\ast$}]{mod }\end{DoxyParamCaption})}
+
+
+
+Default constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em mod} & Instance of \mbox{\hyperlink{class_module}{Module}} that will be used to communicate with the radio. \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_s_x1268_a855e4e0a06850e0df8e437cdffd969a9}\label{class_s_x1268_a855e4e0a06850e0df8e437cdffd969a9}} 
+\index{SX1268@{SX1268}!begin@{begin}}
+\index{begin@{begin}!SX1268@{SX1268}}
+\doxysubsubsection{\texorpdfstring{begin()}{begin()}}
+{\footnotesize\ttfamily int16\+\_\+t S\+X1268\+::begin (\begin{DoxyParamCaption}\item[{float}]{freq = {\ttfamily 434.0},  }\item[{float}]{bw = {\ttfamily 125.0},  }\item[{uint8\+\_\+t}]{sf = {\ttfamily 9},  }\item[{uint8\+\_\+t}]{cr = {\ttfamily 7},  }\item[{uint8\+\_\+t}]{sync\+Word = {\ttfamily SX126X\+\_\+SYNC\+\_\+WORD\+\_\+PRIVATE},  }\item[{int8\+\_\+t}]{power = {\ttfamily 14},  }\item[{float}]{current\+Limit = {\ttfamily 60.0},  }\item[{uint16\+\_\+t}]{preamble\+Length = {\ttfamily 8},  }\item[{float}]{tcxo\+Voltage = {\ttfamily 1.6},  }\item[{bool}]{use\+Regulator\+L\+DO = {\ttfamily false} }\end{DoxyParamCaption})}
+
+
+
+Initialization method for Lo\+Ra modem. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em freq} & Carrier frequency in M\+Hz. Defaults to 434.\+0 M\+Hz.\\
+\hline
+{\em bw} & Lo\+Ra bandwidth in k\+Hz. Defaults to 125.\+0 k\+Hz.\\
+\hline
+{\em sf} & Lo\+Ra spreading factor. Defaults to 9.\\
+\hline
+{\em cr} & Lo\+Ra coding rate denominator. Defaults to 7 (coding rate 4/7).\\
+\hline
+{\em sync\+Word} & 2-\/byte Lo\+Ra sync word. Defaults to S\+X126\+X\+\_\+\+S\+Y\+N\+C\+\_\+\+W\+O\+R\+D\+\_\+\+P\+R\+I\+V\+A\+TE (0x12).\\
+\hline
+{\em power} & Output power in d\+Bm. Defaults to 14 d\+Bm.\\
+\hline
+{\em current\+Limit} & Current protection limit in mA. Defaults to 60.\+0 mA.\\
+\hline
+{\em preamble\+Length} & Lo\+Ra preamble length in symbols. Defaults to 8 symbols.\\
+\hline
+{\em tcxo\+Voltage} & T\+C\+XO reference voltage to be set on D\+I\+O3. Defaults to 1.\+6 V, set to 0 to skip.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_s_x1268_a61685f6afc5052c697fd9387eafd6b50}\label{class_s_x1268_a61685f6afc5052c697fd9387eafd6b50}} 
+\index{SX1268@{SX1268}!beginFSK@{beginFSK}}
+\index{beginFSK@{beginFSK}!SX1268@{SX1268}}
+\doxysubsubsection{\texorpdfstring{beginFSK()}{beginFSK()}}
+{\footnotesize\ttfamily int16\+\_\+t S\+X1268\+::begin\+F\+SK (\begin{DoxyParamCaption}\item[{float}]{freq = {\ttfamily 434.0},  }\item[{float}]{br = {\ttfamily 48.0},  }\item[{float}]{freq\+Dev = {\ttfamily 50.0},  }\item[{float}]{rx\+Bw = {\ttfamily 156.2},  }\item[{int8\+\_\+t}]{power = {\ttfamily 14},  }\item[{float}]{current\+Limit = {\ttfamily 60.0},  }\item[{uint16\+\_\+t}]{preamble\+Length = {\ttfamily 16},  }\item[{float}]{data\+Shaping = {\ttfamily 0.5},  }\item[{float}]{tcxo\+Voltage = {\ttfamily 1.6},  }\item[{bool}]{use\+Regulator\+L\+DO = {\ttfamily false} }\end{DoxyParamCaption})}
+
+
+
+Initialization method for F\+SK modem. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em freq} & Carrier frequency in M\+Hz. Defaults to 434.\+0 M\+Hz.\\
+\hline
+{\em br} & F\+SK bit rate in kbps. Defaults to 48.\+0 kbps.\\
+\hline
+{\em freq\+Dev} & Frequency deviation from carrier frequency in k\+Hz. Defaults to 50.\+0 k\+Hz.\\
+\hline
+{\em rx\+Bw} & Receiver bandwidth in k\+Hz. Defaults to 156.\+2 k\+Hz.\\
+\hline
+{\em power} & Output power in d\+Bm. Defaults to 14 d\+Bm.\\
+\hline
+{\em current\+Limit} & Current protection limit in mA. Defaults to 60.\+0 mA.\\
+\hline
+\end{DoxyParams}
+\textbackslash{}parma preamble\+Length F\+SK preamble length in bits. Defaults to 16 bits.
+
+
+\begin{DoxyParams}{Parameters}
+{\em data\+Shaping} & Time-\/bandwidth product of the Gaussian filter to be used for shaping. Defaults to 0.\+5.\\
+\hline
+{\em tcxo\+Voltage} & T\+C\+XO reference voltage to be set on D\+I\+O3. Defaults to 1.\+6 V, set to 0 to skip.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_s_x1268_a6ad998275281de5c6f24f8a64db88052}\label{class_s_x1268_a6ad998275281de5c6f24f8a64db88052}} 
+\index{SX1268@{SX1268}!setFrequency@{setFrequency}}
+\index{setFrequency@{setFrequency}!SX1268@{SX1268}}
+\doxysubsubsection{\texorpdfstring{setFrequency()}{setFrequency()}}
+{\footnotesize\ttfamily int16\+\_\+t S\+X1268\+::set\+Frequency (\begin{DoxyParamCaption}\item[{float}]{freq,  }\item[{bool}]{calibrate = {\ttfamily true} }\end{DoxyParamCaption})}
+
+
+
+Sets carrier frequency. Allowed values are in range from 410.\+0 to 810.\+0 M\+Hz. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em freq} & Carrier frequency to be set in M\+Hz.\\
+\hline
+{\em calibrate} & Run image calibration.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_s_x1268_a5b0744aa46fbb4f8c738b010dfcc9b45}\label{class_s_x1268_a5b0744aa46fbb4f8c738b010dfcc9b45}} 
+\index{SX1268@{SX1268}!setOutputPower@{setOutputPower}}
+\index{setOutputPower@{setOutputPower}!SX1268@{SX1268}}
+\doxysubsubsection{\texorpdfstring{setOutputPower()}{setOutputPower()}}
+{\footnotesize\ttfamily int16\+\_\+t S\+X1268\+::set\+Output\+Power (\begin{DoxyParamCaption}\item[{int8\+\_\+t}]{power }\end{DoxyParamCaption})}
+
+
+
+Sets output power. Allowed values are in range from -\/9 to 22 d\+Bm. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em power} & Output power to be set in d\+Bm.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+Libraries/\+Radio\+Lib/src/modules/\+S\+X126x/S\+X1268.\+h\item 
+Libraries/\+Radio\+Lib/src/modules/\+S\+X126x/S\+X1268.\+cpp\end{DoxyCompactItemize}

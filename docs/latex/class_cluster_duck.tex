@@ -1,0 +1,405 @@
+\hypertarget{class_cluster_duck}{}\doxysection{Cluster\+Duck Class Reference}
+\label{class_cluster_duck}\index{ClusterDuck@{ClusterDuck}}
+
+
+External A\+P\+Is to build and control a duck device.  
+
+
+
+
+{\ttfamily \#include $<$Cluster\+Duck.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_cluster_duck_ab81a340f13e0b06100bc12fe8a547cb1}\label{class_cluster_duck_ab81a340f13e0b06100bc12fe8a547cb1}} 
+\mbox{\hyperlink{class_cluster_duck_ab81a340f13e0b06100bc12fe8a547cb1}{Cluster\+Duck}} ()
+\begin{DoxyCompactList}\small\item\em Construct a new Cluster \mbox{\hyperlink{class_duck}{Duck}} object. \end{DoxyCompactList}\item 
+String \mbox{\hyperlink{class_cluster_duck_a91dff3259cd83b2afc94d7b10b5254f4}{duck\+Mac}} (boolean format)
+\begin{DoxyCompactList}\small\item\em Get the \mbox{\hyperlink{class_duck}{Duck}} Mac Address. \end{DoxyCompactList}\item 
+String \mbox{\hyperlink{class_cluster_duck_a99127caf18aa9eb983c879e7078b6da8}{uuid\+Creator}} ()
+\begin{DoxyCompactList}\small\item\em Create a uuid string. \end{DoxyCompactList}\item 
+volatile bool \mbox{\hyperlink{class_cluster_duck_a63683e1acc62fb961b350ff848a384be}{get\+Interrupt}} ()
+\begin{DoxyCompactList}\small\item\em Get the interrupt state. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_cluster_duck_ab54fc254f3db80082a92f5f978ebc172}\label{class_cluster_duck_ab54fc254f3db80082a92f5f978ebc172}} 
+void \mbox{\hyperlink{class_cluster_duck_ab54fc254f3db80082a92f5f978ebc172}{flip\+Flag}} ()
+\begin{DoxyCompactList}\small\item\em Toggle the flag that indicates a message is received. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_cluster_duck_ae134a542f1dfbd688e7a2b2ea90f7b10}\label{class_cluster_duck_ae134a542f1dfbd688e7a2b2ea90f7b10}} 
+void \mbox{\hyperlink{class_cluster_duck_ae134a542f1dfbd688e7a2b2ea90f7b10}{flip\+Interrupt}} ()
+\begin{DoxyCompactList}\small\item\em Toggle the interrupt state flag. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_cluster_duck_a96f1ef44b33b43e2bca605019b8db92b}{ping}} ()
+\begin{DoxyCompactList}\small\item\em Transmit a ping message. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_cluster_duck_ac3bfa8d78512ca35738edd381e10f46a}{setup\+Detect}} ()
+\begin{DoxyCompactList}\small\item\em Shortcut to setup a \mbox{\hyperlink{class_duck}{Duck}} Detector. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_cluster_duck_a6643f40cc0bdd62aa4b8c7293c6e0119}{run\+Detect}} ()
+\begin{DoxyCompactList}\small\item\em starts the \mbox{\hyperlink{class_duck}{Duck}} Detector run thread. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_cluster_duck_a6ba4440f4226965d499da0105e6b2ef0}{handle\+Packet}} ()
+\begin{DoxyCompactList}\small\item\em Handles a received Lo\+Ra packet. \end{DoxyCompactList}\item 
+String \mbox{\hyperlink{class_cluster_duck_ab1dc889dfeff16279eaffd7681398fc5}{get\+Packet\+Data}} (int p\+Size)
+\begin{DoxyCompactList}\small\item\em Get the \mbox{\hyperlink{struct_packet}{Packet}} data. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{struct_packet}{Packet}} \mbox{\hyperlink{class_cluster_duck_a4f2b1fab719114b64a23bbdf9f1411d6}{get\+Last\+Packet}} ()
+\begin{DoxyCompactList}\small\item\em Get the last received Lo\+Ra packet. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_cluster_duck_abef568c9bba61f00d6d02ed9a434a0c5}{couple}} (byte byte\+Code, String outgoing)
+\begin{DoxyCompactList}\small\item\em Append a chunk to the packet. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_cluster_duck_ac8d31cdd98761ef1bf638ce3507e0f3f}{id\+In\+Path}} (String path)
+\begin{DoxyCompactList}\small\item\em Determine if a \mbox{\hyperlink{class_duck}{Duck}} device\+\_\+id is present in the path. \end{DoxyCompactList}\item 
+volatile bool \mbox{\hyperlink{class_cluster_duck_afb9dfbb466ced33045b96ea27daa1d1c}{get\+Flag}} ()
+\begin{DoxyCompactList}\small\item\em Get the packet receive flag status. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_cluster_duck_ab61b7cceef6ad8c38ef18bd3ead5dfb2}{start\+Receive}} ()
+\begin{DoxyCompactList}\small\item\em Set the \mbox{\hyperlink{class_duck}{Duck}} to be ready to recieve Lo\+Ra packets. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_cluster_duck_a81f3930034706e985b6a24841dc22676}{start\+Transmit}} ()
+\begin{DoxyCompactList}\small\item\em Set the \mbox{\hyperlink{class_duck}{Duck}} to be ready to transmit Lo\+Ra packets. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_cluster_duck_af90ff8e0f317caa2dd9f3e7787cb1f95}{get\+R\+S\+SI}} ()
+\begin{DoxyCompactList}\small\item\em Get the current R\+S\+SI value. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_cluster_duck_ab408343d50ee840214e1d2b9498201c7}{ssid\+Available}} (String val=\char`\"{}\char`\"{})
+\begin{DoxyCompactList}\small\item\em Checks if the given ssid is available. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_cluster_duck_a190ffbd25294e0c3b4b577d2e813353f}{set\+S\+S\+ID}} (String val)
+\begin{DoxyCompactList}\small\item\em Set the Wi\+Fi network ssid. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_cluster_duck_abad0b1c51b539c4e9fdb361290efeaca}{set\+Password}} (String val)
+\begin{DoxyCompactList}\small\item\em Set the Wi\+Fi password. \end{DoxyCompactList}\item 
+String \mbox{\hyperlink{class_cluster_duck_a85d9c1d3da2853e4e38f2ead1a0f94e6}{get\+S\+S\+ID}} ()
+\begin{DoxyCompactList}\small\item\em Get the Wi\+Fi network ssid. \end{DoxyCompactList}\item 
+String \mbox{\hyperlink{class_cluster_duck_aaa7585bdb04eab5683da4c5da802a242}{get\+Password}} ()
+\begin{DoxyCompactList}\small\item\em Get the Wi\+Fi password ssid. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_cluster_duck_af0ab40227f1032e679112b95c06d569d}\label{class_cluster_duck_af0ab40227f1032e679112b95c06d569d}} 
+void {\bfseries setup\+O\+TA} ()
+\item 
+\mbox{\Hypertarget{class_cluster_duck_abf4fb4cc5d538211137b99ee5a250d4c}\label{class_cluster_duck_abf4fb4cc5d538211137b99ee5a250d4c}} 
+void {\bfseries process\+Portal\+Request} ()
+\item 
+\mbox{\Hypertarget{class_cluster_duck_ac9dbb3b994017b5824d47bc61aa09195}\label{class_cluster_duck_ac9dbb3b994017b5824d47bc61aa09195}} 
+String $\ast$ {\bfseries get\+Portal\+Data\+Array} ()
+\item 
+\mbox{\Hypertarget{class_cluster_duck_a89fcfea20fe3624408e1d61cfc50bfde}\label{class_cluster_duck_a89fcfea20fe3624408e1d61cfc50bfde}} 
+String {\bfseries get\+Portal\+Data\+String} ()
+\item 
+\mbox{\Hypertarget{class_cluster_duck_acfec3d190852fc3c2129d473cf5a00a0}\label{class_cluster_duck_acfec3d190852fc3c2129d473cf5a00a0}} 
+bool {\bfseries run\+Captive\+Portal} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_cluster_duck_a672a6fc60cc39331eace216f08322ba8}\label{class_cluster_duck_a672a6fc60cc39331eace216f08322ba8}} 
+String {\bfseries \+\_\+device\+Id} = \char`\"{}\char`\"{}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+External A\+P\+Is to build and control a duck device. 
+
+This class exposes all the necessary A\+P\+Is to setup/build a duck as well as customizig the duck\textquotesingle{}s behavior. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_cluster_duck_abef568c9bba61f00d6d02ed9a434a0c5}\label{class_cluster_duck_abef568c9bba61f00d6d02ed9a434a0c5}} 
+\index{ClusterDuck@{ClusterDuck}!couple@{couple}}
+\index{couple@{couple}!ClusterDuck@{ClusterDuck}}
+\doxysubsubsection{\texorpdfstring{couple()}{couple()}}
+{\footnotesize\ttfamily void Cluster\+Duck\+::couple (\begin{DoxyParamCaption}\item[{byte}]{byte\+Code,  }\item[{String}]{outgoing }\end{DoxyParamCaption})}
+
+
+
+Append a chunk to the packet. 
+
+A chunk is part of the \mbox{\hyperlink{class_duck}{Duck}} Lo\+Ra packet and is formated as \mbox{[}tag\mbox{]}\mbox{[}length\mbox{]}\mbox{[}payload\mbox{]} where a tag is a single byte identifying the chunk. Currently supported tags\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_cluster_duck_a96f1ef44b33b43e2bca605019b8db92b}{ping}}}
+\DoxyCodeLine{sender\_id}
+\DoxyCodeLine{topic}
+\DoxyCodeLine{message\_id}
+\DoxyCodeLine{payload}
+\DoxyCodeLine{iamhere}
+\end{DoxyCode}
+
+
+
+\begin{DoxyParams}{Parameters}
+{\em byte\+Code} & identifies the tag to append \\
+\hline
+{\em outgoing} & the payload for the tag to be appended to the Lo\+Ra packet \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_cluster_duck_a91dff3259cd83b2afc94d7b10b5254f4}\label{class_cluster_duck_a91dff3259cd83b2afc94d7b10b5254f4}} 
+\index{ClusterDuck@{ClusterDuck}!duckMac@{duckMac}}
+\index{duckMac@{duckMac}!ClusterDuck@{ClusterDuck}}
+\doxysubsubsection{\texorpdfstring{duckMac()}{duckMac()}}
+{\footnotesize\ttfamily String Cluster\+Duck\+::duck\+Mac (\begin{DoxyParamCaption}\item[{boolean}]{format }\end{DoxyParamCaption})}
+
+
+
+Get the \mbox{\hyperlink{class_duck}{Duck}} Mac Address. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em format} & true if the mac address is formated as M\+M\+:\+M\+M\+:\+M\+M\+:\+S\+S\+:\+SS\+:SS \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A string representing the duck mac address 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_cluster_duck_afb9dfbb466ced33045b96ea27daa1d1c}\label{class_cluster_duck_afb9dfbb466ced33045b96ea27daa1d1c}} 
+\index{ClusterDuck@{ClusterDuck}!getFlag@{getFlag}}
+\index{getFlag@{getFlag}!ClusterDuck@{ClusterDuck}}
+\doxysubsubsection{\texorpdfstring{getFlag()}{getFlag()}}
+{\footnotesize\ttfamily volatile bool Cluster\+Duck\+::get\+Flag (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Get the packet receive flag status. 
+
+\begin{DoxyReturn}{Returns}
+true if a received packet is available, false otherwise. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_cluster_duck_a63683e1acc62fb961b350ff848a384be}\label{class_cluster_duck_a63683e1acc62fb961b350ff848a384be}} 
+\index{ClusterDuck@{ClusterDuck}!getInterrupt@{getInterrupt}}
+\index{getInterrupt@{getInterrupt}!ClusterDuck@{ClusterDuck}}
+\doxysubsubsection{\texorpdfstring{getInterrupt()}{getInterrupt()}}
+{\footnotesize\ttfamily volatile bool Cluster\+Duck\+::get\+Interrupt (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Get the interrupt state. 
+
+\begin{DoxyReturn}{Returns}
+true if interrupt is enabled, false otherwise. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_cluster_duck_a4f2b1fab719114b64a23bbdf9f1411d6}\label{class_cluster_duck_a4f2b1fab719114b64a23bbdf9f1411d6}} 
+\index{ClusterDuck@{ClusterDuck}!getLastPacket@{getLastPacket}}
+\index{getLastPacket@{getLastPacket}!ClusterDuck@{ClusterDuck}}
+\doxysubsubsection{\texorpdfstring{getLastPacket()}{getLastPacket()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{struct_packet}{Packet}} Cluster\+Duck\+::get\+Last\+Packet (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Get the last received Lo\+Ra packet. 
+
+\begin{DoxyReturn}{Returns}
+A \mbox{\hyperlink{struct_packet}{Packet}} object containing the last received message. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_cluster_duck_ab1dc889dfeff16279eaffd7681398fc5}\label{class_cluster_duck_ab1dc889dfeff16279eaffd7681398fc5}} 
+\index{ClusterDuck@{ClusterDuck}!getPacketData@{getPacketData}}
+\index{getPacketData@{getPacketData}!ClusterDuck@{ClusterDuck}}
+\doxysubsubsection{\texorpdfstring{getPacketData()}{getPacketData()}}
+{\footnotesize\ttfamily String Cluster\+Duck\+::get\+Packet\+Data (\begin{DoxyParamCaption}\item[{int}]{p\+Size }\end{DoxyParamCaption})}
+
+
+
+Get the \mbox{\hyperlink{struct_packet}{Packet}} data. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Size} & the length of the packet \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A string representing the content of the packet 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_cluster_duck_aaa7585bdb04eab5683da4c5da802a242}\label{class_cluster_duck_aaa7585bdb04eab5683da4c5da802a242}} 
+\index{ClusterDuck@{ClusterDuck}!getPassword@{getPassword}}
+\index{getPassword@{getPassword}!ClusterDuck@{ClusterDuck}}
+\doxysubsubsection{\texorpdfstring{getPassword()}{getPassword()}}
+{\footnotesize\ttfamily String Cluster\+Duck\+::get\+Password (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Get the Wi\+Fi password ssid. 
+
+\begin{DoxyReturn}{Returns}
+a string representing the current network password 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_cluster_duck_af90ff8e0f317caa2dd9f3e7787cb1f95}\label{class_cluster_duck_af90ff8e0f317caa2dd9f3e7787cb1f95}} 
+\index{ClusterDuck@{ClusterDuck}!getRSSI@{getRSSI}}
+\index{getRSSI@{getRSSI}!ClusterDuck@{ClusterDuck}}
+\doxysubsubsection{\texorpdfstring{getRSSI()}{getRSSI()}}
+{\footnotesize\ttfamily int Cluster\+Duck\+::get\+R\+S\+SI (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Get the current R\+S\+SI value. 
+
+\begin{DoxyReturn}{Returns}
+An integer representing the rssi value. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_cluster_duck_a85d9c1d3da2853e4e38f2ead1a0f94e6}\label{class_cluster_duck_a85d9c1d3da2853e4e38f2ead1a0f94e6}} 
+\index{ClusterDuck@{ClusterDuck}!getSSID@{getSSID}}
+\index{getSSID@{getSSID}!ClusterDuck@{ClusterDuck}}
+\doxysubsubsection{\texorpdfstring{getSSID()}{getSSID()}}
+{\footnotesize\ttfamily String Cluster\+Duck\+::get\+S\+S\+ID (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Get the Wi\+Fi network ssid. 
+
+\begin{DoxyReturn}{Returns}
+a string representing the current network ssid 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_cluster_duck_a6ba4440f4226965d499da0105e6b2ef0}\label{class_cluster_duck_a6ba4440f4226965d499da0105e6b2ef0}} 
+\index{ClusterDuck@{ClusterDuck}!handlePacket@{handlePacket}}
+\index{handlePacket@{handlePacket}!ClusterDuck@{ClusterDuck}}
+\doxysubsubsection{\texorpdfstring{handlePacket()}{handlePacket()}}
+{\footnotesize\ttfamily int Cluster\+Duck\+::handle\+Packet (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Handles a received Lo\+Ra packet. 
+
+\begin{DoxyReturn}{Returns}
+The packet length which should be $>$ 0. An error code is returned if there was a failure to read the data from the Lo\+Ra driver. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_cluster_duck_ac8d31cdd98761ef1bf638ce3507e0f3f}\label{class_cluster_duck_ac8d31cdd98761ef1bf638ce3507e0f3f}} 
+\index{ClusterDuck@{ClusterDuck}!idInPath@{idInPath}}
+\index{idInPath@{idInPath}!ClusterDuck@{ClusterDuck}}
+\doxysubsubsection{\texorpdfstring{idInPath()}{idInPath()}}
+{\footnotesize\ttfamily bool Cluster\+Duck\+::id\+In\+Path (\begin{DoxyParamCaption}\item[{String}]{path }\end{DoxyParamCaption})}
+
+
+
+Determine if a \mbox{\hyperlink{class_duck}{Duck}} device\+\_\+id is present in the path. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em path} & path retrieved from the Lo\+Ra packet \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true if the id is in the path, false otherwise. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_cluster_duck_a96f1ef44b33b43e2bca605019b8db92b}\label{class_cluster_duck_a96f1ef44b33b43e2bca605019b8db92b}} 
+\index{ClusterDuck@{ClusterDuck}!ping@{ping}}
+\index{ping@{ping}!ClusterDuck@{ClusterDuck}}
+\doxysubsubsection{\texorpdfstring{ping()}{ping()}}
+{\footnotesize\ttfamily int Cluster\+Duck\+::ping (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Transmit a ping message. 
+
+\begin{DoxyReturn}{Returns}
+0 if the message was sent sucessfully, an error code otherwise. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_cluster_duck_a6643f40cc0bdd62aa4b8c7293c6e0119}\label{class_cluster_duck_a6643f40cc0bdd62aa4b8c7293c6e0119}} 
+\index{ClusterDuck@{ClusterDuck}!runDetect@{runDetect}}
+\index{runDetect@{runDetect}!ClusterDuck@{ClusterDuck}}
+\doxysubsubsection{\texorpdfstring{runDetect()}{runDetect()}}
+{\footnotesize\ttfamily int Cluster\+Duck\+::run\+Detect (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+starts the \mbox{\hyperlink{class_duck}{Duck}} Detector run thread. 
+
+
+\begin{DoxyItemize}
+\item checks for \char`\"{}health\char`\"{} message received and returns the Lo\+Ra R\+S\+SI value \begin{DoxyReturn}{Returns}
+an integer value representing the Lo\+Ra R\+S\+SI value 
+\end{DoxyReturn}
+
+\end{DoxyItemize}\mbox{\Hypertarget{class_cluster_duck_abad0b1c51b539c4e9fdb361290efeaca}\label{class_cluster_duck_abad0b1c51b539c4e9fdb361290efeaca}} 
+\index{ClusterDuck@{ClusterDuck}!setPassword@{setPassword}}
+\index{setPassword@{setPassword}!ClusterDuck@{ClusterDuck}}
+\doxysubsubsection{\texorpdfstring{setPassword()}{setPassword()}}
+{\footnotesize\ttfamily void Cluster\+Duck\+::set\+Password (\begin{DoxyParamCaption}\item[{String}]{val }\end{DoxyParamCaption})}
+
+
+
+Set the Wi\+Fi password. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em val} & the password string to set \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_cluster_duck_a190ffbd25294e0c3b4b577d2e813353f}\label{class_cluster_duck_a190ffbd25294e0c3b4b577d2e813353f}} 
+\index{ClusterDuck@{ClusterDuck}!setSSID@{setSSID}}
+\index{setSSID@{setSSID}!ClusterDuck@{ClusterDuck}}
+\doxysubsubsection{\texorpdfstring{setSSID()}{setSSID()}}
+{\footnotesize\ttfamily void Cluster\+Duck\+::set\+S\+S\+ID (\begin{DoxyParamCaption}\item[{String}]{val }\end{DoxyParamCaption})}
+
+
+
+Set the Wi\+Fi network ssid. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em val} & the ssid string to set \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_cluster_duck_ac3bfa8d78512ca35738edd381e10f46a}\label{class_cluster_duck_ac3bfa8d78512ca35738edd381e10f46a}} 
+\index{ClusterDuck@{ClusterDuck}!setupDetect@{setupDetect}}
+\index{setupDetect@{setupDetect}!ClusterDuck@{ClusterDuck}}
+\doxysubsubsection{\texorpdfstring{setupDetect()}{setupDetect()}}
+{\footnotesize\ttfamily void Cluster\+Duck\+::setup\+Detect (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Shortcut to setup a \mbox{\hyperlink{class_duck}{Duck}} Detector. 
+
+This function will setup a \mbox{\hyperlink{class_duck}{Duck}} Detector and is equivalent to call these individual methods\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{setupDisplay(\textcolor{stringliteral}{"{}Duck"{}});}
+\DoxyCodeLine{setupLoRa();}
+\DoxyCodeLine{setupOTA()}
+\end{DoxyCode}
+
+
+It is assumed that the \mbox{\hyperlink{class_duck}{Duck}} Detector hardware has a display and a wifi component \mbox{\Hypertarget{class_cluster_duck_ab408343d50ee840214e1d2b9498201c7}\label{class_cluster_duck_ab408343d50ee840214e1d2b9498201c7}} 
+\index{ClusterDuck@{ClusterDuck}!ssidAvailable@{ssidAvailable}}
+\index{ssidAvailable@{ssidAvailable}!ClusterDuck@{ClusterDuck}}
+\doxysubsubsection{\texorpdfstring{ssidAvailable()}{ssidAvailable()}}
+{\footnotesize\ttfamily bool Cluster\+Duck\+::ssid\+Available (\begin{DoxyParamCaption}\item[{String}]{val = {\ttfamily \char`\"{}\char`\"{}} }\end{DoxyParamCaption})}
+
+
+
+Checks if the given ssid is available. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em val} & ssid to check, default is an empty string and will use the internal default ssid \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true if the ssid is available, false otherwise. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_cluster_duck_ab61b7cceef6ad8c38ef18bd3ead5dfb2}\label{class_cluster_duck_ab61b7cceef6ad8c38ef18bd3ead5dfb2}} 
+\index{ClusterDuck@{ClusterDuck}!startReceive@{startReceive}}
+\index{startReceive@{startReceive}!ClusterDuck@{ClusterDuck}}
+\doxysubsubsection{\texorpdfstring{startReceive()}{startReceive()}}
+{\footnotesize\ttfamily int Cluster\+Duck\+::start\+Receive (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Set the \mbox{\hyperlink{class_duck}{Duck}} to be ready to recieve Lo\+Ra packets. 
+
+\begin{DoxyReturn}{Returns}
+0 if the call was successful, an error code otherwise. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_cluster_duck_a81f3930034706e985b6a24841dc22676}\label{class_cluster_duck_a81f3930034706e985b6a24841dc22676}} 
+\index{ClusterDuck@{ClusterDuck}!startTransmit@{startTransmit}}
+\index{startTransmit@{startTransmit}!ClusterDuck@{ClusterDuck}}
+\doxysubsubsection{\texorpdfstring{startTransmit()}{startTransmit()}}
+{\footnotesize\ttfamily int Cluster\+Duck\+::start\+Transmit (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Set the \mbox{\hyperlink{class_duck}{Duck}} to be ready to transmit Lo\+Ra packets. 
+
+\begin{DoxyReturn}{Returns}
+0 if the call was successful, an error code otherwise. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_cluster_duck_a99127caf18aa9eb983c879e7078b6da8}\label{class_cluster_duck_a99127caf18aa9eb983c879e7078b6da8}} 
+\index{ClusterDuck@{ClusterDuck}!uuidCreator@{uuidCreator}}
+\index{uuidCreator@{uuidCreator}!ClusterDuck@{ClusterDuck}}
+\doxysubsubsection{\texorpdfstring{uuidCreator()}{uuidCreator()}}
+{\footnotesize\ttfamily String Cluster\+Duck\+::uuid\+Creator (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Create a uuid string. 
+
+\begin{DoxyReturn}{Returns}
+A string representing a unique identifier. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/\mbox{\hyperlink{_cluster_duck_8h}{Cluster\+Duck.\+h}}\item 
+src/Cluster\+Duck.\+cpp\end{DoxyCompactItemize}

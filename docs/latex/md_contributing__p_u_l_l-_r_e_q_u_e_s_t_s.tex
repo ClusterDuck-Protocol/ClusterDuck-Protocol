@@ -1,0 +1,270 @@
+There are two fundamental components of the pull request process\+: one concrete and technical, and one more process oriented. The concrete and technical component involves the specific details of setting up your local environment so that you can make the actual changes. This is where we will start.
+
+
+\begin{DoxyItemize}
+\item \href{\#dependencies}{\texttt{ Dependencies}}
+\item \href{\#setting-up-your-local-environment}{\texttt{ Setting up your local environment}}
+\begin{DoxyItemize}
+\item \href{\#step-1-fork}{\texttt{ Step 1\+: Fork}}
+\item \href{\#step-2-branch}{\texttt{ Step 2\+: Branch}}
+\end{DoxyItemize}
+\item \href{\#the-process-of-making-changes}{\texttt{ The Process of Making Changes}}
+\begin{DoxyItemize}
+\item \href{\#step-3-code}{\texttt{ Step 3\+: Code}}
+\item \href{\#step-4-commit}{\texttt{ Step 4\+: Commit}}
+\begin{DoxyItemize}
+\item \href{\#commit-message-guidelines}{\texttt{ Commit message guidelines}}
+\end{DoxyItemize}
+\item \href{\#step-5-rebase}{\texttt{ Step 5\+: Rebase}}
+\item \href{\#step-6-test}{\texttt{ Step 6\+: Test}}
+\item \href{\#step-7-push}{\texttt{ Step 7\+: Push}}
+\item \href{\#step-8-opening-the-pull-request}{\texttt{ Step 8\+: Opening the pull request}}
+\item \href{\#step-9-discuss-and-update}{\texttt{ Step 9\+: Discuss and update}}
+\begin{DoxyItemize}
+\item \href{\#approval-and-request-changes-workflow}{\texttt{ Approval and request changes workflow}}
+\end{DoxyItemize}
+\item \href{\#step-10-landing}{\texttt{ Step 10\+: Landing}}
+\end{DoxyItemize}
+\item \href{\#reviewing-pull-requests}{\texttt{ Reviewing pull requests}}
+\begin{DoxyItemize}
+\item \href{\#review-a-bit-at-a-time}{\texttt{ Review a bit at a time}}
+\item \href{\#be-aware-of-the-person-behind-the-code}{\texttt{ Be aware of the person behind the code}}
+\item \href{\#respect-the-minimum-wait-time-for-comments}{\texttt{ Respect the minimum wait time for comments}}
+\item \href{\#abandoned-or-stalled-pull-requests}{\texttt{ Abandoned or stalled pull requests}}
+\item \href{\#approving-a-change}{\texttt{ Approving a change}}
+\item \href{\#accept-that-there-are-different-opinions-about-what-belongs-in-ClusterDuck-Protocol}{\texttt{ Accept that there are different opinions about what belongs in Cluster\+Duck-\/\+Protocol}}
+\item \href{\#performance-is-not-everything}{\texttt{ Performance is not everything}}
+\item \href{\#continuous-integration-testing}{\texttt{ Continuous integration testing}}
+\end{DoxyItemize}
+\item \href{\#notes}{\texttt{ Notes}}
+\begin{DoxyItemize}
+\item \href{\#commit-squashing}{\texttt{ Commit squashing}}
+\item \href{\#getting-approvals-for-your-pull-request}{\texttt{ Getting approvals for your pull request}}
+\item \href{\#ci-testing}{\texttt{ CI testing}}
+\item \href{\#waiting-until-the-pull-request-gets-landed}{\texttt{ Waiting until the pull request gets landed}}
+\end{DoxyItemize}
+\end{DoxyItemize}\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md12}{}\doxysection{Dependencies}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md12}
+More details to come on Cluster\+Duck-\/\+Protocol dependencies. In case of doubt, open an issue in the \href{https://github.com/Code-and-Response/ClusterDuck-Protocol/issues/}{\texttt{ issue tracker}} or engage on the \href{https://www.project-owl.com/slack}{\texttt{ Cluster\+Duck-\/\+Protocol Slack workspace}}.\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md13}{}\doxysection{Setting up your local environment}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md13}
+To get started, you will need to have {\ttfamily git} installed locally. Depending on your operating system, there are also a number of other dependencies required.
+
+Once you have {\ttfamily git} and are sure you have all of the necessary dependencies, it\textquotesingle{}s time to create a fork.\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md14}{}\doxysubsection{Step 1\+: Fork}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md14}
+Fork the project \href{https://github.com/Code-and-Response/ClusterDuck-Protocol}{\texttt{ on Git\+Hub}} and clone your fork locally.
+
+You will need to have \href{https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage}{\texttt{ Git Large File Storage}} installed locally.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$ git clone git@github.com:username/ClusterDuck-\/Protocol.git}
+\DoxyCodeLine{\$ cd ClusterDuck-\/Protocol}
+\DoxyCodeLine{\$ git remote add upstream https://github.com/Code-\/and-\/Response/ClusterDuck-\/Protocol.git}
+\DoxyCodeLine{\$ git fetch upstream}
+\end{DoxyCode}
+
+
+It is recommended to configure {\ttfamily git} so that it knows who you are\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$ git config user.name "{}J. Random User"{}}
+\DoxyCodeLine{\$ git config user.email "{}j.random.user@example.com"{}}
+\end{DoxyCode}
+
+
+You can use any name/email address you prefer here. We only use the metadata generated by {\ttfamily git} using this configuration for properly attributing your changes to you in the {\ttfamily A\+U\+T\+H\+O\+RS} file and the changelog.\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md15}{}\doxysubsection{Step 2\+: Branch}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md15}
+As a best practice to keep your development environment as organized as possible, create local branches to work within. These should also be created directly off of the {\ttfamily master} branch.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$ git checkout -\/b my-\/branch -\/t upstream/master}
+\end{DoxyCode}
+\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md16}{}\doxysection{The process of making changes}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md16}
+\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md17}{}\doxysubsection{Step 3\+: Code}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md17}
+Cluster\+Duck-\/\+Protocol does not yet have a style guide. If you\textquotesingle{}re interested in creating one, you\textquotesingle{}re on the right page 😃\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md18}{}\doxysubsection{Step 4\+: Commit}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md18}
+It is a recommended best practice to keep your changes as logically grouped as possible within individual commits. There is no limit to the number of commits any single pull request may have, and many contributors find it easier to review changes that are split across multiple commits.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$ git add my/changed/files}
+\DoxyCodeLine{\$ git commit}
+\end{DoxyCode}
+
+
+Note that multiple commits often get squashed when they are landed (see the notes about \href{\#commit-squashing}{\texttt{ commit squashing}}).\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md19}{}\doxysubsubsection{Commit message guidelines}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md19}
+A good commit message should describe what changed and why. One line commits are good, but if you want to go into more detail\+:
+
+
+\begin{DoxyEnumerate}
+\item The first line should\+:
+\begin{DoxyItemize}
+\item contain a short description of the change (preferably 50 characters or less, and no more than 72 characters)
+\item be entirely in lowercase with the exception of proper nouns, acronyms, and the words that refer to code, like function/variable names
+\item be prefixed with the name of the changed subsystem and start with an imperative verb. Check the output of {\ttfamily git log -\/-\/oneline files/you/changed} to find out what subsystems your changes touch.
+\end{DoxyItemize}
+
+Examples\+:
+\begin{DoxyItemize}
+\item {\ttfamily net\+: add local\+Address and local\+Port to Socket}
+\item {\ttfamily src\+: fix typos in async\+\_\+wrap.\+h}
+\end{DoxyItemize}
+\item Keep the second line blank.
+\item Wrap all other lines at 72 columns (except for long U\+R\+Ls).
+\item If your patch fixes an open issue, you can add a reference to it at the end of the log. Use the {\ttfamily Fixes\+:} prefix and the full issue U\+RL. For other references use {\ttfamily Refs\+:}.
+\end{DoxyEnumerate}
+
+Sample complete commit message\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{subsystem: explain the commit in one line}
+\DoxyCodeLine{}
+\DoxyCodeLine{Body of commit message is a few lines of text, explaining things}
+\DoxyCodeLine{in more detail, possibly giving some background about the issue}
+\DoxyCodeLine{being fixed, etc.}
+\DoxyCodeLine{}
+\DoxyCodeLine{The body of the commit message can be several paragraphs, and}
+\DoxyCodeLine{please \textcolor{keywordflow}{do} proper word-\/wrap and keep columns shorter than about}
+\DoxyCodeLine{72 characters or so. That way, `git log` will show things}
+\DoxyCodeLine{nicely even when it is indented.}
+\DoxyCodeLine{}
+\DoxyCodeLine{Fixes: https:\textcolor{comment}{//github.com/Code-\/and-\/Response/ClusterDuck-\/Protocol/issues/1337}}
+\DoxyCodeLine{Refs: http:\textcolor{comment}{//eslint.org/docs/rules/space-\/in-\/parens.html}}
+\end{DoxyCode}
+
+
+If you are new to contributing to Cluster\+Duck-\/\+Protocol, please try to do your best at conforming to these guidelines, but do not worry if you get something wrong. One of the existing contributors will help get things situated and the contributor landing the pull request will ensure that everything follows the project guidelines.\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md20}{}\doxysubsection{Step 5\+: Rebase}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md20}
+As a best practice, once you have committed your changes, it is a good idea to use {\ttfamily git rebase} (not {\ttfamily git merge}) to synchronize your work with the main repository.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$ git fetch upstream}
+\DoxyCodeLine{\$ git rebase upstream/master}
+\end{DoxyCode}
+
+
+This ensures that your working branch has the latest changes from master.\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md21}{}\doxysubsection{Step 6\+: Test}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md21}
+Instructions should also be provided so that the core team can validate the change.\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md22}{}\doxysubsection{Step 7\+: Push}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md22}
+Once you are sure your commits are ready to go, with passing tests and linting, begin the process of opening a pull request by pushing your working branch to your fork on Git\+Hub.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$ git push origin my-\/branch}
+\end{DoxyCode}
+\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md23}{}\doxysubsection{Step 8\+: Opening the pull request}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md23}
+From within Git\+Hub, opening a new pull request will present you with a few form fields.
+
+Please try to do your best at filling out the details, but feel free to skip parts if you\textquotesingle{}re not sure what to put.
+
+Once opened, pull requests are usually reviewed within a few days.\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md24}{}\doxysubsection{Step 9\+: Discuss and update}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md24}
+You will probably get feedback or requests for changes to your pull request. This is a big part of the submission process so don\textquotesingle{}t be discouraged! Some contributors may sign off on the pull request right away, others may have more detailed comments or feedback. This is a necessary part of the process in order to evaluate whether the changes are correct and necessary.
+
+To make changes to an existing pull request, make the changes to your local branch, add a new commit with those changes, and push those to your fork. Git\+Hub will automatically update the pull request.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$ git add my/changed/files}
+\DoxyCodeLine{\$ git commit}
+\DoxyCodeLine{\$ git push origin my-\/branch}
+\end{DoxyCode}
+
+
+It is also frequently necessary to synchronize your pull request with other changes that have landed in {\ttfamily master} by using {\ttfamily git rebase}\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$ git fetch -\/-\/all}
+\DoxyCodeLine{\$ git rebase origin/master}
+\DoxyCodeLine{\$ git push -\/-\/force-\/with-\/lease origin my-\/branch}
+\end{DoxyCode}
+
+
+{\bfseries{Important\+:}} The {\ttfamily git push -\/-\/force-\/with-\/lease} command is one of the few ways to delete history in {\ttfamily git}. Before you use it, make sure you understand the risks. If in doubt, you can always ask for guidance in the pull request or on the \href{https://www.project-owl.com/slack}{\texttt{ Cluster\+Duck-\/\+Protocol Slack workspace}}.
+
+If you happen to make a mistake in any of your commits, do not worry. You can amend the last commit (for example if you want to change the commit log).
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$ git add any/changed/files}
+\DoxyCodeLine{\$ git commit -\/-\/amend}
+\DoxyCodeLine{\$ git push -\/-\/force-\/with-\/lease origin my-\/branch}
+\end{DoxyCode}
+
+
+There are a number of more advanced mechanisms for managing commits using {\ttfamily git rebase} that can be used, but are beyond the scope of this guide.
+
+Feel free to post a comment in the pull request to ping reviewers if you are awaiting an answer on something. If you encounter words or acronyms that seem unfamiliar, refer to this \href{https://sites.google.com/a/chromium.org/dev/glossary}{\texttt{ glossary}}.\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md25}{}\doxysubsubsection{Approval and request changes workflow}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md25}
+All pull requests require \char`\"{}sign off\char`\"{} in order to land. Whenever a contributor reviews a pull request they may find specific details that they would like to see changed or fixed. These may be as simple as fixing a typo, or may involve substantive changes to the code you have written. While such requests are intended to be helpful, they may come across as abrupt or unhelpful, especially requests to change things that do not include concrete suggestions on {\itshape how} to change them.
+
+Try not to be discouraged. If you feel that a particular review is unfair, say so, or contact one of the other contributors in the project and seek their input. Often such comments are the result of the reviewer having only taken a short amount of time to review and are not ill-\/intended. Such issues can often be resolved with a bit of patience. That said, reviewers should be expected to be helpful in their feedback, and feedback that is simply vague, dismissive and unhelpful is likely safe to ignore.\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md26}{}\doxysubsection{Step 10\+: Landing}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md26}
+In order to land, a pull request needs to be reviewed and \mbox{[}approved\mbox{]}\mbox{[}\mbox{]} by at least one Cluster\+Duck-\/\+Protocol Collaborators. After that, as long as there are no objections from other contributors, the pull request can be merged. If you find your pull request waiting longer than you expect, see the \href{\#waiting-until-the-pull-request-gets-landed}{\texttt{ notes about the waiting time}}.
+
+When a collaborator lands your pull request, they will post a comment to the pull request page mentioning the commit(s) it landed as. Git\+Hub often shows the pull request as {\ttfamily Closed} at this point, but don\textquotesingle{}t worry. If you look at the branch you raised your pull request against (probably {\ttfamily master}), you should see a commit with your name on it. Congratulations and thanks for your contribution!\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md27}{}\doxysection{Reviewing pull requests}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md27}
+All Cluster\+Duck-\/\+Protocol contributors who choose to review and provide feedback on pull requests have a responsibility to both the project and the individual making the contribution. Reviews and feedback must be helpful, insightful, and geared towards improving the contribution as opposed to simply blocking it. If there are reasons why you feel the PR should not land, explain what those are. Do not expect to be able to block a pull request from advancing simply because you say \char`\"{}\+No\char`\"{} without giving an explanation. Be open to having your mind changed. Be open to working with the contributor to make the pull request better.
+
+Reviews that are dismissive or disrespectful of the contributor or any other reviewers are strictly counter to the \href{https://github.com/Code-and-Response/ClusterDuck-Protocol/blob/master/CONTRIBUTING.md\#code-of-conduct}{\texttt{ Code of Conduct}}.
+
+When reviewing a pull request, the primary goals are for the codebase to improve and for the person submitting the request to succeed. Even if a pull request does not land, the submitters should come away from the experience feeling like their effort was not wasted or unappreciated. Every pull request from a new contributor is an opportunity to grow the community.\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md28}{}\doxysubsection{Review a bit at a time.}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md28}
+Do not overwhelm new contributors.
+
+It is tempting to micro-\/optimize and make everything about relative performance, perfect grammar, or exact style matches. Do not succumb to that temptation.
+
+Focus first on the most significant aspects of the change\+:
+
+
+\begin{DoxyEnumerate}
+\item Does this change make sense for Cluster\+Duck-\/\+Protocol?
+\item Does this change make Cluster\+Duck-\/\+Protocol better, even if only incrementally?
+\item Are there clear bugs or larger scale issues that need attending to?
+\item Is the commit message readable and correct? If it contains a breaking change is it clear enough?
+\end{DoxyEnumerate}
+
+When changes are necessary, {\itshape request} them, do not {\itshape demand} them, and do not assume that the submitter already knows how to add a test or run a benchmark.
+
+Specific performance optimization techniques, coding styles and conventions change over time. The first impression you give to a new contributor never does.
+
+Nits (requests for small changes that are not essential) are fine, but try to avoid stalling the pull request. Most nits can typically be fixed by the Cluster\+Duck-\/\+Protocol Collaborator landing the pull request but they can also be an opportunity for the contributor to learn a bit more about the project.
+
+It is always good to clearly indicate nits when you comment\+: e.\+g. {\ttfamily Nit\+: change foo() to bar(). But this is not blocking.}
+
+If your comments were addressed but were not folded automatically after new commits or if they proved to be mistaken, please, \mbox{[}hide them\mbox{]}\mbox{[}hiding-\/a-\/comment\mbox{]} with the appropriate reason to keep the conversation flow concise and relevant.\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md29}{}\doxysubsection{Be aware of the person behind the code}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md29}
+Be aware that {\itshape how} you communicate requests and reviews in your feedback can have a significant impact on the success of the pull request. Yes, we may land a particular change that makes Cluster\+Duck-\/\+Protocol better, but the individual might just not want to have anything to do with Cluster\+Duck-\/\+Protocol ever again. The goal is not just having good code.\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md30}{}\doxysubsection{Respect the minimum wait time for comments}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md30}
+There is a minimum waiting time which we try to respect for non-\/trivial changes, so that people who may have important input in such a distributed project are able to respond.
+
+For non-\/trivial changes, pull requests must be left open for at least 48 hours. In most cases, when the PR is relatively small and focused on a narrow set of changes, that will provide more than enough time to adequately review. Sometimes changes take far longer to review, or need more specialized review from subject matter experts. When in doubt, do not rush.
+
+Trivial changes, typically limited to small formatting changes or fixes to documentation, may be landed within the minimum 48 hour window.\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md31}{}\doxysubsection{Abandoned or stalled pull requests}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md31}
+If a pull request appears to be abandoned or stalled, it is polite to first check with the contributor to see if they intend to continue the work before checking if they would mind if you took it over (especially if it just has nits left). When doing so, it is courteous to give the original contributor credit for the work they started (either by preserving their name and email address in the commit log, or by using an {\ttfamily Author\+:} meta-\/data tag in the commit.\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md32}{}\doxysubsection{Approving a change}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md32}
+Any Cluster\+Duck-\/\+Protocol core Collaborator (any Git\+Hub user with commit rights in the {\ttfamily Code-\/and-\/\+Response/\+Cluster\+Duck-\/\+Protocol} repository) is authorized to approve any other contributor\textquotesingle{}s work. Collaborators are not permitted to approve their own pull requests.
+
+Collaborators indicate that they have reviewed and approve of the changes in a pull request either by using Git\+Hub\textquotesingle{}s Approval Workflow, which is preferred, or by leaving an {\ttfamily L\+G\+TM} (\char`\"{}\+Looks Good To Me\char`\"{}) comment.
+
+When explicitly using the \char`\"{}\+Changes requested\char`\"{} component of the Git\+Hub Approval Workflow, show empathy. That is, do not be rude or abrupt with your feedback and offer concrete suggestions for improvement, if possible. If you\textquotesingle{}re not sure {\itshape how} a particular change can be improved, say so.
+
+Most importantly, after leaving such requests, it is courteous to make yourself available later to check whether your comments have been addressed.
+
+If you see that requested changes have been made, you can clear another collaborator\textquotesingle{}s {\ttfamily Changes requested} review.
+
+Change requests that are vague, dismissive, or unconstructive may also be dismissed if requests for greater clarification go unanswered within a reasonable period of time.
+
+If you do not believe that the pull request should land at all, use {\ttfamily Changes requested} to indicate that you are considering some of your comments to block the PR from landing. When doing so, explain {\itshape why} you believe the pull request should not land along with an explanation of what may be an acceptable alternative course, if any.\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md33}{}\doxysubsection{Accept that there are different opinions about what belongs in Cluster\+Duck-\/\+Protocol}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md33}
+Opinions on this vary, even among the members of the Technical Steering Committee.
+
+One general rule of thumb is that if Cluster\+Duck-\/\+Protocol itself needs it (due to historic or functional reasons), then it belongs in Cluster\+Duck-\/\+Protocol.
+
+Also, functionality that either cannot be implemented outside of core in any reasonable way, or only with significant pain.
+
+It is not uncommon for contributors to suggest new features they feel would make Cluster\+Duck-\/\+Protocol better. These may or may not make sense to add, but as with all changes, be courteous in how you communicate your stance on these. Comments that make the contributor feel like they should have \char`\"{}known better\char`\"{} or ridiculed for even trying run counter to the \href{https://github.com/Code-and-Response/ClusterDuck-Protocol/blob/master/CONTRIBUTING.md\#code-of-conduct}{\texttt{ Code of Conduct}}.\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md34}{}\doxysubsection{Performance is not everything}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md34}
+Cluster\+Duck-\/\+Protocol has always optimized for speed of execution. If a particular change can be shown to make some part of Cluster\+Duck-\/\+Protocol faster, it\textquotesingle{}s quite likely to be accepted. Claims that a particular pull request will make things faster will almost always be met by requests for performance \mbox{[}benchmark results\mbox{]}\mbox{[}\mbox{]} that demonstrate the improvement.
+
+That said, performance is not the only factor to consider. Cluster\+Duck-\/\+Protocol also optimizes in favor of not breaking existing code in the ecosystem, and not changing working functional code just for the sake of changing.
+
+If a particular pull request introduces a performance or functional regression, rather than simply rejecting the pull request, take the time to work {\itshape with} the contributor on improving the change. Offer feedback and advice on what would make the pull request acceptable, and do not assume that the contributor should already know how to do that. Be explicit in your feedback.\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md35}{}\doxysubsection{Continuous integration testing}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md35}
+Every pull request needs to be tested to make sure that it works on the platforms that Cluster\+Duck-\/\+Protocol supports. This is currently done manually, but automated testing may come soon.\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md36}{}\doxysection{Notes}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md36}
+\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md37}{}\doxysubsection{Commit squashing}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md37}
+In most cases, do not squash commits that you add to your pull request during the review process. When the commits in your pull request land, they may be squashed into one commit per logical change. Metadata will be added to the commit message (including links to the pull request, links to relevant issues, and the names of the reviewers). The commit history of your pull request, however, will stay intact on the pull request page.
+
+For the size of \char`\"{}one logical change\char`\"{}, \href{https://github.com/nodejs/node/commit/0b5191f15d0f311c804d542b67e2e922d98834f8}{\texttt{ 0b5191f}} can be a good example. It touches the implementation, the documentation, and the tests, but is still one logical change. All tests should always pass when each individual commit lands on the master branch.\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md38}{}\doxysubsection{Getting approvals for your pull request}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md38}
+A pull request is approved either by saying L\+G\+TM, which stands for \char`\"{}\+Looks Good To Me\char`\"{}, or by using Git\+Hub\textquotesingle{}s Approve button. Git\+Hub\textquotesingle{}s pull request review feature can be used during the process. For more information, check out \href{https://www.youtube.com/watch?v=HW0RPaJqm4g}{\texttt{ the video tutorial}} or \href{https://help.github.com/articles/reviewing-changes-in-pull-requests/}{\texttt{ the official documentation}}.
+
+After you push new changes to your branch, you need to get approval for these new changes again, even if Git\+Hub shows \char`\"{}\+Approved\char`\"{} because the reviewers have hit the buttons before.\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md39}{}\doxysubsection{C\+I testing}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md39}
+Every pull request needs to be tested to make sure that it works on the platforms that Cluster\+Duck-\/\+Protocol supports. This is currently done manually, but automated testing may come soon.\hypertarget{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md40}{}\doxysubsection{Waiting until the pull request gets landed}\label{md_contributing__p_u_l_l-_r_e_q_u_e_s_t_s_autotoc_md40}
+A pull request needs to stay open for at least 48 hours from when it is submitted, even after it gets approved and passes the CI. This is to make sure that everyone has a chance to weigh in. If the changes are trivial, collaborators may decide it doesn\textquotesingle{}t need to wait. A pull request may well take longer to be merged in. 

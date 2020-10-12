@@ -1,0 +1,118 @@
+\hypertarget{class_h_t_t_p_client}{}\doxysection{H\+T\+T\+P\+Client Class Reference}
+\label{class_h_t_t_p_client}\index{HTTPClient@{HTTPClient}}
+
+
+Client for simple H\+T\+TP communication.  
+
+
+
+
+{\ttfamily \#include $<$H\+T\+T\+P.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_h_t_t_p_client_a7c6fdd5681e55437ebddaac785f35557}{H\+T\+T\+P\+Client}} (\mbox{\hyperlink{class_transport_layer}{Transport\+Layer}} $\ast$tl, uint16\+\_\+t port=80)
+\begin{DoxyCompactList}\small\item\em Default constructor. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_h_t_t_p_client_abc505d06d29fdc774d27c163e0be7ff8}{get}} (String \&url, String \&response)
+\begin{DoxyCompactList}\small\item\em Sends H\+T\+TP G\+ET request. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_h_t_t_p_client_a7ae493bf7db12ca2201cd6cead54c64f}{get}} (const char $\ast$url, String \&response)
+\begin{DoxyCompactList}\small\item\em Sends H\+T\+TP G\+ET request. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_h_t_t_p_client_ac1119b889b6fed7bd4d119d3e4842acb}{post}} (const char $\ast$url, const char $\ast$content, String \&response, const char $\ast$content\+Type=\char`\"{}text/plain\char`\"{})
+\begin{DoxyCompactList}\small\item\em Sends H\+T\+TP P\+O\+ST request. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Client for simple H\+T\+TP communication. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{class_h_t_t_p_client_a7c6fdd5681e55437ebddaac785f35557}\label{class_h_t_t_p_client_a7c6fdd5681e55437ebddaac785f35557}} 
+\index{HTTPClient@{HTTPClient}!HTTPClient@{HTTPClient}}
+\index{HTTPClient@{HTTPClient}!HTTPClient@{HTTPClient}}
+\doxysubsubsection{\texorpdfstring{HTTPClient()}{HTTPClient()}}
+{\footnotesize\ttfamily H\+T\+T\+P\+Client\+::\+H\+T\+T\+P\+Client (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_transport_layer}{Transport\+Layer}} $\ast$}]{tl,  }\item[{uint16\+\_\+t}]{port = {\ttfamily 80} }\end{DoxyParamCaption})}
+
+
+
+Default constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tl} & Pointer to the wireless module providing \mbox{\hyperlink{class_transport_layer}{Transport\+Layer}} communication.\\
+\hline
+{\em port} & Port to be used for H\+T\+TP. Defaults to 80. \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_h_t_t_p_client_a7ae493bf7db12ca2201cd6cead54c64f}\label{class_h_t_t_p_client_a7ae493bf7db12ca2201cd6cead54c64f}} 
+\index{HTTPClient@{HTTPClient}!get@{get}}
+\index{get@{get}!HTTPClient@{HTTPClient}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily int16\+\_\+t H\+T\+T\+P\+Client\+::get (\begin{DoxyParamCaption}\item[{const char $\ast$}]{url,  }\item[{String \&}]{response }\end{DoxyParamCaption})}
+
+
+
+Sends H\+T\+TP G\+ET request. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em url} & U\+RL to send the request to.\\
+\hline
+{\em response} & Arduino String object that will save the response.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_h_t_t_p_client_abc505d06d29fdc774d27c163e0be7ff8}\label{class_h_t_t_p_client_abc505d06d29fdc774d27c163e0be7ff8}} 
+\index{HTTPClient@{HTTPClient}!get@{get}}
+\index{get@{get}!HTTPClient@{HTTPClient}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily int16\+\_\+t H\+T\+T\+P\+Client\+::get (\begin{DoxyParamCaption}\item[{String \&}]{url,  }\item[{String \&}]{response }\end{DoxyParamCaption})}
+
+
+
+Sends H\+T\+TP G\+ET request. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em url} & U\+RL to send the request to.\\
+\hline
+{\em response} & Arduino String object that will save the response.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{class_h_t_t_p_client_ac1119b889b6fed7bd4d119d3e4842acb}\label{class_h_t_t_p_client_ac1119b889b6fed7bd4d119d3e4842acb}} 
+\index{HTTPClient@{HTTPClient}!post@{post}}
+\index{post@{post}!HTTPClient@{HTTPClient}}
+\doxysubsubsection{\texorpdfstring{post()}{post()}}
+{\footnotesize\ttfamily int16\+\_\+t H\+T\+T\+P\+Client\+::post (\begin{DoxyParamCaption}\item[{const char $\ast$}]{url,  }\item[{const char $\ast$}]{content,  }\item[{String \&}]{response,  }\item[{const char $\ast$}]{content\+Type = {\ttfamily \char`\"{}text/plain\char`\"{}} }\end{DoxyParamCaption})}
+
+
+
+Sends H\+T\+TP P\+O\+ST request. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em url} & U\+RL to send the request to.\\
+\hline
+{\em content} & Request content.\\
+\hline
+{\em response} & Arduino String object that will save the response.\\
+\hline
+{\em content\+Type} & M\+I\+ME type of request content. Defaults to \char`\"{}text/plain\char`\"{}.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{group__status__codes}{Status Codes}} 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+Libraries/\+Radio\+Lib/src/protocols/\+H\+T\+T\+P/H\+T\+T\+P.\+h\item 
+Libraries/\+Radio\+Lib/src/protocols/\+H\+T\+T\+P/H\+T\+T\+P.\+cpp\end{DoxyCompactItemize}
