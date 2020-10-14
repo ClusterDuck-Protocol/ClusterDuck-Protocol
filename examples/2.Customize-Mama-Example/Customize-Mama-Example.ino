@@ -3,6 +3,10 @@
 #include <DuckDisplay.h>
 
 
+auto timer = timer_create_default();
+const int INTERVAL_MS = 1000;
+char message[32]; 
+int counter = 1;
 
 const char* DUCK_WIFI_AP = "MAMA DUCK PORTAL";
 // create an instance of a MamaDuck with a given unique id
@@ -26,7 +30,7 @@ void setup() {
   // initialize DNS
   duck.setupDns();
   // initialize web server, enabling the captive portal with a custom HTML page
-  duck.setupWebServer(true, HTML);
+//  duck.setupWebServer(true, HTML);
   // initialize Over The Air firmware upgrade
   duck.setupOTA();
   // This duck has an OLED display and we want to use it. 
@@ -36,5 +40,27 @@ void setup() {
   // we are done
   display->drawString(true, 20,20, "DUCK READY");
   Serial.println("MAMA-DUCK...READY!");
+
   timer.every(INTERVAL_MS, runSensor);
+
+
+
+}
+
+void loop(){
+      timer.tick();
+  // Use the default run(). The Mama duck is designed to also forward data it receives
+  // from other ducks, across the network. It has a basic routing mechanism built-in
+  // to prevent messages from hoping endlessly.
+  duck.run();
+    
+    
+    };
+
+  bool runSensor(void *) {
+  sprintf(message, "mama counter %d", counter++); 
+  Serial.print(message);
+  duck.sendPayloadStandard(message, "counter-message"); // sender id will be populated automatically
+  
+  return true;
 }
