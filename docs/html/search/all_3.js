@@ -25,5 +25,5 @@ var searchData=
   ['ducknet_53',['DuckNet',['../class_duck_net.html',1,'']]],
   ['ducknet_2eh_54',['DuckNet.h',['../_duck_net_8h.html',1,'']]],
   ['duckutils_2eh_55',['DuckUtils.h',['../_duck_utils_8h.html',1,'']]],
-  ['dishduck_202_2e0_20hybrid_3a_56',['DISHDUCK 2.0 Hybrid:',['../md_examples__papa-_iridium-_example__dish_duck__hybrid__r_e_a_d_m_e.html',1,'']]]
+  ['dishduck_202_2e0_20hybrid_3a_56',['DISHDUCK 2.0 Hybrid:',['../md_examples_5_8_papa-_iridium-_example__dish_duck__hybrid__r_e_a_d_m_e.html',1,'']]]
 ];
