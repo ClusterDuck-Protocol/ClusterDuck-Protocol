@@ -21,7 +21,7 @@
 
 #include "DuckDisplay.h"
 #include "include/DuckLed.h"
-#include "include/DuckLora.h"
+#include "include/DuckRadio.h"
 #include "include/DuckNet.h"
 #include "include/DuckUtils.h"
 #include "include/cdpcfg.h"
@@ -92,7 +92,7 @@ public:
    * individual methods:
    * ```
    * setupDisplay("Duck");
-   * setupLoRa();
+   * setupRadio();
    * setupOTA()
    * ```
    * It is assumed that the Duck Detector hardware has a display and a wifi

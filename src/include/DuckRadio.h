@@ -1,5 +1,5 @@
 /**
- * @file DuckLora.h
+ * @file DuckRadio.h
  * @brief This file is internal to CDP and provides the library access to
  * onboard LoRa module functions as well as packet management.
  * @version
@@ -12,8 +12,6 @@
 #define DUCKLORA_H_
 
 #include <Arduino.h>
-#include <RadioLib.h>
-
 #include "../DuckError.h"
 
 #include "DuckPacket.h"
@@ -42,20 +40,20 @@ typedef struct {
 } LoraConfigParams;
 
 /**
- * @brief Internal LoRa chip abstraction.
+ * @brief Internal Radio chip abstraction.
  *
  * Provides internal access to the LoRa chip driver. This class is used by other
  * components of the CDP implementation.
  *
  */
-class DuckLora {
+class DuckRadio {
 public:
   /**
-   * @brief Get a singletom instance of the DuckLora class,\.
+   * @brief Get a singletom instance of the DuckRadio class,\.
    *
-   * @returns A pointer to a DuckLora object
+   * @returns A pointer to a DuckRadio object
    */
-  static DuckLora* getInstance();
+  static DuckRadio* getInstance();
 
   /**
    * @brief Initialize the LoRa chip.
@@ -63,7 +61,7 @@ public:
    * @param config    lora configurstion parameters
    * @returns 0 if initialization was successful, an error code otherwise. 
    */
-  int setupLoRa(LoraConfigParams config);
+  int setupRadio(LoraConfigParams config);
   
   /**
    * @brief Send packet data out into the LoRa mesh network
@@ -75,21 +73,20 @@ public:
   int sendData(byte* data, int length);
 
   /**
-   * @brief Send packet data out into the LoRa mesh network
+   * @brief Send packet data out into the mesh network
    *
    * @param data byte vector to send
    * @returns DUCK_ERR_NONE if the message was sent successfully, an error code otherwise.
    */
   int sendData(std::vector<byte> data);
+  /**
+   * @brief Send packet data out into the mesh network
+   *
+   * @param packet Duckpacket object that contains the data to send
+   * @return DUCK_ERR_NONE if the message was sent successfully, an error code otherwise.
+   */
   int sendData(DuckPacket* packet);
   
-  /**
-   * @brief Check if a received packet is available for processing.
-   * 
-   * @returns true if a packet was available, false otherwise.
-   */
-  bool loraPacketReceived();
-
   /**
    * @brief Set the Duck to be ready to recieve LoRa packets.
    *
@@ -98,41 +95,31 @@ public:
   int startReceive();
 
   /**
-   * @brief Set the Duck to be ready to transmit LoRa packets.
+   * @brief Set the Duck to be ready to transmit packets.
    *
    * @returns DUCK_ERR_NONE if the call was successful, an error code otherwise.
    */
-  int transmitData();
-
+  int startTransmitData();
   /**
-   * @brief Set the Duck to be ready to transmit the given data
+   * @brief Set the Duck to be ready to transmit packets.
    *
-   * @param data the data buffer to transmit
-   * @param size the size of the data buffer
-   * @return DUCK_ERR_NONE if the call was successful, an error code otherwise.
+   * @param data data to transmit
+   * @param length data length in bytes
+   * @returns DUCK_ERR_NONE if the call was successful, an error code otherwise.
    */
-  int transmitData(byte* data, int size);
-
+  int startTransmitData(byte* data, int length);
 
   /**
    * @brief Get the current RSSI value.
-   * 
+   *
    * @returns An integer representing the rssi value.
    */
   int getRSSI();
 
-  
-  /**
-   * @brief Get the transmission buffer.
-   * 
-   * @returns An array of bytes containing the transmission packet
-   */
-  byte* getTransmissionBuffer() { return transmission; }
-
   /**
    * @brief Transmit a ping message.
    * 
-   * @returns 0 if the message was sent sucessfully, an error code otherwise. 
+   * @returns DUCK_ERR_NONE if the message was sent sucessfully, an error code otherwise. 
    */
   int ping();
 
@@ -144,13 +131,19 @@ public:
    */
   int standBy();
 
+  /**
+   * @brief Get the data received from the radio
+   * 
+   * @param  packetBytes byte buffer to contain the data 
+   * @return DUCK_ERR_NONE if the chip is sucessfuly set in standby mode, an error code otherwise. 
+   */
   int getReceivedData(std::vector<byte>* packetBytes);
 
 private:
-  DuckLora();
-  DuckLora(DuckLora const&) = delete;
-  DuckLora& operator=(DuckLora const&) = delete;
-  static DuckLora* instance;
+  DuckRadio();
+  DuckRadio(DuckRadio const&) = delete;
+  DuckRadio& operator=(DuckRadio const&) = delete;
+  static DuckRadio* instance;
 
   byte transmission[CDPCFG_CDP_BUFSIZE];
   CDP_Packet packet;

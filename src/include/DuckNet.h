@@ -18,7 +18,7 @@
 
 #ifdef CDPCFG_WIFI_NONE
 
-#include "DuckLora.h"
+#include "DuckRadio.h"
 #include "DuckUtils.h"
 
 #else
@@ -34,7 +34,7 @@
 
 #include "../DuckError.h"
 #include "DuckEsp.h"
-#include "DuckLora.h"
+#include "DuckRadio.h"
 #include "DuckUtils.h"
 #include "OTAPage.h"
 #include "index.h"
@@ -164,7 +164,7 @@ private :
   DuckNet& operator=(DuckNet const&) = delete;
   static DuckNet* instance;
 
-  DuckLora* _duckLora;
+  DuckRadio* duckLora;
   std::vector<byte> deviceId;
   DuckPacket* txPacket = NULL;
 

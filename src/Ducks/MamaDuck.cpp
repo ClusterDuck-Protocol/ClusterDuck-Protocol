@@ -52,7 +52,7 @@ void MamaDuck::handleReceivedPacket() {
   int err = duckLora->getReceivedData(&data);
 
   if (err != DUCK_ERR_NONE) {
-    Serial.print("[MamaDuck] ERROR - failed to get data from DuckLora. rc = ");
+    Serial.print("[MamaDuck] ERROR - failed to get data from DuckRadio. rc = ");
     Serial.println(err);
     return;
   }

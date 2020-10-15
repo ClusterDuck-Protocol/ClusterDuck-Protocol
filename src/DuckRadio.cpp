@@ -1,5 +1,6 @@
-#include "include/DuckLora.h"
+#include "include/DuckRadio.h"
 #include "include/DuckUtils.h"
+#include <RadioLib.h>
 
 #ifdef CDPCFG_PIN_LORA_SPI_SCK
 #include "SPI.h"
@@ -13,15 +14,15 @@ CDPCFG_LORA_CLASS lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO0,
                                     CDPCFG_PIN_LORA_RST, CDPCFG_PIN_LORA_DIO1);
 #endif
 
-DuckLora* DuckLora::instance = NULL;
+DuckRadio* DuckRadio::instance = NULL;
 
-DuckLora::DuckLora() {}
+DuckRadio::DuckRadio() {}
 
-DuckLora* DuckLora::getInstance() {
-  return (instance == NULL) ? new DuckLora : instance;
+DuckRadio* DuckRadio::getInstance() {
+  return (instance == NULL) ? new DuckRadio : instance;
 }
 
-int DuckLora::setupLoRa(LoraConfigParams config) {
+int DuckRadio::setupRadio(LoraConfigParams config) {
 #ifdef CDPCFG_PIN_LORA_SPI_SCK
   log_n("_spi.begin(CDPCFG_PIN_LORA_SPI_SCK, CDPCFG_PIN_LORA_SPI_MISO, "
         "CDPCFG_PIN_LORA_SPI_MOSI, CDPCFG_PIN_LORA_CS)");
@@ -36,7 +37,7 @@ int DuckLora::setupLoRa(LoraConfigParams config) {
   int state = lora.begin(config.band);
   
   if (state != ERR_NONE) {
-    Serial.print("[DuckLora] Failed to start. state = ");
+    Serial.print("[DuckRadio] Failed to start. state = ");
     Serial.println(state);
     return DUCKLORA_ERR_BEGIN;
   }
@@ -45,31 +46,31 @@ int DuckLora::setupLoRa(LoraConfigParams config) {
   // start receiving packets
   if (lora.setFrequency(CDPCFG_RF_LORA_FREQ) == ERR_INVALID_FREQUENCY) {
     Serial.println(
-        F("[DuckLora] Selected frequency is invalid for this module!"));
+        F("[DuckRadio] Selected frequency is invalid for this module!"));
     return DUCKLORA_ERR_SETUP;
   }
 
   if (lora.setBandwidth(CDPCFG_RF_LORA_BW) == ERR_INVALID_BANDWIDTH) {
     Serial.println(
-        F("[DuckLora] Selected bandwidth is invalid for this module!"));
+        F("[DuckRadio] Selected bandwidth is invalid for this module!"));
     return DUCKLORA_ERR_SETUP;
   }
 
   if (lora.setSpreadingFactor(CDPCFG_RF_LORA_SF) ==
       ERR_INVALID_SPREADING_FACTOR) {
     Serial.println(
-        F("[DuckLora] Selected spreading factor is invalid for this module!"));
+        F("[DuckRadio] Selected spreading factor is invalid for this module!"));
     return DUCKLORA_ERR_SETUP;
   }
 
   if (lora.setOutputPower(CDPCFG_RF_LORA_TXPOW) == ERR_INVALID_OUTPUT_POWER) {
     Serial.println(
-        F("[DuckLora] Selected output power is invalid for this module!"));
+        F("[DuckRadio] Selected output power is invalid for this module!"));
     return DUCKLORA_ERR_SETUP;
   }
 
   if (lora.setGain(CDPCFG_RF_LORA_GAIN) == ERR_INVALID_GAIN) {
-    Serial.println(F("[DuckLora] Selected gain is invalid for this module!"));
+    Serial.println(F("[DuckRadio] Selected gain is invalid for this module!"));
     return DUCKLORA_ERR_SETUP;
   }
 
@@ -78,14 +79,14 @@ int DuckLora::setupLoRa(LoraConfigParams config) {
   state = lora.startReceive();
 
   if (state != ERR_NONE) {
-    Serial.print("[DuckLora] Failed to start receive: ");
+    Serial.print("[DuckRadio] Failed to start receive: ");
     Serial.println(state);
     return DUCKLORA_ERR_RECEIVE;
   }
   return DUCK_ERR_NONE;
 }
 
-int DuckLora::getReceivedData(std::vector<byte>* packetBytes) {
+int DuckRadio::getReceivedData(std::vector<byte>* packetBytes) {
 
   int pSize = 0;
   int err = DUCK_ERR_NONE;
@@ -93,7 +94,7 @@ int DuckLora::getReceivedData(std::vector<byte>* packetBytes) {
   pSize = lora.getPacketLength();
   
   if (pSize == 0) {
-    Serial.println("[DuckLora] handlePacket rx data length is 0");
+    Serial.println("[DuckRadio] handlePacket rx data length is 0");
     return DUCKLORA_ERR_HANDLE_PACKET;
   }
 
@@ -101,12 +102,12 @@ int DuckLora::getReceivedData(std::vector<byte>* packetBytes) {
 
   err = lora.readData(packetBytes->data(), pSize);
   if (err != ERR_NONE) {
-    Serial.print("[DuckLora] handlePacket failed. err: ");
+    Serial.print("[DuckRadio] handlePacket failed. err: ");
     Serial.println(err);
     return DUCKLORA_ERR_HANDLE_PACKET;
   }
 
-  Serial.print("[DuckLora] RCV");
+  Serial.print("[DuckRadio] RCV");
   Serial.print(" rssi:");
   Serial.print(lora.getRSSI());
   Serial.print(" snr:");
@@ -115,28 +116,28 @@ int DuckLora::getReceivedData(std::vector<byte>* packetBytes) {
   Serial.print(lora.getFrequencyError());
   Serial.print(" size:");
   Serial.println(pSize);
-  Serial.println("[DuckLora] packet:  " + String(duckutils::convertToHex(packetBytes->data(), packetBytes->size())));
+  Serial.println("[DuckRadio] packet:  " + String(duckutils::convertToHex(packetBytes->data(), packetBytes->size())));
   return err;
 }
 
 
-int DuckLora::sendData(byte* data, int length) {
-  return transmitData(data, length);
+int DuckRadio::sendData(byte* data, int length) {
+  return startTransmitData(data, length);
 }
 
-int DuckLora::sendData(DuckPacket* packet) {
-  return transmitData(packet->getCdpPacketBuffer().data(), packet->getCdpPacketBuffer().size());
+int DuckRadio::sendData(DuckPacket* packet) {
+  return startTransmitData(packet->getCdpPacketBuffer().data(), packet->getCdpPacketBuffer().size());
 }
 
-int DuckLora::sendData(std::vector<byte> data) {
-  return transmitData(data.data(), data.size());
+int DuckRadio::sendData(std::vector<byte> data) {
+  return startTransmitData(data.data(), data.size());
 }
 
-int DuckLora::startReceive() {
+int DuckRadio::startReceive() {
   int state = lora.startReceive();
 
   if (state != ERR_NONE) {
-    Serial.print("[DuckLora] startReceive failed, code ");
+    Serial.print("[DuckRadio] startReceive failed, code ");
     Serial.println(state);
     return DUCKLORA_ERR_RECEIVE;
   }
@@ -144,16 +145,16 @@ int DuckLora::startReceive() {
   return DUCK_ERR_NONE;
 }
 
-int DuckLora::getRSSI() { return lora.getRSSI(); }
+int DuckRadio::getRSSI() { return lora.getRSSI(); }
 
 // TODO: implement this 
-int DuckLora::ping() {
+int DuckRadio::ping() {
   return DUCK_ERR_NOT_SUPPORTED;
 }
 
-int DuckLora::standBy() { return lora.standby(); }
+int DuckRadio::standBy() { return lora.standby(); }
 
-int DuckLora::transmitData(byte* data, int length) {
+int DuckRadio::startTransmitData(byte* data, int length) {
 
   bool oldEI = duckutils::getDuckInterrupt();
   duckutils::setDuckInterrupt(false);
@@ -163,7 +164,7 @@ int DuckLora::transmitData(byte* data, int length) {
   int tx_err = ERR_NONE;
   int rx_err = ERR_NONE;
 
-  Serial.print("[DuckLora] SND data: ");
+  Serial.print("[DuckRadio] SND data: ");
   Serial.print(duckutils::convertToHex(data, length));
   Serial.println(" :length = "+String(length));
 
@@ -171,24 +172,24 @@ int DuckLora::transmitData(byte* data, int length) {
 
   switch (tx_err) {
     case ERR_NONE:
-      Serial.print("[DuckLora] transmitData Packet sent in: ");
+      Serial.print("[DuckRadio] startTransmitData Packet sent in: ");
       Serial.print((millis() - t1));
       Serial.println("ms");
       break;
 
     case ERR_PACKET_TOO_LONG:
       // the supplied packet was longer than 256 bytes
-      Serial.println("[DuckLora] transmitData too long!");
+      Serial.println("[DuckRadio] startTransmitData too long!");
       err = DUCKLORA_ERR_MSG_TOO_LARGE;
       break;
 
     case ERR_TX_TIMEOUT:
-      Serial.println("[DuckLora] transmitData timeout!");
+      Serial.println("[DuckRadio] startTransmitData timeout!");
       err = DUCKLORA_ERR_TIMEOUT;
       break;
 
     default:
-      Serial.print(F("[DuckLora] transmitData failed, code "));
+      Serial.print(F("[DuckRadio] startTransmitData failed, code "));
       Serial.println(err);
       err = DUCKLORA_ERR_TRANSMIT;
       break;

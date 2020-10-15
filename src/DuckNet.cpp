@@ -2,7 +2,7 @@
 
 DuckNet* DuckNet::instance = NULL;
 
-DuckNet::DuckNet() { _duckLora = DuckLora::getInstance(); }
+DuckNet::DuckNet() { duckLora = DuckRadio::getInstance(); }
 DuckNet* DuckNet::getInstance() {
   return (instance == NULL) ? new DuckNet : instance;
 }
@@ -73,7 +73,7 @@ void DuckNet::setupWebServer(bool createCaptivePortal, String html) {
           uint8_t* data, size_t len, bool final) {
         if (!index) {
 
-          _duckLora->standBy();
+          duckLora->standBy();
           Serial.println("Pause Lora");
           Serial.println("startint OTA update");
 
@@ -88,7 +88,7 @@ void DuckNet::setupWebServer(bool createCaptivePortal, String html) {
 
         if (Update.write(data, len) != len) {
           Update.printError(Serial);
-          _duckLora->startReceive();
+          duckLora->startReceive();
         }
 
         if (final) {
@@ -122,7 +122,7 @@ void DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     std::vector<byte> data;
     data.insert(data.end(), val.begin(), val.end());
     txPacket->buildPacketBuffer(topics::status, data );
-    err = _duckLora->sendData(txPacket->getCdpPacketBuffer());
+    err = duckLora->sendData(txPacket->getCdpPacketBuffer());
     
     switch (err) {
       case DUCK_ERR_NONE:

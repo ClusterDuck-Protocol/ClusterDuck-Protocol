@@ -6,7 +6,7 @@
 
 #include "DuckPacket.h"
 #include "../DuckError.h"
-#include "DuckLora.h"
+#include "DuckRadio.h"
 #include "DuckNet.h"
 #include "cdpcfg.h"
 
@@ -116,27 +116,6 @@ public:
    *
    */
   int setupOTA();
-
-  /**
-   * @brief Send a duck LoRa message.
-   *
-   * @param msg         the message payload (optional: if not provided, it will
-   * be set to an empty string)
-   * @param topic       the message topic (optional: if not provided, it will be
-   * set to "status")
-   * @param senderId    the sender id (optional: if not provided, it will be set
-   * to the duck device id)
-   * @param messageId   the message id (optional: if not provided, a unique id
-   * will be generated)
-   * @param path        the message path to append the device id to (optional:
-   * if not provided, the path will only contain the duck's device id)
-   * @returns DUCK_ERR_NONE if success, an error code otherwise.
-   */
-
-  int sendPayloadStandard(String msg = "", String topic = "",
-                          String senderId = "", String messageId = "",
-                          String path = "");
-
   
   int sendData(byte topic, std::vector<byte> data);
 
@@ -170,7 +149,7 @@ public:
 protected:
   String deviceId;
   std::vector<byte> duid;
-  DuckLora* duckLora = DuckLora::getInstance();
+  DuckRadio* duckLora = DuckRadio::getInstance();
   DuckNet* duckNet = DuckNet::getInstance();
   DuckPacket* txPacket = NULL;
   DuckPacket* rxPacket = NULL;

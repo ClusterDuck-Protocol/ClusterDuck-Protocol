@@ -67,7 +67,7 @@ int Duck::setupRadio(float band, int ss, int rst, int di0, int di1, int txPower)
   config.txPower = txPower;
   config.func = Duck::onPacketReceived;
   
-  int err = duckLora->setupLoRa(config);
+  int err = duckLora->setupRadio(config);
 
   if (err == DUCKLORA_ERR_BEGIN) {
     Serial.print("[Duck] setupRadio. Starting LoRa Failed. rc = ");
@@ -208,7 +208,7 @@ bool Duck::reboot(void*) {
 /*
   String reboot = "REBOOT";
   Serial.println(reboot);
-  DuckLora::getInstance()->sendPayloadStandard(reboot, "boot");
+  DuckRadio::getInstance()->sendPayloadStandard(reboot, "boot");
   duckesp::restartDuck();
 */
   return true;
@@ -219,7 +219,7 @@ bool Duck::imAlive(void*) {
   /*
   String alive = "Health Quack";
   Serial.println(alive);
-  DuckLora::getInstance()->sendPayloadStandard(alive, "health");
+  DuckRadio::getInstance()->sendPayloadStandard(alive, "health");
   */
   return true;
 }
@@ -234,7 +234,7 @@ int Duck::startReceive() {
 }
 
 int Duck::startTransmit() {
-  int err = duckLora->transmitData();
+  int err = duckLora->startTransmitData();
   if (err != DUCK_ERR_NONE) {
     Serial.print("[Duck] Oops! Lora transmission failed, err = ");
     Serial.print(err);
