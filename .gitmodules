@@ -38,3 +38,6 @@
 [submodule "Libraries/pubsubclient"]
 	path = Libraries/pubsubclient
 	url = https://github.com/knolleary/pubsubclient.git
+[submodule "ArduinoJson"]
+	path = ArduinoJson
+	url = https://github.com/bblanchon/ArduinoJson.git
