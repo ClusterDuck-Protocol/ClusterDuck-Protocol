@@ -164,7 +164,7 @@ private :
   DuckNet& operator=(DuckNet const&) = delete;
   static DuckNet* instance;
 
-  DuckRadio* duckLora;
+  DuckRadio* duckRadio;
   std::vector<byte> deviceId;
   DuckPacket* txPacket = NULL;
 

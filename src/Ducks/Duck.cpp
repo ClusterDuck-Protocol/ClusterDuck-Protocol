@@ -67,7 +67,7 @@ int Duck::setupRadio(float band, int ss, int rst, int di0, int di1, int txPower)
   config.txPower = txPower;
   config.func = Duck::onPacketReceived;
   
-  int err = duckLora->setupRadio(config);
+  int err = duckRadio->setupRadio(config);
 
   if (err == DUCKLORA_ERR_BEGIN) {
     Serial.print("[Duck] setupRadio. Starting LoRa Failed. rc = ");
@@ -198,7 +198,7 @@ int Duck::sendData(byte topic, std::vector<byte> data) {
   }
 
   int length = txPacket->getBufferLength();
-  err = duckLora->sendData(txPacket->getDataByteBuffer(), length);
+  err = duckRadio->sendData(txPacket->getDataByteBuffer(), length);
   txPacket->reset();
   return err;
 }
@@ -225,7 +225,7 @@ bool Duck::imAlive(void*) {
 }
 
 int Duck::startReceive() {
-  int err = duckLora->startReceive();
+  int err = duckRadio->startReceive();
   if (err != DUCK_ERR_NONE) {
     Serial.println("[Duck] Restarting Duck...");
     duckesp::restartDuck();
@@ -234,7 +234,7 @@ int Duck::startReceive() {
 }
 
 int Duck::startTransmit() {
-  int err = duckLora->startTransmitData();
+  int err = duckRadio->startTransmitData();
   if (err != DUCK_ERR_NONE) {
     Serial.print("[Duck] Oops! Lora transmission failed, err = ");
     Serial.print(err);
@@ -251,7 +251,7 @@ int Duck::sendPong() {
     Serial.println("[Duck] Oops! failed to build pong packet, err = "+err);
     return err;
   }
-  err = duckLora->sendData(txPacket->getDataByteBuffer(), txPacket->getBufferLength());
+  err = duckRadio->sendData(txPacket->getDataByteBuffer(), txPacket->getBufferLength());
   if (err != DUCK_ERR_NONE) {
     Serial.println("[Duck] Oops! Lora sendData failed, err = "+err);
     return err;

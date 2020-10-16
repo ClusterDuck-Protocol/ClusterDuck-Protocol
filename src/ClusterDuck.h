@@ -25,7 +25,7 @@
 #include "include/DuckNet.h"
 #include "include/DuckUtils.h"
 #include "include/cdpcfg.h"
-#include "timer.h"
+#include "arduino-timer.h"
 
 /**
  * @brief External APIs to build and control a duck device.

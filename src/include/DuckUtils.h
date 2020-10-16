@@ -11,7 +11,7 @@
 #define DUCKUTILS_H_
 
 #include "cdpcfg.h"
-#include "timer.h"
+#include "arduino-timer.h"
 #include <Arduino.h>
 #include <WString.h>
 namespace duckutils {

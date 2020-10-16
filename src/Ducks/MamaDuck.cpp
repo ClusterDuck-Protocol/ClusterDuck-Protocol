@@ -49,7 +49,7 @@ void MamaDuck::handleReceivedPacket() {
   rxPacket->reset();
 
   std::vector<byte> data;
-  int err = duckLora->getReceivedData(&data);
+  int err = duckRadio->getReceivedData(&data);
 
   if (err != DUCK_ERR_NONE) {
     Serial.print("[MamaDuck] ERROR - failed to get data from DuckRadio. rc = ");
@@ -72,8 +72,8 @@ void MamaDuck::handleReceivedPacket() {
         return;
       }
     } else {
-      //err = duckLora->sendData(rxPacket->getDataByteBuffer(), rxPacket->getBufferLength());
-      err = duckLora->sendData(rxPacket);
+      //err = duckRadio->sendData(rxPacket->getDataByteBuffer(), rxPacket->getBufferLength());
+      err = duckRadio->sendData(rxPacket);
 
       if (err != DUCK_ERR_NONE) {
         Serial.print("[MamaDuck] ERROR - failed to send data. rc = ");

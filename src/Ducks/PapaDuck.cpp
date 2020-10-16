@@ -14,7 +14,8 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String 
   if (err != DUCK_ERR_NONE) {
     return err;
   }
-  if (!ssid.isEmpty() && !password.isEmpty()) {
+  
+  if (ssid.length() != 0 && password.length() != 0) {
     err = setupWifi("PapaDuck Setup");
     if (err != DUCK_ERR_NONE) {
       Serial.println("[PapaDuck] setupWithDefaults rc = " + String(err));
@@ -56,7 +57,7 @@ void PapaDuck::handleReceivedPacket() {
   rxPacket->reset();
 
   std::vector<byte> data;
-  int err = duckLora->getReceivedData(&data);
+  int err = duckRadio->getReceivedData(&data);
 
   if (err != DUCK_ERR_NONE) {
     Serial.println("[PapaDuck] handleReceivedPacket. Failed to get data. rc = " + err);

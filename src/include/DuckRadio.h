@@ -139,6 +139,8 @@ public:
    */
   int getReceivedData(std::vector<byte>* packetBytes);
 
+  void processRadioIrq();
+
 private:
   DuckRadio();
   DuckRadio(DuckRadio const&) = delete;

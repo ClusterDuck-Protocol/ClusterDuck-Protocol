@@ -48,7 +48,7 @@ void DuckDetect::handleReceivedPacket() {
   Serial.println("[DuckDetect] handleReceivedPacket()...");
 
   std::vector<byte> data;
-  int err = duckLora->getReceivedData(&data);
+  int err = duckRadio->getReceivedData(&data);
 
   if (err != DUCK_ERR_NONE) {
     Serial.print("[DuckDetect] ERROR - failed to get data from DuckRadio. rc = ");
@@ -58,7 +58,7 @@ void DuckDetect::handleReceivedPacket() {
 
   if (data[TOPIC_POS] == reservedTopic::pong) {
     Serial.println("[DuckDetect] run() - got ping response!");
-    rssiCb(duckLora->getRSSI());
+    rssiCb(duckRadio->getRSSI());
   }
 }
 
@@ -82,10 +82,10 @@ void DuckDetect::sendPing(bool startReceive) {
   err = txPacket->buildPacketBuffer(reservedTopic::ping, data);
 
   if (err == DUCK_ERR_NONE) {
-    err = duckLora->sendData(txPacket->getDataByteBuffer(),
+    err = duckRadio->sendData(txPacket->getDataByteBuffer(),
                              txPacket->getBufferLength());
     if (startReceive) {
-      duckLora->startReceive();
+      duckRadio->startReceive();
     }
     if (err != DUCK_ERR_NONE) {
       Serial.println("[DuckDetect] Oops! failed to ping, err = " + String(err));

@@ -149,7 +149,7 @@ public:
 protected:
   String deviceId;
   std::vector<byte> duid;
-  DuckRadio* duckLora = DuckRadio::getInstance();
+  DuckRadio* duckRadio = DuckRadio::getInstance();
   DuckNet* duckNet = DuckNet::getInstance();
   DuckPacket* txPacket = NULL;
   DuckPacket* rxPacket = NULL;

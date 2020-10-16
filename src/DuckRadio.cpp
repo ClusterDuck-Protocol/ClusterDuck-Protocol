@@ -1,4 +1,6 @@
 #include "include/DuckRadio.h"
+
+#if !defined(CDPCFG_HELTEC_CUBE_CELL)
 #include "include/DuckUtils.h"
 #include <RadioLib.h>
 
@@ -75,7 +77,8 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
   }
 
   lora.setDio0Action(config.func);
-
+  lora.setSyncWord(0x12);
+  
   state = lora.startReceive();
 
   if (state != ERR_NONE) {
@@ -154,6 +157,8 @@ int DuckRadio::ping() {
 
 int DuckRadio::standBy() { return lora.standby(); }
 
+void DuckRadio::processRadioIrq() {}
+
 int DuckRadio::startTransmitData(byte* data, int length) {
 
   bool oldEI = duckutils::getDuckInterrupt();
@@ -209,3 +214,4 @@ int DuckRadio::startTransmitData(byte* data, int length) {
 
   return err;
 }
+#endif
