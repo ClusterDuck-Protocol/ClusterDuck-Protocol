@@ -1,7 +1,7 @@
 #include "include/DuckPacket.h"
 #include "include/DuckUtils.h"
 #include "DuckError.h"
-#include "include/DuckLogger.h"
+#include "DuckLogger.h"
 
 bool DuckPacket::update(std::vector<byte> duid, std::vector<byte> dataBuffer) {
   

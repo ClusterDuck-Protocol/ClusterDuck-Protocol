@@ -13,11 +13,11 @@
 
 #include <Arduino.h>
 #include "../DuckError.h"
+#include "../DuckLogger.h"
 
 #include "DuckPacket.h"
 #include "LoraPacket.h"
 #include "cdpcfg.h"
-#include "DuckLogger.h"
 /**
  * @brief Internal structure to hold the LoRa module configuration
  * 

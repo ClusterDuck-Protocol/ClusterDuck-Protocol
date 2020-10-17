@@ -103,12 +103,11 @@ int DuckRadio::getReceivedData(std::vector<byte>* packetBytes) {
     return DUCKLORA_ERR_HANDLE_PACKET;
   }
 
-  logdbg("RCV");
-  logdbg_ln("rssi  :" + String(lora.getRSSI()));
-  logdbg_ln("snr   :" + String(lora.getSNR()));
-  logdbg_ln("fe    :" + String(lora.getFrequencyError()));
-  logdbg_ln("size  :" + String(pSize));
-  logdbg_ln("packet:  " + String(duckutils::convertToHex(packetBytes->data(), packetBytes->size())));
+  logdbg_ln(
+      "RX Packet: rssi: " + String(lora.getRSSI()) + 
+      " snr: " + String(lora.getSNR()) +
+      " fe: " + String(lora.getFrequencyError()) + 
+      " size: " + String(pSize));
   return err;
 }
 

@@ -11,7 +11,7 @@
 #if defined(CDP_LOG_ERROR)
 #define logerr(...)                                                            \
   do {                                                                         \
-    Serial.print("[ERR][" + String(__FILENAME__) + "] -- ");                  \
+    Serial.print("[ERR][" + String(__FILENAME__) + "] -- ");                   \
     Serial.println(__VA_ARGS__);                                               \
   } while (0)
 #define logerr_ln(...)                                                         \
@@ -36,17 +36,17 @@
 #if defined(CDP_LOG_INFO)
 #define loginfo(...)                                                           \
   do {                                                                         \
-    Serial.print("[INF][" + String(__FILENAME__) + "] -- ");                  \
+    Serial.print("[INF][" + String(__FILENAME__) + "] -- ");                   \
     Serial.println(__VA_ARGS__);                                               \
   } while (0)
 #define loginfo_ln(...)                                                        \
   do {                                                                         \
-    Serial.print("[INF][" + String(__FILENAME__) + "] -- ");                  \
+    Serial.print("[INF][" + String(__FILENAME__) + "] -- ");                   \
     Serial.println(__VA_ARGS__);                                               \
   } while (0)
 #define loginfo_f(...)                                                         \
   do {                                                                         \
-    Serial.print("[INF][" + String(__FILENAME__) + "] -- ");                  \
+    Serial.print("[INF][" + String(__FILENAME__) + "] -- ");                   \
     Serial.printf(__VA_ARGS__);                                                \
   } while (0)
 #else
