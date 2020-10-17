@@ -38,7 +38,7 @@ int DuckLink::setupWithDefaults(std::vector<byte> deviceId, String ssid,
       return err;
     }
   }
-  logerr_ln("DuckLink setup done");
+  loginfo_ln("DuckLink setup done");
   return DUCK_ERR_NONE;
 }
 

@@ -149,7 +149,7 @@
  * https://heltec.org/project/htcc-ab01/
  * pio: board = cubecell_board
  */
-#elif defined(CubeCell_Board)
+#elif defined(CubeCell_Board) || defined(CubeCell_GPS)
 
 #define CDPCFG_HELTEC_CUBE_CELL
 

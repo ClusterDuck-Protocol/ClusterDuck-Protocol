@@ -32,10 +32,9 @@ int DuckPacket::buildPacketBuffer(byte topic, std::vector<byte> app_data) {
 
   uint8_t app_data_length = app_data.size();
 
-  logdbg("buildPacket() app_data len: " + String(app_data_length) + " topic: "+ String(topic));
-  logdbg(app_data_length);
-  logdbg(" topic: ");
-  logdbg_ln(topic);
+  logdbg_ln("buildPacket() app_data len: " + String(app_data_length) +
+         " topic: " + String(topic) + "length: " + String(app_data_length));
+
 
   if (app_data_length > MAX_DATA_LENGTH) {
     return DUCKPACKET_ERR_SIZE_INVALID;
