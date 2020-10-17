@@ -1,58 +1,59 @@
 #include "../PapaDuck.h"
 
 int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String password) {
-  Serial.println("[PapaDuck] setupWithDefaults...");
+  loginfo_ln("setupWithDefaults...");
 
   int err = Duck::setupWithDefaults(deviceId, ssid, password);
 
   if (err != DUCK_ERR_NONE) {
-    Serial.println("[PapaDuck] setupWithDefaults rc = " + String(err));
+    logerr_ln("setupWithDefaults rc = " + String(err));
     return err;
   }
 
   err = setupRadio();
   if (err != DUCK_ERR_NONE) {
+    logerr_ln("setupWithDefaults  rc = " + String(err));
     return err;
   }
   
   if (ssid.length() != 0 && password.length() != 0) {
     err = setupWifi("PapaDuck Setup");
     if (err != DUCK_ERR_NONE) {
-      Serial.println("[PapaDuck] setupWithDefaults rc = " + String(err));
+      logerr_ln("setupWithDefaults  rc = " + String(err));
       return err;
     }
 
     err = setupDns();
     if (err != DUCK_ERR_NONE) {
-      Serial.println("[PapaDuck] setupWithDefaults rc = " + String(err));
+      logerr_ln("setupWithDefaults  rc = " + String(err));
       return err;
     }
 
     err = setupInternet(ssid, password);
     if (err != DUCK_ERR_NONE) {
-      Serial.println("[PapaDuck] setupWithDefaults rc = " + String(err));
+      logerr_ln("setupWithDefaults  rc = " + String(err));
       return err;
     }
 
     err = setupWebServer(false);
     if (err != DUCK_ERR_NONE) {
-      Serial.println("[PapaDuck] setupWithDefaults rc = " + String(err));
+      logerr_ln("setupWithDefaults  rc = " + String(err));
       return err;
     }
 
     err = setupOTA();
     if (err != DUCK_ERR_NONE) {
-      Serial.println("[PapaDuck] setupWithDefaults rc = " + String(err));
+      logerr_ln("setupWithDefaults  rc = " + String(err));
       return err;
     }
   }
-  Serial.println("[PapaDuck] setupWithDefaults done");
+  loginfo_ln("setupWithDefaults done");
   return DUCK_ERR_NONE;
 }
 
 void PapaDuck::handleReceivedPacket() {
 
-  Serial.println("[PapaDuck] handleReceivedPacket()...");
+  loginfo_ln("handleReceivedPacket()...");
 
   rxPacket->reset();
 
@@ -60,7 +61,7 @@ void PapaDuck::handleReceivedPacket() {
   int err = duckRadio->getReceivedData(&data);
 
   if (err != DUCK_ERR_NONE) {
-    Serial.println("[PapaDuck] handleReceivedPacket. Failed to get data. rc = " + err);
+    logerr_ln("handleReceivedPacket. Failed to get data. rc = " + String(err));
     return;
   }
   // ignore pings
@@ -72,7 +73,7 @@ void PapaDuck::handleReceivedPacket() {
   if (relay) {
     String data = duckutils::convertToHex(rxPacket->getCdpPacketBuffer().data(),
                                           rxPacket->getCdpPacketBuffer().size());
-    Serial.println("[PapaDuck] relaying:  " + data);
+    logdbg_ln("relaying:  " + data);
     recvDataCallback(rxPacket->getCdpPacket());
   }
 }
@@ -100,7 +101,7 @@ int PapaDuck::reconnectWifi(String ssid, String password) {
   duckNet->setupInternet(ssid, password);
   duckNet->setupDns();
   if (WiFi.status() != WL_CONNECTED) {
-    Serial.print("[PapaDuck] WiFi reconnection failed!");
+    logerr_ln("WiFi reconnection failed!");
     return DUCKWIFI_ERR_DISCONNECTED;
   }
   return DUCK_ERR_NONE;

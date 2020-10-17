@@ -1,6 +1,7 @@
 #include "include/DuckPacket.h"
 #include "include/DuckUtils.h"
 #include "DuckError.h"
+#include "include/DuckLogger.h"
 
 bool DuckPacket::update(std::vector<byte> duid, std::vector<byte> dataBuffer) {
   
@@ -18,12 +19,12 @@ bool DuckPacket::update(std::vector<byte> duid, std::vector<byte> dataBuffer) {
   packet.path.insert(packet.path.end(), &dataBuffer[path_offset], &dataBuffer[packet_length]);
   // update the rx packet byte buffer
   buffer.insert(buffer.end(), dataBuffer.begin(), dataBuffer.end());
-  //Serial.println("[DuckPacket] current path: " + String(duckutils::convertToHex(packet.path.data(), packet.path.size())));
+  //logdbg_ln("Current path: " + String(duckutils::convertToHex(packet.path.data(), packet.path.size())));
 
   // check if we need to relay the packet
   relaying = relay(duid);
-  //Serial.println("[DuckPacket] updated path: " + String(duckutils::convertToHex(packet.path.data(), packet.path.size())));
-  //Serial.println("[DuckPacket] updated buffer: " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
+  //logdbg_ln("Updated path: " + String(duckutils::convertToHex(packet.path.data(), packet.path.size())));
+  //logdbg_ln("Updated buffer: " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
   return relaying;
 }
 
@@ -31,11 +32,11 @@ int DuckPacket::buildPacketBuffer(byte topic, std::vector<byte> app_data) {
 
   uint8_t app_data_length = app_data.size();
 
-  Serial.print("[DuckPacket] buildPacket() app_data len: ");
-  Serial.print(app_data_length);
-  Serial.print(" topic: ");
-  Serial.println(topic);
-  
+  logdbg("buildPacket() app_data len: " + String(app_data_length) + " topic: "+ String(topic));
+  logdbg(app_data_length);
+  logdbg(" topic: ");
+  logdbg_ln(topic);
+
   if (app_data_length > MAX_DATA_LENGTH) {
     return DUCKPACKET_ERR_SIZE_INVALID;
   }
@@ -46,32 +47,35 @@ int DuckPacket::buildPacketBuffer(byte topic, std::vector<byte> app_data) {
   // ----- insert packet header  -----
   // device uid
   buffer.insert(buffer.end(), duid.begin(), duid.end());
-  //Serial.println("[DuckPacket] duid: " + String(duckutils::convertToHex(duid.data(), duid.size())));
+  //logdbg_ln("Duid: " + String(duckutils::convertToHex(duid.data(), duid.size())));
 
   // message uid
   buffer.insert(buffer.end(), &message_id[0], &message_id[MUID_LENGTH]);
-  //Serial.println("[DuckPacket] muid: " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
+  //logdbg_ln("Muid: " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
+  
   // topic
   buffer.insert(buffer.end(), topic);
-  //Serial.println("[DuckPacket] topic: " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
+  //logdbg_ln("Topic: " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
+  
   // path offset
   byte offset = HEADER_LENGTH + app_data_length;
   buffer.insert(buffer.end(), offset);
-  //Serial.println("[DuckPacket] offset: " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
+  //logdbg_ln("Offset: " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
+  
   // reserved
   buffer.insert(buffer.end(), 0x00);
   buffer.insert(buffer.end(), 0x00);
-  //Serial.println("[DuckPacket] reserved: " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
+  //logdbg_ln("Reserved: " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
 
   // ----- insert data -----
   buffer.insert(buffer.end(), app_data.begin(), app_data.end());
-  //Serial.println("[DuckPacket] data: " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
+  //logdbg_ln("Data: " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
 
   // ----- insert path -----
   buffer.insert(buffer.end(), duid.begin(), duid.end());
-  //Serial.println("[DuckPacket] path: " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
+  //logdbg_ln("Path: " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
 
-  Serial.println("[DuckPacket] built packet: " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
+  loginfo_ln("Built packet: " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
   return DUCK_ERR_NONE;
 }
 
@@ -81,7 +85,7 @@ bool  DuckPacket::relay(std::vector<byte> duid) {
   
   int hops = packet.path.size() / DUID_LENGTH;
   if (hops >= MAX_HOPS) {
-    Serial.println("[DuckPacket] Oops. Max hops reached. Cannot relay packet.");
+    logerr_ln("Max hops reached. Cannot relay packet.");
     return false;
   }
 
@@ -91,7 +95,7 @@ bool  DuckPacket::relay(std::vector<byte> duid) {
   String id = duckutils::convertToHex(duid.data(), duid.size());
   String path = duckutils::convertToHex(packet.path.data(), packet.path.size());
   if (path.indexOf(id) >= 0) {
-    Serial.println("[DuckPacket] packet already seen. ignore it.");
+    logdbg_ln("Packet already seen. ignore it.");
     return false;
   }
 

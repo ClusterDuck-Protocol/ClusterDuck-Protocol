@@ -79,7 +79,7 @@ public:
    * @param html A string representing custom HTML code used for the portal. Default is an empty string
    * Default portal web page is used if the string is empty
    */
-  void setupWebServer(bool createCaptivePortal = false, String html = "");
+  int setupWebServer(bool createCaptivePortal = false, String html = "");
 
   /**
    * @brief Set up the WiFi access point.

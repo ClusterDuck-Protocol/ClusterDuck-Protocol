@@ -9,6 +9,7 @@
 #include "DuckRadio.h"
 #include "DuckNet.h"
 #include "cdpcfg.h"
+#include "DuckLogger.h"
 
 class Duck {
 

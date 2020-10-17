@@ -4,60 +4,59 @@ int DuckDetect::setupWithDefaults(std::vector<byte> deviceId, String ssid,
                                 String password) {
   int err = Duck::setupWithDefaults(deviceId, ssid, password);
   if (err != DUCK_ERR_NONE) {
-    Serial.println("[DuckDetect] setupWithDefaults rc = " + String(err));
+    logerr_ln("setupWithDefaults rc = " + String(err));
     return err;
   }
 
   err = setupRadio();
   if (err != DUCK_ERR_NONE) {
-    Serial.println("[DuckDetect] setupWithDefaults rc = " + String(err));
+    logerr_ln("setupWithDefaults rc = " + String(err));
     return err;
   }
 
-  if (!ssid.isEmpty() && !password.isEmpty()) {
+  if (!ssid.length() != 0 && !password.length() != 0) {
     err = setupWifi();
     if (err != DUCK_ERR_NONE) {
-      Serial.println("[DuckDetect] setupWithDefaults rc = " + String(err));
+      logerr_ln("setupWithDefaults rc = " + String(err));
       return err;
     }
 
     err = setupDns();
     if (err != DUCK_ERR_NONE) {
-      Serial.println("[DuckDetect] setupWithDefaults rc = " + String(err));
+      logerr_ln("setupWithDefaults rc = " + String(err));
       return err;
     }
 
     err = setupWebServer(true);
     if (err != DUCK_ERR_NONE) {
-      Serial.println("[DuckDetect] setupWithDefaults rc = " + String(err));
+      logerr_ln("setupWithDefaults rc = " + String(err));
       return err;
     }
 
     err = setupOTA();
     if (err != DUCK_ERR_NONE) {
-      Serial.println("[DuckDetect] setupWithDefaults rc = " + String(err));
+      logerr_ln("setupWithDefaults rc = " + String(err));
       return err;
     }
   }
-  Serial.println("DuckDetect setup done");
+  loginfo_ln("DuckDetect setup done");
   return DUCK_ERR_NONE;
 }
 
 void DuckDetect::handleReceivedPacket() {
 
-  Serial.println("[DuckDetect] handleReceivedPacket()...");
+  loginfo_ln("handleReceivedPacket()...");
 
   std::vector<byte> data;
   int err = duckRadio->getReceivedData(&data);
 
   if (err != DUCK_ERR_NONE) {
-    Serial.print("[DuckDetect] ERROR - failed to get data from DuckRadio. rc = ");
-    Serial.println(err);
+    logerr_ln("Failed to get data from DuckRadio. rc = " + String(err));
     return;
   }
 
   if (data[TOPIC_POS] == reservedTopic::pong) {
-    Serial.println("[DuckDetect] run() - got ping response!");
+    logdbg_ln("run() - got ping response!");
     rssiCb(duckRadio->getRSSI());
   }
 }
@@ -88,10 +87,10 @@ void DuckDetect::sendPing(bool startReceive) {
       duckRadio->startReceive();
     }
     if (err != DUCK_ERR_NONE) {
-      Serial.println("[DuckDetect] Oops! failed to ping, err = " + String(err));
+      logerr_ln("Failed to ping, err = " + String(err));
     }
   } else {
-    Serial.println("[DuckDetect] Oops! failed to build packet, err = "+ String(err));
+    logerr_ln("Failed to build packet, err = "+ String(err));
     return;
   }
 }

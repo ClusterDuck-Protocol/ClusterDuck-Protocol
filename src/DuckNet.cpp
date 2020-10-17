@@ -26,17 +26,18 @@ void DuckNet::setDeviceId(std::vector<byte> deviceId) {
   this->deviceId.insert(this->deviceId.end(), deviceId.begin(), deviceId.end());
 }
 
-void DuckNet::setupWebServer(bool createCaptivePortal, String html) {
+int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
+  loginfo_ln("Setting up Web Server");
 
   if (txPacket == NULL) {
     txPacket = new DuckPacket(deviceId);
   }
 
   if (html == "") {
-    Serial.println("[DuckNet] Setting up Web Server with default main page");
+    logdbg_ln("Web Server using main page");
     portal = MAIN_page;
   } else {
-    Serial.println("[DuckNet] Setting up Web Server with custom main page");
+    logdbg_ln("Web Server using custom main page");
     portal = html;
   }
   webServer.onNotFound([&](AsyncWebServerRequest* request) {
@@ -73,10 +74,8 @@ void DuckNet::setupWebServer(bool createCaptivePortal, String html) {
           uint8_t* data, size_t len, bool final) {
         if (!index) {
 
+          loginfo_ln("Pause Radio and starting OTA update");
           duckRadio->standBy();
-          Serial.println("Pause Lora");
-          Serial.println("startint OTA update");
-
           content_len = request->contentLength();
 
           int cmd = (filename.indexOf("spiffs") > -1) ? U_SPIFFS : U_FLASH;
@@ -104,7 +103,7 @@ void DuckNet::setupWebServer(bool createCaptivePortal, String html) {
 
   // Captive Portal form submission
   webServer.on("/formSubmit", HTTP_POST, [&](AsyncWebServerRequest* request) {
-    Serial.println("Submitting Form");
+    loginfo_ln("Submitting Form");
 
     int err = DUCK_ERR_NONE;
 
@@ -113,8 +112,8 @@ void DuckNet::setupWebServer(bool createCaptivePortal, String html) {
 
     for (int i = 0; i < paramsNumber; i++) {
       AsyncWebParameter* p = request->getParam(i);
-      Serial.printf("%s: %s", p->name().c_str(), p->value().c_str());
-      Serial.println();
+      logdbg_f("%s: %s", p->name().c_str(), p->value().c_str());
+      loginfo_ln();
 
       val = val + p->value().c_str() + "*";
     }
@@ -208,6 +207,8 @@ void DuckNet::setupWebServer(bool createCaptivePortal, String html) {
   });
 
   webServer.begin();
+
+  return DUCK_ERR_NONE;
 }
 
 int DuckNet::setupWifiAp(const char* accessPoint) {
@@ -230,7 +231,7 @@ int DuckNet::setupWifiAp(const char* accessPoint) {
     return DUCKWIFI_ERR_AP_CONFIG;
   }
 
-  Serial.println("[DuckNet] Created Wifi Access Point");
+  loginfo_ln("Created Wifi Access Point");
   return DUCK_ERR_NONE;
 }
 
@@ -238,11 +239,11 @@ int DuckNet::setupDns() {
   dnsServer.start(DNS_PORT, "*", apIP);
 
   if (!MDNS.begin(DNS)) {
-    Serial.println("[DuckNet] Error setting up MDNS responder!");
+    logerr_ln("Setting up MDNS responder!");
     return DUCKDNS_ERR_STARTING;
   }
 
-  Serial.println("[DuckNet] Created local DNS");
+  loginfo_ln("Created local DNS");
   MDNS.addService("http", "tcp", CDPCFG_WEB_PORT);
 
   return DUCK_ERR_NONE;
@@ -251,8 +252,6 @@ int DuckNet::setupDns() {
 int DuckNet::setupInternet(String ssid, String password) {
   this->ssid = ssid;
   this->password = password;
-  // Serial.println("[DuckNet] connecting to ssid: " + ssid);
-
   if (ssid == "" || password == "" || !ssidAvailable(ssid)) {
     return DUCK_ERR_SETUP;
   }
@@ -266,7 +265,7 @@ int DuckNet::setupInternet(String ssid, String password) {
   }
 
   // Connected to Access Point
-  Serial.println("[DuckNet] DUCK CONNECTED TO INTERNET");
+  loginfo_ln("Duck connected to internet!");
 
   return DUCK_ERR_NONE;
 }
@@ -274,25 +273,23 @@ int DuckNet::setupInternet(String ssid, String password) {
 bool DuckNet::ssidAvailable(String val) {
 
   int n = WiFi.scanNetworks();
-  Serial.print("[DuckNet] scan done. ");
+  logdbg("scan done. ");
   if (n == 0 || ssid == "") {
-    Serial.print("networks found: ");
-    Serial.println(n);
+    logdbg_ln("Networks found: "+String(n));
   } else {
-    Serial.print("networks found: ");
-    Serial.println(n);
+    logdbg_ln("Networks found: "+String(n));
     if (val == "") {
       val = ssid;
     }
     for (int i = 0; i < n; ++i) {
       if (WiFi.SSID(i) == val) {
-        Serial.println("[DuckNet] given ssid is available!");
+        logdbg_ln("Given ssid is available!");
         return true;
       }
       delay(AP_SCAN_INTERVAL_MS);
     }
   }
-  Serial.println("[DuckNet] no ssid available");
+  loginfo_ln("No ssid available");
 
   return false;
 }
