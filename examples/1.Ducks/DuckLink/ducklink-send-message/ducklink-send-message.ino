@@ -26,7 +26,7 @@ void setup() {
   // We are using a hardcoded device id here, but it should be retrieved or given during the device provisioning
   // then converted to a byte vector to setup the duck
   // NOTE: The Device ID must be exactly 8 bytes otherwise it will get rejected
-  std::string deviceId("LINK0003");
+  std::string deviceId("LINKSAMD");
   std::vector<byte> devId;
   devId.insert(devId.end(), deviceId.begin(), deviceId.end());
 
@@ -46,35 +46,20 @@ void loop() {
 }
 
 bool runSensor(void *) {
-  bool result;
+  bool result = false;
   const byte* buffer;
   
-  String message = String("link0003:") + String(counter);
-  int length = message.length();
+  String message = String("link samd:") + String(counter);
   Serial.print("[LINK] sensor data: ");
   Serial.println(message);
-  buffer = (byte*) message.c_str(); 
-
-  result = sendData(buffer, length);
-  if (result) {
-     Serial.println("[LINK] runSensor ok.");
-  } else {
-     Serial.println("[LINK] runSensor failed.");
-  }
-  return result;
-}
-
-bool sendData(const byte* buffer, int length) {
-  bool sentOk = false;
   
-  // Send Data can either take a byte buffer (unsigned char) or a vector
-  int err = duck.sendData(topics::status, buffer, length);
+  // There different way of sending data. Here we simply pass in the String object
+  int err = duck.sendData(topics::status, message);
   if (err == DUCK_ERR_NONE) {
+     result = true;
      counter++;
-     sentOk = true;
-  }
-  if (!sentOk) {
+  } else {
     Serial.println("[LINK] Failed to send data. error = " + String(err));
   }
-  return sentOk;
+  return result;
 }
