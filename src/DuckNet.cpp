@@ -27,17 +27,17 @@ void DuckNet::setDeviceId(std::vector<byte> deviceId) {
 }
 
 int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
-  loginfo_ln("Setting up Web Server");
+  loginfo("Setting up Web Server");
 
   if (txPacket == NULL) {
     txPacket = new DuckPacket(deviceId);
   }
 
   if (html == "") {
-    logdbg_ln("Web Server using main page");
+    logdbg("Web Server using main page");
     portal = MAIN_page;
   } else {
-    logdbg_ln("Web Server using custom main page");
+    logdbg("Web Server using custom main page");
     portal = html;
   }
   webServer.onNotFound([&](AsyncWebServerRequest* request) {
@@ -74,7 +74,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
           uint8_t* data, size_t len, bool final) {
         if (!index) {
 
-          loginfo_ln("Pause Radio and starting OTA update");
+          loginfo("Pause Radio and starting OTA update");
           duckRadio->standBy();
           content_len = request->contentLength();
 
@@ -103,7 +103,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
 
   // Captive Portal form submission
   webServer.on("/formSubmit", HTTP_POST, [&](AsyncWebServerRequest* request) {
-    loginfo_ln("Submitting Form");
+    loginfo("Submitting Form");
 
     int err = DUCK_ERR_NONE;
 
@@ -113,7 +113,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     for (int i = 0; i < paramsNumber; i++) {
       AsyncWebParameter* p = request->getParam(i);
       logdbg_f("%s: %s", p->name().c_str(), p->value().c_str());
-      loginfo_ln();
+      loginfo();
 
       val = val + p->value().c_str() + "*";
     }
@@ -231,7 +231,7 @@ int DuckNet::setupWifiAp(const char* accessPoint) {
     return DUCKWIFI_ERR_AP_CONFIG;
   }
 
-  loginfo_ln("Created Wifi Access Point");
+  loginfo("Created Wifi Access Point");
   return DUCK_ERR_NONE;
 }
 
@@ -239,11 +239,11 @@ int DuckNet::setupDns() {
   dnsServer.start(DNS_PORT, "*", apIP);
 
   if (!MDNS.begin(DNS)) {
-    logerr_ln("Setting up MDNS responder!");
+    logerr("ERROR Setting up MDNS responder!");
     return DUCKDNS_ERR_STARTING;
   }
 
-  loginfo_ln("Created local DNS");
+  loginfo("Created local DNS");
   MDNS.addService("http", "tcp", CDPCFG_WEB_PORT);
 
   return DUCK_ERR_NONE;
@@ -265,7 +265,7 @@ int DuckNet::setupInternet(String ssid, String password) {
   }
 
   // Connected to Access Point
-  loginfo_ln("Duck connected to internet!");
+  loginfo("Duck connected to internet!");
 
   return DUCK_ERR_NONE;
 }
@@ -275,21 +275,21 @@ bool DuckNet::ssidAvailable(String val) {
   int n = WiFi.scanNetworks();
   logdbg("scan done. ");
   if (n == 0 || ssid == "") {
-    logdbg_ln("Networks found: "+String(n));
+    logdbg("Networks found: "+String(n));
   } else {
-    logdbg_ln("Networks found: "+String(n));
+    logdbg("Networks found: "+String(n));
     if (val == "") {
       val = ssid;
     }
     for (int i = 0; i < n; ++i) {
       if (WiFi.SSID(i) == val) {
-        logdbg_ln("Given ssid is available!");
+        logdbg("Given ssid is available!");
         return true;
       }
       delay(AP_SCAN_INTERVAL_MS);
     }
   }
-  loginfo_ln("No ssid available");
+  loginfo("No ssid available");
 
   return false;
 }

@@ -117,9 +117,24 @@ public:
    *
    */
   int setupOTA();
-  
-  int sendData(byte topic, std::vector<byte> data);
+  /**
+   * @brief Sends data into the mesh network.
+   * 
+   * @param topic the message topic
+   * @param bytes a vector of bytes representing the data to send
+   * @return DUCK_ERR_NONE if the data was send successfully, an error code otherwise. 
+   */
+  int sendData(byte topic, std::vector<byte> bytes);
 
+  /**
+   * @brief Sends data into the mesh network.
+   *
+   * @param topic the message topic
+   * @param bytes a byte buffer representing the data to send
+   * @return DUCK_ERR_NONE if the data was send successfully, an error code
+   * otherwise.
+   */
+  int sendData(byte topic, const byte* bytes, int length);
   /**
    * @brief Check wifi connection status
    * 
@@ -161,6 +176,13 @@ protected:
    * @return DUCK_ERR_NONE if successfull. An error code otherwise 
    */
   int sendPong();
+  
+  /**
+   * @brief sends a ping message
+   *
+   * @return DUCK_ERR_NONE if successfull. An error code otherwise
+   */
+  int sendPing();
 
   /**
    * @brief Tell the duck radio to start receiving packets from the mesh network

@@ -4,47 +4,47 @@ int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String 
   int err = Duck::setupWithDefaults(deviceId, ssid, password);
 
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("setupWithDefaults rc = " + String(err));
+    logerr("ERROR setupWithDefaults rc = " + String(err));
     return err;
   }
 
   err = setupRadio();
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("setupWithDefaults rc = " + String(err));
+    logerr("ERROR setupWithDefaults rc = " + String(err));
     return err;
   }
 
   err = setupWifi();
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("setupWithDefaults rc = " + String(err));
+    logerr("ERROR setupWithDefaults rc = " + String(err));
     return err;
   }
 
   err = setupDns();
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("setupWithDefaults rc = " + String(err));
+    logerr("ERROR setupWithDefaults rc = " + String(err));
     return err;
   }
 
   err = setupWebServer(true);
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("setupWithDefaults rc = " + String(err));
+    logerr("ERROR setupWithDefaults rc = " + String(err));
     return err;
   }
 
   err = setupOTA();
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("setupWithDefaults rc = " + String(err));
+    logerr("ERROR setupWithDefaults rc = " + String(err));
     return err;
   }
   duckutils::getTimer().every(CDPCFG_MILLIS_ALIVE, imAlive);
-  loginfo_ln("MamaDuck setup done");
+  loginfo("MamaDuck setup done");
   return DUCK_ERR_NONE;
 }
 
 void MamaDuck::handleReceivedPacket() {
 
-  loginfo_ln("handleReceivedPacket()...");
+  loginfo("handleReceivedPacket()...");
 
   rxPacket->reset();
 
@@ -52,7 +52,7 @@ void MamaDuck::handleReceivedPacket() {
   int err = duckRadio->getReceivedData(&data);
 
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("failed to get data from DuckRadio. rc = "+ String(err));
+    logerr("ERROR failed to get data from DuckRadio. rc = "+ String(err));
     return;
   }
   bool relay = rxPacket->update(duid, data);
@@ -66,13 +66,13 @@ void MamaDuck::handleReceivedPacket() {
     if (rxPacket->getCdpPacket().topic == reservedTopic::ping) {
       err = sendPong();
       if (err != DUCK_ERR_NONE) {
-        logerr_ln("failed to send pong message. rc = "+ String(err));
+        logerr("ERROR failed to send pong message. rc = "+ String(err));
         return;
       }
     } else {
       err = duckRadio->sendData(rxPacket);
       if (err != DUCK_ERR_NONE) {
-        logerr_ln("failed to send data. rc = "+ String(err));
+        logerr("ERROR failed to send data. rc = "+ String(err));
         return;
       }
     }

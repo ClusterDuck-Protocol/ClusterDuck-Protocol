@@ -38,35 +38,35 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
   int state = lora.begin(config.band);
   
   if (state != ERR_NONE) {
-    logerr("ERROR initializing LoRa driver. state = ");
-    logerr_ln(state);
+    logerr("ERROR  initializing LoRa driver. state = ");
+    logerr(state);
     return DUCKLORA_ERR_BEGIN;
   }
   
   // Lora is started, we need to set all the radio parameters, before it can
   // start receiving packets
   if (lora.setFrequency(CDPCFG_RF_LORA_FREQ) == ERR_INVALID_FREQUENCY) {
-    logerr_ln("ERROR frequency is invalid for this module!");
+    logerr("ERROR  frequency is invalid for this module!");
     return DUCKLORA_ERR_SETUP;
   }
 
   if (lora.setBandwidth(CDPCFG_RF_LORA_BW) == ERR_INVALID_BANDWIDTH) {
-    logerr_ln("ERROR bandwidth is invalid for this module!");
+    logerr("ERROR  bandwidth is invalid for this module!");
     return DUCKLORA_ERR_SETUP;
   }
 
   if (lora.setSpreadingFactor(CDPCFG_RF_LORA_SF) == ERR_INVALID_SPREADING_FACTOR) {
-    logerr_ln("ERROR spreading factor is invalid for this module!");
+    logerr("ERROR  spreading factor is invalid for this module!");
     return DUCKLORA_ERR_SETUP;
   }
 
   if (lora.setOutputPower(CDPCFG_RF_LORA_TXPOW) == ERR_INVALID_OUTPUT_POWER) {
-    logerr_ln("ERROR output power is invalid for this module!");
+    logerr("ERROR  output power is invalid for this module!");
     return DUCKLORA_ERR_SETUP;
   }
 
   if (lora.setGain(CDPCFG_RF_LORA_GAIN) == ERR_INVALID_GAIN) {
-    logerr_ln("ERROR gain is invalid for this module!");
+    logerr("ERROR  gain is invalid for this module!");
     return DUCKLORA_ERR_SETUP;
   }
 
@@ -76,8 +76,8 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
   state = lora.startReceive();
 
   if (state != ERR_NONE) {
-    logerr("Failed to start receive: ");
-    logerr_ln(state);
+    logerr("ERROR Failed to start receive: ");
+    logerr(state);
     return DUCKLORA_ERR_RECEIVE;
   }
   return DUCK_ERR_NONE;
@@ -91,7 +91,7 @@ int DuckRadio::getReceivedData(std::vector<byte>* packetBytes) {
   pSize = lora.getPacketLength();
   
   if (pSize == 0) {
-    logerr_ln("ERROR handlePacket rx data length is 0");
+    logerr("ERROR  handlePacket rx data length is 0");
     return DUCKLORA_ERR_HANDLE_PACKET;
   }
 
@@ -99,12 +99,12 @@ int DuckRadio::getReceivedData(std::vector<byte>* packetBytes) {
 
   err = lora.readData(packetBytes->data(), pSize);
   if (err != ERR_NONE) {
-    logerr_ln("ERROR handlePacket failed. err: "+ String(err));
+    logerr("ERROR  handlePacket failed. err: "+ String(err));
     return DUCKLORA_ERR_HANDLE_PACKET;
   }
 
-  logdbg_ln(
-      "RX Packet: rssi: " + String(lora.getRSSI()) + 
+  logdbg(
+      "RX: rssi: " + String(lora.getRSSI()) + 
       " snr: " + String(lora.getSNR()) +
       " fe: " + String(lora.getFrequencyError()) + 
       " size: " + String(pSize));
@@ -128,7 +128,7 @@ int DuckRadio::startReceive() {
   int state = lora.startReceive();
 
   if (state != ERR_NONE) {
-    logerr_ln("startReceive failed, code "+String(state));
+    logerr("ERROR startReceive failed, code "+String(state));
     return DUCKLORA_ERR_RECEIVE;
   }
 
@@ -156,32 +156,30 @@ int DuckRadio::startTransmitData(byte* data, int length) {
   int tx_err = ERR_NONE;
   int rx_err = ERR_NONE;
 
-  logdbg("SND data: ");
-  logdbg(duckutils::convertToHex(data, length));
-  logdbg_ln(" :length = " + String(length));
+  loginfo("TX data");
+  logdbg(" -> "+ duckutils::convertToHex(data, length));
+  logdbg(" -> length: " + String(length));
 
   tx_err = lora.transmit(data, length);
 
   switch (tx_err) {
     case ERR_NONE:
-      logdbg("startTransmitData Packet sent in: ");
-      logdbg((millis() - t1));
-      logdbg_ln("ms");
+      loginfo("TX data done in : " + String((millis() - t1)) + "ms");
       break;
 
     case ERR_PACKET_TOO_LONG:
       // the supplied packet was longer than 256 bytes
-      logerr_ln("ERROR startTransmitData too long!");
+      logerr("ERROR startTransmitData too long!");
       err = DUCKLORA_ERR_MSG_TOO_LARGE;
       break;
 
     case ERR_TX_TIMEOUT:
-      logerr_ln("ERROR startTransmitData timeout!");
+      logerr("ERROR startTransmitData timeout!");
       err = DUCKLORA_ERR_TIMEOUT;
       break;
 
     default:
-      logerr_ln("ERROR startTransmitData failed, code " + String(tx_err));
+      logerr("ERROR startTransmitData failed, err: " + String(tx_err));
       err = DUCKLORA_ERR_TRANSMIT;
       break;
   }

@@ -41,21 +41,21 @@ static RadioEvents_t radioEvents;
 
 static void OnLoraTxDone(void) {
   Radio.Sleep();
-  loginfo_ln("TX done");
+  loginfo("TX done");
   turnOnRGB(0x002000, 1000);
   turnOnRGB(0x000000, 0);
 }
 
 static void OnLoraTxTimeout(void) {
   Radio.Sleep();
-  loginfo_ln("TX timeout");
+  loginfo("TX timeout");
   turnOnRGB(0x3000000,1000);
   turnOnRGB(0x000000, 0);
 }
 
 static void OnLoraRxDone(uint8_t* payload, uint16_t size, int16_t rssi,
                          int8_t snr) {
-  loginfo_ln("RX Done");
+  loginfo("RX Done");
 
   Radio.Sleep();
   logdbg("Received Hex:");
@@ -67,12 +67,12 @@ static void OnLoraRxDone(uint8_t* payload, uint16_t size, int16_t rssi,
 
 static void OnLoraRxTimeout(void) {
   Radio.Sleep();
-  loginfo_ln("RX Timeout");
+  loginfo("RX Timeout");
 }
 
 static void OnLoraRxError(void) {
   Radio.Sleep();
-  loginfo_ln("RX error");
+  loginfo("RX error");
 }
 
 DuckRadio* DuckRadio::getInstance() {

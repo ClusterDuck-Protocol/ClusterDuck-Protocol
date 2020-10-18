@@ -14,14 +14,14 @@ Duck::Duck(std::vector<byte> id) {
 
 int Duck::setDeviceId(std::vector<byte> id) {
   if (id.size() > DUID_LENGTH) {
-    logerr_ln("ERROR device id too long rc = " + String(DUCK_ERR_NONE));
+    logerr("ERROR  device id too long rc = " + String(DUCK_ERR_NONE));
     return DUCK_ERR_ID_TOO_LONG;
   }
   if (duid.size() > 0) {
     duid.clear();
   }
   duid.insert(duid.end(), id.begin(), id.end());
-  loginfo_ln("setupDeviceId rc = " + String(DUCK_ERR_NONE));
+  loginfo("setupDeviceId rc = " + String(DUCK_ERR_NONE));
   return DUCK_ERR_NONE;
 }
 
@@ -34,7 +34,7 @@ int Duck::setDeviceId(byte* id) {
     return DUCK_ERR_ID_TOO_LONG;
   }
   duid.assign(id, id + len);
-  loginfo_ln("setupDeviceId rc = " + String(DUCK_ERR_NONE));
+  loginfo("setupDeviceId rc = " + String(DUCK_ERR_NONE));
 
   return DUCK_ERR_NONE;
 }
@@ -43,7 +43,7 @@ int Duck::setupSerial(int baudRate) {
   while (!Serial && millis() < 10000);
 
   Serial.begin(baudRate);
-  loginfo_ln("setupSerial rc = " + String(DUCK_ERR_NONE));
+  loginfo("setupSerial rc = " + String(DUCK_ERR_NONE));
   return DUCK_ERR_NONE;
 }
 
@@ -70,21 +70,21 @@ int Duck::setupRadio(float band, int ss, int rst, int di0, int di1, int txPower)
   int err = duckRadio->setupRadio(config);
 
   if (err == DUCKLORA_ERR_BEGIN) {
-    logerr_ln("setupRadio. Starting LoRa Failed. rc = " + String(err));
+    logerr("ERROR setupRadio. Starting LoRa Failed. rc = " + String(err));
     return err;
   }
   if (err == DUCKLORA_ERR_SETUP) {
-    logerr_ln("setupRadio. Failed to setup Lora. rc = " + String(err));
+    logerr("ERROR setupRadio. Failed to setup Lora. rc = " + String(err));
     return err;
   }
   if (err == DUCKLORA_ERR_RECEIVE) {
-    logerr_ln("setupRadio. Failed to start receive. rc = "+String(err));
+    logerr("ERROR setupRadio. Failed to start receive. rc = "+String(err));
     return err;
   }
 
   txPacket = new DuckPacket(duid);
   rxPacket = new DuckPacket();
-  loginfo_ln("setupRadio rc = " + String(DUCK_ERR_NONE));
+  loginfo("setupRadio rc = " + String(DUCK_ERR_NONE));
 
   return DUCK_ERR_NONE;
 }
@@ -94,9 +94,9 @@ int Duck::setupWebServer(bool createCaptivePortal, String html) {
   duckNet->setDeviceId(duid);
   err = duckNet->setupWebServer(createCaptivePortal, html);
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("setupWebServer rc = " + String(err));
+    logerr("ERROR setupWebServer rc = " + String(err));
   } else {
-    loginfo_ln("setupWebServer OK");
+    loginfo("setupWebServer OK");
   }
   return err;
 }
@@ -104,9 +104,9 @@ int Duck::setupWebServer(bool createCaptivePortal, String html) {
 int Duck::setupWifi(const char* ap) {
   int err = duckNet->setupWifiAp(ap);
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("setupWifi rc = " + String(err));
+    logerr("ERROR setupWifi rc = " + String(err));
   } else {
-    loginfo_ln("setupWifi OK");
+    loginfo("setupWifi OK");
   }
   return err;
 }
@@ -114,9 +114,9 @@ int Duck::setupWifi(const char* ap) {
 int Duck::setupDns() {
   int err = duckNet->setupDns();
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("setupDns rc = " + String(err));
+    logerr("ERROR setupDns rc = " + String(err));
   } else {
-    loginfo_ln("setupDns OK");
+    loginfo("setupDns OK");
   }
   return err;
 }
@@ -124,9 +124,9 @@ int Duck::setupDns() {
 int Duck::setupInternet(String ssid, String password) {
   int err = duckNet->setupInternet(ssid, password);
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("setupInternet rc = " + String(err));
+    logerr("ERROR setupInternet rc = " + String(err));
   } else {
-    loginfo_ln("setupInternet OK");
+    loginfo("setupInternet OK");
   }
   return err;
 }
@@ -145,9 +145,9 @@ int Duck::setupOTA() {
 
     // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using
     // SPIFFS.end()
-    loginfo_ln("setupOTA. Start updating " + type);
+    loginfo("setupOTA. Start updating " + type);
   });
-  ArduinoOTA.onEnd([]() { loginfo_ln("\nEnd"); });
+  ArduinoOTA.onEnd([]() { loginfo("\nEnd"); });
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
     loginfo_f("Progress: %u%%\r", (progress / (total / 100)));
   });
@@ -156,27 +156,27 @@ int Duck::setupOTA() {
     logerr_f("Error[%u]: ", error);
     switch(error) {
       case OTA_AUTH_ERROR:
-        logerr_ln("setupOTA. Auth Failed");
+        logerr("ERROR setupOTA. Auth Failed");
         break;
       case OTA_BEGIN_ERROR:
-        logerr_ln("setupOTA. Begin Failed");
+        logerr("ERROR setupOTA. Begin Failed");
         break;
       case OTA_CONNECT_ERROR:
-        logerr_ln("setupOTA. Connect Failed");
+        logerr("ERROR setupOTA. Connect Failed");
         break;
       case OTA_RECEIVE_ERROR:
-        logerr_ln("setupOTA. Receive Failed");
+        logerr("ERROR setupOTA. Receive Failed");
         break;
       case OTA_END_ERROR:
-        logerr_ln("setupOTA. End Failed");
+        logerr("ERROR setupOTA. End Failed");
         break;
       default:
-        logerr_ln("setupOTA. Unknown Error");
+        logerr("ERROR setupOTA. Unknown Error");
     }
   });
 
   ArduinoOTA.begin();
-  loginfo_ln("setupOTA rc = " + String(DUCK_ERR_NONE));
+  loginfo("setupOTA rc = " + String(DUCK_ERR_NONE));
   return DUCK_ERR_NONE;
 }
 #endif
@@ -197,12 +197,22 @@ void Duck::processPortalRequest() {
 }
 #endif
 
-int Duck::sendData(byte topic, std::vector<byte> data) {
+int Duck::sendData(byte topic, const byte* bytes, int length) {
+
+  std::vector<byte> app_data;
+  app_data.insert(app_data.end(), &bytes[0], &bytes[length]);
+  int err = sendData(topic, app_data);
+  return err;
+}
+
+int Duck::sendData(byte topic, std::vector<byte> bytes) {
+  String str;
+  str.c_str();
   if (topic < reservedTopic::max_reserved) {
-    logerr_ln("send data failed, topic is reserved.");
+    logerr("ERROR send data failed, topic is reserved.");
     return DUCKPACKET_ERR_TOPIC_INVALID;
   }
-  int err = txPacket->buildPacketBuffer(topic, data);
+  int err = txPacket->buildPacketBuffer(topic, bytes);
   if ( err != DUCK_ERR_NONE) {
     return err;
   }
@@ -217,7 +227,7 @@ int Duck::sendData(byte topic, std::vector<byte> data) {
 bool Duck::reboot(void*) {
   /*
     String reboot = "REBOOT";
-    loginfo_ln(reboot);
+    loginfo(reboot);
     DuckRadio::getInstance()->sendPayloadStandard(reboot, "boot");
     duckesp::restartDuck();
   */
@@ -228,7 +238,7 @@ bool Duck::reboot(void*) {
 bool Duck::imAlive(void*) {
   /*
   String alive = "Health Quack";
-  loginfo_ln(alive);
+  loginfo(alive);
   DuckRadio::getInstance()->sendPayloadStandard(alive, "health");
   */
   return true;
@@ -237,7 +247,7 @@ bool Duck::imAlive(void*) {
 int Duck::startReceive() {
   int err = duckRadio->startReceive();
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("Restarting Duck...");
+    logerr("ERROR Restarting Duck...");
     duckesp::restartDuck();
   }
   return err;
@@ -246,7 +256,7 @@ int Duck::startReceive() {
 int Duck::startTransmit() {
   int err = duckRadio->startTransmitData();
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("Oops! Lora transmission failed, err = " + String(err));
+    logerr("ERROR Oops! Lora transmission failed, err = " + String(err));
   }
   return err;
 }
@@ -257,12 +267,30 @@ int Duck::sendPong() {
   txPacket->reset();
   err = txPacket->buildPacketBuffer(reservedTopic::pong, data);
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("Oops! failed to build pong packet, err = " + err);
+    logerr("ERROR Oops! failed to build pong packet, err = " + err);
     return err;
   }
   err = duckRadio->sendData(txPacket->getDataByteBuffer(), txPacket->getBufferLength());
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("Oops! Lora sendData failed, err = " + err);
+    logerr("ERROR Oops! Lora sendData failed, err = " + err);
+    return err;
+  }
+  return err;
+}
+
+int Duck::sendPing() {
+  int err = DUCK_ERR_NONE;
+  std::vector<byte> data(1, 0);
+  txPacket->reset();
+  err = txPacket->buildPacketBuffer(reservedTopic::ping, data);
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR Failed to build ping packet, err = " + err);
+    return err;
+  }
+  err = duckRadio->sendData(txPacket->getDataByteBuffer(),
+                            txPacket->getBufferLength());
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR Lora sendData failed, err = " + err);
     return err;
   }
   return err;
