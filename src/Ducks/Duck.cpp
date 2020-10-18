@@ -197,22 +197,35 @@ void Duck::processPortalRequest() {
 }
 #endif
 
-int Duck::sendData(byte topic, const byte* bytes, int length) {
+int Duck::sendData(byte topic, const String data) {
 
+  const byte* buffer = (byte*)data.c_str();
+  int err = sendData(topic, buffer, data.length());
+  return err;
+}
+
+int Duck::sendData(byte topic, const std::string data) {
   std::vector<byte> app_data;
-  app_data.insert(app_data.end(), &bytes[0], &bytes[length]);
+  app_data.insert(app_data.end(), data.begin(), data.end());
   int err = sendData(topic, app_data);
   return err;
 }
 
-int Duck::sendData(byte topic, std::vector<byte> bytes) {
+int Duck::sendData(byte topic, const byte* data, int length) {
+  std::vector<byte> app_data;
+  app_data.insert(app_data.end(), &data[0], &data[length]);
+  int err = sendData(topic, app_data);
+  return err;
+}
+
+int Duck::sendData(byte topic, std::vector<byte> data) {
   String str;
   str.c_str();
   if (topic < reservedTopic::max_reserved) {
     logerr("ERROR send data failed, topic is reserved.");
     return DUCKPACKET_ERR_TOPIC_INVALID;
   }
-  int err = txPacket->buildPacketBuffer(topic, bytes);
+  int err = txPacket->buildPacketBuffer(topic, data);
   if ( err != DUCK_ERR_NONE) {
     return err;
   }

@@ -4,12 +4,13 @@
 #include <Arduino.h>
 #include <WString.h>
 
-#include "DuckPacket.h"
 #include "../DuckError.h"
-#include "DuckRadio.h"
-#include "DuckNet.h"
-#include "cdpcfg.h"
 #include "../DuckLogger.h"
+#include "DuckNet.h"
+#include "DuckPacket.h"
+#include "DuckRadio.h"
+#include "cdpcfg.h"
+#include <string>
 
 class Duck {
 
@@ -117,11 +118,21 @@ public:
    *
    */
   int setupOTA();
+
+  /**
+   * @brief Sends data into the mesh network.
+   *
+   * @param topic the message topic
+   * @param data a string representing the data
+   * @return DUCK_ERR_NONE if the data was send successfully, an error code otherwise. 
+   */
+  int sendData(byte topic, const String data);
+
   /**
    * @brief Sends data into the mesh network.
    * 
    * @param topic the message topic
-   * @param bytes a vector of bytes representing the data to send
+   * @param data a vector of bytes representing the data to send
    * @return DUCK_ERR_NONE if the data was send successfully, an error code otherwise. 
    */
   int sendData(byte topic, std::vector<byte> bytes);
@@ -130,11 +141,22 @@ public:
    * @brief Sends data into the mesh network.
    *
    * @param topic the message topic
-   * @param bytes a byte buffer representing the data to send
+   * @param data a string representing the data to send
    * @return DUCK_ERR_NONE if the data was send successfully, an error code
    * otherwise.
    */
-  int sendData(byte topic, const byte* bytes, int length);
+  int sendData(byte topic, const std::string data);
+
+  /**
+   * @brief Sends data into the mesh network.
+   *
+   * @param topic the message topic
+   * @param data a byte buffer representing the data to send
+   * @param length the length of the byte buffer
+   * @return DUCK_ERR_NONE if the data was send successfully, an error code
+   * otherwise.
+   */
+  int sendData(byte topic, const byte* data, int length);
   /**
    * @brief Check wifi connection status
    * 
