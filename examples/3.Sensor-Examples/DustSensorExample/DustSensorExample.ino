@@ -1,5 +1,4 @@
 /**
- * @file mamaduck-send-message.ino
  * @brief Uses the built in Mama Duck with some customatizations.
  * 
  * This example is a Mama Duck, but it is also periodically sending a message in the Mesh
@@ -12,8 +11,9 @@
  * 
  */
 
-#include "timer.h"
 #include <MamaDuck.h>
+#include <arduino-timer.h>
+#include <string>
 
 #ifdef SERIAL_PORT_USBVIRTUAL
 #define Serial SERIAL_PORT_USBVIRTUAL
@@ -27,9 +27,8 @@ const uint8_t SHARP_VO_PIN = 0;    // Sharp Dust/particle analog out pin used fo
 
 GP2YDustSensor dustSensor(GP2YDustSensorType::GP2Y1010AU0F, SHARP_LED_PIN, SHARP_VO_PIN);
 
-
-// Set device ID between ""
-MamaDuck duck = MamaDuck("DuckOne");
+// create a built-in mama duck
+MamaDuck duck = MamaDuck();
 
 auto timer = timer_create_default();
 const int INTERVAL_MS = 60000;
@@ -37,11 +36,19 @@ char message[32];
 int counter = 1;
 
 void setup() {
+  // We are using a hardcoded device id here, but it should be retrieved or
+  // given during the device provisioning then converted to a byte vector to
+  // setup the duck NOTE: The Device ID must be exactly 8 bytes otherwise it
+  // will get rejected
+  std::string deviceId("MAMA0001");
+  std::vector<byte> devId;
+  devId.insert(devId.end(), deviceId.begin(), deviceId.end());
+
   // Use the default setup provided by the SDK
-  duck.setupWithDefaults();
+  duck.setupWithDefaults(devId);
   Serial.println("MAMA-DUCK...READY!");
 
-    //Dust sensor
+  // Dust sensor
   dustSensor.begin();
 
   // initialize the timer. The timer thread runs separately from the main loop
@@ -63,7 +70,7 @@ bool runSensor(void *) {
   String sensorVal = "Current dust concentration: " + dustSensor.getDustDensity();
   sensorVal += " ug/m3";
 
-  duck.sendPayloadStandard(sensorVal, "dust");
-  
+  duck.sendData(topics::sensor, sensorVal);
+
   return true;
 }

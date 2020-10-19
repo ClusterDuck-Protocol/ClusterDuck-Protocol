@@ -1,5 +1,4 @@
 /**
- * @file mamaduck-send-message.ino
  * @brief Uses the built in Mama Duck with some customatizations.
  * 
  * This example is a Mama Duck, but it is also periodically sending a message in the Mesh
@@ -30,9 +29,8 @@
 
 BluetoothSerial SerialBT;
 
-
-// Set device ID between ""
-MamaDuck duck = MamaDuck("DuckOne");
+// create a built-in mama duck
+MamaDuck duck = MamaDuck();
 
 char message[32]; 
 int counter = 1;
@@ -42,11 +40,17 @@ void setup() {
   duck.setupSerial();
   duck.setupRadio();
 
- 
+  // We are using a hardcoded device id here, but it should be retrieved or
+  // given during the device provisioning then converted to a byte vector to
+  // setup the duck NOTE: The Device ID must be exactly 8 bytes otherwise it
+  // will get rejected
+  std::string deviceId("MAMA0001");
+  std::vector<byte> devId;
+  devId.insert(devId.end(), deviceId.begin(), deviceId.end());
+  duck.setDeviceId(devId);
+
   Serial.println("MAMA-DUCK...READY!");
-
-
-  SerialBT.begin("DuckLink1"); //Bluetooth device name
+  SerialBT.begin("MamaDuck1"); //Bluetooth device name
   Serial.println("The device started, now you can pair it with bluetooth!");
 
 }
@@ -56,7 +60,7 @@ void loop() {
   if (SerialBT.available()) {
     String text = SerialBT.readString();
     Serial.println(text);
-    duck.sendPayloadStandard(text, "app");
+    duck.sendData(topics::status, text);
     delay(10);
   }
 
