@@ -238,13 +238,10 @@ protected:
     if (err != DUCK_ERR_NONE) {
       return err;
     }
-
     err = setDeviceId(deviceId);
     if (err != DUCK_ERR_NONE) {
       return err;
     }
-
-    duckNet->setDeviceId(deviceId);
     return DUCK_ERR_NONE;
   }
   

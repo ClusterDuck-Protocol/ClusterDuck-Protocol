@@ -112,14 +112,14 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
 
     for (int i = 0; i < paramsNumber; i++) {
       AsyncWebParameter* p = request->getParam(i);
-      logdbg_f("%s: %s", p->name().c_str(), p->value().c_str());
-      loginfo();
+      logdbg(p->name() + ": " + p->value());
 
       val = val + p->value().c_str() + "*";
     }
 
     std::vector<byte> data;
     data.insert(data.end(), val.begin(), val.end());
+    txPacket->reset();
     txPacket->buildPacketBuffer(topics::status, data );
     err = duckRadio->sendData(txPacket->getCdpPacketBuffer());
     
