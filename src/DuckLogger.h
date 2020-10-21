@@ -12,18 +12,18 @@
 #if defined(CDP_LOG_ERROR)
 #define logerr(...)                                                            \
   do {                                                                         \
-    Serial.print("[ERR] ");                                                      \
-    Serial.print(__VA_ARGS__);                                                 \
-    Serial.println(" in " + String(__FILENAME__) + "(" + String(__LINE__) +    \
-                   ")");                                                       \
+    Serial.print("[ERR: ");                                                    \
+    Serial.print(String(__FILENAME__) + ":" + String(__LINE__) + "]  ");       \
+    Serial.println(__VA_ARGS__);                                               \
   } while (0)
+#if !defined(ARDUINO_SAMD_ZERO)
 #define logerr_f(...)                                                          \
   do {                                                                         \
-    Serial.print("[ERR] ");                                                    \
+    Serial.print("[ERR: ");                                                    \
+    Serial.print(String(__FILENAME__) + ":" + String(__LINE__) + "]  ");       \
     Serial.printf(__VA_ARGS__);                                                \
-    Serial.println(" in " + String(__FILENAME__) + "(" + String(__LINE__) +    \
-                   ")");                                                       \
   } while (0)
+#endif
 #else
 #define logerr(...)                                                            \
   {}
@@ -34,38 +34,40 @@
 #if defined(CDP_LOG_WARN)
 #define logwarn(...)                                                           \
   do {                                                                         \
-    Serial.print("[WRN]  ");                                                     \
-    Serial.print(__VA_ARGS__);                                                 \
-    Serial.println(" in " + String(__FILENAME__) + "(" + String(__LINE__) +    \
-                   ")");                                                       \
+    Serial.print("[WRN: ");                                                    \
+    Serial.print(String(__FILENAME__) + ":" + String(__LINE__) + "]  ");       \
+    Serial.println(__VA_ARGS__);                                               \
   } while (0)
+#if !defined(ARDUINO_SAMD_ZERO)
 #define logwarn_f(...)                                                         \
   do {                                                                         \
-    Serial.print("[WRN]  ");                                                     \
+    Serial.print("[WRN: ");                                                    \
+    Serial.print(String(__FILENAME__) + ":" + String(__LINE__) + "]  ");       \
     Serial.printf(__VA_ARGS__);                                                \
-    Serial.println(" in " + String(__FILENAME__) + "(" + String(__LINE__) +    \
-                   ")");                                                       \
   } while (0)
+#endif
 #else
-#define logerr(...)                                                            \
+#define logwarn(...)                                                           \
   {}
-#define logerr_f(...)                                                          \
+#define logwarn_f(...)                                                         \
   {}
 #endif
 
 #if defined(CDP_LOG_INFO)
 #define loginfo(...)                                                           \
   do {                                                                         \
-    Serial.print("[INF]  ");                                                     \
-    Serial.print(__VA_ARGS__);                                                 \
-    Serial.println(" in " + String(__FILENAME__));                             \
+    Serial.print("[INF: ");                                                    \
+    Serial.print(String(__FILENAME__) + "]  ");                                \
+    Serial.println(__VA_ARGS__);                                               \
   } while (0)
+#if !defined(ARDUINO_SAMD_ZERO)
 #define loginfo_f(...)                                                         \
   do {                                                                         \
-    Serial.print("[INF]  ");                                                     \
+    Serial.print("[INF: ");                                                    \
+    Serial.print(String(__FILENAME__) + "]  ");                                \
     Serial.printf(__VA_ARGS__);                                                \
-    Serial.println(" in " + String(__FILENAME__));                             \
   } while (0)
+#endif
 #else
 #define loginfo(...)                                                           \
   {}
@@ -76,16 +78,18 @@
 #if defined(CDP_LOG_DEBUG)
 #define logdbg(...)                                                            \
   do {                                                                         \
-    Serial.print("[DBG]  ");                                                     \
-    Serial.print(__VA_ARGS__);                                                 \
-    Serial.println(" in " + String(__FILENAME__));                             \
+    Serial.print("[DBG: ");                                                    \
+    Serial.print(String(__FILENAME__) + "]  ");                                \
+    Serial.println(__VA_ARGS__);                                               \
   } while (0)
+#if !defined(ARDUINO_SAMD_ZERO)
 #define logdbg_f(...)                                                          \
   do {                                                                         \
-    Serial.print("[DBG]  ");                                                   \
+    Serial.print("[DBG: ");                                                    \
+    Serial.print(String(__FILENAME__) + "]  ");                                \
     Serial.printf(__VA_ARGS__);                                                \
-    Serial.println(" in " + String(__FILENAME__));                             \
   } while (0)
+#endif
 #else
 #define logdbg(...)                                                            \
   {}
