@@ -219,8 +219,9 @@ int Duck::sendData(byte topic, const byte* data, int length) {
 }
 
 int Duck::sendData(byte topic, std::vector<byte> data) {
-  String str;
-  str.c_str();
+
+  txPacket->reset();
+
   if (topic < reservedTopic::max_reserved) {
     logerr("ERROR send data failed, topic is reserved.");
     return DUCKPACKET_ERR_TOPIC_INVALID;
@@ -232,7 +233,7 @@ int Duck::sendData(byte topic, std::vector<byte> data) {
 
   int length = txPacket->getBufferLength();
   err = duckRadio->sendData(txPacket->getDataByteBuffer(), length);
-  txPacket->reset();
+  
   return err;
 }
 
