@@ -94,6 +94,7 @@ int DuckRadio::getReceivedData(std::vector<byte>* packetBytes) {
     logerr("ERROR  handlePacket rx data length is 0");
     return DUCKLORA_ERR_HANDLE_PACKET;
   }
+  logdbg("getReceivedData() - packet length returns: "+ String(pSize));
 
   packetBytes->resize(pSize);
 

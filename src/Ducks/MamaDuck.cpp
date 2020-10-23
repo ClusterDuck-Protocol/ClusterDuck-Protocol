@@ -55,8 +55,12 @@ void MamaDuck::handleReceivedPacket() {
     logerr("ERROR failed to get data from DuckRadio. rc = "+ String(err));
     return;
   }
+
   bool relay = rxPacket->update(duid, data);
+
   if (relay) {
+    loginfo("====> handleReceivedPacket() packet needs relay.....");
+
     // NOTE:
     // Ducks will only handle received message one at a time, so there is a chance the
     // packet being sent below will never be received, especially if the cluster is small
@@ -71,6 +75,8 @@ void MamaDuck::handleReceivedPacket() {
       }
     } else {
       err = duckRadio->sendData(rxPacket);
+      loginfo("====> handleReceivedPacket() packet sent");
+
       if (err != DUCK_ERR_NONE) {
         logerr("ERROR failed to send data. rc = "+ String(err));
         return;

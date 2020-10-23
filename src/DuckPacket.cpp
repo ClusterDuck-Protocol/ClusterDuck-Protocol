@@ -5,25 +5,43 @@
 #include<string>
 bool DuckPacket::update(std::vector<byte> duid, std::vector<byte> dataBuffer) {
 
+
+
   bool relaying;
   byte packet_length = dataBuffer.size();
+
+  logdbg("Updating received packet: " + String(duckutils::convertToHex(dataBuffer.data(), packet_length)));
+
+  if (packet_length < MIN_PACKET_LENGTH) {
+    logerr("ERROR Packet size is invalid: (" + String(packet_length) +
+           ") Data may be corrupted.");
+    return false;
+  }
+
   byte path_offset = dataBuffer[PATH_OFFSET_POS];
+  
+  if (path_offset > MAX_PATH_OFFSET) {
+    logerr("ERROR Path position is invalide (" + String(path_offset) + ") Data may be corrupted.");
+    return false;
+  }
+
   // build an rxPacket with data we have received
   packet.duid.insert(packet.duid.end(), &dataBuffer[0], &dataBuffer[DUID_LENGTH]);
   packet.muid.insert(packet.muid.end(), &dataBuffer[MUID_POS], &dataBuffer[TOPIC_POS]);
   packet.topic = dataBuffer[TOPIC_POS];
   packet.path_offset = dataBuffer[PATH_OFFSET_POS];
+  
   packet.reserved.insert(packet.reserved.end(), &dataBuffer[RESERVED_POS], &dataBuffer[DATA_POS]);
   packet.data.insert(packet.data.end(), &dataBuffer[DATA_POS], &dataBuffer[path_offset]);
   packet.path.insert(packet.path.end(), &dataBuffer[path_offset], &dataBuffer[packet_length]);
   // update the rx packet byte buffer
   buffer.insert(buffer.end(), dataBuffer.begin(), dataBuffer.end());
-  //logdbg("Current path: " + String(duckutils::convertToHex(packet.path.data(), packet.path.size())));
+  logdbg("Current path: " + String(duckutils::convertToHex(packet.path.data(), packet.path.size())));
 
   // check if we need to relay the packet
   relaying = relay(duid);
-  //logdbg("Updated path: " + String(duckutils::convertToHex(packet.path.data(), packet.path.size())));
-  //logdbg("Updated buffer: " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
+  logdbg("Updated path: " + String(duckutils::convertToHex(packet.path.data(), packet.path.size())));
+  logdbg("Updated buffer: " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
   return relaying;
 }
 

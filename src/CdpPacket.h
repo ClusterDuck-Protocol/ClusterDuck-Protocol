@@ -32,6 +32,10 @@
 #define HEADER_LENGTH 16
 #define MAX_PATH_LENGTH (MAX_HOPS * MUID_LENGTH)
 #define MAX_DATA_LENGTH (PACKET_LENGTH - HEADER_LENGTH - MAX_PATH_LENGTH)
+#define MAX_PATH_OFFSET (PACKET_LENGTH - DUID_LENGTH - 1)
+
+// 16 bytes header + 1 hop + 1 byte data
+#define MIN_PACKET_LENGTH (HEADER_LENGTH + DUID_LENGTH + 1)
 
 // field/section offsets
 #define DUID_POS 0
