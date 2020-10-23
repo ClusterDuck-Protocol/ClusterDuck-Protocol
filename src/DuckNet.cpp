@@ -252,8 +252,13 @@ int DuckNet::setupDns() {
 int DuckNet::setupInternet(String ssid, String password) {
   this->ssid = ssid;
   this->password = password;
-  if (ssid == "" || password == "" || !ssidAvailable(ssid)) {
-    return DUCK_ERR_SETUP;
+  if (ssid == "" || password == "") {
+    logerr("ERROR setupInternet: Please provide an ssid and password for connecting to a wifi access point");
+    return DUCK_INTERNET_ERR_SETUP;
+  }
+  if (!ssidAvailable(ssid)) {
+    logerr("ERROR setupInternet: " + ssid + " is not available. Please check the provided ssid and/or passwords");
+    return DUCK_INTERNET_ERR_SSID;
   }
   // Connect to Access Point
   WiFi.begin(ssid.c_str(), password.c_str());
@@ -261,6 +266,7 @@ int DuckNet::setupInternet(String ssid, String password) {
   // TODO: we should probably simply fail here and let the app decide what to do
   // Continuous retry could deplete the battery
   while (WiFi.status() != WL_CONNECTED) {
+    logerr("ERROR setupInternet: failed to connect to " + ssid);
     duckutils::getTimer().tick(); // Advance timer to reboot after awhile
   }
 
