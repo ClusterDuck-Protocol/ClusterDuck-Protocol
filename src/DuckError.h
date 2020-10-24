@@ -22,7 +22,7 @@
 #define DUCKLORA_ERR_TRANSMIT       -1004
 // Failed to handle data received from the Lora module
 #define DUCKLORA_ERR_HANDLE_PACKET  -1050
-// Attempted to send a message larger than 256 byrtes
+// Attempted to send a message larger than 256 bytes
 #define DUCKLORA_ERR_MSG_TOO_LARGE  -1051
 
 // Wifi network is not availble

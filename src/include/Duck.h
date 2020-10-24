@@ -184,6 +184,14 @@ public:
    */
   String getPassword() { return duckNet->getPassword(); }
 
+  /**
+   * @brief Get an error code description.
+   * 
+   * @param error an error code
+   * @returns a string describing the error. 
+   */
+  String getErrorString(int error);
+  
 protected:
   String deviceId;
   std::vector<byte> duid;
