@@ -13,15 +13,14 @@ bool DuckPacket::update(std::vector<byte> duid, std::vector<byte> dataBuffer) {
   logdbg("Updating received packet: " + String(duckutils::convertToHex(dataBuffer.data(), packet_length)));
 
   if (packet_length < MIN_PACKET_LENGTH) {
-    logerr("ERROR Packet size is invalid: (" + String(packet_length) +
-           ") Data may be corrupted.");
+    logerr("ERROR Packet size is invalid: (" + String(packet_length) + ") Data may be corrupted.");
     return false;
   }
 
-  byte path_offset = dataBuffer[PATH_OFFSET_POS];
-  
-  if (path_offset > MAX_PATH_OFFSET) {
-    logerr("ERROR Path position is invalide (" + String(path_offset) + ") Data may be corrupted.");
+  byte path_pos = dataBuffer[PATH_OFFSET_POS];
+
+  if (path_pos > (packet_length - 1)) {
+    logerr("ERROR Path position is invalid (" + String(path_pos) + ") Data may be corrupted.");
     return false;
   }
 
@@ -32,8 +31,8 @@ bool DuckPacket::update(std::vector<byte> duid, std::vector<byte> dataBuffer) {
   packet.path_offset = dataBuffer[PATH_OFFSET_POS];
   
   packet.reserved.insert(packet.reserved.end(), &dataBuffer[RESERVED_POS], &dataBuffer[DATA_POS]);
-  packet.data.insert(packet.data.end(), &dataBuffer[DATA_POS], &dataBuffer[path_offset]);
-  packet.path.insert(packet.path.end(), &dataBuffer[path_offset], &dataBuffer[packet_length]);
+  packet.data.insert(packet.data.end(), &dataBuffer[DATA_POS], &dataBuffer[path_pos]);
+  packet.path.insert(packet.path.end(), &dataBuffer[path_pos], &dataBuffer[packet_length]);
   // update the rx packet byte buffer
   buffer.insert(buffer.end(), dataBuffer.begin(), dataBuffer.end());
   logdbg("Current path: " + String(duckutils::convertToHex(packet.path.data(), packet.path.size())));
