@@ -25,6 +25,7 @@ public:
    *
    */
   void run();
+  
   /**
    * @brief Override the default setup method to match DuckDetect specific
    * defaults.

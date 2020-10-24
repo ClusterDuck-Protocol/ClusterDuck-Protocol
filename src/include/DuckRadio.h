@@ -132,6 +132,14 @@ public:
   int standBy();
 
   /**
+   * @brief Set the LoRa radio into sleep mode.
+   * 
+   * @returns DUCK_ERR_NONE if the chip is sucessfuly set in standby mode, an
+   * error code otherwise.   
+   */
+  int sleep();
+  
+  /**
    * @brief Get the data received from the radio
    * 
    * @param  packetBytes byte buffer to contain the data 

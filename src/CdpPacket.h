@@ -86,12 +86,11 @@ enum reservedTopic {
  *
  * DUID:      08  byte array          - Device Unique ID
  * MUID:      04  byte array          - Message unique ID
- * T   :      01  byte value          - Topic (topic 0..15 are reserved for
- * internal use) PO  :      01  byte array          - Offset to the start of the
- * PATH section in the packet R   :      02  byte array          - Reserved for
- * internal use DATA:      192 byte array          - Data payload (e.g sensor
- * read, text,...). Max is 192 bytes. PATH:      048 byte array of DUIDs -
- * Device UIDs having seen this packet. Max is 48 bytes (6 hops)
+ * T   :      01  byte value          - Topic (topic 0..15 are reserved for internal use)
+ * PO  :      01  byte array          - Offset to the start of the PATH section in the packet 
+ * R   :      02  byte array          - Reserved for internal use 
+ * DATA:      192 byte array          - Data payload (e.g sensor read, text,...). Max is 192 bytes.
+ * PATH:      048 byte array of DUIDs - Device UIDs having seen this packet. Max is 48 bytes (6 hops)
  */
 typedef struct {
   /// Device UID (8 bytes)
@@ -106,7 +105,7 @@ typedef struct {
   std::vector<byte> reserved;
   /// Data section (192 bytes max)
   std::vector<byte> data;
-  /// Path section (48 bytes ma)
+  /// Path section (48 bytes max)
   std::vector<byte> path;
 } CDP_Packet;
 

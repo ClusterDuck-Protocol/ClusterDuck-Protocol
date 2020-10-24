@@ -145,6 +145,8 @@ int DuckRadio::ping() {
 
 int DuckRadio::standBy() { return lora.standby(); }
 
+int DuckRadio::sleep() { return lora.sleep(); }
+
 void DuckRadio::processRadioIrq() {}
 
 int DuckRadio::startTransmitData(byte* data, int length) {
