@@ -1,14 +1,13 @@
 /**
- * @file mamaduck-send-message.ino
+ * @file MamaDuck.ino
  * @brief Uses the built in Mama Duck with some customatizations.
  * 
  * This example is a Mama Duck, but it is also periodically sending a message in the Mesh
- * It is setup to provide a custom Emergency portal, instead of using the one provided by the SDK.
- * Notice the background color of the captive portal is Black instead of the default Red.
  * 
  * @date 2020-09-21
  * 
  * @copyright Copyright (c) 2020
+ * ClusterDuck Protocol 
  * 
  */
 
