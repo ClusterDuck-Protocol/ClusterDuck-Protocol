@@ -3,7 +3,7 @@
 void DuckLink::setupWithDefaults(String ssid, String password) {
   Duck::setupWithDefaults(ssid, password);
   setupRadio();
-  if( !ssid.isEmpty() && !password.isEmpty()) {
+  if (ssid.length() != 0 && password.length() != 0) {
     setupWifi();
     setupDns();
     setupWebServer(true);
