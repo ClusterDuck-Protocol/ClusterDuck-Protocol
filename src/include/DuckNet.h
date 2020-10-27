@@ -60,7 +60,7 @@ public:
 #ifdef CDPCFG_WIFI_NONE
   void setupWebServer(bool createCaptivePortal = false, String html = "") {}
   void setupWifiAp(const char* accessPoint = "🆘 DUCK EMERGENCY PORTAL") {}
-  void setupDns() {}
+  int setupDns() {}
   void setupInternet(String ssid, String password) {}
   bool ssidAvailable(String val = "") {return false;}
   void setSsid(String val) {}
@@ -68,7 +68,7 @@ public:
   String getSsid() {return "";}
   String getPassword() {return "";}
   void setDeviceId(String deviceId) {}
-  bool isWifiConnect() {return false;}
+  bool isWifiConnected() {return false;}
 #else 
   /**
    * @brief Set up the WebServer.

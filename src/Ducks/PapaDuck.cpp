@@ -3,8 +3,8 @@
 void PapaDuck::setupWithDefaults(String ssid, String password) {
   Duck::setupWithDefaults(ssid, password);
   setupRadio();
-  
-  if (!ssid.isEmpty() && !password.isEmpty()) {
+
+  if (ssid.length() != 0 && password.length() != 0) {
     setupWifi("PapaDuck Setup");
     setupDns();
     setupInternet(ssid, password);
@@ -37,6 +37,11 @@ void PapaDuck::run() {
 }
 
 int PapaDuck::reconnectWifi(String ssid, String password) {
+#ifdef CDPCFG_WIFI_NONE
+  Serial.println("[PapaDuck] WARNING reconnectWifi skipped, device has no WiFi.");
+  return DUCK_ERR_NONE;
+#else
+
   if (!duckNet->ssidAvailable(ssid)) {
     return DUCKWIFI_ERR_NOT_AVAILABLE;
   }
@@ -48,4 +53,5 @@ int PapaDuck::reconnectWifi(String ssid, String password) {
   }
 
   return DUCK_ERR_NONE;
+#endif
 }
