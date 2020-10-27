@@ -151,7 +151,7 @@ void DuckRadio::processRadioIrq() {}
 
 int DuckRadio::startTransmitData(byte* data, int length) {
 
-  bool oldEI = duckutils::getDuckInterrupt();
+  bool couldInterrupt = duckutils::getDuckInterrupt();
   duckutils::setDuckInterrupt(false);
   long t1 = millis();
 
@@ -163,6 +163,7 @@ int DuckRadio::startTransmitData(byte* data, int length) {
   logdbg(" -> "+ duckutils::convertToHex(data, length));
   logdbg(" -> length: " + String(length));
 
+  // this is going to wait for transmission to complete or to timeout
   tx_err = lora.transmit(data, length);
 
   switch (tx_err) {
@@ -187,13 +188,14 @@ int DuckRadio::startTransmitData(byte* data, int length) {
       break;
   }
 
-  if (err != DUCK_ERR_NONE) {
-    return err;
-  }
-
-  if (oldEI) {
+  if (couldInterrupt) {
     duckutils::setDuckInterrupt(true);
     rx_err = startReceive();
+
+    if (err != DUCK_ERR_NONE) {
+      return err;
+    }
+
     if (rx_err != ERR_NONE) {
       err = DUCKLORA_ERR_RECEIVE;
     }
