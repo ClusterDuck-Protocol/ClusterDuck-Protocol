@@ -1,5 +1,4 @@
 #include "DuckDisplay.h"
-
 #ifdef CDPCFG_OLED_CLASS
 CDPCFG_OLED_CLASS u8x8(/* clock=*/CDPCFG_PIN_OLED_CLOCK,
                        /* data=*/CDPCFG_PIN_OLED_DATA,
@@ -17,7 +16,7 @@ DuckDisplay* DuckDisplay::getInstance() {
   return instance;
 }
 
-#ifndef CDPCFG_WIFI_NONE
+#ifndef CDPCFG_OLED_NONE
 
 void DuckDisplay::setupDisplay(int duckType, String duid) {
   u8x8.begin();
@@ -55,4 +54,4 @@ void DuckDisplay::print(String text) { u8x8.print(text); }
 
 void DuckDisplay::clear(void) { u8x8.clear(); }
 
-#endif
+#endif // CDPCFG_OLED_NONE

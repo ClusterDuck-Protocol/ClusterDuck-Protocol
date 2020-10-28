@@ -14,16 +14,12 @@
 #ifndef DUCKDISPLAY_H_
 #define DUCKDISPLAY_H_
 
-#ifndef CDPCFG_OLED_NONE
 #include "include/cdpcfg.h"
-#include "include/Duck.h"
 #include <Arduino.h>
-#include <U8x8lib.h>
 #include <WString.h>
-#else
-#include "include/cdpcfg.h"
-#include "include/Duck.h"
-#include <Arduino.h>
+#include "include/DuckTypes.h"
+#ifndef CDPCFG_OLED_NONE
+#include <U8x8lib.h>
 #endif
 
 /**
