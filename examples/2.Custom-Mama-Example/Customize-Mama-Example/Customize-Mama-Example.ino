@@ -4,14 +4,20 @@
 
 
 auto timer = timer_create_default();
-const int INTERVAL_MS = 1000;
+const int INTERVAL_MS = 50000;
 char message[32]; 
 int counter = 1;
 
 const char* DUCK_WIFI_AP = "MAMA DUCK PORTAL";
 // create an instance of a MamaDuck with a given unique id
-MamaDuck duck = MamaDuck("DUCK-UID");
+
+String deviceId = "MAMA001";
+
+  
+MamaDuck duck = MamaDuck(deviceId);
 DuckDisplay* display = NULL;
+
+
 // LORA RF CONFIG
 #define LORA_FREQ 915.0 // Frequency Range. Set for US Region 915.0Mhz
 #define LORA_TXPOWER 20 // Transmit Power
@@ -20,6 +26,8 @@ DuckDisplay* display = NULL;
 #define LORA_DIO0_PIN 26
 #define LORA_DIO1_PIN -1 // unused
 #define LORA_RST_PIN 14
+
+
 void setup() {
   // initialize the serial component with the hardware supported baudrate
   duck.setupSerial(115200);
@@ -37,8 +45,7 @@ void setup() {
   // Get an instance and initialize it, so we can use in our application
   display = DuckDisplay::getInstance();
   display->setupDisplay();
-  // we are done
-  display->drawString(true, 20,20, "DUCK READY");
+  display->displayExample(deviceId, "MAMA-DUCK");
   Serial.println("MAMA-DUCK...READY!");
 
   timer.every(INTERVAL_MS, runSensor);
