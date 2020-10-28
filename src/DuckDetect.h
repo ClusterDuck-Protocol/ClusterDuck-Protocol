@@ -52,6 +52,13 @@ public:
    */
   void onReceiveRssi(rssiCallback rssiCb) { this->rssiCb = rssiCb; }
 
+  /**
+   * @brief Get the DuckType
+   *
+   * @returns the duck type defined as DuckType
+   */
+  int getType() { return DuckType::DETECTOR; }
+
 private:
   rssiCallback rssiCb;
   void handleReceivedPacket();

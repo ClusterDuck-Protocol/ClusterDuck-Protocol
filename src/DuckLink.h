@@ -32,6 +32,13 @@ public:
    * @returns DUCK_ERR_NONE if setup is successfull, an error code otherwise.
    */
   int setupWithDefaults(std::vector<byte> deviceId, String ssid="", String password="");
+
+  /**
+   * @brief Get the DuckType
+   *
+   * @returns the duck type defined as DuckType
+   */
+  int getType() { return DuckType::LINK; }
 };
 
 #endif

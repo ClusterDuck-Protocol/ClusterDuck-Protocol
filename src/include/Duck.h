@@ -5,12 +5,28 @@
 #include <WString.h>
 
 #include "../DuckError.h"
-#include "../DuckLogger.h"
+#include "DuckLora.h"
 #include "DuckNet.h"
-#include "DuckPacket.h"
-#include "DuckRadio.h"
+#include "DuckTypes.h"
 #include "cdpcfg.h"
-#include <string>
+
+/**
+ * @brief Type of ducks
+ *
+ */
+enum DuckType {
+  /// A Duck of unknown type
+  UNKNOWN = 0x00,
+  /// A PapaDuck
+  PAPA = 0x01,
+  /// A MamaDuck
+  MAMA = 0x02,
+  /// A DuckLink
+  LINK = 0x03,
+  /// A Detector Duck
+  DETECTOR = 0x04,
+  MAX_TYPE
+};
 
 class Duck {
 
@@ -252,9 +268,10 @@ protected:
     }
     return DUCK_ERR_NONE;
   }
-  
-  virtual int reconnectWifi(String ssid, String password) { return 0; }
 
+  virtual int getType() = 0;
+
+  virtual int reconnectWifi(String ssid, String password) { return 0; }
 
   static volatile bool receivedFlag;
   static void toggleReceiveFlag() { receivedFlag = !receivedFlag; }
