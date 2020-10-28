@@ -90,11 +90,13 @@ public:
    */
   void setCursor(uint8_t x, uint8_t y);
 
-  void displayExample(String deviceId, String deviceType){
+  void displayExample(){
+ 
 
-  drawString( 0,0, deviceType.c_str()  );
+
+  drawString( 0,6, duckTypeString.c_str() );
   drawString( 0,1, "ID:" );
-  drawString(5,1, deviceId.c_str());
+  drawString(5,1, duid.c_str());
   drawString(0,2, "Version: " );
   drawString(10,2, "2.1.1");
   drawString(0,3, "Mac: ");
@@ -103,6 +105,21 @@ public:
   
 
   };
+
+  String duckTypeString(int duckType) {
+
+  switch(duckType) {
+    case 1: duckType = 0x01; 
+      duckTypeStr = "Papa";
+      break;
+  case 2: duckType = 0x02; 
+   duckTypeStr = "Mama";
+      break;
+    default:
+      duckTypeStr = "Duck";
+  }
+  return duckTypeStr;
+};
 
   /**
    * @brief Print a string at the current cursor position.
@@ -125,6 +142,8 @@ private:
   static DuckDisplay* instance;
   int duckType;
   String duid;
+  String duckTypeStr;
+ 
 };
 
 #endif /* DUCKDISPLAY_H_ */
