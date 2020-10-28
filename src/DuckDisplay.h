@@ -14,11 +14,17 @@
 #ifndef DUCKDISPLAY_H_
 #define DUCKDISPLAY_H_
 
+#ifndef CDPCFG_OLED_NONE
+#include "include/cdpcfg.h"
+#include "include/Duck.h"
 #include <Arduino.h>
 #include <U8x8lib.h>
 #include <WString.h>
-
+#else
 #include "include/cdpcfg.h"
+#include "include/Duck.h"
+#include <Arduino.h>
+#endif
 
 /**
  * @brief Internal OLED Display abstraction.
@@ -36,11 +42,20 @@ public:
    */
   static DuckDisplay* getInstance();
 
+#ifdef CDPCFG_OLED_NONE
+  void setupDisplay(int duckType, String duid) {}
+  void powerSave(bool save){}
+  void drawString(uint8_t x, uint8_t y, const char* text) {}
+  void drawString(bool cls, uint8_t x, uint8_t y, const char* text) {}
+  void setCursor(uint8_t x, uint8_t y) {}
+  void print(String text) {}
+  void clear(void) {}
+#else
   /**
    * @brief Initialize the display component.
    * 
    */
-  void setupDisplay();
+  void setupDisplay(int duckType, String duid);
   /**
    * @brief Toggle the display in or out of power saving mode.
    * 
@@ -102,13 +117,14 @@ public:
    */
   void clear(void);
 
-
-
+#endif
 private:
   DuckDisplay();
   DuckDisplay(DuckDisplay const&) = delete;
   DuckDisplay& operator=(DuckDisplay const&) = delete;
   static DuckDisplay* instance;
+  int duckType;
+  String duid;
 };
 
 #endif /* DUCKDISPLAY_H_ */
