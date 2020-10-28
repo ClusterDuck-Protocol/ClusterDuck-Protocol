@@ -75,6 +75,20 @@ public:
    */
   void setCursor(uint8_t x, uint8_t y);
 
+  void displayExample(String deviceId, String deviceType){
+
+  drawString( 0,0, deviceType.c_str()  );
+  drawString( 0,1, "ID:" );
+  drawString(5,1, deviceId.c_str());
+  drawString(0,2, "Version: " );
+  drawString(10,2, "2.1.1");
+  drawString(0,3, "Mac: ");
+  drawString(5,3, "12:33:44:55");
+
+  
+
+  };
+
   /**
    * @brief Print a string at the current cursor position.
    *
@@ -87,6 +101,8 @@ public:
    * 
    */
   void clear(void);
+
+
 
 private:
   DuckDisplay();
