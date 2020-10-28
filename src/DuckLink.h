@@ -28,6 +28,13 @@ public:
    * @param password wifi password (defaults to an empty string if not provided)
    */
   void setupWithDefaults(String ssid="", String password="");
+
+  /**
+   * @brief Get the DuckType
+   *
+   * @returns the duck type defined as DuckType
+   */
+  int getType() { return DuckType::LINK; }
 };
 
 #endif

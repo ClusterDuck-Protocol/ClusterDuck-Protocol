@@ -5,9 +5,28 @@
 #include <WString.h>
 
 #include "../DuckError.h"
+#include "../DuckDisplay.h"
 #include "DuckLora.h"
 #include "DuckNet.h"
 #include "cdpcfg.h"
+
+/**
+ * @brief Type of ducks
+ *
+ */
+enum DuckType {
+  /// A Duck of unknown type
+  UNKNOWN = 0x00,
+  /// A PapaDuck
+  PAPA = 0x01,
+  /// A MamaDuck
+  MAMA = 0x02,
+  /// A DuckLink
+  LINK = 0x03,
+  /// A Detector Duck
+  DETECTOR = 0x04,
+  MAX_TYPE
+};
 
 class Duck {
 
@@ -138,6 +157,7 @@ public:
    */
   String getPassword() { return duckNet->getPassword(); }
 
+  
 protected:
   String deviceId;
   DuckLora* duckLora = DuckLora::getInstance();
@@ -174,9 +194,10 @@ protected:
     duckNet->setDeviceId(deviceId);
     setupSerial();
   }
-  
-  virtual int reconnectWifi(String ssid, String password) { return 0; }
 
+  virtual int getType() = 0;
+
+  virtual int reconnectWifi(String ssid, String password) { return 0; }
 
   static volatile bool receivedFlag;
   static void toggleReceiveFlag() { receivedFlag = !receivedFlag; }
