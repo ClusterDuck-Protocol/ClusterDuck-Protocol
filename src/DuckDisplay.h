@@ -18,6 +18,7 @@
 #include <Arduino.h>
 #include <WString.h>
 #include "include/DuckTypes.h"
+#include "include/DuckEsp.h"
 #ifndef CDPCFG_OLED_NONE
 #include <U8x8lib.h>
 #endif
@@ -86,37 +87,6 @@ public:
    */
   void setCursor(uint8_t x, uint8_t y);
 
-  void displayExample(){
- 
-
-
-  drawString( 0,6, duckTypeString.c_str() );
-  drawString( 0,1, "ID:" );
-  drawString(5,1, duid.c_str());
-  drawString(0,2, "Version: " );
-  drawString(10,2, "2.1.1");
-  drawString(0,3, "Mac: ");
-  drawString(5,3, "12:33:44:55");
-
-  
-
-  };
-
-  String duckTypeString(int duckType) {
-
-  switch(duckType) {
-    case 1: duckType = 0x01; 
-      duckTypeStr = "Papa";
-      break;
-  case 2: duckType = 0x02; 
-   duckTypeStr = "Mama";
-      break;
-    default:
-      duckTypeStr = "Duck";
-  }
-  return duckTypeStr;
-};
-
   /**
    * @brief Print a string at the current cursor position.
    *
@@ -130,6 +100,7 @@ public:
    */
   void clear(void);
 
+  void showDefaultScreen();
 #endif
 private:
   DuckDisplay();
@@ -138,8 +109,8 @@ private:
   static DuckDisplay* instance;
   int duckType;
   String duid;
-  String duckTypeStr;
- 
+  String duckTypeToString(int duckType);
+
 };
 
 #endif /* DUCKDISPLAY_H_ */
