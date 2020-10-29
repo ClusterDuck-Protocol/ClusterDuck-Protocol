@@ -20,7 +20,7 @@
 #include "include/DuckTypes.h"
 #include "include/DuckEsp.h"
 #ifndef CDPCFG_OLED_NONE
-#include <U8x8lib.h>
+#include <U8g2lib.h>
 #endif
 
 /**
@@ -42,9 +42,9 @@ public:
 #ifdef CDPCFG_OLED_NONE
   void setupDisplay(int duckType, String duid) {}
   void powerSave(bool save){}
-  void drawString(uint8_t x, uint8_t y, const char* text) {}
-  void drawString(bool cls, uint8_t x, uint8_t y, const char* text) {}
-  void setCursor(uint8_t x, uint8_t y) {}
+  void drawString(u8g2_uint_t x, u8g2_uint_t y, const char *s) {}
+  void drawString(bool cls,u8g2_uint_t x, u8g2_uint_t y, const char *s) {}
+  void setCursor(u8g2_uint_t x, u8g2_uint_t y) {}
   void print(String text) {}
   void clear(void) {}
 #else
@@ -67,7 +67,7 @@ public:
    * @param y     value of Y coordinate
    * @param text  string to draw
    */
-  void drawString(uint8_t x, uint8_t y, const char* text);
+  void drawString(u8g2_uint_t x, u8g2_uint_t y, const char *s);
 
   /**
    * @brief Draw a string at the given coordinates.
@@ -77,7 +77,7 @@ public:
    * @param y     value of Y coordinate
    * @param text  string to draw
    */
-  void drawString(bool cls, uint8_t x, uint8_t y, const char* text);
+  void drawString(bool cls, u8g2_uint_t x, u8g2_uint_t y, const char *s);
 
   /**
    * @brief Set the cursor to the given position on the screen.
@@ -85,14 +85,14 @@ public:
    * @param x X coordinate value
    * @param y Y coordinate value
    */
-  void setCursor(uint8_t x, uint8_t y);
+  void setCursor(u8g2_uint_t x, u8g2_uint_t y);
 
   /**
    * @brief Print a string at the current cursor position.
    *
    * @param text string to draw
    */
-  void print(String text);
+  void print(String s);
 
   /**
    * @brief Clear the screen.

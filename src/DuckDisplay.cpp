@@ -1,7 +1,11 @@
 #include "DuckDisplay.h"
 
 #ifdef CDPCFG_OLED_CLASS
-CDPCFG_OLED_CLASS u8x8(/* clock=*/CDPCFG_PIN_OLED_CLOCK,
+
+// #define CDPCFG_PIN_OLED_ROTATION U8G2_R0
+
+CDPCFG_OLED_CLASS u8g2(            CDPCFG_PIN_OLED_ROTATION,
+                        /* clock=*/CDPCFG_PIN_OLED_CLOCK,
                        /* data=*/CDPCFG_PIN_OLED_DATA,
                        /* reset=*/CDPCFG_PIN_OLED_RESET);
 #endif
@@ -20,8 +24,11 @@ DuckDisplay* DuckDisplay::getInstance() {
 #ifndef CDPCFG_OLED_NONE
 
 void DuckDisplay::setupDisplay(int duckType, String duid) {
-  u8x8.begin();
-  u8x8.setFont(u8x8_font_chroma48medium8_r);
+  u8g2.begin();
+  u8g2.clearBuffer();         // clear the internal memory
+  u8g2.setFont(u8g2_font_ncenB08_tr); // choose a suitable font
+  u8g2.drawStr(0,10,"Hello World!");  // write something to the internal memory
+  u8g2.sendBuffer();  
   if (duckType >= DuckType::MAX_TYPE) {
     this->duckType = DuckType::UNKNOWN;
   } else {
@@ -32,28 +39,28 @@ void DuckDisplay::setupDisplay(int duckType, String duid) {
 
 void DuckDisplay::powerSave(bool save) {
   if (save) {
-    u8x8.noDisplay();
+    u8g2.clear();
   } else {
-    u8x8.display();
+    u8g2.initDisplay();
   }
 }
 
-void DuckDisplay::drawString(uint8_t x, uint8_t y, const char* text) {
-  u8x8.drawString(x, y, text);
+void DuckDisplay::drawString(u8g2_uint_t x, u8g2_uint_t y, const char *s) {
+  u8g2.drawStr(x, y, s);
 }
 
-void DuckDisplay::drawString(bool cls, uint8_t x, uint8_t y, const char* text) {
+void DuckDisplay::drawString(bool cls, u8g2_uint_t x, u8g2_uint_t y, const char *s) {
   if (cls) {
     clear();
   }
-  drawString(x, y, text);
+  drawString(x, y, s);
 }
 
-void DuckDisplay::setCursor(uint8_t x, uint8_t y) { u8x8.setCursor(x, y); }
+void DuckDisplay::setCursor(u8g2_uint_t x, u8g2_uint_t y) { u8g2.setCursor(x, y); }
 
-void DuckDisplay::print(String text) { u8x8.print(text); }
+void DuckDisplay::print(String s) { u8g2.print(s); }
 
-void DuckDisplay::clear(void) { u8x8.clear(); }
+void DuckDisplay::clear(void) { u8g2.clear(); }
 
 String DuckDisplay::duckTypeToString(int duckType) {
   String duckTypeStr = "";
@@ -81,7 +88,7 @@ void DuckDisplay::showDefaultScreen() {
 #ifdef CDPCFG_OLED_64x32
   // small display 64x32
   setCursor(0, 2);
-  print("((>.<))");
+  print("CDP");
 
   setCursor(0, 4);
   print("DT: " + duckTypeToString(duckType));
@@ -91,10 +98,10 @@ void DuckDisplay::showDefaultScreen() {
 #else
   // default display size 128x64
   setCursor(0, 1);
-  print("    ((>.<))    ");
+  print("Clusterduck");
 
   setCursor(0, 2);
-  print("  Project OWL  ");
+  print("Protocol");
 
   setCursor(0, 4);
   print("DT: " + duckTypeToString(duckType));
