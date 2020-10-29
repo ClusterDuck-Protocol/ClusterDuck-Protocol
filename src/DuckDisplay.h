@@ -18,6 +18,7 @@
 #include <Arduino.h>
 #include <WString.h>
 #include "include/DuckTypes.h"
+#include "include/DuckEsp.h"
 #ifndef CDPCFG_OLED_NONE
 #include <U8x8lib.h>
 #endif
@@ -98,6 +99,8 @@ public:
    * 
    */
   void clear(void);
+
+  void showDefaultScreen();
 #endif
 private:
   DuckDisplay();
@@ -106,6 +109,8 @@ private:
   static DuckDisplay* instance;
   int duckType;
   String duid;
+  String duckTypeToString(int duckType);
+
 };
 
 #endif /* DUCKDISPLAY_H_ */
