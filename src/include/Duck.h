@@ -5,7 +5,7 @@
 #include <WString.h>
 
 #include "../DuckError.h"
-#include "DuckLora.h"
+#include "DuckRadio.h"
 #include "DuckNet.h"
 #include "DuckTypes.h"
 #include "cdpcfg.h"
