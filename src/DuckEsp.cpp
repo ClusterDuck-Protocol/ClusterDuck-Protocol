@@ -40,6 +40,6 @@ String getDuckMacAddress(boolean format) {
   }
 }
 #else
-String getDuckMacAddress(boolean format) {return "";}
+String getDuckMacAddress(boolean format) {return "unknown";}
 #endif
 } // namespace duckesp
