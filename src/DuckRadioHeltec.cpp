@@ -110,6 +110,13 @@ int DuckRadio::sendData(std::vector<byte> data) {
   return DUCK_ERR_NONE;
 }
 
+int DuckRadio::sendData(DuckPacket* packet) {
+  Radio.Send(packet->getCdpPacketBuffer().data(),
+             packet->getCdpPacketBuffer().size());
+  loginfo("Sent data: len: " + packet->getCdpPacketBuffer().size());
+  return DUCK_ERR_NONE;
+}
+
 int DuckRadio::getRSSI() { return Radio.Rssi(MODEM_LORA); }
 
 // TODO: implement this

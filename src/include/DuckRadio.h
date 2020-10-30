@@ -11,9 +11,10 @@
 #ifndef DUCKLORA_H_
 #define DUCKLORA_H_
 
-#include <Arduino.h>
+#include "../DuckDisplay.h"
 #include "../DuckError.h"
 #include "../DuckLogger.h"
+#include <Arduino.h>
 
 #include "DuckPacket.h"
 #include "LoraPacket.h"
@@ -79,6 +80,7 @@ public:
    * @returns DUCK_ERR_NONE if the message was sent successfully, an error code otherwise.
    */
   int sendData(std::vector<byte> data);
+  
   /**
    * @brief Send packet data out into the mesh network
    *
@@ -154,6 +156,7 @@ private:
   DuckRadio(DuckRadio const&) = delete;
   DuckRadio& operator=(DuckRadio const&) = delete;
   static DuckRadio* instance;
+  DuckDisplay* display = DuckDisplay::getInstance();
 
   byte transmission[CDPCFG_CDP_BUFSIZE];
   CDP_Packet packet;

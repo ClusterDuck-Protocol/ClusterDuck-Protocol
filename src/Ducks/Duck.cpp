@@ -3,8 +3,9 @@
 
 volatile bool Duck::receivedFlag = false;
 
-Duck::Duck() {
+Duck::Duck(String name) {
   duckutils::setDuckInterrupt(true);
+  duckName = name;
 }
 
 Duck::Duck(std::vector<byte> id) {

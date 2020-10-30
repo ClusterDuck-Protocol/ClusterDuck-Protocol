@@ -1,15 +1,14 @@
 #ifndef DUCK_H
 #define DUCK_H
 
-#include <Arduino.h>
-#include <WString.h>
-
 #include "../DuckError.h"
-#include "DuckRadio.h"
 #include "DuckNet.h"
+#include "DuckRadio.h"
 #include "DuckTypes.h"
 #include "cdpcfg.h"
-
+#include <Arduino.h>
+#include <WString.h>
+#include <string>
 
 class Duck {
 
@@ -18,7 +17,7 @@ public:
    * @brief Construct a new Duck object.
    *
    */
-  Duck();
+  Duck(String name="");
  
   /**
    * @brief Construct a new Duck object.
@@ -37,6 +36,19 @@ public:
   }
 
   /**
+   * @brief Set the Device Name object
+   * 
+   * @param name 
+   */
+  void setName(String name) { this->duckName = name; }
+  
+  /**
+   * @brief Get the duck's name.
+   * 
+   * @returns A string representing the duck's name
+   */
+  String getName() {return duckName;}
+  /**
    * @brief setup the duck unique ID
    * 
    * @param an 8 byte unique id 
@@ -51,7 +63,6 @@ public:
    * @return DUCK_ERR_NONE if successful, an error code otherwise
    */
   int setDeviceId(byte* id);
-
 
   /**
    * @brief Setup serial connection.
@@ -192,6 +203,8 @@ public:
   String getErrorString(int error);
   
 protected:
+  String duckName="";
+
   String deviceId;
   std::vector<byte> duid;
   DuckRadio* duckRadio = DuckRadio::getInstance();
@@ -252,19 +265,21 @@ protected:
     return DUCK_ERR_NONE;
   }
 
+  /**
+   * @brief Get the duck type.
+   * 
+   * @returns A value representing a DuckType
+   */
   virtual int getType() = 0;
 
+  /**
+   * @brief reconnect the duck to the given wifi access point
+   * 
+   * @param ssid the access point ssid to connect to 
+   * @param password the access point password
+   * @return DUCK_ERR_NONE if the duck reconnected to the AP sucessfully. An error code otherwise. 
+   */
   virtual int reconnectWifi(String ssid, String password) { return 0; }
-
-  static volatile bool receivedFlag;
-  static void toggleReceiveFlag() { receivedFlag = !receivedFlag; }
-  static void setReceiveFlag(bool value) { receivedFlag = value; }
-  static bool getReceiveFlag() { return receivedFlag; }
-
-  static void onPacketReceived();
-
-  static bool imAlive(void*);
-  static bool reboot(void*);
 
   /**
    * @brief Handle request from emergency portal.
@@ -277,6 +292,16 @@ protected:
    *
    */
   void handleOtaUpdate();
+
+  static volatile bool receivedFlag;
+  static void toggleReceiveFlag() { receivedFlag = !receivedFlag; }
+  static void setReceiveFlag(bool value) { receivedFlag = value; }
+  static bool getReceiveFlag() { return receivedFlag; }
+
+  static void onPacketReceived();
+
+  static bool imAlive(void*);
+  static bool reboot(void*);
 };
 
 #endif

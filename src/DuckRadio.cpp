@@ -34,6 +34,7 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
 #else
   lora = new Module(config.ss, config.di0, config.rst, config.di1);
 #endif
+  display->setupDisplay(DuckType::MAMA, "mama");
 
   int state = lora.begin(config.band);
   
@@ -89,7 +90,7 @@ int DuckRadio::getReceivedData(std::vector<byte>* packetBytes) {
   int err = DUCK_ERR_NONE;
 
   pSize = lora.getPacketLength();
-  
+
   if (pSize == 0) {
     logerr("ERROR  handlePacket rx data length is 0");
     return DUCKLORA_ERR_HANDLE_PACKET;
@@ -97,13 +98,15 @@ int DuckRadio::getReceivedData(std::vector<byte>* packetBytes) {
   logdbg("getReceivedData() - packet length returns: "+ String(pSize));
 
   packetBytes->resize(pSize);
-
+  display->log("data-in: ****");
   err = lora.readData(packetBytes->data(), pSize);
   if (err != ERR_NONE) {
     logerr("ERROR  handlePacket failed. err: "+ String(err));
+    display->log("data-in:!!"+ String(err));
     return DUCKLORA_ERR_HANDLE_PACKET;
   }
 
+  display->log("data-in: ok "+ String(pSize));
   logdbg(
       "RX: rssi: " + String(lora.getRSSI()) + 
       " snr: " + String(lora.getSNR()) +
@@ -114,14 +117,17 @@ int DuckRadio::getReceivedData(std::vector<byte>* packetBytes) {
 
 
 int DuckRadio::sendData(byte* data, int length) {
+  display->log("sendData: duck");
   return startTransmitData(data, length);
 }
 
 int DuckRadio::sendData(DuckPacket* packet) {
+  display->log("sendData: relay");
   return startTransmitData(packet->getCdpPacketBuffer().data(), packet->getCdpPacketBuffer().size());
 }
 
 int DuckRadio::sendData(std::vector<byte> data) {
+  display->log("sendData:3");
   return startTransmitData(data.data(), data.size());
 }
 
@@ -153,22 +159,22 @@ int DuckRadio::startTransmitData(byte* data, int length) {
 
   bool couldInterrupt = duckutils::getDuckInterrupt();
   duckutils::setDuckInterrupt(false);
-  long t1 = millis();
 
   int err = DUCK_ERR_NONE;
   int tx_err = ERR_NONE;
   int rx_err = ERR_NONE;
-
+  display->log("tx-start");
   loginfo("TX data");
   logdbg(" -> "+ duckutils::convertToHex(data, length));
   logdbg(" -> length: " + String(length));
 
+  long t1 = millis();
   // this is going to wait for transmission to complete or to timeout
   tx_err = lora.transmit(data, length);
-
   switch (tx_err) {
     case ERR_NONE:
       loginfo("TX data done in : " + String((millis() - t1)) + "ms");
+      display->log("tx-done");
       break;
 
     case ERR_PACKET_TOO_LONG:
@@ -179,16 +185,20 @@ int DuckRadio::startTransmitData(byte* data, int length) {
 
     case ERR_TX_TIMEOUT:
       logerr("ERROR startTransmitData timeout!");
+      display->log("tx-tmout");
       err = DUCKLORA_ERR_TIMEOUT;
       break;
 
     default:
       logerr("ERROR startTransmitData failed, err: " + String(tx_err));
+      display->log("tx-fail");
       err = DUCKLORA_ERR_TRANSMIT;
       break;
   }
 
   if (couldInterrupt) {
+    display->log("interrupt=1");
+
     duckutils::setDuckInterrupt(true);
     rx_err = startReceive();
 
@@ -197,6 +207,7 @@ int DuckRadio::startTransmitData(byte* data, int length) {
     }
 
     if (rx_err != ERR_NONE) {
+      display->log("strt-rx-fail");
       err = DUCKLORA_ERR_RECEIVE;
     }
   }
