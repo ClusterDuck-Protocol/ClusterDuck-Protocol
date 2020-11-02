@@ -10,10 +10,8 @@
  *
  * @copyright
  */
-
 #ifndef DUCKDISPLAY_H_
 #define DUCKDISPLAY_H_
-
 #include "include/cdpcfg.h"
 #include <Arduino.h>
 #include <WString.h>
@@ -22,7 +20,6 @@
 #ifndef CDPCFG_OLED_NONE
 #include <U8g2lib.h>
 #endif
-
 /**
  * @brief Internal OLED Display abstraction.
  *
@@ -38,7 +35,6 @@ public:
    * @returns A pointer to a DuckDisplay object.
    */
   static DuckDisplay* getInstance();
-
 #ifdef CDPCFG_OLED_NONE
   void setupDisplay(int duckType, String duid) {}
   void powerSave(bool save){}
@@ -59,7 +55,6 @@ public:
    * @param save Set to true to enable power saving, false to disable
    */
   void powerSave(bool save);
-
   /**
    * @brief Draw a string at the given coordinates.
    *
@@ -68,7 +63,6 @@ public:
    * @param text  string to draw
    */
   void drawString(u8g2_uint_t x, u8g2_uint_t y, const char *s);
-
   /**
    * @brief Draw a string at the given coordinates.
    *
@@ -78,7 +72,6 @@ public:
    * @param text  string to draw
    */
   void drawString(bool cls, u8g2_uint_t x, u8g2_uint_t y, const char *s);
-
   /**
    * @brief Set the cursor to the given position on the screen.
    *
@@ -86,20 +79,17 @@ public:
    * @param y Y coordinate value
    */
   void setCursor(u8g2_uint_t x, u8g2_uint_t y);
-
   /**
    * @brief Print a string at the current cursor position.
    *
    * @param text string to draw
    */
   void print(String s);
-
   /**
    * @brief Clear the screen.
    * 
    */
   void clear(void);
-
   void showDefaultScreen();
 #endif
 private:
@@ -112,5 +102,4 @@ private:
   String duckTypeToString(int duckType);
 
 };
-
 #endif /* DUCKDISPLAY_H_ */
