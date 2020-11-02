@@ -74,7 +74,7 @@ void MamaDuck::handleReceivedPacket() {
         return;
       }
     } else {
-      err = duckRadio->sendData(rxPacket);
+      err = duckRadio->relayPacket(rxPacket);
       loginfo("====> handleReceivedPacket() packet sent");
 
       if (err != DUCK_ERR_NONE) {

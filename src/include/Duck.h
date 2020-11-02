@@ -232,13 +232,6 @@ protected:
    * @return DUCK_ERR_NONE if successful, an error code otherwise
    */
   int startReceive();
-  
-  /**
-   * @brief Tell the duck radio to start receiving packets from the mesh network
-   *
-   * @return DUCK_ERR_NONE if successful, an error code otherwise
-   */
-  int startTransmit();
 
   /**
    * @brief Implement the duck's specific behavior.

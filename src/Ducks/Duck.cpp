@@ -268,14 +268,6 @@ int Duck::startReceive() {
   return err;
 }
 
-int Duck::startTransmit() {
-  int err = duckRadio->startTransmitData();
-  if (err != DUCK_ERR_NONE) {
-    logerr("ERROR Oops! Lora transmission failed, err = " + String(err));
-  }
-  return err;
-}
-
 int Duck::sendPong() {
   int err = DUCK_ERR_NONE;
   std::vector<byte> data(1, 0);

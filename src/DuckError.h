@@ -24,6 +24,8 @@
 #define DUCKLORA_ERR_HANDLE_PACKET  -1050
 // Attempted to send a message larger than 256 bytes
 #define DUCKLORA_ERR_MSG_TOO_LARGE  -1051
+// Radio is busy sending data
+#define DUCKLORA_ERR_TX_BUSY        -1052
 
 // Wifi network is not availble
 #define DUCKWIFI_ERR_NOT_AVAILABLE  -2000

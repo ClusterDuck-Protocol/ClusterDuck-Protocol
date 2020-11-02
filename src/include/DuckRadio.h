@@ -87,7 +87,7 @@ public:
    * @param packet Duckpacket object that contains the data to send
    * @return DUCK_ERR_NONE if the message was sent successfully, an error code otherwise.
    */
-  int sendData(DuckPacket* packet);
+  int relayPacket(DuckPacket* packet);
   
   /**
    * @brief Set the Duck to be ready to recieve LoRa packets.
@@ -150,6 +150,7 @@ public:
   int getReceivedData(std::vector<byte>* packetBytes);
 
   void processRadioIrq();
+  bool isTxBusy() { return txBusy; }
 
 private:
   DuckRadio();
@@ -160,6 +161,8 @@ private:
 
   byte transmission[CDPCFG_CDP_BUFSIZE];
   CDP_Packet packet;
+
+  volatile bool txBusy;
 };
 
 #endif
