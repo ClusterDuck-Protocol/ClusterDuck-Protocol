@@ -1,7 +1,7 @@
 #include "ClusterDuck.h"
 #include "include/DuckEsp.h"
 
-ClusterDuck::ClusterDuck() { duckutils::setDuckInterrupt(true); }
+ClusterDuck::ClusterDuck() { duckutils::setDuckBusy(true); }
 
 
 // Get Duck MAC address
@@ -14,7 +14,7 @@ String ClusterDuck::uuidCreator() { return duckutils::createUuid(); }
 
 
 void ClusterDuck::flipInterrupt() {
-  duckutils::setDuckInterrupt(!duckutils::getDuckInterrupt());
+  duckutils::setDuckBusy(!duckutils::isDuckBusy());
 }
 
 //TODO: Move this in a separate module. Either DuckOta or DuckNet

@@ -4,11 +4,11 @@
 
 namespace duckutils {
 
-volatile bool enableDuckInterrupt = true;
+volatile bool busyDuck = false;
 Timer<> duckTimer = timer_create_default();
 
-volatile bool getDuckInterrupt() { return enableDuckInterrupt; }
-void setDuckInterrupt(bool interrupt) { enableDuckInterrupt = interrupt; }
+volatile bool isDuckBusy() { return busyDuck; }
+void setDuckBusy(bool busy) { busyDuck = busy; }
 
 Timer<> getTimer() { return duckTimer; }
 

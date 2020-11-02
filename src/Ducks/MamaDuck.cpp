@@ -44,19 +44,21 @@ int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String 
 
 void MamaDuck::handleReceivedPacket() {
 
-  loginfo("handleReceivedPacket()...");
-
-  rxPacket->reset();
-
   std::vector<byte> data;
-  int err = duckRadio->getReceivedData(&data);
+  bool relay = false;
+  
+  loginfo("handleReceivedPacket START");
+  
+  rxPacket->reset();
+  loginfo("reading received data from radio");
 
+  int err = duckRadio->getReceivedData(&data);
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR failed to get data from DuckRadio. rc = "+ String(err));
     return;
   }
 
-  bool relay = rxPacket->update(duid, data);
+  relay = rxPacket->update(duid, data);
 
   if (relay) {
     loginfo("====> handleReceivedPacket() packet needs relay.....");
@@ -89,21 +91,11 @@ void MamaDuck::run() {
 
   handleOtaUpdate();
 
-  if (duckutils::getDuckInterrupt()) {
-    duckutils::getTimer().tick();
-  }
-
-  // Mama ducks can also receive packets from other ducks
-  // For safe processing of the received packet we make sure
-  // to disable interrupts, before handling the received packet.
   if (getReceiveFlag()) {
+    duckutils::setDuckBusy(true);
     setReceiveFlag(false);
-    duckutils::setDuckInterrupt(false);
-
-    // Here we check whether a packet needs to be relayed or not
     handleReceivedPacket();
-
-    duckutils::setDuckInterrupt(true);
+    duckutils::setDuckBusy(false);
     startReceive();
   }
   processPortalRequest();

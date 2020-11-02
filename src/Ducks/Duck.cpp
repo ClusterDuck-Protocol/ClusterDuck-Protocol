@@ -4,13 +4,13 @@
 volatile bool Duck::receivedFlag = false;
 
 Duck::Duck(String name) {
-  duckutils::setDuckInterrupt(true);
+  duckutils::setDuckBusy(false);
   duckName = name;
 }
 
 Duck::Duck(std::vector<byte> id) {
   duid.insert(duid.end(), id.begin(), id.end());
-  duckutils::setDuckInterrupt(true);
+  duckutils::setDuckBusy(true);
 }
 
 int Duck::setDeviceId(std::vector<byte> id) {
@@ -51,7 +51,8 @@ int Duck::setupSerial(int baudRate) {
 void Duck::onPacketReceived(void) {
   // set the received flag to true if we are not already busy processing
   // a received packet
-  if (!duckutils::getDuckInterrupt()) {
+  if (duckutils::isDuckBusy()) {
+    logdbg("onPacketReceived: duck is busy...skip received packet");
     return;
   }
   setReceiveFlag(true);
@@ -229,12 +230,13 @@ int Duck::sendData(byte topic, std::vector<byte> data) {
   }
   int err = txPacket->buildPacketBuffer(topic, data);
   if ( err != DUCK_ERR_NONE) {
+    duckutils::setDuckBusy(false);
     return err;
   }
 
   int length = txPacket->getBufferLength();
   err = duckRadio->sendData(txPacket->getDataByteBuffer(), length);
-  
+
   return err;
 }
 

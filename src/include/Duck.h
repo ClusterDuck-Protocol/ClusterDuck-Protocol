@@ -287,7 +287,6 @@ protected:
   void handleOtaUpdate();
 
   static volatile bool receivedFlag;
-  static void toggleReceiveFlag() { receivedFlag = !receivedFlag; }
   static void setReceiveFlag(bool value) { receivedFlag = value; }
   static bool getReceiveFlag() { return receivedFlag; }
 

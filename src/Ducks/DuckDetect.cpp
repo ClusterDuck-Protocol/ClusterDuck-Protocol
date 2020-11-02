@@ -65,11 +65,11 @@ void DuckDetect::run() {
   handleOtaUpdate();
   if (getReceiveFlag()) {
     setReceiveFlag(false);
-    duckutils::setDuckInterrupt(false);
+    duckutils::setDuckBusy(false);
 
     handleReceivedPacket();
 
-    duckutils::setDuckInterrupt(true);
+    duckutils::setDuckBusy(true);
     startReceive();
   }
 }

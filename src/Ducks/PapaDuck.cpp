@@ -81,12 +81,10 @@ void PapaDuck::run() {
 
   handleOtaUpdate();
   if (getReceiveFlag()) {
+    duckutils::setDuckBusy(true);
     setReceiveFlag(false);
-    duckutils::setDuckInterrupt(false);
-    
     handleReceivedPacket();
-
-    duckutils::setDuckInterrupt(true);
+    duckutils::setDuckBusy(false);
     startReceive();
   }
 }

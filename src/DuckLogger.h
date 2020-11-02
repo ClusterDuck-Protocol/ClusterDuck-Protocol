@@ -3,8 +3,8 @@
 
  #define CDP_LOG_ERROR
  #define CDP_LOG_INFO
- // #define CDP_LOG_DEBUG
- // #define CDP_LOG_WARN
+ //#define CDP_LOG_DEBUG
+ #define CDP_LOG_WARN
 
 #define __FILENAME__                                                           \
   (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)

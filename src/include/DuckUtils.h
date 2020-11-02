@@ -16,7 +16,7 @@
 #include <WString.h>
 namespace duckutils {
 
-extern volatile bool enableDuckInterrupt;
+extern volatile bool busyDuck;
 extern Timer<> duckTimer;
 
 /**
@@ -49,14 +49,14 @@ String convertToHex(byte* data, int size);
  * 
  * @returns true if interrupt is enabled, false otherwise.
  */
-volatile bool getDuckInterrupt();
+volatile bool isDuckBusy();
 
 /**
  * @brief Toggle the duck Interrupt
  * 
- * @param interrupt true to enable interrupt, false otherwise.
+ * @param busy true to enable interrupt, false otherwise.
  */
-void setDuckInterrupt(bool interrupt);
+void setDuckBusy(bool busy);
 
 Timer<> getTimer();
 

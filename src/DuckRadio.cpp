@@ -108,7 +108,7 @@ int DuckRadio::getReceivedData(std::vector<byte>* packetBytes) {
   }
 
   //display->log("data-in: ok "+ String(pSize));
-  logdbg(
+  loginfo(
       "RX: rssi: " + String(lora.getRSSI()) + 
       " snr: " + String(lora.getSNR()) +
       " fe: " + String(lora.getFrequencyError()) + 
@@ -158,12 +158,8 @@ void DuckRadio::processRadioIrq() {}
 
 int DuckRadio::startTransmitData(byte* data, int length) {
 
-  if (txBusy) {
-    loginfo("Radio is busy..can't transmit data");
-    display->log("*** busy ***");
-    return DUCKLORA_ERR_TX_BUSY;
-  }  
-  txBusy = true;
+  bool wasBusy = duckutils::isDuckBusy();
+  duckutils::setDuckBusy(true);
 
   int err = DUCK_ERR_NONE;
   int tx_err = ERR_NONE;
@@ -199,14 +195,14 @@ int DuckRadio::startTransmitData(byte* data, int length) {
       err = DUCKLORA_ERR_TRANSMIT;
       break;
   }
-
-  txBusy = false;
-
-  // we can start receive again regardless of whether the transmit succeeded or not
-  rx_err = startReceive();
-  if (rx_err != ERR_NONE) {
-    display->log("strt-rx-fail");
-    err = DUCKLORA_ERR_RECEIVE;
+  
+  if (!wasBusy) {
+    duckutils::setDuckBusy(false);
+    rx_err = startReceive();
+    if (rx_err != ERR_NONE) {
+      display->log("strt-rx-fail");
+      err = DUCKLORA_ERR_RECEIVE;
+    }
   }
   return err;
 }
