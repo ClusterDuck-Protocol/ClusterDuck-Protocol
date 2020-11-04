@@ -32,6 +32,13 @@ public:
    */
   void setupWithDefaults(String ssid = "", String password = "");
 
+  /**
+   * @brief Get the DuckType
+   * 
+   * @returns the duck type defined as DuckType
+   */
+  int getType() {return DuckType::MAMA;}
+
 private :
   bool idInPath(String path);
 };

@@ -7,7 +7,9 @@
 #include "../DuckError.h"
 #include "DuckLora.h"
 #include "DuckNet.h"
+#include "DuckTypes.h"
 #include "cdpcfg.h"
+
 
 class Duck {
 
@@ -138,6 +140,7 @@ public:
    */
   String getPassword() { return duckNet->getPassword(); }
 
+  
 protected:
   String deviceId;
   DuckLora* duckLora = DuckLora::getInstance();
@@ -174,9 +177,10 @@ protected:
     duckNet->setDeviceId(deviceId);
     setupSerial();
   }
-  
-  virtual int reconnectWifi(String ssid, String password) { return 0; }
 
+  virtual int getType() = 0;
+
+  virtual int reconnectWifi(String ssid, String password) { return 0; }
 
   static volatile bool receivedFlag;
   static void toggleReceiveFlag() { receivedFlag = !receivedFlag; }

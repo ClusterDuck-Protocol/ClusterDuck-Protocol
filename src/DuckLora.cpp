@@ -381,8 +381,8 @@ int DuckLora::startReceive() {
 }
 
 int DuckLora::transmitData() {
-  
-  bool oldEI = duckutils::getDuckInterrupt();
+
+  bool couldInterrupt = duckutils::getDuckInterrupt();
   duckutils::setDuckInterrupt(false);
   long t1 = millis();
 
@@ -422,18 +422,19 @@ int DuckLora::transmitData() {
   }
   resetTransmissionBuffer();
 
-  if (err != DUCK_ERR_NONE) {
-    return err;
-  }
-
-  if (oldEI) {
+  if (couldInterrupt) {
     duckutils::setDuckInterrupt(true);
     rx_err = startReceive();
+
+    if (err != DUCK_ERR_NONE) {
+      return err;
+    }
+
     if (rx_err != ERR_NONE) {
       err = DUCKLORA_ERR_RECEIVE;
     }
   }
-  
+
   return err;
 }
 

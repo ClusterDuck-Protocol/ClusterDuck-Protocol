@@ -55,6 +55,13 @@ public:
    */
   int reconnectWifi(String ssid, String password);
 
+  /**
+   * @brief Get the DuckType
+   *
+   * @returns the duck type defined as DuckType
+   */
+  int getType() { return DuckType::PAPA; }
+
 private:
   callbackFunc recvDataCallback;
 };

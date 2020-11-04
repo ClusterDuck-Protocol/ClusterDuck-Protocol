@@ -9,5 +9,5 @@ Note: Check Local Rules and regulations for frequency. Can be bought from differ
 #### - JST 1.25mm 2pin connector Male https://tinyurl.com/wfjj4bq
 
 
-![CDP-BOX](/doc/assets/images/CDP_BOX.jpg)
+![CDP-BOX](/docs/assets/images/CDP_BOX.jpg)
 

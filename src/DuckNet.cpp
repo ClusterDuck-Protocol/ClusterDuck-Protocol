@@ -229,24 +229,32 @@ int DuckNet::setupDns() {
 void DuckNet::setupInternet(String ssid, String password) {
   this->ssid = ssid;
   this->password = password;
-  Serial.println();
-  Serial.print("[DuckNet] setupInternet: Connecting to ");
-  Serial.println(ssid);
+  // turn radio off while we setup WiFi connection
+  _duckLora->standBy();
 
-  if (ssid != "" && password != "" && ssidAvailable(ssid)) {
-    // Connect to Access Point
-    WiFi.begin(ssid.c_str(), password.c_str());
-
-    while (WiFi.status() != WL_CONNECTED) {
-      duckutils::getTimer().tick(); // Advance timer to reboot after awhile
-      // TODO: Change this to make sure it is non-blocking for all other
-      // processes
-    }
-
-    // Connected to Access Point
-    Serial.println("");
-    Serial.println("[DuckNet] DUCK CONNECTED TO INTERNET");
+  if (ssid == "" || password == "") {
+    Serial.println("ERROR setupInternet: Please provide an ssid and password for connecting to a wifi access point");
+    return;
   }
+  if (!ssidAvailable(ssid)) {
+    Serial.println( "ERROR setupInternet: " + ssid + " is not available. Please check the provided ssid and/or passwords");
+    return;
+  }
+
+  // Connecting to Access Point
+  WiFi.begin(ssid.c_str(), password.c_str());
+
+  Serial.print("setupInternet: connecting to " + ssid + ": ");
+  // TODO: we should probably simply fail here and let the app decide what to do
+  // Continuous retry could deplete the battery
+  while (WiFi.status() != WL_CONNECTED) {
+    // This will continuously print
+    Serial.print(".");
+    duckutils::getTimer().tick(); // Advance timer to reboot after awhile
+  }
+  // Connected to Access Point
+  Serial.println("[DuckNet] DUCK CONNECTED TO INTERNET");
+  _duckLora->startReceive();
 }
 
 

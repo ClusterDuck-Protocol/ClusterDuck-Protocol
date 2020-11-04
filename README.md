@@ -1,4 +1,4 @@
-![Logo](doc/assets/images/CDP_LOGO_small.png)
+![Logo](docs/assets/images/CDP_LOGO_small.png)
 
 [![License](https://img.shields.io/badge/License-Apache2-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![Slack](https://img.shields.io/badge/Join-Slack-blue)](https://www.project-owl.com/slack) [![Wiki](https://img.shields.io/badge/Read-Wiki-blue)](https://github.com/Code-and-Response/ClusterDuck-Protocol/wiki)
 
@@ -41,7 +41,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our Code of Conduc
 This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE) file for details.
 
 ## Version
-v1.1.6
+v1.1.7
 
 
 [Project OWL]: <https://www.project-owl.com/>
