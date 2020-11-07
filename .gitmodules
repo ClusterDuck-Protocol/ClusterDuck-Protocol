@@ -41,3 +41,6 @@
 [submodule "Libraries/pubsubclient"]
 	path = Libraries/pubsubclient
 	url = https://github.com/knolleary/pubsubclient.git
+[submodule "Libraries/CRC32"]
+	path = Libraries/CRC32
+	url = https://github.com/bakercp/CRC32.git
