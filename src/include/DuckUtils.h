@@ -58,6 +58,14 @@ volatile bool isDuckBusy();
  */
 void setDuckBusy(bool busy);
 
+/**
+ * @brief Convert a byte array to unsigned 32 bit integer.
+ * 
+ * @param data byte array to convert
+ * @returns a 32 bit unsigned integer.
+ */
+uint32_t toUnit32(byte* data);
+
 Timer<> getTimer();
 
 } // namespace duckutils

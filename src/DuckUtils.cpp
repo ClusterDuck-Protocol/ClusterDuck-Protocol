@@ -34,6 +34,7 @@ String createUuid(int length) {
   }
   return msg;
 }
+
 String convertToHex(byte* data, int size) {
   String buf = "";
   buf.reserve(size * 3); // 2 digit hex + separator
@@ -49,6 +50,16 @@ String convertToHex(byte* data, int size) {
     */
   }
   return buf;
+}
+
+uint32_t toUnit32(byte* data) {
+    uint32_t value = 0;
+
+    value |= data[0] << 24;
+    value |= data[1] << 16;
+    value |= data[2] << 8;
+    value |= data[3];
+    return value;
 }
 
 } // namespace duckutils

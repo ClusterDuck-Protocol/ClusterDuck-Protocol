@@ -1,10 +1,14 @@
 #ifndef DUCKLOGGER_H
 #define DUCKLOGGER_H
 
- #define CDP_LOG_ERROR
- #define CDP_LOG_INFO
- //#define CDP_LOG_DEBUG
- #define CDP_LOG_WARN
+#define CDP_DEBUG
+
+#ifdef CDP_DEBUG
+#define CDP_LOG_ERROR
+#define CDP_LOG_INFO
+#define CDP_LOG_DEBUG
+#define CDP_LOG_WARN
+#endif
 
 #define __FILENAME__                                                           \
   (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)

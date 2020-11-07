@@ -32,6 +32,7 @@
 #define LORA_SYMBOL_TIMEOUT 0  // Symbols
 #define LORA_FIX_LENGTH_PAYLOAD_ON false
 #define LORA_IQ_INVERSION_ON false
+#define LORA_CRC_ON true
 
 DuckRadio* DuckRadio::instance = NULL;
 
@@ -88,7 +89,7 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
   Radio.SetChannel(RF_FREQUENCY);
   Radio.SetTxConfig(MODEM_LORA, TX_OUTPUT_POWER, 0, LORA_BANDWIDTH,
                     LORA_SPREADING_FACTOR, LORA_CODINGRATE,
-                    LORA_PREAMBLE_LENGTH, LORA_FIX_LENGTH_PAYLOAD_ON, true,
+                    LORA_PREAMBLE_LENGTH, LORA_FIX_LENGTH_PAYLOAD_ON, LORA_CRC_ON,
                     0, 0, LORA_IQ_INVERSION_ON, TX_TIMEOUT_VALUE);
   
   Radio.SetSyncWord(LORA_MAC_PRIVATE_SYNCWORD);

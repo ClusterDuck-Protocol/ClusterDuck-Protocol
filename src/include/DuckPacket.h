@@ -5,6 +5,7 @@
 #include "Arduino.h"
 #include "DuckUtils.h"
 #include "cdpcfg.h"
+#include <CRC32.h>
 #include <WString.h>
 #include <vector>
 
@@ -50,6 +51,7 @@ public:
       packet.reserved.clear();
       packet.path.clear();
       packet.data.clear();
+      packet.dcrc = 0;
       buffer.clear();
     }
 
