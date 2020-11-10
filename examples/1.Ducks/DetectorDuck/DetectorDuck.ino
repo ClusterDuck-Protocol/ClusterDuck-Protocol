@@ -1,5 +1,6 @@
 /**
  * @file DetectorDuck.ino
+ *
  * @brief Builds a Duck to get RSSI signal strength value.
  * 
  * This example builds a duck using the preset DuckDetect to periodically send a ping message
@@ -19,14 +20,14 @@
 #define Serial SERIAL_PORT_USBVIRTUAL
 #endif
 
-// We use the built-in DetectorDuck with a given Device UID
+
+// We use the built-in duck detector with a given Device UID
 DuckDetect duck = DuckDetect("DUCK-DETECTOR");
 
 // Create a timer with default settings
 auto timer = timer_create_default(); 
 
 void setup() {
-
    duck.setupWithDefaults();
 
    Serial.println("DUCK-DETECTOR...READY!");
@@ -72,4 +73,6 @@ void showSignalQuality(int incoming) {
    else if(rssi <= -108) {
       Serial.println(" - BAD");
    }
+
 }
+

@@ -11,7 +11,6 @@
  * 
  */
 
-
 #include "timer.h"
 #include <MamaDuck.h>
 #include <DuckDisplay.h>
