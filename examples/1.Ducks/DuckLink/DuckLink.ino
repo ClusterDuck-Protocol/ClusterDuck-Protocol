@@ -1,7 +1,14 @@
-
 /**
+ * @file DuckLink.ino
+ * @brief Base Node in the CDP network
+ *
  * This example creates a duck link that sends a counter message periodically
  * It's using a pre-built ducklink available from the ClsuterDuk SDK 
+ *
+ * @date 2020-11-10
+ *
+ * @copyright Copyright (c) 2020
+ * ClusterDuck Protocol 
  */
 
 #include "timer.h"

@@ -1,14 +1,16 @@
 /**
- * @file papa-duck-with-callback.ino
- * @author 
+ * @file PapaDuck.ino
  * @brief Uses built-in PapaDuck from the SDK to create a WiFi enabled Papa Duck
  * 
  * This example will configure and run a Papa Duck that connects to the cloud
  * and forwards all messages (except  pings) to the cloud.
  * 
- * @date 2020-09-21
+ * @date 2020-11-10
  * 
+ * @copyright Copyright (c) 2020
+ * ClusterDuck Protocol 
  */
+
 #include <PapaDuck.h>
 
 #include <PubSubClient.h>

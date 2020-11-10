@@ -4,7 +4,7 @@
  * 
  * This example is a Mama Duck, but it is also periodically sending a message in the Mesh
  * 
- * @date 2020-09-21
+ * @date 2020-11-10
  * 
  * @copyright Copyright (c) 2020
  * ClusterDuck Protocol 
