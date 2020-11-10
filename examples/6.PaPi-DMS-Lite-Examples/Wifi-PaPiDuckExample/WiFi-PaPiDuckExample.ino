@@ -1,10 +1,12 @@
-/*
-*
-*
-* PapaDuck configuration to be used with a PaPi/DMS-Lite device
-*
-*
-*/
+/**
+ * @file WIFI-PaPiDuckExample.ino
+ * @brief Uses built-in PapaDuck from the SDK to create a WiFi enabled Papa Duck
+ * 
+ * This example will configure and run a Papa Duck that connect to the DMS-LITE over WiFi.
+ * 
+ * @date 2020-11-10
+ * 
+ */
 
 #include <WiFi.h>
 #include <ArduinoJson.h>

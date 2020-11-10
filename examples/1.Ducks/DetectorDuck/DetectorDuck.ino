@@ -1,15 +1,14 @@
 /**
- * @file DuckDetector.ino
- * @author 
+ * @file DetectorDuck.ino
  * @brief Builds a Duck to get RSSI signal strength value.
  * 
  * This example builds a duck using the preset DuckDetect to periodically send a ping message
  * then provide the RSSI value of the response.
  * 
- * @version 
- * @date 2020-09-21
- * 
- * @copyright 
+ * @date 2020-11-10
+ *
+ * @copyright Copyright (c) 2020
+ * ClusterDuck Protocol 
  */
 
 #include <DuckDetect.h>
@@ -20,26 +19,14 @@
 #define Serial SERIAL_PORT_USBVIRTUAL
 #endif
 
-// We use the built-in duck detector with a given Device UID
+// We use the built-in DetectorDuck with a given Device UID
 DuckDetect duck = DuckDetect("DUCK-DETECTOR");
 
 // Create a timer with default settings
 auto timer = timer_create_default(); 
 
 void setup() {
-   /**
-    * Setup using default settings
-    * It will only initialize the serial and radio components
-    * For a more custom setup the APIs below can be called instead of setupWithDefaults()
-    * 
-    * duck.setupSerial();
-    * duck.setupRadio();
-    * duck.setupWifi("PapaDuck Setup");
-    * duck.setupDns();
-    * duck.setupInternet(SSID, PASSWORD);
-    * duck.setupWebServer(false);
-    * duck.setupOTA();
-    */
+
    duck.setupWithDefaults();
 
    Serial.println("DUCK-DETECTOR...READY!");

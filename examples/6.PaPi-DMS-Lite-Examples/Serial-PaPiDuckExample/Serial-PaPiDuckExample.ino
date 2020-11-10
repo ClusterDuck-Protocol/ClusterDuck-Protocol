@@ -1,12 +1,10 @@
 /**
- * @file papa-duck-with-callback.ino
- * @author 
+ * @file Serial-PaPiDuckExample.ino
  * @brief Uses built-in PapaDuck from the SDK to create a WiFi enabled Papa Duck
  * 
- * This example will configure and run a Papa Duck that connects to the cloud
- * and forwards all messages (except  pings) to the cloud.
+ * This example will configure and run a Papa Duck that connect to the DMS-LITE over serial.
  * 
- * @date 2020-09-21
+ * @date 2020-11-10
  * 
  */
 #include <PapaDuck.h>
