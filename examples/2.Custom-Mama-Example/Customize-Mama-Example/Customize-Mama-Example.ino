@@ -1,16 +1,3 @@
-/**
- * @file Customise-Mama-Example.ino
- * @brief Uses the built in Mama Duck with customatizations.
- * 
- * A MamaDuck with easy to change Lora Setupm that has a Oled display and counter messages.
- * 
- * @date 2020-11-10
- * 
- * @copyright Copyright (c) 2020
- * ClusterDuck Protocol 
- * 
- */
-
 #include "timer.h"
 #include <MamaDuck.h>
 #include <DuckDisplay.h>
@@ -57,9 +44,9 @@ void setup() {
   // This duck has an OLED display and we want to use it. 
   // Get an instance and initialize it, so we can use in our application
   display = DuckDisplay::getInstance();
-  display->setupDisplay();
-  display->displayExample(deviceId, "MAMA-DUCK");
-  Serial.println("MAMA-DUCK...READY!");
+  display->setupDisplay(duck.getType(), deviceId );
+  // we are done
+  display->showDefaultScreen();
 
   timer.every(INTERVAL_MS, runSensor);
 
