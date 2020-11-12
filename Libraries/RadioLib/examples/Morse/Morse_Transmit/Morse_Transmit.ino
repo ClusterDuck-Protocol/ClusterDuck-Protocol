@@ -11,14 +11,6 @@
     - CC1101
     - SX126x
     - nRF24
-    - Si443x/RFM2x
-    - SX128x
-
-   For default module settings, see the wiki page
-   https://github.com/jgromes/RadioLib/wiki/Default-configuration
-
-   For full API reference, see the GitHub Pages
-   https://jgromes.github.io/RadioLib/
 */
 
 // include the library
@@ -29,25 +21,32 @@
 // DIO0 pin:  2
 // RESET pin: 9
 // DIO1 pin:  3
-SX1278 radio = new Module(10, 2, 9, 3);
+SX1278 fsk = new Module(10, 2, 9, 3);
 
 // or using RadioShield
 // https://github.com/jgromes/RadioShield
-//SX1278 radio = RadioShield.ModuleA;
+//SX1278 fsk = RadioShield.ModuleA;
 
 // create Morse client instance using the FSK module
-MorseClient morse(&radio);
+MorseClient morse(&fsk);
 
 void setup() {
   Serial.begin(9600);
 
-  // initialize SX1278 with default settings
+  // initialize SX1278
   Serial.print(F("[SX1278] Initializing ... "));
-  int state = radio.beginFSK();
+  // carrier frequency:           434.0 MHz
+  // bit rate:                    48.0 kbps
+  // frequency deviation:         50.0 kHz
+  // Rx bandwidth:                125.0 kHz
+  // output power:                13 dBm
+  // current limit:               100 mA
+  // sync word:                   0x2D  0x01
+  int state = fsk.beginFSK();
 
   // when using one of the non-LoRa modules for Morse code
-  // (RF69, CC1101, Si4432 etc.), use the basic begin() method
-  // int state = radio.begin();
+  // (RF69, CC1101, etc.), use the basic begin() method
+  // int state = fsk.begin();
 
   if(state == ERR_NONE) {
     Serial.println(F("success!"));

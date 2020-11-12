@@ -9,9 +9,6 @@
 
    Packet delivery is automatically acknowledged by the receiver.
 
-   For default module settings, see the wiki page
-   https://github.com/jgromes/RadioLib/wiki/Default-configuration#nrf24
-
    For full API reference, see the GitHub Pages
    https://jgromes.github.io/RadioLib/
 */
@@ -23,18 +20,22 @@
 // CS pin:    10
 // IRQ pin:   2
 // CE pin:    3
-nRF24 radio = new Module(10, 2, 3);
+nRF24 nrf = new Module(10, 2, 3);
 
 // or using RadioShield
 // https://github.com/jgromes/RadioShield
-//nRF24 radio = RadioShield.ModuleA;
+//nRF24 nrf = RadioShield.ModuleA;
 
 void setup() {
   Serial.begin(9600);
 
-  // initialize nRF24 with default settings
+  // initialize nRF24
   Serial.print(F("[nRF24] Initializing ... "));
-  int state = radio.begin();
+  // carrier frequency:           2400 MHz
+  // data rate:                   1000 kbps
+  // output power:                -12 dBm
+  // address width:               5 bytes
+  int state = nrf.begin();
   if(state == ERR_NONE) {
     Serial.println(F("success!"));
   } else {
@@ -49,7 +50,7 @@ void setup() {
   //       methods (5 by default)
   byte addr[] = {0x01, 0x23, 0x45, 0x67, 0x89};
   Serial.print(F("[nRF24] Setting transmit pipe ... "));
-  state = radio.setTransmitPipe(addr);
+  state = nrf.setTransmitPipe(addr);
   if(state == ERR_NONE) {
     Serial.println(F("success!"));
   } else {
@@ -64,7 +65,7 @@ void loop() {
 
   // you can transmit C-string or Arduino string up to
   // 32 characters long
-  int state = radio.transmit("Hello World!");
+  int state = nrf.transmit("Hello World!");
 
   if (state == ERR_NONE) {
     // the packet was successfully transmitted

@@ -1,9 +1,10 @@
 #include "XBee.h"
-#if !defined(RADIOLIB_EXCLUDE_XBEE)
 
 XBee::XBee(Module* mod) {
   _mod = mod;
-  _packetData[0] = '\0';
+  _frameID = 0x01;
+  _frameLength = 0;
+  _frameHeaderProcessed = false;
 }
 
 int16_t XBee::begin(long speed) {
@@ -34,7 +35,7 @@ int16_t XBee::begin(long speed) {
       RADIOLIB_DEBUG_PRINTLN(state);
       RADIOLIB_DEBUG_PRINTLN(F("Resetting ..."));
       reset();
-      Module::delay(10);
+      delay(1000);
       _mod->ATemptyBuffer();
       i++;
     }
@@ -51,10 +52,10 @@ int16_t XBee::begin(long speed) {
 }
 
 void XBee::reset() {
-  Module::pinMode(_mod->getRst(), OUTPUT);
-  Module::digitalWrite(_mod->getRst(), LOW);
-  Module::delay(1);
-  Module::digitalWrite(_mod->getRst(), HIGH);
+  pinMode(_mod->getRst(), OUTPUT);
+  digitalWrite(_mod->getRst(), LOW);
+  delayMicroseconds(200);
+  digitalWrite(_mod->getRst(), HIGH);
 }
 
 int16_t XBee::transmit(uint8_t* dest, const char* payload, uint8_t radius) {
@@ -95,9 +96,9 @@ size_t XBee::available() {
     return(0);
   }
 
+  uint8_t header[3];
   if(!_frameHeaderProcessed) {
     // read frame header
-    uint8_t header[3];
     for(uint8_t i = 0; i < 3; i++) {
       header[i] = _mod->ModuleSerial->read();
     }
@@ -183,8 +184,7 @@ XBeeSerial::XBeeSerial(Module* mod) : ISerial(mod) {
 
 int16_t XBeeSerial::begin(long speed) {
   // set module properties
-  char lf[3] = "\r";
-  memcpy(_mod->AtLineFeed, lf, strlen(lf));
+  _mod->AtLineFeed = "\r";
   _mod->baudrate = speed;
   _mod->init(RADIOLIB_USE_UART);
 
@@ -216,11 +216,11 @@ int16_t XBeeSerial::begin(long speed) {
 }
 
 void XBeeSerial::reset() {
-  Module::pinMode(_mod->getRst(), OUTPUT);
-  Module::digitalWrite(_mod->getRst(), LOW);
-  Module::delay(1);
-  Module::digitalWrite(_mod->getRst(), HIGH);
-  Module::pinMode(_mod->getRst(), INPUT);
+  pinMode(_mod->getRst(), OUTPUT);
+  digitalWrite(_mod->getRst(), LOW);
+  delayMicroseconds(200);
+  digitalWrite(_mod->getRst(), HIGH);
+  pinMode(_mod->getRst(), INPUT);
 }
 
 int16_t XBeeSerial::setDestinationAddress(const char* destinationAddressHigh, const char* destinationAddressLow) {
@@ -308,13 +308,13 @@ int16_t XBeeSerial::setPanId(const char* panId) {
 
 bool XBeeSerial::enterCmdMode() {
   for(uint8_t i = 0; i < 10; i++) {
-    Module::delay(1000);
+    delay(1000);
 
     _mod->ModuleSerial->write('+');
     _mod->ModuleSerial->write('+');
     _mod->ModuleSerial->write('+');
 
-    Module::delay(1000);
+    delay(1000);
 
     if(_mod->ATgetResponse()) {
       return(true);
@@ -374,13 +374,13 @@ void XBee::sendApiFrame(uint8_t type, uint8_t id, uint8_t* data, uint16_t length
 
   // calculate the checksum
   uint8_t checksum = 0;
-  for(size_t i = 3; i < frameLength - 1; i++) {
+  for(uint16_t i = 3; i < frameLength - 1; i++) {
     checksum += frame[i];
   }
   frame[5 + length] = 0xFF - checksum;
 
   // send the frame
-  for(size_t i = 0; i < frameLength; i++) {
+  for(uint16_t i = 0; i < frameLength; i++) {
     _mod->ModuleSerial->write(frame[i]);
   }
 
@@ -391,7 +391,7 @@ void XBee::sendApiFrame(uint8_t type, uint8_t id, uint8_t* data, uint16_t length
 }
 
 int16_t XBee::readApiFrame(uint8_t frameID, uint8_t codePos, uint16_t timeout) {
-  /// \todo modemStatus frames may be sent at any time, interfering with frame parsing. Add check to make sure this does not happen.
+  // TODO: modemStatus frames may be sent at any time, interfering with frame parsing. Add check to make sure this does not happen.
 
   // get number of bytes in response (must be enough to read the length field
   uint16_t numBytes = getNumBytes(timeout/2, 3);
@@ -403,10 +403,9 @@ int16_t XBee::readApiFrame(uint8_t frameID, uint8_t codePos, uint16_t timeout) {
   numBytes++;
 
   // wait until all response bytes are available (5s timeout)
-  uint32_t start = Module::millis();
+  uint32_t start = millis();
   while(_mod->ModuleSerial->available() < (int16_t)numBytes) {
-    Module::yield();
-    if(Module::millis() - start >= timeout/2) {
+    if(millis() - start >= timeout/2) {
       return(ERR_FRAME_MALFORMED);
     }
   }
@@ -455,10 +454,9 @@ int16_t XBee::readApiFrame(uint8_t frameID, uint8_t codePos, uint16_t timeout) {
 
 uint16_t XBee::getNumBytes(uint32_t timeout, size_t minBytes) {
   // wait for available data
-  uint32_t start = Module::millis();
+  uint32_t start = millis();
   while((size_t)_mod->ModuleSerial->available() < minBytes) {
-    Module::yield();
-    if(Module::millis() - start >= timeout) {
+    if(millis() - start >= timeout) {
       return(0);
     }
   }
@@ -468,7 +466,6 @@ uint16_t XBee::getNumBytes(uint32_t timeout, size_t minBytes) {
   uint8_t i = 0;
   RADIOLIB_DEBUG_PRINT(F("reading frame length: "));
   while(_mod->ModuleSerial->available() > 0) {
-    Module::yield();
     uint8_t b = _mod->ModuleSerial->read();
     RADIOLIB_DEBUG_PRINT(b, HEX);
     RADIOLIB_DEBUG_PRINT('\t');
@@ -481,5 +478,3 @@ uint16_t XBee::getNumBytes(uint32_t timeout, size_t minBytes) {
 
   return((resp[1] << 8) | resp[2]);
 }
-
-#endif

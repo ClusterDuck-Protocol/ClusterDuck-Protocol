@@ -1,5 +1,4 @@
 #include "MQTT.h"
-#if !defined(RADIOLIB_EXCLUDE_MQTT)
 
 MQTTClient::MQTTClient(TransportLayer* tl, uint16_t port) {
   _tl = tl;
@@ -96,6 +95,7 @@ int16_t MQTTClient::connect(const char* host, const char* clientId, const char* 
     packet[pos++] = (passwordLen & 0xFF00) >> 8;;
     packet[pos++] = passwordLen & 0x00FF;
     memcpy(packet + pos, password, passwordLen);
+    pos += passwordLen;
   }
 
   // create TCP connection
@@ -197,6 +197,7 @@ int16_t MQTTClient::publish(const char* topic, const char* message) {
   // payload
   // message
   memcpy(packet + pos, message, messageLen);
+  pos += messageLen;
 
   // send MQTT packet
   int16_t state = _tl->send(packet, 1 + encodedBytes + remainingLength);
@@ -205,7 +206,7 @@ int16_t MQTTClient::publish(const char* topic, const char* message) {
   #endif
   return(state);
 
-  /// \todo implement QoS > 0 and PUBACK response checking
+  //TODO: implement QoS > 0 and PUBACK response checking
 }
 
 int16_t MQTTClient::subscribe(const char* topicFilter) {
@@ -312,6 +313,7 @@ int16_t MQTTClient::unsubscribe(const char* topicFilter) {
   packet[pos++] = (topicFilterLen & 0xFF00) >> 8;;
   packet[pos++] = topicFilterLen & 0x00FF;
   memcpy(packet + pos, topicFilter, topicFilterLen);
+  pos += topicFilterLen;
 
   // send MQTT packet
   int16_t state = _tl->send(packet, 1 + encodedBytes + remainingLength);
@@ -410,11 +412,11 @@ int16_t MQTTClient::check(void (*func)(const char*, const char*)) {
   uint8_t* dataIn = new uint8_t[numBytes];
   _tl->receive(dataIn, numBytes);
   if(dataIn[0] == MQTT_PUBLISH << 4) {
-    uint8_t remLenFieldLen = 0;
-    uint32_t remainingLength = decodeLength(dataIn + 1, remLenFieldLen);
+    // TODO: properly decode remaining length
+    uint8_t remainingLength = dataIn[1];
 
     // get the topic
-    size_t topicLength = dataIn[remLenFieldLen + 2] | dataIn[remLenFieldLen + 1] << 8;
+    size_t topicLength = dataIn[3] | dataIn[2] << 8;
     char* topic = new char[topicLength + 1];
     memcpy(topic, dataIn + 4, topicLength);
     topic[topicLength] = 0x00;
@@ -422,7 +424,7 @@ int16_t MQTTClient::check(void (*func)(const char*, const char*)) {
     // get the message
     size_t messageLength = remainingLength - topicLength - 2;
     char* message = new char[messageLength + 1];
-    memcpy(message, dataIn + remLenFieldLen + 3 + topicLength, messageLength);
+    memcpy(message, dataIn + 4 + topicLength, messageLength);
     message[messageLength] = 0x00;
 
     // execute the callback function provided by user
@@ -452,7 +454,7 @@ size_t MQTTClient::encodeLength(uint32_t len, uint8_t* encoded) {
   return(i);
 }
 
-uint32_t MQTTClient::decodeLength(uint8_t* encoded, uint8_t& numBytes) {
+uint32_t MQTTClient::decodeLength(uint8_t* encoded) {
   // algorithm to decode packet length as per MQTT specification 3.1.1
   uint32_t mult = 1;
   uint32_t len = 0;
@@ -464,9 +466,6 @@ uint32_t MQTTClient::decodeLength(uint8_t* encoded, uint8_t& numBytes) {
       // malformed remaining length
       return(0);
     }
-  } while((encoded[i++] & 128) != 0);
-  numBytes = i;
+  } while((encoded[i] & 128) != 0);
   return len;
 }
-
-#endif

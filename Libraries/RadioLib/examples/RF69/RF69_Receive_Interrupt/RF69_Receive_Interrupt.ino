@@ -5,9 +5,6 @@
    receive them. Once a packet is received, an interrupt is
    triggered.
 
-   For default module settings, see the wiki page
-   https://github.com/jgromes/RadioLib/wiki/Default-configuration#rf69sx1231
-
    For full API reference, see the GitHub Pages
    https://jgromes.github.io/RadioLib/
 */
@@ -19,18 +16,24 @@
 // CS pin:    10
 // DIO0 pin:  2
 // RESET pin: 3
-RF69 radio = new Module(10, 2, 3);
+RF69 rf = new Module(10, 2, 3);
 
 // or using RadioShield
 // https://github.com/jgromes/RadioShield
-//RF69 radio = RadioShield.ModuleA;
+//RF69 rf = RadioShield.ModuleA;
 
 void setup() {
   Serial.begin(9600);
 
   // initialize RF69 with default settings
   Serial.print(F("[RF69] Initializing ... "));
-  int state = radio.begin();
+  // carrier frequency:                   434.0 MHz
+  // bit rate:                            48.0 kbps
+  // frequency deviation:                 50.0 kHz
+  // Rx bandwidth:                        125.0 kHz
+  // output power:                        13 dBm
+  // sync word:                           0x2D01
+  int state = rf.begin();
   if (state == ERR_NONE) {
     Serial.println(F("success!"));
   } else {
@@ -41,11 +44,11 @@ void setup() {
 
   // set the function that will be called
   // when new packet is received
-  radio.setDio0Action(setFlag);
+  rf.setDio0Action(setFlag);
 
   // start listening for packets
   Serial.print(F("[RF69] Starting to listen ... "));
-  state = radio.startReceive();
+  state = rf.startReceive();
   if (state == ERR_NONE) {
     Serial.println(F("success!"));
   } else {
@@ -57,11 +60,11 @@ void setup() {
   // if needed, 'listen' mode can be disabled by calling
   // any of the following methods:
   //
-  // radio.standby()
-  // radio.sleep()
-  // radio.transmit();
-  // radio.receive();
-  // radio.readData();
+  // rf.standby()
+  // rf.sleep()
+  // rf.transmit();
+  // rf.receive();
+  // rf.readData();
 }
 
 // flag to indicate that a packet was received
@@ -96,12 +99,12 @@ void loop() {
 
     // you can read received data as an Arduino String
     String str;
-    int state = radio.readData(str);
+    int state = rf.readData(str);
 
     // you can also read received data as byte array
     /*
       byte byteArr[8];
-      int state = radio.readData(byteArr, 8);
+      int state = lora.readData(byteArr, 8);
     */
 
     if (state == ERR_NONE) {
@@ -109,14 +112,8 @@ void loop() {
       Serial.println(F("[RF69] Received packet!"));
 
       // print data of the packet
-      Serial.print(F("[RF69] Data:\t\t"));
+      Serial.print(F("[RF69] Data:\t\t\t"));
       Serial.println(str);
-
-      // print RSSI (Received Signal Strength Indicator)
-      // of the last received packet
-      Serial.print(F("[RF69] RSSI:\t\t"));
-      Serial.print(radio.getRSSI());
-      Serial.println(F(" dBm"));
 
     } else if (state == ERR_CRC_MISMATCH) {
       // packet was received, but is malformed
@@ -130,7 +127,7 @@ void loop() {
     }
 
     // put module back to listen mode
-    radio.startReceive();
+    rf.startReceive();
 
     // we're ready to receive more packets,
     // enable interrupt service routine

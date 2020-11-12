@@ -1,5 +1,4 @@
 #include "RFM97.h"
-#if !defined(RADIOLIB_EXCLUDE_RFM9X)
 
 RFM97::RFM97(Module* mod) : RFM95(mod) {
 
@@ -38,5 +37,3 @@ int16_t RFM97::setSpreadingFactor(uint8_t sf) {
   }
   return(state);
 }
-
-#endif

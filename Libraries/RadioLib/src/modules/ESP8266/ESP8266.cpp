@@ -1,5 +1,5 @@
+#ifndef ESP8266
 #include "ESP8266.h"
-#if !defined(RADIOLIB_EXCLUDE_ESP8266) && !defined(ESP8266)
 
 ESP8266::ESP8266(Module* module) {
   _mod = module;
@@ -7,8 +7,7 @@ ESP8266::ESP8266(Module* module) {
 
 int16_t ESP8266::begin(long speed) {
   // set module properties
-  char lf[3] = "\r\n";
-  memcpy(_mod->AtLineFeed, lf, strlen(lf));
+  _mod->AtLineFeed = "\r\n";
   _mod->baudrate = speed;
   _mod->init(RADIOLIB_USE_UART);
 
@@ -30,13 +29,13 @@ int16_t ESP8266::reset() {
   }
 
   // wait for the module to start
-  Module::delay(2000);
+  delay(2000);
 
   // test AT setup
-  uint32_t start = Module::millis();
-  while (Module::millis() - start < 3000) {
+  uint32_t start = millis();
+  while (millis() - start < 3000) {
     if(!_mod->ATsendCommand("AT")) {
-      Module::delay(100);
+      delay(100);
     } else {
       return(ERR_NONE);
     }
@@ -84,19 +83,19 @@ int16_t ESP8266::join(const char* ssid, const char* password) {
 
 int16_t ESP8266::openTransportConnection(const char* host, const char* protocol, uint16_t port, uint16_t tcpKeepAlive) {
   char portStr[6];
-  sprintf(portStr, "%u", port);
+  itoa(port, portStr, 10);
   char tcpKeepAliveStr[6];
-  sprintf(tcpKeepAliveStr, "%u", tcpKeepAlive);
+  itoa(tcpKeepAlive, tcpKeepAliveStr, 10);
 
   // build AT command
   const char* atStr = "AT+CIPSTART=\"";
+  uint8_t cmdLen = strlen(atStr) + strlen(protocol) + strlen(host) + strlen(portStr) + 5;
+  if((strcmp(protocol, "TCP") == 0) && (tcpKeepAlive > 0)) {
+	  cmdLen += strlen(tcpKeepAliveStr) + 1;
+  }
   #ifdef RADIOLIB_STATIC_ONLY
     char cmd[RADIOLIB_STATIC_ARRAY_SIZE];
   #else
-    uint8_t cmdLen = strlen(atStr) + strlen(protocol) + strlen(host) + strlen(portStr) + 5;
-    if((strcmp(protocol, "TCP") == 0) && (tcpKeepAlive > 0)) {
-  	  cmdLen += strlen(tcpKeepAliveStr) + 1;
-    }
     char* cmd = new char[cmdLen + 1];
   #endif
   strcpy(cmd, atStr);
@@ -132,8 +131,8 @@ int16_t ESP8266::closeTransportConnection() {
 
 int16_t ESP8266::send(const char* data) {
   // build AT command
-  char lenStr[12];
-  sprintf(lenStr, "%u", (uint16_t)strlen(data));
+  char lenStr[8];
+  itoa(strlen(data), lenStr, 10);
   const char* atStr = "AT+CIPSEND=";
   #ifdef RADIOLIB_STATIC_ONLY
     char cmd[RADIOLIB_STATIC_ARRAY_SIZE];
@@ -160,10 +159,10 @@ int16_t ESP8266::send(const char* data) {
   return(ERR_NONE);
 }
 
-int16_t ESP8266::send(uint8_t* data, size_t len) {
+int16_t ESP8266::send(uint8_t* data, uint32_t len) {
   // build AT command
   char lenStr[8];
-  sprintf(lenStr, "%u", (uint16_t)len);
+  itoa(len, lenStr, 10);
   const char atStr[] = "AT+CIPSEND=";
   #ifdef RADIOLIB_STATIC_ONLY
     char cmd[RADIOLIB_STATIC_ARRAY_SIZE];
@@ -192,11 +191,10 @@ int16_t ESP8266::send(uint8_t* data, size_t len) {
 
 size_t ESP8266::receive(uint8_t* data, size_t len, uint32_t timeout) {
   size_t i = 0;
-  uint32_t start = Module::millis();
+  uint32_t start = millis();
 
   // wait until the required number of bytes is received or until timeout
-  while((Module::millis() - start < timeout) && (i < len)) {
-    Module::yield();
+  while((millis() - start < timeout) && (i < len)) {
     while(_mod->ModuleSerial->available() > 0) {
       uint8_t b = _mod->ModuleSerial->read();
       RADIOLIB_DEBUG_PRINT(b);
@@ -209,10 +207,9 @@ size_t ESP8266::receive(uint8_t* data, size_t len, uint32_t timeout) {
 
 size_t ESP8266::getNumBytes(uint32_t timeout, size_t minBytes) {
   // wait for available data
-  uint32_t start = Module::millis();
+  uint32_t start = millis();
   while(_mod->ModuleSerial->available() < (int16_t)minBytes) {
-    Module::yield();
-    if(Module::millis() - start >= timeout) {
+    if(millis() - start >= timeout) {
       return(0);
     }
   }
@@ -220,16 +217,15 @@ size_t ESP8266::getNumBytes(uint32_t timeout, size_t minBytes) {
   // read response
   char rawStr[20];
   uint8_t i = 0;
-  start = Module::millis();
+  start = millis();
   while(_mod->ModuleSerial->available() > 0) {
-    Module::yield();
     char c = _mod->ModuleSerial->read();
     rawStr[i++] = c;
     if(c == ':') {
       rawStr[i++] = 0;
       break;
     }
-    if(Module::millis() - start >= timeout) {
+    if(millis() - start >= timeout) {
       rawStr[i++] = 0;
       break;
     }

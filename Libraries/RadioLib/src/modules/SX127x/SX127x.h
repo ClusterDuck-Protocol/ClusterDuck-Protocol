@@ -1,10 +1,7 @@
-#if !defined(_RADIOLIB_SX127X_H)
+#ifndef _RADIOLIB_SX127X_H
 #define _RADIOLIB_SX127X_H
 
 #include "../../TypeDef.h"
-
-#if !defined(RADIOLIB_EXCLUDE_SX127X)
-
 #include "../../Module.h"
 
 #include "../../protocols/PhysicalLayer/PhysicalLayer.h"
@@ -462,8 +459,8 @@
 #define SX127X_TEMP_THRESHOLD_10_DEG_C                0b00000010  //  2     1                                   10 deg. C (default)
 #define SX127X_TEMP_THRESHOLD_15_DEG_C                0b00000100  //  2     1                                   15 deg. C
 #define SX127X_TEMP_THRESHOLD_20_DEG_C                0b00000110  //  2     1                                   20 deg. C
-#define SX127X_TEMP_MONITOR_ON                        0b00000000  //  0     0     temperature monitoring enabled (default)
-#define SX127X_TEMP_MONITOR_OFF                       0b00000001  //  0     0     temperature monitoring disabled
+#define SX127X_TEMP_MONITOR_OFF                       0b00000000  //  0     0     temperature monitoring disabled (default)
+#define SX127X_TEMP_MONITOR_ON                        0b00000001  //  0     0     temperature monitoring enabled
 
 // SX127X_REG_LOW_BAT
 #define SX127X_LOW_BAT_OFF                            0b00000000  //  3     3     low battery detector disabled
@@ -483,7 +480,7 @@
 #define SX127X_FLAG_TX_READY                          0b00100000  //  5     5     transmission ready (after PA ramp-up)
 #define SX127X_FLAG_PLL_LOCK                          0b00010000  //  4     4     PLL locked
 #define SX127X_FLAG_RSSI                              0b00001000  //  3     3     RSSI value exceeds RSSI threshold
-#define SX127X_FLAG_TIMEOUT                           0b00000100  //  2     2     timeout occurred
+#define SX127X_FLAG_TIMEOUT                           0b00000100  //  2     2     timeout occured
 #define SX127X_FLAG_PREAMBLE_DETECT                   0b00000010  //  1     1     valid preamble was detected
 #define SX127X_FLAG_SYNC_ADDRESS_MATCH                0b00000001  //  0     0     sync address matched
 
@@ -491,7 +488,7 @@
 #define SX127X_FLAG_FIFO_FULL                         0b10000000  //  7     7     FIFO is full
 #define SX127X_FLAG_FIFO_EMPTY                        0b01000000  //  6     6     FIFO is empty
 #define SX127X_FLAG_FIFO_LEVEL                        0b00100000  //  5     5     number of bytes in FIFO exceeds FIFO_THRESHOLD
-#define SX127X_FLAG_FIFO_OVERRUN                      0b00010000  //  4     4     FIFO overrun occurred
+#define SX127X_FLAG_FIFO_OVERRUN                      0b00010000  //  4     4     FIFO overrun occured
 #define SX127X_FLAG_PACKET_SENT                       0b00001000  //  3     3     packet was successfully sent
 #define SX127X_FLAG_PAYLOAD_READY                     0b00000100  //  2     2     packet was successfully received
 #define SX127X_FLAG_CRC_OK                            0b00000010  //  1     1     CRC check passed
@@ -559,14 +556,16 @@ class SX127x: public PhysicalLayer {
 
       \param syncWord %LoRa sync word.
 
+      \param currentLimit Trim value for OCP (over current protection) in mA.
+
       \param preambleLength Length of %LoRa transmission preamble in symbols.
 
       \returns \ref status_codes
     */
-    int16_t begin(uint8_t chipVersion, uint8_t syncWord, uint16_t preambleLength);
+    int16_t begin(uint8_t chipVersion, uint8_t syncWord, uint8_t currentLimit, uint16_t preambleLength);
 
     /*!
-      \brief Reset method. Will reset the chip to the default state using RST pin. Declared pure virtual since SX1272 and SX1278 implementations differ.
+      \brief Reset method. Will reset the chip to the default state using RST pin. Declared pure virtual since SX1272 and SX1278 implmentations differ.
     */
     virtual void reset() = 0;
 
@@ -581,13 +580,15 @@ class SX127x: public PhysicalLayer {
 
       \param rxBw Receiver bandwidth in kHz.
 
+      \param currentLimit Trim value for OCP (over current protection) in mA.
+
       \param preambleLength Length of FSK preamble in bits.
 
       \param enableOOK Flag to specify OOK mode. This modulation is similar to FSK.
 
       \returns \ref status_codes
     */
-    int16_t beginFSK(uint8_t chipVersion, float br, float freqDev, float rxBw, uint16_t preambleLength, bool enableOOK);
+    int16_t beginFSK(uint8_t chipVersion, float br, float freqDev, float rxBw, uint8_t currentLimit, uint16_t preambleLength, bool enableOOK);
 
     /*!
       \brief Binary transmit method. Will transmit arbitrary binary data up to 255 bytes long using %LoRa or up to 63 bytes using FSK modem.
@@ -601,7 +602,7 @@ class SX127x: public PhysicalLayer {
 
       \returns \ref status_codes
     */
-    int16_t transmit(uint8_t* data, size_t len, uint8_t addr = 0) override;
+    int16_t transmit(uint8_t* data, size_t len, uint8_t addr = 0);
 
     /*!
       \brief Binary receive method. Will attempt to receive arbitrary binary data up to 255 bytes long using %LoRa or up to 63 bytes using FSK modem.
@@ -613,7 +614,7 @@ class SX127x: public PhysicalLayer {
 
       \returns \ref status_codes
     */
-    int16_t receive(uint8_t* data, size_t len) override;
+    int16_t receive(uint8_t* data, size_t len);
 
     /*!
       \brief Performs scan for valid %LoRa preamble in the current channel.
@@ -635,17 +636,17 @@ class SX127x: public PhysicalLayer {
 
       \returns \ref status_codes
     */
-    int16_t standby() override;
+    int16_t standby();
 
     /*!
       \brief Enables direct transmission mode on pins DIO1 (clock) and DIO2 (data).
       While in direct mode, the module will not be able to transmit or receive packets. Can only be activated in FSK mode.
 
-      \param frf 24-bit raw frequency value to start transmitting at. Required for quick frequency shifts in RTTY.
+      \param FRF 24-bit raw frequency value to start transmitting at. Required for quick frequency shifts in RTTY.
 
       \returns \ref status_codes
     */
-    int16_t transmitDirect(uint32_t frf = 0) override;
+    int16_t transmitDirect(uint32_t FRF = 0);
 
     /*!
       \brief Enables direct reception mode on pins DIO1 (clock) and DIO2 (data).
@@ -653,7 +654,7 @@ class SX127x: public PhysicalLayer {
 
       \returns \ref status_codes
     */
-    int16_t receiveDirect() override;
+    int16_t receiveDirect();
 
     /*!
       \brief Disables direct mode and enables packet mode, allowing the module to receive packets. Can only be activated in FSK mode.
@@ -661,6 +662,7 @@ class SX127x: public PhysicalLayer {
       \returns \ref status_codes
     */
     int16_t packetMode();
+
 
     // interrupt methods
 
@@ -699,7 +701,7 @@ class SX127x: public PhysicalLayer {
 
       \returns \ref status_codes
     */
-    int16_t startTransmit(uint8_t* data, size_t len, uint8_t addr = 0) override;
+    int16_t startTransmit(uint8_t* data, size_t len, uint8_t addr = 0);
 
     /*!
       \brief Interrupt-driven receive method. DIO0 will be activated when full valid packet is received.
@@ -721,7 +723,7 @@ class SX127x: public PhysicalLayer {
 
       \returns \ref status_codes
     */
-    int16_t readData(uint8_t* data, size_t len) override;
+    int16_t readData(uint8_t* data, size_t len);
 
 
     // configuration methods
@@ -774,7 +776,7 @@ class SX127x: public PhysicalLayer {
 
       \returns Last packet data rate in bps (bits per second).
     */
-    float getDataRate() const;
+    float getDataRate();
 
     /*!
       \brief Sets FSK bit rate. Allowed values range from 1.2 to 300 kbps. Only available in FSK mode.
@@ -792,7 +794,7 @@ class SX127x: public PhysicalLayer {
 
       \returns \ref status_codes
     */
-    int16_t setFrequencyDeviation(float freqDev) override;
+    int16_t setFrequencyDeviation(float freqDev);
 
     /*!
       \brief Sets FSK receiver bandwidth. Allowed values range from 2.6 to 250 kHz. Only available in FSK mode.
@@ -855,7 +857,7 @@ class SX127x: public PhysicalLayer {
 
       \returns Length of last received packet in bytes.
     */
-    size_t getPacketLength(bool update = true) override;
+    size_t getPacketLength(bool update = true);
 
     /*!
      \brief Set modem in fixed packet length mode. Available in FSK mode only.
@@ -878,7 +880,7 @@ class SX127x: public PhysicalLayer {
     /*!
       \brief Sets RSSI measurement configuration in FSK mode.
 
-      \param smoothingSamples Number of samples taken to average the RSSI result.
+      \param smoothingSamples Number of samples taken to avergae the RSSI result.
       numSamples = 2 ^ (1 + smoothingSamples), allowed values are in range 0 (2 samples) - 7 (256 samples)
 
       \param offset Signed RSSI offset that will be automatically compensated. 1 dB per LSB, defaults to 0, allowed values are in range -16 dB to +15 dB.
@@ -889,67 +891,29 @@ class SX127x: public PhysicalLayer {
 
     /*!
       \brief Sets transmission encoding. Only available in FSK mode.
-       Allowed values are RADIOLIB_ENCODING_NRZ, RADIOLIB_ENCODING_MANCHESTER and RADIOLIB_ENCODING_WHITENING.
 
-      \param encoding Encoding to be used.
+      \param encoding Encoding to be used. Set to 0 for NRZ, 1 for Manchester and 2 for whitening.
 
       \returns \ref status_codes
     */
-    int16_t setEncoding(uint8_t encoding) override;
+    int16_t setEncoding(uint8_t encoding);
 
-    /*!
-      \brief Reads currently active IRQ flags, can be used to check which event caused an interrupt.
-      In LoRa mode, this is the content of SX127X_REG_IRQ_FLAGS register.
-      In FSK mode, this is the contents of SX127X_REG_IRQ_FLAGS_2 (MSB) and SX127X_REG_IRQ_FLAGS_1 (LSB) registers.
-
-      \returns IRQ flags.
-    */
-    uint16_t getIRQFlags();
-
-    /*!
-      \brief Reads modem status. Only available in LoRa mode.
-
-      \returns Modem status.
-    */
-    uint8_t getModemStatus();
-
-    /*!
-      \brief Reads uncalibrated temperature value. This function will change operating mode
-      and should not be called during Tx, Rx or CAD.
-
-      \returns Uncalibrated temperature sensor reading.
-    */
-    int8_t getTempRaw();
-
-    /*!
-      \brief Some modules contain external RF switch controlled by two pins. This function gives RadioLib control over those two pins to automatically switch Rx and Tx state.
-      When using automatic RF switch control, DO NOT change the pin mode of rxEn or txEn from Arduino sketch!
-
-      \param rxEn RX enable pin.
-
-      \param txEn TX enable pin.
-    */
-    void setRfSwitchPins(RADIOLIB_PIN_TYPE rxEn, RADIOLIB_PIN_TYPE txEn);
-
-    /*!
-     \brief Get one truly random byte from RSSI noise.
-
-     \returns TRNG byte.
-   */
-    uint8_t random();
+    #ifdef RADIOLIB_DEBUG
+      void regDump();
+    #endif
 
 #ifndef RADIOLIB_GODMODE
   protected:
 #endif
     Module* _mod;
 
-    float _freq = 0;
-    float _bw = 0;
-    uint8_t _sf = 0;
-    uint8_t _cr = 0;
-    float _br = 0;
-    float _rxBw = 0;
-    bool _ook = false;
+    float _freq;
+    float _bw;
+    uint8_t _sf;
+    uint8_t _cr;
+    float _br;
+    float _rxBw;
+    bool _ook;
 
     int16_t setFrequencyRaw(float newFreq);
     int16_t config();
@@ -961,10 +925,10 @@ class SX127x: public PhysicalLayer {
 #ifndef RADIOLIB_GODMODE
   private:
 #endif
-    float _dataRate = 0;
-    size_t _packetLength = 0;
-    bool _packetLengthQueried = false; // FSK packet length is the first byte in FIFO, length can only be queried once
-    uint8_t _packetLengthConfig = SX127X_PACKET_VARIABLE;
+    float _dataRate;
+    size_t _packetLength;
+    bool _packetLengthQueried; // FSK packet length is the first byte in FIFO, length can only be queried once
+    uint8_t _packetLengthConfig;
 
     bool findChip(uint8_t ver);
     int16_t setMode(uint8_t mode);
@@ -972,7 +936,5 @@ class SX127x: public PhysicalLayer {
     void clearIRQFlags();
     void clearFIFO(size_t count); // used mostly to clear remaining bytes in FIFO after a packet read
 };
-
-#endif
 
 #endif

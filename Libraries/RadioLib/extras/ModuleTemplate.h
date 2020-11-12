@@ -12,16 +12,14 @@
   If at any point you are unsure about the required style, please refer to the rest of the modules.
 */
 
-#if !defined(_RADIOLIB_<module_name>_H) && !defined(RADIOLIB_EXCLUDE_<module_name>)
 #ifndef _RADIOLIB_<module_name>_H
 #define _RADIOLIB_<module_name>_H
 
 /*
-  Header file for each module MUST include Module.h and TypeDef.h in the src folder.
+  Header file for each module MUST include Module.h.
   The header file MAY include additional header files.
 */
-#include "../../Module.h"
-#include "../../TypeDef.h"
+#include "Module.h"
 
 /*
   Only use the following include if the module implements methods for OSI transport layer control.
@@ -31,7 +29,7 @@
   You also MUST provide crystal oscillator frequency and frequency configuration divisor step resolution
   to the TransportLayer constructor.
 */
-//#include "../../protocols/PhysicalLayer/TransportLayer.h"
+//#include "../protocols/TransportLayer.h"
 
 /*
   Only use the following include if the module implements methods for OSI physical layer control.
@@ -39,7 +37,7 @@
 
   In this case, your class MUST implement all virtual methods of PhysicalLayer class.
 */
-//#include "../../protocols/PhysicalLayer/PhysicalLayer.h"
+//#include "../protocols/PhysicalLayer.h"
 
 /*
   Register map
@@ -76,7 +74,7 @@ class <module_name> {
       The class MAY implement additional overloaded constructors.
     */
     // constructor
-    <module_name>(Module* mod);
+    <module_name>(Module* module);
 
     /*
       The class MUST implement at least one basic method called "begin".
@@ -105,7 +103,5 @@ class <module_name> {
       Usually, these are variables for saving module configuration, or methods that do not have to be exposed to the end user.
     */
 };
-
-#endif
 
 #endif

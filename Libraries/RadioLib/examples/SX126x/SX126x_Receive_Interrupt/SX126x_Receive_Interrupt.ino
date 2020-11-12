@@ -12,10 +12,7 @@
     - coding rate
     - sync word
 
-   Other modules from SX126x family can also be used.
-
-   For default module settings, see the wiki page
-   https://github.com/jgromes/RadioLib/wiki/Default-configuration#sx126x---lora-modem
+   Other modules from SX126x/RFM9x family can also be used.
 
    For full API reference, see the GitHub Pages
    https://jgromes.github.io/RadioLib/
@@ -29,18 +26,29 @@
 // DIO1 pin:  2
 // NRST pin:  3
 // BUSY pin:  9
-SX1262 radio = new Module(10, 2, 3, 9);
+SX1262 lora = new Module(10, 2, 3, 9);
 
 // or using RadioShield
 // https://github.com/jgromes/RadioShield
-//SX1262 radio = RadioShield.ModuleA;
+//SX1262 lora = RadioShield.ModuleA;
 
 void setup() {
   Serial.begin(9600);
 
   // initialize SX1262 with default settings
   Serial.print(F("[SX1262] Initializing ... "));
-  int state = radio.begin();
+  // carrier frequency:           434.0 MHz
+  // bandwidth:                   125.0 kHz
+  // spreading factor:            9
+  // coding rate:                 7
+  // sync word:                   0x12 (private network)
+  // output power:                14 dBm
+  // current limit:               60 mA
+  // preamble length:             8 symbols
+  // TCXO voltage:                1.6 V (set to 0 to not use TCXO)
+  // regulator:                   DC-DC (set to true to use LDO)
+  // CRC:                         enabled
+  int state = lora.begin();
   if (state == ERR_NONE) {
     Serial.println(F("success!"));
   } else {
@@ -51,11 +59,11 @@ void setup() {
 
   // set the function that will be called
   // when new packet is received
-  radio.setDio1Action(setFlag);
+  lora.setDio1Action(setFlag);
 
   // start listening for LoRa packets
   Serial.print(F("[SX1262] Starting to listen ... "));
-  state = radio.startReceive();
+  state = lora.startReceive();
   if (state == ERR_NONE) {
     Serial.println(F("success!"));
   } else {
@@ -67,12 +75,12 @@ void setup() {
   // if needed, 'listen' mode can be disabled by calling
   // any of the following methods:
   //
-  // radio.standby()
-  // radio.sleep()
-  // radio.transmit();
-  // radio.receive();
-  // radio.readData();
-  // radio.scanChannel();
+  // lora.standby()
+  // lora.sleep()
+  // lora.transmit();
+  // lora.receive();
+  // lora.readData();
+  // lora.scanChannel();
 }
 
 // flag to indicate that a packet was received
@@ -107,12 +115,12 @@ void loop() {
 
     // you can read received data as an Arduino String
     String str;
-    int state = radio.readData(str);
+    int state = lora.readData(str);
 
     // you can also read received data as byte array
     /*
       byte byteArr[8];
-      int state = radio.readData(byteArr, 8);
+      int state = lora.readData(byteArr, 8);
     */
 
     if (state == ERR_NONE) {
@@ -125,12 +133,12 @@ void loop() {
 
       // print RSSI (Received Signal Strength Indicator)
       Serial.print(F("[SX1262] RSSI:\t\t"));
-      Serial.print(radio.getRSSI());
+      Serial.print(lora.getRSSI());
       Serial.println(F(" dBm"));
 
       // print SNR (Signal-to-Noise Ratio)
       Serial.print(F("[SX1262] SNR:\t\t"));
-      Serial.print(radio.getSNR());
+      Serial.print(lora.getSNR());
       Serial.println(F(" dB"));
 
     } else if (state == ERR_CRC_MISMATCH) {
@@ -145,7 +153,7 @@ void loop() {
     }
 
     // put module back to listen mode
-    radio.startReceive();
+    lora.startReceive();
 
     // we're ready to receive more packets,
     // enable interrupt service routine

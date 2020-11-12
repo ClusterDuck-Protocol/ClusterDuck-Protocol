@@ -1,9 +1,8 @@
-#if !defined(_RADIOLIB_MORSE_H) && !defined(RADIOLIB_EXCLUDE_MORSE)
+#ifndef _RADIOLIB_MORSE_H
 #define _RADIOLIB_MORSE_H
 
 #include "../../TypeDef.h"
 #include "../PhysicalLayer/PhysicalLayer.h"
-#include "../AFSK/AFSK.h"
 
 #define MORSE_DOT                                     0b0
 #define MORSE_DASH                                    0b1
@@ -14,7 +13,7 @@
 //                        - Morse code representation is saved LSb first, using additional bit as guard
 //                        - position in array corresponds ASCII code minus MORSE_ASCII_OFFSET
 //                        - ASCII characters marked MORSE_UNSUPORTED do not have ITU-R M.1677-1 equivalent
-static const uint8_t MorseTable[] RADIOLIB_PROGMEM = {
+static const uint8_t MorseTable[] PROGMEM = {
     0b00,                   // space
     0b110101,               // ! (unsupported)
     0b1010010,              // "
@@ -89,27 +88,18 @@ static const uint8_t MorseTable[] RADIOLIB_PROGMEM = {
 class MorseClient {
   public:
     /*!
-      \brief Constructor for 2-FSK mode.
+      \brief Default constructor.
 
       \param phy Pointer to the wireless module providing PhysicalLayer communication.
     */
-    explicit MorseClient(PhysicalLayer* phy);
-
-    #if !defined(RADIOLIB_EXCLUDE_AFSK)
-    /*!
-      \brief Constructor for AFSK mode.
-
-      \param audio Pointer to the AFSK instance providing audio.
-    */
-    explicit MorseClient(AFSKClient* audio);
-    #endif
+    MorseClient(PhysicalLayer* phy);
 
     // basic methods
 
     /*!
       \brief Initialization method.
 
-      \param base Base RF frequency to be used in MHz (in 2-FSK mode), or the tone frequency in Hz (in AFSK mode)
+      \param base Base RF frequency to be used in MHz.
 
       \param speed Coding speed in words per minute.
 
@@ -141,7 +131,7 @@ class MorseClient {
 
     size_t println(void);
     size_t println(__FlashStringHelper*);
-    size_t println(const String &);
+    size_t println(const String &s);
     size_t println(const char[]);
     size_t println(char);
     size_t println(unsigned char, int = DEC);
@@ -155,18 +145,11 @@ class MorseClient {
   private:
 #endif
     PhysicalLayer* _phy;
-    #if !defined(RADIOLIB_EXCLUDE_AFSK)
-    AFSKClient* _audio;
-    #endif
-
-    uint32_t _base = 0, _baseHz = 0;
-    uint16_t _dotLength = 0;
+    uint32_t _base;
+    uint16_t _dotLength;
 
     size_t printNumber(unsigned long, uint8_t);
     size_t printFloat(double, uint8_t);
-
-    int16_t transmitDirect(uint32_t freq = 0, uint32_t freqHz = 0);
-    int16_t standby();
 };
 
 #endif

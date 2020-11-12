@@ -1,4 +1,4 @@
-#if !defined(_RADIOLIB_JDY08_H) && !defined(RADIOLIB_EXCLUDE_JDY08)
+#ifndef _RADIOLIB_JDY08_H
 #define _RADIOLIB_JDY08_H
 
 #include "../../ISerial.h"

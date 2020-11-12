@@ -1,5 +1,4 @@
 #include "RTTY.h"
-#if !defined(RADIOLIB_EXCLUDE_RTTY)
 
 ITA2String::ITA2String(char c) {
   _len = 1;
@@ -91,11 +90,11 @@ uint16_t ITA2String::getBits(char c) {
   // search ITA2 table
   uint16_t code = 0x0000;
   for(uint8_t i = 0; i < ITA2_LENGTH; i++) {
-    if(RADIOLIB_PROGMEM_READ_BYTE(&ITA2Table[i][0]) == c) {
+    if(pgm_read_byte(&ITA2Table[i][0]) == c) {
       // character is in letter shift
       code = (ITA2_LTRS << 5) | i;
       break;
-    } else if(RADIOLIB_PROGMEM_READ_BYTE(&ITA2Table[i][1]) == c) {
+    } else if(pgm_read_byte(&ITA2Table[i][1]) == c) {
       // character is in figures shift
       code = (ITA2_FIGS << 5) | i;
       break;
@@ -107,24 +106,12 @@ uint16_t ITA2String::getBits(char c) {
 
 RTTYClient::RTTYClient(PhysicalLayer* phy) {
   _phy = phy;
-  #if !defined(RADIOLIB_EXCLUDE_AFSK)
-  _audio = nullptr;
-  #endif
 }
-
-#if !defined(RADIOLIB_EXCLUDE_AFSK)
-RTTYClient::RTTYClient(AFSKClient* audio) {
-  _phy = audio->_phy;
-  _audio = audio;
-}
-#endif
 
 int16_t RTTYClient::begin(float base, uint32_t shift, uint16_t rate, uint8_t encoding, uint8_t stopBits) {
   // save configuration
   _encoding = encoding;
   _stopBits = stopBits;
-  _baseHz = base;
-  _shiftHz = shift;
 
   switch(encoding) {
     case ASCII:
@@ -161,19 +148,15 @@ int16_t RTTYClient::begin(float base, uint32_t shift, uint16_t rate, uint8_t enc
   // calculate 24-bit frequency
   _base = (base * 1000000.0) / _phy->getFreqStep();
 
-  // set module frequency deviation to 0 if using FSK
-  int16_t state = ERR_NONE;
-  #if !defined(RADIOLIB_EXCLUDE_AFSK)
-  if(_audio == nullptr) {
-    state = _phy->setFrequencyDeviation(0);
-  }
-  #endif
+  // set module frequency deviation to 0
+  int16_t state = _phy->setFrequencyDeviation(0);
 
   return(state);
 }
 
 void RTTYClient::idle() {
-  transmitDirect();
+  _phy->transmitDirect();
+
   mark();
 }
 
@@ -195,8 +178,7 @@ size_t RTTYClient::write(uint8_t* buff, size_t len) {
 size_t RTTYClient::write(uint8_t b) {
   space();
 
-  uint16_t maxDataMask = 0x01 << (_dataBits - 1);
-  for(uint16_t mask = 0x01; mask <= maxDataMask; mask <<= 1) {
+  for(uint16_t mask = 0x01; mask <= (uint16_t)(0x01 << (_dataBits - 1)); mask <<= 1) {
     if(b & mask) {
       mark();
     } else {
@@ -208,7 +190,7 @@ size_t RTTYClient::write(uint8_t b) {
     mark();
   }
 
-  standby();
+  _phy->standby();
 
   return(1);
 }
@@ -218,7 +200,7 @@ size_t RTTYClient::print(__FlashStringHelper* fstr) {
   size_t len = 0;
   PGM_P p = reinterpret_cast<PGM_P>(fstr);
   while(true) {
-    char c = RADIOLIB_PROGMEM_READ_BYTE(p++);
+    char c = pgm_read_byte(p++);
     len++;
     if(c == '\0') {
       break;
@@ -235,12 +217,12 @@ size_t RTTYClient::print(__FlashStringHelper* fstr) {
   // copy string from flash
   p = reinterpret_cast<PGM_P>(fstr);
   for(size_t i = 0; i < len; i++) {
-    str[i] = RADIOLIB_PROGMEM_READ_BYTE(p + i);
+    str[i] = pgm_read_byte(p + i);
   }
 
   size_t n = 0;
   if(_encoding == ITA2) {
-    ITA2String ita2 = ITA2String(str);
+    ITA2String ita2 = str;
     n = RTTYClient::print(ita2);
   } else if((_encoding == ASCII) || (_encoding == ASCII_EXTENDED)) {
     n = RTTYClient::write((uint8_t*)str, len);
@@ -261,7 +243,7 @@ size_t RTTYClient::print(ITA2String& ita2) {
 size_t RTTYClient::print(const String& str) {
   size_t n = 0;
   if(_encoding == ITA2) {
-    ITA2String ita2 = ITA2String(str.c_str());
+    ITA2String ita2 = str.c_str();
     n = RTTYClient::print(ita2);
   } else if((_encoding == ASCII) || (_encoding == ASCII_EXTENDED)) {
     n = RTTYClient::write((uint8_t*)str.c_str(), str.length());
@@ -272,7 +254,7 @@ size_t RTTYClient::print(const String& str) {
 size_t RTTYClient::print(const char str[]) {
   size_t n = 0;
   if(_encoding == ITA2) {
-    ITA2String ita2 = ITA2String(str);
+    ITA2String ita2 = str;
     n = RTTYClient::print(ita2);
   } else if((_encoding == ASCII) || (_encoding == ASCII_EXTENDED)) {
     n = RTTYClient::write((uint8_t*)str, strlen(str));
@@ -283,7 +265,7 @@ size_t RTTYClient::print(const char str[]) {
 size_t RTTYClient::print(char c) {
   size_t n = 0;
   if(_encoding == ITA2) {
-    ITA2String ita2 = ITA2String(c);
+    ITA2String ita2 = c;
     n = RTTYClient::print(ita2);
   } else if((_encoding == ASCII) || (_encoding == ASCII_EXTENDED)) {
     n = RTTYClient::write(c);
@@ -333,7 +315,7 @@ size_t RTTYClient::print(double n, int digits) {
 size_t RTTYClient::println(void) {
   size_t n = 0;
   if(_encoding == ITA2) {
-    ITA2String lf = ITA2String("\r\n");
+    ITA2String lf = "\r\n";
     n = RTTYClient::print(lf);
   } else if((_encoding == ASCII) || (_encoding == ASCII_EXTENDED)) {
     n = RTTYClient::write("\r\n");
@@ -408,19 +390,15 @@ size_t RTTYClient::println(double d, int digits) {
 }
 
 void RTTYClient::mark() {
-  uint32_t start = Module::micros();
-  transmitDirect(_base + _shift, _baseHz + _shiftHz);
-  while(Module::micros() - start < _bitDuration) {
-    Module::yield();
-  }
+  uint32_t start = micros();
+  _phy->transmitDirect(_base + _shift);
+  while(micros() - start < _bitDuration);
 }
 
 void RTTYClient::space() {
-  uint32_t start = Module::micros();
-  transmitDirect(_base, _baseHz);
-  while(Module::micros() - start < _bitDuration) {
-    Module::yield();
-  }
+  uint32_t start = micros();
+  _phy->transmitDirect(_base);
+  while(micros() - start < _bitDuration);
 }
 
 size_t RTTYClient::printNumber(unsigned long n, uint8_t base) {
@@ -442,7 +420,7 @@ size_t RTTYClient::printNumber(unsigned long n, uint8_t base) {
 
   size_t l = 0;
   if(_encoding == ITA2) {
-    ITA2String ita2 = ITA2String(str);
+    ITA2String ita2 = str;
     uint8_t* arr = ita2.byteArr();
     l = RTTYClient::write(arr, ita2.length());
     delete[] arr;
@@ -453,7 +431,8 @@ size_t RTTYClient::printNumber(unsigned long n, uint8_t base) {
   return(l);
 }
 
-/// \todo improve ITA2 float print speed (characters are sent one at a time)
+// TODO: improve ITA2 float print speed
+//       (characters are sent one at a time)
 size_t RTTYClient::printFloat(double number, uint8_t digits)  {
   size_t n = 0;
 
@@ -465,7 +444,7 @@ size_t RTTYClient::printFloat(double number, uint8_t digits)  {
 
   if(code[0] != 0x00) {
     if(_encoding == ITA2) {
-      ITA2String ita2 = ITA2String(code);
+      ITA2String ita2 = code;
       uint8_t* arr = ita2.byteArr();
       n = RTTYClient::write(arr, ita2.length());
       delete[] arr;
@@ -478,7 +457,7 @@ size_t RTTYClient::printFloat(double number, uint8_t digits)  {
   // Handle negative numbers
   if (number < 0.0) {
     if(_encoding == ITA2) {
-      ITA2String ita2 = ITA2String("-");
+      ITA2String ita2 = "-";
       uint8_t* arr = ita2.byteArr();
       n += RTTYClient::write(arr, ita2.length());
       delete[] arr;
@@ -503,7 +482,7 @@ size_t RTTYClient::printFloat(double number, uint8_t digits)  {
   // Print the decimal point, but only if there are digits beyond
   if(digits > 0) {
     if(_encoding == ITA2) {
-      ITA2String ita2 = ITA2String(".");
+      ITA2String ita2 = ".";
       uint8_t* arr = ita2.byteArr();
       n += RTTYClient::write(arr, ita2.length());
       delete[] arr;
@@ -522,23 +501,3 @@ size_t RTTYClient::printFloat(double number, uint8_t digits)  {
 
   return n;
 }
-
-int16_t RTTYClient::transmitDirect(uint32_t freq, uint32_t freqHz) {
-  #if !defined(RADIOLIB_EXCLUDE_AFSK)
-  if(_audio != nullptr) {
-    return(_audio->tone(freqHz));
-  }
-  #endif
-  return(_phy->transmitDirect(freq));
-}
-
-int16_t RTTYClient::standby() {
-  #if !defined(RADIOLIB_EXCLUDE_AFSK)
-  if(_audio != nullptr) {
-    return(_audio->noTone());
-  }
-  #endif
-  return(_phy->standby());
-}
-
-#endif
