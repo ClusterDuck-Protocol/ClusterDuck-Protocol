@@ -54,11 +54,8 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String 
 void PapaDuck::handleReceivedPacket() {
 
   loginfo("handleReceivedPacket()...");
-
-  rxPacket->reset();
-
   std::vector<byte> data;
-  int err = duckRadio->getReceivedData(&data);
+  int err = duckRadio->readReceivedData(&data);
 
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR handleReceivedPacket. Failed to get data. rc = " + String(err));
@@ -66,14 +63,15 @@ void PapaDuck::handleReceivedPacket() {
   }
   // ignore pings
   if (data[TOPIC_POS] == reservedTopic::ping) {
+    rxPacket->reset();
     return;
   }
 
-  bool relay = rxPacket->update(duid, data);
+  bool relay = rxPacket->prepareForRelaying(duid, data);
   if (relay) {
-    String data = duckutils::convertToHex(rxPacket->getCdpPacketBuffer().data(),
+    String data_str = duckutils::convertToHex(rxPacket->getCdpPacketBuffer().data(),
                                           rxPacket->getCdpPacketBuffer().size());
-    logdbg("relaying:  " + data);
+    logdbg("relaying:  " + data_str);
     recvDataCallback(rxPacket->getCdpPacket());
   }
 }
@@ -81,10 +79,11 @@ void PapaDuck::run() {
 
   handleOtaUpdate();
   if (getReceiveFlag()) {
-    duckutils::setDuckBusy(true);
+    duckutils::setInterrupt(false);
     setReceiveFlag(false);
     handleReceivedPacket();
-    duckutils::setDuckBusy(false);
+    rxPacket->reset();
+    duckutils::setInterrupt(true);
     startReceive();
   }
 }

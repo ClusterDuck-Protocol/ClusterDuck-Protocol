@@ -16,7 +16,7 @@
 #include <WString.h>
 namespace duckutils {
 
-extern volatile bool busyDuck;
+extern volatile bool interruptEnabled;
 extern Timer<> duckTimer;
 
 /**
@@ -49,14 +49,14 @@ String convertToHex(byte* data, int size);
  * 
  * @returns true if interrupt is enabled, false otherwise.
  */
-volatile bool isDuckBusy();
+volatile bool isInterruptEnabled();
 
 /**
  * @brief Toggle the duck Interrupt
- * 
- * @param busy true to enable interrupt, false otherwise.
+ *
+ * @param enable true to enable interrupt, false otherwise.
  */
-void setDuckBusy(bool busy);
+void setInterrupt(bool enable);
 
 /**
  * @brief Convert a byte array to unsigned 32 bit integer.

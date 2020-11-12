@@ -147,7 +147,7 @@ public:
    * @param  packetBytes byte buffer to contain the data 
    * @return DUCK_ERR_NONE if the chip is sucessfuly set in standby mode, an error code otherwise. 
    */
-  int getReceivedData(std::vector<byte>* packetBytes);
+  int readReceivedData(std::vector<byte>* packetBytes);
 
   void processRadioIrq();
   bool isTxBusy() { return txBusy; }
@@ -158,10 +158,6 @@ private:
   DuckRadio& operator=(DuckRadio const&) = delete;
   static DuckRadio* instance;
   DuckDisplay* display = DuckDisplay::getInstance();
-
-  byte transmission[CDPCFG_CDP_BUFSIZE];
-  CDP_Packet packet;
-
   volatile bool txBusy;
 };
 

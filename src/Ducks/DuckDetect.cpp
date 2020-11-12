@@ -48,7 +48,7 @@ void DuckDetect::handleReceivedPacket() {
   loginfo("handleReceivedPacket()...");
 
   std::vector<byte> data;
-  int err = duckRadio->getReceivedData(&data);
+  int err = duckRadio->readReceivedData(&data);
 
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR Failed to get data from DuckRadio. rc = " + String(err));
@@ -65,11 +65,11 @@ void DuckDetect::run() {
   handleOtaUpdate();
   if (getReceiveFlag()) {
     setReceiveFlag(false);
-    duckutils::setDuckBusy(false);
+    duckutils::setInterrupt(false);
 
     handleReceivedPacket();
 
-    duckutils::setDuckBusy(true);
+    duckutils::setInterrupt(true);
     startReceive();
   }
 }
@@ -77,8 +77,7 @@ void DuckDetect::run() {
 void DuckDetect::sendPing(bool startReceive) {
   int err = DUCK_ERR_NONE;
   std::vector<byte> data(1, 0);
-  txPacket->reset();
-  err = txPacket->buildPacketBuffer(reservedTopic::ping, data);
+  err = txPacket->prepareForSending(reservedTopic::ping, data);
 
   if (err == DUCK_ERR_NONE) {
     err = duckRadio->sendData(txPacket->getDataByteBuffer(),
@@ -91,6 +90,6 @@ void DuckDetect::sendPing(bool startReceive) {
     }
   } else {
     logerr("ERROR Failed to build packet, err = "+ String(err));
-    return;
+    txPacket->reset();
   }
 }

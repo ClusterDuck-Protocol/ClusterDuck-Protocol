@@ -1,5 +1,5 @@
 #include "../MamaDuck.h"
-
+#include "../MemoryFree.h"
 int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String password) {
   int err = Duck::setupWithDefaults(deviceId, ssid, password);
 
@@ -38,7 +38,7 @@ int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String 
     return err;
   }
   duckutils::getTimer().every(CDPCFG_MILLIS_ALIVE, imAlive);
-  loginfo("MamaDuck setup done");
+
   return DUCK_ERR_NONE;
 }
 
@@ -47,22 +47,20 @@ void MamaDuck::handleReceivedPacket() {
   std::vector<byte> data;
   bool relay = false;
   
-  loginfo("handleReceivedPacket START");
-  
-  rxPacket->reset();
-  loginfo("reading received data from radio");
+  loginfo("====> handleReceivedPacket: START");
+  int err = duckRadio->readReceivedData(&data);
 
-  int err = duckRadio->getReceivedData(&data);
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR failed to get data from DuckRadio. rc = "+ String(err));
+    std::vector<byte>().swap(data);
+    rxPacket->reset();
     return;
   }
+  logdbg("Got data from radio, prepare for relay. size: "+ String(data.size()));
 
-  relay = rxPacket->update(duid, data);
-
+  relay = rxPacket->prepareForRelaying(duid, data);
   if (relay) {
-    loginfo("====> handleReceivedPacket() packet needs relay.....");
-
+    loginfo("handleReceivedPacket: packet RELAY START");
     // NOTE:
     // Ducks will only handle received message one at a time, so there is a chance the
     // packet being sent below will never be received, especially if the cluster is small
@@ -72,30 +70,31 @@ void MamaDuck::handleReceivedPacket() {
     if (rxPacket->getCdpPacket().topic == reservedTopic::ping) {
       err = sendPong();
       if (err != DUCK_ERR_NONE) {
-        logerr("ERROR failed to send pong message. rc = "+ String(err));
-        return;
+        logerr("ERROR failed to send pong message. rc = " + String(err));
       }
-    } else {
-      err = duckRadio->relayPacket(rxPacket);
-      loginfo("====> handleReceivedPacket() packet sent");
+      rxPacket->reset();
+      return;
+    }
 
-      if (err != DUCK_ERR_NONE) {
-        logerr("ERROR failed to send data. rc = "+ String(err));
-        return;
-      }
+    err = duckRadio->relayPacket(rxPacket);
+    if (err != DUCK_ERR_NONE) {
+      logerr("====> ERROR handleReceivedPacket failed to relay. rc = " + String(err));
+    } else {
+      loginfo("handleReceivedPacket: packet RELAY DONE");
     }
   }
+  rxPacket->reset();
 }
 
 void MamaDuck::run() {
 
   handleOtaUpdate();
-
   if (getReceiveFlag()) {
-    duckutils::setDuckBusy(true);
+    duckutils::setInterrupt(false);
     setReceiveFlag(false);
     handleReceivedPacket();
-    duckutils::setDuckBusy(false);
+    rxPacket->reset();
+    duckutils::setInterrupt(true);
     startReceive();
   }
   processPortalRequest();

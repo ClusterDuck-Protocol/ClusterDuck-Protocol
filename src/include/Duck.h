@@ -211,7 +211,7 @@ protected:
   DuckNet* duckNet = DuckNet::getInstance();
   DuckPacket* txPacket = NULL;
   DuckPacket* rxPacket = NULL;
-  
+
   /**
    * @brief sends a pong message
    * 
@@ -290,7 +290,7 @@ protected:
   static void setReceiveFlag(bool value) { receivedFlag = value; }
   static bool getReceiveFlag() { return receivedFlag; }
 
-  static void onPacketReceived();
+  static void onRadioRxTxDone();
 
   static bool imAlive(void*);
   static bool reboot(void*);

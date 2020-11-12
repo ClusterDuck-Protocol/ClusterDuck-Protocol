@@ -23,11 +23,10 @@ public:
 
     ~DuckPacket() {}
 
-    void setDeviceId(String device_id) { this->deviceId = device_id; }
     void setDeviceId(std::vector<byte> duid) { this->duid = duid; }
 
-    int buildPacketBuffer(byte topic, std::vector<byte> app_data);
-    bool update(std::vector<byte> duid, std::vector<byte> dataBuffer);
+    int prepareForSending(byte topic, std::vector<byte> app_data);
+    bool prepareForRelaying(std::vector<byte> duid, std::vector<byte> dataBuffer);
     
     byte* getDataByteBuffer() { return buffer.data(); }
     
@@ -44,23 +43,21 @@ public:
     }
     
     void reset() {
-      packet.duid.clear();
-      packet.muid.clear();
+      std::vector<byte>().swap(packet.duid);
+      std::vector<byte>().swap(packet.muid);
+      std::vector<byte>().swap(packet.reserved);
+      std::vector<byte>().swap(packet.path);
+      std::vector<byte>().swap(packet.data);
+      std::vector<byte>().swap(buffer);
       packet.topic = 0;
       packet.path_offset = 0;
-      packet.reserved.clear();
-      packet.path.clear();
-      packet.data.clear();
       packet.dcrc = 0;
-      buffer.clear();
     }
 
 private : 
-    String deviceId;
     std::vector<byte> duid;
     std::vector<byte> buffer;
     CDP_Packet packet;
-    int bufferLength;
 };
 
 #endif

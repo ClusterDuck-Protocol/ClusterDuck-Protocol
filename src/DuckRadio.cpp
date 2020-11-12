@@ -1,4 +1,5 @@
 #include "include/DuckRadio.h"
+#include "MemoryFree.h"
 #if !defined(CDPCFG_HELTEC_CUBE_CELL)
 #include "include/DuckUtils.h"
 #include <RadioLib.h>
@@ -71,7 +72,10 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
     return DUCKLORA_ERR_SETUP;
   }
 
+  // set the function that will be called
+  // when packet tx or rx is done.
   lora.setDio0Action(config.func);
+  // set sync word to private network
   lora.setSyncWord(0x12);
 
   txBusy = false;
@@ -85,34 +89,56 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
   return DUCK_ERR_NONE;
 }
 
-int DuckRadio::getReceivedData(std::vector<byte>* packetBytes) {
+int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
 
   int pSize = 0;
   int err = DUCK_ERR_NONE;
 
   pSize = lora.getPacketLength();
 
-  if (pSize == 0) {
-    logerr("ERROR  handlePacket rx data length is 0");
+  if (pSize == 0 || pSize < MIN_PACKET_LENGTH) {
+    logerr("ERROR  handlePacket rx data size invalid: " + String(pSize));
     return DUCKLORA_ERR_HANDLE_PACKET;
   }
-  logdbg("getReceivedData() - packet length returns: "+ String(pSize));
+  
+  loginfo("readReceivedData() - packet length returns: "+ String(pSize));
 
   packetBytes->resize(pSize);
-  //display->log("data-in: ****");
   err = lora.readData(packetBytes->data(), pSize);
+  loginfo("readReceivedData() - lora.readData returns: " + String(err));
+
   if (err != ERR_NONE) {
-    logerr("ERROR  handlePacket failed. err: "+ String(err));
-    //display->log("data-in:!!"+ String(err));
+    logerr("ERROR  readReceivedData failed. err: " + String(err));
     return DUCKLORA_ERR_HANDLE_PACKET;
   }
 
-  //display->log("data-in: ok "+ String(pSize));
-  loginfo(
-      "RX: rssi: " + String(lora.getRSSI()) + 
-      " snr: " + String(lora.getSNR()) +
-      " fe: " + String(lora.getFrequencyError()) + 
-      " size: " + String(pSize));
+  loginfo("readReceivedData: checking path offset integrity");
+  byte* data = packetBytes->data();
+  int path_pos = data[PATH_OFFSET_POS];
+  if (path_pos >= packetBytes->size()) {
+    logerr("ERROR path offset out of bound. Data is probably corrupted.");
+    return DUCKLORA_ERR_HANDLE_PACKET;
+  }
+
+  loginfo("readReceivedData: checking data section CRC");
+
+  std::vector<byte> data_section;
+  data_section.insert(data_section.end(), &data[DATA_POS],
+                      &data[path_pos]);
+  uint32_t packet_data_crc = duckutils::toUnit32(&data[DATA_CRC_POS]);
+  uint32_t computed_data_crc = CRC32::calculate(data_section.data(), data_section.size());
+
+  if (computed_data_crc != packet_data_crc) {
+    logerr("ERROR data crc mismatch: received: " + String(packet_data_crc) +
+           " calculated:" + String(computed_data_crc));
+    return DUCKLORA_ERR_HANDLE_PACKET;
+  }
+  // we have a good packet
+  loginfo("RX: rssi: " + String(lora.getRSSI()) +
+          " snr: " + String(lora.getSNR()) +
+          " fe: " + String(lora.getFrequencyError(true)) +
+          " size: " + String(pSize));
+
   return err;
 }
 
@@ -158,8 +184,9 @@ void DuckRadio::processRadioIrq() {}
 
 int DuckRadio::startTransmitData(byte* data, int length) {
 
-  bool wasBusy = duckutils::isDuckBusy();
-  duckutils::setDuckBusy(true);
+  bool interruptWasEnabled = duckutils::isInterruptEnabled();
+  // we are ready to transmit so radio cannot be interrupted
+  duckutils::setInterrupt(false);
 
   int err = DUCK_ERR_NONE;
   int tx_err = ERR_NONE;
@@ -170,6 +197,7 @@ int DuckRadio::startTransmitData(byte* data, int length) {
 
   long t1 = millis();
   // this is going to wait for transmission to complete or to timeout
+  // when transmit is complete, the Di0 interrupt will be triggered
   tx_err = lora.transmit(data, length);
   switch (tx_err) {
     case ERR_NONE:
@@ -195,9 +223,12 @@ int DuckRadio::startTransmitData(byte* data, int length) {
       err = DUCKLORA_ERR_TRANSMIT;
       break;
   }
-  
-  if (!wasBusy) {
-    duckutils::setDuckBusy(false);
+
+  if (interruptWasEnabled) {
+    duckutils::setInterrupt(true);
+    // we can set the radio back to receive mode
+    // di0 interrupt will trigger again and set a receive flag
+    // if a packet is received. See void Duck::onRadioRxTxDone(void)
     rx_err = startReceive();
     if (rx_err != ERR_NONE) {
       display->log("strt-rx-fail");

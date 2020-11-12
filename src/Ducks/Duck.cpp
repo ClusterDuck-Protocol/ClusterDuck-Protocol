@@ -4,13 +4,13 @@
 volatile bool Duck::receivedFlag = false;
 
 Duck::Duck(String name) {
-  duckutils::setDuckBusy(false);
+  duckutils::setInterrupt(true);
   duckName = name;
 }
 
 Duck::Duck(std::vector<byte> id) {
   duid.insert(duid.end(), id.begin(), id.end());
-  duckutils::setDuckBusy(true);
+  duckutils::setInterrupt(true);
 }
 
 int Duck::setDeviceId(std::vector<byte> id) {
@@ -48,13 +48,15 @@ int Duck::setupSerial(int baudRate) {
   return DUCK_ERR_NONE;
 }
 
-void Duck::onPacketReceived(void) {
-  // set the received flag to true if we are not already busy processing
-  // a received packet
-  if (duckutils::isDuckBusy()) {
-    logdbg("onPacketReceived: duck is busy...skip received packet");
+// this function is called when a complete packet is transmitted by the module
+// IMPORTANT: this function MUST be 'void' type and MUST NOT have any arguments!
+void Duck::onRadioRxTxDone(void) {
+  if (!duckutils::isInterruptEnabled()) {
     return;
   }
+  // we set a "received" flag here because after transmiting a packet we
+  // re-enabled the RX on the radio
+  // see DuckRadio::startTransmitData(byte* data, int length)
   setReceiveFlag(true);
 }
 
@@ -67,8 +69,8 @@ int Duck::setupRadio(float band, int ss, int rst, int di0, int di1, int txPower)
   config.di0 = di0;
   config.di1 = di1;
   config.txPower = txPower;
-  config.func = Duck::onPacketReceived;
-  
+  config.func = Duck::onRadioRxTxDone;
+
   int err = duckRadio->setupRadio(config);
 
   if (err == DUCKLORA_ERR_BEGIN) {
@@ -221,22 +223,25 @@ int Duck::sendData(byte topic, const byte* data, int length) {
 }
 
 int Duck::sendData(byte topic, std::vector<byte> data) {
-
-  txPacket->reset();
-
   if (topic < reservedTopic::max_reserved) {
     logerr("ERROR send data failed, topic is reserved.");
     return DUCKPACKET_ERR_TOPIC_INVALID;
   }
-  int err = txPacket->buildPacketBuffer(topic, data);
+  if (data.size() > MAX_DATA_LENGTH) {
+    logerr("ERROR send data failed, message too large: "+ String(data.size()) + " bytes");
+    return DUCKPACKET_ERR_SIZE_INVALID;
+  }
+  int err = txPacket->prepareForSending(topic, data);
+
   if ( err != DUCK_ERR_NONE) {
-    duckutils::setDuckBusy(false);
+    duckutils::setInterrupt(false);
+    txPacket->reset();
     return err;
   }
 
   int length = txPacket->getBufferLength();
   err = duckRadio->sendData(txPacket->getDataByteBuffer(), length);
-
+  txPacket->reset();
   return err;
 }
 
@@ -273,8 +278,7 @@ int Duck::startReceive() {
 int Duck::sendPong() {
   int err = DUCK_ERR_NONE;
   std::vector<byte> data(1, 0);
-  txPacket->reset();
-  err = txPacket->buildPacketBuffer(reservedTopic::pong, data);
+  err = txPacket->prepareForSending(reservedTopic::pong, data);
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR Oops! failed to build pong packet, err = " + err);
     return err;
@@ -290,8 +294,7 @@ int Duck::sendPong() {
 int Duck::sendPing() {
   int err = DUCK_ERR_NONE;
   std::vector<byte> data(1, 0);
-  txPacket->reset();
-  err = txPacket->buildPacketBuffer(reservedTopic::ping, data);
+  err = txPacket->prepareForSending(reservedTopic::ping, data);
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR Failed to build ping packet, err = " + err);
     return err;
@@ -300,7 +303,6 @@ int Duck::sendPing() {
                             txPacket->getBufferLength());
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR Lora sendData failed, err = " + err);
-    return err;
   }
   return err;
 }

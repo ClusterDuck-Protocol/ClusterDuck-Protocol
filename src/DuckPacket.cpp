@@ -2,35 +2,25 @@
 #include "DuckError.h"
 #include "DuckLogger.h"
 #include "include/DuckUtils.h"
+#include "MemoryFree.h"
 #include <string>
 
-bool DuckPacket::update(std::vector<byte> duid, std::vector<byte> dataBuffer) {
+bool DuckPacket::prepareForRelaying(std::vector<byte> duid, std::vector<byte> dataBuffer) {
 
   bool relaying;
-  byte path_pos;
-  byte packet_length = dataBuffer.size();
+  int packet_length = dataBuffer.size();
+
+  this->reset();
+
+  loginfo("prepareForRelaying: START");
+  logdbg("prepareForRelaying: building packet from received data...");
+
+  // get data section and data crc
+  byte* data = dataBuffer.data();
+  int path_pos = data[PATH_OFFSET_POS];
   std::vector<byte> data_section;
-
-  logdbg("RX buffer: " +
-         String(duckutils::convertToHex(dataBuffer.data(), dataBuffer.size())));
-
-  if (packet_length < MIN_PACKET_LENGTH) {
-    logerr("ERROR Packet size is invalid: (" + String(packet_length) +
-           ") Data may be corrupted.");
-    return false;
-  }
-
-  path_pos = dataBuffer[PATH_OFFSET_POS];
-  data_section.insert(data_section.end(), &dataBuffer[DATA_POS], &dataBuffer[path_pos]);
-  packet.dcrc = duckutils::toUnit32(&dataBuffer[DATA_CRC_POS]);
-  logdbg("DATA SECTION: " + String(duckutils::convertToHex(
-                                data_section.data(), data_section.size())));
-  uint32_t computed_crc = CRC32::calculate(data_section.data(), data_section.size());
-
-  if (computed_crc != packet.dcrc) {
-    logerr("ERROR data crc mismatch: was: "+ String(packet.dcrc) + " expected:" + String(computed_crc));
-    return false;
-  }
+  data_section.insert(data_section.end(), &data[DATA_POS], &data[path_pos]);
+  uint32_t packet_data_crc = duckutils::toUnit32(&data[DATA_CRC_POS]);
 
   // build an rxPacket with data we have received
   // duid
@@ -43,7 +33,8 @@ bool DuckPacket::update(std::vector<byte> duid, std::vector<byte> dataBuffer) {
   packet.path_offset = dataBuffer[PATH_OFFSET_POS];
   // reserved
   packet.reserved.insert(packet.reserved.end(), &dataBuffer[RESERVED_POS], &dataBuffer[DATA_POS]);
-
+  // data crc
+  packet.dcrc = packet_data_crc;
   // data section
   packet.data.insert(packet.data.end(), data_section.begin(), data_section.end());
   // path section
@@ -51,21 +42,24 @@ bool DuckPacket::update(std::vector<byte> duid, std::vector<byte> dataBuffer) {
   // update the rx packet byte buffer
   buffer.insert(buffer.end(), dataBuffer.begin(), dataBuffer.end());
 
-  //logdbg("Current path: " + String(duckutils::convertToHex(packet.path.data(), packet.path.size())));
+  loginfo("prepareForRelaying: Packet is built. Checking for relay...");
 
   // check if we need to relay the packet
   relaying = relay(duid);
-  //logdbg("Updated path: " + String(duckutils::convertToHex(packet.path.data(), packet.path.size())));
-  logdbg("Updated buffer: " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
+  if(!relaying) {
+    this->reset();
+  }
+  loginfo("prepareForRelaying: DONE. Relay = "+ String (relaying));
   return relaying;
 }
 
-int DuckPacket::buildPacketBuffer(byte topic, std::vector<byte> app_data) {
-
+int DuckPacket::prepareForSending(byte topic, std::vector<byte> app_data) {
 
   uint8_t app_data_length = app_data.size();
+  
+  this->reset();
 
-  loginfo("buildPacketBuffer: DATA LENGTH: " + String(app_data_length) +
+  loginfo("prepareForSending: DATA LENGTH: " + String(app_data_length) +
           " TOPIC: " + String(topic));
 
   if (app_data_length > MAX_DATA_LENGTH) {
@@ -85,39 +79,39 @@ int DuckPacket::buildPacketBuffer(byte topic, std::vector<byte> app_data) {
   // ----- insert packet header  -----
   // device uid
   buffer.insert(buffer.end(), duid.begin(), duid.end());
-   logdbg("Duid:      " + String(duckutils::convertToHex(duid.data(), duid.size())));
+  //logdbg("Duid:      " + duckutils::convertToHex(duid.data(), duid.size()));
 
   // message uid
   buffer.insert(buffer.end(), &message_id[0], &message_id[MUID_LENGTH]);
-  logdbg("Muid:      " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
+  //logdbg("Muid:      " + duckutils::convertToHex(buffer.data(), buffer.size()));
 
   // topic
   buffer.insert(buffer.end(), topic);
-  logdbg("Topic:     " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
+  //logdbg("Topic:     " + duckutils::convertToHex(buffer.data(), buffer.size()));
 
   // path offset
   byte offset = HEADER_LENGTH + app_data_length;
   buffer.insert(buffer.end(), offset);
-  logdbg("Offset:    " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
+  //logdbg("Offset:    " + duckutils::convertToHex(buffer.data(), buffer.size()));
 
   // reserved
   buffer.insert(buffer.end(), 0x00);
   buffer.insert(buffer.end(), 0x00);
-  logdbg("Reserved:  " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
+  //logdbg("Reserved:  " + duckutils::convertToHex(buffer.data(), buffer.size()));
 
   // data crc
   buffer.insert(buffer.end(), &crc_bytes[0], &crc_bytes[DATA_CRC_LENGTH]);
-  logdbg("Data CRC:  " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
+  //logdbg("Data CRC:  " + duckutils::convertToHex(buffer.data(), buffer.size()));
 
   // ----- insert data -----
   buffer.insert(buffer.end(), app_data.begin(), app_data.end());
-  logdbg("Data:      " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
+  //logdbg("Data:      " + duckutils::convertToHex(buffer.data(), buffer.size()));
 
   // ----- insert path -----
   buffer.insert(buffer.end(), duid.begin(), duid.end());
-  logdbg("Path:      " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
+  //logdbg("Path:      " + duckutils::convertToHex(buffer.data(), buffer.size()));
 
-  logdbg("Built packet: " + String(duckutils::convertToHex(buffer.data(), buffer.size())));
+  //logdbg("Built packet: " + duckutils::convertToHex(buffer.data(), buffer.size()));
   return DUCK_ERR_NONE;
 }
 
@@ -125,14 +119,17 @@ int DuckPacket::buildPacketBuffer(byte topic, std::vector<byte> app_data) {
 // packet needs to be send back into the mesh for the next hop.
 bool DuckPacket::relay(std::vector<byte> duid) {
 
-  int hops = packet.path.size() / DUID_LENGTH;
+  int path_length = packet.path.size();
+  int hops = path_length / DUID_LENGTH;
+
   if (hops >= MAX_HOPS) {
     logerr("ERROR Max hops reached. Cannot relay packet.");
     return false;
   }
 
-  if ((packet.path.size() + DUID_LENGTH) > MAX_PATH_LENGTH) {
-    logerr("ERROR Path section corrupted. Cannot relay packet.");
+  if ((path_length + DUID_LENGTH) > MAX_PATH_LENGTH) {
+    logerr("ERROR Path section corrupted. Cannot relay packet. " +
+           String((path_length + DUID_LENGTH)));
     return false;
   }
   // we don't have a contains() method but we can use indexOf()

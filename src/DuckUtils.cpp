@@ -4,11 +4,11 @@
 
 namespace duckutils {
 
-volatile bool busyDuck = false;
+volatile bool interruptEnabled = true;
 Timer<> duckTimer = timer_create_default();
 
-volatile bool isDuckBusy() { return busyDuck; }
-void setDuckBusy(bool busy) { busyDuck = busy; }
+volatile bool isInterruptEnabled() { return interruptEnabled; }
+void setInterrupt(bool enable) { interruptEnabled = enable; }
 
 Timer<> getTimer() { return duckTimer; }
 
@@ -37,17 +37,12 @@ String createUuid(int length) {
 
 String convertToHex(byte* data, int size) {
   String buf = "";
-  buf.reserve(size * 3); // 2 digit hex + separator
+  buf.reserve(size * 2); // 2 digit hex
   const char* cs = "0123456789ABCDEF";
   for (int i = 0; i < size; i++) {
     byte val = data[i];
     buf += cs[(val >> 4) & 0x0F];
     buf += cs[val & 0x0F];
-    /*
-    if(i < size - 1) {
-      buf += ':';
-    }
-    */
   }
   return buf;
 }
