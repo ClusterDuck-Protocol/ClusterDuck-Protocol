@@ -1,0 +1,40 @@
+{
+    "name": "ClusterDuck Protocol",
+    "keywords": "lora, mesh, emergency-network, ducks, owl, iot",
+    "description": "An open source firmware for a mesh network of Internet-of-Things devices based on LoRa (Long Range radio)",
+    "authors":
+    {
+        "name": "Project OWL",
+        "email": "info@project-owl.com",
+        "url": "https://www.project-owl.com"
+    },
+    "version": "1.1.6",
+    "repository":
+    {
+        "type": "git",
+        "url": "https://github.com/Code-and-Response/ClusterDuck-Protocol.git"
+    },
+    "export":
+    {
+        "include": 
+        [
+            "ClusterDuck.[cpp|.h]",
+            "index.h",
+            "examples/*"
+        ]
+    },
+    "frameworks": "arduino",
+    "platforms": "espressif32",
+    
+    "examples": [
+        "[Ee]xamples/*/*.ino"
+    ],
+    "dependencies": {
+        "U8g2": "~2.28.0",
+        "arduino-timer": "~2.0.1",
+        "ESP Async WebServer": "~1.2.3",
+        "RadioLib": "~3.5.0"
+    }
+ 
+}
+
