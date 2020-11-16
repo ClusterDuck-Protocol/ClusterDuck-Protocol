@@ -1,7 +1,7 @@
 
 [submodule "Libraries/RadioLib"]
 	path = Libraries/RadioLib
-	url = https://github.com/jgromes/RadioLib
+	url = https://github.com/jgromes/RadioLib.git
 [submodule "Libraries/arduino-timer"]
 	path = Libraries/arduino-timer
 	url = https://github.com/contrem/arduino-timer
@@ -26,9 +26,6 @@
 [submodule "Libraries/DHT-sensor-library"]
 	path = Libraries/DHT-sensor-library
 	url = https://github.com/adafruit/DHT-sensor-library
-[submodule "Libraries/ArduinoJson"]
-	path = Libraries/ArduinoJson
-	url = https://github.com/bblanchon/ArduinoJson.git
 [submodule "Libraries/U8g2_Arduino"]
 	path = Libraries/U8g2_Arduino
 	url = https://github.com/olikraus/U8g2_Arduino.git
@@ -47,3 +44,6 @@
 [submodule "Libraries/AXP202X_Library"]
 	path = Libraries/AXP202X_Library
 	url = https://github.com/lewisxhe/AXP202X_Library.git
+[submodule "Libraries/ArduinoJson"]
+	path = Libraries/ArduinoJson
+	url = https://github.com/bblanchon/ArduinoJson.git
