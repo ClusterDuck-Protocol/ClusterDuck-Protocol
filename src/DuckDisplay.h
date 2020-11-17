@@ -10,35 +10,16 @@
  *
  * @copyright
  */
-
 #ifndef DUCKDISPLAY_H_
 #define DUCKDISPLAY_H_
-
 #include "include/cdpcfg.h"
 #include <Arduino.h>
 #include <WString.h>
 #include "include/DuckTypes.h"
 #include "include/DuckEsp.h"
-#include "DuckLogger.h"
-
 #ifndef CDPCFG_OLED_NONE
-#include <U8x8lib.h>
-#define CDP_LOG_DISPLAY
+#include <U8g2lib.h>
 #endif
-
-
-
-#ifdef CDP_LOG_DISPLAY
-#define logdisp(...)                                                           \
-  do {                                                                         \
-    u8x8log.println(__VA_ARGS__);                                              \
-  } while (0)
-#else
-#define logdisp(...)                                                           \
-  {}
-#endif
-
-
 /**
  * @brief Internal OLED Display abstraction.
  *
@@ -54,32 +35,26 @@ public:
    * @returns A pointer to a DuckDisplay object.
    */
   static DuckDisplay* getInstance();
-
 #ifdef CDPCFG_OLED_NONE
   void setupDisplay(int duckType, String duid) {}
   void powerSave(bool save){}
-  void drawString(uint8_t x, uint8_t y, const char* text) {}
-  void drawString(bool cls, uint8_t x, uint8_t y, const char* text) {}
-  void setCursor(uint8_t x, uint8_t y) {}
+  void drawString(u8g2_uint_t x, u8g2_uint_t y, const char *s) {}
+  void drawString(bool cls,u8g2_uint_t x, u8g2_uint_t y, const char *s) {}
+  void setCursor(u8g2_uint_t x, u8g2_uint_t y) {}
   void print(String text) {}
   void clear(void) {}
-  void log(String text) {}
-  uint8_t getWidth() {return 0;}
-  uint8_t getHeight() {return 0;}
-  void showDefaultScreen(){};
 #else
   /**
    * @brief Initialize the display component.
    * 
    */
-  void setupDisplay(int duckType, String name);
+  void setupDisplay(int duckType, String duid);
   /**
    * @brief Toggle the display in or out of power saving mode.
    * 
    * @param save Set to true to enable power saving, false to disable
    */
   void powerSave(bool save);
-
   /**
    * @brief Draw a string at the given coordinates.
    *
@@ -87,8 +62,7 @@ public:
    * @param y     value of Y coordinate
    * @param text  string to draw
    */
-  void drawString(uint8_t x, uint8_t y, const char* text);
-
+  void drawString(u8g2_uint_t x, u8g2_uint_t y, const char *s);
   /**
    * @brief Draw a string at the given coordinates.
    *
@@ -97,47 +71,31 @@ public:
    * @param y     value of Y coordinate
    * @param text  string to draw
    */
-  void drawString(bool cls, uint8_t x, uint8_t y, const char* text);
-
+  void drawString(bool cls, u8g2_uint_t x, u8g2_uint_t y, const char *s);
   /**
    * @brief Set the cursor to the given position on the screen.
    *
    * @param x X coordinate value
    * @param y Y coordinate value
    */
-  void setCursor(uint8_t x, uint8_t y);
-
+  void setCursor(u8g2_uint_t x, u8g2_uint_t y);
   /**
    * @brief Print a string at the current cursor position.
    *
    * @param text string to draw
    */
-  void print(String text);
-
-#if defined(CDP_LOG_DISPLAY) && !defined(CDPCFG_OLED_NONE)
-  /**
-   * @brief logs traces on the display if the device has one
-   *
-   * @param text trace to display
-   */
-  void log(String text);
-#else
-  void log(String text) {}
-#endif
-
+  void print(String s);
   /**
    * @brief Clear the screen.
    * 
    */
   void clear(void);
-
   void showDefaultScreen();
-
   uint8_t getWidth() {return width;}
   uint8_t getHeight() {return height;}
 
 #endif
-      private :
+private:
 #ifdef CDPCFG_OLED_CLASS
   #define U8LOG_WIDTH 16
   #define U8LOG_HEIGHT 8

@@ -54,6 +54,7 @@
 #define CDPCFG_PIN_LORA_RST 23
 
 // Oled Display settings
+// #define CDPCFG_PIN_OLED_ROTATION U8G2_R0
 #define CDPCFG_PIN_OLED_CLOCK 15
 #define CDPCFG_PIN_OLED_DATA 4
 #define CDPCFG_PIN_OLED_RESET 16
@@ -81,12 +82,33 @@
 #define CDPCFG_PIN_LORA_RST 14
 
 // Oled Display settings
-#define CDPCFG_PIN_OLED_CLOCK 22
-#define CDPCFG_PIN_OLED_DATA 21
+
+#define CDPCFG_PIN_OLED_CLOCK 15
+#define CDPCFG_PIN_OLED_DATA 4
+#define CDPCFG_PIN_OLED_RESET 16
+#define CDPCFG_PIN_OLED_ROTATION U8G2_R0
 
 // actualy missing
-#define CDPCFG_PIN_OLED_RESET -1
 #define CDPCFG_PIN_LORA_DIO1 -1
+
+// T-Beam
+ #elif defined(ARDUINO_TBeam)
+  #define CDPCFG_PIN_BAT 35 
+  #define CDPCFG_BAT_MULDIV 200 / 100 
+  #define CDPCFG_PIN_LED1 25 
+  // Lora configurations 
+  #define CDPCFG_PIN_LORA_CS 18 
+  #define CDPCFG_PIN_LORA_DIO0 26 
+  #define CDPCFG_PIN_LORA_RST 14 
+  // Oled Display settings 
+  #define CDPCFG_PIN_OLED_CLOCK 22 
+  #define CDPCFG_PIN_OLED_DATA 21 
+  #define CDPCFG_PIN_OLED_RESET 16 
+  #define CDPCFG_PIN_OLED_ROTATION U8G2_R0 
+  // actualy missing 
+  #define CDPCFG_PIN_LORA_DIO1 -1
+
+
 
 /*
  * BOARD "heltec wireless stick"
@@ -324,6 +346,7 @@
 #define CDPCFG_PIN_OLED_CLOCK 15
 #define CDPCFG_PIN_OLED_DATA 4
 #define CDPCFG_PIN_OLED_RESET 16
+#define CDPCFG_PIN_OLED_ROTATION U8G2_R0
 
 // actualy missing
 #define CDPCFG_PIN_LORA_DIO1 -1
@@ -391,10 +414,10 @@
 // do nothing
 #elif defined(CDPCFG_OLED_64x32)
 // smaller displays
-#define CDPCFG_OLED_CLASS U8X8_SSD1306_64X32_NONAME_SW_I2C
+#define CDPCFG_OLED_CLASS U8G2_SSD1306_64X32_NONAME_F_SW_I2C
 #else
 // classic default
-#define CDPCFG_OLED_CLASS U8X8_SSD1306_128X64_NONAME_SW_I2C
+#define CDPCFG_OLED_CLASS U8G2_SSD1306_128X64_NONAME_F_SW_I2C
 #endif
 #endif
 
