@@ -37,12 +37,16 @@ public:
   static DuckDisplay* getInstance();
 #ifdef CDPCFG_OLED_NONE
   void setupDisplay(int duckType, String duid) {}
-  void powerSave(bool save){}
-  void drawString(u8g2_uint_t x, u8g2_uint_t y, const char *s) {}
-  void drawString(bool cls,u8g2_uint_t x, u8g2_uint_t y, const char *s) {}
-  void setCursor(u8g2_uint_t x, u8g2_uint_t y) {}
+  void powerSave(bool save) {}
+  void drawString(uint8_t x, uint8_t y, const char* text) {}
+  void drawString(bool cls, uint8_t x, uint8_t y, const char* text) {}
+  void setCursor(uint8_t x, uint8_t y) {}
   void print(String text) {}
   void clear(void) {}
+  void log(String text) {}
+  uint8_t getWidth() { return 0; }
+  uint8_t getHeight() { return 0; }
+  void showDefaultScreen(){};
 #else
   /**
    * @brief Initialize the display component.
@@ -93,19 +97,11 @@ public:
   void showDefaultScreen();
   uint8_t getWidth() {return width;}
   uint8_t getHeight() {return height;}
-
+  
+  //TODO implement this for the U8g2 library
+  void log(String text) {}
 #endif
 private:
-#ifdef CDPCFG_OLED_CLASS
-  #define U8LOG_WIDTH 16
-  #define U8LOG_HEIGHT 8
-      CDPCFG_OLED_CLASS u8x8 = CDPCFG_OLED_CLASS(CDPCFG_PIN_OLED_CLOCK,
-                                                 CDPCFG_PIN_OLED_DATA,
-                                                 CDPCFG_PIN_OLED_RESET);
-  uint8_t u8log_buffer[U8LOG_WIDTH * U8LOG_HEIGHT];
-  U8X8LOG u8x8log;
-#endif
-
   DuckDisplay();
   DuckDisplay(DuckDisplay const&) = delete;
   DuckDisplay& operator=(DuckDisplay const&) = delete;
