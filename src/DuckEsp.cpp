@@ -3,12 +3,15 @@
 namespace duckesp {
 #ifdef ESP32
 void restartDuck() { ESP.restart(); }
+int freeHeapMemory() {ESP.getFreeHeap();}
 #else 
 void restartDuck() {}
+int freeHeapMemory() {}
 #endif
 
 #ifdef ESP32
-String getDuckMacAddress(boolean format) {
+    String
+    getDuckMacAddress(boolean format) {
   char id1[15];
   char id2[15];
 
@@ -40,6 +43,6 @@ String getDuckMacAddress(boolean format) {
   }
 }
 #else
-String getDuckMacAddress(boolean format) {return "unknown";}
+    String getDuckMacAddress(boolean format) {return "unknown";}
 #endif
 } // namespace duckesp
