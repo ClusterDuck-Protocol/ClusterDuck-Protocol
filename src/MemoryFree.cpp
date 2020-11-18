@@ -5,6 +5,12 @@ extern "C" char* sbrk(int incr);
 extern char* __brkval;
 #endif // __arm__
 
+#ifdef ESP32
+#include "include/DuckEsp.h"
+int freeMemory() {
+  return duckesp::freeHeapMemory();
+}
+#else
 int freeMemory() {
   char top;
 #ifdef __arm__
@@ -15,3 +21,4 @@ int freeMemory() {
   return __brkval ? &top - __brkval : &top - __malloc_heap_start;
 #endif // __arm__
 }
+#endif //ESP32
