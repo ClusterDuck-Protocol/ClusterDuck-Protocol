@@ -167,6 +167,61 @@
 #define CDPCFG_PIN_LORA_DIO1 -1
 
 /*
+ * BOARD "Heltec Cube Cell Board ASR6501 with SX1262"
+ * https://heltec.org/project/htcc-ab01/
+ * pio: board = cubecell_board
+ */
+#elif defined(CubeCell_Board)
+
+#define CDPCFG_HELTEC_CUBE_CELL
+
+// TODO: These are not used by the Heltec LoRa library
+// But they still need to be defined for now because the Duck::setupRadio() uses them.
+// Update the setupRadio to use a RadioConfig data structure instead so we don't need to expose these to the apps
+#define CDPCFG_PIN_LORA_CS 10
+#define CDPCFG_PIN_LORA_DIO0 9 // BUSY PIN
+#define CDPCFG_PIN_LORA_DIO1 8
+#define CDPCFG_PIN_LORA_DIO2 -1
+#define CDPCFG_PIN_LORA_RST 14
+
+// Oled Display settings
+#define CDPCFG_OLED_NONE
+
+// Wifi module
+#define CDPCFG_WIFI_NONE
+//===== BOARD "Heltec Cube Cell Board ASR6501 with SX1262" =====
+
+#elif defined(CubeCell_GPS)
+
+#define CDPCFG_HELTEC_CUBE_CELL
+
+// Uncomment this to enable the OLED display
+//#define ENABLE_DISPLAY
+
+// TODO: These are not used by the Heltec LoRa library
+// But they still need to be defined for now because the Duck::setupRadio() uses
+// them. Update the setupRadio to use a RadioConfig data structure instead so we
+// don't need to expose these to the apps
+#define CDPCFG_PIN_LORA_CS 10
+#define CDPCFG_PIN_LORA_DIO0 9 // BUSY PIN
+#define CDPCFG_PIN_LORA_DIO1 8
+#define CDPCFG_PIN_LORA_DIO2 -1
+#define CDPCFG_PIN_LORA_RST 14
+
+// Oled Display settings
+#ifdef ENABLE_DISPLAY
+#define CDPCFG_PIN_OLED_CLOCK 15
+#define CDPCFG_PIN_OLED_DATA 4
+#define CDPCFG_PIN_OLED_RESET 16
+#else
+#define CDPCFG_OLED_NONE
+#endif
+
+// Wifi module
+#define CDPCFG_WIFI_NONE
+//===== BOARD "Heltec Cube Cell Board ASR6502+GPS+DISPLAY with SX1262" =====
+
+/*
  * BOARD "rocket scream Mini Ultra Pro v3"
  * https://www.rocketscream.com/blog/docs-item/mini-ultra-pro-hookup-guide/
  * pio: board = arduino_zero
@@ -262,7 +317,7 @@
 // actualy missing
 #define CDPCFG_PIN_LORA_DIO1 -1
 
-#else
+#else // Default to WIFI_LORA_32_V2 board
 
 #if !defined(ARDUINO_HELTEC_WIFI_LORA_32_V2)
 #warning "NO BOARD DEFINED, DEFAULTING TO HELTEC v2"
@@ -296,7 +351,7 @@
 // actualy missing
 #define CDPCFG_PIN_LORA_DIO1 -1
 
-#endif
+#endif  // Board definitions
 
 /**
  * @brief Non board specific configuration
@@ -322,6 +377,7 @@
 
 /// Frequency Range. Set for US Region 915.0Mhz
 #define CDPCFG_RF_LORA_FREQ 915.0
+#define CDPCFG_RF_LORA_FREQ_HZ 915000000
 /// Bandwidth. Default is 125Mhz
 #define CDPCFG_RF_LORA_BW 125.0
 /// Spread Factor
@@ -348,8 +404,8 @@
 /// CDP RGB Led BLUE Pin default value
 #define CDPCFG_PIN_RGBLED_B 2
 
-#ifndef CDPCFG_LORA_CLASS
-/// Default LoRa Module supported chipset
+/// Default LoRa Module supported chipset when using the RadioLib library
+#if !defined(CDPCFG_LORA_CLASS) && !defined(CDPCFG_HELTEC_CUBE_CELL)
 #define CDPCFG_LORA_CLASS SX1276
 #endif
 

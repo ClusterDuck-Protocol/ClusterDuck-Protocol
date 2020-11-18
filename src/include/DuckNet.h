@@ -1,9 +1,10 @@
 /**
  * @file DuckNet.h
  * @brief This file is internal to CDP and provides the library access to
- * networking functions. 
- * 
- * The implementation is conditioned by the `CDPCFG_WIFI_NONE` flag which may be defined in `cdpcfh.h` to disable WiFi.
+ * networking functions.
+ *
+ * The implementation is conditioned by the `CDPCFG_WIFI_NONE` flag which may be
+ * defined in `cdpcfh.h` to disable WiFi.
  * @version
  * @date 2020-09-16
  *
@@ -13,12 +14,12 @@
 #ifndef DUCKNET_H_
 #define DUCKNET_H_
 
-#include <WString.h>
 #include "cdpcfg.h"
+#include <WString.h>
 
 #ifdef CDPCFG_WIFI_NONE
 
-#include "DuckLora.h"
+#include "DuckRadio.h"
 #include "DuckUtils.h"
 
 #else
@@ -34,7 +35,7 @@
 
 #include "../DuckError.h"
 #include "DuckEsp.h"
-#include "DuckLora.h"
+#include "DuckRadio.h"
 #include "DuckUtils.h"
 #include "OTAPage.h"
 #include "index.h"
@@ -42,7 +43,7 @@
 #endif
 
 #define AP_SCAN_INTERVAL_MS 10
- 
+
 /**
  * @brief Internal network abstraction.
  *
@@ -56,37 +57,57 @@ public:
    * @returns A pointer to DuckNet object.
    */
   static DuckNet* getInstance();
-  
+
 #ifdef CDPCFG_WIFI_NONE
-  void setupWebServer(bool createCaptivePortal = false, String html = "") {}
-  void setupWifiAp(const char* accessPoint = "🆘 DUCK EMERGENCY PORTAL") {}
-  int setupDns() {}
-  void setupInternet(String ssid, String password) {}
-  bool ssidAvailable(String val = "") {return false;}
+  int setupWebServer(bool createCaptivePortal = false, String html = "") {
+    logwarn("WARNING setupWebServer skipped, device has no WiFi.");
+    return DUCK_ERR_NONE;
+  }
+  int setupWifiAp(const char* accessPoint = "🆘 DUCK EMERGENCY PORTAL") {
+    logwarn("WARNING setupWifiAp skipped, device has no WiFi.");
+    return DUCK_ERR_NONE;
+  }
+  int setupDns() {
+    logwarn("WARNING setupDns skipped, device has no WiFi.");
+    return DUCK_ERR_NONE;
+  }
+
+  int setupInternet(String ssid, String password) {
+    logwarn("WARNING setupInternet skipped, device has no WiFi.");
+    return DUCK_ERR_NONE;
+  }
+  
+  bool ssidAvailable(String val = "") { return false; }
   void setSsid(String val) {}
   void setPassword(String val) {}
-  String getSsid() {return "";}
-  String getPassword() {return "";}
-  void setDeviceId(String deviceId) {}
-  bool isWifiConnected() {return false;}
-#else 
+  String getSsid() { return ""; }
+  String getPassword() { return ""; }
+  void setDeviceId(std::vector<byte> deviceId) {}
+  bool isWifiConnected() { return false; }
+#else
   /**
    * @brief Set up the WebServer.
-   * 
-   * The WebServer is used to communicate with the Duck over ad-hoc WiFi connection.
-   * 
-   * @param createCaptivePortal set to true if Captive WiFi connection is needed. Defaults to false
-   * @param html A string representing custom HTML code used for the portal. Default is an empty string
-   * Default portal web page is used if the string is empty
+   *
+   * The WebServer is used to communicate with the Duck over ad-hoc WiFi
+   * connection.
+   *
+   * @param createCaptivePortal set to true if Captive WiFi connection is
+   * needed. Defaults to false
+   * @param html A string representing custom HTML code used for the portal.
+   * Default is an empty string Default portal web page is used if the string is
+   * empty
    */
-  void setupWebServer(bool createCaptivePortal = false, String html = "");
+  int setupWebServer(bool createCaptivePortal = false, String html = "");
 
   /**
    * @brief Set up the WiFi access point.
    *
-   * @param accessPoint a string representing the access point. Default to  "🆘 DUCK EMERGENCY PORTAL"
+   * @param accessPoint a string representing the access point. Default to  "🆘
+   * DUCK EMERGENCY PORTAL"
+   *
+   * @returns DUCK_ERR_NONE if successful, an error code otherwise.
    */
-  void setupWifiAp(const char* accessPoint = "🆘 DUCK EMERGENCY PORTAL");
+  int setupWifiAp(const char* accessPoint = "🆘 DUCK EMERGENCY PORTAL");
 
   /**
    * @brief Set up DNS.
@@ -97,37 +118,38 @@ public:
 
   /**
    * @brief Set up internet access.
-   * 
+   *
    * @param ssid        the ssid of the WiFi network
-   * @param password    password to join the network 
+   * @param password    password to join the network
    */
-  void setupInternet(String ssid, String password);
+  int setupInternet(String ssid, String password);
 
   /**
    * @brief  Checks if the given ssid is available.
-   * 
-   * @param val     ssid to check, default is an empty string and will use the internal default ssid
+   *
+   * @param val     ssid to check, default is an empty string and will use the
+   * internal default ssid
    * @returns true if the ssid is available, false otherwise.
    */
   bool ssidAvailable(String val = "");
 
   /**
    * @brief Set the WiFi network ssid.
-   * 
+   *
    * @param val the ssid string to set
    */
   void setSsid(String val);
 
   /**
    * @brief Set the WiFi password.
-   * 
+   *
    * @param val  the password string to set
    */
   void setPassword(String val);
 
   /**
    * @brief Get the WiFi network ssid.
-   * 
+   *
    * @returns a string representing the current network ssid
    */
   String getSsid();
@@ -141,29 +163,30 @@ public:
 
   /**
    * @brief Set the Duck's device id.
-   * 
+   *
    * @param deviceId Duck's device ID string to set
    */
-  void setDeviceId(String deviceId);
+  void setDeviceId(std::vector<byte> deviceId);
 
   /**
    * @brief Provide Wifi connection status.
-   * 
-   * @returns true if wifi is connected, false otherwise.  
+   *
+   * @returns true if wifi is connected, false otherwise.
    */
   bool isWifiConnected() { return (WiFi.status() == WL_CONNECTED); }
 
   static DNSServer dnsServer;
 #endif
 
-private : 
+private:
   DuckNet();
   DuckNet(DuckNet const&) = delete;
   DuckNet& operator=(DuckNet const&) = delete;
   static DuckNet* instance;
 
-  DuckLora* _duckLora;
-  String _deviceId;
+  DuckRadio* duckRadio;
+  std::vector<byte> deviceId;
+  DuckPacket* txPacket = NULL;
 
   static const byte DNS_PORT;
   static const char* DNS;
@@ -172,6 +195,5 @@ private :
   String ssid = "";
   String password = "";
 };
-
 
 #endif
