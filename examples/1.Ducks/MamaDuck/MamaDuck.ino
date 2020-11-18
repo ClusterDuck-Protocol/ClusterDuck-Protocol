@@ -1,41 +1,47 @@
 /**
  * @file MamaDuck.ino
- * @brief Uses the built in Mama Duck with some customatizations.
+ * @brief Uses the built in Mama Duck.
  * 
  * This example is a Mama Duck, but it is also periodically sending a message in the Mesh
- * 
- * @date 2020-11-10
- * 
- * @copyright Copyright (c) 2020
- * ClusterDuck Protocol 
+ * It is setup to provide a custom Emergency portal, instead of using the one provided by the SDK.
+ * Notice the background color of the captive portal is Black instead of the default Red.
  * 
  */
 
-#include "timer.h"
+#include <string>
+#include <arduino-timer.h>
 #include <MamaDuck.h>
 
 #ifdef SERIAL_PORT_USBVIRTUAL
 #define Serial SERIAL_PORT_USBVIRTUAL
 #endif
 
+// create a built-in mama duck
+MamaDuck duck = MamaDuck();
 
-
-// Set device ID between ""
-MamaDuck duck = MamaDuck("DuckOne");
-
+// create a timer with default settings
 auto timer = timer_create_default();
+
+// for sending the counter message
 const int INTERVAL_MS = 60000;
-char message[32]; 
 int counter = 1;
 
 void setup() {
+  // We are using a hardcoded device id here, but it should be retrieved or given during the device provisioning
+  // then converted to a byte vector to setup the duck
+  // NOTE: The Device ID must be exactly 8 bytes otherwise it will get rejected
+  std::string deviceId("MAMA0001");
+  std::vector<byte> devId;
+  devId.insert(devId.end(), deviceId.begin(), deviceId.end());
+  
   // Use the default setup provided by the SDK
-  duck.setupWithDefaults();
-  Serial.println("MAMA-DUCK...READY!");
+  duck.setupWithDefaults(devId);
 
-  // initialize the timer. The timer thread runs separately from the main loop
+  // Initialize the timer. The timer thread runs separately from the main loop
   // and will trigger sending a counter message.
   timer.every(INTERVAL_MS, runSensor);
+  Serial.println("[MAMA] Setup OK!");
+
 }
 
 void loop() {
@@ -47,8 +53,35 @@ void loop() {
 }
 
 bool runSensor(void *) {
-  sprintf(message, "mama counter %d", counter++); 
-  duck.sendPayloadStandard(message, "counter-message"); // sender id will be populated automatically
+  bool result;
+  const byte* buffer;
   
-  return true;
+  String message = String("mama0001:") + String(counter);
+  int length = message.length();
+  Serial.print("[MAMA] sensor data: ");
+  Serial.println(message);
+  buffer = (byte*) message.c_str(); 
+
+  result = sendData(buffer, length);
+  if (result) {
+     Serial.println("[MAMA] runSensor ok.");
+  } else {
+     Serial.println("[MAMA] runSensor failed.");
+  }
+  return result;
+}
+
+bool sendData(const byte* buffer, int length) {
+  bool sentOk = false;
+  
+  // Send Data can either take a byte buffer (unsigned char) or a vector
+  int err = duck.sendData(topics::status, buffer, length);
+  if (err == DUCK_ERR_NONE) {
+     counter++;
+     sentOk = true;
+  }
+  if (!sentOk) {
+    Serial.println("[MAMA] Failed to send data. error = " + String(err));
+  }
+  return sentOk;
 }

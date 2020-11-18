@@ -1,15 +1,14 @@
 #ifndef DUCK_H
 #define DUCK_H
 
-#include <Arduino.h>
-#include <WString.h>
-
 #include "../DuckError.h"
-#include "DuckLora.h"
 #include "DuckNet.h"
+#include "DuckRadio.h"
 #include "DuckTypes.h"
 #include "cdpcfg.h"
-
+#include <Arduino.h>
+#include <WString.h>
+#include <string>
 
 class Duck {
 
@@ -18,22 +17,59 @@ public:
    * @brief Construct a new Duck object.
    *
    */
-  Duck() {}
+  Duck(String name="");
+ 
   /**
    * @brief Construct a new Duck object.
    *
-   * @param id a unique id
+   * @param duid a unique id
    */
-  Duck(String id);
+  Duck(std::vector<byte> duid);
 
-  ~Duck() {}
+  ~Duck() {
+    if (txPacket != NULL) {
+      delete txPacket;
+    }
+    if (rxPacket != NULL) {
+      delete rxPacket;
+    }
+  }
+
+  /**
+   * @brief Set the Device Name object
+   * 
+   * @param name 
+   */
+  void setName(String name) { this->duckName = name; }
+  
+  /**
+   * @brief Get the duck's name.
+   * 
+   * @returns A string representing the duck's name
+   */
+  String getName() {return duckName;}
+  /**
+   * @brief setup the duck unique ID
+   * 
+   * @param an 8 byte unique id 
+   * @return DUCK_ERR_NONE if successful, an error code otherwise 
+   */
+  int setDeviceId(std::vector<byte> id);
+
+  /**
+   * @brief setup the duck unique ID
+   *
+   * @param an 8 byte unique id
+   * @return DUCK_ERR_NONE if successful, an error code otherwise
+   */
+  int setDeviceId(byte* id);
 
   /**
    * @brief Setup serial connection.
    *
    * @param baudRate default: 115200
    */
-  void setupSerial(int baudRate = 115200);
+  int setupSerial(int baudRate = 115200);
 
   /**
    * @brief Setup the radio component
@@ -45,18 +81,18 @@ public:
    * @param di1       dio1 interrupt pin (default: CDPCFG_PIN_LORA_DIO1)
    * @param txPower   transmit power (default: CDPCFG_RF_LORA_TXPOW)
    */
-  void setupRadio(float band = CDPCFG_RF_LORA_FREQ, int ss = CDPCFG_PIN_LORA_CS,
+  int setupRadio(float band = CDPCFG_RF_LORA_FREQ, int ss = CDPCFG_PIN_LORA_CS,
                   int rst = CDPCFG_PIN_LORA_RST, int di0 = CDPCFG_PIN_LORA_DIO0,
                   int di1 = CDPCFG_PIN_LORA_DIO1,
                   int txPower = CDPCFG_RF_LORA_TXPOW);
-
+                  
   /**
    * @brief Setup WiFi access point.
    *
    * @param accessPoint a string representing the access point. Default to
    * "🆘 DUCK EMERGENCY PORTAL"
    */
-  void setupWifi(const char* ap = "🆘 DUCK EMERGENCY PORTAL");
+  int setupWifi(const char* ap = "🆘 DUCK EMERGENCY PORTAL");
 
   /**
    * @brief Setup DNS.
@@ -77,7 +113,7 @@ public:
    * Default is an empty string Default portal web page is used if the string is
    * empty
    */
-  void setupWebServer(bool createCaptivePortal = false, String html = "");
+  int setupWebServer(bool createCaptivePortal = false, String html = "");
 
   /**
    * @brief Setup internet access.
@@ -85,34 +121,52 @@ public:
    * @param ssid        the ssid of the WiFi network
    * @param password    password to join the network
    */
-  void setupInternet(String ssid, String password);
+  int setupInternet(String ssid, String password);
 
   /**
    * @brief
    *
    */
-  void setupOTA();
+  int setupOTA();
 
   /**
-   * @brief Send a duck LoRa message.
+   * @brief Sends data into the mesh network.
    *
-   * @param msg         the message payload (optional: if not provided, it will
-   * be set to an empty string)
-   * @param topic       the message topic (optional: if not provided, it will be
-   * set to "status")
-   * @param senderId    the sender id (optional: if not provided, it will be set
-   * to the duck device id)
-   * @param messageId   the message id (optional: if not provided, a unique id
-   * will be generated)
-   * @param path        the message path to append the device id to (optional:
-   * if not provided, the path will only contain the duck's device id)
-   * @returns DUCK_ERR_NONE if success, an error code otherwise.
+   * @param topic the message topic
+   * @param data a string representing the data
+   * @return DUCK_ERR_NONE if the data was send successfully, an error code otherwise. 
    */
+  int sendData(byte topic, const String data);
 
-  int sendPayloadStandard(String msg = "", String topic = "",
-                          String senderId = "", String messageId = "",
-                          String path = "");
+  /**
+   * @brief Sends data into the mesh network.
+   * 
+   * @param topic the message topic
+   * @param data a vector of bytes representing the data to send
+   * @return DUCK_ERR_NONE if the data was send successfully, an error code otherwise. 
+   */
+  int sendData(byte topic, std::vector<byte> bytes);
 
+  /**
+   * @brief Sends data into the mesh network.
+   *
+   * @param topic the message topic
+   * @param data a string representing the data to send
+   * @return DUCK_ERR_NONE if the data was send successfully, an error code
+   * otherwise.
+   */
+  int sendData(byte topic, const std::string data);
+
+  /**
+   * @brief Sends data into the mesh network.
+   *
+   * @param topic the message topic
+   * @param data a byte buffer representing the data to send
+   * @param length the length of the byte buffer
+   * @return DUCK_ERR_NONE if the data was send successfully, an error code
+   * otherwise.
+   */
+  int sendData(byte topic, const byte* data, int length);
   /**
    * @brief Check wifi connection status
    * 
@@ -140,11 +194,37 @@ public:
    */
   String getPassword() { return duckNet->getPassword(); }
 
+  /**
+   * @brief Get an error code description.
+   * 
+   * @param error an error code
+   * @returns a string describing the error. 
+   */
+  String getErrorString(int error);
   
 protected:
+  String duckName="";
+
   String deviceId;
-  DuckLora* duckLora = DuckLora::getInstance();
+  std::vector<byte> duid;
+  DuckRadio* duckRadio = DuckRadio::getInstance();
   DuckNet* duckNet = DuckNet::getInstance();
+  DuckPacket* txPacket = NULL;
+  DuckPacket* rxPacket = NULL;
+
+  /**
+   * @brief sends a pong message
+   * 
+   * @return DUCK_ERR_NONE if successfull. An error code otherwise 
+   */
+  int sendPong();
+  
+  /**
+   * @brief sends a ping message
+   *
+   * @return DUCK_ERR_NONE if successfull. An error code otherwise
+   */
+  int sendPing();
 
   /**
    * @brief Tell the duck radio to start receiving packets from the mesh network
@@ -152,13 +232,6 @@ protected:
    * @return DUCK_ERR_NONE if successful, an error code otherwise
    */
   int startReceive();
-  
-  /**
-   * @brief Tell the duck radio to start receiving packets from the mesh network
-   *
-   * @return DUCK_ERR_NONE if successful, an error code otherwise
-   */
-  int startTransmit();
 
   /**
    * @brief Implement the duck's specific behavior.
@@ -173,24 +246,33 @@ protected:
    * The default implementation simply initializes the serial interface.
    * It can be overriden by each concrete Duck class implementation.
    */
-  virtual void setupWithDefaults(String ssid, String password) {
-    duckNet->setDeviceId(deviceId);
-    setupSerial();
+  virtual int setupWithDefaults(std::vector<byte> deviceId, String ssid, String password) {
+    int err = setupSerial();
+    if (err != DUCK_ERR_NONE) {
+      return err;
+    }
+    err = setDeviceId(deviceId);
+    if (err != DUCK_ERR_NONE) {
+      return err;
+    }
+    return DUCK_ERR_NONE;
   }
 
+  /**
+   * @brief Get the duck type.
+   * 
+   * @returns A value representing a DuckType
+   */
   virtual int getType() = 0;
 
+  /**
+   * @brief reconnect the duck to the given wifi access point
+   * 
+   * @param ssid the access point ssid to connect to 
+   * @param password the access point password
+   * @return DUCK_ERR_NONE if the duck reconnected to the AP sucessfully. An error code otherwise. 
+   */
   virtual int reconnectWifi(String ssid, String password) { return 0; }
-
-  static volatile bool receivedFlag;
-  static void toggleReceiveFlag() { receivedFlag = !receivedFlag; }
-  static void setReceiveFlag(bool value) { receivedFlag = value; }
-  static bool getReceiveFlag() { return receivedFlag; }
-
-  static void onPacketReceived();
-
-  static bool imAlive(void*);
-  static bool reboot(void*);
 
   /**
    * @brief Handle request from emergency portal.
@@ -203,6 +285,15 @@ protected:
    *
    */
   void handleOtaUpdate();
+
+  static volatile bool receivedFlag;
+  static void setReceiveFlag(bool value) { receivedFlag = value; }
+  static bool getReceiveFlag() { return receivedFlag; }
+
+  static void onRadioRxTxDone();
+
+  static bool imAlive(void*);
+  static bool reboot(void*);
 };
 
 #endif
