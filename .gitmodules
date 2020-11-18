@@ -47,3 +47,7 @@
 [submodule "Libraries/ArduinoJson"]
 	path = Libraries/ArduinoJson
 	url = https://github.com/bblanchon/ArduinoJson.git
+[submodule "Libraries/CRC32"]
+	path = Libraries/CRC32
+	url = https://github.com/bakercp/CRC32
+

@@ -1,25 +1,31 @@
 /**
- * @file PapaDuck.ino
+ * @file papa-duck-with-callback.ino
+ * @author 
  * @brief Uses built-in PapaDuck from the SDK to create a WiFi enabled Papa Duck
  * 
  * This example will configure and run a Papa Duck that connects to the cloud
  * and forwards all messages (except  pings) to the cloud.
  * 
- * @date 2020-11-10
+ * @date 2020-09-21
  * 
- * @copyright Copyright (c) 2020
- * ClusterDuck Protocol 
  */
 
-#include <PapaDuck.h>
-
-#include <PubSubClient.h>
 #include <ArduinoJson.h>
+#include <PubSubClient.h>
 #include <WiFiClientSecure.h>
-#include "timer.h"
+#include <arduino-timer.h>
+#include <string>
+
+/* CDP Headers */
+#include <PapaDuck.h>
+#include <CdpPacket.h>
+
+#define MQTT_RETRY_DELAY_MS 500
+#define WIFI_RETRY_DELAY_MS 5000
 
 #define SSID ""
 #define PASSWORD ""
+
 
 // Used for Mqtt client connection
 // Provided when a Papa Duck device is created in DMS
@@ -28,8 +34,10 @@
 #define DEVICE_TYPE ""
 #define TOKEN       ""
 
-// Use pre-built papa duck: the duck ID is provided by DMS
-PapaDuck duck = PapaDuck(DEVICE_ID);
+
+
+// Use pre-built papa duck
+PapaDuck duck = PapaDuck();
 
 char server[]           = ORG ".messaging.internetofthings.ibmcloud.com";
 char authMethod[]       = "use-token-auth";
@@ -48,18 +56,15 @@ bool retry = true;
 
 void setup() {
   
-
-  /**
-   * duck.setupSerial()
-   * duck.setupRadio();
-   * duck.setupWifi("PapaDuck Setup"); 
-   * duck.setupDns();
-   * duck.setupInternet(SSID, PASSWORD);
-   * duck.setupWebServer(false);
-   * duck.setupOTA();
-   */
-  // the default setup is equivalent to the above setup sequence
-  duck.setupWithDefaults(SSID, PASSWORD);
+  // We are using a hardcoded device id here, but it should be retrieved or given during the device provisioning
+  // then converted to a byte vector to setup the duck
+  // NOTE: The Device ID must be exactly 8 bytes otherwise it will get rejected
+  std::string deviceId(DEVICE_ID);
+  std::vector<byte> devId;
+  devId.insert(devId.end(), deviceId.begin(), deviceId.end());
+  
+  // Use the default setup provided by the SDK  
+  duck.setupWithDefaults(devId, SSID, PASSWORD);
 
   
   // register a callback to handle incoming data from duck in the network
@@ -70,9 +75,14 @@ void setup() {
 
 // The callback method simply takes the incoming packet and
 // converts it to a JSON string, before sending it out over WiFi
-void handleDuckData(Packet packet) {
+void handleDuckData(CDP_Packet packet) {
+  if (packet.topic == reservedTopic::ping) {
+    return;
+  }
+  
   quackJson(packet);
 }
+
 
 void loop() {
 
@@ -87,7 +97,7 @@ void loop() {
 
     if (err != DUCK_ERR_NONE) {
       retry = false;
-      timer.in(5000, enableRetry);
+      timer.in(WIFI_RETRY_DELAY_MS, enableRetry);
     }
   }
   if (duck.isWifiConnected()) {
@@ -115,45 +125,68 @@ void setup_mqtt(bool use_auth)
       Serial.println("[PAPA] mqtt client is connected!");
       break;
     }
-    retry_mqtt_connection(500);
+    retry_mqtt_connection(MQTT_RETRY_DELAY_MS);
   }
 }
 
-void quackJson(Packet packet) {
-
-  if (packet.topic == "ping") {
-    return;
+// DMS locator URL requires a topicString, so we need to convert the topic
+// from the packet to a string based on the topics code
+std::string toTopicString(byte topic) {
+  
+  std::string topicString;
+  
+  switch (topic) {
+    case  topics::status:
+      topicString = "status";
+      break;
+    case topics::cpm:
+      topicString = "portal";
+      break;
+    case topics::sensor:
+      topicString = "sensor";
+      break;
+    case topics::alert:
+      topicString = "alert";
+      break;
+    case topics::location:
+      topicString = "gps";
+      break;
+    default:
+      topicString = "status";
   }
+
+  return topicString;
+}
+
+void quackJson(CDP_Packet packet) {
   
   const int bufferSize = 4 *  JSON_OBJECT_SIZE(4);
   StaticJsonDocument<bufferSize> doc;
 
-  doc["DeviceID"]  = packet.senderId;
-  doc["MessageID"] = packet.messageId;
-  doc["Payload"].set(packet.payload);
+  std::string payload(packet.data.begin(),packet.data.end());
+  std::string duid(packet.duid.begin(),packet.duid.end());
+  std::string muid(packet.muid.begin(),packet.muid.end());
+  std::string path(packet.path.begin(),packet.path.end());
 
-  // FIXME: Path shouldn't be altered by the application
-  // It should done in the library PapaDuck component
-  doc["path"].set(packet.path + "," + DEVICE_ID);
+  doc["DeviceID"]  = duid;
+  doc["MessageID"] = muid;
+  doc["Payload"].set(payload);
+  doc["path"].set(path);
 
-  String loc = "iot-2/evt/" + packet.topic + "/fmt/json";
-  Serial.print(loc);
-  // add space for null char
-  int len = loc.length() + 1;
-
-  char topic[len];
-  loc.toCharArray(topic, len);
+  std::string cdpTopic = toTopicString(packet.topic);
+  
+  std::string topic = "iot-2/evt/" + cdpTopic + "/fmt/json";
 
   String jsonstat;
   serializeJson(doc, jsonstat);
 
-  if (client.publish(topic, jsonstat.c_str())) {
+  if (client.publish(topic.c_str(), jsonstat.c_str())) {
     serializeJsonPretty(doc, Serial);
     Serial.println("");
-    Serial.println("[PAPA] Publish ok");
+    Serial.println("Publish ok");
   }
   else {
-    Serial.println("[PAPA] Publish failed");
+    Serial.println("Publish failed");
   }
 }
 

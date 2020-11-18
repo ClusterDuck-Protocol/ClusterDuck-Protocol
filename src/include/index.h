@@ -12,7 +12,7 @@ const char MAIN_page[] PROGMEM = R"=====(
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
             body {
-                background-color: black;
+                background-color: red;
                 font: 14px "Avenir", helvetica, sans-serif;
                 color: white;
                 -webkit-font-smoothing: antialiased;
@@ -74,12 +74,13 @@ const char MAIN_page[] PROGMEM = R"=====(
                border: 0;
                background: #fe5454;
             }
-            #sendReportBtn {
+            .sendReportBtn {
                 box-shadow: 0px 1px 0px 0px #fff6af;
                 background:linear-gradient(to bottom, #ffec64 5%, #ffab23 100%);
                 background-color:#ffec64;
                 border-radius:6px;
                 border:1px solid #ffaa22;
+                display:inline-block;
                 cursor:pointer;
                 color:#333333;
                 font-family:Arial;
@@ -89,16 +90,14 @@ const char MAIN_page[] PROGMEM = R"=====(
                 text-decoration:none;
                 text-shadow:0px 1px 0px #ffee66;
                 text-align: center;
-                width: 100%;
+                width: 210px;
                 margin-top: 24px;
-                display: none;
-
             }
-            #sendReportBtn:hover {
+            .sendReportBtn:hover {
                 background:linear-gradient(to bottom, #ffab23 5%, #ffec64 100%);
                 background-color:#ffab23;
             }
-            #sendReportBtn:active {
+            .sendReportBtn:active {
                 position:relative;
                 top:1px;
             }
@@ -128,18 +127,9 @@ const char MAIN_page[] PROGMEM = R"=====(
                 width: 100%;
                 height: 100px;
             }
-            .alert{
-                color:red;
-                font-weight: 800;
-            }
             label  {
                 font-weight: bold;
             }
-            #sendReportBtn.button-on{
-                display: block;
-
-            }
-           
 
         </style>
         </head>
@@ -159,7 +149,7 @@ const char MAIN_page[] PROGMEM = R"=====(
                     <label for="streetAddress">Street Address</label>
                     <input class="textbox textbox-full" name="streetAddress" id="streetAddress" type="text" placeholder="PR-108" /> <br /> <br />
                     <label for="city">City</label><br>
-                    <input class="textbox textbox-full" id="city" name="city" type="text" placeholder="Mayagüez" /><br><br>
+                    <input class="textbox textbox-full" name="city" type="text" placeholder="Mayagüez" /><br><br>
                     <label for="zipcode">Zipcode</label><br>
                     <input class="textbox textbox-full" name="zipcode" type="number" placeholder="00682" /> <br /> <br />
                     <label for="phone">Phone</label><br />
@@ -186,29 +176,19 @@ const char MAIN_page[] PROGMEM = R"=====(
                     <br /> <br />
                     <label for="status">Additional Comments</label><br />
                     <textarea class="textbox comments" name="message" id="commentsInput" cols="30" rows="2"></textarea><br />
-                    <div id="count">
-                    
-                    </div>
-                    <input type="submit"  class="button-on" id="sendReportBtn" value="SEND REPORT" />
+                    <input type="submit" class="sendReportBtn" value="SEND REPORT" />
                 </form>
                 <p style="font-size: 10px; text-align: center;margin-top: 24px;">Powered by the ClusterDuck Protocol</p>
             </div>
         </div>
+      <div id="bodySent" class="body off sent">
+         <div class="c">
+            <div class="gps"><h4>Message Sent</h4><h5 id="dateNow">March 13, 2019 @ 1:02 PM</h5><p>Your message ID#: 9XP002</p></div>
+            <p class="disclaimer">If your situation changes, please send another update.
+            <div id="bupdate" class="b update">Send Update</div>
+         </div>
+      </div>
       <script type="text/javascript">
-
-
-        document.onkeydown = function () {
-            var AllLength = document.getElementById("firstName").value + document.getElementById("lastName").value + document.getElementById("streetAddress").value + document.getElementById("city").value + document.getElementById("commentsInput").value + document.getElementById("petsInput").value;
-                if (130 > AllLength.length) {
-                    document.getElementById("count").innerHTML='Length ' + AllLength.length + "/130";
-                    document.getElementById("sendReportBtn").classList.add("button-on");
-                     document.getElementById("count").classList.remove("alert");      
-                }   else{
-                     document.getElementById("count").innerHTML='Length ' + AllLength.length + "/130";
-                      document.getElementById("count").classList.add("alert");
-                     document.getElementById("sendReportBtn").classList.remove("button-on");
-                }
-            };
       </script>
     </body>
 </html>

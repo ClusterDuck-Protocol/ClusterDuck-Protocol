@@ -1,7 +1,7 @@
 #include "ClusterDuck.h"
 #include "include/DuckEsp.h"
 
-ClusterDuck::ClusterDuck() { duckutils::setDuckInterrupt(true); }
+ClusterDuck::ClusterDuck() { duckutils::setInterrupt(true); }
 
 
 // Get Duck MAC address
@@ -14,7 +14,7 @@ String ClusterDuck::uuidCreator() { return duckutils::createUuid(); }
 
 
 void ClusterDuck::flipInterrupt() {
-  duckutils::setDuckInterrupt(!duckutils::getDuckInterrupt());
+  duckutils::setInterrupt(!duckutils::isInterruptEnabled());
 }
 
 //TODO: Move this in a separate module. Either DuckOta or DuckNet
@@ -26,7 +26,7 @@ void handleFirmwareUpload(AsyncWebServerRequest* request, String filename,
   // handle upload and update
   if (!index) {
     //FIXME: printf may not be implemented on some Arduiono platforms
-    Serial.printf("Update: %s\n", filename.c_str());
+    loginfo_f("Update: %s\n", filename.c_str());
     if (!Update.begin(UPDATE_SIZE_UNKNOWN)) { // start with max available size
       Update.printError(Serial);
     }
@@ -37,8 +37,7 @@ void handleFirmwareUpload(AsyncWebServerRequest* request, String filename,
   }
   if (final) {
     if (Update.end(true)) { // true to set the size to the current progress
-      Serial.printf("Update Success: %ub written\nRebooting...\n",
-                    index + lenght);
+      loginfo_f("Update Success: %ub written\nRebooting...\n", index + lenght);
     } else {
       Update.printError(Serial);
     }
