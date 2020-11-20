@@ -1,11 +1,12 @@
 #include "include/DuckPacket.h"
 #include "DuckError.h"
 #include "DuckLogger.h"
-#include "include/DuckUtils.h"
 #include "MemoryFree.h"
+#include "include/DuckUtils.h"
 #include <string>
 
-bool DuckPacket::prepareForRelaying(std::vector<byte> duid, std::vector<byte> dataBuffer) {
+bool DuckPacket::prepareForRelaying(std::vector<byte> duid,
+                                    std::vector<byte> dataBuffer) {
 
   bool relaying;
   int packet_length = dataBuffer.size();
@@ -24,39 +25,45 @@ bool DuckPacket::prepareForRelaying(std::vector<byte> duid, std::vector<byte> da
 
   // build an rxPacket with data we have received
   // duid
-  packet.duid.insert(packet.duid.end(), &dataBuffer[0], &dataBuffer[DUID_LENGTH]);
+  packet.duid.insert(packet.duid.end(), &dataBuffer[0],
+                     &dataBuffer[DUID_LENGTH]);
   // muid
-  packet.muid.insert(packet.muid.end(), &dataBuffer[MUID_POS], &dataBuffer[TOPIC_POS]);
+  packet.muid.insert(packet.muid.end(), &dataBuffer[MUID_POS],
+                     &dataBuffer[TOPIC_POS]);
   // topic
   packet.topic = dataBuffer[TOPIC_POS];
   // path offset
   packet.path_offset = dataBuffer[PATH_OFFSET_POS];
   // reserved
-  packet.reserved.insert(packet.reserved.end(), &dataBuffer[RESERVED_POS], &dataBuffer[DATA_POS]);
+  packet.reserved.insert(packet.reserved.end(), &dataBuffer[RESERVED_POS],
+                         &dataBuffer[DATA_POS]);
   // data crc
   packet.dcrc = packet_data_crc;
   // data section
-  packet.data.insert(packet.data.end(), data_section.begin(), data_section.end());
+  packet.data.insert(packet.data.end(), data_section.begin(),
+                     data_section.end());
   // path section
-  packet.path.insert(packet.path.end(), &dataBuffer[path_pos], &dataBuffer[packet_length]);
+  packet.path.insert(packet.path.end(), &dataBuffer[path_pos],
+                     &dataBuffer[packet_length]);
   // update the rx packet byte buffer
   buffer.insert(buffer.end(), dataBuffer.begin(), dataBuffer.end());
 
   loginfo("prepareForRelaying: Packet is built. Checking for relay...");
 
-  // when a packet is relayed the given duid is added to the path section of the packet
+  // when a packet is relayed the given duid is added to the path section of the
+  // packet
   relaying = relay(duid);
-  if(!relaying) {
+  if (!relaying) {
     this->reset();
   }
-  loginfo("prepareForRelaying: DONE. Relay = "+ String (relaying));
+  loginfo("prepareForRelaying: DONE. Relay = " + String(relaying));
   return relaying;
 }
 
 int DuckPacket::prepareForSending(byte topic, std::vector<byte> app_data) {
 
   uint8_t app_data_length = app_data.size();
-  
+
   this->reset();
 
   if (topic < reservedTopic::max_reserved) {
@@ -74,13 +81,13 @@ int DuckPacket::prepareForSending(byte topic, std::vector<byte> app_data) {
   duckutils::getRandomBytes(MUID_LENGTH, message_id);
 
   byte crc_bytes[DATA_CRC_LENGTH];
-  //TODO: update the CRC32 library to return crc as a byte array
-  uint32_t value = CRC32::calculate(app_data.data(), app_data.size());  
+  // TODO: update the CRC32 library to return crc as a byte array
+  uint32_t value = CRC32::calculate(app_data.data(), app_data.size());
   crc_bytes[0] = (value >> 24) & 0xFF;
   crc_bytes[1] = (value >> 16) & 0xFF;
   crc_bytes[2] = (value >> 8) & 0xFF;
   crc_bytes[3] = value & 0xFF;
-  
+
   // ----- insert packet header  -----
   // device uid
   buffer.insert(buffer.end(), duid.begin(), duid.end());
@@ -116,7 +123,8 @@ int DuckPacket::prepareForSending(byte topic, std::vector<byte> app_data) {
   buffer.insert(buffer.end(), duid.begin(), duid.end());
   logdbg("Path:      " + duckutils::convertToHex(buffer.data(), buffer.size()));
 
-  logdbg("Built packet: " + duckutils::convertToHex(buffer.data(), buffer.size()));
+  logdbg("Built packet: " +
+         duckutils::convertToHex(buffer.data(), buffer.size()));
   return DUCK_ERR_NONE;
 }
 

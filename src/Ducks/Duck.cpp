@@ -56,6 +56,7 @@ void Duck::onRadioRxTxDone(void) {
   setReceiveFlag(true);
 }
 
+// TODO: use LoraConfigParams directly as argument to setupRadio
 int Duck::setupRadio(float band, int ss, int rst, int di0, int di1,
                      int txPower) {
   LoraConfigParams config;
@@ -234,7 +235,7 @@ int Duck::sendData(byte topic, std::vector<byte> data) {
   }
 
   int length = txPacket->getBufferLength();
-  err = duckRadio->sendData(txPacket->getDataByteBuffer(), length);
+  err = duckRadio->sendData(txPacket->getCdpPacketBufferBytes(), length);
   txPacket->reset();
   return err;
 }
@@ -277,7 +278,7 @@ int Duck::sendPong() {
     logerr("ERROR Oops! failed to build pong packet, err = " + err);
     return err;
   }
-  err = duckRadio->sendData(txPacket->getDataByteBuffer(),
+  err = duckRadio->sendData(txPacket->getCdpPacketBufferBytes(),
                             txPacket->getBufferLength());
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR Oops! Lora sendData failed, err = " + err);
@@ -294,7 +295,7 @@ int Duck::sendPing() {
     logerr("ERROR Failed to build ping packet, err = " + err);
     return err;
   }
-  err = duckRadio->sendData(txPacket->getDataByteBuffer(),
+  err = duckRadio->sendData(txPacket->getCdpPacketBufferBytes(),
                             txPacket->getBufferLength());
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR Lora sendData failed, err = " + err);

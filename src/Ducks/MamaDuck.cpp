@@ -2,8 +2,8 @@
 #include "../MemoryFree.h"
 
 int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String password) {
+  
   int err = Duck::setupWithDefaults(deviceId, ssid, password);
-
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR setupWithDefaults rc = " + String(err));
     return err;
@@ -48,6 +48,8 @@ void MamaDuck::handleReceivedPacket() {
   std::vector<byte> data;
   bool relay = false;
   
+  //TODO: revisit packet reset calls, they should no longer be needed
+  //once RadioLib corrupt packet issue is fixed
   loginfo("====> handleReceivedPacket: START");
   int err = duckRadio->readReceivedData(&data);
 
