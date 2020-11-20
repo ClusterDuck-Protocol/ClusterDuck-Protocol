@@ -28,7 +28,7 @@ void setup() {
   // NOTE: The Device ID must be exactly 8 bytes otherwise it will get rejected
   std::string deviceId("LINKSAMD");
   std::vector<byte> devId;
-  devId.insert(devId.end(), deviceId.begin(), deviceId.end());
+  devId.assign(deviceId.begin(), deviceId.end());
 
   // Use the default setup provided by the SDK
   duck.setupWithDefaults(devId);

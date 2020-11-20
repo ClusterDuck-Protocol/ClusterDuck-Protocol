@@ -32,9 +32,11 @@ void setup() {
   // NOTE: The Device ID must be exactly 8 bytes otherwise it will get rejected
   std::string deviceId("MAMA0001");
   std::vector<byte> devId;
-  devId.insert(devId.end(), deviceId.begin(), deviceId.end());
+  devId.assign(deviceId.begin(), deviceId.end());
   
-  // Use the default setup provided by the SDK
+  //Use the default setup provided by the SDK
+  //TODO: Check the return code. If the setup fails, we could reboot the device
+  //or blink some LED and then reboot
   duck.setupWithDefaults(devId);
 
   // Initialize the timer. The timer thread runs separately from the main loop

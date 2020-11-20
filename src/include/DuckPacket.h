@@ -57,12 +57,12 @@ public:
     bool prepareForRelaying(std::vector<byte> duid, std::vector<byte> dataBuffer);
     
     /**
-     * @brief Get the Data Byte Buffer from a packet.
+     * @brief Get the CDP Packet Buffer bytes.
      * 
      * @returns a byte array representing the packet
      */
-    byte* getDataByteBuffer() { return buffer.data(); }
-    
+    byte* getCdpPacketBufferBytes() { return buffer.data(); }
+
     /**
      * @brief Get the Cdp Packet byte vector.
      * 

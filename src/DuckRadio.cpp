@@ -35,55 +35,62 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
 #else
   lora = new Module(config.ss, config.di0, config.rst, config.di1);
 #endif
+
+  // TODO: Display should be setup outside the radio setup
   display->setupDisplay(DuckType::MAMA, "mama");
 
-  int state = lora.begin(config.band);
-  
-  if (state != ERR_NONE) {
+  int rc = lora.begin();
+
+  if (rc != ERR_NONE) {
     logerr("ERROR  initializing LoRa driver. state = ");
-    logerr(state);
+    logerr(rc);
     return DUCKLORA_ERR_BEGIN;
   }
-  
+
   // Lora is started, we need to set all the radio parameters, before it can
   // start receiving packets
-  if (lora.setFrequency(CDPCFG_RF_LORA_FREQ) == ERR_INVALID_FREQUENCY) {
-    logerr("ERROR  frequency is invalid for this module!");
+  rc = lora.setFrequency(CDPCFG_RF_LORA_FREQ);
+  if (rc == ERR_INVALID_FREQUENCY) {
+    logerr("ERROR  frequency is invalid");
     return DUCKLORA_ERR_SETUP;
   }
 
-  if (lora.setBandwidth(CDPCFG_RF_LORA_BW) == ERR_INVALID_BANDWIDTH) {
-    logerr("ERROR  bandwidth is invalid for this module!");
+  rc = lora.setBandwidth(CDPCFG_RF_LORA_BW);
+  if (rc == ERR_INVALID_BANDWIDTH) {
+    logerr("ERROR  bandwidth is invalid");
     return DUCKLORA_ERR_SETUP;
   }
 
-  if (lora.setSpreadingFactor(CDPCFG_RF_LORA_SF) == ERR_INVALID_SPREADING_FACTOR) {
-    logerr("ERROR  spreading factor is invalid for this module!");
+  rc = lora.setSpreadingFactor(CDPCFG_RF_LORA_SF);
+  if (rc == ERR_INVALID_SPREADING_FACTOR) {
+    logerr("ERROR  spreading factor is invalid");
     return DUCKLORA_ERR_SETUP;
   }
 
-  if (lora.setOutputPower(CDPCFG_RF_LORA_TXPOW) == ERR_INVALID_OUTPUT_POWER) {
-    logerr("ERROR  output power is invalid for this module!");
+  rc = lora.setOutputPower(CDPCFG_RF_LORA_TXPOW);
+  if (rc == ERR_INVALID_OUTPUT_POWER) {
+    logerr("ERROR  output power is invalid");
     return DUCKLORA_ERR_SETUP;
   }
 
-  if (lora.setGain(CDPCFG_RF_LORA_GAIN) == ERR_INVALID_GAIN) {
-    logerr("ERROR  gain is invalid for this module!");
+  rc = lora.setGain(CDPCFG_RF_LORA_GAIN);
+  if (rc == ERR_INVALID_GAIN) {
+    logerr("ERROR  gain is invalid");
     return DUCKLORA_ERR_SETUP;
   }
 
-  // set the function that will be called
-  // when packet tx or rx is done.
+  // set the interrupt handler to execute when packet tx or rx is done.
   lora.setDio0Action(config.func);
   // set sync word to private network
-  lora.setSyncWord(0x12);
+  if (lora.setSyncWord(0x12) != ERR_NONE) {
+    logerr("ERROR  sync word is invalid");
+    return DUCKLORA_ERR_SETUP;
+  }
 
-  txBusy = false;
-  state = lora.startReceive();
+  rc = lora.startReceive();
 
-  if (state != ERR_NONE) {
-    logerr("ERROR Failed to start receive: ");
-    logerr(state);
+  if (rc != ERR_NONE) {
+    logerr("ERROR Failed to start receive");
     return DUCKLORA_ERR_RECEIVE;
   }
   return DUCK_ERR_NONE;
@@ -91,20 +98,22 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
 
 int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
 
-  int pSize = 0;
+  int packet_length = 0;
   int err = DUCK_ERR_NONE;
 
-  pSize = lora.getPacketLength();
+  packet_length = lora.getPacketLength();
 
-  if (pSize == 0 || pSize < MIN_PACKET_LENGTH) {
-    logerr("ERROR  handlePacket rx data size invalid: " + String(pSize));
+  if (packet_length < MIN_PACKET_LENGTH) {
+    logerr("ERROR  handlePacket rx data size invalid: " +
+           String(packet_length));
     return DUCKLORA_ERR_HANDLE_PACKET;
   }
-  
-  loginfo("readReceivedData() - packet length returns: "+ String(pSize));
 
-  packetBytes->resize(pSize);
-  err = lora.readData(packetBytes->data(), pSize);
+  loginfo("readReceivedData() - packet length returns: " +
+          String(packet_length));
+
+  packetBytes->resize(packet_length);
+  err = lora.readData(packetBytes->data(), packet_length);
   loginfo("readReceivedData() - lora.readData returns: " + String(err));
 
   if (err != ERR_NONE) {
@@ -113,6 +122,12 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
   }
 
   loginfo("readReceivedData: checking path offset integrity");
+
+  // Do some sanity checks on the received packet here before we continue
+  // further RadioLib v4.0.5 has a bug where corrupt packets are still returned
+  // to the app despite CRC check being enabled in the radio by both sender and
+  // receiver.
+
   byte* data = packetBytes->data();
   int path_pos = data[PATH_OFFSET_POS];
   if (path_pos >= packetBytes->size()) {
@@ -123,10 +138,10 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
   loginfo("readReceivedData: checking data section CRC");
 
   std::vector<byte> data_section;
-  data_section.insert(data_section.end(), &data[DATA_POS],
-                      &data[path_pos]);
+  data_section.insert(data_section.end(), &data[DATA_POS], &data[path_pos]);
   uint32_t packet_data_crc = duckutils::toUnit32(&data[DATA_CRC_POS]);
-  uint32_t computed_data_crc = CRC32::calculate(data_section.data(), data_section.size());
+  uint32_t computed_data_crc =
+      CRC32::calculate(data_section.data(), data_section.size());
 
   if (computed_data_crc != packet_data_crc) {
     logerr("ERROR data crc mismatch: received: " + String(packet_data_crc) +
@@ -137,24 +152,24 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
   loginfo("RX: rssi: " + String(lora.getRSSI()) +
           " snr: " + String(lora.getSNR()) +
           " fe: " + String(lora.getFrequencyError(true)) +
-          " size: " + String(pSize));
+          " size: " + String(packet_length));
 
   return err;
 }
 
-
 int DuckRadio::sendData(byte* data, int length) {
-  //display->log("sendData...");
+  // display->log("sendData...");
   return startTransmitData(data, length);
 }
 
 int DuckRadio::relayPacket(DuckPacket* packet) {
-  //display->log("relayPacket...");
-  return startTransmitData(packet->getCdpPacketBuffer().data(), packet->getCdpPacketBuffer().size());
+  // display->log("relayPacket...");
+  return startTransmitData(packet->getCdpPacketBuffer().data(),
+                           packet->getCdpPacketBuffer().size());
 }
 
 int DuckRadio::sendData(std::vector<byte> data) {
-  //display->log("sendData...");
+  // display->log("sendData...");
   return startTransmitData(data.data(), data.size());
 }
 
@@ -162,7 +177,7 @@ int DuckRadio::startReceive() {
   int state = lora.startReceive();
 
   if (state != ERR_NONE) {
-    logerr("ERROR startReceive failed, code "+String(state));
+    logerr("ERROR startReceive failed, code " + String(state));
     return DUCKLORA_ERR_RECEIVE;
   }
 
@@ -171,10 +186,8 @@ int DuckRadio::startReceive() {
 
 int DuckRadio::getRSSI() { return lora.getRSSI(); }
 
-// TODO: implement this 
-int DuckRadio::ping() {
-  return DUCK_ERR_NOT_SUPPORTED;
-}
+// TODO: implement this
+int DuckRadio::ping() { return DUCK_ERR_NOT_SUPPORTED; }
 
 int DuckRadio::standBy() { return lora.standby(); }
 
@@ -192,7 +205,7 @@ int DuckRadio::startTransmitData(byte* data, int length) {
   int tx_err = ERR_NONE;
   int rx_err = ERR_NONE;
   loginfo("TX data");
-  logdbg(" -> "+ duckutils::convertToHex(data, length));
+  logdbg(" -> " + duckutils::convertToHex(data, length));
   logdbg(" -> length: " + String(length));
 
   long t1 = millis();
@@ -202,7 +215,7 @@ int DuckRadio::startTransmitData(byte* data, int length) {
   switch (tx_err) {
     case ERR_NONE:
       loginfo("TX data done in : " + String((millis() - t1)) + "ms");
-      //display->log(">> txdone");
+      // display->log(">> txdone");
       break;
 
     case ERR_PACKET_TOO_LONG:

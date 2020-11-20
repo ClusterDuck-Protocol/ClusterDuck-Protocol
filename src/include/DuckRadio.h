@@ -27,7 +27,7 @@
 typedef struct {
   /// radio frequency (i.e US915Mhz)
   float band;
-  /// slave select pin
+  /// SPI slave select pin - the pin on each device that the master can use to enable and disable specific devices.
   int ss;
   /// chip reset pin
   int rst;
