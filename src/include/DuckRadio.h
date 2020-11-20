@@ -19,6 +19,7 @@
 #include "DuckPacket.h"
 #include "LoraPacket.h"
 #include "cdpcfg.h"
+
 /**
  * @brief Internal structure to hold the LoRa module configuration
  * 
@@ -48,6 +49,7 @@ typedef struct {
  *
  */
 class DuckRadio {
+
 public:
   /**
    * @brief Get a singletom instance of the DuckRadio class,\.
@@ -149,8 +151,11 @@ public:
    */
   int readReceivedData(std::vector<byte>* packetBytes);
 
+  /**
+   * @brief Process IRQ interrupts for the LoRa Radio.
+   * 
+   */
   void processRadioIrq();
-  bool isTxBusy() { return txBusy; }
 
 private:
   DuckRadio();

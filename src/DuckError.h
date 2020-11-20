@@ -4,8 +4,11 @@
 
 /// No Error
 #define DUCK_ERR_NONE 0
+// Feature not supported
 #define DUCK_ERR_NOT_SUPPORTED -5000
+// Failed to setup device
 #define DUCK_ERR_SETUP         -5100
+// Device Id is too long
 #define DUCK_ERR_ID_TOO_LONG   -5101
 #define DUCK_ERR_OTA           -5200
 
@@ -35,6 +38,7 @@
 #define DUCKWIFI_ERR_AP_CONFIG      -2002
 // DNS initialization failed
 #define DUCKDNS_ERR_STARTING        -3000
+
 
 #define DUCKPACKET_ERR_SIZE_INVALID  -4000
 #define DUCKPACKET_ERR_TOPIC_INVALID -4001

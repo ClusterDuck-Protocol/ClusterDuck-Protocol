@@ -8,20 +8,14 @@ Duck::Duck(String name) {
   duckName = name;
 }
 
-Duck::Duck(std::vector<byte> id) {
-  duid.insert(duid.end(), id.begin(), id.end());
-  duckutils::setInterrupt(true);
-}
-
 int Duck::setDeviceId(std::vector<byte> id) {
-  if (id.size() > DUID_LENGTH) {
+  if (id.size() != DUID_LENGTH) {
     logerr("ERROR  device id too long rc = " + String(DUCK_ERR_NONE));
     return DUCK_ERR_ID_TOO_LONG;
   }
-  if (duid.size() > 0) {
-    duid.clear();
-  }
-  duid.insert(duid.end(), id.begin(), id.end());
+  
+  duid.clear();
+  duid.assign(id.begin(), id.end());
   loginfo("setupDeviceId rc = " + String(DUCK_ERR_NONE));
   return DUCK_ERR_NONE;
 }
@@ -41,7 +35,9 @@ int Duck::setDeviceId(byte* id) {
 }
 
 int Duck::setupSerial(int baudRate) {
-  while (!Serial && millis() < 10000);
+  // This gives us 10 seconds to do a hard reset if the board is in a bad state after power cycle
+  while (!Serial && millis() < 10000)
+    ;
 
   Serial.begin(baudRate);
   loginfo("setupSerial rc = " + String(DUCK_ERR_NONE));
@@ -60,7 +56,8 @@ void Duck::onRadioRxTxDone(void) {
   setReceiveFlag(true);
 }
 
-int Duck::setupRadio(float band, int ss, int rst, int di0, int di1, int txPower) {
+int Duck::setupRadio(float band, int ss, int rst, int di0, int di1,
+                     int txPower) {
   LoraConfigParams config;
 
   config.band = band;
@@ -82,7 +79,7 @@ int Duck::setupRadio(float band, int ss, int rst, int di0, int di1, int txPower)
     return err;
   }
   if (err == DUCKLORA_ERR_RECEIVE) {
-    logerr("ERROR setupRadio. Failed to start receive. rc = "+String(err));
+    logerr("ERROR setupRadio. Failed to start receive. rc = " + String(err));
     return err;
   }
 
@@ -136,7 +133,7 @@ int Duck::setupInternet(String ssid, String password) {
 }
 
 #ifdef CDPCFG_WIFI_NONE
-int Duck::setupOTA() {return DUCK_ERR_NONE;}
+int Duck::setupOTA() { return DUCK_ERR_NONE; }
 #else
 int Duck::setupOTA() {
 
@@ -158,7 +155,7 @@ int Duck::setupOTA() {
 
   ArduinoOTA.onError([](ota_error_t error) {
     logerr_f("Error[%u]: ", error);
-    switch(error) {
+    switch (error) {
       case OTA_AUTH_ERROR:
         logerr("ERROR setupOTA. Auth Failed");
         break;
@@ -186,19 +183,15 @@ int Duck::setupOTA() {
 #endif
 
 #ifdef CDPCFG_WIFI_NONE
-void Duck::handleOtaUpdate(){}
+void Duck::handleOtaUpdate() {}
 #else
-void Duck::handleOtaUpdate() { 
-    ArduinoOTA.handle();
-}
+void Duck::handleOtaUpdate() { ArduinoOTA.handle(); }
 #endif
 
 #ifdef CDPCFG_WIFI_NONE
 void Duck::processPortalRequest() {}
 #else
-void Duck::processPortalRequest() {
-  duckNet->dnsServer.processNextRequest();
-}
+void Duck::processPortalRequest() { duckNet->dnsServer.processNextRequest(); }
 #endif
 
 int Duck::sendData(byte topic, const String data) {
@@ -228,12 +221,13 @@ int Duck::sendData(byte topic, std::vector<byte> data) {
     return DUCKPACKET_ERR_TOPIC_INVALID;
   }
   if (data.size() > MAX_DATA_LENGTH) {
-    logerr("ERROR send data failed, message too large: "+ String(data.size()) + " bytes");
+    logerr("ERROR send data failed, message too large: " + String(data.size()) +
+           " bytes");
     return DUCKPACKET_ERR_SIZE_INVALID;
   }
   int err = txPacket->prepareForSending(topic, data);
 
-  if ( err != DUCK_ERR_NONE) {
+  if (err != DUCK_ERR_NONE) {
     duckutils::setInterrupt(false);
     txPacket->reset();
     return err;
@@ -283,7 +277,8 @@ int Duck::sendPong() {
     logerr("ERROR Oops! failed to build pong packet, err = " + err);
     return err;
   }
-  err = duckRadio->sendData(txPacket->getDataByteBuffer(), txPacket->getBufferLength());
+  err = duckRadio->sendData(txPacket->getDataByteBuffer(),
+                            txPacket->getBufferLength());
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR Oops! Lora sendData failed, err = " + err);
     return err;
@@ -307,12 +302,10 @@ int Duck::sendPing() {
   return err;
 }
 
-
-
 String Duck::getErrorString(int error) {
   String errorStr = String(error) + ": ";
 
-  switch(error) {
+  switch (error) {
     case DUCK_ERR_NONE:
       return errorStr + "No error";
     case DUCK_ERR_NOT_SUPPORTED:

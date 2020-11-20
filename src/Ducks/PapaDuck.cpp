@@ -1,6 +1,7 @@
 #include "../PapaDuck.h"
 
-int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String password) {
+int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid,
+                                String password) {
   loginfo("setupWithDefaults...");
 
   int err = Duck::setupWithDefaults(deviceId, ssid, password);
@@ -15,7 +16,7 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String 
     logerr("ERROR setupWithDefaults  rc = " + String(err));
     return err;
   }
-  
+
   if (ssid.length() != 0 && password.length() != 0) {
     err = setupWifi("PapaDuck Setup");
     if (err != DUCK_ERR_NONE) {
@@ -58,7 +59,8 @@ void PapaDuck::handleReceivedPacket() {
   int err = duckRadio->readReceivedData(&data);
 
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR handleReceivedPacket. Failed to get data. rc = " + String(err));
+    logerr("ERROR handleReceivedPacket. Failed to get data. rc = " +
+           String(err));
     return;
   }
   // ignore pings
@@ -69,12 +71,14 @@ void PapaDuck::handleReceivedPacket() {
 
   bool relay = rxPacket->prepareForRelaying(duid, data);
   if (relay) {
-    String data_str = duckutils::convertToHex(rxPacket->getCdpPacketBuffer().data(),
-                                          rxPacket->getCdpPacketBuffer().size());
+    String data_str =
+        duckutils::convertToHex(rxPacket->getCdpPacketBuffer().data(),
+                                rxPacket->getCdpPacketBuffer().size());
     logdbg("relaying:  " + data_str);
     recvDataCallback(rxPacket->getCdpPacket());
   }
 }
+
 void PapaDuck::run() {
 
   handleOtaUpdate();

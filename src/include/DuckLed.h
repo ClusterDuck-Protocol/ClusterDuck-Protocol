@@ -11,7 +11,6 @@
 #define DUCKLED_H_
 
 #include "cdpcfg.h"
-
 #include <Arduino.h>
 
 /**

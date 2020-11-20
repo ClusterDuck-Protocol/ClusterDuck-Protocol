@@ -1,5 +1,6 @@
 #include "../MamaDuck.h"
 #include "../MemoryFree.h"
+
 int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String password) {
   int err = Duck::setupWithDefaults(deviceId, ssid, password);
 
@@ -52,7 +53,6 @@ void MamaDuck::handleReceivedPacket() {
 
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR failed to get data from DuckRadio. rc = "+ String(err));
-    std::vector<byte>().swap(data);
     rxPacket->reset();
     return;
   }

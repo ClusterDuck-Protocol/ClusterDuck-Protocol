@@ -1,7 +1,7 @@
 #include "../DuckDetect.h"
 
 int DuckDetect::setupWithDefaults(std::vector<byte> deviceId, String ssid,
-                                String password) {
+                                  String password) {
   int err = Duck::setupWithDefaults(deviceId, ssid, password);
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR setupWithDefaults rc = " + String(err));
@@ -81,7 +81,7 @@ void DuckDetect::sendPing(bool startReceive) {
 
   if (err == DUCK_ERR_NONE) {
     err = duckRadio->sendData(txPacket->getDataByteBuffer(),
-                             txPacket->getBufferLength());
+                              txPacket->getBufferLength());
     if (startReceive) {
       duckRadio->startReceive();
     }
@@ -89,7 +89,7 @@ void DuckDetect::sendPing(bool startReceive) {
       logerr("ERROR Failed to ping, err = " + String(err));
     }
   } else {
-    logerr("ERROR Failed to build packet, err = "+ String(err));
+    logerr("ERROR Failed to build packet, err = " + String(err));
     txPacket->reset();
   }
 }
