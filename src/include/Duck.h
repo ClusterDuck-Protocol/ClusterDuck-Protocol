@@ -18,13 +18,6 @@ public:
    *
    */
   Duck(String name="");
- 
-  /**
-   * @brief Construct a new Duck object.
-   *
-   * @param duid a unique id
-   */
-  Duck(std::vector<byte> duid);
 
   ~Duck() {
     if (txPacket != NULL) {
@@ -272,7 +265,9 @@ protected:
    * @param password the access point password
    * @return DUCK_ERR_NONE if the duck reconnected to the AP sucessfully. An error code otherwise. 
    */
-  virtual int reconnectWifi(String ssid, String password) { return 0; }
+  virtual int reconnectWifi(String ssid, String password) {
+    return DUCK_ERR_NONE;
+  }
 
   /**
    * @brief Handle request from emergency portal.

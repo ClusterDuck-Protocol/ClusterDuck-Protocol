@@ -193,7 +193,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
 
 int DuckNet::setupWifiAp(const char* accessPoint) {
 
-  bool success = true;
+  bool success;
 
   success = WiFi.mode(WIFI_AP);
   if (!success) {
@@ -204,7 +204,8 @@ int DuckNet::setupWifiAp(const char* accessPoint) {
   if (!success) {
     return DUCKWIFI_ERR_AP_CONFIG;
   }
-  delay(200); // wait for 200ms for the access point to start before configuring
+  //TODO: need to find out why there is a delay here
+  delay(200);
 
   success = WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
   if (!success) {
@@ -216,10 +217,17 @@ int DuckNet::setupWifiAp(const char* accessPoint) {
 }
 
 int DuckNet::setupDns() {
-  dnsServer.start(DNS_PORT, "*", apIP);
+  bool success = dnsServer.start(DNS_PORT, "*", apIP);
 
-  if (!MDNS.begin(DNS)) {
-    logerr("ERROR Setting up MDNS responder!");
+  if (!success) {
+    logerr("ERROR dns server start failed");
+    return DUCKDNS_ERR_STARTING;
+  }
+
+  success = MDNS.begin(DNS);
+ 
+  if (!success) {
+    logerr("ERROR dns server begin failed");
     return DUCKDNS_ERR_STARTING;
   }
 
@@ -244,13 +252,14 @@ int DuckNet::setupInternet(String ssid, String password) {
   WiFi.begin(ssid.c_str(), password.c_str());
 
   // TODO: we should probably simply fail here and let the app decide what to do
-  // Continuous retry could deplete the battery
+  // Continuous retry could deplete the battery.
+  // Also this will only work if we have a reboot timer handler implemented
+  // otherwise we are just going to be stuck in this loop
   while (WiFi.status() != WL_CONNECTED) {
     logerr("ERROR setupInternet: failed to connect to " + ssid);
     duckutils::getTimer().tick(); // Advance timer to reboot after awhile
   }
 
-  // Connected to Access Point
   loginfo("Duck connected to internet!");
 
   return DUCK_ERR_NONE;

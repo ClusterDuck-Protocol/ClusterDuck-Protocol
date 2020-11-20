@@ -45,6 +45,7 @@ public:
 
   /// callback definition for receiving RSSI value
   using rssiCallback = void (*)(const int);
+  
   /**
    * @brief Regsiter a callback for receiving and handling RSSI value
    *
