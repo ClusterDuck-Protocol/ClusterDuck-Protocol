@@ -11,6 +11,8 @@ class DuckDetect : public Duck {
 public:
   using Duck::Duck;
 
+  ~DuckDetect() {}
+  
   /**
    * @brief Send a ping message to devices in the mesh network.
    * 

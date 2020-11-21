@@ -43,6 +43,22 @@ int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String 
   return DUCK_ERR_NONE;
 }
 
+void MamaDuck::run() {
+
+  handleOtaUpdate();
+  if (getReceiveFlag()) {
+    duckutils::setInterrupt(false);
+    setReceiveFlag(false);
+
+    handleReceivedPacket();
+    rxPacket->reset();
+    
+    duckutils::setInterrupt(true);
+    startReceive();
+  }
+  processPortalRequest();
+}
+
 void MamaDuck::handleReceivedPacket() {
 
   std::vector<byte> data;
@@ -86,18 +102,4 @@ void MamaDuck::handleReceivedPacket() {
     }
   }
   rxPacket->reset();
-}
-
-void MamaDuck::run() {
-
-  handleOtaUpdate();
-  if (getReceiveFlag()) {
-    duckutils::setInterrupt(false);
-    setReceiveFlag(false);
-    handleReceivedPacket();
-    rxPacket->reset();
-    duckutils::setInterrupt(true);
-    startReceive();
-  }
-  processPortalRequest();
 }

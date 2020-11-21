@@ -11,6 +11,8 @@ class PapaDuck : public Duck {
 public:
   using Duck::Duck;
   
+  ~PapaDuck() {}
+
   /// Papa Duck callback functions signature.
   using rxDoneCallback = void (*)(CDP_Packet );
   using txDoneCallback = void (*)(void);
