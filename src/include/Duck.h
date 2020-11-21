@@ -16,10 +16,10 @@ public:
   /**
    * @brief Construct a new Duck object.
    *
-   */
+   */\
   Duck(String name="");
 
-  ~Duck() {
+  virtual ~Duck() {
     if (txPacket != NULL) {
       delete txPacket;
     }
@@ -78,12 +78,14 @@ public:
                   int rst = CDPCFG_PIN_LORA_RST, int di0 = CDPCFG_PIN_LORA_DIO0,
                   int di1 = CDPCFG_PIN_LORA_DIO1,
                   int txPower = CDPCFG_RF_LORA_TXPOW);
-                  
+
   /**
    * @brief Setup WiFi access point.
    *
    * @param accessPoint a string representing the access point. Default to
    * "🆘 DUCK EMERGENCY PORTAL"
+   *
+   * @returns DUCK_ERROR_NONE if successful, an error code otherwise.
    */
   int setupWifi(const char* ap = "🆘 DUCK EMERGENCY PORTAL");
 

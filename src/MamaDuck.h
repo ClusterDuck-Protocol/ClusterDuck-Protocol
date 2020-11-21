@@ -11,6 +11,8 @@ class MamaDuck : public Duck {
 public:
   using Duck::Duck;
 
+  ~MamaDuck() {}
+
   /**
    * @brief Provide the DuckLink specific implementation of the base `run()`
    * method.

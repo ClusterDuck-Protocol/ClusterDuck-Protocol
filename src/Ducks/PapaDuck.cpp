@@ -52,6 +52,21 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid,
   return DUCK_ERR_NONE;
 }
 
+void PapaDuck::run() {
+
+  handleOtaUpdate();
+  if (getReceiveFlag()) {
+    duckutils::setInterrupt(false);
+    setReceiveFlag(false);
+
+    handleReceivedPacket();
+    rxPacket->reset();
+    
+    duckutils::setInterrupt(true);
+    startReceive();
+  }
+}
+
 void PapaDuck::handleReceivedPacket() {
 
   loginfo("handleReceivedPacket()...");
@@ -76,19 +91,6 @@ void PapaDuck::handleReceivedPacket() {
                                 rxPacket->getCdpPacketBuffer().size());
     logdbg("relaying:  " + data_str);
     recvDataCallback(rxPacket->getCdpPacket());
-  }
-}
-
-void PapaDuck::run() {
-
-  handleOtaUpdate();
-  if (getReceiveFlag()) {
-    duckutils::setInterrupt(false);
-    setReceiveFlag(false);
-    handleReceivedPacket();
-    rxPacket->reset();
-    duckutils::setInterrupt(true);
-    startReceive();
   }
 }
 

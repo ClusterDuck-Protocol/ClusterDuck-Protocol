@@ -43,6 +43,19 @@ int DuckDetect::setupWithDefaults(std::vector<byte> deviceId, String ssid,
   return DUCK_ERR_NONE;
 }
 
+void DuckDetect::run() {
+  handleOtaUpdate();
+  if (getReceiveFlag()) {
+    setReceiveFlag(false);
+    duckutils::setInterrupt(false);
+
+    handleReceivedPacket();
+
+    duckutils::setInterrupt(true);
+    startReceive();
+  }
+}
+
 void DuckDetect::handleReceivedPacket() {
 
   loginfo("handleReceivedPacket()...");
@@ -58,19 +71,6 @@ void DuckDetect::handleReceivedPacket() {
   if (data[TOPIC_POS] == reservedTopic::pong) {
     logdbg("run() - got ping response!");
     rssiCb(duckRadio->getRSSI());
-  }
-}
-
-void DuckDetect::run() {
-  handleOtaUpdate();
-  if (getReceiveFlag()) {
-    setReceiveFlag(false);
-    duckutils::setInterrupt(false);
-
-    handleReceivedPacket();
-
-    duckutils::setInterrupt(true);
-    startReceive();
   }
 }
 
