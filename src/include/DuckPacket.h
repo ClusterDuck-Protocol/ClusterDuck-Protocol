@@ -57,70 +57,36 @@ public:
     bool prepareForRelaying(std::vector<byte> duid, std::vector<byte> dataBuffer);
     
     /**
-     * @brief Get the CDP Packet Buffer bytes.
-     * 
-     * @returns a byte array representing the packet
-     */
-    byte* getCdpPacketBufferBytes() { return buffer.data(); }
-
-    /**
      * @brief Get the Cdp Packet byte vector.
      * 
      * @returns a vector of bytes representing the cdp packet 
      */
     std::vector<byte> getCdpPacketBuffer() { return buffer;}
-    /**
-     * @brief Get the Cdp Packet object
-     * 
-     * @returns a cdp packet 
-     */
-    CDP_Packet getCdpPacket() { return packet; }
-
-    /**
-     * @brief Get the CDP Packet buffer length.
-     * 
-     * @returns length in bytes of the cdp packet buffer.
-     */
-    int getBufferLength() { return buffer.size(); }
     
     /**
      * @brief Checks if a packet needs to be relayed and update the path section.
      * of the cdp packet
      * 
      * @param duid the device uid to add to the path section if packet is relayed
+     * @param path_section the path section of the cdp packet to check
      * @returns true if packet should be relayed.
      * @returns false if packet should not be relayed.
      */
-    bool relay(std::vector<byte> duid);
+    bool relay(std::vector<byte> duid, std::vector<byte> path_section);
 
     /**
-     * @brief Get the path cdp packet section as hex string object.
-     * 
-     * @returns a hex string representing the path section of a cdp packet 
-     */
-    String getPathAsHexString() {
-      return duckutils::convertToHex(packet.path.data(), packet.path.size());
-    }
-    /**
-     * @brief Resets the cdp packet and underlying byte buffers.
-     * 
+     * @brief Resets the packet byte buffer.
+     *
      */
     void reset() {
-      std::vector<byte>().swap(packet.duid);
-      std::vector<byte>().swap(packet.muid);
-      std::vector<byte>().swap(packet.reserved);
-      std::vector<byte>().swap(packet.path);
-      std::vector<byte>().swap(packet.data);
       std::vector<byte>().swap(buffer);
-      packet.topic = 0;
-      packet.path_offset = 0;
-      packet.dcrc = 0;
     }
 
-private : 
+    byte getTopic() { return buffer[TOPIC_POS]; }
+
+  private: 
     std::vector<byte> duid;
     std::vector<byte> buffer;
-    CDP_Packet packet;
 };
 
 #endif

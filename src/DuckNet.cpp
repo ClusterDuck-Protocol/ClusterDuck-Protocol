@@ -120,8 +120,8 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     std::vector<byte> data;
     data.insert(data.end(), val.begin(), val.end());
     txPacket->prepareForSending(topics::status, data );
-    err = duckRadio->sendData(txPacket->getCdpPacketBufferBytes());
-    
+    err = duckRadio->sendData(txPacket->getCdpPacketBuffer());
+
     switch (err) {
       case DUCK_ERR_NONE:
         request->send(200, "text/html", portal);
