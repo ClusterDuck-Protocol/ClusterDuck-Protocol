@@ -9,17 +9,26 @@ bool DuckPacket::prepareForRelaying(std::vector<byte> duid,
                                     std::vector<byte> dataBuffer) {
 
   bool relaying;
+
+
   int packet_length = dataBuffer.size();
+  int path_pos = dataBuffer.data()[PATH_OFFSET_POS];
+
+  std::vector<byte> path_section;
+
+  // extract path section from the packet buffer
+  path_section.assign(&dataBuffer[path_pos], &dataBuffer[packet_length]);
+
 
   this->reset();
 
   loginfo("prepareForRelaying: START");
   logdbg("prepareForRelaying: building packet from received data...");
 
+/*
   // get data section and data crc
   byte* data = dataBuffer.data();
   int path_pos = data[PATH_OFFSET_POS];
-  std::vector<byte> data_section;
   data_section.assign(&data[DATA_POS], &data[path_pos]);
   uint32_t packet_data_crc = duckutils::toUnit32(&data[DATA_CRC_POS]);
 
@@ -40,6 +49,7 @@ bool DuckPacket::prepareForRelaying(std::vector<byte> duid,
   packet.data.assign(data_section.begin(), data_section.end());
   // path section
   packet.path.assign(&dataBuffer[path_pos], &dataBuffer[packet_length]);
+*/
 
   // update the rx packet byte buffer
   buffer.assign(dataBuffer.begin(), dataBuffer.end());
@@ -48,12 +58,34 @@ bool DuckPacket::prepareForRelaying(std::vector<byte> duid,
 
   // when a packet is relayed the given duid is added to the path section of the
   // packet
-  relaying = relay(duid);
+  relaying = relay(duid, path_section);
   if (!relaying) {
     this->reset();
   }
   loginfo("prepareForRelaying: DONE. Relay = " + String(relaying));
   return relaying;
+}
+
+bool DuckPacket::relay(std::vector<byte> duid, std::vector<byte> path_section) {
+
+  int path_length = path_section.size();
+
+  if (path_length == MAX_PATH_LENGTH) {
+    logerr("ERROR Max hops reached. Cannot relay packet.");
+    return false;
+  }
+
+  // we don't have a contains() method but we can use indexOf()
+  // if the result is > 0 then the substring was found
+  // starting at the returned index value.
+  String id = duckutils::convertToHex(duid.data(), duid.size());
+  String path_string = duckutils::convertToHex(path_section.data(), path_length);
+  if (path_string.indexOf(id) >= 0) {
+    loginfo("Packet already seen. ignore it.");
+    return false;
+  }
+  buffer.insert(buffer.end(), duid.begin(), duid.end());
+  return true;
 }
 
 int DuckPacket::prepareForSending(byte topic, std::vector<byte> app_data) {
@@ -124,34 +156,3 @@ int DuckPacket::prepareForSending(byte topic, std::vector<byte> app_data) {
   return DUCK_ERR_NONE;
 }
 
-bool DuckPacket::relay(std::vector<byte> duid) {
-
-  int path_length = packet.path.size();
-
-  if (path_length == MAX_PATH_LENGTH) {
-    logerr("ERROR Max hops reached. Cannot relay packet.");
-    return false;
-  }
-
-  // we don't have a contains() method but we can use indexOf()
-  // if the result is > 0 then the substring was found
-  // starting at the returned index value.
-  String id = duckutils::convertToHex(duid.data(), duid.size());
-  String path = duckutils::convertToHex(packet.path.data(), packet.path.size());
-  if (path.indexOf(id) >= 0) {
-    loginfo("Packet already seen. ignore it.");
-    return false;
-  }
-
-  // TODO: Need to review the DuckPacket component
-  // This should be greatly simplified if we stick with byte buffers rather than having both a
-  // buffer and a CDP Packet. The CDP Packet is only needed for convience when a received packet is
-  // provided to the application through the packet received callback.
-  // The callback could just return the packet buffer and the app could use a utility method to map it
-  // to a CDP Packet.
-
-  // add our duid at the end of the path and update the packet buffer
-  packet.path.insert(packet.path.end(), duid.begin(), duid.end());
-  buffer.insert(buffer.end(), duid.begin(), duid.end());
-  return true;
-}

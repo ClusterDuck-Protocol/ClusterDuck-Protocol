@@ -69,7 +69,7 @@ void PapaDuck::run() {
 
 void PapaDuck::handleReceivedPacket() {
 
-  loginfo("handleReceivedPacket()...");
+  loginfo("handleReceivedPacket() START");
   std::vector<byte> data;
   int err = duckRadio->readReceivedData(&data);
 
@@ -83,14 +83,15 @@ void PapaDuck::handleReceivedPacket() {
     rxPacket->reset();
     return;
   }
-
+  // build our RX DuckPacket which holds the updated path in case the packet is relayed
   bool relay = rxPacket->prepareForRelaying(duid, data);
   if (relay) {
-    String data_str =
-        duckutils::convertToHex(rxPacket->getCdpPacketBuffer().data(),
-                                rxPacket->getCdpPacketBuffer().size());
-    logdbg("relaying:  " + data_str);
-    recvDataCallback(rxPacket->getCdpPacket());
+    logdbg("relaying:  " +
+            duckutils::convertToHex(rxPacket->getCdpPacketBuffer().data(),
+                                    rxPacket->getCdpPacketBuffer().size()));
+    loginfo("invoking callback in the duck application...");
+    recvDataCallback(rxPacket->getCdpPacketBuffer());
+    loginfo("handleReceivedPacket() DONE");
   }
 }
 

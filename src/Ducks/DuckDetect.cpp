@@ -80,8 +80,7 @@ void DuckDetect::sendPing(bool startReceive) {
   err = txPacket->prepareForSending(reservedTopic::ping, data);
 
   if (err == DUCK_ERR_NONE) {
-    err = duckRadio->sendData(txPacket->getCdpPacketBufferBytes(),
-                              txPacket->getBufferLength());
+    err = duckRadio->sendData(txPacket->getCdpPacketBuffer());
     if (startReceive) {
       duckRadio->startReceive();
     }
@@ -90,6 +89,5 @@ void DuckDetect::sendPing(bool startReceive) {
     }
   } else {
     logerr("ERROR Failed to build packet, err = " + String(err));
-    txPacket->reset();
   }
 }

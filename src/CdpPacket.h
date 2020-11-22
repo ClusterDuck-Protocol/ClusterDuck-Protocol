@@ -2,7 +2,9 @@
 #define CDPPACKET_H
 
 #include "Arduino.h"
-#include <WString.h>
+#include "include/DuckUtils.h"
+#include "DuckLogger.h"
+#include <string>
 #include <vector>
 
 #define MAX_HOPS 6
@@ -78,7 +80,9 @@ DATA:      192 byte array          - Data payload (e.g sensor read, text,...). M
 PATH:      048 byte array of DUIDs - Device UIDs having seen this packet. Max is 48 bytes (6 hops)
 */
 
-typedef struct {
+
+class CdpPacket {
+public:
   /// Device UID (8 bytes)
   std::vector<byte> duid;
   /// Message UID (4 bytes)
@@ -95,6 +99,93 @@ typedef struct {
   std::vector<byte> data;
   /// Path section (48 bytes max)
   std::vector<byte> path;
-} CDP_Packet;
+
+  CdpPacket() {
+    this->reserved[0] = 0;
+    this->reserved[1] = 0;
+  }
+
+  CdpPacket(std::vector<byte> buffer) {
+    int buffer_length = buffer.size();
+    
+    // get path start position
+    int path_pos = buffer[PATH_OFFSET_POS];
+    
+    // duid
+    duid.assign(&buffer[0], &buffer[DUID_LENGTH]);
+    loginfo("packet duid:  " + duckutils::convertToHex(duid.data(), duid.size()));
+
+    // muid
+    muid.assign(&buffer[MUID_POS], &buffer[TOPIC_POS]);
+    loginfo("packet muid:  " +
+            duckutils::convertToHex(muid.data(), muid.size()));
+
+    // topic
+    topic = buffer[TOPIC_POS];
+    // path offset
+    path_offset = buffer[PATH_OFFSET_POS];
+    // reserved
+    reserved.assign(&buffer[RESERVED_POS], &buffer[DATA_CRC_POS]);
+    // data crc
+    dcrc = duckutils::toUnit32(&buffer[DATA_CRC_POS]);
+    // data section
+    data.assign(&buffer[DATA_POS], &buffer[path_pos]);
+    // path section
+    path.assign(&buffer[path_pos], &buffer[buffer_length]);
+
+    std::string payload(data.begin(), data.end());
+    loginfo("DATA = " + String(payload.c_str()));
+  }
+
+  ~CdpPacket() {}
+
+  void build(std::vector<byte> buffer) {
+    int buffer_length = buffer.size();
+
+    // get path start position
+    int path_pos = buffer[PATH_OFFSET_POS];
+
+    // duid
+    duid.assign(&buffer[0], &buffer[DUID_LENGTH]);
+    // muid
+    muid.assign(&buffer[MUID_POS], &buffer[TOPIC_POS]);
+    // topic
+    topic = buffer[TOPIC_POS];
+    // path offset
+    path_offset = buffer[PATH_OFFSET_POS];
+    // reserved
+    reserved.assign(&buffer[RESERVED_POS], &buffer[DATA_CRC_POS]);
+    // data crc
+    dcrc = duckutils::toUnit32(&buffer[DATA_CRC_POS]);
+    // data section
+    data.assign(&buffer[DATA_POS], &buffer[path_pos]);
+    // path section
+    path.assign(&buffer[path_pos], &buffer[buffer_length]);
+  }
+
+  /**
+   * @brief Get the path cdp packet section as hex string.
+   *
+   * @returns a hex string representing the path section of a cdp packet
+   */
+  String getPathAsHexString() {
+    return duckutils::convertToHex(path.data(), path.size());
+  }
+
+  /**
+   * @brief Resets the cdp packet and underlying byte buffers.
+   *
+   */
+  void reset() {
+    std::vector<byte>().swap(duid);
+    std::vector<byte>().swap(muid);
+    std::vector<byte>().swap(reserved);
+    std::vector<byte>().swap(path);
+    std::vector<byte>().swap(data);
+    topic = 0;
+    path_offset = 0;
+    dcrc = 0;
+  }
+};
 
 #endif
