@@ -100,11 +100,6 @@ public:
   /// Path section (48 bytes max)
   std::vector<byte> path;
 
-  CdpPacket() {
-    this->reserved[0] = 0;
-    this->reserved[1] = 0;
-  }
-
   CdpPacket(std::vector<byte> buffer) {
     int buffer_length = buffer.size();
     
@@ -113,13 +108,8 @@ public:
     
     // duid
     duid.assign(&buffer[0], &buffer[DUID_LENGTH]);
-    loginfo("packet duid:  " + duckutils::convertToHex(duid.data(), duid.size()));
-
     // muid
     muid.assign(&buffer[MUID_POS], &buffer[TOPIC_POS]);
-    loginfo("packet muid:  " +
-            duckutils::convertToHex(muid.data(), muid.size()));
-
     // topic
     topic = buffer[TOPIC_POS];
     // path offset
@@ -132,9 +122,6 @@ public:
     data.assign(&buffer[DATA_POS], &buffer[path_pos]);
     // path section
     path.assign(&buffer[path_pos], &buffer[buffer_length]);
-
-    std::string payload(data.begin(), data.end());
-    loginfo("DATA = " + String(payload.c_str()));
   }
 
   ~CdpPacket() {}
