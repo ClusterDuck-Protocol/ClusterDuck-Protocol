@@ -80,7 +80,7 @@ void DuckDetect::sendPing(bool startReceive) {
   err = txPacket->prepareForSending(reservedTopic::ping, data);
 
   if (err == DUCK_ERR_NONE) {
-    err = duckRadio->sendData(txPacket->getCdpPacketBuffer());
+    err = duckRadio->sendData(txPacket->getBuffer());
     if (startReceive) {
       duckRadio->startReceive();
     }

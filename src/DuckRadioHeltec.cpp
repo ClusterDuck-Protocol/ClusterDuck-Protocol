@@ -112,9 +112,9 @@ int DuckRadio::sendData(std::vector<byte> data) {
 }
 
 int DuckRadio::relayPacket(DuckPacket* packet) {
-  Radio.Send(packet->getCdpPacketBuffer().data(),
-             packet->getCdpPacketBuffer().size());
-  loginfo("Sent data: len: " + packet->getCdpPacketBuffer().size());
+  Radio.Send(packet->getBuffer().data(),
+             packet->getBuffer().size());
+  loginfo("Sent data: len: " + packet->getBuffer().size());
   return DUCK_ERR_NONE;
 }
 
