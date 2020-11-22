@@ -232,7 +232,7 @@ int Duck::sendData(byte topic, std::vector<byte> data) {
     duckutils::setInterrupt(false);
     return err;
   }
-  err = duckRadio->sendData(txPacket->getCdpPacketBuffer());
+  err = duckRadio->sendData(txPacket->getBuffer());
   txPacket->reset();
   return err;
 }
@@ -275,7 +275,7 @@ int Duck::sendPong() {
     logerr("ERROR Oops! failed to build pong packet, err = " + err);
     return err;
   }
-  err = duckRadio->sendData(txPacket->getCdpPacketBuffer());
+  err = duckRadio->sendData(txPacket->getBuffer());
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR Oops! Lora sendData failed, err = " + err);
     return err;
@@ -291,7 +291,7 @@ int Duck::sendPing() {
     logerr("ERROR Failed to build ping packet, err = " + err);
     return err;
   }
-  err = duckRadio->sendData(txPacket->getCdpPacketBuffer());
+  err = duckRadio->sendData(txPacket->getBuffer());
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR Lora sendData failed, err = " + err);
   }

@@ -19,37 +19,9 @@ bool DuckPacket::prepareForRelaying(std::vector<byte> duid,
   // extract path section from the packet buffer
   path_section.assign(&dataBuffer[path_pos], &dataBuffer[packet_length]);
 
-
   this->reset();
 
   loginfo("prepareForRelaying: START");
-  logdbg("prepareForRelaying: building packet from received data...");
-
-/*
-  // get data section and data crc
-  byte* data = dataBuffer.data();
-  int path_pos = data[PATH_OFFSET_POS];
-  data_section.assign(&data[DATA_POS], &data[path_pos]);
-  uint32_t packet_data_crc = duckutils::toUnit32(&data[DATA_CRC_POS]);
-
-  // build an rxPacket with data we have received
-  // duid
-  packet.duid.assign(&dataBuffer[0], &dataBuffer[DUID_LENGTH]);
-  // muid
-  packet.muid.assign(&dataBuffer[MUID_POS], &dataBuffer[TOPIC_POS]);
-  // topic
-  packet.topic = dataBuffer[TOPIC_POS];
-  // path offset
-  packet.path_offset = dataBuffer[PATH_OFFSET_POS];
-  // reserved
-  packet.reserved.assign(&dataBuffer[RESERVED_POS], &dataBuffer[DATA_POS]);
-  // data crc
-  packet.dcrc = packet_data_crc;
-  // data section
-  packet.data.assign(data_section.begin(), data_section.end());
-  // path section
-  packet.path.assign(&dataBuffer[path_pos], &dataBuffer[packet_length]);
-*/
 
   // update the rx packet byte buffer
   buffer.assign(dataBuffer.begin(), dataBuffer.end());

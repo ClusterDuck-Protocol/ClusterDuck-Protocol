@@ -164,8 +164,8 @@ int DuckRadio::sendData(byte* data, int length) {
 
 int DuckRadio::relayPacket(DuckPacket* packet) {
   // display->log("relayPacket...");
-  return startTransmitData(packet->getCdpPacketBuffer().data(),
-                           packet->getCdpPacketBuffer().size());
+  return startTransmitData(packet->getBuffer().data(),
+                           packet->getBuffer().size());
 }
 
 int DuckRadio::sendData(std::vector<byte> data) {

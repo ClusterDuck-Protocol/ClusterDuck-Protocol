@@ -87,10 +87,10 @@ void PapaDuck::handleReceivedPacket() {
   bool relay = rxPacket->prepareForRelaying(duid, data);
   if (relay) {
     logdbg("relaying:  " +
-            duckutils::convertToHex(rxPacket->getCdpPacketBuffer().data(),
-                                    rxPacket->getCdpPacketBuffer().size()));
+            duckutils::convertToHex(rxPacket->getBuffer().data(),
+                                    rxPacket->getBuffer().size()));
     loginfo("invoking callback in the duck application...");
-    recvDataCallback(rxPacket->getCdpPacketBuffer());
+    recvDataCallback(rxPacket->getBuffer());
     loginfo("handleReceivedPacket() DONE");
   }
 }

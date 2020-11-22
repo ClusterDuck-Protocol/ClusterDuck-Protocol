@@ -61,7 +61,7 @@ public:
      * 
      * @returns a vector of bytes representing the cdp packet 
      */
-    std::vector<byte> getCdpPacketBuffer() { return buffer;}
+    std::vector<byte> getBuffer() { return buffer;}
     
     /**
      * @brief Checks if a packet needs to be relayed and update the path section.
