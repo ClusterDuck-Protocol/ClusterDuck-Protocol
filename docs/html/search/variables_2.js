@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['control_568',['control',['../class_a_x25_frame.html#a5b196079b539dc417ca65dd4ad622f8f',1,'AX25Frame']]]
+  ['enableduckinterrupt_246',['enableDuckInterrupt',['../namespaceduckutils.html#ad05a5136ce402f494840e02f0e0816dd',1,'duckutils']]]
 ];
