@@ -77,7 +77,7 @@ void DuckDetect::handleReceivedPacket() {
 void DuckDetect::sendPing(bool startReceive) {
   int err = DUCK_ERR_NONE;
   std::vector<byte> data(1, 0);
-  err = txPacket->prepareForSending(reservedTopic::ping, data);
+  err = txPacket->prepareForSending(DuckType::DETECTOR, reservedTopic::ping, data);
 
   if (err == DUCK_ERR_NONE) {
     err = duckRadio->sendData(txPacket->getBuffer());

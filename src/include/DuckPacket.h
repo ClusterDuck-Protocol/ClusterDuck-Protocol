@@ -44,7 +44,7 @@ public:
      * @param app_data a byte buffer that contains the packet data section
      * @returns DUCK_ERR_NONE if the operation was successful, otherwise an error code.
      */
-    int prepareForSending(byte topic, std::vector<byte> app_data);
+    int prepareForSending(byte duckType, byte topic, std::vector<byte> app_data);
 
     /**
      * @brief Update a received packet if it needs to be relayed in the mesh.

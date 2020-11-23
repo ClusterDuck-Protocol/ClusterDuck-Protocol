@@ -4,6 +4,7 @@
 #include "Arduino.h"
 #include "include/DuckUtils.h"
 #include "DuckLogger.h"
+#include "include/DuckTypes.h"
 #include <string>
 #include <vector>
 
@@ -21,7 +22,8 @@
 #define MUID_POS 8
 #define TOPIC_POS 12
 #define PATH_OFFSET_POS 13
-#define RESERVED_POS 14
+#define DUCK_TYPE_POS 14
+#define HOP_COUNT_POS 15
 #define DATA_CRC_POS 16
 #define DATA_POS HEADER_LENGTH // Data section starts immediately after header
 
@@ -91,8 +93,10 @@ public:
   byte topic;
   /// Offset to the Path section (1 byte)
   byte path_offset;
-  /// Reserved (2 bytes)
-  std::vector<byte> reserved;
+  /// Type of ducks as define in DuckTypes.h
+  byte duckType;
+  /// Number of times a packet was relayed in the mesh
+  byte hopCount;
   /// crc32 for the data section
   uint32_t dcrc;
   /// Data section
@@ -114,8 +118,10 @@ public:
     topic = buffer[TOPIC_POS];
     // path offset
     path_offset = buffer[PATH_OFFSET_POS];
-    // reserved
-    reserved.assign(&buffer[RESERVED_POS], &buffer[DATA_CRC_POS]);
+    // duckType
+    duckType = buffer[DUCK_TYPE_POS];
+    // hop count
+    hopCount = buffer[HOP_COUNT_POS];
     // data crc
     dcrc = duckutils::toUnit32(&buffer[DATA_CRC_POS]);
     // data section
@@ -126,29 +132,6 @@ public:
 
   ~CdpPacket() {}
 
-  void build(std::vector<byte> buffer) {
-    int buffer_length = buffer.size();
-
-    // get path start position
-    int path_pos = buffer[PATH_OFFSET_POS];
-
-    // duid
-    duid.assign(&buffer[0], &buffer[DUID_LENGTH]);
-    // muid
-    muid.assign(&buffer[MUID_POS], &buffer[TOPIC_POS]);
-    // topic
-    topic = buffer[TOPIC_POS];
-    // path offset
-    path_offset = buffer[PATH_OFFSET_POS];
-    // reserved
-    reserved.assign(&buffer[RESERVED_POS], &buffer[DATA_CRC_POS]);
-    // data crc
-    dcrc = duckutils::toUnit32(&buffer[DATA_CRC_POS]);
-    // data section
-    data.assign(&buffer[DATA_POS], &buffer[path_pos]);
-    // path section
-    path.assign(&buffer[path_pos], &buffer[buffer_length]);
-  }
 
   /**
    * @brief Get the path cdp packet section as hex string.
@@ -166,9 +149,10 @@ public:
   void reset() {
     std::vector<byte>().swap(duid);
     std::vector<byte>().swap(muid);
-    std::vector<byte>().swap(reserved);
     std::vector<byte>().swap(path);
     std::vector<byte>().swap(data);
+    duckType = DuckType::UNKNOWN;
+    hopCount = 0;
     topic = 0;
     path_offset = 0;
     dcrc = 0;

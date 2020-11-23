@@ -57,10 +57,11 @@ bool DuckPacket::relay(std::vector<byte> duid, std::vector<byte> path_section) {
     return false;
   }
   buffer.insert(buffer.end(), duid.begin(), duid.end());
+  buffer[HOP_COUNT_POS]++;
   return true;
 }
 
-int DuckPacket::prepareForSending(byte topic, std::vector<byte> app_data) {
+int DuckPacket::prepareForSending(byte duckType, byte topic, std::vector<byte> app_data) {
 
   uint8_t app_data_length = app_data.size();
 
@@ -106,10 +107,13 @@ int DuckPacket::prepareForSending(byte topic, std::vector<byte> app_data) {
   buffer.insert(buffer.end(), offset);
   logdbg("Offset:    " + duckutils::convertToHex(buffer.data(), buffer.size()));
 
-  // reserved
+  // duckType
+  buffer.insert(buffer.end(), duckType);
+  logdbg("duck type: " + duckutils::convertToHex(buffer.data(), buffer.size()));
+
+  // hop count
   buffer.insert(buffer.end(), 0x00);
-  buffer.insert(buffer.end(), 0x00);
-  logdbg("Reserved:  " + duckutils::convertToHex(buffer.data(), buffer.size()));
+  logdbg("hop count: " + duckutils::convertToHex(buffer.data(), buffer.size()));
 
   // data crc
   buffer.insert(buffer.end(), &crc_bytes[0], &crc_bytes[DATA_CRC_LENGTH]);
