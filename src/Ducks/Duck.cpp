@@ -226,7 +226,7 @@ int Duck::sendData(byte topic, std::vector<byte> data) {
            " bytes");
     return DUCKPACKET_ERR_SIZE_INVALID;
   }
-  int err = txPacket->prepareForSending(topic, data);
+  int err = txPacket->prepareForSending(this->getType(), topic, data);
 
   if (err != DUCK_ERR_NONE) {
     duckutils::setInterrupt(false);
@@ -270,7 +270,7 @@ int Duck::startReceive() {
 int Duck::sendPong() {
   int err = DUCK_ERR_NONE;
   std::vector<byte> data(1, 0);
-  err = txPacket->prepareForSending(reservedTopic::pong, data);
+  err = txPacket->prepareForSending(this->getType(), reservedTopic::pong, data);
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR Oops! failed to build pong packet, err = " + err);
     return err;
@@ -286,7 +286,7 @@ int Duck::sendPong() {
 int Duck::sendPing() {
   int err = DUCK_ERR_NONE;
   std::vector<byte> data(1, 0);
-  err = txPacket->prepareForSending(reservedTopic::ping, data);
+  err = txPacket->prepareForSending(this->getType(), reservedTopic::ping, data);
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR Failed to build ping packet, err = " + err);
     return err;

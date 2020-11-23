@@ -41,15 +41,16 @@ DuckRadio::DuckRadio() {}
 static RadioEvents_t radioEvents;
 
 static void OnLoraTxDone(void) {
-  Radio.Sleep();
   loginfo("TX done");
+
+  Radio.Sleep();
   //turnOnRGB(0x002000, 300);
   //turnOnRGB(0x000000, 0);
 }
 
 static void OnLoraTxTimeout(void) {
-  Radio.Sleep();
   loginfo("TX timeout");
+  Radio.Sleep();
   //turnOnRGB(0x3000000,300);
   //turnOnRGB(0x000000, 0);
 }
@@ -57,7 +58,6 @@ static void OnLoraTxTimeout(void) {
 static void OnLoraRxDone(uint8_t* payload, uint16_t size, int16_t rssi,
                          int8_t snr) {
   loginfo("RX Done");
-
   Radio.Sleep();
   logdbg("Received Hex:");
   for (int i = 0; i < size; i++) {
@@ -67,8 +67,8 @@ static void OnLoraRxDone(uint8_t* payload, uint16_t size, int16_t rssi,
 }
 
 static void OnLoraRxTimeout(void) {
-  Radio.Sleep();
   loginfo("RX Timeout");
+  Radio.Sleep();
 }
 
 static void OnLoraRxError(void) {
@@ -99,22 +99,22 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
 
 int DuckRadio::sendData(byte* data, int length) {
   //turnOnRGB(0, 300);
+  loginfo("Sending packet: len: " + String(length));
   Radio.Send(data, length);
-  loginfo("Sent data: len: " +String(length));
   return DUCK_ERR_NONE;
 }
 
 int DuckRadio::sendData(std::vector<byte> data) {
   //turnOnRGB(0x0000F0, 0);
+  loginfo("Sending packet: len: " + String(data.size()));
   Radio.Send(data.data(), data.size());
-  loginfo("Sent data: len: " + data.size());
   return DUCK_ERR_NONE;
 }
 
 int DuckRadio::relayPacket(DuckPacket* packet) {
+  loginfo("Relaying packet: len: " + packet->getBuffer().size());
   Radio.Send(packet->getBuffer().data(),
              packet->getBuffer().size());
-  loginfo("Sent data: len: " + packet->getBuffer().size());
   return DUCK_ERR_NONE;
 }
 
