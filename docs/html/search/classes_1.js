@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['cc1101_290',['CC1101',['../class_c_c1101.html',1,'']]],
-  ['clusterduck_291',['ClusterDuck',['../class_cluster_duck.html',1,'']]]
+  ['loraconfigparams_158',['LoraConfigParams',['../struct_lora_config_params.html',1,'']]]
 ];
