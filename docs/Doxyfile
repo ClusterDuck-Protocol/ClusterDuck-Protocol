@@ -120,7 +120,8 @@ WARN_LOGFILE           =
 INPUT                  = ../src/Ducks \
                          ../src/Ducks \
                          ../src/include \
-                        main.md
+                        main.md \
+               header.html
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.c \
                          *.cc \
