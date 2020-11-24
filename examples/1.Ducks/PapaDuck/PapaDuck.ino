@@ -33,71 +33,69 @@
 #define DEVICE_ID   ""
 #define DEVICE_TYPE ""
 #define TOKEN       ""
+char server[] = ORG ".messaging.internetofthings.ibmcloud.com";
+char authMethod[] = "use-token-auth";
+char token[] = TOKEN;
+char clientId[] = "d:" ORG ":" DEVICE_TYPE ":" DEVICE_ID;
 
+// Use pre-built papa duck.
+PapaDuck duck = PapaDuck(DEVICE_ID);
 
-
-// Use pre-built papa duck
-PapaDuck duck = PapaDuck();
-
-char server[]           = ORG ".messaging.internetofthings.ibmcloud.com";
-char authMethod[]       = "use-token-auth";
-char token[]            = TOKEN;
-char clientId[]         = "d:" ORG ":" DEVICE_TYPE ":" DEVICE_ID;
+DuckDisplay* display = NULL;
 
 // Set this to false if testing quickstart on IBM IoT Platform
 bool use_auth_method = true;
 
-auto timer = timer_create_default(); // create a timer with default settings
+auto timer = timer_create_default();
 
 WiFiClientSecure wifiClient;
 PubSubClient client(server, 8883, wifiClient);
 
+// WiFi connection retry
 bool retry = true;
 
 void setup() {
-  
-  // We are using a hardcoded device id here, but it should be retrieved or given during the device provisioning
-  // then converted to a byte vector to setup the duck
-  // NOTE: The Device ID must be exactly 8 bytes otherwise it will get rejected
-  std::string deviceId(DEVICE_ID);
-  std::vector<byte> devId;
-  devId.insert(devId.end(), deviceId.begin(), deviceId.end());
-  
-  // Use the default setup provided by the SDK  
+  // The Device ID must be unique and 8 bytes long. Typically the ID is stored
+  // in a secure nvram, or provided to the duck during provisioning/registration
+  std::vector<byte> devId = {'P', 'A', 'P', 'A', '0', '0', '0', '1'};
+
+  // the default setup is equivalent to the above setup sequence
   duck.setupWithDefaults(devId, SSID, PASSWORD);
 
-  
+  display = DuckDisplay::getInstance();
+  // DuckDisplay instance is returned unconditionally, if there is no physical
+  // display the functions will not do anything
+  display->setupDisplay(duck.getType(), duck.getName());
+
   // register a callback to handle incoming data from duck in the network
   duck.onReceiveDuckData(handleDuckData);
-  
-  Serial.println("[PAPA] Setup OK!");
+
+  Serial.println("[PAPA] Setup OK! " + duck.getName());
+  display->drawString(true, 1, 10, duck.getName().c_str());
 }
 
 // The callback method simply takes the incoming packet and
 // converts it to a JSON string, before sending it out over WiFi
-void handleDuckData(CDP_Packet packet) {
-  if (packet.topic == reservedTopic::ping) {
-    return;
-  }
-  
-  quackJson(packet);
+void handleDuckData(std::vector<byte> packetBuffer) {
+  Serial.println("[PAPA] got packet: " +
+                 convertToHex(packetBuffer.data(), packetBuffer.size()));
+  quackJson(packetBuffer);
 }
-
 
 void loop() {
 
   if (!duck.isWifiConnected() && retry) {
     String ssid = duck.getSsid();
     String password = duck.getPassword();
-    
-    Serial.print("[PAPA] WiFi disconnected, reconnecting to local network: ");
-    Serial.print(ssid);
+
+    Serial.println("[PAPA] WiFi disconnected, reconnecting to local network: " +
+                   ssid);
 
     int err = duck.reconnectWifi(ssid, password);
 
     if (err != DUCK_ERR_NONE) {
       retry = false;
-      timer.in(WIFI_RETRY_DELAY_MS, enableRetry);
+      timer.in(5000, enableRetry);
     }
   }
   if (duck.isWifiConnected()) {
@@ -108,13 +106,12 @@ void loop() {
   timer.tick();
 }
 
-void setup_mqtt(bool use_auth)
-{
+void setup_mqtt(bool use_auth) {
   bool connected = client.connected();
   if (connected) {
     return;
   }
-  
+
   for (;;) {
     if (use_auth) {
       connected = client.connect(clientId, authMethod, token);
@@ -122,21 +119,21 @@ void setup_mqtt(bool use_auth)
       connected = client.connect(clientId);
     }
     if (connected) {
-      Serial.println("[PAPA] mqtt client is connected!");
+      Serial.println("[PAPA] Mqtt client is connected!");
       break;
     }
-    retry_mqtt_connection(MQTT_RETRY_DELAY_MS);
+    retry_mqtt_connection(500);
   }
 }
 
 // DMS locator URL requires a topicString, so we need to convert the topic
 // from the packet to a string based on the topics code
 std::string toTopicString(byte topic) {
-  
+
   std::string topicString;
-  
+
   switch (topic) {
-    case  topics::status:
+    case topics::status:
       topicString = "status";
       break;
     case topics::cpm:
@@ -158,39 +155,74 @@ std::string toTopicString(byte topic) {
   return topicString;
 }
 
-void quackJson(CDP_Packet packet) {
-  
-  const int bufferSize = 4 *  JSON_OBJECT_SIZE(4);
+String convertToHex(byte* data, int size) {
+  String buf = "";
+  buf.reserve(size * 2); // 2 digit hex
+  const char* cs = "0123456789ABCDEF";
+  for (int i = 0; i < size; i++) {
+    byte val = data[i];
+    buf += cs[(val >> 4) & 0x0F];
+    buf += cs[val & 0x0F];
+  }
+  return buf;
+}
+
+void quackJson(std::vector<byte> packetBuffer) {
+
+  CdpPacket packet = CdpPacket(packetBuffer);
+  const int bufferSize = 4 * JSON_OBJECT_SIZE(4);
   StaticJsonDocument<bufferSize> doc;
 
-  std::string payload(packet.data.begin(),packet.data.end());
-  std::string duid(packet.duid.begin(),packet.duid.end());
-  std::string muid(packet.muid.begin(),packet.muid.end());
-  std::string path(packet.path.begin(),packet.path.end());
+  // Here we treat the internal payload of the CDP packet as a string
+  // but this is mostly application dependent. 
+  // The parsingf here is optional. The Papa duck could simply decide to
+  // forward the CDP packet as a byte array and let the Network Server (or DMS) deal with
+  // the parsing based on some business logic.
 
-  doc["DeviceID"]  = duid;
+  std::string payload(packet.data.begin(), packet.data.end());
+  std::string duid(packet.duid.begin(), packet.duid.end());
+  std::string muid(packet.muid.begin(), packet.muid.end());
+  std::string path(packet.path.begin(), packet.path.end());
+
+  Serial.println("[PAPA] Packet Received:");
+  Serial.println("[PAPA] duid:    " + String(duid.c_str()));
+  Serial.println("[PAPA] muid:    " + String(muid.c_str()));
+  Serial.println("[PAPA] path:    " + String(path.c_str()));
+  Serial.println("[PAPA] data:    " + String(payload.c_str()));
+  Serial.println("[PAPA] hops:    " + String(packet.hopCount));
+  Serial.println("[PAPA] duck:    " + String(packet.duckType));
+
+  doc["DeviceID"] = duid;
   doc["MessageID"] = muid;
   doc["Payload"].set(payload);
   doc["path"].set(path);
+  doc["hops"].set(packet.hopCount);
+  doc["duckType"].set(packet.duckType);
 
+  display->clear();
+  display->drawString(1, 1, duid.c_str());
   std::string cdpTopic = toTopicString(packet.topic);
-  
+  display->drawString(1, 2, muid.c_str());
+  display->drawString(1, 3, cdpTopic.c_str());
+
   std::string topic = "iot-2/evt/" + cdpTopic + "/fmt/json";
 
   String jsonstat;
   serializeJson(doc, jsonstat);
 
   if (client.publish(topic.c_str(), jsonstat.c_str())) {
+    Serial.println("[PAPA] Packet forwarded:");
     serializeJsonPretty(doc, Serial);
     Serial.println("");
-    Serial.println("Publish ok");
-  }
-  else {
-    Serial.println("Publish failed");
+    Serial.println("[PAPA] Publish ok");
+    display->drawString(1, 6, "Publish ok");
+  } else {
+    Serial.println("[PAPA] Publish failed");
+    display->drawString(1, 6, "Publish failed");
   }
 }
 
-bool enableRetry(void *) {
+bool enableRetry(void*) {
   retry = true;
   return retry;
 }
