@@ -64,24 +64,22 @@ enum reservedTopic {
 };
 
 /*
-0        07   12  19  15   20   25                 PO                    255
-|        |    |   |   |    |    |                  |                     |
-+--------+----+-+-+-+-+----+----+------------------+---------------------+
-|  DUID  |MUID|T|P|D|H|DCRC|CTR |      DATA        | PATH (max 48 bytes) |
-|        |    | |O|T|C|    |    | (max 184 bytes)  |                     |
-+--------+----+-+-+-+-+----+----+------------------+---------------------+
-DUID:      08  byte array          - Device Unique ID
+0        7    11  13  15   19                 PO                    255
+|        |    |   |   |    |                  |                     |
++--------+----+-+-+-+-+----+------------------+---------------------+
+| SDUID  |MUID|T|P|D|H|DCRC|      DATA        | PATH (max 48 bytes) |
+|        |    | |O|T|C|    | (max 180 bytes)  |                     |
++--------+----+-+-+-+-+----+--------+------------------+------------+
+SDUID:     08  byte array          - Device Unique ID
 MUID:      04  byte array          - Message unique ID
 T   :      01  byte value          - Topic (topic 0..15 are reserved for internal use)
-PO  :      01  byte value          - Offset to the start of the
-DT  :      01  byte value          - Duck Type
+PO  :      01  byte value          - Offset to the start of the Path section
+DT  :      01  byte value          - Duck Type 
 HC  :      01  byte value          - Hop count (the number of times the packet was relayed)
 DCRC:      04  byte value          - Data section CRC
-CTR :      04  byte value          - Frame counter
-DATA:      192 byte array          - Data payload (e.g sensor read, text,...). Max is 188 bytes.
-PATH:      048 byte array of DUIDs - Device UIDs having seen this packet. Max is 48 bytes (6 hops)
+DATA:      188 byte array          - Data payload (e.g sensor read, text,...)
+PATH:      048 byte array of DUIDs - Device UIDs having seen this packet - Max is 48 bytes (6 hops)
 */
-
 
 class CdpPacket {
 public:
