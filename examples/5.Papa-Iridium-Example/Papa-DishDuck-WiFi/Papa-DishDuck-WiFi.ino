@@ -192,19 +192,19 @@ void quackJson(std::vector<byte> packetBuffer) {
   // deal with the parsing based on some business logic.
 
   std::string payload(packet.data.begin(), packet.data.end());
-  std::string duid(packet.duid.begin(), packet.duid.end());
+  std::string sduid(packet.sduid.begin(), packet.sduid.end());
   std::string muid(packet.muid.begin(), packet.muid.end());
   std::string path(packet.path.begin(), packet.path.end());
 
   Serial.println("[PAPA] Packet Received:");
-  Serial.println("[PAPA] duid:    " + String(duid.c_str()));
+  Serial.println("[PAPA] sduid:   " + String(sduid.c_str()));
   Serial.println("[PAPA] muid:    " + String(muid.c_str()));
   Serial.println("[PAPA] path:    " + String(path.c_str()));
   Serial.println("[PAPA] data:    " + String(payload.c_str()));
   Serial.println("[PAPA] hops:    " + String(packet.hopCount));
   Serial.println("[PAPA] duck:    " + String(packet.duckType));
 
-  doc["DeviceID"] = duid;
+  doc["DeviceID"] = sduid;
   doc["MessageID"] = muid;
   doc["Payload"].set(payload);
   doc["path"].set(path);
@@ -233,7 +233,7 @@ void quackBeam(std::vector<byte> packetBuffer) {
   int err;
 
   std::string payload(packet.data.begin(), packet.data.end());
-  std::string duid(packet.duid.begin(), packet.duid.end());
+  std::string duid(packet.sduid.begin(), packet.sduid.end());
   std::string muid(packet.muid.begin(), packet.muid.end());
   std::string path(packet.path.begin(), packet.path.end());
 

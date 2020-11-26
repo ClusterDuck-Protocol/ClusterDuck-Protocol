@@ -9,6 +9,9 @@
 #include <WString.h>
 #include <vector>
 
+static std::vector<byte> ZERO_DUID = {0x00, 0x00, 0x00, 0x00,
+                                      0x00, 0x00, 0x00, 0x00};
+
 /**
  * @brief Encapsulate the protocol packet attributes and operations
  * 
@@ -40,11 +43,12 @@ public:
     /**
      * @brief Build a packet from the given topic and provided byte buffer.
      *
+     * @param targetDevice the target device to receive the message
      * @param topic a message topic
      * @param app_data a byte buffer that contains the packet data section
      * @returns DUCK_ERR_NONE if the operation was successful, otherwise an error code.
      */
-    int prepareForSending(byte duckType, byte topic, std::vector<byte> app_data);
+    int prepareForSending(const std::vector<byte> targetDevice, byte duckType, byte topic, std::vector<byte> app_data);
 
     /**
      * @brief Update a received packet if it needs to be relayed in the mesh.
@@ -83,6 +87,7 @@ public:
     }
 
     byte getTopic() { return buffer[TOPIC_POS]; }
+
 
   private: 
     std::vector<byte> duid;

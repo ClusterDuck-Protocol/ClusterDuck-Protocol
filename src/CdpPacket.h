@@ -1,5 +1,5 @@
-#ifndef CDPPACKET_H
-#define CDPPACKET_H
+#ifndef CDPPACKET_H_
+#define CDPPACKET_H_
 
 #include "Arduino.h"
 #include "include/DuckUtils.h"
@@ -15,16 +15,17 @@
 #define DUID_LENGTH 8
 #define MUID_LENGTH 4
 #define DATA_CRC_LENGTH 4
-#define HEADER_LENGTH 20
+#define HEADER_LENGTH 28
 
 // field/section offsets
-#define DUID_POS 0
-#define MUID_POS 8
-#define TOPIC_POS 12
-#define PATH_OFFSET_POS 13
-#define DUCK_TYPE_POS 14
-#define HOP_COUNT_POS 15
-#define DATA_CRC_POS 16
+#define SDUID_POS 0
+#define DDUID_POS 8
+#define MUID_POS 16
+#define TOPIC_POS 20
+#define PATH_OFFSET_POS 21
+#define DUCK_TYPE_POS 22
+#define HOP_COUNT_POS 23
+#define DATA_CRC_POS 24
 #define DATA_POS HEADER_LENGTH // Data section starts immediately after header
 
 #define RESERVED_LENGTH 2
@@ -64,13 +65,15 @@ enum reservedTopic {
 };
 
 /*
-0        7    11  13  15   19                 PO                    255
-|        |    |   |   |    |                  |                     |
-+--------+----+-+-+-+-+----+------------------+---------------------+
-| SDUID  |MUID|T|P|D|H|DCRC|      DATA        | PATH (max 48 bytes) |
-|        |    | |O|T|C|    | (max 180 bytes)  |                     |
-+--------+----+-+-+-+-+----+--------+------------------+------------+
-SDUID:     08  byte array          - Device Unique ID
+0        7       15   19      23   27                  PO                  255
+|        |        |    | | | | |    |                  |                     |
++--------+--------+----+-+-+-+-+----+------------------+---------------------+
+| SDUID  | DDUID  |MUID|T|P|D|H|DCRC|      DATA        | PATH (max 48 bytes) |
+|        |        |    | |O|T|C|    | (max 180 bytes)  |                     |
++--------+--------+----+-+-+-+-+----+------------------+---------------------+
+
+SDUID:     08  byte array          - Source Device Unique ID
+DDUID:     08  byte array          - Destination Device Unique ID
 MUID:      04  byte array          - Message unique ID
 T   :      01  byte value          - Topic (topic 0..15 are reserved for internal use)
 PO  :      01  byte value          - Offset to the start of the Path section
@@ -83,8 +86,10 @@ PATH:      048 byte array of DUIDs - Device UIDs having seen this packet - Max i
 
 class CdpPacket {
 public:
-  /// Device UID (8 bytes)
-  std::vector<byte> duid;
+  /// Source Device UID (8 bytes)
+  std::vector<byte> sduid;
+  /// Destination Device UID (8 bytes)
+  std::vector<byte> dduid;
   /// Message UID (4 bytes)
   std::vector<byte> muid;
   /// Message topic (1 byte)
@@ -108,8 +113,10 @@ public:
     // get path start position
     int path_pos = buffer[PATH_OFFSET_POS];
     
-    // duid
-    duid.assign(&buffer[0], &buffer[DUID_LENGTH]);
+    // sduid
+    sduid.assign(&buffer[SDUID_POS], &buffer[DDUID_POS]);
+    // dduid
+    dduid.assign(&buffer[DDUID_POS], &buffer[MUID_POS]);
     // muid
     muid.assign(&buffer[MUID_POS], &buffer[TOPIC_POS]);
     // topic
@@ -145,7 +152,7 @@ public:
    *
    */
   void reset() {
-    std::vector<byte>().swap(duid);
+    std::vector<byte>().swap(sduid);
     std::vector<byte>().swap(muid);
     std::vector<byte>().swap(path);
     std::vector<byte>().swap(data);

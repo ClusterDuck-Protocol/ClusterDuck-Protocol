@@ -5,8 +5,8 @@
 
 #ifdef CDP_DEBUG
 #define CDP_LOG_ERROR
-//#define CDP_LOG_INFO
-//#define CDP_LOG_DEBUG
+#define CDP_LOG_INFO
+#define CDP_LOG_DEBUG
 #define CDP_LOG_WARN
 #endif
 

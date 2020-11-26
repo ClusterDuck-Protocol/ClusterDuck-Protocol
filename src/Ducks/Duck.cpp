@@ -195,28 +195,28 @@ void Duck::processPortalRequest() {}
 void Duck::processPortalRequest() { duckNet->dnsServer.processNextRequest(); }
 #endif
 
-int Duck::sendData(byte topic, const String data) {
+int Duck::sendData(byte topic, const String data, const std::vector<byte> targetDevice) {
 
   const byte* buffer = (byte*)data.c_str();
-  int err = sendData(topic, buffer, data.length());
+  int err = sendData(topic, buffer, data.length(), targetDevice);
   return err;
 }
 
-int Duck::sendData(byte topic, const std::string data) {
+int Duck::sendData(byte topic, const std::string data, const std::vector<byte> targetDevice) {
   std::vector<byte> app_data;
   app_data.insert(app_data.end(), data.begin(), data.end());
   int err = sendData(topic, app_data);
   return err;
 }
 
-int Duck::sendData(byte topic, const byte* data, int length) {
+int Duck::sendData(byte topic, const byte* data, int length, const std::vector<byte> targetDevice) {
   std::vector<byte> app_data;
   app_data.insert(app_data.end(), &data[0], &data[length]);
-  int err = sendData(topic, app_data);
+  int err = sendData(topic, app_data, targetDevice);
   return err;
 }
 
-int Duck::sendData(byte topic, std::vector<byte> data) {
+int Duck::sendData(byte topic, std::vector<byte> data, const std::vector<byte> targetDevice) {
   if (topic < reservedTopic::max_reserved) {
     logerr("ERROR send data failed, topic is reserved.");
     return DUCKPACKET_ERR_TOPIC_INVALID;
@@ -226,7 +226,7 @@ int Duck::sendData(byte topic, std::vector<byte> data) {
            " bytes");
     return DUCKPACKET_ERR_SIZE_INVALID;
   }
-  int err = txPacket->prepareForSending(this->getType(), topic, data);
+  int err = txPacket->prepareForSending(targetDevice, this->getType(), topic, data);
 
   if (err != DUCK_ERR_NONE) {
     duckutils::setInterrupt(false);
@@ -270,7 +270,7 @@ int Duck::startReceive() {
 int Duck::sendPong() {
   int err = DUCK_ERR_NONE;
   std::vector<byte> data(1, 0);
-  err = txPacket->prepareForSending(this->getType(), reservedTopic::pong, data);
+  err = txPacket->prepareForSending(ZERO_DUID, this->getType(), reservedTopic::pong, data);
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR Oops! failed to build pong packet, err = " + err);
     return err;
@@ -286,7 +286,7 @@ int Duck::sendPong() {
 int Duck::sendPing() {
   int err = DUCK_ERR_NONE;
   std::vector<byte> data(1, 0);
-  err = txPacket->prepareForSending(this->getType(), reservedTopic::ping, data);
+  err = txPacket->prepareForSending(ZERO_DUID, this->getType(), reservedTopic::ping, data);
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR Failed to build ping packet, err = " + err);
     return err;

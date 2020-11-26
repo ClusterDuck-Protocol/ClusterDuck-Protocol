@@ -5,6 +5,7 @@
 #include "DuckNet.h"
 #include "DuckRadio.h"
 #include "DuckTypes.h"
+#include "DuckPacket.h"
 #include "cdpcfg.h"
 #include <Arduino.h>
 #include <WString.h>
@@ -16,7 +17,7 @@ public:
   /**
    * @brief Construct a new Duck object.
    *
-   */\
+   */
   Duck(String name="");
 
   virtual ~Duck() {
@@ -129,28 +130,32 @@ public:
    *
    * @param topic the message topic
    * @param data a string representing the data
+   * @param targetDevice the device UID to receive the message (default is no target device)
    * @return DUCK_ERR_NONE if the data was send successfully, an error code otherwise. 
    */
-  int sendData(byte topic, const String data);
+  int sendData(byte topic, const String data, const std::vector<byte> targetDevice = ZERO_DUID);
 
   /**
    * @brief Sends data into the mesh network.
-   * 
+   *
    * @param topic the message topic
    * @param data a vector of bytes representing the data to send
-   * @return DUCK_ERR_NONE if the data was send successfully, an error code otherwise. 
+   * @param targetDevice the device UID to receive the message (default is no target device)
+   * @return DUCK_ERR_NONE if the data was send successfully, an error code
+   otherwise.
    */
-  int sendData(byte topic, std::vector<byte> bytes);
+  int sendData(byte topic, std::vector<byte> bytes, const std::vector<byte> targetDevice = ZERO_DUID);
 
   /**
    * @brief Sends data into the mesh network.
    *
    * @param topic the message topic
    * @param data a string representing the data to send
+   * @param targetDevice the device UID to receive the message (default is no target device)
    * @return DUCK_ERR_NONE if the data was send successfully, an error code
    * otherwise.
    */
-  int sendData(byte topic, const std::string data);
+  int sendData(byte topic, const std::string data, const std::vector<byte> targetDevice = ZERO_DUID);
 
   /**
    * @brief Sends data into the mesh network.
@@ -158,10 +163,12 @@ public:
    * @param topic the message topic
    * @param data a byte buffer representing the data to send
    * @param length the length of the byte buffer
+   * @param targetDevice the device UID to receive the message (default is no target device)
    * @return DUCK_ERR_NONE if the data was send successfully, an error code
    * otherwise.
    */
-  int sendData(byte topic, const byte* data, int length);
+  int sendData(byte topic, const byte* data, int length, const std::vector<byte> targetDevice = ZERO_DUID);
+
   /**
    * @brief Check wifi connection status
    * 
@@ -196,7 +203,7 @@ public:
    * @returns a string describing the error. 
    */
   String getErrorString(int error);
-  
+
 protected:
   String duckName="";
 

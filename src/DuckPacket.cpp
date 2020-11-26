@@ -5,8 +5,8 @@
 #include "include/DuckUtils.h"
 #include <string>
 
-bool DuckPacket::prepareForRelaying(std::vector<byte> duid,
-                                    std::vector<byte> dataBuffer) {
+
+bool DuckPacket::prepareForRelaying(std::vector<byte> duid, std::vector<byte> dataBuffer) {
 
   bool relaying;
 
@@ -61,7 +61,7 @@ bool DuckPacket::relay(std::vector<byte> duid, std::vector<byte> path_section) {
   return true;
 }
 
-int DuckPacket::prepareForSending(byte duckType, byte topic, std::vector<byte> app_data) {
+int DuckPacket::prepareForSending(std::vector<byte> targetDevice, byte duckType, byte topic, std::vector<byte> app_data) {
 
   uint8_t app_data_length = app_data.size();
 
@@ -90,9 +90,13 @@ int DuckPacket::prepareForSending(byte duckType, byte topic, std::vector<byte> a
   crc_bytes[3] = value & 0xFF;
 
   // ----- insert packet header  -----
-  // device uid
+  // source device uid
   buffer.insert(buffer.end(), duid.begin(), duid.end());
-  logdbg("Duid:      " + duckutils::convertToHex(duid.data(), duid.size()));
+  logdbg("SDuid:     " + duckutils::convertToHex(duid.data(), duid.size()));
+
+  // destination device uid
+  buffer.insert(buffer.end(), targetDevice.begin(), targetDevice.end());
+  logdbg("DDuid:     " + duckutils::convertToHex(targetDevice.data(), targetDevice.size()));
 
   // message uid
   buffer.insert(buffer.end(), &message_id[0], &message_id[MUID_LENGTH]);

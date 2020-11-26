@@ -120,7 +120,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     std::vector<byte> data;
     data.insert(data.end(), val.begin(), val.end());
     //TODO: send the correct ducktype
-    txPacket->prepareForSending(DuckType::UNKNOWN, topics::status, data );
+    txPacket->prepareForSending(ZERO_DUID, DuckType::UNKNOWN, topics::status, data );
     err = duckRadio->sendData(txPacket->getBuffer());
 
     switch (err) {
