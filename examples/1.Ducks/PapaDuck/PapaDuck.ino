@@ -180,12 +180,16 @@ void quackJson(std::vector<byte> packetBuffer) {
   // the parsing based on some business logic.
 
   std::string payload(packet.data.begin(), packet.data.end());
-  std::string duid(packet.duid.begin(), packet.duid.end());
+  std::string sduid(packet.sduid.begin(), packet.sduid.end());
+  std::string dduid(packet.dduid.begin(), packet.dduid.end());
+
   std::string muid(packet.muid.begin(), packet.muid.end());
   std::string path(packet.path.begin(), packet.path.end());
 
   Serial.println("[PAPA] Packet Received:");
-  Serial.println("[PAPA] duid:    " + String(duid.c_str()));
+  Serial.println("[PAPA] sduid:   " + String(sduid.c_str()));
+  Serial.println("[PAPA] sduid:   " + String(dduid.c_str()));
+
   Serial.println("[PAPA] muid:    " + String(muid.c_str()));
   Serial.println("[PAPA] path:    " + String(path.c_str()));
   Serial.println("[PAPA] data:    " + String(payload.c_str()));
@@ -200,7 +204,7 @@ void quackJson(std::vector<byte> packetBuffer) {
   doc["duckType"].set(packet.duckType);
 
   display->clear();
-  display->drawString(1, 1, duid.c_str());
+  display->drawString(1, 1, sduid.c_str());
   std::string cdpTopic = toTopicString(packet.topic);
   display->drawString(1, 2, muid.c_str());
   display->drawString(1, 3, cdpTopic.c_str());
