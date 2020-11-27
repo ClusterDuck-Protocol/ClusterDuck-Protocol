@@ -4,8 +4,7 @@
 const char wifi_page[] PROGMEM = R"=====(
 
 
-   <!DOCTYPE html><html><head><title>Update Wifi "
-              "Credentials</title>
+   <!DOCTYPE html><html><head><title>Update Wifi Credentials</title>
               <style type="text/css">
      
       .main-box{
