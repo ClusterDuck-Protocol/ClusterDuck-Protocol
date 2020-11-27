@@ -148,27 +148,8 @@ void DuckNet::setupWebServer(bool createCaptivePortal, String html) {
   });
 
   webServer.on("/wifi", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    AsyncResponseStream* response = request->beginResponseStream("text/html");
-    response->print("<!DOCTYPE html><html><head><title>Update Wifi "
-                    "Credentials</title></head><body>");
-    response->print("<p>Use this page to update your Wifi credentials</p>");
-
-    response->print("<form action='/changeSSID' method='post'>");
-
-    response->print("<label for='ssid'>SSID:</label><br>");
-    response->print(
-        "<input name='ssid' type='text' placeholder='SSID' /><br><br>");
-
-    response->print("<label for='pass'>Password:</label><br>");
-    response->print(
-        "<input name='pass' type='text' placeholder='Password' /><br><br>");
-
-    response->print("<input type='submit' value='Submit' />");
-
-    response->print("</form>");
-
-    response->print("</body></html>");
-    request->send(response);
+     request->send(200, "text/html", wifi_page);
+    
   });
 
   webServer.on("/changeSSID", HTTP_POST, [&](AsyncWebServerRequest* request) {
