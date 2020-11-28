@@ -27,16 +27,9 @@ const int INTERVAL_MS = 60000;
 int counter = 1;
 
 void setup() {
-  // We are using a hardcoded device id here, but it should be retrieved or given during the device provisioning
-  // then converted to a byte vector to setup the duck
-  // NOTE: The Device ID must be exactly 8 bytes otherwise it will get rejected
-  std::string deviceId("MAMA0001");
-  std::vector<byte> devId;
-  devId.assign(deviceId.begin(), deviceId.end());
-  
-  //Use the default setup provided by the SDK
-  //TODO: Check the return code. If the setup fails, we could reboot the device
-  //or blink some LED and then reboot
+  // The Device ID must be unique and 8 bytes long. Typically the ID is stored
+  // in a secure nvram, or provided to the duck during provisioning/registration
+  std::vector<byte> devId = {'M', 'A', 'M', 'A', '0', '0', '0', '1'};
   duck.setupWithDefaults(devId);
 
   // Initialize the timer. The timer thread runs separately from the main loop
