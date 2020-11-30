@@ -38,6 +38,7 @@
 #include "DuckUtils.h"
 #include "OTAPage.h"
 #include "index.h"
+#include "wifiCredentials.h"
 
 #endif
 
