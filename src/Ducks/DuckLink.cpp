@@ -7,13 +7,14 @@ int DuckLink::setupWithDefaults(std::vector<byte> deviceId, String ssid,
     logerr("ERROR setupWithDefaults rc = " + String(err));
     return err;
   }
-  
+
   err = setupRadio();
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR setupWithDefaults rc = " + String(err));
     return err;
   }
-  if( !ssid.length() == 0 && !password.length() == 0) {
+  
+  if (!ssid.length() == 0 && !password.length() == 0) {
     err = setupWifi();
     if (err != DUCK_ERR_NONE) {
       logerr("ERROR setupWithDefaults rc = " + String(err));

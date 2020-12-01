@@ -30,13 +30,10 @@ auto timer = timer_create_default();
 const int INTERVAL_MS = 20000;
 
 void setup() {
-  // We are using a hardcoded device id here, but it should be retrieved or given during the device provisioning
-  // then converted to a byte vector to setup the duck
-  // NOTE: The Device ID must be exactly 8 bytes otherwise it will get rejected
-  std::string deviceId("DETECTOR");
-  std::vector<byte> devId;
-  devId.insert(devId.end(), deviceId.begin(), deviceId.end());
-  
+  // The Device ID must be unique and 8 bytes long. Typically the ID is stored
+  // in a secure nvram, or provided to the duck during provisioning/registration
+  std::vector<byte> devId = {'D', 'E', 'T', 'E', 'C', 'T', 'O', 'R'};
+
   // Use the default setup provided by the SDK
   duck.setupWithDefaults(devId);
 

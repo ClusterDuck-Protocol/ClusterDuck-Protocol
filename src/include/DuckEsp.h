@@ -18,6 +18,13 @@
 namespace duckesp {
 
 /**
+ * @brief Get free heap memory
+ * 
+ * @returns free heap memory size in bytes 
+ */
+int freeHeapMemory();
+
+/**
  * @brief Restart the duck device.
  * 
  */

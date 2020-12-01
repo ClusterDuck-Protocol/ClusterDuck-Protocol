@@ -31,17 +31,20 @@
 IridiumSBD modem(IridiumSerial);
 //============== IRIDIUM Setup ================
 
-// Use pre-built papa duck: the duck ID is provided by DMS
-PapaDuck duck = PapaDuck("PAPA");
- 
+PapaDuck duck = PapaDuck();
 
-
+#define SSID ""
+#define PASSWORD ""
 
 bool retry = true;
 
 void setup() {
-  duck.setupSerial(115200);
-  duck.setupRadio(LORA_FREQ, LORA_CS_PIN, LORA_RST_PIN, LORA_DIO0_PIN, LORA_DIO1_PIN, LORA_TXPOWER);
+  // The Device ID must be unique and 8 bytes long. Typically the ID is stored
+  // in a secure nvram, or provided to the duck during provisioning/registration
+  std::vector<byte> devId = {'P', 'A', 'P', 'A', '0', '0', '0', '1'};
+
+  // Use the default setup provided by the SDK
+  duck.setupWithDefaults(devId, SSID, PASSWORD);
   setupRockBlock();
   
   // register a callback to handle incoming data from duck in the network
@@ -52,26 +55,72 @@ void setup() {
 
 // The callback method simply takes the incoming packet and
 // converts it to a JSON string, before sending it out over WiFi
-void handleDuckData(Packet packet) {
-  quackJson(packet);
+void handleDuckData(std::vector<byte> packetBuffer) {
+  if (beamData) {
+    quackBeam(packetBuffer);
+  } else {
+    quackJson(packetBuffer);
+  }
 }
 
 void loop() {
-
-
   duck.run();
-
 }
 
+String convertToHex(byte* data, int size) {
+  String buf = "";
+  buf.reserve(size * 2); // 2 digit hex
+  const char* cs = "0123456789ABCDEF";
+  for (int i = 0; i < size; i++) {
+    byte val = data[i];
+    buf += cs[(val >> 4) & 0x0F];
+    buf += cs[val & 0x0F];
+  }
+  return buf;
+}
+// DMS locator URL requires a topicString, so we need to convert the topic
+// from the packet to a string based on the topics code
+std::string toTopicString(byte topic) {
 
-void quackJson(Packet packet) {
+  std::string topicString;
 
- int err;
-  Packet lastPacket = packet;
-  
+  switch (topic) {
+    case topics::status:
+      topicString = "status";
+      break;
+    case topics::cpm:
+      topicString = "portal";
+      break;
+    case topics::sensor:
+      topicString = "sensor";
+      break;
+    case topics::alert:
+      topicString = "alert";
+      break;
+    case topics::location:
+      topicString = "gps";
+      break;
+    default:
+      topicString = "status";
+  }
+
+  return topicString;
+}
+
+void quackJson(std::vector<byte> packetBuffer) {
+
+  int err;
+
+  std::string cdpTopic = toTopicString(packet.topic);
+
+  std::string payload(packet.data.begin(), packet.data.end());
+  std::string sduid(packet.sduid.begin(), packet.sduid.end());
+  std::string muid(packet.muid.begin(), packet.muid.end());
+  std::string path(packet.path.begin(), packet.path.end());
+
   //Uncomment the lines below of which data you want to send
-   String data = lastPacket.senderId +  "/" + lastPacket.messageId + "/"+ lastPacket.payload + "/"+  lastPacket.path + "/" + lastPacket.topic;
-  // String data = lastPacket.messageId ;
+  String data = sduid.c_str() + "/" + muid.c_str() + "/" + payload.c_str() +
+                "/" + path.c_str() + "/" + cdpTopic.c_str();
   
   Serial.println(data);
   const   char *text = data.c_str();
@@ -89,7 +138,6 @@ void quackJson(Packet packet) {
   {
     Serial.println("Message Sent to Iridium!");
   }
-
 }
 
 void setupRockBlock(){

@@ -11,6 +11,8 @@ class DuckDetect : public Duck {
 public:
   using Duck::Duck;
 
+  ~DuckDetect() {}
+  
   /**
    * @brief Send a ping message to devices in the mesh network.
    * 
@@ -45,6 +47,7 @@ public:
 
   /// callback definition for receiving RSSI value
   using rssiCallback = void (*)(const int);
+  
   /**
    * @brief Regsiter a callback for receiving and handling RSSI value
    *

@@ -14,6 +14,7 @@
 #include "arduino-timer.h"
 #include <Arduino.h>
 #include <WString.h>
+
 namespace duckutils {
 
 extern volatile bool interruptEnabled;

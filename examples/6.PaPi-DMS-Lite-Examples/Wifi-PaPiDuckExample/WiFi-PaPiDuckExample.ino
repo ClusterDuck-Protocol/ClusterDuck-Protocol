@@ -165,7 +165,7 @@ void quackJson(CDP_Packet packet) {
   StaticJsonDocument<bufferSize> doc;
 
   std::string payload(packet.data.begin(), packet.data.end());
-  std::string duid(packet.duid.begin(), packet.duid.end());
+  std::string duid(packet.sduid.begin(), packet.sduid.end());
   std::string muid(packet.muid.begin(), packet.muid.end());
   std::string path(packet.path.begin(), packet.path.end());
 

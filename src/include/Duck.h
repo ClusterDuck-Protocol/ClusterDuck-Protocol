@@ -5,6 +5,7 @@
 #include "DuckNet.h"
 #include "DuckRadio.h"
 #include "DuckTypes.h"
+#include "DuckPacket.h"
 #include "cdpcfg.h"
 #include <Arduino.h>
 #include <WString.h>
@@ -18,15 +19,8 @@ public:
    *
    */
   Duck(String name="");
- 
-  /**
-   * @brief Construct a new Duck object.
-   *
-   * @param duid a unique id
-   */
-  Duck(std::vector<byte> duid);
 
-  ~Duck() {
+  virtual ~Duck() {
     if (txPacket != NULL) {
       delete txPacket;
     }
@@ -85,12 +79,14 @@ public:
                   int rst = CDPCFG_PIN_LORA_RST, int di0 = CDPCFG_PIN_LORA_DIO0,
                   int di1 = CDPCFG_PIN_LORA_DIO1,
                   int txPower = CDPCFG_RF_LORA_TXPOW);
-                  
+
   /**
    * @brief Setup WiFi access point.
    *
    * @param accessPoint a string representing the access point. Default to
    * "🆘 DUCK EMERGENCY PORTAL"
+   *
+   * @returns DUCK_ERROR_NONE if successful, an error code otherwise.
    */
   int setupWifi(const char* ap = "🆘 DUCK EMERGENCY PORTAL");
 
@@ -134,28 +130,32 @@ public:
    *
    * @param topic the message topic
    * @param data a string representing the data
+   * @param targetDevice the device UID to receive the message (default is no target device)
    * @return DUCK_ERR_NONE if the data was send successfully, an error code otherwise. 
    */
-  int sendData(byte topic, const String data);
+  int sendData(byte topic, const String data, const std::vector<byte> targetDevice = ZERO_DUID);
 
   /**
    * @brief Sends data into the mesh network.
-   * 
+   *
    * @param topic the message topic
    * @param data a vector of bytes representing the data to send
-   * @return DUCK_ERR_NONE if the data was send successfully, an error code otherwise. 
+   * @param targetDevice the device UID to receive the message (default is no target device)
+   * @return DUCK_ERR_NONE if the data was send successfully, an error code
+   otherwise.
    */
-  int sendData(byte topic, std::vector<byte> bytes);
+  int sendData(byte topic, std::vector<byte> bytes, const std::vector<byte> targetDevice = ZERO_DUID);
 
   /**
    * @brief Sends data into the mesh network.
    *
    * @param topic the message topic
    * @param data a string representing the data to send
+   * @param targetDevice the device UID to receive the message (default is no target device)
    * @return DUCK_ERR_NONE if the data was send successfully, an error code
    * otherwise.
    */
-  int sendData(byte topic, const std::string data);
+  int sendData(byte topic, const std::string data, const std::vector<byte> targetDevice = ZERO_DUID);
 
   /**
    * @brief Sends data into the mesh network.
@@ -163,10 +163,12 @@ public:
    * @param topic the message topic
    * @param data a byte buffer representing the data to send
    * @param length the length of the byte buffer
+   * @param targetDevice the device UID to receive the message (default is no target device)
    * @return DUCK_ERR_NONE if the data was send successfully, an error code
    * otherwise.
    */
-  int sendData(byte topic, const byte* data, int length);
+  int sendData(byte topic, const byte* data, int length, const std::vector<byte> targetDevice = ZERO_DUID);
+
   /**
    * @brief Check wifi connection status
    * 
@@ -201,7 +203,7 @@ public:
    * @returns a string describing the error. 
    */
   String getErrorString(int error);
-  
+
 protected:
   String duckName="";
 
@@ -272,7 +274,9 @@ protected:
    * @param password the access point password
    * @return DUCK_ERR_NONE if the duck reconnected to the AP sucessfully. An error code otherwise. 
    */
-  virtual int reconnectWifi(String ssid, String password) { return 0; }
+  virtual int reconnectWifi(String ssid, String password) {
+    return DUCK_ERR_NONE;
+  }
 
   /**
    * @brief Handle request from emergency portal.

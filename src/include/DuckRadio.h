@@ -19,6 +19,7 @@
 #include "DuckPacket.h"
 #include "LoraPacket.h"
 #include "cdpcfg.h"
+
 /**
  * @brief Internal structure to hold the LoRa module configuration
  * 
@@ -26,7 +27,7 @@
 typedef struct {
   /// radio frequency (i.e US915Mhz)
   float band;
-  /// slave select pin
+  /// SPI slave select pin - the pin on each device that the master can use to enable and disable specific devices.
   int ss;
   /// chip reset pin
   int rst;
@@ -48,6 +49,7 @@ typedef struct {
  *
  */
 class DuckRadio {
+
 public:
   /**
    * @brief Get a singletom instance of the DuckRadio class,\.
@@ -149,8 +151,11 @@ public:
    */
   int readReceivedData(std::vector<byte>* packetBytes);
 
+  /**
+   * @brief Process IRQ interrupts for the LoRa Radio.
+   * 
+   */
   void processRadioIrq();
-  bool isTxBusy() { return txBusy; }
 
 private:
   DuckRadio();
@@ -158,7 +163,6 @@ private:
   DuckRadio& operator=(DuckRadio const&) = delete;
   static DuckRadio* instance;
   DuckDisplay* display = DuckDisplay::getInstance();
-  volatile bool txBusy;
 };
 
 #endif

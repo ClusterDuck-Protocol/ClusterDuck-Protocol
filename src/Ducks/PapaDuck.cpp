@@ -1,6 +1,7 @@
 #include "../PapaDuck.h"
 
-int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String password) {
+int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid,
+                                String password) {
   loginfo("setupWithDefaults...");
 
   int err = Duck::setupWithDefaults(deviceId, ssid, password);
@@ -15,7 +16,7 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String 
     logerr("ERROR setupWithDefaults  rc = " + String(err));
     return err;
   }
-  
+
   if (ssid.length() != 0 && password.length() != 0) {
     err = setupWifi("PapaDuck Setup");
     if (err != DUCK_ERR_NONE) {
@@ -51,14 +52,30 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String 
   return DUCK_ERR_NONE;
 }
 
+void PapaDuck::run() {
+
+  handleOtaUpdate();
+  if (getReceiveFlag()) {
+    duckutils::setInterrupt(false);
+    setReceiveFlag(false);
+
+    handleReceivedPacket();
+    rxPacket->reset();
+    
+    duckutils::setInterrupt(true);
+    startReceive();
+  }
+}
+
 void PapaDuck::handleReceivedPacket() {
 
-  loginfo("handleReceivedPacket()...");
+  loginfo("handleReceivedPacket() START");
   std::vector<byte> data;
   int err = duckRadio->readReceivedData(&data);
 
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR handleReceivedPacket. Failed to get data. rc = " + String(err));
+    logerr("ERROR handleReceivedPacket. Failed to get data. rc = " +
+           String(err));
     return;
   }
   // ignore pings
@@ -66,25 +83,15 @@ void PapaDuck::handleReceivedPacket() {
     rxPacket->reset();
     return;
   }
-
+  // build our RX DuckPacket which holds the updated path in case the packet is relayed
   bool relay = rxPacket->prepareForRelaying(duid, data);
   if (relay) {
-    String data_str = duckutils::convertToHex(rxPacket->getCdpPacketBuffer().data(),
-                                          rxPacket->getCdpPacketBuffer().size());
-    logdbg("relaying:  " + data_str);
-    recvDataCallback(rxPacket->getCdpPacket());
-  }
-}
-void PapaDuck::run() {
-
-  handleOtaUpdate();
-  if (getReceiveFlag()) {
-    duckutils::setInterrupt(false);
-    setReceiveFlag(false);
-    handleReceivedPacket();
-    rxPacket->reset();
-    duckutils::setInterrupt(true);
-    startReceive();
+    logdbg("relaying:  " +
+            duckutils::convertToHex(rxPacket->getBuffer().data(),
+                                    rxPacket->getBuffer().size()));
+    loginfo("invoking callback in the duck application...");
+    recvDataCallback(rxPacket->getBuffer());
+    loginfo("handleReceivedPacket() DONE");
   }
 }
 

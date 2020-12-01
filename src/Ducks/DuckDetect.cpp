@@ -1,7 +1,7 @@
 #include "../DuckDetect.h"
 
 int DuckDetect::setupWithDefaults(std::vector<byte> deviceId, String ssid,
-                                String password) {
+                                  String password) {
   int err = Duck::setupWithDefaults(deviceId, ssid, password);
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR setupWithDefaults rc = " + String(err));
@@ -43,6 +43,19 @@ int DuckDetect::setupWithDefaults(std::vector<byte> deviceId, String ssid,
   return DUCK_ERR_NONE;
 }
 
+void DuckDetect::run() {
+  handleOtaUpdate();
+  if (getReceiveFlag()) {
+    setReceiveFlag(false);
+    duckutils::setInterrupt(false);
+
+    handleReceivedPacket();
+
+    duckutils::setInterrupt(true);
+    startReceive();
+  }
+}
+
 void DuckDetect::handleReceivedPacket() {
 
   loginfo("handleReceivedPacket()...");
@@ -61,27 +74,13 @@ void DuckDetect::handleReceivedPacket() {
   }
 }
 
-void DuckDetect::run() {
-  handleOtaUpdate();
-  if (getReceiveFlag()) {
-    setReceiveFlag(false);
-    duckutils::setInterrupt(false);
-
-    handleReceivedPacket();
-
-    duckutils::setInterrupt(true);
-    startReceive();
-  }
-}
-
 void DuckDetect::sendPing(bool startReceive) {
   int err = DUCK_ERR_NONE;
   std::vector<byte> data(1, 0);
-  err = txPacket->prepareForSending(reservedTopic::ping, data);
+  err = txPacket->prepareForSending(ZERO_DUID, DuckType::DETECTOR, reservedTopic::ping, data);
 
   if (err == DUCK_ERR_NONE) {
-    err = duckRadio->sendData(txPacket->getDataByteBuffer(),
-                             txPacket->getBufferLength());
+    err = duckRadio->sendData(txPacket->getBuffer());
     if (startReceive) {
       duckRadio->startReceive();
     }
@@ -89,7 +88,6 @@ void DuckDetect::sendPing(bool startReceive) {
       logerr("ERROR Failed to ping, err = " + String(err));
     }
   } else {
-    logerr("ERROR Failed to build packet, err = "+ String(err));
-    txPacket->reset();
+    logerr("ERROR Failed to build packet, err = " + String(err));
   }
 }

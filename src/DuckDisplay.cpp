@@ -4,7 +4,7 @@
 
 // #define CDPCFG_PIN_OLED_ROTATION U8G2_R0
 
-CDPCFG_OLED_CLASS u8g2(            CDPCFG_PIN_OLED_ROTATION,
+CDPCFG_OLED_CLASS u8g2( CDPCFG_PIN_OLED_ROTATION,
                         /* clock=*/CDPCFG_PIN_OLED_CLOCK,
                        /* data=*/CDPCFG_PIN_OLED_DATA,
                        /* reset=*/CDPCFG_PIN_OLED_RESET);
