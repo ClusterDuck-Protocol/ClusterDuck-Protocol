@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['func_573',['func',['../struct_lora_config_params.html#af2ebe2e5a8cec9c8c0644febc2091b08',1,'LoraConfigParams']]]
+  ['iamhere_5fb_250',['iamhere_B',['../_duck_lora_8h.html#a4fd105dd83fb1983bcf595924355a619',1,'DuckLora.h']]]
 ];
