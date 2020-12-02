@@ -207,7 +207,6 @@ int DuckNet::setupWifiAp(const char* accessPoint) {
   }
   //TODO: need to find out why there is a delay here
   delay(200);
-
   success = WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
   if (!success) {
     return DUCKWIFI_ERR_AP_CONFIG;
