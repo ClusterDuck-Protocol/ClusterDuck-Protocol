@@ -3,14 +3,13 @@
 void PapaDuck::setupWithDefaults(String ssid, String password) {
   Duck::setupWithDefaults(ssid, password);
   setupRadio();
-
-  if (ssid.length() != 0 && password.length() != 0) {
-    setupWifi("PapaDuck Setup");
-    setupDns();
-    setupInternet(ssid, password);
-    setupWebServer(false);
-    setupOTA();
-  }
+  // network related setups. These will silently fail if the board does not have
+  // a WIFI chip (i.e CDPCFG_WIFI_NONE is set in cdpcfg.h)
+  setupWifi("PapaDuck Setup");
+  setupDns();
+  setupInternet(ssid, password);
+  setupWebServer(false);
+  setupOTA();
   Serial.println("PapaDuck setup done");
 }
 
