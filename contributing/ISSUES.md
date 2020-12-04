@@ -13,7 +13,7 @@ For any issue, there are fundamentally three ways an individual can
 contribute:
 
 1. By opening the issue for discussion: For instance, if you believe that you
-   have uncovered a bug in ClusterDuck-Protocol, creating a new issue in the `Code-and-Response/ClusterDuck-Protocol`
+   have uncovered a bug in ClusterDuck-Protocol, creating a new issue in the `Call-for-Code/ClusterDuck-Protocol`
    issue tracker is the way to report it.
 2. By helping to triage the issue: This can be done either by providing
    supporting details (a test case that demonstrates a bug), or providing
@@ -21,7 +21,7 @@ contribute:
 3. By helping to resolve the issue: Typically this is done either in the form
    of demonstrating that the issue reported is not a problem after all, or more
    often, by opening a Pull Request that changes some bit of something in
-   `Code-and-Response/ClusterDuck-Protocol` in a concrete and reviewable manner.
+   `Call-for-Code/ClusterDuck-Protocol` in a concrete and reviewable manner.
 
 ## Asking for General Help
 
@@ -35,7 +35,7 @@ of the [ClusterDuck-Protocol Slack workspace][].
 
 ## Submitting a Bug Report
 
-When opening a new issue in the `Code-and-Response/ClusterDuck-Protocol` issue tracker, please provide as much
+When opening a new issue in the `Call-for-Code/ClusterDuck-Protocol` issue tracker, please provide as much
 detail about your environment as possible.
 
 See [How to create a Minimal, Complete, and Verifiable example](https://stackoverflow.com/help/mcve).
