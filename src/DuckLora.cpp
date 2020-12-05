@@ -18,7 +18,10 @@ DuckLora* DuckLora::instance = NULL;
 DuckLora::DuckLora() {}
 
 DuckLora* DuckLora::getInstance() {
-  return (instance == NULL) ? new DuckLora : instance;
+  if (instance == NULL) {
+    instance = new DuckLora();
+  }
+  return instance;
 }
 
 int DuckLora::setupLoRa(LoraConfigParams config, String deviceId) {
