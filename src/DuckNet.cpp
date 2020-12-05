@@ -4,7 +4,10 @@ DuckNet* DuckNet::instance = NULL;
 
 DuckNet::DuckNet() { _duckLora = DuckLora::getInstance(); }
 DuckNet* DuckNet::getInstance() {
-  return (instance == NULL) ? new DuckNet : instance;
+  if (instance == NULL) {
+    instance = new DuckNet();
+  }
+  return instance;
 }
 
 
