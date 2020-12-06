@@ -77,7 +77,11 @@ static void OnLoraRxError(void) {
 }
 
 DuckRadio* DuckRadio::getInstance() {
-  return (instance == NULL) ? new DuckRadio : instance;
+  if (instance == NULL) {
+    instance == new DuckRadio();
+  }
+
+  return instance;
 }
 
 int DuckRadio::setupRadio(LoraConfigParams config) {

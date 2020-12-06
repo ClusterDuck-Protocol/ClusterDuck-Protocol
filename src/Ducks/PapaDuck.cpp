@@ -17,36 +17,34 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid,
     return err;
   }
 
-  if (ssid.length() != 0 && password.length() != 0) {
-    err = setupWifi("PapaDuck Setup");
-    if (err != DUCK_ERR_NONE) {
-      logerr("ERROR setupWithDefaults  rc = " + String(err));
-      return err;
-    }
+  err = setupWifi("PapaDuck Setup");
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR setupWithDefaults  rc = " + String(err));
+    return err;
+  }
 
-    err = setupDns();
-    if (err != DUCK_ERR_NONE) {
-      logerr("ERROR setupWithDefaults  rc = " + String(err));
-      return err;
-    }
+  err = setupDns();
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR setupWithDefaults  rc = " + String(err));
+    return err;
+  }
 
-    err = setupInternet(ssid, password);
-    if (err != DUCK_ERR_NONE) {
-      logerr("ERROR setupWithDefaults  rc = " + String(err));
-      return err;
-    }
+  err = setupInternet(ssid, password);
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR setupWithDefaults  rc = " + String(err));
+    return err;
+  }
 
-    err = setupWebServer(false);
-    if (err != DUCK_ERR_NONE) {
-      logerr("ERROR setupWithDefaults  rc = " + String(err));
-      return err;
-    }
+  err = setupWebServer(false);
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR setupWithDefaults  rc = " + String(err));
+    return err;
+  }
 
-    err = setupOTA();
-    if (err != DUCK_ERR_NONE) {
-      logerr("ERROR setupWithDefaults  rc = " + String(err));
-      return err;
-    }
+  err = setupOTA();
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR setupWithDefaults  rc = " + String(err));
+    return err;
   }
   loginfo("setupWithDefaults done");
   return DUCK_ERR_NONE;
@@ -61,7 +59,7 @@ void PapaDuck::run() {
 
     handleReceivedPacket();
     rxPacket->reset();
-    
+
     duckutils::setInterrupt(true);
     startReceive();
   }
@@ -83,12 +81,13 @@ void PapaDuck::handleReceivedPacket() {
     rxPacket->reset();
     return;
   }
-  // build our RX DuckPacket which holds the updated path in case the packet is relayed
+  // build our RX DuckPacket which holds the updated path in case the packet is
+  // relayed
   bool relay = rxPacket->prepareForRelaying(duid, data);
   if (relay) {
     logdbg("relaying:  " +
-            duckutils::convertToHex(rxPacket->getBuffer().data(),
-                                    rxPacket->getBuffer().size()));
+           duckutils::convertToHex(rxPacket->getBuffer().data(),
+                                   rxPacket->getBuffer().size()));
     loginfo("invoking callback in the duck application...");
     recvDataCallback(rxPacket->getBuffer());
     loginfo("handleReceivedPacket() DONE");
