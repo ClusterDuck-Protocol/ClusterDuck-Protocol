@@ -1,6 +1,6 @@
 ![Logo](docs/assets/images/CDP_LOGO_small.png)
 
-[![License](https://img.shields.io/badge/License-Apache2-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![Slack](https://img.shields.io/badge/Join-Slack-blue)](https://www.project-owl.com/slack) [![Wiki](https://img.shields.io/badge/Read-Wiki-blue)](https://github.com/Code-and-Response/ClusterDuck-Protocol/wiki)
+[![License](https://img.shields.io/badge/License-Apache2-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![Slack](https://img.shields.io/badge/Join-Slack-blue)](https://www.project-owl.com/slack) [![Wiki](https://img.shields.io/badge/Read-Wiki-blue)](https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki)
 
 ## What is it?
 In 2017 a category-5 hurricane, Maria, hit Puerto Rico and wreaked havoc on the island's infrastructure. Communication and power were disabled for an extended period of time causing lasting effects long after the hurricane passed. Many of these issues could have been prevented if civilians had access to a basic network where they could send short messages to emergency services and local governments. 
@@ -21,10 +21,10 @@ This is beneficial after events such as earthquakes or hurricanes where traditio
 
 
 ## Installation
-Check out the [Wiki](https://github.com/Code-and-Response/ClusterDuck-Protocol/wiki) to learn how to build your own ClusterDuck Protocol Network. And go to the [ClusterDuck Protocol](https://clusterduckprotocol.org/) website for more information and to learn about projects built upon this codebase. You can reach out directly on our [Slack Workspace] for any questions and work with the community. 
+Check out the [Wiki](https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki) to learn how to build your own ClusterDuck Protocol Network. And go to the [ClusterDuck Protocol](https://clusterduckprotocol.org/) website for more information and to learn about projects built upon this codebase. You can reach out directly on our [Slack Workspace] for any questions and work with the community. 
 
 
-**To use the ClusterDuck Protocol follow the [Installation Manual](https://github.com/Code-and-Response/ClusterDuck-Protocol/wiki/getting-started).**
+**To use the ClusterDuck Protocol follow the [Installation Manual](https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki/getting-started).**
 
 
 ## Contributing
@@ -32,8 +32,8 @@ Check out the [Wiki](https://github.com/Code-and-Response/ClusterDuck-Protocol/w
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our Code of Conduct, and the process for submitting ClusterDuck Protocol improvements.
 
 ## Contributors
-<a href="https://github.com/code-and-response/clusterduck-protocol/graphs/contributors">
-  <img src="https://contributors-img.web.app/image?repo=code-and-response/clusterduck-protocol" />
+<a href="https://github.com/Call-for-Code/clusterduck-protocol/graphs/contributors">
+  <img src="https://contributors-img.web.app/image?repo=Call-for-Code/clusterduck-protocol" />
 </a>
 
 ## License
@@ -45,6 +45,6 @@ v1.1.7
 
 
 [Project OWL]: <https://www.project-owl.com/>
-[ClusterDuck Protocol]: <https://github.com/Code-and-Response/ClusterDuck-Protocol/wiki>
+[ClusterDuck Protocol]: <https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki>
 [Slack Workspace]: <https://www.project-owl.com/slack>
 

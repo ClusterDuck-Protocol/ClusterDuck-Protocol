@@ -25,5 +25,5 @@ The network is made up of multiple nodes called **Ducks**. There are 3 core role
 
 
 [Project OWL]: <https://www.project-owl.com/>
-[ClusterDuck Protocol]: <https://github.com/Code-and-Response/ClusterDuck-Protocol/wiki>
+[ClusterDuck Protocol]: <https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki>
 [Slack Workspace]: <https://www.project-owl.com/slack>
