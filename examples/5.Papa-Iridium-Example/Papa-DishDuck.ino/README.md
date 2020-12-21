@@ -1,5 +1,5 @@
 # DishDuck 
-When you are in the middle of know where or there are no ClusterDuck networks in your area what do you do? 
+When you are in the middle of nowhere or there are no ClusterDuck networks in your area what do you do? 
 Well if you need sensor data or a emergency communications mesh network in that area. 
 
 **Then checkout the DishDuck**
