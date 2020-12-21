@@ -61,6 +61,7 @@ enum reservedTopic {
   unused = 0x00,
   ping = 0x01,
   pong = 0x02,
+  gps = 0x03,
   max_reserved = 0x0F
 };
 

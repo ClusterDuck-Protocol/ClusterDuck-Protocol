@@ -67,10 +67,6 @@ int DuckPacket::prepareForSending(std::vector<byte> targetDevice, byte duckType,
 
   this->reset();
 
-  if (topic < reservedTopic::max_reserved) {
-    logerr("ERROR send data failed, topic is reserved.");
-    return DUCKPACKET_ERR_TOPIC_INVALID;
-  }
   if (app_data_length > MAX_DATA_LENGTH) {
     return DUCKPACKET_ERR_SIZE_INVALID;
   }
