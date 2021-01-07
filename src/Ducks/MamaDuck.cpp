@@ -1,84 +1,98 @@
 #include "../MamaDuck.h"
+#include "../MemoryFree.h"
 
-bool MamaDuck::idInPath(String path) {
-  Serial.print("[MamaDuck] idInPath '");
-  Serial.print(path);
-  Serial.print("' ");
-  String temp = "";
-  int len = path.length() + 1;
-  char arr[len];
-  path.toCharArray(arr, len);
-
-  for (int i = 0; i < len; i++) {
-    if (arr[i] == ',' || i == len - 1) {
-      if (temp == deviceId) {
-        Serial.println("true");
-        return true;
-      }
-      temp = "";
-    } else {
-      temp += arr[i];
-    }
+int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String password) {
+  
+  int err = Duck::setupWithDefaults(deviceId, ssid, password);
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR setupWithDefaults rc = " + String(err));
+    return err;
   }
-  Serial.println("false");
-  return false;
-}
 
-void MamaDuck::setupWithDefaults(String ssid, String password) {
-  Duck::setupWithDefaults(ssid, password);
-  setupRadio();
-  setupWifi();
-  setupDns();
-  setupWebServer(true);
-  setupOTA();
-  Serial.println("MamaDuck setup done");
+  err = setupRadio();
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR setupWithDefaults rc = " + String(err));
+    return err;
+  }
 
+  err = setupWifi();
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR setupWithDefaults rc = " + String(err));
+    return err;
+  }
+
+  err = setupDns();
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR setupWithDefaults rc = " + String(err));
+    return err;
+  }
+
+  err = setupWebServer(true);
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR setupWithDefaults rc = " + String(err));
+    return err;
+  }
+
+  err = setupOTA();
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR setupWithDefaults rc = " + String(err));
+    return err;
+  }
   duckutils::getTimer().every(CDPCFG_MILLIS_ALIVE, imAlive);
-  }
+
+  return DUCK_ERR_NONE;
+}
 
 void MamaDuck::run() {
 
   handleOtaUpdate();
-
-  if (duckutils::getDuckInterrupt()) {
-    duckutils::getTimer().tick();
-  }
-
-  // Mama ducks can also receive packets from other ducks
-  // Here we check whether a packet needs to be relayed or not
-  // For safe processing of the received packet we make sure
-  // to disable interrupts, before handling the received packet.
   if (getReceiveFlag()) {
+    duckutils::setInterrupt(false);
     setReceiveFlag(false);
-    duckutils::setDuckInterrupt(false);
-    int pSize = duckLora->handlePacket();
-    Serial.print("[MamaDuck] run() rcv packet. pSize = ");
-    Serial.println(pSize);
 
-    if (pSize > 0) {
-      // These 2 methods should be combined in one.
-      // the string returned by getPacketData() is only the message topic
-      // it could instead return the whole packet and we can get the topic from
-      // the Packet data structure
-      String msg = duckLora->getPacketData(pSize);
-      Packet lastPacket = duckLora->getLastPacket();
-      duckLora->resetPacketIndex();
-
-      if (msg != "ping" && !idInPath(lastPacket.path)) {
-        Serial.print("[MamaDuck] run() relay packet msg: ");
-        Serial.println(msg);
-
-        duckLora->sendPayloadStandard(lastPacket.payload, lastPacket.topic,
-                                      lastPacket.senderId, lastPacket.messageId,
-                                      lastPacket.path);
-        duckLora->resetTransmissionBuffer();
-      }
-    } else {
-      // discard any unrecognized packets
-      duckLora->resetTransmissionBuffer();
-    }
-    duckutils::setDuckInterrupt(true);
+    handleReceivedPacket();
+    rxPacket->reset();
+    
+    duckutils::setInterrupt(true);
     startReceive();
   }
   processPortalRequest();
+}
+
+void MamaDuck::handleReceivedPacket() {
+
+  std::vector<byte> data;
+  bool relay = false;
+  
+  loginfo("====> handleReceivedPacket: START");
+
+  int err = duckRadio->readReceivedData(&data);
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR failed to get data from DuckRadio. rc = "+ String(err));
+    return;
+  }
+  logdbg("Got data from radio, prepare for relay. size: "+ String(data.size()));
+
+  relay = rxPacket->prepareForRelaying(duid, data);
+  if (relay) {
+    loginfo("handleReceivedPacket: packet RELAY START");
+    // NOTE:
+    // Ducks will only handle received message one at a time, so there is a chance the
+    // packet being sent below will never be received, especially if the cluster is small
+    // there are not many alternative paths to reach other mama ducks that could relay the packet.
+    if (rxPacket->getTopic() == reservedTopic::ping) {
+      err = sendPong();
+      if (err != DUCK_ERR_NONE) {
+        logerr("ERROR failed to send pong message. rc = " + String(err));
+      }
+      return;
+    }
+
+    err = duckRadio->relayPacket(rxPacket);
+    if (err != DUCK_ERR_NONE) {
+      logerr("====> ERROR handleReceivedPacket failed to relay. rc = " + String(err));
+    } else {
+      loginfo("handleReceivedPacket: packet RELAY DONE");
+    }
+  }
 }

@@ -37,12 +37,16 @@ public:
   static DuckDisplay* getInstance();
 #ifdef CDPCFG_OLED_NONE
   void setupDisplay(int duckType, String duid) {}
-  void powerSave(bool save){}
-  void drawString(u8g2_uint_t x, u8g2_uint_t y, const char *s) {}
-  void drawString(bool cls,u8g2_uint_t x, u8g2_uint_t y, const char *s) {}
-  void setCursor(u8g2_uint_t x, u8g2_uint_t y) {}
+  void powerSave(bool save) {}
+  void drawString(uint8_t x, uint8_t y, const char* text) {}
+  void drawString(bool cls, uint8_t x, uint8_t y, const char* text) {}
+  void setCursor(uint8_t x, uint8_t y) {}
   void print(String text) {}
   void clear(void) {}
+  void log(String text) {}
+  uint8_t getWidth() { return 0; }
+  uint8_t getHeight() { return 0; }
+  void showDefaultScreen(){};
 #else
   /**
    * @brief Initialize the display component.
@@ -91,6 +95,11 @@ public:
    */
   void clear(void);
   void showDefaultScreen();
+  uint8_t getWidth() {return width;}
+  uint8_t getHeight() {return height;}
+  
+  //TODO implement this for the U8g2 library
+  void log(String text) {}
 #endif
 private:
   DuckDisplay();
@@ -98,8 +107,10 @@ private:
   DuckDisplay& operator=(DuckDisplay const&) = delete;
   static DuckDisplay* instance;
   int duckType;
-  String duid;
+  String duckName;
   String duckTypeToString(int duckType);
-
+  uint8_t width;
+  uint8_t height;
 };
+
 #endif /* DUCKDISPLAY_H_ */

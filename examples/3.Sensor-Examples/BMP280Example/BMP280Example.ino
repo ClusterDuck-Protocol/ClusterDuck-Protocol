@@ -1,17 +1,19 @@
 /**
- * @file BMP280Example.ino
  * @brief Uses the built in Mama Duck with some customatizations.
  * 
- * A MamaDuck that sends sensor data from a BMP280 sensor
+ * This example is a Mama Duck, but it is also periodically sending a message in the Mesh
+ * It is setup to provide a custom Emergency portal, instead of using the one provided by the SDK.
+ * Notice the background color of the captive portal is Black instead of the default Red.
  * 
- * @date 2020-11-10
+ * @date 2020-09-21
  * 
  * @copyright Copyright (c) 2020
- * ClusterDuck Protocol 
+ * 
  */
 
-#include "timer.h"
 #include <MamaDuck.h>
+#include <arduino-timer.h>
+#include <string>
 
 #ifdef SERIAL_PORT_USBVIRTUAL
 #define Serial SERIAL_PORT_USBVIRTUAL
@@ -22,18 +24,24 @@
 #include <Adafruit_BMP280.h>
 Adafruit_BMP280 bmp;
 
-
-// Set device ID between ""
-MamaDuck duck = MamaDuck("DuckOne");
+// create a built-in mama duck
+MamaDuck duck = MamaDuck();
 
 auto timer = timer_create_default();
 const int INTERVAL_MS = 60000;
-char message[32]; 
-int counter = 1;
+
 
 void setup() {
+  // We are using a hardcoded device id here, but it should be retrieved or
+  // given during the device provisioning then converted to a byte vector to
+  // setup the duck NOTE: The Device ID must be exactly 8 bytes otherwise it
+  // will get rejected
+  std::string deviceId("MAMA0001");
+  std::vector<byte> devId;
+  devId.insert(devId.end(), deviceId.begin(), deviceId.end());
+
   // Use the default setup provided by the SDK
-  duck.setupWithDefaults();
+  duck.setupWithDefaults(devId);
   Serial.println("MAMA-DUCK...READY!");
 
   //BMp setup
@@ -67,7 +75,7 @@ bool runSensor(void *) {
   
   String sensorVal = "Temp: " + String(T) + " Pres: " + String(P); //Store Data
 
-  duck.sendPayloadStandard(sensorVal, "BMP");
+  duck.sendData(topics::sensor, sensorVal);
   
   return true;
 }

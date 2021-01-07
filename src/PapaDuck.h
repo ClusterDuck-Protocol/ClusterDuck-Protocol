@@ -11,15 +11,18 @@ class PapaDuck : public Duck {
 public:
   using Duck::Duck;
   
-  /// Papa Duck callback function signature.
-  using callbackFunc = void (*)(Packet );
-  
+  ~PapaDuck() {}
+
+  /// Papa Duck callback functions signature.
+  using rxDoneCallback = void (*)(std::vector<byte> data );
+  using txDoneCallback = void (*)(void);
   /**
    * @brief Register callback for handling data received from duck devices
    * 
+   * The callback will be invoked if the packet needs to be relayed (i.e not seen before)
    * @param cb a callback to handle data received by the papa duck
    */
-  void onReceiveDuckData(callbackFunc cb) { this->recvDataCallback = cb; }
+  void onReceiveDuckData(rxDoneCallback cb) { this->recvDataCallback = cb; }
 
   /**
    * @brief Provide the PapaDuck specific implementation of the base `run()`
@@ -29,7 +32,7 @@ public:
   void run();
 
   /**
-   * @brief Override the default setup method to match MamaDuck specific
+   * @brief Override the default setup method to match the Duck specific
    * defaults.
    *
    * In addition to Serial component, the Radio component is also initialized.
@@ -39,8 +42,10 @@ public:
    * @param ssid wifi access point ssid (defaults to an empty string if not
    * provided)
    * @param password wifi password (defaults to an empty string if not provided)
+   * @returns DUCK_ERR_NONE if setup is successfull, an error code otherwise.
    */
-  void setupWithDefaults(String ssid = "", String password = "");
+   int setupWithDefaults(std::vector<byte> deviceId, String ssid = "",
+                            String password = "");
 
   /**
    * @brief Reconnect the device's WiFi access point.
@@ -63,7 +68,8 @@ public:
   int getType() { return DuckType::PAPA; }
 
 private:
-  callbackFunc recvDataCallback;
+  rxDoneCallback recvDataCallback;
+  void handleReceivedPacket();
 };
 
 #endif

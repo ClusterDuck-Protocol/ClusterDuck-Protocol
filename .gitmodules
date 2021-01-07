@@ -1,7 +1,7 @@
 
 [submodule "Libraries/RadioLib"]
 	path = Libraries/RadioLib
-	url = https://github.com/jgromes/RadioLib.git
+	url = https://github.com/Project-Owl/RadioLib.git
 [submodule "Libraries/arduino-timer"]
 	path = Libraries/arduino-timer
 	url = https://github.com/contrem/arduino-timer
@@ -47,3 +47,7 @@
 [submodule "Libraries/ArduinoJson"]
 	path = Libraries/ArduinoJson
 	url = https://github.com/bblanchon/ArduinoJson.git
+[submodule "Libraries/CRC32"]
+	path = Libraries/CRC32
+	url = https://github.com/bakercp/CRC32
+
