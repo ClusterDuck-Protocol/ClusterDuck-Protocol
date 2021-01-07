@@ -27,6 +27,22 @@ DuckDisplay* display = NULL;
 #define LORA_RST_PIN 14
 
 
+bool sendData(const byte* buffer, int length) {
+  bool sentOk = false;
+
+  // Send Data can either take a byte buffer (unsigned char) or a vector
+  int err = duck.sendData(buffer, length);
+  if (err == DUCK_ERR_NONE) {
+    counter++;
+    sentOk = true;
+  }
+  if (!sentOk) {
+    Serial.println("[MAMA] Failed to send data. error = " + String(err));
+  }
+  return sentOk;
+}
+
+
 void setup() {
   // initialize the serial component with the hardware supported baudrate
   duck.setupSerial(115200);
@@ -77,17 +93,3 @@ bool runSensor(void*) {
   return result;
 }
 
-bool sendData(const byte* buffer, int length) {
-  bool sentOk = false;
-
-  // Send Data can either take a byte buffer (unsigned char) or a vector
-  int err = duck.sendData(topics::status, buffer, length);
-  if (err == DUCK_ERR_NONE) {
-    counter++;
-    sentOk = true;
-  }
-  if (!sentOk) {
-    Serial.println("[MAMA] Failed to send data. error = " + String(err));
-  }
-  return sentOk;
-}

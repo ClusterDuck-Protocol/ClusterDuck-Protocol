@@ -179,7 +179,9 @@ void setup() {
   duck.onReceiveDuckData(handleDuckData);
 
   Serial.println("[PAPA] Setup OK! " + duck.getName());
-  display->drawString(true, 1, 10, duck.getName().c_str());
+  
+  // we are done
+  display->showDefaultScreen();
 }
 
 
