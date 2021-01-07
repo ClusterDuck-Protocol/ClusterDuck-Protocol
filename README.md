@@ -41,7 +41,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our Code of Conduc
 This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE) file for details.
 
 ## Version
-v1.1.7
+v2.0
 
 
 [Project OWL]: <https://www.project-owl.com/>
