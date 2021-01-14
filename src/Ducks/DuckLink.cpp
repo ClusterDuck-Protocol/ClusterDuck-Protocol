@@ -14,31 +14,30 @@ int DuckLink::setupWithDefaults(std::vector<byte> deviceId, String ssid,
     return err;
   }
   
-  if (!ssid.length() == 0 && !password.length() == 0) {
-    err = setupWifi();
-    if (err != DUCK_ERR_NONE) {
-      logerr("ERROR setupWithDefaults rc = " + String(err));
-      return err;
-    }
-
-    err = setupDns();
-    if (err != DUCK_ERR_NONE) {
-      logerr("ERROR setupWithDefaults rc = " + String(err));
-      return err;
-    }
-
-    err = setupWebServer(true);
-    if (err != DUCK_ERR_NONE) {
-      logerr("ERROR setupWithDefaults rc = " + String(err));
-      return err;
-    }
-
-    err = setupOTA();
-    if (err != DUCK_ERR_NONE) {
-      logerr("ERROR setupWithDefaults rc = " + String(err));
-      return err;
-    }
+  err = setupWifi();
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR setupWithDefaults rc = " + String(err));
+    return err;
   }
+
+  err = setupDns();
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR setupWithDefaults rc = " + String(err));
+    return err;
+  }
+
+  err = setupWebServer(true);
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR setupWithDefaults rc = " + String(err));
+    return err;
+  }
+
+  err = setupOTA();
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR setupWithDefaults rc = " + String(err));
+    return err;
+  }
+  
   loginfo("DuckLink setup done");
   return DUCK_ERR_NONE;
 }
