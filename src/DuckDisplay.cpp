@@ -1,4 +1,6 @@
 #include "DuckDisplay.h"
+#include <iostream>
+#include <vector>
 
 #ifdef CDPCFG_OLED_CLASS
 
@@ -115,7 +117,7 @@ DuckDisplay* DuckDisplay::getInstance() {
 }
 #ifndef CDPCFG_OLED_NONE
 
-void DuckDisplay::setupDisplay(int duckType, String name) {
+void DuckDisplay::setupDisplay(int duckType, std::vector<byte> name) {
   u8g2.begin();        // clear the internal memory
   u8g2.setFont(u8g2_font_synchronizer_nbp_tf); // choose a suitable font
   u8g2.clearBuffer();  
@@ -126,12 +128,16 @@ void DuckDisplay::setupDisplay(int duckType, String name) {
   width = u8g2.getCols();
   height = u8g2.getRows();
 
+
+  std::string id(name.begin(), name.end());
+
+
   if (duckType >= DuckType::MAX_TYPE) {
     this->duckType = DuckType::UNKNOWN;
   } else {
     this->duckType = duckType;
   }
-  this->duckName = name;
+  this->duckName = id.c_str();
 }
 
 
