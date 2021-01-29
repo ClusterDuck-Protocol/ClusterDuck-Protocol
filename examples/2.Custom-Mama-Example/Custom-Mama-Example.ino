@@ -1,21 +1,25 @@
-#include "timer.h"
+
+/**
+ * @file Custom-Mama-Example.ino
+ * @brief Uses the built in Mama Duck.
+ * 
+ * This example is a Custom Mama Duck with an Oled display, and it is periodically sending a message in the Mesh
+ * 
+ */
+
+#include <string>
+#include <arduino-timer.h>
 #include <MamaDuck.h>
-#include <DuckDisplay.h>
 
+#ifdef SERIAL_PORT_USBVIRTUAL
+#define Serial SERIAL_PORT_USBVIRTUAL
+#endif
 
-auto timer = timer_create_default();
-const int INTERVAL_MS = 50000;
-char message[32]; 
-int counter = 1;
+// create a built-in mama duck
+MamaDuck duck = MamaDuck();
 
-const char* DUCK_WIFI_AP = "MAMA DUCK PORTAL";
-// create an instance of a MamaDuck with a given unique id
-
-String deviceName = "MAMA001";
-
-MamaDuck duck = MamaDuck(deviceName);
+// Create a Display Instance
 DuckDisplay* display = NULL;
-
 
 // LORA RF CONFIG
 #define LORA_FREQ 915.0 // Frequency Range. Set for US Region 915.0Mhz
@@ -27,29 +31,26 @@ DuckDisplay* display = NULL;
 #define LORA_RST_PIN 14
 
 
-bool sendData(const byte* buffer, int length) {
-  bool sentOk = false;
+// create a timer with default settings
+auto timer = timer_create_default();
 
-  // Send Data can either take a byte buffer (unsigned char) or a vector
-  int err = duck.sendData(buffer, length);
-  if (err == DUCK_ERR_NONE) {
-    counter++;
-    sentOk = true;
-  }
-  if (!sentOk) {
-    Serial.println("[MAMA] Failed to send data. error = " + String(err));
-  }
-  return sentOk;
-}
-
+// for sending the counter message
+const int INTERVAL_MS = 60000;
+int counter = 1;
 
 void setup() {
-  // initialize the serial component with the hardware supported baudrate
+  // The Device ID must be unique and 8 bytes long. Typically the ID is stored
+  // in a secure nvram, or provided to the duck during provisioning/registration
+  std::vector<byte> devId = {'M', 'A', 'M', 'A', '0', '0', '0', '1'};
+  
+
+
+   // initialize the serial component with the hardware supported baudrate
   duck.setupSerial(115200);
   // initialize the LoRa radio with specific settings. This will overwrites settings defined in the CDP config file cdpcfg.h
   duck.setupRadio(LORA_FREQ, LORA_CS_PIN, LORA_RST_PIN, LORA_DIO0_PIN, LORA_DIO1_PIN, LORA_TXPOWER);
   // initialize the wifi access point with a custom AP name
-  duck.setupWifi(DUCK_WIFI_AP);
+  duck.setupWifi();
   // initialize DNS
   duck.setupDns();
   // initialize web server, enabling the captive portal with a custom HTML page
@@ -59,37 +60,69 @@ void setup() {
   // This duck has an OLED display and we want to use it. 
   // Get an instance and initialize it, so we can use in our application
   display = DuckDisplay::getInstance();
-  display->setupDisplay(duck.getType(), deviceName);
+  display->setupDisplay(duck.getType(), devId);
   // we are done
   display->showDefaultScreen();
 
+  // Initialize the timer. The timer thread runs separately from the main loop
+  // and will trigger sending a counter message.
   timer.every(INTERVAL_MS, runSensor);
+  Serial.println("[MAMA] Setup OK!");
+
 }
 
-void loop(){
-      timer.tick();
+void loop() {
+  timer.tick();
   // Use the default run(). The Mama duck is designed to also forward data it receives
   // from other ducks, across the network. It has a basic routing mechanism built-in
   // to prevent messages from hoping endlessly.
   duck.run();
-};
+}
 
-bool runSensor(void*) {
+bool runSensor(void *) {
   bool result;
   const byte* buffer;
-
+  
   String message = String("mama0001:") + String(counter);
   int length = message.length();
   Serial.print("[MAMA] sensor data: ");
   Serial.println(message);
-  buffer = (byte*)message.c_str();
+  buffer = (byte*) message.c_str(); 
 
   result = sendData(buffer, length);
   if (result) {
-    Serial.println("[MAMA] runSensor ok.");
+     Serial.println("[MAMA] runSensor ok.");
   } else {
-    Serial.println("[MAMA] runSensor failed.");
+     Serial.println("[MAMA] runSensor failed.");
   }
   return result;
 }
+
+bool sendData(const byte* buffer, int length) {
+  bool sentOk = false;
+  
+  // Send Data can either take a byte buffer (unsigned char) or a vector
+  int err = duck.sendData(topics::status, buffer, length);
+  if (err == DUCK_ERR_NONE) {
+     counter++;
+     sentOk = true;
+  }
+  if (!sentOk) {
+    Serial.println("[MAMA] Failed to send data. error = " + String(err));
+  }
+  return sentOk;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
