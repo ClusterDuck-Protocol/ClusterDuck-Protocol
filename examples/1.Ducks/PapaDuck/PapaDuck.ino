@@ -173,7 +173,7 @@ void setup() {
   display = DuckDisplay::getInstance();
   // DuckDisplay instance is returned unconditionally, if there is no physical
   // display the functions will not do anything
-  display->setupDisplay(duck.getType(), duck.getName());
+  display->setupDisplay(duck.getType(), devId);
 
   // register a callback to handle incoming data from duck in the network
   duck.onReceiveDuckData(handleDuckData);
