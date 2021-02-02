@@ -40,8 +40,8 @@ char authMethod[] = "use-token-auth";
 char token[] = TOKEN;
 char clientId[] = "d:" ORG ":" DEVICE_TYPE ":" DEVICE_ID;
 
-// Use pre-built papa duck.
-PapaDuck duck = PapaDuck(DEVICE_ID);
+// Use pre-built papa duck
+PapaDuck duck = PapaDuck();
 
 DuckDisplay* display = NULL;
 
@@ -73,6 +73,9 @@ std::string toTopicString(byte topic) {
       break;
     case topics::location:
       topicString = "gps";
+      break;
+    case topics::health:
+      topicString ="health";
       break;
     default:
       topicString = "status";
@@ -116,7 +119,7 @@ void quackJson(std::vector<byte> packetBuffer) {
 
   Serial.println("[PAPA] Packet Received:");
   Serial.println("[PAPA] sduid:   " + String(sduid.c_str()));
-  Serial.println("[PAPA] sduid:   " + String(dduid.c_str()));
+  Serial.println("[PAPA] dduid:   " + String(dduid.c_str()));
 
   Serial.println("[PAPA] muid:    " + String(muid.c_str()));
   Serial.println("[PAPA] path:    " + String(path.c_str()));
@@ -163,9 +166,13 @@ void handleDuckData(std::vector<byte> packetBuffer) {
 }
 
 void setup() {
-  // The Device ID must be unique and 8 bytes long. Typically the ID is stored
-  // in a secure nvram, or provided to the duck during provisioning/registration
-  std::vector<byte> devId = {'P', 'A', 'P', 'A', '0', '0', '0', '1'};
+  // We are using a hardcoded device id here, but it should be retrieved or
+  // given during the device provisioning then converted to a byte vector to
+  // setup the duck NOTE: The Device ID must be exactly 8 bytes otherwise it
+  // will get rejected
+  std::string deviceId("PAPADUCK");
+  std::vector<byte> devId;
+  devId.insert(devId.end(), deviceId.begin(), deviceId.end());
 
   // the default setup is equivalent to the above setup sequence
   duck.setupWithDefaults(devId, SSID, PASSWORD);
@@ -173,12 +180,12 @@ void setup() {
   display = DuckDisplay::getInstance();
   // DuckDisplay instance is returned unconditionally, if there is no physical
   // display the functions will not do anything
-  display->setupDisplay(duck.getType(), duck.getName());
+  display->setupDisplay(duck.getType(), devId);
 
   // register a callback to handle incoming data from duck in the network
   duck.onReceiveDuckData(handleDuckData);
 
-  Serial.println("[PAPA] Setup OK! " + duck.getName());
+  Serial.println("[PAPA] Setup OK! ");
   
   // we are done
   display->showDefaultScreen();

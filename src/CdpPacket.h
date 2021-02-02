@@ -53,6 +53,8 @@ enum topics {
   sensor = 0x13,
   /// an allert message that should be given immediate attention
   alert = 0x14,
+  /// Device health status
+  health = 0x15,
   /// Max supported topics
   max_topics = 0xFF
 };

@@ -41,7 +41,7 @@ void setup() {
   // given during the device provisioning
   // then converted to a byte vector to setup the duck
   // NOTE: The Device ID must be exactly 8 bytes otherwise it will get rejected
-  std::string deviceId(DEVICE_ID);
+  std::string deviceId("PAPADUCK");
   std::vector<byte> devId;
   devId.insert(devId.end(), deviceId.begin(), deviceId.end());
 
@@ -53,16 +53,15 @@ void setup() {
   // register a callback to handle incoming data from duck in the network
   duck.onReceiveDuckData(handleDuckData);
 
-  Serial.println("[PAPA] Setup OK!");
+  Serial.println("[PAPI] Setup OK!");
 }
 
 // The callback method simply takes the incoming packet and
 // converts it to a JSON string, before sending it out over WiFi
-void handleDuckData(Packet packet) {
-  if (packet.topic == reservedTopic::ping) {
-    return;
-  }
-  quackJson(packet);
+void handleDuckData(std::vector<byte> packetBuffer) {
+  Serial.println("[PAPI] got packet: " +
+                 convertToHex(packetBuffer.data(), packetBuffer.size()));
+  quackJson(packetBuffer);
 }
 
 void loop() { duck.run(); }
@@ -89,6 +88,9 @@ std::string toTopicString(byte topic) {
     case topics::location:
       topicString = "gps";
       break;
+    case topics::health:
+      topicString = "health";
+      break;
     default:
       topicString = "status";
   }
@@ -96,24 +98,56 @@ std::string toTopicString(byte topic) {
   return topicString;
 }
 
-void quackJson(Packet packet) {
+void quackJson(std::vector<byte> packetBuffer) {
 
+  CdpPacket packet = CdpPacket(packetBuffer);
   const int bufferSize = 4 * JSON_OBJECT_SIZE(4);
   StaticJsonDocument<bufferSize> doc;
 
+  // Here we treat the internal payload of the CDP packet as a string
+  // but this is mostly application dependent. 
+  // The parsingf here is optional. The Papa duck could simply decide to
+  // forward the CDP packet as a byte array and let the Network Server (or DMS) deal with
+  // the parsing based on some business logic.
+
   std::string payload(packet.data.begin(), packet.data.end());
-  std::string duid(packet.sduid.begin(), packet.sduid.end());
+  std::string sduid(packet.sduid.begin(), packet.sduid.end());
+  std::string dduid(packet.dduid.begin(), packet.dduid.end());
+
   std::string muid(packet.muid.begin(), packet.muid.end());
   std::string path(packet.path.begin(), packet.path.end());
 
-  doc["DeviceID"] = duid;
+  Serial.println("[PAPI] Packet Received:");
+  Serial.println("[PAPI] sduid:   " + String(sduid.c_str()));
+  Serial.println("[PAPI] sduid:   " + String(dduid.c_str()));
+
+  Serial.println("[PAPI] muid:    " + String(muid.c_str()));
+  Serial.println("[PAPI] path:    " + String(path.c_str()));
+  Serial.println("[PAPI] data:    " + String(payload.c_str()));
+  Serial.println("[PAPI] hops:    " + String(packet.hopCount));
+  Serial.println("[PAPI] duck:    " + String(packet.duckType));
+
+  std::string cdpTopic = toTopicString(packet.topic);
+  //TODO: add topic to json
+  doc["DeviceID"] = sduid;
   doc["MessageID"] = muid;
   doc["Payload"].set(payload);
   doc["path"].set(path);
+  doc["hops"].set(packet.hopCount);
+  doc["duckType"].set(packet.duckType);
 
-  std::string cdpTopic = toTopicString(packet.topic);
+  //Print to Serial
+  serializeJson(doc, Serial);
+}
 
-  std::string topic = "iot-2/evt/" + cdpTopic + "/fmt/json";
-
-  serializeJsonPretty(doc, Serial);
+String convertToHex(byte* data, int size) {
+  String buf = "";
+  buf.reserve(size * 2); // 2 digit hex
+  const char* cs = "0123456789ABCDEF";
+  for (int i = 0; i < size; i++) {
+    byte val = data[i];
+    buf += cs[(val >> 4) & 0x0F];
+    buf += cs[val & 0x0F];
+  }
+  return buf;
 }
