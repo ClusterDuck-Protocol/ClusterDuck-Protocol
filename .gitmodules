@@ -48,3 +48,6 @@
 	path = Libraries/CRC32
 	url = https://github.com/bakercp/CRC32.git
 
+[submodule "Libraries/RadioLib"]
+	path = Libraries/RadioLib
+	url = https://github.com/jgromes/RadioLib.git
