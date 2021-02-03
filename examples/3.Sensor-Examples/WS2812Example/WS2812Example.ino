@@ -29,10 +29,7 @@
 CRGB leds[NUM_LEDS];  
 DuckDisplay* display = NULL;
 
-
-// Set device ID between ""
-String deviceId = "MAMA001";
-MamaDuck duck = MamaDuck(deviceId);
+MamaDuck duck = MamaDuck();
 
 auto timer = timer_create_default();
 const int INTERVAL_MS = 60000;
@@ -40,8 +37,14 @@ char message[32];
 int counter = 1;
 
 void setup() {
-  // Use the default setup provided by the SDK
-  duck.setupWithDefaults();
+  // We are using a hardcoded device id here, but it should be retrieved or
+  // given during the device provisioning then converted to a byte vector to
+  // setup the duck NOTE: The Device ID must be exactly 8 bytes otherwise it
+  // will get rejected
+  std::string deviceId("MAMA0001");
+  std::vector<byte> devId;
+  devId.insert(devId.end(), deviceId.begin(), deviceId.end());
+  duck.setupWithDefaults(devId);
   Serial.println("MAMA-DUCK...READY!");
 
   display = DuckDisplay::getInstance();

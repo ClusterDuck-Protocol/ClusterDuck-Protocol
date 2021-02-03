@@ -30,6 +30,7 @@ void setup() {
   std::string deviceId("DUCK0001");
   std::vector<byte> devId;
   devId.insert(devId.end(), deviceId.begin(), deviceId.end());
+  duck.setupWithDefaults(devId);
 
   // Initialize the timer. The timer thread runs separately from the main loop
   // and will trigger sending a counter message.

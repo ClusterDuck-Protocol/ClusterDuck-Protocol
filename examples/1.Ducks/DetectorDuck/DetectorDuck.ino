@@ -37,6 +37,7 @@ void setup() {
   std::string deviceId("DETECTOR");
   std::vector<byte> devId;
   devId.insert(devId.end(), deviceId.begin(), deviceId.end());
+  duck.setupWithDefaults(devId);
 
   // Register  a callback that provides RSSI value
   duck.onReceiveRssi(handleReceiveRssi);
