@@ -41,8 +41,9 @@ int counter = 1;
 void setup() {
   // The Device ID must be unique and 8 bytes long. Typically the ID is stored
   // in a secure nvram, or provided to the duck during provisioning/registration
-  std::vector<byte> devId = {'M', 'A', 'M', 'A', '0', '0', '0', '1'};
-  
+std::string deviceId("MAMA0001");
+std::vector<byte> devId;
+devId.insert(devId.end(), deviceId.begin(), deviceId.end()); 
 
 
    // initialize the serial component with the hardware supported baudrate
@@ -54,7 +55,7 @@ void setup() {
   // initialize DNS
   duck.setupDns();
   // initialize web server, enabling the captive portal with a custom HTML page
-//  duck.setupWebServer(true, HTML);
+  duck.setupWebServer(true);
   // initialize Over The Air firmware upgrade
   duck.setupOTA();
   // This duck has an OLED display and we want to use it. 
@@ -83,7 +84,7 @@ bool runSensor(void *) {
   bool result;
   const byte* buffer;
   
-  String message = String("mama0001:") + String(counter);
+  String message = String("MAMA0001:") + String(counter);
   int length = message.length();
   Serial.print("[MAMA] sensor data: ");
   Serial.println(message);
@@ -112,7 +113,6 @@ bool sendData(const byte* buffer, int length) {
   }
   return sentOk;
 }
-
 
 
 
