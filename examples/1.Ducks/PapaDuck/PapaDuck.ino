@@ -209,7 +209,7 @@ void loop() {
       timer.in(5000, enableRetry);
     }
   }
-  if (duck.isWifiConnected()) {
+  if (duck.isWifiConnected() && retry) {
     setup_mqtt(use_auth_method);
   }
 
@@ -223,18 +223,18 @@ void setup_mqtt(bool use_auth) {
     return;
   }
 
-  for (;;) {
-    if (use_auth) {
-      connected = client.connect(clientId, authMethod, token);
-    } else {
-      connected = client.connect(clientId);
-    }
-    if (connected) {
-      Serial.println("[PAPA] Mqtt client is connected!");
-      break;
-    }
-    retry_mqtt_connection(500);
+  
+  if (use_auth) {
+    connected = client.connect(clientId, authMethod, token);
+  } else {
+    connected = client.connect(clientId);
   }
+  if (connected) {
+    Serial.println("[PAPA] Mqtt client is connected!");
+    return;
+  }
+  retry_mqtt_connection(1000);
+  
 }
 
 
@@ -247,7 +247,7 @@ bool enableRetry(void*) {
 }
 
 void retry_mqtt_connection(int delay_ms) {
-  timer.tick();
-  Serial.print(".");
-  delay(delay_ms);
+  Serial.println("[PAPA] Could not connect to MQTT...............................");
+  retry = false;
+  timer.in(delay_ms, enableRetry);
 }

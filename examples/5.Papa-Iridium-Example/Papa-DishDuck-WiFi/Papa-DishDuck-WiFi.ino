@@ -140,18 +140,17 @@ void setup_mqtt(bool use_auth) {
     return;
   }
 
-  for (;;) {
-    if (use_auth) {
-      connected = client.connect(clientId, authMethod, token);
-    } else {
-      connected = client.connect(clientId);
-    }
-    if (connected) {
-      Serial.println("[DISH] mqtt client is connected!");
-      break;
-    }
-    retry_mqtt_connection(WIFI_RETRY_DELAY_MS);
+  
+  if (use_auth) {
+    connected = client.connect(clientId, authMethod, token);
+  } else {
+    connected = client.connect(clientId);
   }
+  if (connected) {
+    Serial.println("[PAPA] Mqtt client is connected!");
+    return;
+  }
+  retry_mqtt_connection(1000);
 }
 
 // DMS locator URL requires a topicString, so we need to convert the topic
@@ -298,9 +297,9 @@ bool enableRetry(void*) {
 }
 
 void retry_mqtt_connection(int delay_ms) {
-  timer.tick();
-  Serial.print(".");
-  delay(delay_ms);
+  Serial.println("[PAPA] Could not connect to MQTT...............................");
+  retry = false;
+  timer.in(delay_ms, enableRetry);
 }
 
 void setupRockBlock() {
