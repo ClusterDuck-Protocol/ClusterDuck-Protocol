@@ -104,12 +104,11 @@ public:
   /**
    * @brief Set up the WiFi access point.
    *
-   * @param accessPoint a string representing the access point. Default to  "🆘
-   * DUCK EMERGENCY PORTAL"
+   * @param accessPoint a string representing the access point. Default to  "DuckLink"
    *
    * @returns DUCK_ERR_NONE if successful, an error code otherwise.
    */
-  int setupWifiAp(const char* accessPoint = "🆘 DUCK EMERGENCY PORTAL");
+  int setupWifiAp(const char* accessPoint = "DuckLink");
 
   /**
    * @brief Set up DNS.
