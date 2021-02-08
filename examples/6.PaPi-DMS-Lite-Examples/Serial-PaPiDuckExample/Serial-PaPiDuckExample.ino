@@ -1,31 +1,21 @@
 /**
- * @file papa-duck-with-callback.ino
+ * @file Serial-PaPiDuckExample.ino
  * @author 
- * @brief Uses built-in PapaDuck from the SDK to create a WiFi enabled Papa Duck
+ * @brief Uses built-in PapaDuck from the SDK to create a Serial Print papaDuck for DMS Lite
  * 
- * This example will configure and run a Papa Duck that connects to the cloud
- * and forwards all messages (except  pings) to the cloud.
+ * This example will configure and run a Papa Duck that will print JSON in the serial monitor for the DMS-Lite to pick up
  * 
- * @date 2020-09-21
+ * @date 2021-02-08 
  * 
  */
 
 #include <ArduinoJson.h>
-
 #include <arduino-timer.h>
 #include <string>
 
 /* CDP Headers */
 #include <PapaDuck.h>
 #include <CdpPacket.h>
-
-
-
-#define MQTT_RETRY_DELAY_MS 500
-#define WIFI_RETRY_DELAY_MS 5000
-
-#define SSID ""
-#define PASSWORD ""
 
 #define LORA_FREQ 915.0 // Frequency Range. Set for US Region 915.0Mhz
 #define LORA_TXPOWER 20 // Transmit Power
@@ -131,6 +121,7 @@ void handleDuckData(std::vector<byte> packetBuffer) {
 }
 
 void setup() {
+  
   // We are using a hardcoded device id here, but it should be retrieved or
   // given during the device provisioning then converted to a byte vector to
   // setup the duck NOTE: The Device ID must be exactly 8 bytes otherwise it
@@ -146,16 +137,13 @@ void setup() {
                   LORA_DIO1_PIN, LORA_TXPOWER);
   duck.setDeviceId(devId);
 
-  
-
+ 
   // register a callback to handle incoming data from duck in the network
   duck.onReceiveDuckData(handleDuckData);
 
 }
 
 void loop() {
-
-
   duck.run();
   timer.tick();
 }

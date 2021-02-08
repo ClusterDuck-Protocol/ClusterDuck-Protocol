@@ -3,10 +3,8 @@
  * 
  * This is to be used with a PaPi/DMS-Lite device
  *
- * This example will configure and run a Papa Duck that connects to the cloud
- * and forwards all messages (except  pings) to the cloud.
- *
- * @date 2020-09-21
+ * This example will configure and run a Papa Duck that connects to a local MQTT server
+ * @date 2021-02-08
  *
  */
 #include <ArduinoJson.h>
@@ -20,9 +18,17 @@
 #include <CdpPacket.h>
 #include <PapaDuck.h>
 
-// Note the device id here is just an example.
-// It should be a unique securely stored ID
-const std::string DEVICE_ID = "PAPA0001";
+
+
+#define LORA_FREQ 915.0 // Frequency Range. Set for US Region 915.0Mhz
+#define LORA_TXPOWER 20 // Transmit Power
+// LORA HELTEC PIN CONFIG
+#define LORA_CS_PIN 18
+#define LORA_DIO0_PIN 26
+#define LORA_DIO1_PIN -1 // unused
+#define LORA_RST_PIN 14
+
+
 
 // Use pre-built papa duck.
 PapaDuck duck = PapaDuck();
@@ -40,9 +46,18 @@ WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
 
 void setup() {
-  duck.setupSerial();
-  duck.setupRadio();
-  duck.setDeviceId((byte*)DEVICE_ID.data());
+ std::string deviceId("PAPADUCK");
+  std::vector<byte> devId;
+  devId.insert(devId.end(), deviceId.begin(), deviceId.end());
+
+  // the default setup is equivalent to the above setup sequence
+// duck.setupSerial(115200);
+  Serial.begin(115200);
+  duck.setupRadio(LORA_FREQ, LORA_CS_PIN, LORA_RST_PIN, LORA_DIO0_PIN,
+                  LORA_DIO1_PIN, LORA_TXPOWER);
+  duck.setDeviceId(devId);
+
+  
   duck.onReceiveDuckData(handleDuckData);
   setup_wifi();
   mqttClient.setServer(mqtt_server, 1883);
