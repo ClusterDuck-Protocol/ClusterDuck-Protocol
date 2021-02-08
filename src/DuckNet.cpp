@@ -254,13 +254,10 @@ int DuckNet::setupInternet(String ssid, String password) {
   // Connect to Access Point
   WiFi.begin(ssid.c_str(), password.c_str());
 
-  // TODO: we should probably simply fail here and let the app decide what to do
-  // Continuous retry could deplete the battery.
-  // Also this will only work if we have a reboot timer handler implemented
-  // otherwise we are just going to be stuck in this loop
+  //TODO: Handle bad password better
   if(WiFi.status() != WL_CONNECTED) {
     logerr("ERROR setupInternet: failed to connect to " + ssid);
-    duckutils::getTimer().tick(); // Advance timer to reboot after awhile
+    return DUCK_INTERNET_ERR_CONNECT;
   }
 
   loginfo("Duck connected to internet!");
