@@ -258,7 +258,7 @@ int DuckNet::setupInternet(String ssid, String password) {
   // Continuous retry could deplete the battery.
   // Also this will only work if we have a reboot timer handler implemented
   // otherwise we are just going to be stuck in this loop
-  while (WiFi.status() != WL_CONNECTED) {
+  if(WiFi.status() != WL_CONNECTED) {
     logerr("ERROR setupInternet: failed to connect to " + ssid);
     duckutils::getTimer().tick(); // Advance timer to reboot after awhile
   }
