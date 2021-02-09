@@ -33,34 +33,31 @@ IridiumSBD modem(IridiumSerial);
 
 PapaDuck duck = PapaDuck();
 
-#define SSID ""
-#define PASSWORD ""
-
 bool retry = true;
 
 void setup() {
-  // The Device ID must be unique and 8 bytes long. Typically the ID is stored
-  // in a secure nvram, or provided to the duck during provisioning/registration
-  std::vector<byte> devId = {'P', 'A', 'P', 'A', '0', '0', '0', '1'};
+  // We are using a hardcoded device id here, but it should be retrieved or
+  // given during the device provisioning then converted to a byte vector to
+  // setup the duck NOTE: The Device ID must be exactly 8 bytes otherwise it
+  // will get rejected
+  std::string deviceId("DISHDUCK");
+  std::vector<byte> devId;
+  devId.insert(devId.end(), deviceId.begin(), deviceId.end());
 
   // Use the default setup provided by the SDK
-  duck.setupWithDefaults(devId, SSID, PASSWORD);
+  duck.setupWithDefaults(devId);
   setupRockBlock();
   
   // register a callback to handle incoming data from duck in the network
   duck.onReceiveDuckData(handleDuckData);
   
-  Serial.println("[PAPA] Setup OK!");
+  Serial.println("[DISH] Setup OK!");
 }
 
 // The callback method simply takes the incoming packet and
 // converts it to a JSON string, before sending it out over WiFi
 void handleDuckData(std::vector<byte> packetBuffer) {
-  if (beamData) {
-    quackBeam(packetBuffer);
-  } else {
-    quackJson(packetBuffer);
-  }
+  quackBeam(packetBuffer);
 }
 
 void loop() {
@@ -100,6 +97,9 @@ std::string toTopicString(byte topic) {
     case topics::location:
       topicString = "gps";
       break;
+    case topics::health:
+      topicString ="health";
+      break;
     default:
       topicString = "status";
   }
@@ -107,37 +107,59 @@ std::string toTopicString(byte topic) {
   return topicString;
 }
 
-void quackJson(std::vector<byte> packetBuffer) {
-
+void quackBeam(std::vector<byte> packetBuffer) {
+  Serial.print("quackBeam");
   int err;
 
-  std::string cdpTopic = toTopicString(packet.topic);
+  CdpPacket packet = CdpPacket(packetBuffer);
+  const int bufferSize = 4 * JSON_OBJECT_SIZE(4);
+  StaticJsonDocument<bufferSize> doc;
+
+  // Here we treat the internal payload of the CDP packet as a string
+  // but this is mostly application dependent. 
+  // The parsingf here is optional. The Papa duck could simply decide to
+  // forward the CDP packet as a byte array and let the Network Server (or DMS) deal with
+  // the parsing based on some business logic.
 
   std::string payload(packet.data.begin(), packet.data.end());
   std::string sduid(packet.sduid.begin(), packet.sduid.end());
+  std::string dduid(packet.dduid.begin(), packet.dduid.end());
+
   std::string muid(packet.muid.begin(), packet.muid.end());
   std::string path(packet.path.begin(), packet.path.end());
 
-  //Uncomment the lines below of which data you want to send
-  String data = sduid.c_str() + "/" + muid.c_str() + "/" + payload.c_str() +
-                "/" + path.c_str() + "/" + cdpTopic.c_str();
-  
-  Serial.println(data);
+  Serial.println("[DISH] Packet Received:");
+  Serial.println("[DISH] sduid:   " + String(sduid.c_str()));
+  Serial.println("[DISH] dduid:   " + String(dduid.c_str()));
+
+  Serial.println("[DISH] muid:    " + String(muid.c_str()));
+  Serial.println("[DISH] path:    " + String(path.c_str()));
+  Serial.println("[DISH] data:    " + String(payload.c_str()));
+  Serial.println("[DISH] hops:    " + String(packet.hopCount));
+  Serial.println("[DISH] duck:    " + String(packet.duckType));
+
+  std::string cdpTopic = toTopicString(packet.topic);
+
+  String data = String(sduid.c_str()) + "/" + String(muid.c_str()) + "/" + String(payload.c_str()) +
+                "/" + String(path.c_str()) + "/" + String(cdpTopic.c_str());
+
+                Serial.println(data);
   const   char *text = data.c_str();
   // Send the message
-  Serial.print("Trying to send the message.  This might take several minutes.\r\n");
+  Serial.print("[DISH] Trying to send the message.  This might take several minutes.\r\n");
   err = modem.sendSBDText(text);
   if (err != ISBD_SUCCESS)
   {
-    Serial.print("sendSBDText failed: error ");
+    Serial.print("[DISH] sendSBDText failed: error ");
     Serial.println(err);
     if (err == ISBD_SENDRECEIVE_TIMEOUT)
-      Serial.println("Try again with a better view of the sky.");
+      Serial.println("[DISH] Try again with a better view of the sky.");
   }
   else
   {
-    Serial.println("Message Sent to Iridium!");
+    Serial.println("[DISH] Message Sent to Iridium!");
   }
+
 }
 
 void setupRockBlock(){
@@ -147,14 +169,14 @@ void setupRockBlock(){
   // Start the serial port connected to the satellite modem
   Serial2.begin(19200, SERIAL_8N1, rxpin, txpin, false); // false means normal data polarity so steady state of line = 0, true means staedy state = high.
   // Begin satellite modem operation
-  Serial.println("Starting modem...");
+  Serial.println("[DISH] Starting modem...");
   err = modem.begin();
   if (err != ISBD_SUCCESS)
   {
-    Serial.print("Modem begin failed: error ");
+    Serial.print("[DISH] Modem begin failed: error ");
     Serial.println(err);
     if (err == ISBD_NO_MODEM_DETECTED)
-      Serial.println("No modem detected: check wiring.");
+      Serial.println("[DISH] No modem detected: check wiring.");
     return;
   }
 
@@ -163,13 +185,13 @@ void setupRockBlock(){
   err = modem.getFirmwareVersion(version, sizeof(version));
   if (err != ISBD_SUCCESS)
   {
-    Serial.print("FirmwareVersion failed: error ");
+    Serial.print("[DISH] FirmwareVersion failed: error ");
     Serial.println(err);
     return;
   }
 
   {
-  Serial.print("Firmware Version is ");
+  Serial.print("[DISH] Firmware Version is ");
   Serial.print(version);
   Serial.println(".");
   }
