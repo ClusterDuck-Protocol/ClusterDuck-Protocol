@@ -65,7 +65,7 @@ public:
     logwarn("WARNING setupWebServer skipped, device has no WiFi.");
     return DUCK_ERR_NONE;
   }
-  int setupWifiAp(const char* accessPoint = "🆘 DUCK EMERGENCY PORTAL") {
+  int setupWifiAp(const char* accessPoint = "DuckLink") {
     logwarn("WARNING setupWifiAp skipped, device has no WiFi.");
     return DUCK_ERR_NONE;
   }
