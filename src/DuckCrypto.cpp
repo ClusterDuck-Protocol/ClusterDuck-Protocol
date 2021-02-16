@@ -28,7 +28,9 @@ void encryptData(std::vector<uint8_t> text, std::vector<uint8_t> encryptedData, 
    for (posn = 0; posn < text.size(); posn += inc) {
       len = text.size() - posn;
       if (len > inc) len = inc;
-      //ctraes256.encrypt(encryptedData, text, len);
+      uint8_t* encryptPos = encryptedData.data();
+      uint8_t* textPos = text.data();
+      ctraes256.encrypt(encryptPos + posn, textPos + posn, len);
    }
 }
 
