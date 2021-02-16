@@ -35,6 +35,8 @@ public:
    */
   int setupWithDefaults(std::vector<byte> deviceId, String ssid="", String password="");
 
+  void crypto(std::vector<uint8_t> text, std::vector<uint8_t> encryptedData, size_t inc);
+
   /**
    * @brief Get the DuckType
    *
