@@ -46,6 +46,8 @@ std::vector<byte> devId;
 devId.insert(devId.end(), deviceId.begin(), deviceId.end()); 
 
 
+  //Set the Device ID
+  duck.setDeviceId(devId);
    // initialize the serial component with the hardware supported baudrate
   duck.setupSerial(115200);
   // initialize the LoRa radio with specific settings. This will overwrites settings defined in the CDP config file cdpcfg.h
