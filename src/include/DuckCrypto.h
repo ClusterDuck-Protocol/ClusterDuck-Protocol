@@ -25,7 +25,7 @@ public:
    int setAESKey(uint8_t newKEY[32]);
    int setAESIV(uint8_t newIV[16]);
 
-   void encryptData(std::vector<uint8_t> text, std::vector<uint8_t> encryptedData, size_t inc);
+   void encryptData(std::uint8_t* text, std::uint8_t* encryptedData, std::size_t inc);
 
 private:
    uint8_t KEY[32];

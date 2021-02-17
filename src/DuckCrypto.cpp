@@ -11,7 +11,7 @@ uint8_t KEY[32] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 uint8_t IV[16] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
                   0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
 
-void DuckCrypto::encryptData(std::vector<uint8_t> text, std::vector<uint8_t> encryptedData, size_t inc)
+void encryptData(std::uint8_t* text, std::uint8_t* encryptedData, std::size_t inc)
 {
   // Processing message for encryption
   //int msgLength = msg.length() + 1;
@@ -25,14 +25,16 @@ void DuckCrypto::encryptData(std::vector<uint8_t> text, std::vector<uint8_t> enc
    ctraes256.setIV(IV, 16);
    ctraes256.setCounterSize(4);
 
-   for (posn = 0; posn < text.size(); posn += inc) {
-      len = text.size() - posn;
+   for (posn = 0; posn < inc; posn += inc) {
+      len = inc - posn;
       if (len > inc) len = inc;
-      uint8_t* encryptPos = encryptedData.data();
-      uint8_t* textPos = text.data();
-      ctraes256.encrypt(encryptPos + posn, textPos + posn, len);
+     
+      ctraes256.encrypt(encryptedData + posn, text + posn, len);
    }
+
+//    std::cout << "Ciphertext: " << convertToHex(encryptedData, inc) << "\n";
 }
+
 
 int setAESKey(uint8_t newKEY[32]) {
 

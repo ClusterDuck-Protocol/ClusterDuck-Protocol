@@ -45,7 +45,7 @@ int DuckLink::setupWithDefaults(std::vector<byte> deviceId, String ssid,
   return DUCK_ERR_NONE;
 }
 
-void DuckLink::crypto(std::vector<uint8_t> text, std::vector<uint8_t> encryptedData, size_t inc) {
+void DuckLink::crypto(std::uint8_t* text, std::uint8_t* encryptedData, std::size_t inc) {
   test.encryptData(text, encryptedData, inc);
 }
 
