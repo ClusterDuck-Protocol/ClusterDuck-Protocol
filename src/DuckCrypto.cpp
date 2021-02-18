@@ -11,8 +11,7 @@ uint8_t KEY[32] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 uint8_t IV[16] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
                   0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
 
-void encryptData(std::uint8_t* text, std::uint8_t* encryptedData, std::size_t inc)
-{
+void encryptData(std::uint8_t* text, std::uint8_t* encryptedData, std::size_t inc) {
   // Processing message for encryption
   //int msgLength = msg.length() + 1;
   //msg.getBytes(text, msgLength);
