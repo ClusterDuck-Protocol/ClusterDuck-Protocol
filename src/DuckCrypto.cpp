@@ -1,4 +1,5 @@
 #include "include/DuckCrypto.h"
+#include "include/DuckUtils.h"
 
 // Initializing the cipher (CTR with AES256)
 CTR<AES256> ctraes256;
@@ -11,7 +12,7 @@ uint8_t KEY[32] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 uint8_t IV[16] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
                   0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
 
-void encryptData(std::uint8_t* text, std::uint8_t* encryptedData, std::size_t inc) {
+void DuckCrypto::encryptData(std::uint8_t* text, std::uint8_t* encryptedData, std::size_t inc) {
   // Processing message for encryption
   //int msgLength = msg.length() + 1;
   //msg.getBytes(text, msgLength);
@@ -31,17 +32,19 @@ void encryptData(std::uint8_t* text, std::uint8_t* encryptedData, std::size_t in
       ctraes256.encrypt(encryptedData + posn, text + posn, len);
    }
 
+   loginfo("Encrypted: " + duckutils::convertToHex(encryptedData,inc)); 
+
 //    std::cout << "Ciphertext: " << convertToHex(encryptedData, inc) << "\n";
 }
 
 
-int setAESKey(uint8_t newKEY[32]) {
+int DuckCrypto::setAESKey(uint8_t newKEY[32]) {
 
    return -1;
 }
 
 
-int setAESIV(uint8_t newIV[16]) {
+int DuckCrypto::setAESIV(uint8_t newIV[16]) {
 
    return -1;
 }

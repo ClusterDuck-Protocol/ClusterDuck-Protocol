@@ -15,6 +15,7 @@
 #include <Crypto.h>
 #include <AES.h>
 #include <CTR.h>
+#include "../DuckLogger.h"
 #include <vector>
 #include <string>
 
