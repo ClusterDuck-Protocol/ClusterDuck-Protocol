@@ -16,7 +16,7 @@ before_install:
   - arduino-cli config init 
   - arduino-cli config set library.enable_unsafe_install true          
   - arduino-cli lib install --git-url https://github.com/contrem/arduino-timer.git
-  - arduino-cli lib istall --git-url https://github.com/jgromes/RadioLib.git
+  - arduino-cli lib install --git-url https://github.com/jgromes/RadioLib.git
 
   - buildExampleSketch() { arduino-cli compile -v -t -b $BOARD $PWD/examples/$1/$2/$2.ino; }
 script:
