@@ -24,6 +24,7 @@ before_install:
   - arduino-cli lib install --git-url https://github.com/olikraus/U8g2_Arduino.git
   - arduino-cli lib install --git-url https://github.com/bakercp/CRC32.git
   - arduino-cli lib install --git-url https://github.com/adafruit/Adafruit_Sensor
+  - arduino-cli lib install --git-url https://github.com/knolleary/pubsubclient.git
 
   - buildExampleSketch() { arduino-cli compile  -t -b $BOARD $PWD/examples/$1/$2/$2.ino; }
 script:
