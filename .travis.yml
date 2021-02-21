@@ -17,6 +17,14 @@ before_install:
   - arduino-cli config set library.enable_unsafe_install true          
   - arduino-cli lib install --git-url https://github.com/contrem/arduino-timer.git
   - arduino-cli lib install --git-url https://github.com/jgromes/RadioLib.git
+  - arduino-cli lib install --git-url https://github.com/Call-for-Code/ClusterDuck-Protocol.git
+  - arduino-cli lib install --git-url https://github.com/bblanchon/ArduinoJson.git
+  - arduino-cli lib install --git-url https://github.com/me-no-dev/AsyncTCP
+  - arduino-cli lib install --git-url https://github.com/ThingPulse/esp8266-oled-ssd1306
+  - arduino-cli lib install --git-url https://github.com/me-no-dev/ESPAsyncWebServer
+  - arduino-cli lib install --git-url https://github.com/olikraus/U8g2_Arduino.git
+  - arduino-cli lib install --git-url https://github.com/bakercp/CRC32.git
+  - arduino-cli lib install --git-url https://github.com/adafruit/Adafruit_Sensor
 
   - buildExampleSketch() { arduino-cli compile -v -t -b $BOARD $PWD/examples/$1/$2/$2.ino; }
 script:
