@@ -25,7 +25,7 @@ before_install:
   - arduino-cli lib install --git-url https://github.com/bakercp/CRC32.git
   - arduino-cli lib install --git-url https://github.com/adafruit/Adafruit_Sensor
 
-  - buildExampleSketch() { arduino-cli compile -p --quiet -v -t -b $BOARD $PWD/examples/$1/$2/$2.ino; }
+  - buildExampleSketch() { arduino-cli compile  -t -b $BOARD $PWD/examples/$1/$2/$2.ino; }
 script:
   - buildExampleSketch 1.Ducks DuckLink
   - buildExampleSketch 1.Ducks MamaDuck
