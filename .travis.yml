@@ -13,6 +13,9 @@ before_install:
   - if [[ "$BOARD" =~ "esp32:esp32:" ]]; then
       arduino-cli core install esp32:esp32 --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json;
     fi
+  - arduino-cli lib install --git-url https://github.com/contrem/arduino-timer.git
+  - arduino-cli lib istall --git-url https://github.com/jgromes/RadioLib.git
+
   - buildExampleSketch() { arduino-cli compile -v -t -b $BOARD $PWD/examples/$1/$2/$2.ino; }
 script:
   - buildExampleSketch 1.Ducks DuckLink
