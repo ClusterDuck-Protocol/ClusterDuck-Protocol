@@ -35,24 +35,24 @@ script:
   - buildExampleSketch 1.Ducks DuckLink
   - buildExampleSketch 1.Ducks MamaDuck
   - buildExampleSketch 1.Ducks PapaDuck
-#   - buildExampleSketch 1.Ducks DetectorDuck
-#   - buildExampleSketch 2.Custom-MamaDuck-Example
-#   - buildExampleSketch 3.Sensor-Examples BMP180Example
-#   - buildExampleSketch 3.Sensor-Examples BMP280Example
-#   - buildExampleSketch 3.Sensor-Examples DHT11Example
-#   - buildExampleSketch 3.Sensor-Examples DustSensorExample
-#   - buildExampleSketch 3.Sensor-Examples MQ7Example
-#   - buildExampleSketch 3.Sensor-Examples WS287Example
-#   - if [[ "$BOARD" != "esp32:esp32:t-beam" ]]; then
-#       buildExampleSketch 4.Ble-Duck-App Ble-Duck-App;
-#     fi
-#   - buildExampleSketch 5.Papa-Iridium-Example Papa-DishDuck
-#   - buildExampleSketch 5.Papa-Iridium-Example Papa-DishDuck-WiFi
-#   - buildExampleSketch 6.PaPi-DMS-Lite-Examples Serial-PaPiDuckExample
-#   - buildExampleSketch 6.PaPi-DMS-Lite-Examples Wifi-PaPiDuckExample
-#   - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]]; then
-#       buildExampleSketch 7.TTGO-TBeam-Examples TTGO-APX-Examples;
-#     fi
-#   - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]]; then
-#       buildExampleSketch 7.TTGO-TBeam-Examples TTGOGPSExample;
-#     fi
+  - buildExampleSketch 1.Ducks DetectorDuck
+  - buildExampleSketch 2.Custom-MamaDuck-Example
+  - buildExampleSketch 3.Sensor-Examples BMP180Example
+  - buildExampleSketch 3.Sensor-Examples BMP280Example
+  - buildExampleSketch 3.Sensor-Examples DHT11Example
+  - buildExampleSketch 3.Sensor-Examples DustSensorExample
+  - buildExampleSketch 3.Sensor-Examples MQ7Example
+  - buildExampleSketch 3.Sensor-Examples WS287Example
+  - if [[ "$BOARD" != "esp32:esp32:t-beam" ]]; then
+      buildExampleSketch 4.Ble-Duck-App Ble-Duck-App;
+    fi
+  - buildExampleSketch 5.Papa-Iridium-Example Papa-DishDuck
+  - buildExampleSketch 5.Papa-Iridium-Example Papa-DishDuck-WiFi
+  - buildExampleSketch 6.PaPi-DMS-Lite-Examples Serial-PaPiDuckExample
+  - buildExampleSketch 6.PaPi-DMS-Lite-Examples Wifi-PaPiDuckExample
+  - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]]; then
+      buildExampleSketch 7.TTGO-TBeam-Examples TTGO-APX-Examples;
+    fi
+  - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]]; then
+      buildExampleSketch 7.TTGO-TBeam-Examples TTGOGPSExample;
+    fi
