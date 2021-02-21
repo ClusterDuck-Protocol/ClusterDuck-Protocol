@@ -1,4 +1,4 @@
-language: generic
+anguage: generic
 env:
   global:
     - CLI_VERSION=master
@@ -26,11 +26,12 @@ before_install:
   - arduino-cli lib install --git-url https://github.com/adafruit/Adafruit_Sensor
   - arduino-cli lib install --git-url https://github.com/knolleary/pubsubclient.git
   - arduino-cli lib install --git-url https://github.com/adafruit/Adafruit_BMP085_Unified
-  https://github.com/miguel5612/MQSensorsLib.git
-  https://github.com/mikalhart/IridiumSBD.git
   - arduino-cli lib install --git-url https://github.com/luciansabo/GP2YDustSensor.git
   - arduino-cli lib install --git-url https://github.com/adafruit/DHT-sensor-library
   - arduino-cli lib install --git-url https://github.com/adafruit/Adafruit_BMP280_Library
+  - arduino-cli lib install --git-url https://github.com/miguel5612/MQSensorsLib.git
+  - arduino-cli lib install --git-url https://github.com/FastLED/FastLED.git
+  - arduino-cli lib install --git-url https://github.com/mikalhart/IridiumSBD.git
 
   - buildExampleSketch() { arduino-cli compile  -t -b $BOARD $PWD/examples/$1/$2/$2.ino; }
 script:
@@ -38,7 +39,7 @@ script:
   - buildExampleSketch 1.Ducks MamaDuck
   - buildExampleSketch 1.Ducks PapaDuck
   - buildExampleSketch 1.Ducks DetectorDuck
-  - buildExampleSketch 2.Custom-MamaDuck-Example Custom-MamaDuck-Example
+  - buildExampleSketch 2.Custom-Mama-Example Custom-Mama-Example
   - buildExampleSketch 3.Sensor-Examples BMP180Example
   - buildExampleSketch 3.Sensor-Examples BMP280Example
   - buildExampleSketch 3.Sensor-Examples DHT11Example
