@@ -33,6 +33,7 @@ before_install:
   - arduino-cli lib install --git-url https://github.com/adafruit/Adafruit_BMP280_Library
   
   - buildExampleSketch() { arduino-cli compile  -t -b $BOARD $PWD/examples/$1/$2/$2.ino; }
+  
 script:
   - buildExampleSketch 1.Ducks DuckLink
   - buildExampleSketch 1.Ducks MamaDuck
