@@ -25,6 +25,10 @@ before_install:
   - arduino-cli lib install --git-url https://github.com/bakercp/CRC32.git
   - arduino-cli lib install --git-url https://github.com/adafruit/Adafruit_Sensor
   - arduino-cli lib install --git-url https://github.com/knolleary/pubsubclient.git
+  - arduino-cli lib install --git-url https://github.com/adafruit/Adafruit_BMP085_Unified
+  - arduino-cli lib install --git-url https://github.com/luciansabo/GP2YDustSensor.git
+  - arduino-cli lib install --git-url https://github.com/adafruit/DHT-sensor-library
+  - arduino-cli lib install --git-url https://github.com/adafruit/Adafruit_BMP280_Library
 
   - buildExampleSketch() { arduino-cli compile  -t -b $BOARD $PWD/examples/$1/$2/$2.ino; }
 script:
