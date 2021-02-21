@@ -43,6 +43,7 @@ public:
   void setCursor(uint8_t x, uint8_t y) {}
   void print(String text) {}
   void clear(void) {}
+  void sendBuffer(void){}
   void log(String text) {}
   uint8_t getWidth() { return 0; }
   uint8_t getHeight() { return 0; }
@@ -94,6 +95,7 @@ public:
    * 
    */
   void clear(void);
+  void sendBuffer(void);
   void showDefaultScreen();
   uint8_t getWidth() {return width;}
   uint8_t getHeight() {return height;}
