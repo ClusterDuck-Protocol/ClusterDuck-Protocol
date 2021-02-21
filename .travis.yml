@@ -26,6 +26,8 @@ before_install:
   - arduino-cli lib install --git-url https://github.com/adafruit/Adafruit_Sensor
   - arduino-cli lib install --git-url https://github.com/knolleary/pubsubclient.git
   - arduino-cli lib install --git-url https://github.com/adafruit/Adafruit_BMP085_Unified
+  https://github.com/miguel5612/MQSensorsLib.git
+  https://github.com/mikalhart/IridiumSBD.git
   - arduino-cli lib install --git-url https://github.com/luciansabo/GP2YDustSensor.git
   - arduino-cli lib install --git-url https://github.com/adafruit/DHT-sensor-library
   - arduino-cli lib install --git-url https://github.com/adafruit/Adafruit_BMP280_Library
@@ -42,14 +44,14 @@ script:
   - buildExampleSketch 3.Sensor-Examples DHT11Example
   - buildExampleSketch 3.Sensor-Examples DustSensorExample
   - buildExampleSketch 3.Sensor-Examples MQ7Example
-  - buildExampleSketch 3.Sensor-Examples WS287Example
+  - buildExampleSketch 3.Sensor-Examples WS2812Example
   - if [[ "$BOARD" != "esp32:esp32:t-beam" ]]; then
       buildExampleSketch 4.Ble-Duck-App Ble-Duck-App;
     fi
   - buildExampleSketch 5.Papa-Iridium-Example Papa-DishDuck
   - buildExampleSketch 5.Papa-Iridium-Example Papa-DishDuck-WiFi
   - buildExampleSketch 6.PaPi-DMS-Lite-Examples Serial-PaPiDuckExample
-  - buildExampleSketch 6.PaPi-DMS-Lite-Examples Wifi-PaPiDuckExample
+  - buildExampleSketch 6.PaPi-DMS-Lite-Examples WiFi-PaPiDuckExample
   - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]]; then
       buildExampleSketch 7.TTGO-TBeam-Examples TTGO-APX-Examples;
     fi
