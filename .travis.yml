@@ -32,6 +32,8 @@ before_install:
   - arduino-cli lib install --git-url https://github.com/miguel5612/MQSensorsLib.git
   - arduino-cli lib install --git-url https://github.com/FastLED/FastLED.git
   - arduino-cli lib install --git-url https://github.com/mikalhart/IridiumSBD.git
+  - arduino-cli lib install --git-url https://github.com/lewisxhe/AXP202X_Library
+  - arduino-cli lib install --git-url https://github.com/mikalhart/TinyGPSPlus.git
 
   - buildExampleSketch() { arduino-cli compile  -t -b $BOARD $PWD/examples/$1/$2/$2.ino; }
 script:
