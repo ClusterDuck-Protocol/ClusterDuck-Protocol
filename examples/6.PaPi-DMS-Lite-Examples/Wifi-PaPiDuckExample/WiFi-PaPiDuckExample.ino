@@ -4,7 +4,7 @@
  * This is to be used with a PaPi/DMS-Lite device
  *
  * This example will configure and run a Papa Duck that connects to a local MQTT server
- * @date 2021-02-08
+ * @date 2021-02-22
  *
  */
 #include <ArduinoJson.h>
