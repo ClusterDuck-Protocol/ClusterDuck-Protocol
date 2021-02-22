@@ -7,18 +7,17 @@
  * @date 2021-02-22
  *
  */
+
+ /* CDP Headers */
+#include <CdpPacket.h>
+#include <PapaDuck.h>
+
 #include <ArduinoJson.h>
 #include <PubSubClient.h>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <arduino-timer.h>
 #include <string>
-
-/* CDP Headers */
-#include <CdpPacket.h>
-#include <PapaDuck.h>
-
-
 
 #define LORA_FREQ 915.0 // Frequency Range. Set for US Region 915.0Mhz
 #define LORA_TXPOWER 20 // Transmit Power
