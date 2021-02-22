@@ -167,6 +167,8 @@ void DuckDisplay::print(String s) { u8g2.print(s); }
 
 void DuckDisplay::clear(void) { u8g2.clear(); }
 
+void DuckDisplay::sendBuffer(void){  u8g2.sendBuffer();}
+ 
 String DuckDisplay::duckTypeToString(int duckType) {
   String duckTypeStr = "";
   switch (duckType) {
@@ -188,9 +190,7 @@ String DuckDisplay::duckTypeToString(int duckType) {
   return duckTypeStr;
 }
 
- // void DuckDisplay::drawXBM(0, 0, u8g_logo_width, u8g_logo_height, u8g_logo_bits){
- //  u8g2.drawXBM( 0, 0, u8g_logo_width, u8g_logo_height, u8g_logo_bits);
- // };
+
 
 
 void DuckDisplay::showDefaultScreen() {
