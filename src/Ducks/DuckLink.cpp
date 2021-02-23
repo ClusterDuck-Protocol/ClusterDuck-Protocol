@@ -1,7 +1,4 @@
 #include "../DuckLink.h"
-#include "../include/DuckCrypto.h"
-
-DuckCrypto test;
 
 int DuckLink::setupWithDefaults(std::vector<byte> deviceId, String ssid,
                                 String password) {
@@ -43,10 +40,6 @@ int DuckLink::setupWithDefaults(std::vector<byte> deviceId, String ssid,
   
   loginfo("DuckLink setup done");
   return DUCK_ERR_NONE;
-}
-
-void DuckLink::crypto(std::uint8_t* text, std::uint8_t* encryptedData, std::size_t inc) {
-  test.encryptData(text, encryptedData, inc);
 }
 
 void DuckLink::run() {
