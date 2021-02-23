@@ -14,7 +14,6 @@
 
 #include "timer.h"
 #include <MamaDuck.h>
-#include <DuckDisplay.h>
 
 #ifdef SERIAL_PORT_USBVIRTUAL
 #define Serial SERIAL_PORT_USBVIRTUAL
@@ -27,7 +26,6 @@
 #define DATA_PIN 4         // Pin on the board for connecting data in for LED
 #define NUM_LEDS 1        // Nuber of LEDS on your Led Strip (use 1 for single LED)
 CRGB leds[NUM_LEDS];  
-DuckDisplay* display = NULL;
 
 MamaDuck duck = MamaDuck();
 
@@ -47,10 +45,7 @@ void setup() {
   duck.setupWithDefaults(devId);
   Serial.println("MAMA-DUCK...READY!");
 
-  display = DuckDisplay::getInstance();
-  display->setupDisplay(duck.getType(), deviceId );
-  // we are done
-  display->showDefaultScreen();
+
 
   // initialize the timer. The timer thread runs separately from the main loop
   // and will trigger sending a counter message.
