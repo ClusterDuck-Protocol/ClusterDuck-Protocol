@@ -57,7 +57,7 @@ script:
   - buildExampleSketch 6.PaPi-DMS-Lite-Examples Serial-PaPiDuckExample
   
   - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]]; then
-      buildExampleSketch 7.TTGO-TBeam-Examples TTGOAPX-Examples;
+      buildExampleSketch 7.TTGO-TBeam-Examples TTGOAPX-Example;
     fi
   - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]]; then
       buildExampleSketch 7.TTGO-TBeam-Examples TTGOGPSExample;
