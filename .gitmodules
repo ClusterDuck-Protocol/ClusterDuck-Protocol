@@ -51,6 +51,3 @@
 [submodule "Libraries/RadioLib"]
 	path = Libraries/RadioLib
 	url = https://github.com/jgromes/RadioLib.git
-[submodule "Libraries/arduinolibs"]
-	path = Libraries/arduinolibs
-	url = https://github.com/rweather/arduinolibs.git
