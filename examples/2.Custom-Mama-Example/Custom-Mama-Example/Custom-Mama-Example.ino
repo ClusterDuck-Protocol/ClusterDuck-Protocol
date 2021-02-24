@@ -41,14 +41,14 @@ int counter = 1;
 void setup() {
   // The Device ID must be unique and 8 bytes long. Typically the ID is stored
   // in a secure nvram, or provided to the duck during provisioning/registration
-std::string deviceId("MAMA0001");
-std::vector<byte> devId;
-devId.insert(devId.end(), deviceId.begin(), deviceId.end()); 
+  std::string deviceId("MAMA0001");
+  std::vector<byte> devId;
+  devId.insert(devId.end(), deviceId.begin(), deviceId.end()); 
 
 
   //Set the Device ID
   duck.setDeviceId(devId);
-   // initialize the serial component with the hardware supported baudrate
+  // initialize the serial component with the hardware supported baudrate
   duck.setupSerial(115200);
   // initialize the LoRa radio with specific settings. This will overwrites settings defined in the CDP config file cdpcfg.h
   duck.setupRadio(LORA_FREQ, LORA_CS_PIN, LORA_RST_PIN, LORA_DIO0_PIN, LORA_DIO1_PIN, LORA_TXPOWER);
@@ -94,9 +94,9 @@ bool runSensor(void *) {
 
   result = sendData(buffer, length);
   if (result) {
-     Serial.println("[MAMA] runSensor ok.");
+    Serial.println("[MAMA] runSensor ok.");
   } else {
-     Serial.println("[MAMA] runSensor failed.");
+    Serial.println("[MAMA] runSensor failed.");
   }
   return result;
 }
@@ -107,8 +107,8 @@ bool sendData(const byte* buffer, int length) {
   // Send Data can either take a byte buffer (unsigned char) or a vector
   int err = duck.sendData(topics::status, buffer, length);
   if (err == DUCK_ERR_NONE) {
-     counter++;
-     sentOk = true;
+    counter++;
+    sentOk = true;
   }
   if (!sentOk) {
     Serial.println("[MAMA] Failed to send data. error = " + String(err));

@@ -35,6 +35,7 @@ public:
    */
   int setupWithDefaults(std::vector<byte> deviceId, String ssid="", String password="");
 
+
   /**
    * @brief Get the DuckType
    *
