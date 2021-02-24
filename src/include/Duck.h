@@ -205,9 +205,44 @@ public:
    */
   String getErrorString(int error);
 
+  /**
+   * @brief Turn on or off encryption.
+   * 
+   * @param state true for on, false for off
+   */
   void setEncrypt(bool state);
+
+  /**
+   * @brief Set new AES key for encryption.
+   * 
+   * @param newKEY byte array, must be 32 bytes
+   */
   void setAESKey(uint8_t newKEY[32]);
+
+  /**
+   * @brief Set new AES initialization vector.
+   * 
+   * @param newIV byte array, must be 16 bytes
+   */
   void setAESIv(uint8_t newIV[16]);
+
+  /**
+   * @brief Encrypt data using AES-256 CTR.
+   * 
+   * @param text pointer to byte array of plaintext
+   * @param encryptedData pointer to byte array to store encrypted message
+   * @param inc size of text to be encrypted
+   */
+  void encrypt(uint8_t* text, uint8_t* encryptedData, size_t inc);
+
+  /**
+   * @brief Decrypt data using AES-256 CTR.
+   * 
+   * @param encryptedData pointer to byte array to be decrypted
+   * @param text pointer to byte array to store decrypted plaintext
+   * @param inc size of text to be decrypted
+   */
+  void decrypt(uint8_t* encryptedData, uint8_t* text, size_t inc);
 
 protected:
   String duckName="";

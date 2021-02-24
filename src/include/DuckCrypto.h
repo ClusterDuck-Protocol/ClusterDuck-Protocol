@@ -3,8 +3,6 @@
  * @brief This file is internal to CDP and provides the library access to
  * encryption functions.
  *
- * The implementation is conditioned by the `CDPCFG_ENCRYPTION_NONE` flag which may be
- * defined in `cdpcfh.h` to disable encryption.
  * @version
  * @date 2021-02-10
  *
