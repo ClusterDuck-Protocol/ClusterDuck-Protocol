@@ -82,10 +82,11 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
   // set the interrupt handler to execute when packet tx or rx is done.
   lora.setDio0Action(config.func);
   // set sync word to private network
-  if (lora.setSyncWord(0x12) != ERR_NONE) {
-    logerr("ERROR  sync word is invalid");
-    return DUCKLORA_ERR_SETUP;
-  }
+  lora.setSyncWord(0x99);
+  // if (lora.setSyncWord(0x99) != ERR_NONE) {
+  //   logerr("ERROR  sync word is invalid");
+  //   return DUCKLORA_ERR_SETUP;
+  // }
 
   rc = lora.startReceive();
 
