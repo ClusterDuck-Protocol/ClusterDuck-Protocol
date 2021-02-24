@@ -206,6 +206,8 @@ public:
   String getErrorString(int error);
 
   void setEncrypt(bool state);
+  void setAESKey(uint8_t newKEY[32]);
+  void setAESIv(uint8_t newIV[16]);
 
 protected:
   String duckName="";

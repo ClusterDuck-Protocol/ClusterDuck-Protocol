@@ -123,7 +123,7 @@ int DuckPacket::prepareForSending(std::vector<byte> targetDevice, byte duckType,
   logdbg("Data CRC:  " + duckutils::convertToHex(buffer.data(), buffer.size()));
 
   // ----- insert data -----
-  if(duckcrypto::encryptOn) {
+  if(duckcrypto::getState()) {
 
     std::vector<uint8_t> encryptedData;
     encryptedData.resize(app_data.size());

@@ -11,6 +11,8 @@ namespace duckcrypto {
       encryptOn = state;
    }
 
+   bool getState() { return encryptOn; }
+
    void encryptData(uint8_t* text, uint8_t* encryptedData, size_t inc)
    {
       size_t posn, len;

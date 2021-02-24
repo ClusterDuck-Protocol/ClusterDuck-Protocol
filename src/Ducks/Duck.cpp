@@ -9,7 +9,15 @@ Duck::Duck(String name) {
 }
 
 void Duck::setEncrypt(bool state) {
-    duckcrypto::setEncrypt(state);
+  duckcrypto::setEncrypt(state);
+}
+
+void Duck::setAESKey(uint8_t newKEY[32]) {
+  duckcrypto::setAESKey(newKEY);
+}
+
+void Duck::setAESIv(uint8_t newIV[16]) {
+  duckcrypto::setAESIV(newIV);
 }
 
 int Duck::setDeviceId(std::vector<byte> id) {

@@ -33,6 +33,7 @@ namespace duckcrypto {
    }
 
    void setEncrypt(bool state);
+   bool getState();
 
    void encryptData(uint8_t* text, uint8_t* encryptedData, size_t inc);
    void decryptData(uint8_t* encryptedData, uint8_t* text, size_t inc);
