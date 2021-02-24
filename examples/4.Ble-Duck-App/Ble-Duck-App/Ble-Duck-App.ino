@@ -36,10 +36,6 @@ char message[32];
 int counter = 1;
 
 void setup() {
-
-  duck.setupSerial();
-  duck.setupRadio();
-
   // We are using a hardcoded device id here, but it should be retrieved or
   // given during the device provisioning then converted to a byte vector to
   // setup the duck NOTE: The Device ID must be exactly 8 bytes otherwise it
@@ -49,8 +45,14 @@ void setup() {
   devId.insert(devId.end(), deviceId.begin(), deviceId.end());
   duck.setDeviceId(devId);
 
+  duck.setupSerial();
+  duck.setupRadio();
+
   Serial.println("MAMA-DUCK...READY!");
-  SerialBT.begin("MamaDuck1"); //Bluetooth device name
+
+  // Bluetooth display name
+  // This is what will be displyed in you Bluetooth settings
+  SerialBT.begin("MamaDuck1"); 
   Serial.println("The device started, now you can pair it with bluetooth!");
 
 }

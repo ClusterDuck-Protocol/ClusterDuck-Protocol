@@ -134,12 +134,15 @@ void quackJson(std::vector<byte> packetBuffer) {
   doc["hops"].set(packet.hopCount);
   doc["duckType"].set(packet.duckType);
 
-  display->clear();
-  display->drawString(1, 1, sduid.c_str());
   std::string cdpTopic = toTopicString(packet.topic);
-  display->drawString(1, 2, muid.c_str());
-  display->drawString(1, 3, cdpTopic.c_str());
 
+  display->clear();
+  display->drawString(0, 10, "New Message");
+  display->drawString(0, 20, sduid.c_str());
+  display->drawString(0, 30, muid.c_str());
+  display->drawString(0, 40, cdpTopic.c_str());
+  display->sendBuffer();
+    
   std::string topic = "iot-2/evt/" + cdpTopic + "/fmt/json";
 
   String jsonstat;
@@ -150,10 +153,12 @@ void quackJson(std::vector<byte> packetBuffer) {
     serializeJsonPretty(doc, Serial);
     Serial.println("");
     Serial.println("[PAPA] Publish ok");
-    display->drawString(1, 6, "Publish ok");
+    display->drawString(0, 60, "Publish ok");
+     display->sendBuffer();
   } else {
     Serial.println("[PAPA] Publish failed");
-    display->drawString(1, 6, "Publish failed");
+    display->drawString(0, 60, "Publish failed");
+    display->sendBuffer();
   }
 }
 
