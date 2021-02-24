@@ -7,6 +7,10 @@ namespace duckcrypto {
    // Initializing the cipher (CTR with AES256)
    CTR<AES256> ctraes256;
 
+   void setEncrypt(bool state) {
+      encryptOn = state;
+   }
+
    void encryptData(uint8_t* text, uint8_t* encryptedData, size_t inc)
    {
       size_t posn, len;

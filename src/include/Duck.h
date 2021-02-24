@@ -6,6 +6,7 @@
 #include "DuckRadio.h"
 #include "DuckTypes.h"
 #include "DuckPacket.h"
+#include "DuckCrypto.h"
 #include "cdpcfg.h"
 #include <Arduino.h>
 #include <WString.h>
@@ -203,6 +204,8 @@ public:
    * @returns a string describing the error. 
    */
   String getErrorString(int error);
+
+  void setEncrypt(bool state);
 
 protected:
   String duckName="";

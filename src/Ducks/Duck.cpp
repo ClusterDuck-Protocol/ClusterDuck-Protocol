@@ -8,6 +8,10 @@ Duck::Duck(String name) {
   duckName = name;
 }
 
+void Duck::setEncrypt(bool state) {
+    duckcrypto::setEncrypt(state);
+}
+
 int Duck::setDeviceId(std::vector<byte> id) {
   if (id.size() != DUID_LENGTH) {
     logerr("ERROR  device id too long rc = " + String(DUCK_ERR_NONE));

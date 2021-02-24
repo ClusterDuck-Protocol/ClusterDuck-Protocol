@@ -123,20 +123,18 @@ int DuckPacket::prepareForSending(std::vector<byte> targetDevice, byte duckType,
   logdbg("Data CRC:  " + duckutils::convertToHex(buffer.data(), buffer.size()));
 
   // ----- insert data -----
-  #ifdef ENCRYPTION
-  
-  std::vector<uint8_t> encryptedData;
-  encryptedData.resize(app_data.size());
-  duckcrypto::encryptData(app_data.data(), encryptedData.data(), app_data.size());
-  buffer.insert(buffer.end(), encryptedData.begin(), encryptedData.end());
-  logdbg("Encrypted Data:      " + duckutils::convertToHex(buffer.data(), buffer.size()));
+  if(duckcrypto::encryptOn) {
 
-  #else
-  
-  buffer.insert(buffer.end(), app_data.begin(), app_data.end());
-  logdbg("Data:      " + duckutils::convertToHex(buffer.data(), buffer.size()));
-  
-  #endif
+    std::vector<uint8_t> encryptedData;
+    encryptedData.resize(app_data.size());
+    duckcrypto::encryptData(app_data.data(), encryptedData.data(), app_data.size());
+    buffer.insert(buffer.end(), encryptedData.begin(), encryptedData.end());
+    logdbg("Encrypted Data:      " + duckutils::convertToHex(buffer.data(), buffer.size()));
+
+  } else {
+    buffer.insert(buffer.end(), app_data.begin(), app_data.end());
+    logdbg("Data:      " + duckutils::convertToHex(buffer.data(), buffer.size()));
+  }
   
   // ----- insert path -----
   buffer.insert(buffer.end(), duid.begin(), duid.end());
