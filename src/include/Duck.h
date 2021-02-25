@@ -82,6 +82,13 @@ public:
                   int txPower = CDPCFG_RF_LORA_TXPOW);
 
   /**
+   * @brief Set sync word used to communicate between radios. 0x12 for private and 0x34 for public channels.
+   * 
+   * @param syncWord set byte syncWord
+   */
+  void setSyncWord(byte syncWord);
+
+  /**
    * @brief Setup WiFi access point.
    *
    * @param accessPoint a string representing the access point. Default to
