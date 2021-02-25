@@ -66,6 +66,7 @@ bool DuckPacket::relay(std::vector<byte> duid, std::vector<byte> path_section) {
 
 int DuckPacket::prepareForSending(std::vector<byte> targetDevice, byte duckType, byte topic, std::vector<byte> app_data) {
 
+  std::vector<uint8_t> encryptedData;
   uint8_t app_data_length = app_data.size();
 
   this->reset();
@@ -81,8 +82,16 @@ int DuckPacket::prepareForSending(std::vector<byte> targetDevice, byte duckType,
   duckutils::getRandomBytes(MUID_LENGTH, message_id);
 
   byte crc_bytes[DATA_CRC_LENGTH];
+  uint32_t value;
   // TODO: update the CRC32 library to return crc as a byte array
-  uint32_t value = CRC32::calculate(app_data.data(), app_data.size());
+  if(duckcrypto::getState()) {
+    encryptedData.resize(app_data.size());
+    duckcrypto::encryptData(app_data.data(), encryptedData.data(), app_data.size());
+    value = CRC32::calculate(encryptedData.data(), encryptedData.size());
+  } else {
+    value = CRC32::calculate(app_data.data(), app_data.size());
+  }
+  
   crc_bytes[0] = (value >> 24) & 0xFF;
   crc_bytes[1] = (value >> 16) & 0xFF;
   crc_bytes[2] = (value >> 8) & 0xFF;
@@ -125,9 +134,6 @@ int DuckPacket::prepareForSending(std::vector<byte> targetDevice, byte duckType,
   // ----- insert data -----
   if(duckcrypto::getState()) {
 
-    std::vector<uint8_t> encryptedData;
-    encryptedData.resize(app_data.size());
-    duckcrypto::encryptData(app_data.data(), encryptedData.data(), app_data.size());
     buffer.insert(buffer.end(), encryptedData.begin(), encryptedData.end());
     logdbg("Encrypted Data:      " + duckutils::convertToHex(buffer.data(), buffer.size()));
 
