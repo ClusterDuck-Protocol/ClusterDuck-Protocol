@@ -51,3 +51,6 @@
 [submodule "Libraries/RadioLib"]
 	path = Libraries/RadioLib
 	url = https://github.com/jgromes/RadioLib.git
+[submodule "Libraries/Crypto"]
+	path = Libraries/Crypto
+	url = https://github.com/Project-Owl/Crypto.git
