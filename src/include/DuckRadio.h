@@ -65,7 +65,14 @@ public:
    * @returns 0 if initialization was successful, an error code otherwise. 
    */
   int setupRadio(LoraConfigParams config);
-  
+
+  /**
+   * @brief Set sync word used to communicate between radios. 0x12 for private and 0x34 for public channels.
+   * 
+   * @param syncWord set byte syncWord
+   */
+  void setSyncWord(byte syncWord);
+
   /**
    * @brief Send packet data out into the LoRa mesh network
    *
@@ -163,6 +170,7 @@ private:
   DuckRadio& operator=(DuckRadio const&) = delete;
   static DuckRadio* instance;
   DuckDisplay* display = DuckDisplay::getInstance();
+  int err;
 };
 
 #endif

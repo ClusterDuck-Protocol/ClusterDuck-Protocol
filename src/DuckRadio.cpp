@@ -81,8 +81,10 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
 
   // set the interrupt handler to execute when packet tx or rx is done.
   lora.setDio0Action(config.func);
+
   // set sync word to private network
-  if (lora.setSyncWord(0x12) != ERR_NONE) {
+  err = lora.setSyncWord(0x12);
+  if (err != ERR_NONE) {
     logerr("ERROR  sync word is invalid");
     return DUCKLORA_ERR_SETUP;
   }
@@ -94,6 +96,14 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
     return DUCKLORA_ERR_RECEIVE;
   }
   return DUCK_ERR_NONE;
+}
+
+void DuckRadio::setSyncWord(byte syncWord) {
+  int error = lora.setSyncWord(syncWord);
+  if (error != ERR_NONE) {
+    logerr("ERROR  sync word is invalid");
+  }
+  lora.startReceive();
 }
 
 int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {

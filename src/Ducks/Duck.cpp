@@ -111,6 +111,10 @@ int Duck::setupRadio(float band, int ss, int rst, int di0, int di1,
   return DUCK_ERR_NONE;
 }
 
+void Duck::setSyncWord(byte syncWord) {
+  duckRadio->setSyncWord(syncWord);
+}
+
 int Duck::setupWebServer(bool createCaptivePortal, String html) {
   int err = DUCK_ERR_NONE;
   duckNet->setDeviceId(duid);
