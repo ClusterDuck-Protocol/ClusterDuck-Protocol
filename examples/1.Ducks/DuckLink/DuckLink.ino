@@ -48,7 +48,7 @@ bool runSensor(void *) {
   bool result = false;
   const byte* buffer;
   
-  String message = String("link samd:") + String(counter);
+  String message = String("Counter:") + String(counter);
   Serial.print("[LINK] sensor data: ");
   Serial.println(message);
   
