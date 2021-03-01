@@ -1,15 +1,17 @@
 
 /**
- * @file Custom-Mama-Example.ino
+ * @file Custom-Portal-Example.ino
  * @brief Uses the built in Mama Duck.
  * 
- * This example is a Custom Mama Duck with an Oled display, and it is periodically sending a message in the Mesh
+ * This example is a Custom Mama Duck with a captive emergency portal, and it is periodically sending a message in the Mesh
  * 
  */
 
 #include <string>
 #include <arduino-timer.h>
 #include <MamaDuck.h>
+// You can build and modify your own Captive Portal by making edits to emergencyPortal.h 
+#include "emergencyPortal.h"
 
 #ifdef SERIAL_PORT_USBVIRTUAL
 #define Serial SERIAL_PORT_USBVIRTUAL
@@ -56,15 +58,15 @@ void setup() {
   duck.setupWifi();
   // initialize DNS
   duck.setupDns();
-  // initialize web server, enabling the captive portal with a custom HTML page
-  duck.setupWebServer(true);
+  // initialize web server, enabling the captive portal and pass in a Custom Captive portal from emergencyPortal.h
+  duck.setupWebServer(true, emergencyPortal);
   // initialize Over The Air firmware upgrade
   duck.setupOTA();
+
   // This duck has an OLED display and we want to use it. 
   // Get an instance and initialize it, so we can use in our application
   display = DuckDisplay::getInstance();
   display->setupDisplay(duck.getType(), devId);
-  // we are done
   display->showDefaultScreen();
 
   // Initialize the timer. The timer thread runs separately from the main loop
@@ -115,7 +117,6 @@ bool sendData(const byte* buffer, int length) {
   }
   return sentOk;
 }
-
 
 
 
