@@ -31,10 +31,21 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid,
 
   if (ssid.length() != 0 && password.length() != 0) {
     err = setupInternet(ssid, password);
+
     if (err != DUCK_ERR_NONE) {
       logerr("ERROR setupWithDefaults  rc = " + String(err));
       return err;
     }
+  } else {
+    err = duckNet->loadWiFiCredentials();
+
+    if (err != DUCK_ERR_NONE) {
+      logerr("ERROR setupWithDefaults  rc = " + String(err));
+      duckNet->loadWiFiCredentials();
+      return err;
+    }
+    
+    
   }
 
     err = setupWebServer(false);

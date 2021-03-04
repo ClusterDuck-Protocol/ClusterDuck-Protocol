@@ -32,6 +32,7 @@
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <esp_int_wdt.h>
+#include <EEPROM.h>
 #include <esp_task_wdt.h>
 
 #include "../DuckError.h"
@@ -139,6 +140,17 @@ public:
    *
    * @param val the ssid string to set
    */
+
+  int saveWifiCredentials(String ssid, String password);
+  /**
+   * @brief Save Wifi credentials to EEPROM
+   *
+   * @param ssid        the ssid of the WiFi network
+   * @param password    password to join the network
+   */
+
+  int loadWiFiCredentials();
+
   void setSsid(String val);
 
   /**

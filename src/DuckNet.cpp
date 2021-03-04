@@ -184,6 +184,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
 
     if (ssid != "" && password != "") {
       setupInternet(ssid, password);
+      saveWifiCredentials(ssid, password);
       request->send(200, "text/plain", "Success");
     } else {
       request->send(500, "text/plain", "There was an error");
@@ -240,13 +241,80 @@ int DuckNet::setupDns() {
   return DUCK_ERR_NONE;
 }
 
+int DuckNet::saveWifiCredentials(String ssid, String password) {
+this->ssid = ssid;
+this->password = password;
+
+
+EEPROM.begin(512);
+
+if (ssid.length() > 0 && password.length() > 0) {
+        Serial.println("clearing eeprom");
+        for (int i = 0; i < 96; ++i) {
+          EEPROM.write(i, 0);
+        }
+
+        Serial.println("writing eeprom ssid:");
+        for (int i = 0; i < ssid.length(); ++i)
+        {
+          EEPROM.write(i, ssid[i]);
+          Serial.print("Wrote: ");
+          Serial.println(ssid[i]);
+        }
+        Serial.println("writing eeprom pass:");
+        for (int i = 0; i < password.length(); ++i)
+        {
+          EEPROM.write(32 + i, password[i]);
+          Serial.print("Wrote: ");
+          Serial.println(password[i]);
+        }
+        EEPROM.commit();}
+
+}
+
+int DuckNet::loadWiFiCredentials(){
+  EEPROM.begin(512); //Initialasing EEPROM
+
+  Serial.println("Reading EEPROM ssid");
+
+  String esid;
+  for (int i = 0; i < 32; ++i)
+  {
+    esid += char(EEPROM.read(i));
+  }
+  Serial.print("SSID: ");
+  Serial.println(esid);
+  Serial.println("Reading EEPROM pass");
+
+  String epass = "";
+  for (int i = 32; i < 96; ++i)
+  {
+    epass += char(EEPROM.read(i));
+  }
+  Serial.print("PASS: ");
+  Serial.println(epass);
+  if (esid.length() == 0 || epass.length() == 0){
+     logerr("ERROR setupInternet: Please provide an ssid and password for connecting to a wifi access point");
+    return DUCK_ERR_SETUP;
+  } else{
+
+ return DUCK_ERR_NONE;
+  setupInternet(esid, epass);
+  logerr("Setup Internet With Saved Credentials");
+  }
+    
+}
+
+
 int DuckNet::setupInternet(String ssid, String password) {
   this->ssid = ssid;
   this->password = password;
-  if (ssid == "" || password == "") {
-    logerr("ERROR setupInternet: Please provide an ssid and password for connecting to a wifi access point");
-    return DUCK_INTERNET_ERR_SETUP;
-  }
+  logerr("------ TEST LINE------");
+  logerr(ssid);
+  logerr(password);
+ 
+  
+
   if (!ssidAvailable(ssid)) {
     logerr("ERROR setupInternet: " + ssid + " is not available. Please check the provided ssid and/or passwords");
     return DUCK_INTERNET_ERR_SSID;
@@ -263,6 +331,7 @@ int DuckNet::setupInternet(String ssid, String password) {
   loginfo("Duck connected to internet!");
 
   return DUCK_ERR_NONE;
+
 }
 
 bool DuckNet::ssidAvailable(String val) {
