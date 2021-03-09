@@ -1,7 +1,7 @@
 #include "../PapaDuck.h"
 
 int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid,
-                                String password) {
+  String password) {
   loginfo("setupWithDefaults...");
 
   int err = Duck::setupWithDefaults(deviceId, ssid, password);
@@ -17,17 +17,31 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid,
     return err;
   }
 
-    err = setupWifi("PapaDuck Setup");
-    if (err != DUCK_ERR_NONE) {
-      logerr("ERROR setupWithDefaults  rc = " + String(err));
-      return err;
-    }
+  err = setupWifi("PapaDuck Setup");
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR setupWithDefaults  rc = " + String(err));
+    return err;
+  }
 
-    err = setupDns();
-    if (err != DUCK_ERR_NONE) {
-      logerr("ERROR setupWithDefaults  rc = " + String(err));
-      return err;
-    }
+  err = setupDns();
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR setupWithDefaults  rc = " + String(err));
+    return err;
+  }
+
+
+
+  err = setupWebServer(false);
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR setupWithDefaults  rc = " + String(err));
+    return err;
+  }
+
+  err = setupOTA();
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR setupWithDefaults  rc = " + String(err));
+    return err;
+  }
 
   if (ssid.length() != 0 && password.length() != 0) {
     err = setupInternet(ssid, password);
@@ -36,29 +50,23 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid,
       logerr("ERROR setupWithDefaults  rc = " + String(err));
       return err;
     }
-  } else {
+  } 
+
+  if (ssid.length() == 0 && password.length() == 0) {
+   
     err = duckNet->loadWiFiCredentials();
 
     if (err != DUCK_ERR_NONE) {
       logerr("ERROR setupWithDefaults  rc = " + String(err));
-      duckNet->loadWiFiCredentials();
+     
       return err;
     }
     
     
   }
 
-    err = setupWebServer(false);
-    if (err != DUCK_ERR_NONE) {
-      logerr("ERROR setupWithDefaults  rc = " + String(err));
-      return err;
-    }
 
-    err = setupOTA();
-    if (err != DUCK_ERR_NONE) {
-      logerr("ERROR setupWithDefaults  rc = " + String(err));
-      return err;
-    }
+
   loginfo("setupWithDefaults done");
   return DUCK_ERR_NONE;
 }
@@ -86,7 +94,7 @@ void PapaDuck::handleReceivedPacket() {
 
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR handleReceivedPacket. Failed to get data. rc = " +
-           String(err));
+     String(err));
     return;
   }
   // ignore pings
@@ -98,8 +106,8 @@ void PapaDuck::handleReceivedPacket() {
   bool relay = rxPacket->prepareForRelaying(duid, data);
   if (relay) {
     logdbg("relaying:  " +
-            duckutils::convertToHex(rxPacket->getBuffer().data(),
-                                    rxPacket->getBuffer().size()));
+      duckutils::convertToHex(rxPacket->getBuffer().data(),
+        rxPacket->getBuffer().size()));
     loginfo("invoking callback in the duck application...");
     recvDataCallback(rxPacket->getBuffer());
     loginfo("handleReceivedPacket() DONE");

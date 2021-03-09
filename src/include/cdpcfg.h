@@ -342,6 +342,7 @@
 #define CDPCFG_PIN_LORA_DIO0 26
 #define CDPCFG_PIN_LORA_RST 14
 
+
 // Oled Display settings
 #define CDPCFG_PIN_OLED_CLOCK 15
 #define CDPCFG_PIN_OLED_DATA 4
@@ -418,6 +419,7 @@
 #else
 // classic default
 #define CDPCFG_OLED_CLASS U8G2_SSD1306_128X64_NONAME_F_SW_I2C
+
 #endif
 #endif
 
