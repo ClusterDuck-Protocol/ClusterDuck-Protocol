@@ -55,7 +55,7 @@ bool runSensor(void *) {
   bool result;
   const byte* buffer;
   
-  String message = String("mama0001:") + String(counter);
+  String message = String("Counter:") + String(counter);
   int length = message.length();
   Serial.print("[MAMA] sensor data: ");
   Serial.println(message);
