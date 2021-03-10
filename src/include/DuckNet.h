@@ -143,13 +143,16 @@ public:
 
   int saveWifiCredentials(String ssid, String password);
   /**
-   * @brief Save Wifi credentials to EEPROM
+   * @brief Save / Write Wifi credentials to EEPROM
    *
    * @param ssid        the ssid of the WiFi network
    * @param password    password to join the network
    */
 
   int loadWiFiCredentials();
+  /**
+   * @brief Load Wifi credentials from EEPROM
+   */
 
   void setSsid(String val);
 

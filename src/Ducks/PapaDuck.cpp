@@ -53,7 +53,9 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid,
   } 
 
   if (ssid.length() == 0 && password.length() == 0) {
-   
+  // If WiFi credentials inside the INO are empty use the saved credentials
+  // TODO: if the portal credentials were saved and the INO contains credentials it won't
+  // take the Portal credentials on setup
     err = duckNet->loadWiFiCredentials();
 
     if (err != DUCK_ERR_NONE) {
