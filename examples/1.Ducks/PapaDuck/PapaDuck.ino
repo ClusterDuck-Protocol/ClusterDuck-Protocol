@@ -23,18 +23,18 @@
 #define MQTT_RETRY_DELAY_MS 500
 #define WIFI_RETRY_DELAY_MS 5000
 
-#define SSID "Novahotel - WiFi"
-#define PASSWORD "Novahotel2"
+#define SSID ""
+#define PASSWORD ""
 
 
 
 
 // Used for Mqtt client connection
 // Provided when a Papa Duck device is created in DMS
-#define ORG         "9c6nfo"
-#define DEVICE_ID   "TIMO_DUCK"
-#define DEVICE_TYPE "PAPA"
-#define TOKEN       "qQTQ5q(4qvAVSlxdHu"
+#define ORG         ""
+#define DEVICE_ID   ""
+#define DEVICE_TYPE ""
+#define TOKEN       ""
 char server[] = ORG ".messaging.internetofthings.ibmcloud.com";
 char authMethod[] = "use-token-auth";
 char token[] = TOKEN;
