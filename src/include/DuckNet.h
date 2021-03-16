@@ -41,6 +41,7 @@
 #include "OTAPage.h"
 #include "index.h"
 #include "wifiCredentials.h"
+#include "controlPanel.h"
 
 #endif
 

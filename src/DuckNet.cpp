@@ -51,6 +51,10 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     request->send(200, "text/html", portal);
   });
 
+  webServer.on("/control-panel", HTTP_GET, [&](AsyncWebServerRequest* request) {
+    request->send(200, "text/html", control_panel);
+  });
+
   // Update Firmware OTA
   webServer.on("/update", HTTP_GET, [&](AsyncWebServerRequest* request) {
     if (!request->authenticate(http_username, http_password))
