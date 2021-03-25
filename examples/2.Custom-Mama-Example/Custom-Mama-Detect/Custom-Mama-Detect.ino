@@ -1,5 +1,5 @@
 /**
- * @file MamaDuck.ino
+ * @file Custom-Mama-Detect.ino
  * @brief Uses the built in Mama Duck.
  * 
  * This example is a Mama Duck, but it is also periodically sending a message in the Mesh

@@ -44,6 +44,7 @@ script:
   - buildExampleSketch 1.Ducks DetectorDuck
   - buildExampleSketch 2.Custom-Mama-Example Custom-Mama-Example
   - buildExampleSketch 2.Custom-Mama-Example Custom-Portal-Example
+  - buildExampleSketch 2.Custom-Mama-Example Custom-Mama-Detect
   - buildExampleSketch 3.Sensor-Examples BMP180Example
   - buildExampleSketch 3.Sensor-Examples BMP280Example
   - buildExampleSketch 3.Sensor-Examples DHT11Example
