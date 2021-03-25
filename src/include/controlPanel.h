@@ -1,7 +1,7 @@
 #ifndef CONTROLPANEL_H
 #define CONTROLPANEL_H
 
-const char control_panel[] PROGMEM = R"=====(
+const char controlPanel[] PROGMEM = R"=====(
 
 
    <!DOCTYPE html><html><head><title>Update Wifi Credentials</title>
@@ -43,8 +43,7 @@ const char control_panel[] PROGMEM = R"=====(
 
     
      <div class="main-box">
-     <h1>Use this page to update your Wifi credentials</h1>
-    <p>Fill in your SSID and WiFi Password in the form below.</p>
+     <h1>Control Panel</h1>
     <form action='/flipDetector' method='post'>
     <input type='submit' value='Detector On' />
  </form>

@@ -96,3 +96,5 @@ void MamaDuck::handleReceivedPacket() {
     }
   }
 }
+
+bool MamaDuck::getDetectState() { return duckutils::getDetectState(); }

@@ -27,7 +27,7 @@ bool detectOn = false;
 auto timer = timer_create_default();
 
 // for sending the counter message
-const int INTERVAL_MS = 60000;
+const int INTERVAL_MS = 5000;
 int counter = 1;
 
 void setup() {
@@ -39,6 +39,9 @@ void setup() {
   std::vector<byte> devId;
   devId.insert(devId.end(), deviceId.begin(), deviceId.end());
   duck.setupWithDefaults(devId);
+  
+  detect.setupRadio();
+  detect.onReceiveRssi(handleReceiveRssi);
 
   // Initialize the timer. The timer thread runs separately from the main loop
   // and will trigger sending a counter message.
@@ -52,10 +55,23 @@ void loop() {
   // Use the default run(). The Mama duck is designed to also forward data it receives
   // from other ducks, across the network. It has a basic routing mechanism built-in
   // to prevent messages from hoping endlessly.
-  if(detectOn) {
-     detect.run();
+  
+  if(duck.getDetectState()) {
+    if(!detectOn) {
+      detectOn = true;
+      timer.cancel();
+      detect.run();
+      timer.every(3000, pingHandler);
+    }
+    detect.run();
   } else {
-     duck.run();
+    if(detectOn) {
+      detectOn = false;
+      timer.cancel();
+      duck.run();
+      timer.every(INTERVAL_MS, runSensor);
+    }
+    duck.run();
   }
   
 }
@@ -94,14 +110,44 @@ bool sendData(const byte* buffer, int length) {
   return sentOk;
 }
 
+void handleReceiveRssi(const int rssi) {
+  if(detectOn) { showSignalQuality(rssi); }
+}
+
+// Periodically sends a ping message
+bool pingHandler(void *) {
+  Serial.println("[DETECTOR] Says ping!");
+  detect.sendPing(true);
+
+  return true;
+}
+
+// This uses the serial console to output the RSSI quality
+// But you can use a display, sound or LEDs
+void showSignalQuality(int incoming) {
+  int rssi = incoming;
+  Serial.print("[DETECTOR] Rssi value: ");
+  Serial.print(rssi);
+
+  if (rssi > -95) {
+    Serial.println(" - GOOD");
+  }
+  else if (rssi <= -95 && rssi > -108) {
+    Serial.println(" - OKAY");
+  }
+  else if (rssi <= -108) {
+    Serial.println(" - BAD");
+  }
+}
+
 /*
 TODO:
 Add new captive portal page - DONE
-Method for turning on/off detector
+Method for turning on/off detector - DONE
 
-timer.every(INTERVAL_MS, pingHandler);
-pingHandler method
-callback for rssi
-showsignalquality method
+timer.every(INTERVAL_MS, pingHandler); - Done
+pingHandler method - Done
+callback for rssi - Done
+showsignalquality method - Done
 
 */
