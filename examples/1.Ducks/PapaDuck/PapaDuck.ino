@@ -50,6 +50,9 @@ bool use_auth_method = true;
 
 auto timer = timer_create_default();
 
+int disconnectTime;
+bool disconnect = false;
+
 WiFiClientSecure wifiClient;
 PubSubClient client(server, 8883, wifiClient);
 // / DMS locator URL requires a topicString, so we need to convert the topic
@@ -201,6 +204,11 @@ void setup() {
 void loop() {
 
   if (!duck.isWifiConnected() && retry) {
+    if(!disconnect) {
+      disconnectTime = millis();
+      disconnect = true;
+    }
+
     String ssid = duck.getSsid();
     String password = duck.getPassword();
 
@@ -228,7 +236,11 @@ void setup_mqtt(bool use_auth) {
     return;
   }
 
-  
+  if(!disconnect) {
+    disconnectTime = millis();
+    disconnect = true;
+  }
+
   if (use_auth) {
     connected = client.connect(clientId, authMethod, token);
   } else {
@@ -236,13 +248,62 @@ void setup_mqtt(bool use_auth) {
   }
   if (connected) {
     Serial.println("[PAPA] Mqtt client is connected!");
+    disconnect = false;
+    int timeDisconnected = millis() - disconnectTime;
+    quackDownReport("Time Disconnected: " + timeDisconnected/1000);
     return;
   }
   retry_mqtt_connection(1000);
   
 }
 
+void quackDownReport(String payload) {
+  Serial.println("Send QuackDownReport");
 
+  const int bufferSize = 4 * JSON_OBJECT_SIZE(4);
+  StaticJsonDocument<bufferSize> doc;
+
+  doc["DeviceID"] = "PAPADUCK";
+  doc["MessageID"] = createUuid(4);
+  doc["Payload"].set(payload);
+  doc["path"] = "PAPADUCK";
+  doc["hops"] = "0";
+  doc["duckType"] = "1";
+    
+  std::string topic = "iot-2/evt/health/fmt/json";
+
+  String jsonstat;
+  serializeJson(doc, jsonstat);
+
+  if (client.publish(topic.c_str(), jsonstat.c_str())) {
+    Serial.println("[PAPA] Packet forwarded:");
+    serializeJsonPretty(doc, Serial);
+    Serial.println("");
+    Serial.println("[PAPA] Publish ok");
+    display->drawString(0, 60, "Publish ok");
+    display->sendBuffer();
+  } else {
+    Serial.println("[PAPA] Publish failed");
+    display->drawString(0, 60, "Publish failed");
+    display->sendBuffer();
+  }
+
+}
+
+String createUuid(int length) {
+  String msg = "";
+  int i;
+
+  for (i = 0; i < length; i++) {
+    byte randomValue = random(0, 36);
+    if (randomValue < 26) {
+      msg = msg + char(randomValue + 'a');
+    } else {
+      msg = msg + char((randomValue - 26) + '0');
+    }
+  }
+  return msg;
+}
 
 
 
