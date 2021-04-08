@@ -52,6 +52,7 @@ auto timer = timer_create_default();
 
 int disconnectTime;
 bool disconnect = false;
+int failCounter = 0;
 
 WiFiClientSecure wifiClient;
 PubSubClient client(server, 8883, wifiClient);
@@ -162,6 +163,7 @@ void quackJson(std::vector<byte> packetBuffer) {
     Serial.println("[PAPA] Publish failed");
     display->drawString(0, 60, "Publish failed");
     display->sendBuffer();
+    failCounter++;
   }
 }
 
@@ -192,6 +194,8 @@ void setup() {
 
   // register a callback to handle incoming data from duck in the network
   duck.onReceiveDuckData(handleDuckData);
+
+  timer.every(3000000, sendFailReport);
 
   Serial.println("[PAPA] Setup OK! ");
   
@@ -250,7 +254,8 @@ void setup_mqtt(bool use_auth) {
     Serial.println("[PAPA] Mqtt client is connected!");
     disconnect = false;
     int timeDisconnected = millis() - disconnectTime;
-    quackDownReport("Time Disconnected: " + timeDisconnected/1000);
+    timeDisconnected = timeDisconnected/1000;
+    quackDownReport("Time Disconnected: " + String(timeDisconnected));
     return;
   }
   retry_mqtt_connection(1000);
@@ -286,6 +291,7 @@ void quackDownReport(String payload) {
     Serial.println("[PAPA] Publish failed");
     display->drawString(0, 60, "Publish failed");
     display->sendBuffer();
+    failCounter++;
   }
 
 }
@@ -305,7 +311,9 @@ String createUuid(int length) {
   return msg;
 }
 
-
+bool sendFailReport(void*) {
+  quackDownReport(String(failCounter));
+}
 
 bool enableRetry(void*) {
   retry = true;
