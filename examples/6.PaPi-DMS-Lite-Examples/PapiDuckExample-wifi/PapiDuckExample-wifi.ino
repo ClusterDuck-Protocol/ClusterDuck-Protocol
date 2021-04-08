@@ -183,7 +183,7 @@ void quackJson(std::vector<byte> packetBuffer) {
   Serial.println("[PAPI] Packet Received:");
   Serial.println("[PAPI] sduid:   " + String(sduid.c_str()));
   Serial.println("[PAPI] dduid:   " + String(dduid.c_str()));
-
+  Serial.println("[PAPI] topic:   " + String(toTopicString(packet.topic).c_str()));
   Serial.println("[PAPI] muid:    " + String(muid.c_str()));
   Serial.println("[PAPI] path:    " + String(path.c_str()));
   Serial.println("[PAPI] data:    " + String(payload.c_str()));
@@ -196,10 +196,10 @@ void quackJson(std::vector<byte> packetBuffer) {
   doc["path"].set(path);
   doc["hops"].set(packet.hopCount);
   doc["duckType"].set(packet.duckType);
+  doc["topic"].set(toTopicString(packet.topic));
 
-  std::string cdpTopic = toTopicString(packet.topic);
-
-  std::string topic = "iot-2/evt/" + cdpTopic + "/fmt/json";
+  //std::string cdpTopic = toTopicString(packet.topic);
+  //std::string topic = "iot-2/evt/" + cdpTopic + "/fmt/json";
 
   String jsonstat;
   serializeJson(doc, jsonstat);

@@ -106,6 +106,7 @@ void quackJson(std::vector<byte> packetBuffer) {
   doc["path"].set(path);
   doc["hops"].set(packet.hopCount);
   doc["duckType"].set(packet.duckType);
+  doc["topic"].set(toTopicString(packet.topic));
 
   String jsonstat;
   serializeJson(doc, Serial);
