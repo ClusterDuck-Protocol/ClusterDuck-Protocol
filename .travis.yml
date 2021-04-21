@@ -1,4 +1,4 @@
-anguage: generic
+language: generic
 env:
   global:
     - CLI_VERSION=master
