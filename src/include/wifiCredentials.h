@@ -4,38 +4,34 @@
 const char wifi_page[] PROGMEM = R"=====(
 
 
-   <!DOCTYPE html><html><head><title>Update Wifi Credentials</title>
+   <!DOCTYPE html><html><head><title>Update WiFi Credentials</title>
               <style type="text/css">
+
+      body{
+        padding:4em;
+      }        
      
       .main-box{
-        padding:3em;
+        padding:2em;
         font: 26px "Avenir", helvetica, sans-serif;
-        height: 50vh;
         border-radius: 8px;
+        background-color: lightgray; 
 
       }
       .submit {
         border-style: none;
-        padding: 1em;
+        padding: 0,6em;
         border-radius: 8px;
-        background: #05172d;
-        color: white;
-        width: 8em;
-      }
-      .fileupload {
-        border-style: none;
-        padding: 0.8em;
-        border-radius: 8px;
-        width:30em;
-        background: #e0e0e0;
-      }
-      img{
-        width:100%;
-        margin-top: 10  em;  
+        background: yellow;
+        font-size: 1em; 
+        margin-bottom: 3em;
+
+      
       }
       input{
         width:100%; 
-        height: 5em;  
+        height: 3em;  
+        font-size: 1.4em;
       }
    
       
@@ -43,14 +39,14 @@ const char wifi_page[] PROGMEM = R"=====(
 
     
      <div class="main-box">
-     <h2>Use this page to update your Wifi credentials</h1>
-    <p>Fill in your SSID and WiFi Password in the form below.</p>
+     <h1>Use this page to update your WiFi credentials</h1>
+    <p>Fill in your SSID and WiFi Password from your local network below.</p>
  <form action='/changeSSID' method='post'>
     <label for='ssid'>SSID:</label><br> 
     <input name='ssid' type='text' placeholder='SSID' /><br><br>
     <label for='pass'>Password:</label><br>
     <input name='pass' type='text' placeholder='Password' /><br><br>
-    <input type='submit' value='Submit' />
+    <input class="submit" type='submit' value='Submit' />
  </form>
  
    
