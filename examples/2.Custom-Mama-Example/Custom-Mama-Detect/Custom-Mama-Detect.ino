@@ -1,10 +1,11 @@
 /**
  * @file Custom-Mama-Detect.ino
- * @brief Uses the built in Mama Duck.
+ * @brief Uses the built in Mama Duck and DuckDetector.
  * 
- * This example is a Mama Duck, but it is also periodically sending a message in the Mesh
- * It is setup to provide a custom Emergency portal, instead of using the one provided by the SDK.
- * Notice the background color of the captive portal is Black instead of the default Red.
+ * This example is a DubleDuck. It has the ability to easily change from a MamaDuck
+ * to a DuckDetector. This can be controlled by going to 192.168.1.1/controlpanel
+ * after connecting to the Duck's wifi AP. In this example the duck starts as a 
+ * MamaDuck by default. 
  * 
  */
 
@@ -40,6 +41,7 @@ void setup() {
   devId.insert(devId.end(), deviceId.begin(), deviceId.end());
   duck.setupWithDefaults(devId);
   
+  // Load DetectorDuck profile
   detect.setupRadio();
   detect.onReceiveRssi(handleReceiveRssi);
 
@@ -52,13 +54,14 @@ void setup() {
 
 void loop() {
   timer.tick();
-  // Use the default run(). The Mama duck is designed to also forward data it receives
-  // from other ducks, across the network. It has a basic routing mechanism built-in
-  // to prevent messages from hoping endlessly.
+  // Here we check the state of our Detect flag that is adjustable using the /controlpanel
+  // Changing the state will determine the Duck's behavior
+  // This strategy can be used with other ducks to morph a duck quickly into other behaviors
   
   if(duck.getDetectState()) {
     if(!detectOn) {
       detectOn = true;
+      // Remove MamaDuck timer
       timer.cancel();
       detect.run();
       timer.every(3000, pingHandler);
@@ -67,6 +70,7 @@ void loop() {
   } else {
     if(detectOn) {
       detectOn = false;
+      // Remove Detector timer
       timer.cancel();
       duck.run();
       timer.every(INTERVAL_MS, runSensor);
@@ -110,11 +114,12 @@ bool sendData(const byte* buffer, int length) {
   return sentOk;
 }
 
+//If in DetectorDuck mode show RSSI
 void handleReceiveRssi(const int rssi) {
   if(detectOn) { showSignalQuality(rssi); }
 }
 
-// Periodically sends a ping message
+// Periodically sends a ping message in DetectorDuck mode
 bool pingHandler(void *) {
   Serial.println("[DETECTOR] Says ping!");
   detect.sendPing(true);
@@ -139,15 +144,3 @@ void showSignalQuality(int incoming) {
     Serial.println(" - BAD");
   }
 }
-
-/*
-TODO:
-Add new captive portal page - DONE
-Method for turning on/off detector - DONE
-
-timer.every(INTERVAL_MS, pingHandler); - Done
-pingHandler method - Done
-callback for rssi - Done
-showsignalquality method - Done
-
-*/

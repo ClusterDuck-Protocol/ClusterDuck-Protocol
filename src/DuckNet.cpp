@@ -50,7 +50,10 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
   webServer.on("/", HTTP_GET, [&](AsyncWebServerRequest* request) {
     request->send(200, "text/html", portal);
   });
-
+  
+  // This will serve as an easy to access "control panel" to change settings of devices easily
+  // TODO: Need to be able to turn off this feature from the application layer for security
+  // TODO: Can we limit controls depending on the duck?
   webServer.on("/controlPanel", HTTP_GET, [&](AsyncWebServerRequest* request) {
     request->send(200, "text/html", controlPanel);
   });
