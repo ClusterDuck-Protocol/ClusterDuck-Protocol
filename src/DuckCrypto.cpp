@@ -15,7 +15,9 @@ namespace duckcrypto {
 
    void encryptData(uint8_t* text, uint8_t* encryptedData, size_t inc)
    {
+      
       size_t posn, len;
+      long t1 = millis();
 
       ctraes256.clear();
       ctraes256.setKey(KEY, 32);
@@ -27,6 +29,7 @@ namespace duckcrypto {
          if (len > inc) len = inc;
          ctraes256.encrypt(encryptedData + posn, text + posn, len);
       }
+      loginfo("Encrypt done in : " + String((millis() - t1)) + "ms");
    }
 
    void decryptData(uint8_t* encryptedData, uint8_t* text, size_t inc) {
