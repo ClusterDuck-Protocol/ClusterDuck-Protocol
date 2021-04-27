@@ -204,7 +204,7 @@ void quackJson(std::vector<byte> packetBuffer) {
   String jsonstat;
   serializeJson(doc, jsonstat);
 
-  if (mqttClient.publish(topic.c_str(), jsonstat.c_str())) {
+  if (mqttClient.publish(doc["topic"], jsonstat.c_str())) {
     Serial.println("[PAPIDUCK] Packet forwarded:");
     serializeJsonPretty(doc, Serial);
     Serial.println("");
