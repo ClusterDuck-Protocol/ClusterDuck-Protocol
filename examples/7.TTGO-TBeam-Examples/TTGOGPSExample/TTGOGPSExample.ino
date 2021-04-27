@@ -84,19 +84,23 @@ static void smartDelay(unsigned long ms)
   } while (millis() - start < ms);
 }
 
-bool runSensor(void *) {
-  bool result;
-  const byte* buffer;
+// Getting GPS data
+String getGPSData() {
 
+  // Encoding the GPS
+  smartDelay(5000);
+  
+  // Printing the GPS data
+  Serial.println("--- GPS ---");
   Serial.print("Latitude  : ");
   Serial.println(tgps.location.lat(), 5);  
   Serial.print("Longitude : ");
   Serial.println(tgps.location.lng(), 4);
-  Serial.print("Satellites: ");
-  Serial.println(tgps.satellites.value());
   Serial.print("Altitude  : ");
   Serial.print(tgps.altitude.feet() / 3.2808);
   Serial.println("M");
+  Serial.print("Satellites: ");
+  Serial.println(tgps.satellites.value());
   Serial.print("Time      : ");
   Serial.print(tgps.time.hour());
   Serial.print(":");
@@ -106,17 +110,25 @@ bool runSensor(void *) {
   Serial.print("Speed     : ");
   Serial.println(tgps.speed.kmph());
   Serial.println("**********************");
-  smartDelay(7500);
   
-  String sensorVal = "Lat: " + String(tgps.location.lat(), 5) + " Lng: " + String(tgps.location.lng(), 4);
-  
+  // Creating a message of the Latitude and Longitude
+  String sensorVal = "Lat:" + String(tgps.location.lat(), 5) + " Lng:" + String(tgps.location.lng(), 4) + " Alt:" + String(tgps.altitude.feet() / 3.2808);
+
+  // Check to see if GPS data is being received
   if (millis() > 5000 && tgps.charsProcessed() < 10)
   {
     Serial.println(F("No GPS data received: check wiring"));
   }
 
+  return sensorVal;
+}
+
+bool runSensor(void *) {
+  bool result;
+  String sensorVal = getGPSData();
+
   Serial.print("[MAMA] sensor data: ");
-  Serial.println(message);
+  Serial.println(sensorVal);
 
   //Send gps data
   duck.sendData(topics::location, sensorVal);
