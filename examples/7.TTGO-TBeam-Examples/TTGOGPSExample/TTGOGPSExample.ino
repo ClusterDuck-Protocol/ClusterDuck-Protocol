@@ -132,5 +132,5 @@ bool runSensor(void *) {
 
   //Send gps data
   duck.sendData(topics::location, sensorVal);
-  return result;
+  return true;
 }
