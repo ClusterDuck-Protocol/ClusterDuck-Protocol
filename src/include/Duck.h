@@ -7,6 +7,7 @@
 #include "DuckTypes.h"
 #include "DuckPacket.h"
 #include "DuckCrypto.h"
+#include "DuckUtils.h"
 #include "cdpcfg.h"
 #include <Arduino.h>
 #include <WString.h>
@@ -29,6 +30,8 @@ public:
       delete rxPacket;
     }
   }
+
+  std::string getCDPVersion() { return duckutils::getCDPVersion(); }
 
   /**
    * @brief Set the Device Name object

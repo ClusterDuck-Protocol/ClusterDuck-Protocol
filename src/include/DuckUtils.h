@@ -20,6 +20,8 @@ namespace duckutils {
 extern volatile bool interruptEnabled;
 extern Timer<> duckTimer;
 
+std::string getCDPVersion();
+
 /**
  * @brief Creates a byte array with random alpha numerical values.
  *

@@ -1,14 +1,23 @@
 #include "include/DuckUtils.h"
 #include <iomanip>
 #include <sstream>
+#include <string>
 
 namespace duckutils {
+
+  namespace {
+    std::string cdpVersion = "2.2.6";
+  }
 
 volatile bool interruptEnabled = true;
 Timer<> duckTimer = timer_create_default();
 
 volatile bool isInterruptEnabled() { return interruptEnabled; }
 void setInterrupt(bool enable) { interruptEnabled = enable; }
+
+std::string getCDPVersion() {
+  return cdpVersion;
+}
 
 Timer<> getTimer() { return duckTimer; }
 
