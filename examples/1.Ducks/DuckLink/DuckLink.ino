@@ -36,7 +36,7 @@ void setup() {
   // and will trigger sending a counter message.
   timer.every(INTERVAL_MS, runSensor);
   Serial.println("[LINK] Setup OK!");
-
+  
 }
 
 void loop() {

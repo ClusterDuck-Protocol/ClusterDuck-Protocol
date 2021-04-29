@@ -21,6 +21,8 @@ extern volatile bool interruptEnabled;
 extern Timer<> duckTimer;
 extern bool detectState;
 
+std::string getCDPVersion();
+
 /**
  * @brief Creates a byte array with random alpha numerical values.
  *

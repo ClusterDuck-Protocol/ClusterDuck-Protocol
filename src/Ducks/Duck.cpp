@@ -6,6 +6,7 @@ volatile bool Duck::receivedFlag = false;
 Duck::Duck(String name) {
   duckutils::setInterrupt(true);
   duckName = name;
+  loginfo("Running CDP Version: " + String(getCDPVersion().c_str()));
 }
 
 void Duck::setEncrypt(bool state) {
