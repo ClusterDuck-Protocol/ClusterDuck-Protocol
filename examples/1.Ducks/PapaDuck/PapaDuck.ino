@@ -1,5 +1,5 @@
 /**
- * @file papa-duck-with-callback.ino
+ * @file PapaDuck.ino
  * @author 
  * @brief Uses built-in PapaDuck from the SDK to create a WiFi enabled Papa Duck
  * 
