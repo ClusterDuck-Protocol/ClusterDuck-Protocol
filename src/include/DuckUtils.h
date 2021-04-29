@@ -19,6 +19,7 @@ namespace duckutils {
 
 extern volatile bool interruptEnabled;
 extern Timer<> duckTimer;
+extern bool detectState;
 
 /**
  * @brief Creates a byte array with random alpha numerical values.
@@ -68,6 +69,9 @@ void setInterrupt(bool enable);
 uint32_t toUnit32(byte* data);
 
 Timer<> getTimer();
+
+bool getDetectState();
+bool flipDetectState();
 
 } // namespace duckutils
 #endif

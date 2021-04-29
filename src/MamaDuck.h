@@ -6,6 +6,7 @@
 
 #include "include/Duck.h"
 #include "include/cdpcfg.h"
+#include "include/DuckUtils.h"
 
 class MamaDuck : public Duck {
 public:
@@ -44,6 +45,8 @@ public:
    * @returns the duck type defined as DuckType
    */
   int getType() {return DuckType::MAMA;}
+
+  bool getDetectState();
 
 private :
   void handleReceivedPacket();

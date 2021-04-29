@@ -6,11 +6,19 @@ namespace duckutils {
 
 volatile bool interruptEnabled = true;
 Timer<> duckTimer = timer_create_default();
+bool detectState = false;
 
 volatile bool isInterruptEnabled() { return interruptEnabled; }
 void setInterrupt(bool enable) { interruptEnabled = enable; }
 
 Timer<> getTimer() { return duckTimer; }
+
+bool getDetectState() { return detectState; }
+bool flipDetectState() {
+  detectState = !detectState;
+  return detectState;
+
+}
 
 void  getRandomBytes(int length, byte* bytes) {
   const char* digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
