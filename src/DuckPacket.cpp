@@ -4,9 +4,65 @@
 #include "MemoryFree.h"
 #include "include/DuckUtils.h"
 #include "include/DuckCrypto.h"
+#include "include/bloom_filter.hpp"
 #include <string>
 
 #define ENCRYPTION
+
+
+void DuckPacket::setupBloomFilter() {
+  bloom_parameters parameters;
+
+  // How many elements roughly do we expect to insert?
+  parameters.projected_element_count = 1000;
+
+  // Maximum tolerable false positive probability? (0,1)
+  parameters.false_positive_probability = 0.0001; // 1 in 10000
+
+  // Simple randomizer (optional)
+  parameters.random_seed = 0xA5A5A5A5;
+
+  if (!parameters)
+  {
+    Serial.print("Error - Invalid set of bloom filter parameters!");
+  }
+
+  parameters.compute_optimal_parameters();
+
+  //Instantiate Bloom Filter
+  bloom_filter temp(parameters);
+  filter = temp;
+
+    //PUT BLOOM FILTER STUFF HERE
+  std::string str_list[] = { "AbC", "iJk", "XYZ" };
+
+  // Insert into Bloom Filter
+  // Insert some strings
+  for (std::size_t i = 0; i < (sizeof(str_list) / sizeof(std::string)); ++i)
+  {
+    temp.insert(str_list[i]);
+    Serial.println("insert into bf!");
+  }
+
+  // Insert some numbers
+  for (std::size_t i = 0; i < 100; ++i)
+  {
+    temp.insert(i);
+  }
+
+  String id = duckutils::convertToHex(duid.data(), duid.size());
+  if(temp.contains(id)) {
+    Serial.println("Here now!");
+  } else {
+    Serial.println("Not Here!Not Here!Not Here!Not Here!Not Here!");
+  }
+
+  temp.insert(id);
+
+  if(temp.contains(id)) {
+    Serial.println("Here now!");
+  }
+}
 
 
 bool DuckPacket::prepareForRelaying(std::vector<byte> duid, std::vector<byte> dataBuffer) {
@@ -50,10 +106,32 @@ bool DuckPacket::relay(std::vector<byte> duid, std::vector<byte> path_section) {
     return false;
   }
 
+  String id = duckutils::convertToHex(duid.data(), duid.size());
+
+  // Query the existence of strings
+    if(filter.contains(id)) {
+      Serial.println("WE'RE HERE!");
+    } else {
+      filter.insert(id);
+      Serial.println("Inserted ID");
+    }
+
+      // std::string invalid_str_list[] = { "AbCX", "iJkX", "XYZX" };
+
+      // // Query the existence of invalid strings
+      // for (std::size_t i = 0; i < (sizeof(invalid_str_list) / sizeof(std::string)); ++i)
+      // {
+      //    if (filter.contains(invalid_str_list[i]))
+      //    {
+      //       Serial.println("BF falsely contains: " + invalid_str_list[i].c_str());
+      //    }
+      // }
+
+
   // we don't have a contains() method but we can use indexOf()
   // if the result is > 0 then the substring was found
   // starting at the returned index value.
-  String id = duckutils::convertToHex(duid.data(), duid.size());
+  
   String path_string = duckutils::convertToHex(path_section.data(), path_length);
   if (path_string.indexOf(id) >= 0) {
     loginfo("Packet already seen. ignore it.");

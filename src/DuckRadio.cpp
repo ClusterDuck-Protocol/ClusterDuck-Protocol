@@ -25,6 +25,8 @@ DuckRadio* DuckRadio::getInstance() {
 }
 
 int DuckRadio::setupRadio(LoraConfigParams config) {
+DuckPacket temp;
+temp.setupBloomFilter();
 #ifdef CDPCFG_PIN_LORA_SPI_SCK
   log_n("_spi.begin(CDPCFG_PIN_LORA_SPI_SCK, CDPCFG_PIN_LORA_SPI_MISO, "
         "CDPCFG_PIN_LORA_SPI_MOSI, CDPCFG_PIN_LORA_CS)");

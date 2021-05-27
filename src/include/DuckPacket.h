@@ -5,6 +5,7 @@
 #include "Arduino.h"
 #include "DuckUtils.h"
 #include "cdpcfg.h"
+#include "bloom_filter.hpp"
 #include <CRC32.h>
 #include <WString.h>
 #include <vector>
@@ -88,10 +89,14 @@ public:
 
     byte getTopic() { return buffer[TOPIC_POS]; }
 
+    void setupBloomFilter();
+
 
   private: 
     std::vector<byte> duid;
     std::vector<byte> buffer;
+
+    bloom_filter filter;
 };
 
 #endif
