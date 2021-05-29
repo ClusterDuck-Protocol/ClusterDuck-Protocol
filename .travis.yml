@@ -16,7 +16,6 @@ before_install:
   - arduino-cli config set library.enable_unsafe_install true          
   - arduino-cli lib install --git-url https://github.com/contrem/arduino-timer.git
   - arduino-cli lib install --git-url https://github.com/jgromes/RadioLib.git
-  - arduino-cli lib install --git-url https://github.com/Call-for-Code/ClusterDuck-Protocol.git
   - arduino-cli lib install --git-url https://github.com/bblanchon/ArduinoJson.git
   - arduino-cli lib install --git-url https://github.com/me-no-dev/AsyncTCP
   - arduino-cli lib install --git-url https://github.com/ThingPulse/esp8266-oled-ssd1306
