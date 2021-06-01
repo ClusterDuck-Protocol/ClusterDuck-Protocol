@@ -1,12 +1,3 @@
----
-name: Feature change
-about: Provide code that changes functionality
-title: ''
-labels: ''
-assignees: ''
-
----
-
 **Describe at a high level the solution you're providing**
 A clear and concise description of what you changed.
 

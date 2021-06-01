@@ -1,5 +1,5 @@
 /**
- * @file papa-duck-with-callback.ino
+ * @file PapaDuck.ino
  * @author 
  * @brief Uses built-in PapaDuck from the SDK to create a WiFi enabled Papa Duck
  * 
@@ -19,6 +19,7 @@
 /* CDP Headers */
 #include <PapaDuck.h>
 #include <CdpPacket.h>
+#include <queue>
 
 #define MQTT_RETRY_DELAY_MS 500
 #define WIFI_RETRY_DELAY_MS 5000
@@ -49,6 +50,8 @@ DuckDisplay* display = NULL;
 bool use_auth_method = true;
 
 auto timer = timer_create_default();
+
+std::queue<std::vector<byte>> packetQueue;
 
 WiFiClientSecure wifiClient;
 PubSubClient client(server, 8883, wifiClient);
@@ -98,7 +101,7 @@ String convertToHex(byte* data, int size) {
 
 // WiFi connection retry
 bool retry = true;
-void quackJson(std::vector<byte> packetBuffer) {
+int quackJson(std::vector<byte> packetBuffer) {
 
   CdpPacket packet = CdpPacket(packetBuffer);
   const int bufferSize = 4 * JSON_OBJECT_SIZE(4);
@@ -154,11 +157,13 @@ void quackJson(std::vector<byte> packetBuffer) {
     Serial.println("");
     Serial.println("[PAPA] Publish ok");
     display->drawString(0, 60, "Publish ok");
-     display->sendBuffer();
+    display->sendBuffer();
+    return 0;
   } else {
     Serial.println("[PAPA] Publish failed");
     display->drawString(0, 60, "Publish failed");
     display->sendBuffer();
+    return -1;
   }
 }
 
@@ -167,7 +172,16 @@ void quackJson(std::vector<byte> packetBuffer) {
 void handleDuckData(std::vector<byte> packetBuffer) {
   Serial.println("[PAPA] got packet: " +
                  convertToHex(packetBuffer.data(), packetBuffer.size()));
-  quackJson(packetBuffer);
+  if(quackJson(packetBuffer) == -1) {
+    if(packetQueue.size() > 5) {
+      packetQueue.pop();
+      packetQueue.push(packetBuffer);
+    } else {
+      packetQueue.push(packetBuffer);
+    }
+    Serial.print("New size of queue: ");
+    Serial.println(packetQueue.size());
+  }
 }
 
 void setup() {
@@ -225,6 +239,9 @@ void loop() {
 void setup_mqtt(bool use_auth) {
   bool connected = client.connected();
   if (connected) {
+    if(packetQueue.size() > 0) {
+      publishQueue();
+    }
     return;
   }
 
@@ -235,16 +252,15 @@ void setup_mqtt(bool use_auth) {
     connected = client.connect(clientId);
   }
   if (connected) {
+    if(packetQueue.size() > 0) {
+      publishQueue();
+    }
     Serial.println("[PAPA] Mqtt client is connected!");
     return;
   }
   retry_mqtt_connection(1000);
   
 }
-
-
-
-
 
 bool enableRetry(void*) {
   retry = true;
@@ -255,4 +271,17 @@ void retry_mqtt_connection(int delay_ms) {
   Serial.println("[PAPA] Could not connect to MQTT...............................");
   retry = false;
   timer.in(delay_ms, enableRetry);
+}
+
+
+void publishQueue() {
+  while(!packetQueue.empty()) {
+    if(quackJson(packetQueue.front()) == 0) {
+      packetQueue.pop();
+      Serial.print("Queue size: ");
+      Serial.println(packetQueue.size());
+    } else {
+      return;
+    }
+  }
 }

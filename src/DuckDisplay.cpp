@@ -209,8 +209,9 @@ void DuckDisplay::showDefaultScreen() {
   drawString(0,20, "Protocol ");
   setCursor(0, 40);
   print("DT: " + duckTypeToString(duckType));
-  setCursor(0, 50);
-  print("ST: Online");
+  drawString(0,50,"v");
+  setCursor(5, 50);
+  print(duckutils::getCDPVersion().c_str());
   drawString(0,30, "----------------");
   setCursor(0, 60);
   print("ID: " + duckName);
