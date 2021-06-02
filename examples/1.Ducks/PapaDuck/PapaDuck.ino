@@ -4,7 +4,10 @@
  * @brief Uses built-in PapaDuck from the SDK to create a WiFi enabled Papa Duck
  * 
  * This example will configure and run a Papa Duck that connects to the cloud
- * and forwards all messages (except  pings) to the cloud.
+ * and forwards all messages (except  pings) to the cloud. When disconnected
+ * it will add received packets to a queue. When it reconnects to MQTT it will
+ * try to publish all messages in the queue. You can change the size of the queue
+ * by changing `QUEUE_SIZE_MAX`.
  * 
  * @date 2020-09-21
  * 
@@ -46,11 +49,11 @@ PapaDuck duck = PapaDuck();
 
 DuckDisplay* display = NULL;
 
-// Set this to false if testing quickstart on IBM IoT Platform
 bool use_auth_method = true;
 
 auto timer = timer_create_default();
 
+int QUEUE_SIZE_MAX = 5;
 std::queue<std::vector<byte>> packetQueue;
 
 WiFiClientSecure wifiClient;
@@ -173,7 +176,7 @@ void handleDuckData(std::vector<byte> packetBuffer) {
   Serial.println("[PAPA] got packet: " +
                  convertToHex(packetBuffer.data(), packetBuffer.size()));
   if(quackJson(packetBuffer) == -1) {
-    if(packetQueue.size() > 5) {
+    if(packetQueue.size() > QUEUE_SIZE_MAX) {
       packetQueue.pop();
       packetQueue.push(packetBuffer);
     } else {
@@ -239,6 +242,8 @@ void loop() {
 void setup_mqtt(bool use_auth) {
   bool connected = client.connected();
   if (connected) {
+
+    //Once reconnected check queue and publish all queued messages
     if(packetQueue.size() > 0) {
       publishQueue();
     }
@@ -272,7 +277,6 @@ void retry_mqtt_connection(int delay_ms) {
   retry = false;
   timer.in(delay_ms, enableRetry);
 }
-
 
 void publishQueue() {
   while(!packetQueue.empty()) {

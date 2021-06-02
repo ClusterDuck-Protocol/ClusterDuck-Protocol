@@ -43,16 +43,31 @@ The papa Iridium Example is built to have an extra Iridium Satelite Backhaul whe
 ## 6.PaPi-DMS-Lite-Examples
 
 #### Serial-PaPiDuckExample
-The Serial Papi Example is a custom papa that will print the incoming data into the Serial Monitor for the PAPI to read
+The Serial Papi Example is a custom papa that will print the incoming data into the Serial Monitor for the PAPI to read.
 
 #### WIFI-PaPiDuckExample
 The WiFi Papi Example is a custom papa that will send the incoming data into the Papi.
 https://github.com/Project-Owl/dms-lite
 
 ## 7.TTGO-TBeam-Examples
-If you have a TTGO T Beam you can use these custom examples for it 
+If you have a TTGO T Beam you can use these custom examples for it. 
+
+#### TTGO-Telemetry
+Using the TTGO's hardware we can collect all different kinds of live board information such as: onboard temperature, battery voltage (if 18650 installed), and charging.
 
 #### TTGOGPSExample
 This example is a Mama Duck, that has GPS capabilities and will send the GPS data with the GPS topic based on the set timer.
+
+## 8.Encryption
+You can enable encryption. CDP comes with default settings, but set your own IV and AES256 key when in use.
+
+#### DecryptionPapa
+Decryption is a very fast operation and using this example your messages will be decrypted before sending to the cloud. Remember to set IV and AES256 key to be the same as what you use on other devices.
+
+## 9.Telemetry
+These examples will help collect telemetry data from your network.
+
+#### Papa-Downtime-Counter
+This example keeps track of how many messages failed to publish and sends reports on how long the device went offline. Helps understand gaps in data if there is unstable WiFi.
 
 
