@@ -19,11 +19,13 @@ before_install:
   #- arduino-cli lib install --git-url https://github.com/Call-for-Code/ClusterDuck-Protocol.git
   - arduino-cli lib install --git-url https://github.com/bblanchon/ArduinoJson.git
   - arduino-cli lib install --git-url https://github.com/me-no-dev/AsyncTCP
-  # - arduino-cli lib install --git-url https://github.com/ThingPulse/esp8266-oled-ssd1306
+  #- arduino-cli lib install --git-url https://github.com/ThingPulse/esp8266-oled-ssd1306
   # This is exactly the same library as above
   - arduino-cli lib install "ESP8266 and ESP32 Oled Driver for SSD1306 displays"
   - arduino-cli lib install --git-url https://github.com/me-no-dev/ESPAsyncWebServer
-  - arduino-cli lib install --git-url https://github.com/olikraus/U8g2_Arduino.git
+  #- arduino-cli lib install --git-url https://github.com/olikraus/U8g2_Arduino.git
+  # This is exactly the same library as above
+  - arduino-cli lib install "U8g2"
   - arduino-cli lib install --git-url https://github.com/bakercp/CRC32.git
   - arduino-cli lib install --git-url https://github.com/adafruit/Adafruit_Sensor
   - arduino-cli lib install --git-url https://github.com/knolleary/pubsubclient.git
