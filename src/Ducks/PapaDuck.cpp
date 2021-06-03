@@ -105,7 +105,7 @@ void PapaDuck::handleReceivedPacket() {
     return;
   }
   // build our RX DuckPacket which holds the updated path in case the packet is relayed
-  bool relay = rxPacket->prepareForRelaying(duid, data);
+  bool relay = rxPacket->prepareForRelaying(filter, data);
   if (relay) {
     logdbg("relaying:  " +
       duckutils::convertToHex(rxPacket->getBuffer().data(),

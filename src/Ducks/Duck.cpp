@@ -1,5 +1,6 @@
 #include "include/Duck.h"
 #include "include/DuckEsp.h"
+#include "include/bloom_filter.hpp"
 
 volatile bool Duck::receivedFlag = false;
 

@@ -7,139 +7,37 @@
 #include "include/bloom_filter.hpp"
 #include <string>
 
-#define ENCRYPTION
 
+bool DuckPacket::prepareForRelaying(bloom_filter *filter, std::vector<byte> dataBuffer) {
 
-void DuckPacket::setupBloomFilter() {
-  bloom_parameters parameters;
-
-  // How many elements roughly do we expect to insert?
-  parameters.projected_element_count = 1000;
-
-  // Maximum tolerable false positive probability? (0,1)
-  parameters.false_positive_probability = 0.0001; // 1 in 10000
-
-  // Simple randomizer (optional)
-  parameters.random_seed = 0xA5A5A5A5;
-
-  if (!parameters)
-  {
-    Serial.print("Error - Invalid set of bloom filter parameters!");
-  }
-
-  parameters.compute_optimal_parameters();
-
-  //Instantiate Bloom Filter
-  bloom_filter temp(parameters);
-  filter = temp;
-
-    //PUT BLOOM FILTER STUFF HERE
-  std::string str_list[] = { "AbC", "iJk", "XYZ" };
-
-  // Insert into Bloom Filter
-  // Insert some strings
-  for (std::size_t i = 0; i < (sizeof(str_list) / sizeof(std::string)); ++i)
-  {
-    temp.insert(str_list[i]);
-    Serial.println("insert into bf!");
-  }
-
-  // Insert some numbers
-  for (std::size_t i = 0; i < 100; ++i)
-  {
-    temp.insert(i);
-  }
-
-  String id = duckutils::convertToHex(duid.data(), duid.size());
-  if(temp.contains(id)) {
-    Serial.println("Here now!");
-  } else {
-    Serial.println("Not Here!Not Here!Not Here!Not Here!Not Here!");
-  }
-
-  temp.insert(id);
-
-  if(temp.contains(id)) {
-    Serial.println("Here now!");
-  }
-}
-
-
-bool DuckPacket::prepareForRelaying(std::vector<byte> duid, std::vector<byte> dataBuffer) {
-
-  bool relaying;
-
-
-  int packet_length = dataBuffer.size();
-  int path_pos = dataBuffer.data()[PATH_OFFSET_POS];
-
-  std::vector<byte> path_section;
-
-  // extract path section from the packet buffer
-  path_section.assign(&dataBuffer[path_pos], &dataBuffer[packet_length]);
 
   this->reset();
 
   loginfo("prepareForRelaying: START");
-
-  // update the rx packet byte buffer
-  buffer.assign(dataBuffer.begin(), dataBuffer.end());
-
   loginfo("prepareForRelaying: Packet is built. Checking for relay...");
 
-  // when a packet is relayed the given duid is added to the path section of the
-  // packet
-  relaying = relay(duid, path_section);
-  if (!relaying) {
-    this->reset();
-  }
-  loginfo("prepareForRelaying: DONE. Relay = " + String(relaying));
-  return relaying;
-}
-
-bool DuckPacket::relay(std::vector<byte> duid, std::vector<byte> path_section) {
-
-  int path_length = path_section.size();
-
-  if (path_length == MAX_PATH_LENGTH) {
-    logerr("ERROR Max hops reached. Cannot relay packet.");
-    return false;
-  }
-
-  String id = duckutils::convertToHex(duid.data(), duid.size());
+  //TODO: Add bloom filter empty when full
+  //TODO: Add 2nd bloom filter
+  //TODO: Calculate false positive chance
+  //TODO: Add backwards compatibility
 
   // Query the existence of strings
-    if(filter.contains(id)) {
-      Serial.println("WE'RE HERE!");
-    } else {
-      filter.insert(id);
-      Serial.println("Inserted ID");
-    }
-
-      // std::string invalid_str_list[] = { "AbCX", "iJkX", "XYZX" };
-
-      // // Query the existence of invalid strings
-      // for (std::size_t i = 0; i < (sizeof(invalid_str_list) / sizeof(std::string)); ++i)
-      // {
-      //    if (filter.contains(invalid_str_list[i]))
-      //    {
-      //       Serial.println("BF falsely contains: " + invalid_str_list[i].c_str());
-      //    }
-      // }
-
-
-  // we don't have a contains() method but we can use indexOf()
-  // if the result is > 0 then the substring was found
-  // starting at the returned index value.
-  
-  String path_string = duckutils::convertToHex(path_section.data(), path_length);
-  if (path_string.indexOf(id) >= 0) {
-    loginfo("Packet already seen. ignore it.");
+  bool alreadySeen = filter->contains(&dataBuffer[MUID_POS], MUID_LENGTH);
+  if (alreadySeen) {
+    logdbg("handleReceivedPacket: Packet already seen. No relay.");
     return false;
+  } else {
+    filter->insert(&dataBuffer[MUID_POS], MUID_LENGTH);
+    logdbg("handleReceivedPacket: Relaying packet: "  + duckutils::convertToHex(&dataBuffer[MUID_POS], MUID_LENGTH));
   }
-  buffer.insert(buffer.end(), duid.begin(), duid.end());
-  buffer[HOP_COUNT_POS]++;
+
+  // update the rx packet internal byte buffer
+  buffer.assign(dataBuffer.begin(), dataBuffer.end());
+  int hops = buffer[HOP_COUNT_POS]++;
+  loginfo("prepareForRelaying: hops count: "+ String(hops));
   return true;
+  
+  
 }
 
 int DuckPacket::prepareForSending(std::vector<byte> targetDevice, byte duckType, byte topic, std::vector<byte> app_data) {

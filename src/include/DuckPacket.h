@@ -59,7 +59,7 @@ public:
      * @returns true if the packet needs to be relayed
      * @returns false if the packet does not need to be replayed
      */
-    bool prepareForRelaying(std::vector<byte> duid, std::vector<byte> dataBuffer);
+    bool prepareForRelaying(bloom_filter *filter, std::vector<byte> dataBuffer);
     
     /**
      * @brief Get the Cdp Packet byte vector.
@@ -96,7 +96,6 @@ public:
     std::vector<byte> duid;
     std::vector<byte> buffer;
 
-    bloom_filter filter;
 };
 
 #endif
