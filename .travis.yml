@@ -31,13 +31,19 @@ before_install:
   #- arduino-cli lib install --git-url https://github.com/knolleary/pubsubclient
   # This is exactly the same library as above, verified with arduino-cli lib search
   - arduino-cli lib install "PubSubClient"
-  - arduino-cli lib install --git-url https://github.com/adafruit/Adafruit_BMP085_Unified
+  #- arduino-cli lib install --git-url https://github.com/adafruit/Adafruit_BMP085_Unified
+  # This is exactly the same library as above, verified with arduino-cli lib search
+  - arduino-cli lib install "Adafruit BMP085 Unified"
   - arduino-cli lib install --git-url https://github.com/luciansabo/GP2YDustSensor.git
-  - arduino-cli lib install --git-url https://github.com/adafruit/DHT-sensor-library
-  - arduino-cli lib install --git-url https://github.com/adafruit/Adafruit_BMP280_Library
-  - arduino-cli lib install --git-url https://github.com/miguel5612/MQSensorsLib.git
+  #- arduino-cli lib install --git-url https://github.com/adafruit/DHT-sensor-library
+  - arduino-cli lib install "DHT sensor library"
+  #- arduino-cli lib install --git-url https://github.com/adafruit/Adafruit_BMP280_Library
+  - arduino-cli lib install "Adafruit BMP280 Library"
+  #- arduino-cli lib install --git-url https://github.com/miguel5612/MQSensorsLib.git
+  - arduino-cli lib install "MQUnifiedsensor"
   - arduino-cli lib install --git-url https://github.com/FastLED/FastLED.git
   - arduino-cli lib install --git-url https://github.com/mikalhart/IridiumSBD.git
+  # The following two are not listed in the Arduino library, so another work-around will have to be found
   - arduino-cli lib install --git-url https://github.com/lewisxhe/AXP202X_Library
   - arduino-cli lib install --git-url https://github.com/mikalhart/TinyGPSPlus.git
   - arduino-cli lib install --git-url https://github.com/Project-Owl/Crypto.git
