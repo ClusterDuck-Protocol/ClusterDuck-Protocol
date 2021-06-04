@@ -1,4 +1,5 @@
 language: generic
+dist: bionic
 addons:
   apt:
     packages:
@@ -10,8 +11,8 @@ env:
     - BOARD="esp32:esp32:heltec_wifi_lora_32_V2"
     - BOARD="esp32:esp32:t-beam"
 before_install:
-  - cppcheck --force --error-exitcode=1  src
   - cppcheck --version
+  - cppcheck --force --error-exitcode=1 src
 
   - curl https://raw.githubusercontent.com/arduino/arduino-cli/${CLI_VERSION}/install.sh | sh
   - export PATH=$PATH:$PWD/bin/
