@@ -49,7 +49,7 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
 
   // Lora is started, we need to set all the radio parameters, before it can
   // start receiving packets
-  rc = lora.setFrequency(CDPCFG_RF_LORA_FREQ);
+  rc = lora.setFrequency(config.band ?: CDPCFG_RF_LORA_FREQ);
   if (rc == ERR_INVALID_FREQUENCY) {
     logerr("ERROR  frequency is invalid");
     return DUCKLORA_ERR_SETUP;
