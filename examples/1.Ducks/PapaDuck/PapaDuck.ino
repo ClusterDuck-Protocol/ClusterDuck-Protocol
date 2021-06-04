@@ -235,6 +235,10 @@ void setup() {
   duck.onReceiveDuckData(handleDuckData);
 
   wifiClient.setCACert(example_root_ca);
+  while (!wifiClient.connect(server, port)) {
+    Serial.println("[PAPA] Failed to connect to " + String(server) + ":" + String(port));
+    delay(5000);
+  }
 
   Serial.println("[PAPA] Setup OK! ");
   
@@ -245,12 +249,6 @@ void setup() {
 
 
 void loop() {
-  if (!wifiClient.connect(server, port)) {
-    Serial.println("[PAPA] Failed to connect to " + String(server) + ":" + String(port));
-    delay(5000);
-    return;
-  }
-
   if (!duck.isWifiConnected() && retry) {
     String ssid = duck.getSsid();
     String password = duck.getPassword();
