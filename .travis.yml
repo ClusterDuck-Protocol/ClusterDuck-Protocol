@@ -38,6 +38,9 @@ before_install:
 
   - buildExampleSketch() { arduino-cli compile  -t -b $BOARD $PWD/examples/$1/$2/$2.ino; }
 script:
+  - cppcheck --force --error-exitcode=1  src
+  - cppcheck --version
+
   - buildExampleSketch 1.Ducks DuckLink
   - buildExampleSketch 1.Ducks MamaDuck
   - buildExampleSketch 1.Ducks PapaDuck
