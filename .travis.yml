@@ -7,6 +7,7 @@ env:
     - BOARD="esp32:esp32:heltec_wifi_lora_32_V2"
     - BOARD="esp32:esp32:t-beam"
 before_install:
+  - sudo add-apt-repository --yes ppa:nnstreamer/ppa
   - sudo apt-get update
   - sudo apt-get -y install cppcheck
   - cppcheck --version
