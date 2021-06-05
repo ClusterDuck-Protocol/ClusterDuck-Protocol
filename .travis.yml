@@ -6,7 +6,7 @@ env:
     - BOARD="esp32:esp32:heltec_wifi_lora_32_V2"
     - BOARD="esp32:esp32:t-beam"
 before_install:
-  - curl https://raw.githubusercontent.com/arduino/arduino-cli/${CLI_VERSION}/install.sh | sh
+  - curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh -s 0.18.1
   - export PATH=$PATH:$PWD/bin/
   - arduino-cli core update-index --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
   - if [[ "$BOARD" =~ "esp32:esp32:" ]]; then
