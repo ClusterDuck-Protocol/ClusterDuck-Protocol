@@ -6,7 +6,7 @@
 namespace duckutils {
 
   namespace {
-    std::string cdpVersion = "2.9.6";
+    std::string cdpVersion = "2.9.9";
   }
 
 volatile bool interruptEnabled = true;

@@ -110,7 +110,7 @@ public:
   /// Path section (48 bytes max)
   std::vector<byte> path;
 
-  CdpPacket(std::vector<byte> buffer) {
+  CdpPacket(std::vector<byte> & buffer) {
     int buffer_length = buffer.size();
     
     // get path start position
