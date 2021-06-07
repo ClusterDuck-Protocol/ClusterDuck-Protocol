@@ -13,14 +13,15 @@ before_install:
   - cppcheck --version
   - cppcheck --force --error-exitcode=1 src
 
-  - curl https://raw.githubusercontent.com/arduino/arduino-cli/${CLI_VERSION}/install.sh | sh
+  - curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh -s 0.17.0
   - export PATH=$PATH:$PWD/bin/
   - arduino-cli core update-index --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
   - if [[ "$BOARD" =~ "esp32:esp32:" ]]; then
       arduino-cli core install esp32:esp32 --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json;
     fi
   - arduino-cli config init 
-  - arduino-cli config set library.enable_unsafe_install true          
+  - arduino-cli config set library.enable_unsafe_install true    
+  - arduino-cli lib install --git-url https://github.com/Call-for-Code/ClusterDuck-Protocol.git      
   - arduino-cli lib install --git-url https://github.com/contrem/arduino-timer.git
   - arduino-cli lib install --git-url https://github.com/jgromes/RadioLib.git
   - arduino-cli lib install --git-url https://github.com/bblanchon/ArduinoJson.git
