@@ -13,17 +13,17 @@ before_install:
   - cppcheck --version
   - cppcheck --force --error-exitcode=1 src
 
-  - curl https://raw.githubusercontent.com/arduino/arduino-cli/${CLI_VERSION}/install.sh | sh
+  - curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh -s 0.17.0
   - export PATH=$PATH:$PWD/bin/
   - arduino-cli core update-index --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
   - if [[ "$BOARD" =~ "esp32:esp32:" ]]; then
       arduino-cli core install esp32:esp32 --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json;
     fi
   - arduino-cli config init 
-  - arduino-cli config set library.enable_unsafe_install true          
+  - arduino-cli config set library.enable_unsafe_install true    
+  - arduino-cli lib install --git-url https://github.com/Call-for-Code/ClusterDuck-Protocol.git      
   - arduino-cli lib install --git-url https://github.com/contrem/arduino-timer.git
   - arduino-cli lib install --git-url https://github.com/jgromes/RadioLib.git
-  - arduino-cli lib install --git-url https://github.com/Call-for-Code/ClusterDuck-Protocol.git
   - arduino-cli lib install --git-url https://github.com/bblanchon/ArduinoJson.git
   - arduino-cli lib install --git-url https://github.com/me-no-dev/AsyncTCP
   - arduino-cli lib install --git-url https://github.com/ThingPulse/esp8266-oled-ssd1306
@@ -58,23 +58,21 @@ script:
   - buildExampleSketch 3.Sensor-Examples DustSensorExample
   - buildExampleSketch 3.Sensor-Examples MQ7Example
   - buildExampleSketch 3.Sensor-Examples WS2812Example
-  - if [[ "$BOARD" != "esp32:esp32:t-beam" ]]; then
-      buildExampleSketch 4.Ble-Duck-App Ble-Duck-App;
+  - if [[ "$BOARD" != "esp32:esp32:t-beam" ]]; 
+    then buildExampleSketch 4.Ble-Duck-App Ble-Duck-App;
     fi
   - buildExampleSketch 5.Papa-Iridium-Example Papa-DishDuck
   - buildExampleSketch 5.Papa-Iridium-Example Papa-DishDuck-WiFi
   - buildExampleSketch 6.PaPi-DMS-Lite-Examples PapiDuckExample-wifi
   - buildExampleSketch 6.PaPi-DMS-Lite-Examples Serial-PaPiDuckExample
-  
-  - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]]; then
-      buildExampleSketch 7.TTGO-TBeam-Examples TTGO-Telemetry;
+  - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]]; 
+    then buildExampleSketch 7.TTGO-TBeam-Examples TTGO-Telemetry;
     fi
-  - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]]; then
-      buildExampleSketch 7.TTGO-TBeam-Examples TTGOAPX-Example
+  - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]]; 
+    then buildExampleSketch 7.TTGO-TBeam-Examples TTGOGPSExample;
     fi
-  - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]]; then
-      buildExampleSketch 7.TTGO-TBeam-Examples TTGOGPSExample
+  - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]]; 
+    then buildExampleSketch 7.TTGO-TBeam-Examples TTGOAPX-Example;
     fi
-  
   - buildExampleSketch 8.Encryption DecryptionPapaDuck
   - buildExampleSketch 9.Telemetry Papa-Downtime-Counter
