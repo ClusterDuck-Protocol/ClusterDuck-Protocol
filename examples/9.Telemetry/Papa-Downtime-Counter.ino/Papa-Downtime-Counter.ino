@@ -31,8 +31,6 @@
 #define PASSWORD ""
 
 
-
-
 // Used for Mqtt client connection
 // Provided when a Papa Duck device is created in DMS
 #define ORG         ""
