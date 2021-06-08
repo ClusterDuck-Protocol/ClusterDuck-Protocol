@@ -206,34 +206,42 @@ int DuckRadio::sleep() { return lora.sleep(); }
 void DuckRadio::processRadioIrq() {}
 
 void DuckRadio::setChannel(int channelNum) {
+  loginfo("Setting Channel to : " + channelNum);
+  int err;
   switch(channelNum) {
     case 1:
       loginfo("Set channel: 1");
-      lora.setFrequency(CHANNEL_1);
+      err = lora.setFrequency(CHANNEL_1);
       break;
     case 2:
       loginfo("Set channel: 2");
-      lora.setFrequency(CHANNEL_2);
+      err = lora.setFrequency(CHANNEL_2);
       break;
     case 3:
       loginfo("Set channel: 3");
-      lora.setFrequency(CHANNEL_3);
+      err = lora.setFrequency(CHANNEL_3);
       break;
     case 4:
       loginfo("Set channel: 4");
-      lora.setFrequency(CHANNEL_4);
+      err = lora.setFrequency(CHANNEL_4);
       break;
     case 5:
       loginfo("Set channel: 5");
-      lora.setFrequency(CHANNEL_5);
+      err = lora.setFrequency(CHANNEL_5);
       break;
     case 6:
       loginfo("Set channel: 6");
-      lora.setFrequency(CHANNEL_6);
+      err = lora.setFrequency(CHANNEL_6);
       break;
     default:
       loginfo("Set channel: 1");
-      lora.setFrequency(CHANNEL_1);
+      err = lora.setFrequency(CHANNEL_1);
+    
+    if (err != ERR_NONE) {
+      logerr("ERROR Failed to set channel");
+    } else {
+      loginfo("Channel Set");
+    }
   }
 
 }
