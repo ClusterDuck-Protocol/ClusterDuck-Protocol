@@ -46,7 +46,30 @@ const char controlPanel[] PROGMEM = R"=====(
      <h1>Control Panel</h1>
     <form action='/flipDetector' method='post'>
     <input type='submit' value='Detector On' />
- </form>
+    </form>
+    <p>Channel Select</p>
+    <form action='/setChannel' method='post'>
+
+    <input type="radio" id="channel1" name="channel" value=1>
+    <label for="channel1">1</label><br>
+
+    <input type="radio" id="channel2" name="channel" value=2>
+    <label for="channel2">2</label><br>
+
+    <input type="radio" id="channel3" name="channel" value=3>
+    <label for="channel3">3</label><br>
+
+    <input type="radio" id="channel4" name="channel" value=4>
+    <label for="channel4">4</label><br>
+
+    <input type="radio" id="channel5" name="channel" value=5>
+    <label for="channel5">5</label><br>
+
+    <input type="radio" id="channel6" name="channel" value=6>
+    <label for="channel6">6</label><br>
+    <input type="submit" value="Submit">
+    </form>
+    
  
    
       </div>

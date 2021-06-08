@@ -63,6 +63,14 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     duckutils::flipDetectState();
   });
 
+  webServer.on("/setChannel", HTTP_POST, [&](AsyncWebServerRequest* request) {
+    AsyncWebParameter* p = request->getParam(0);
+    logdbg(p->name() + ": " + p->value());
+    int val = std::atoi(p->value().c_str());
+    
+    duckRadio->setChannel(val);
+  });
+
   // Update Firmware OTA
   webServer.on("/update", HTTP_GET, [&](AsyncWebServerRequest* request) {
     if (!request->authenticate(http_username, http_password))

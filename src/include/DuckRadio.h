@@ -36,7 +36,13 @@ typedef struct {
   /// dio1 interrupt pin
   int di1;
   /// transmit power
-  int txPower;
+  int8_t txPower;
+  /// bandwidth
+  float bw;
+  /// spreading factor
+  uint8_t sf;
+  /// gain
+  uint8_t gain;
   /// interrupt service routine function when di0 activates
   void (*func)(void); 
 } LoraConfigParams;
@@ -163,6 +169,13 @@ public:
    * 
    */
   void processRadioIrq();
+
+  /**
+   * @brief change the duck channel.
+   * 
+   * @param channelNum set the channel number 1-6.
+   */
+  void setChannel(int channelNum);
 
 private:
   DuckRadio();
