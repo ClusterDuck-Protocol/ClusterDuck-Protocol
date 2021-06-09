@@ -4,7 +4,10 @@
  * @brief Uses built-in PapaDuck from the SDK to create a WiFi enabled Papa Duck
  * 
  * This example will configure and run a Papa Duck that connects to the cloud
- * and forwards all messages (except  pings) to the cloud.
+ * and forwards all messages (except  pings) to the cloud. When disconnected
+ * it will add received packets to a queue. When it reconnects to MQTT it will
+ * try to publish all messages in the queue. You can change the size of the queue
+ * by changing `QUEUE_SIZE_MAX`.
  * 
  * @date 2021-06-03
  * 
@@ -30,6 +33,10 @@
 // To connect to a different cloud provider or server, you may need to use a
 // different cert. For details, see
 // https://github.com/espressif/arduino-esp32/tree/master/libraries/WiFiClientSecure
+
+//Uncomment CA_CERT if you want to use the certificate auth method
+//#define CA_CERT
+#ifdef CA_CERT
 const char* example_root_ca = \
   "-----BEGIN CERTIFICATE-----\n" \
   "MIIDrzCCApegAwIBAgIQCDvgVpBCRrGhdWrJWZHHSjANBgkqhkiG9w0BAQUFADBh\n" \
@@ -53,7 +60,7 @@ const char* example_root_ca = \
   "YSEY1QSteDwsOoBrp+uvFRTp2InBuThs4pFsiv9kuXclVzDAGySj4dzp30d8tbQk\n" \
   "CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=\n" \
   "-----END CERTIFICATE-----\n";
-
+#endif
 
 #define SSID ""
 #define PASSWORD ""
@@ -76,11 +83,11 @@ PapaDuck duck = PapaDuck();
 
 DuckDisplay* display = NULL;
 
-// Set this to false if testing quickstart on IBM IoT Platform
 bool use_auth_method = true;
 
 auto timer = timer_create_default();
 
+int QUEUE_SIZE_MAX = 5;
 std::queue<std::vector<byte>> packetQueue;
 
 WiFiClientSecure wifiClient;
@@ -203,7 +210,7 @@ void handleDuckData(std::vector<byte> packetBuffer) {
   Serial.println("[PAPA] got packet: " +
                  convertToHex(packetBuffer.data(), packetBuffer.size()));
   if(quackJson(packetBuffer) == -1) {
-    if(packetQueue.size() > 5) {
+    if(packetQueue.size() > QUEUE_SIZE_MAX) {
       packetQueue.pop();
       packetQueue.push(packetBuffer);
     } else {
@@ -234,11 +241,13 @@ void setup() {
   // register a callback to handle incoming data from duck in the network
   duck.onReceiveDuckData(handleDuckData);
 
+  #ifdef CA_CERT
   wifiClient.setCACert(example_root_ca);
   while (!wifiClient.connect(server, port)) {
     Serial.println("[PAPA] Failed to connect to " + String(server) + ":" + String(port));
     delay(5000);
   }
+  #endif
 
   Serial.println("[PAPA] Setup OK! ");
   
@@ -274,6 +283,8 @@ void loop() {
 void setup_mqtt(bool use_auth) {
   bool connected = client.connected();
   if (connected) {
+
+    //Once reconnected check queue and publish all queued messages
     if(packetQueue.size() > 0) {
       publishQueue();
     }
@@ -307,7 +318,6 @@ void retry_mqtt_connection(int delay_ms) {
   retry = false;
   timer.in(delay_ms, enableRetry);
 }
-
 
 void publishQueue() {
   while(!packetQueue.empty()) {
