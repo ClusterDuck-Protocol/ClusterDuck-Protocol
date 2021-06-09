@@ -6,7 +6,7 @@
 #include "DuckRadio.h"
 #include "DuckTypes.h"
 #include "DuckPacket.h"
-#include "DuckCrypto.h"
+//#include "DuckCrypto.h"
 #include "DuckUtils.h"
 #include "cdpcfg.h"
 #include <Arduino.h>
