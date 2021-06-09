@@ -88,6 +88,7 @@ public:
   String getPassword() { return ""; }
   void setDeviceId(std::vector<byte> deviceId) {}
   bool isWifiConnected() { return false; }
+  int loadWiFiCredentials(){return DUCK_ERR_NONE; };
 #else
   /**
    * @brief Set up the WebServer.
