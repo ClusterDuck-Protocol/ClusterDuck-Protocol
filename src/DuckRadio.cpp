@@ -49,31 +49,31 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
 
   // Lora is started, we need to set all the radio parameters, before it can
   // start receiving packets
-  rc = lora.setFrequency(config.band ?: CDPCFG_RF_LORA_FREQ);
+  rc = lora.setFrequency(config.band);
   if (rc == ERR_INVALID_FREQUENCY) {
     logerr("ERROR  frequency is invalid");
     return DUCKLORA_ERR_SETUP;
   }
 
-  rc = lora.setBandwidth(CDPCFG_RF_LORA_BW);
+  rc = lora.setBandwidth(config.bw);
   if (rc == ERR_INVALID_BANDWIDTH) {
     logerr("ERROR  bandwidth is invalid");
     return DUCKLORA_ERR_SETUP;
   }
 
-  rc = lora.setSpreadingFactor(CDPCFG_RF_LORA_SF);
+  rc = lora.setSpreadingFactor(config.sf);
   if (rc == ERR_INVALID_SPREADING_FACTOR) {
     logerr("ERROR  spreading factor is invalid");
     return DUCKLORA_ERR_SETUP;
   }
 
-  rc = lora.setOutputPower(CDPCFG_RF_LORA_TXPOW);
+  rc = lora.setOutputPower(config.txPower);
   if (rc == ERR_INVALID_OUTPUT_POWER) {
     logerr("ERROR  output power is invalid");
     return DUCKLORA_ERR_SETUP;
   }
 
-  rc = lora.setGain(CDPCFG_RF_LORA_GAIN);
+  rc = lora.setGain(config.gain);
   if (rc == ERR_INVALID_GAIN) {
     logerr("ERROR  gain is invalid");
     return DUCKLORA_ERR_SETUP;
@@ -204,6 +204,47 @@ int DuckRadio::standBy() { return lora.standby(); }
 int DuckRadio::sleep() { return lora.sleep(); }
 
 void DuckRadio::processRadioIrq() {}
+
+void DuckRadio::setChannel(int channelNum) {
+  loginfo("Setting Channel to : " + channelNum);
+  int err;
+  switch(channelNum) {
+    case 1:
+      loginfo("Set channel: 1");
+      err = lora.setFrequency(CHANNEL_1);
+      break;
+    case 2:
+      loginfo("Set channel: 2");
+      err = lora.setFrequency(CHANNEL_2);
+      break;
+    case 3:
+      loginfo("Set channel: 3");
+      err = lora.setFrequency(CHANNEL_3);
+      break;
+    case 4:
+      loginfo("Set channel: 4");
+      err = lora.setFrequency(CHANNEL_4);
+      break;
+    case 5:
+      loginfo("Set channel: 5");
+      err = lora.setFrequency(CHANNEL_5);
+      break;
+    case 6:
+      loginfo("Set channel: 6");
+      err = lora.setFrequency(CHANNEL_6);
+      break;
+    default:
+      loginfo("Set channel: 1");
+      err = lora.setFrequency(CHANNEL_1);
+    
+    if (err != ERR_NONE) {
+      logerr("ERROR Failed to set channel");
+    } else {
+      loginfo("Channel Set");
+    }
+  }
+
+}
 
 int DuckRadio::startTransmitData(byte* data, int length) {
 
