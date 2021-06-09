@@ -13,6 +13,14 @@ void Duck::setEncrypt(bool state) {
   duckcrypto::setEncrypt(state);
 }
 
+bool Duck::getEncrypt() {
+  return duckcrypto::getState();
+}
+
+bool Duck::getDecrypt() {
+  return duckcrypto::getDecrypt();
+}
+
 void Duck::setAESKey(uint8_t newKEY[32]) {
   duckcrypto::setAESKey(newKEY);
 }

@@ -63,6 +63,11 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     duckutils::flipDetectState();
   });
 
+  webServer.on("/flipDecrypt", HTTP_POST, [&](AsyncWebServerRequest* request) {
+    //Flip Decrypt State
+    duckcrypto::setDecrypt(!duckcrypto::getDecrypt());
+  });
+
   webServer.on("/setChannel", HTTP_POST, [&](AsyncWebServerRequest* request) {
     AsyncWebParameter* p = request->getParam(0);
     logdbg(p->name() + ": " + p->value());

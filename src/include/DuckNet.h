@@ -39,6 +39,7 @@
 #include "DuckEsp.h"
 #include "DuckRadio.h"
 #include "DuckUtils.h"
+#include "DuckCrypto.h"
 #include "OTAPage.h"
 #include "index.h"
 #include "wifiCredentials.h"

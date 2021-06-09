@@ -47,6 +47,11 @@ const char controlPanel[] PROGMEM = R"=====(
     <form action='/flipDetector' method='post'>
     <input type='submit' value='Detector On' />
     </form>
+
+    <form action='/flipDecrypt' method='post'>
+    <input type='submit' value='Decrypt On' />
+    </form>
+
     <p>Channel Select</p>
     <form action='/setChannel' method='post'>
 
