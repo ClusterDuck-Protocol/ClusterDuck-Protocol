@@ -91,6 +91,10 @@ $ git checkout -b my-branch -t upstream/master
 
 ClusterDuck-Protocol does not yet have a style guide. If you're interested in creating one, you're on the right page 😃
 
+#### Static analysis
+
+[Cppcheck](http://cppcheck.sourceforge.net/) is used within the ClusterDuck's Travis CI to detect some of the more obvious C++ problems. If cppcheck finds a problem the build will fail, so you probably want to run cppcheck locally before committing and pushing changes. See [.travis.yml](https://github.com/Call-for-Code/ClusterDuck-Protocol/blob/master/.travis.yml) for the current `cppcheck` command being used by CI.
+
 ### Step 4: Commit
 
 It is a recommended best practice to keep your changes as logically grouped
