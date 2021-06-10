@@ -27,13 +27,6 @@
 #define MQTT_RETRY_DELAY_MS 500
 #define WIFI_RETRY_DELAY_MS 5000
 
-// This is the DigiCert Global Root CA, which is the root CA cert for
-// https://internetofthings.ibmcloud.com/
-// It expires November 9, 2031.
-// To connect to a different cloud provider or server, you may need to use a
-// different cert. For details, see
-// https://github.com/espressif/arduino-esp32/tree/master/libraries/WiFiClientSecure
-
 //Uncomment CA_CERT if you want to use the certificate auth method
 //#define CA_CERT
 #ifdef CA_CERT
@@ -60,6 +53,12 @@ const char* example_root_ca = \
   "YSEY1QSteDwsOoBrp+uvFRTp2InBuThs4pFsiv9kuXclVzDAGySj4dzp30d8tbQk\n" \
   "CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=\n" \
   "-----END CERTIFICATE-----\n";
+  // This is the DigiCert Global Root CA, which is the root CA cert for
+  // https://internetofthings.ibmcloud.com/
+  // It expires November 9, 2031.
+  // To connect to a different cloud provider or server, you may need to use a
+  // different cert. For details, see
+  // https://github.com/espressif/arduino-esp32/tree/master/libraries/WiFiClientSecure
 #endif
 
 #define SSID ""
@@ -242,11 +241,11 @@ void setup() {
   duck.onReceiveDuckData(handleDuckData);
 
   #ifdef CA_CERT
+  Serial.println("[PAPA] Using root CA cert");
   wifiClient.setCACert(example_root_ca);
-  while (!wifiClient.connect(server, port)) {
-    Serial.println("[PAPA] Failed to connect to " + String(server) + ":" + String(port));
-    delay(5000);
-  }
+  #else
+  Serial.println("[PAPA] Using insecure TLS");
+  wifiClient.setInsecure();
   #endif
 
   Serial.println("[PAPA] Setup OK! ");
