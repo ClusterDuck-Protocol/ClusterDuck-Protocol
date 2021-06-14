@@ -29,7 +29,7 @@ Check out the [Wiki](https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki)
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our Code of Conduct, and the process for submitting ClusterDuck Protocol improvements.
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our Code of Conduct, the process for submitting ClusterDuck Protocol improvements, and how to join our town halls and livestreams.
 
 ## Contributors
 <a href="https://github.com/Call-for-Code/clusterduck-protocol/graphs/contributors">
