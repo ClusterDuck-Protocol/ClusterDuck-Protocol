@@ -280,9 +280,9 @@ int DuckNet::saveWifiCredentials(String ssid, String password) {
       loginfo("Wrote: ");
       loginfo(password[i]);
     }
-    EEPROM.commit();}
-
+    EEPROM.commit();
   }
+}
 
   int DuckNet::loadWiFiCredentials(){
 
@@ -308,13 +308,12 @@ int DuckNet::saveWifiCredentials(String ssid, String password) {
   setPassword(epass);
 
   if (esid.length() == 0 || epass.length() == 0){
-   loginfo("ERROR setupInternet: Stored SSID and PASSWORD empty");
-   return DUCK_ERR_SETUP;
- } else{
-  loginfo("Setup Internet with saved credentials");
-  setupInternet(esid, epass);
-  
-}
+    loginfo("ERROR setupInternet: Stored SSID and PASSWORD empty");
+    return DUCK_ERR_SETUP;
+  } else{
+    loginfo("Setup Internet with saved credentials");
+    setupInternet(esid, epass);
+  }
 
 }
 
@@ -324,7 +323,7 @@ int DuckNet::setupInternet(String ssid, String password) {
   this->password = password;
 
 
-// Check if SSID is available
+  // Check if SSID is available
   if (!ssidAvailable(ssid)) {
     logerr("ERROR setupInternet: " + ssid + " is not available. Please check the provided ssid and/or passwords");
     return DUCK_INTERNET_ERR_SSID;
@@ -332,7 +331,7 @@ int DuckNet::setupInternet(String ssid, String password) {
 
 
 
-//  Connect to Access Point
+  //  Connect to Access Point
   logdbg("setupInternet: connecting to WiFi access point SSID: " + ssid);
   WiFi.begin(ssid.c_str(), password.c_str());
   // We need to wait here for the connection to estanlish. Otherwise the WiFi.status() may return a false negative
