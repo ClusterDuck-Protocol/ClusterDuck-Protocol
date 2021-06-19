@@ -73,14 +73,18 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
       if (!request->authenticate(controlSsid, controlPassword))
       return request->requestAuthentication();
     }
+
+    AsyncWebServerResponse* response =
+    request->beginResponse(200, "text/html", controlPanel);
+
+    request->send(response);
     
-    
-    request->send(200, "text/html", controlPanel);
   });
 
   webServer.on("/flipDetector", HTTP_POST, [&](AsyncWebServerRequest* request) {
     //Run flip method
     duckutils::flipDetectState();
+    request->send(200, "text/plain", "Success");
   });
 
   webServer.on("/setChannel", HTTP_POST, [&](AsyncWebServerRequest* request) {
@@ -89,6 +93,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     int val = std::atoi(p->value().c_str());
     
     duckRadio->setChannel(val);
+    request->send(200, "text/plain", "Success");
   });
 
   webServer.on("/changeControlPassword", HTTP_POST, [&](AsyncWebServerRequest* request) {
