@@ -360,8 +360,8 @@
  */
 
 //Default Username and Password
-#define CDPCFG_UPDATE_USERNAME "username"
-#define CDPCFG_UPDATE_PASSWORD "password"
+#define CDPCFG_UPDATE_USERNAME "user"
+#define CDPCFG_UPDATE_PASSWORD "pass"
 
 #define CDPCFG_EEPROM_CRED_MAX 32
 #define CDPCFG_EEPROM_WIFI_USERNAME 0
