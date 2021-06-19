@@ -359,9 +359,15 @@
  *
  */
 
-// Username and Password for OTA web page
+//Default Username and Password
 #define CDPCFG_UPDATE_USERNAME "username"
 #define CDPCFG_UPDATE_PASSWORD "password"
+
+#define CDPCFG_EEPROM_CRED_MAX 32
+#define CDPCFG_EEPROM_WIFI_USERNAME 0
+#define CDPCFG_EEPROM_WIFI_PASSWORD 32
+#define CDPCFG_EEPROM_CONTROL_USERNAME 64
+#define CDPCFG_EEPROM_CONTROL_PASSWORD 96
 
 /// Serial Console Baud Rate
 #define CDPCFG_SERIAL_BAUD 115200

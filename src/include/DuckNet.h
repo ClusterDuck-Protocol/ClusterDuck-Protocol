@@ -152,6 +152,11 @@ public:
    */
 
   int loadWiFiCredentials();
+
+  int saveControlCredentials(String ssid, String password);
+
+  int loadControlCredentials();
+
   /**
    * @brief Load Wifi credentials from EEPROM
    */
@@ -164,6 +169,10 @@ public:
    * @param val  the password string to set
    */
   void setPassword(String val);
+
+  void setControlSsid(String val);
+
+  void setControlPassword(String val);
 
   /**
    * @brief Get the WiFi network ssid.
@@ -212,6 +221,8 @@ private:
   String portal = "";
   String ssid = "";
   String password = "";
+  char* controlSsid = "";
+  char* controlPassword = "";
 };
 
 #endif

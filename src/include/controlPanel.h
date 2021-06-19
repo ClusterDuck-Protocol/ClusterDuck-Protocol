@@ -69,10 +69,24 @@ const char controlPanel[] PROGMEM = R"=====(
     <label for="channel6">6</label><br>
     <input type="submit" value="Submit">
     </form>
+
+    <form action='/changeControlPassword' method='post'>
+
+    <label for='ssid'>SSID:</label><br> 
+    <input name='ssid' type='text' placeholder='SSID' /><br><br>
+    <label for='pass'>Password:</label><br>
+    <input name='pass' type='text' placeholder='Password' /><br><br>
+    <label for='newSsid'>New SSID:</label><br> 
+    <input name='newSsid' type='text' placeholder='New SSID' /><br><br>
+    <label for='newPass'>New Password:</label><br>
+    <input name='newPass' type='text' placeholder='New Password' /><br><br>
+
+    <input type="submit" value="Submit">
+    </form>
     
  
    
-      </div>
+    </div>
 
   </body></html>
   

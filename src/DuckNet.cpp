@@ -19,8 +19,12 @@ const char* DuckNet::DNS = "duck";
 const byte DuckNet::DNS_PORT = 53;
 
 // Username and password for /update
-const char* http_username = CDPCFG_UPDATE_USERNAME;
-const char* http_password = CDPCFG_UPDATE_PASSWORD;
+const char* update_username = CDPCFG_UPDATE_USERNAME;
+const char* update_password = CDPCFG_UPDATE_PASSWORD;
+
+const char* control_username = CDPCFG_UPDATE_USERNAME;
+const char* control_password = CDPCFG_UPDATE_PASSWORD;
+
 
 bool restartRequired = false;
 size_t content_len;
@@ -54,7 +58,23 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
   // This will serve as an easy to access "control panel" to change settings of devices easily
   // TODO: Need to be able to turn off this feature from the application layer for security
   // TODO: Can we limit controls depending on the duck?
-  webServer.on("/controlPanel", HTTP_GET, [&](AsyncWebServerRequest* request) {
+  webServer.on("/controlpanel", HTTP_GET, [&](AsyncWebServerRequest* request) {
+    if(controlSsid == "" || controlPassword == "") {
+      int empty = loadControlCredentials();
+      if(empty) {
+        if (!request->authenticate(control_username, control_password))
+      return request->requestAuthentication();
+      } else {
+        if (!request->authenticate(controlSsid, controlPassword))
+      return request->requestAuthentication();
+      }
+
+    } else {
+      if (!request->authenticate(controlSsid, controlPassword))
+      return request->requestAuthentication();
+    }
+    
+    
     request->send(200, "text/html", controlPanel);
   });
 
@@ -71,9 +91,42 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     duckRadio->setChannel(val);
   });
 
+  webServer.on("/changeControlPassword", HTTP_POST, [&](AsyncWebServerRequest* request) {
+    int paramsNumber = request->params();
+    String val = "";
+    String ssid = "";
+    String password = "";
+    String newSsid = "";
+    String newPassword = "";
+
+    for (int i = 0; i < paramsNumber; i++) {
+      AsyncWebParameter* p = request->getParam(i);
+
+      String name = String(p->name());
+      String value = String(p->value());
+
+      if (name == "ssid") {
+        ssid = String(p->value());
+      } else if (name == "pass") {
+        password = String(p->value());
+      } else if (name == "newSsid") {
+        newSsid = String(p->value());
+      } else if (name == "newPassword") {
+        newPassword = String(p->value());
+      }
+    }
+
+    if (ssid == controlSsid && password == controlPassword && newSsid != "" && newPassword != "") {
+      saveControlCredentials(newSsid, newPassword);
+      request->send(200, "text/plain", "Success");
+    } else {
+      request->send(500, "text/plain", "There was an error");
+    }
+  });
+
   // Update Firmware OTA
   webServer.on("/update", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    if (!request->authenticate(http_username, http_password))
+    if (!request->authenticate(update_username, update_password))
       return request->requestAuthentication();
 
     AsyncWebServerResponse* response =
@@ -261,55 +314,62 @@ int DuckNet::setupDns() {
   return DUCK_ERR_NONE;
 }
 
+//TODO: EEPROM saving should probably be moved out of DuckNet.cpp
+
 int DuckNet::saveWifiCredentials(String ssid, String password) {
   this->ssid = ssid;
   this->password = password;
 
+  if(ssid.length() > 32 || password.length() > 32) {
+    //Too long
+    return -1;
+  }
 
   EEPROM.begin(512);
 
   if (ssid.length() > 0 && password.length() > 0) {
     loginfo("Clearing EEPROM");
-    for (int i = 0; i < 96; i++) {
+    for (int i = 0; i < 64; i++) {
       EEPROM.write(i, 0);
     }
 
     loginfo("writing EEPROM SSID:");
     for (int i = 0; i < ssid.length(); i++)
     {
-      EEPROM.write(i, ssid[i]);
+      EEPROM.write(CDPCFG_EEPROM_WIFI_USERNAME + i, ssid[i]);
       loginfo("Wrote: ");
       loginfo(ssid[i]);
     }
     loginfo("writing EEPROM Password:");
     for (int i = 0; i < password.length(); ++i)
     {
-      EEPROM.write(32 + i, password[i]);
+      EEPROM.write(CDPCFG_EEPROM_WIFI_PASSWORD + i, password[i]);
       loginfo("Wrote: ");
       loginfo(password[i]);
     }
     EEPROM.commit();
+    return 0;
   }
 }
 
-  int DuckNet::loadWiFiCredentials(){
+int DuckNet::loadWiFiCredentials(){
 
   // This method will look for any saved WiFi credntials on the device and set up a internet connection
   EEPROM.begin(512); //Initialasing EEPROM
 
   String esid;
-  for (int i = 0; i < 32; ++i)
+  for (int i = 0; i < CDPCFG_EEPROM_CRED_MAX; ++i)
   {
-    esid += char(EEPROM.read(i));
+    esid += char(EEPROM.read(CDPCFG_EEPROM_WIFI_USERNAME + i));
   }
   // lopp through saved SSID carachters
   loginfo("Reading EEPROM SSID: " + esid);
   setSsid(esid);
 
   String epass = "";
-  for (int i = 32; i < 96; ++i)
+  for (int i = 0; i < CDPCFG_EEPROM_CRED_MAX; ++i)
   {
-    epass += char(EEPROM.read(i));
+    epass += char(EEPROM.read(CDPCFG_EEPROM_WIFI_PASSWORD + i));
   }
   // lopp through saved Password carachters
   loginfo("Reading EEPROM Password: " + epass);
@@ -321,6 +381,85 @@ int DuckNet::saveWifiCredentials(String ssid, String password) {
   } else{
     loginfo("Setup Internet with saved credentials");
     setupInternet(esid, epass);
+  }
+
+}
+
+int DuckNet::saveControlCredentials(String ssid, String password) {
+  int n = ssid.length();
+  char temp[n + 1];
+  strcpy(temp, ssid.c_str());
+  this->controlSsid = temp;
+  delete[] temp;
+
+  n = password.length();
+  char temp[n + 1];
+  strcpy(temp, password.c_str());
+  this->controlPassword = temp;
+  delete[] temp;
+
+  if(ssid.length() > 32 || password.length() > 32) {
+    //Too long
+    return -1;
+  }
+
+  EEPROM.begin(512);
+
+  if (ssid.length() > 0 && password.length() > 0) {
+    loginfo("Clearing EEPROM");
+    for (int i = CDPCFG_EEPROM_CONTROL_USERNAME; 
+      i < CDPCFG_EEPROM_CONTROL_PASSWORD + CDPCFG_EEPROM_CRED_MAX; i++) {
+      EEPROM.write(i, 0);
+    }
+
+    loginfo("writing EEPROM SSID:");
+    for (int i = 0; i < ssid.length(); i++)
+    {
+      EEPROM.write(CDPCFG_EEPROM_CONTROL_USERNAME + i, ssid[i]);
+      loginfo("Wrote: ");
+      loginfo(ssid[i]);
+    }
+    loginfo("writing EEPROM Password:");
+    for (int i = 0; i < password.length(); ++i)
+    {
+      EEPROM.write(CDPCFG_EEPROM_CONTROL_PASSWORD + i, password[i]);
+      loginfo("Wrote: ");
+      loginfo(password[i]);
+    }
+    EEPROM.commit();
+    return 0;
+  }
+}
+
+int DuckNet::loadControlCredentials(){
+
+  // This method will look for any saved WiFi credntials on the device and set up a internet connection
+  EEPROM.begin(512); //Initialasing EEPROM
+
+  String esid;
+  for (int i = 0; i < CDPCFG_EEPROM_CRED_MAX; ++i)
+  {
+    esid += char(EEPROM.read(CDPCFG_EEPROM_CONTROL_USERNAME + i));
+  }
+  // lopp through saved SSID carachters
+  loginfo("Reading EEPROM SSID: " + esid);
+  setControlSsid(esid);
+
+  String epass = "";
+  for (int i = 0; i < CDPCFG_EEPROM_CRED_MAX; ++i)
+  {
+    epass += char(EEPROM.read(CDPCFG_EEPROM_CONTROL_PASSWORD + i));
+  }
+  // lopp through saved Password carachters
+  loginfo("Reading EEPROM Password: " + epass);
+  setControlPassword(epass);
+
+  if (esid.length() == 0 || epass.length() == 0){
+    loginfo("ERROR no Control Panel SSID and PASSWORD set: Stored SSID and PASSWORD empty");
+    return 1;
+  } else{
+    loginfo("Control panel credentials loaded");
+    return 0;
   }
 
 }
@@ -383,6 +522,22 @@ bool DuckNet::ssidAvailable(String val) {
 void DuckNet::setSsid(String val) { ssid = val; }
 
 void DuckNet::setPassword(String val) { password = val; }
+
+void DuckNet::setControlSsid(String val) { 
+  int n = val.length();
+  char temp[n + 1];
+  strcpy(temp, val.c_str());
+  this->controlSsid = temp;
+  delete[] temp; 
+}
+
+void DuckNet::setControlPassword(String val) { 
+  int n = val.length();
+  char temp[n + 1];
+  strcpy(temp, val.c_str());
+  this->controlPassword = temp;
+  delete[] temp;
+ }
 
 String DuckNet::getSsid() { return ssid; }
 
