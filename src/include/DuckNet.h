@@ -11,8 +11,7 @@
  * @copyright
  */
 
-#ifndef DUCKNET_H_
-#define DUCKNET_H_
+#pragma once
 
 #include "cdpcfg.h"
 #include <WString.h>
@@ -137,25 +136,27 @@ public:
    */
   bool ssidAvailable(String val = "");
 
-  /**
-   * @brief Set the WiFi network ssid.
-   *
-   * @param val the ssid string to set
-   */
-
-  int saveWifiCredentials(String ssid, String password);
+  
   /**
    * @brief Save / Write Wifi credentials to EEPROM
    *
    * @param ssid        the ssid of the WiFi network
    * @param password    password to join the network
+   * @return DUCK_ERR_NONE if successful, an error code otherwise.
    */
-
-  int loadWiFiCredentials();
+  int saveWifiCredentials(String ssid, String password);
+  
   /**
    * @brief Load Wifi credentials from EEPROM
+   * @return DUCK_ERR_NONE if successful, an error code otherwise.
    */
-
+  int loadWiFiCredentials();
+  
+  /**
+   * @brief Set the WiFi network ssid.
+   *
+   * @param val the ssid string to set
+   */
   void setSsid(String val);
 
   /**
@@ -213,5 +214,3 @@ private:
   String ssid = "";
   String password = "";
 };
-
-#endif
