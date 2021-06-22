@@ -3,7 +3,7 @@
 namespace duckesp {
 #ifdef ESP32
 void restartDuck() { ESP.restart(); }
-int freeHeapMemory() {ESP.getFreeHeap();}
+int freeHeapMemory() {return ESP.getFreeHeap();}
 #else 
 void restartDuck() {}
 int freeHeapMemory() {}

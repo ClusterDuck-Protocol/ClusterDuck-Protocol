@@ -282,6 +282,7 @@ int DuckNet::saveWifiCredentials(String ssid, String password) {
     }
     EEPROM.commit();
   }
+  return DUCK_ERR_NONE;
 }
 
   int DuckNet::loadWiFiCredentials(){
@@ -314,7 +315,7 @@ int DuckNet::saveWifiCredentials(String ssid, String password) {
     loginfo("Setup Internet with saved credentials");
     setupInternet(esid, epass);
   }
-
+  return DUCK_ERR_NONE;
 }
 
 
