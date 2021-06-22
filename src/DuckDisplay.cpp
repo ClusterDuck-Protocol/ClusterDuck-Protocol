@@ -1,9 +1,6 @@
 #include "DuckDisplay.h"
 
 #ifdef CDPCFG_OLED_CLASS
-// 2021-06-18: Including iostream adds ~169KB to the build.
-#include <iostream>
-
 #include "include/DuckTypes.h"
 #include "include/DuckEsp.h"
 #include "include/DuckUtils.h"
