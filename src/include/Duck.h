@@ -263,6 +263,8 @@ protected:
   DuckNet* duckNet = DuckNet::getInstance();
   DuckPacket* txPacket = NULL;
   DuckPacket* rxPacket = NULL;
+  std::vector<byte> lastMessageMuid;
+  bool lastMessageReceipt;
 
   /**
    * @brief sends a pong message

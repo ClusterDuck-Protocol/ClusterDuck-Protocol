@@ -49,6 +49,11 @@ String createUuid(int length = CDPCFG_UUID_LEN);
  */
 String convertToHex(byte* data, int size);
 
+template<typename T>
+String toString(const std::vector<T> & vec) {
+  return std::string(vec.begin(), vec.end()).c_str();
+}
+
 /**
  * @brief Get the Duck Interrupt state
  * 
@@ -69,7 +74,7 @@ void setInterrupt(bool enable);
  * @param data byte array to convert
  * @returns a 32 bit unsigned integer.
  */
-uint32_t toUnit32(byte* data);
+uint32_t toUnit32(const byte* data);
 
 Timer<> getTimer();
 

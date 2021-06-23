@@ -55,6 +55,8 @@ enum topics {
   alert = 0x14,
   /// Device health status
   health = 0x15,
+  /// Previous message was received
+  receipt = 0x16,
   /// Max supported topics
   max_topics = 0xFF
 };
@@ -110,7 +112,7 @@ public:
   /// Path section (48 bytes max)
   std::vector<byte> path;
 
-  CdpPacket(std::vector<byte> & buffer) {
+  CdpPacket(const std::vector<byte> & buffer) {
     int buffer_length = buffer.size();
     
     // get path start position

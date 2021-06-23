@@ -3,7 +3,11 @@
 
 volatile bool Duck::receivedFlag = false;
 
-Duck::Duck(String name) {
+Duck::Duck(String name):
+  lastMessageReceipt(true)
+  // Since this can be used to throttle outgoing packets, start out in a state
+  // that indicates we're not waiting for a receipt
+{
   duckutils::setInterrupt(true);
   duckName = name;
 }
@@ -258,6 +262,10 @@ int Duck::sendData(byte topic, std::vector<byte> data, const std::vector<byte> t
     return err;
   }
   err = duckRadio->sendData(txPacket->getBuffer());
+  lastMessageReceipt = false;
+  CdpPacket packet = CdpPacket(txPacket->getBuffer());
+  lastMessageMuid.assign(packet.muid.begin(), packet.muid.end());
+  assert(lastMessageMuid.size() == MUID_LENGTH);
   txPacket->reset();
   return err;
 }

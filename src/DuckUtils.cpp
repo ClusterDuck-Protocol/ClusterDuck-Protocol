@@ -66,7 +66,7 @@ String convertToHex(byte* data, int size) {
   return buf;
 }
 
-uint32_t toUnit32(byte* data) {
+uint32_t toUnit32(const byte* data) {
     uint32_t value = 0;
 
     value |= data[0] << 24;

@@ -88,6 +88,56 @@ void MamaDuck::handleReceivedPacket() {
       return;
     }
 
+    if (rxPacket->getTopic() == topics::receipt) {
+      CdpPacket packet = CdpPacket(rxPacket->getBuffer());
+
+      if (duid[0] == packet.dduid[0]
+        && duid[1] == packet.dduid[1]
+        && duid[2] == packet.dduid[2]
+        && duid[3] == packet.dduid[3]
+        && duid[4] == packet.dduid[4]
+        && duid[5] == packet.dduid[5]
+        && duid[6] == packet.dduid[6]
+        && duid[7] == packet.dduid[7]
+      ) {
+        if (lastMessageMuid.size() != MUID_LENGTH) {
+          // This may indicate a duplicate DUID on the network.
+          logwarn("handleReceivedPacket: received receipt with matching DUID "
+            + duckutils::toString(duid)
+            + " but no receipt is expected. Not relaying.");
+        } else if(lastMessageMuid[0] == packet.data[0]
+          && lastMessageMuid[1] == packet.data[1]
+          && lastMessageMuid[2] == packet.data[2]
+          && lastMessageMuid[3] == packet.data[3]
+        ) {
+          loginfo("handleReceivedPacket: matched receipt. Not relaying. Matching DDUID "
+            + duckutils::toString(duid) + " and receipt-MUID "
+            + duckutils::toString(lastMessageMuid));
+          lastMessageReceipt = true;
+        } else {
+          // This may indicate a duplicate DUID on the network or it may be a
+          // receipt for a previous message.
+          logwarn("handleReceivedPacket: received receipt with matching DUID "
+            + duckutils::toString(duid) + " but receipt-MUID "
+            + duckutils::toString(packet.data)
+            + " does not match. Expected receipt for MUID "
+            + duckutils::toString(lastMessageMuid)
+            + ". Not relaying.");
+        }
+
+        // Returning here prevents anything else from happening.
+        // TODO[Rory Olsen: 2021-06-23]: The application may need to know about
+        //   receipts. I recommend a callback specifically for receipts, or
+        //   similar.
+        return;
+      } else {
+        loginfo("handleReceivedPacket: relaying receipt for DDUID "
+            + duckutils::toString(packet.dduid)
+            + " and receipt-MUID "
+            + duckutils::toString(packet.muid));
+      }
+    }
+
     err = duckRadio->relayPacket(rxPacket);
     if (err != DUCK_ERR_NONE) {
       logerr("====> ERROR handleReceivedPacket failed to relay. rc = " + String(err));
