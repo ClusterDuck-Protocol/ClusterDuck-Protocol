@@ -91,25 +91,16 @@ void MamaDuck::handleReceivedPacket() {
     if (rxPacket->getTopic() == reservedTopic::receipt) {
       CdpPacket packet = CdpPacket(rxPacket->getBuffer());
 
-      if (duid[0] == packet.dduid[0]
-        && duid[1] == packet.dduid[1]
-        && duid[2] == packet.dduid[2]
-        && duid[3] == packet.dduid[3]
-        && duid[4] == packet.dduid[4]
-        && duid[5] == packet.dduid[5]
-        && duid[6] == packet.dduid[6]
-        && duid[7] == packet.dduid[7]
-      ) {
+      if (duckutils::isEqual(duid, packet.dduid)) {
         if (lastMessageMuid.size() != MUID_LENGTH) {
-          // This may indicate a duplicate DUID on the network.
+          // This may indicate a duplicate DUID (if this MamaDuck hasn't
+          // previously sent any packets on the network) or may indicate that
+          // this MamaDuck has recently rebooted (and a previous message is
+          // being ack'd).
           logwarn("handleReceivedPacket: received receipt with matching DUID "
             + duckutils::toString(duid)
             + " but no receipt is expected. Not relaying.");
-        } else if(lastMessageMuid[0] == packet.data[0]
-          && lastMessageMuid[1] == packet.data[1]
-          && lastMessageMuid[2] == packet.data[2]
-          && lastMessageMuid[3] == packet.data[3]
-        ) {
+        } else if(duckutils::isEqual(lastMessageMuid, packet.data)) {
           loginfo("handleReceivedPacket: matched receipt. Not relaying. Matching DDUID "
             + duckutils::toString(duid) + " and receipt-MUID "
             + duckutils::toString(lastMessageMuid));
