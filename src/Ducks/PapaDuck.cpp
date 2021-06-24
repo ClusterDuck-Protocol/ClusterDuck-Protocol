@@ -120,7 +120,7 @@ void PapaDuck::handleReceivedPacket() {
 
     // The data payload of a receipt is the MUID of the received packet
     err = txPacket->prepareForSending(packet.sduid, DuckType::PAPA,
-      topics::receipt, packet.muid);
+      reservedTopic::receipt, packet.muid);
     if (err != DUCK_ERR_NONE) {
       logerr("ERROR handleReceivedPacket. Failed to prepare receipt. Error: " +
         String(err));

@@ -88,7 +88,7 @@ void MamaDuck::handleReceivedPacket() {
       return;
     }
 
-    if (rxPacket->getTopic() == topics::receipt) {
+    if (rxPacket->getTopic() == reservedTopic::receipt) {
       CdpPacket packet = CdpPacket(rxPacket->getBuffer());
 
       if (duid[0] == packet.dduid[0]

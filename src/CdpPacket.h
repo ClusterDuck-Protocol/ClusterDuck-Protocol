@@ -55,8 +55,6 @@ enum topics {
   alert = 0x14,
   /// Device health status
   health = 0x15,
-  /// Previous message was received
-  receipt = 0x16,
   /// Max supported topics
   max_topics = 0xFF
 };
@@ -66,6 +64,7 @@ enum reservedTopic {
   ping = 0x01,
   pong = 0x02,
   gps = 0x03,
+  receipt = 0x04,
   max_reserved = 0x0F
 };
 
