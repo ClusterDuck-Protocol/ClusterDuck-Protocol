@@ -11,14 +11,14 @@
 #ifndef DUCKLORA_H_
 #define DUCKLORA_H_
 
+#include <Arduino.h>
+
 #include "../DuckDisplay.h"
 #include "../DuckError.h"
 #include "../DuckLogger.h"
-#include <Arduino.h>
-
+#include "cdpcfg.h"
 #include "DuckPacket.h"
 #include "LoraPacket.h"
-#include "cdpcfg.h"
 
 /**
  * @brief Internal structure to hold the LoRa module configuration
@@ -49,8 +49,20 @@ typedef struct {
  *
  */
 class DuckRadio {
+  friend class Duck;
+  friend class DuckDetect;
+  friend class DuckLink;
+  friend class MamaDuck;
+  friend class PapaDuck;
 
-public:
+private:
+  // Everything is private to force Duck (and Duck descendants) to be the only
+  // way to interact with the radio. There should only be one Duck per sketch
+  // so that arbitrary pieces of code cannot interfere with the radio. Also,
+  // Duck does things like recording the outgoing MUIDs so that it can wait for
+  // acknowledgments to those MUIDs.
+
+  DuckRadio();
 
   /**
    * @brief Initialize the LoRa chip.
@@ -159,10 +171,9 @@ public:
   void processRadioIrq();
 
 private:
-  DuckRadio();
   DuckRadio(DuckRadio const&) = delete;
   DuckRadio& operator=(DuckRadio const&) = delete;
-  static DuckRadio* instance;
+
   DuckDisplay* display = DuckDisplay::getInstance();
 };
 

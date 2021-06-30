@@ -1,17 +1,19 @@
 #ifndef DUCK_H
 #define DUCK_H
 
-#include "../DuckError.h"
-#include "DuckNet.h"
-#include "DuckRadio.h"
-#include "DuckTypes.h"
-#include "DuckPacket.h"
-#include "DuckCrypto.h"
-#include "DuckUtils.h"
-#include "cdpcfg.h"
+#include <string>
+
 #include <Arduino.h>
 #include <WString.h>
-#include <string>
+
+#include "../DuckError.h"
+#include "cdpcfg.h"
+#include "DuckCrypto.h"
+#include "DuckNet.h"
+#include "DuckPacket.h"
+#include "DuckRadio.h"
+#include "DuckTypes.h"
+#include "DuckUtils.h"
 
 class Duck {
 
@@ -181,31 +183,45 @@ public:
   int sendData(byte topic, const byte* data, int length, const std::vector<byte> targetDevice = ZERO_DUID);
 
   /**
+   * @brief Updates the firmware on the device
+   *
+   * TODO: Additional documentation
+   */
+  void updateFirmware(const String & filename, size_t index, uint8_t* data, size_t len, bool final);
+
+  /**
+   * @brief Get the MUID of the last packet that was sent into the mesh network.
+   *
+   * @return An MUID as a vector that's owned by this Duck.
+   */
+  const std::vector<byte> & getLastTxMuid();
+
+  /**
    * @brief Check wifi connection status
    * 
    * @returns true if device wifi is connected, false otherwise. 
    */
-  bool isWifiConnected() { return duckNet->isWifiConnected(); }
+  bool isWifiConnected() { return duckNet.isWifiConnected(); }
   /**
    * @brief Check if the give access point is available.
    * 
    * @param ssid access point to check
    * @returns true if the access point is available, false otherwise.
    */
-  bool ssidAvailable(String ssid) { return duckNet->ssidAvailable(ssid); }
+  bool ssidAvailable(String ssid) { return duckNet.ssidAvailable(ssid); }
 
   /**
    * @brief Get the access point ssid
    * 
    * @returns the wifi access point as a string
    */
-  String getSsid() { return duckNet->getSsid(); }
+  String getSsid() { return duckNet.getSsid(); }
   /**
    * @brief Get the wifi access point password.
    * 
    * @returns the wifi access point password as a string. 
    */
-  String getPassword() { return duckNet->getPassword(); }
+  String getPassword() { return duckNet.getPassword(); }
 
   /**
    * @brief Get an error code description.
@@ -262,12 +278,15 @@ protected:
 
   String deviceId;
   std::vector<byte> duid;
-  DuckRadio* duckRadio = DuckRadio::getInstance();
-  DuckNet* duckNet = DuckNet::getInstance();
+  DuckRadio duckRadio;
+  DuckNet duckNet;
   DuckPacket* txPacket = NULL;
   DuckPacket* rxPacket = NULL;
   std::vector<byte> lastMessageMuid;
-  bool lastMessageReceipt;
+
+  bool lastMessageReceipt = true;
+  // Since this may be used to throttle outgoing packets, start out in a state
+  // that indicates we're not waiting for a receipt
 
   /**
    * @brief sends a pong message

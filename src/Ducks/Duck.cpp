@@ -1,12 +1,16 @@
 #include "include/Duck.h"
+
+#include <ArduinoOTA.h>
+#include <esp_int_wdt.h>
+#include <esp_task_wdt.h>
+#include <Update.h>
+
 #include "include/DuckEsp.h"
 
 volatile bool Duck::receivedFlag = false;
 
 Duck::Duck(String name):
-  lastMessageReceipt(true)
-  // Since this can be used to throttle outgoing packets, start out in a state
-  // that indicates we're not waiting for a receipt
+  duckNet(this)
 {
   duckutils::setInterrupt(true);
   duckName = name;
@@ -94,7 +98,7 @@ int Duck::setupRadio(float band, int ss, int rst, int di0, int di1,
   config.txPower = txPower;
   config.func = Duck::onRadioRxTxDone;
 
-  int err = duckRadio->setupRadio(config);
+  int err = duckRadio.setupRadio(config);
 
   if (err == DUCKLORA_ERR_BEGIN) {
     logerr("ERROR setupRadio. Starting LoRa Failed. rc = " + String(err));
@@ -117,13 +121,13 @@ int Duck::setupRadio(float band, int ss, int rst, int di0, int di1,
 }
 
 void Duck::setSyncWord(byte syncWord) {
-  duckRadio->setSyncWord(syncWord);
+  duckRadio.setSyncWord(syncWord);
 }
 
 int Duck::setupWebServer(bool createCaptivePortal, String html) {
   int err = DUCK_ERR_NONE;
-  duckNet->setDeviceId(duid);
-  err = duckNet->setupWebServer(createCaptivePortal, html);
+  duckNet.setDeviceId(duid);
+  err = duckNet.setupWebServer(createCaptivePortal, html);
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR setupWebServer rc = " + String(err));
   } else {
@@ -133,7 +137,7 @@ int Duck::setupWebServer(bool createCaptivePortal, String html) {
 }
 
 int Duck::setupWifi(const char* ap) {
-  int err = duckNet->setupWifiAp(ap);
+  int err = duckNet.setupWifiAp(ap);
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR setupWifi rc = " + String(err));
   } else {
@@ -143,7 +147,7 @@ int Duck::setupWifi(const char* ap) {
 }
 
 int Duck::setupDns() {
-  int err = duckNet->setupDns();
+  int err = duckNet.setupDns();
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR setupDns rc = " + String(err));
   } else {
@@ -153,7 +157,7 @@ int Duck::setupDns() {
 }
 
 int Duck::setupInternet(String ssid, String password) {
-  int err = duckNet->setupInternet(ssid, password);
+  int err = duckNet.setupInternet(ssid, password);
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR setupInternet rc = " + String(err));
   } else {
@@ -221,7 +225,7 @@ void Duck::handleOtaUpdate() { ArduinoOTA.handle(); }
 #ifdef CDPCFG_WIFI_NONE
 void Duck::processPortalRequest() {}
 #else
-void Duck::processPortalRequest() { duckNet->dnsServer.processNextRequest(); }
+void Duck::processPortalRequest() { duckNet.dnsServer.processNextRequest(); }
 #endif
 
 int Duck::sendData(byte topic, const String data, const std::vector<byte> targetDevice) {
@@ -261,13 +265,48 @@ int Duck::sendData(byte topic, std::vector<byte> data, const std::vector<byte> t
     duckutils::setInterrupt(false);
     return err;
   }
-  err = duckRadio->sendData(txPacket->getBuffer());
+
+  err = duckRadio.sendData(txPacket->getBuffer());
   lastMessageReceipt = false;
   CdpPacket packet = CdpPacket(txPacket->getBuffer());
   lastMessageMuid.assign(packet.muid.begin(), packet.muid.end());
   assert(lastMessageMuid.size() == MUID_LENGTH);
   txPacket->reset();
   return err;
+}
+
+#ifdef CDPCFG_WIFI_NONE
+void Duck::updateFirmware(const String & filename, size_t index, uint8_t* data, size_t len, bool final) {}
+#else
+void Duck::updateFirmware(const String & filename, size_t index, uint8_t* data, size_t len, bool final) {
+  if (!index) {
+    loginfo("Pause Radio and starting OTA update");
+    duckRadio.standBy();
+
+    int cmd = (filename.indexOf("spiffs") > -1) ? U_SPIFFS : U_FLASH;
+    if (!Update.begin(UPDATE_SIZE_UNKNOWN, cmd)) {
+
+      Update.printError(Serial);
+    }
+  }
+
+  if (Update.write(data, len) != len) {
+    Update.printError(Serial);
+    duckRadio.startReceive();
+  }
+
+  if (final) {
+    if (Update.end(true)) {
+      ESP.restart();
+      esp_task_wdt_init(1, true);
+      esp_task_wdt_add(NULL);
+    }
+  }
+}
+#endif
+
+const std::vector<byte> & Duck::getLastTxMuid() {
+  return lastMessageMuid;
 }
 
 // TODO: implement this using new packet format
@@ -292,7 +331,7 @@ bool Duck::imAlive(void*) {
 }
 
 int Duck::startReceive() {
-  int err = duckRadio->startReceive();
+  int err = duckRadio.startReceive();
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR Restarting Duck...");
     duckesp::restartDuck();
@@ -308,7 +347,7 @@ int Duck::sendPong() {
     logerr("ERROR Oops! failed to build pong packet, err = " + err);
     return err;
   }
-  err = duckRadio->sendData(txPacket->getBuffer());
+  err = duckRadio.sendData(txPacket->getBuffer());
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR Oops! Lora sendData failed, err = " + err);
     return err;
@@ -324,7 +363,7 @@ int Duck::sendPing() {
     logerr("ERROR Failed to build ping packet, err = " + err);
     return err;
   }
-  err = duckRadio->sendData(txPacket->getBuffer());
+  err = duckRadio.sendData(txPacket->getBuffer());
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR Lora sendData failed, err = " + err);
   }

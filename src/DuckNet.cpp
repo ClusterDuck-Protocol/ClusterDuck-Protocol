@@ -1,14 +1,13 @@
 #include "include/DuckNet.h"
 
-DuckNet* DuckNet::instance = NULL;
+#include <Update.h>
 
-DuckNet::DuckNet() { duckRadio = DuckRadio::getInstance(); }
-DuckNet* DuckNet::getInstance() {
-  if (instance == NULL) {
-    instance = new DuckNet();
-  }
-  return instance;
-}
+#include "DuckLogger.h"
+#include "include/Duck.h"
+
+DuckNet::DuckNet(Duck* duckIn):
+  duck(duckIn)
+{}
 
 #ifndef CDPCFG_WIFI_NONE
 IPAddress apIP(CDPCFG_AP_IP1, CDPCFG_AP_IP2, CDPCFG_AP_IP3, CDPCFG_AP_IP4);
@@ -30,10 +29,6 @@ void DuckNet::setDeviceId(std::vector<byte> deviceId) {
 
 int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
   loginfo("Setting up Web Server");
-
-  if (txPacket == NULL) {
-    txPacket = new DuckPacket(deviceId);
-  }
 
   if (html == "") {
     logdbg("Web Server using main page");
@@ -85,33 +80,11 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
       restartRequired = true;
     },
     [&](AsyncWebServerRequest* request, String filename, size_t index,
-      uint8_t* data, size_t len, bool final) {
-      if (!index) {
-
-        loginfo("Pause Radio and starting OTA update");
-        duckRadio->standBy();
-
-        int cmd = (filename.indexOf("spiffs") > -1) ? U_SPIFFS : U_FLASH;
-        if (!Update.begin(UPDATE_SIZE_UNKNOWN, cmd)) {
-
-          Update.printError(Serial);
-        }
-      }
-
-      if (Update.write(data, len) != len) {
-        Update.printError(Serial);
-        duckRadio->startReceive();
-      }
-
-      if (final) {
-        if (Update.end(true)) {
-          ESP.restart();
-          esp_task_wdt_init(1, true);
-          esp_task_wdt_add(NULL);
-          while (true)
-            ;
-        }
-      }
+      uint8_t* data, size_t len, bool final)
+    {
+      duck->updateFirmware(filename, index, data, len, final);
+      // TODO: error/exception handling
+      // TODO: request->send
     });
 
   // Captive Portal form submission
@@ -130,15 +103,15 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
       val = val + p->value().c_str() + "*";
     }
 
-    std::vector<byte> data;
-    data.insert(data.end(), val.begin(), val.end());
-    //TODO: send the correct ducktype
-    txPacket->prepareForSending(ZERO_DUID, DuckType::UNKNOWN, topics::status, data );
-    err = duckRadio->sendData(txPacket->getBuffer());
+    err = duck->sendData(topics::status, val, ZERO_DUID);
 
     switch (err) {
       case DUCK_ERR_NONE:
-      request->send(200, "text/html", portal);
+      {
+        // TODO: Return something reasonably user-friendly
+        auto muid = duck->getLastTxMuid();
+        request->send(200, "text/html", "<h2>" + duckutils::toString(muid) + "</h2>");
+      }
       break;
       case DUCKLORA_ERR_MSG_TOO_LARGE:
       request->send(413, "text/html", "Message payload too big!");

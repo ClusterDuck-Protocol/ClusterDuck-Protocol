@@ -66,7 +66,7 @@ void MamaDuck::handleReceivedPacket() {
   
   loginfo("====> handleReceivedPacket: START");
 
-  int err = duckRadio->readReceivedData(&data);
+  int err = duckRadio.readReceivedData(&data);
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR failed to get data from DuckRadio. rc = "+ String(err));
     return;
@@ -129,7 +129,7 @@ void MamaDuck::handleReceivedPacket() {
       }
     }
 
-    err = duckRadio->relayPacket(rxPacket);
+    err = duckRadio.relayPacket(rxPacket);
     if (err != DUCK_ERR_NONE) {
       logerr("====> ERROR handleReceivedPacket failed to relay. rc = " + String(err));
     } else {
