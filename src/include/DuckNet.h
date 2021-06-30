@@ -144,15 +144,12 @@ public:
    * @param password    password to join the network
    * @return DUCK_ERR_NONE if successful, an error code otherwise.
    */
-
-  int loadWiFiCredentials();
-
+  int saveWifiCredentials(String ssid, String password);
+  
   int saveControlCredentials(String ssid, String password);
 
   int loadControlCredentials();
 
-  int saveWifiCredentials(String ssid, String password);
-  
   /**
    * @brief Load Wifi credentials from EEPROM
    * @return DUCK_ERR_NONE if successful, an error code otherwise.

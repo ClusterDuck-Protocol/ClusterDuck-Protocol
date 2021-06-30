@@ -399,10 +399,10 @@ int DuckNet::saveControlCredentials(String ssid, String password) {
   delete[] temp;
 
   n = password.length();
-  char temp[n + 1];
-  strcpy(temp, password.c_str());
-  this->controlPassword = temp;
-  delete[] temp;
+  char temp2[n + 1];
+  strcpy(temp2, password.c_str());
+  this->controlPassword = temp2;
+  delete[] temp2;
 
   if(ssid.length() > 32 || password.length() > 32) {
     //Too long
