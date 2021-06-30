@@ -267,7 +267,7 @@ int Duck::sendData(byte topic, std::vector<byte> data, const std::vector<byte> t
   }
 
   err = duckRadio.sendData(txPacket->getBuffer());
-  lastMessageReceipt = false;
+  lastMessageAck = false;
   CdpPacket packet = CdpPacket(txPacket->getBuffer());
   lastMessageMuid.assign(packet.muid.begin(), packet.muid.end());
   assert(lastMessageMuid.size() == MUID_LENGTH);

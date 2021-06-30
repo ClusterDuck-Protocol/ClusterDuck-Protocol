@@ -88,7 +88,7 @@ void MamaDuck::handleReceivedPacket() {
       return;
     }
 
-    if (rxPacket->getTopic() == reservedTopic::receipt) {
+    if (rxPacket->getTopic() == reservedTopic::ack) {
       CdpPacket packet = CdpPacket(rxPacket->getBuffer());
 
       if (duckutils::isEqual(duid, packet.dduid)) {
@@ -97,34 +97,34 @@ void MamaDuck::handleReceivedPacket() {
           // previously sent any packets on the network) or may indicate that
           // this MamaDuck has recently rebooted (and a previous message is
           // being ack'd).
-          logwarn("handleReceivedPacket: received receipt with matching DUID "
+          logwarn("handleReceivedPacket: received ack with matching DUID "
             + duckutils::toString(duid)
-            + " but no receipt is expected. Not relaying.");
+            + " but no ack is expected. Not relaying.");
         } else if(duckutils::isEqual(lastMessageMuid, packet.data)) {
-          loginfo("handleReceivedPacket: matched receipt. Not relaying. Matching DDUID "
-            + duckutils::toString(duid) + " and receipt-MUID "
+          loginfo("handleReceivedPacket: matched ack. Not relaying. Matching DDUID "
+            + duckutils::toString(duid) + " and ack-MUID "
             + duckutils::toString(lastMessageMuid));
-          lastMessageReceipt = true;
+          lastMessageAck = true;
         } else {
           // This may indicate a duplicate DUID on the network or it may be a
-          // receipt for a previous message.
-          logwarn("handleReceivedPacket: received receipt with matching DUID "
-            + duckutils::toString(duid) + " but receipt-MUID "
+          // ack for a previous message.
+          logwarn("handleReceivedPacket: received ack with matching DUID "
+            + duckutils::toString(duid) + " but ack-MUID "
             + duckutils::toString(packet.data)
-            + " does not match. Expected receipt for MUID "
+            + " does not match. Expected ack for MUID "
             + duckutils::toString(lastMessageMuid)
             + ". Not relaying.");
         }
 
         // Returning here prevents anything else from happening.
         // TODO[Rory Olsen: 2021-06-23]: The application may need to know about
-        //   receipts. I recommend a callback specifically for receipts, or
+        //   acks. I recommend a callback specifically for acks, or
         //   similar.
         return;
       } else {
-        loginfo("handleReceivedPacket: relaying receipt for DDUID "
+        loginfo("handleReceivedPacket: relaying ack for DDUID "
             + duckutils::toString(packet.dduid)
-            + " and receipt-MUID "
+            + " and ack-MUID "
             + duckutils::toString(packet.muid));
       }
     }

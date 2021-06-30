@@ -115,21 +115,21 @@ void PapaDuck::handleReceivedPacket() {
 
     const CdpPacket packet = CdpPacket(rxPacket->getBuffer());
 
-    logdbg("Sending receipt to DUID " + duckutils::toString(packet.sduid)
+    logdbg("Sending ack to DUID " + duckutils::toString(packet.sduid)
       + " for MUID " + duckutils::toString(packet.muid));
 
-    // The data payload of a receipt is the MUID of the received packet
+    // The data payload of a ack is the MUID of the received packet
     err = txPacket->prepareForSending(packet.sduid, DuckType::PAPA,
-      reservedTopic::receipt, packet.muid);
+      reservedTopic::ack, packet.muid);
     if (err != DUCK_ERR_NONE) {
-      logerr("ERROR handleReceivedPacket. Failed to prepare receipt. Error: " +
+      logerr("ERROR handleReceivedPacket. Failed to prepare ack. Error: " +
         String(err));
       return;
     }
 
     err = duckRadio.sendData(txPacket->getBuffer());
     if (err != DUCK_ERR_NONE) {
-      logerr("ERROR handleReceivedPacket. Failed to send receipt. Error: " +
+      logerr("ERROR handleReceivedPacket. Failed to send ack. Error: " +
         String(err));
       return;
     }

@@ -284,9 +284,9 @@ protected:
   DuckPacket* rxPacket = NULL;
   std::vector<byte> lastMessageMuid;
 
-  bool lastMessageReceipt = true;
+  bool lastMessageAck = true;
   // Since this may be used to throttle outgoing packets, start out in a state
-  // that indicates we're not waiting for a receipt
+  // that indicates we're not waiting for a ack
 
   /**
    * @brief sends a pong message
