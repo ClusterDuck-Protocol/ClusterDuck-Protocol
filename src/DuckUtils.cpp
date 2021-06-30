@@ -35,7 +35,7 @@ void  getRandomBytes(int length, byte* bytes) {
   for (i = 0; i < length; i++) {
     //TODO: Random generator here isn't seeded properly
     //We can use RSSI value to seed it or use a frame counter if available
-    bytes[i] = digits[random(0, 35)];
+    bytes[i] = digits[random(36)];    
   }
 }
 
@@ -44,7 +44,7 @@ String createUuid(int length) {
   int i;
 
   for (i = 0; i < length; i++) {
-    byte randomValue = random(0, 36);
+    byte randomValue = random(36);
     if (randomValue < 26) {
       msg = msg + char(randomValue + 'a');
     } else {

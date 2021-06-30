@@ -378,8 +378,7 @@ String Duck::getErrorString(int error) {
       return errorStr + "Internet SSID is not valid";
     case DUCK_INTERNET_ERR_CONNECT:
       return errorStr + "Internet connection failed";
-
-    defaut:
-      return "Unknown error";
   }
+  
+  return "Unknown error";
 }
