@@ -44,7 +44,7 @@ IridiumSBD modem(IridiumSerial);
 #define TOKEN ""
 
 // Use pre-built papa duck
-PapaDuck duck = PapaDuck();
+PapaDuck duck;
 
 char server[] = ORG ".messaging.internetofthings.ibmcloud.com";
 char authMethod[] = "use-token-auth";

@@ -255,6 +255,9 @@ public:
   void decrypt(uint8_t* encryptedData, uint8_t* text, size_t inc);
 
 protected:
+  Duck(Duck const&) = delete;
+  Duck& operator=(Duck const&) = delete;
+
   String duckName="";
 
   String deviceId;
