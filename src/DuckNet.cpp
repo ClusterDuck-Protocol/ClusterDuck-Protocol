@@ -23,7 +23,6 @@ const char* http_username = CDPCFG_UPDATE_USERNAME;
 const char* http_password = CDPCFG_UPDATE_PASSWORD;
 
 bool restartRequired = false;
-size_t content_len;
 
 void DuckNet::setDeviceId(std::vector<byte> deviceId) {
   this->deviceId.insert(this->deviceId.end(), deviceId.begin(), deviceId.end());
@@ -91,7 +90,6 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
 
         loginfo("Pause Radio and starting OTA update");
         duckRadio->standBy();
-        content_len = request->contentLength();
 
         int cmd = (filename.indexOf("spiffs") > -1) ? U_SPIFFS : U_FLASH;
         if (!Update.begin(UPDATE_SIZE_UNKNOWN, cmd)) {

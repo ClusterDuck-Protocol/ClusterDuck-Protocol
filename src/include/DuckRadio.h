@@ -51,12 +51,6 @@ typedef struct {
 class DuckRadio {
 
 public:
-  /**
-   * @brief Get a singletom instance of the DuckRadio class,\.
-   *
-   * @returns A pointer to a DuckRadio object
-   */
-  static DuckRadio* getInstance();
 
   /**
    * @brief Initialize the LoRa chip.
