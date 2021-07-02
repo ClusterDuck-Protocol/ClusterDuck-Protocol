@@ -59,20 +59,28 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
   // TODO: Need to be able to turn off this feature from the application layer for security
   // TODO: Can we limit controls depending on the duck?
   webServer.on("/controlpanel", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    if(controlSsid == "" || controlPassword == "") {
-      int empty = loadControlCredentials();
-      if(empty) {
-        if (!request->authenticate(control_username, control_password))
-      return request->requestAuthentication();
-      } else {
-        if (!request->authenticate(controlSsid, controlPassword))
-      return request->requestAuthentication();
-      }
+    // if(controlSsid == "" || controlPassword == "") {
+    //   int empty = loadControlCredentials();
+    //   Serial.println("Empty: " + empty);
+    //   if(empty) {
+    //     Serial.println(control_username);
+    //     Serial.println(control_password);
+    //     if (!request->authenticate(control_username, control_password))
+    //   return request->requestAuthentication();
+    //   } else {
+    //     Serial.println(controlSsid);
+    //     Serial.println(controlPassword);
+    //     if (!request->authenticate(controlSsid, controlPassword))
+    //   return request->requestAuthentication();
+    //   }
 
-    } else {
-      if (!request->authenticate(controlSsid, controlPassword))
-      return request->requestAuthentication();
-    }
+    // } else {
+    //   Serial.println('ELSE');
+    //   Serial.println(controlSsid);
+    //   Serial.println(controlPassword);
+    //   if (!request->authenticate(controlSsid, controlPassword))
+    //   return request->requestAuthentication();
+    // }
 
     AsyncWebServerResponse* response =
     request->beginResponse(200, "text/html", controlPanel);
@@ -396,13 +404,13 @@ int DuckNet::saveControlCredentials(String ssid, String password) {
   char temp[n + 1];
   strcpy(temp, ssid.c_str());
   this->controlSsid = temp;
-  delete[] temp;
+  //delete[] temp;
 
   n = password.length();
   char temp2[n + 1];
   strcpy(temp2, password.c_str());
   this->controlPassword = temp2;
-  delete[] temp2;
+  //delete[] temp2;
 
   if(ssid.length() > 32 || password.length() > 32) {
     //Too long
@@ -421,9 +429,13 @@ int DuckNet::saveControlCredentials(String ssid, String password) {
     loginfo("writing EEPROM SSID:");
     for (int i = 0; i < ssid.length(); i++)
     {
-      EEPROM.write(CDPCFG_EEPROM_CONTROL_USERNAME + i, ssid[i]);
+      if(i == 0) {
+        EEPROM.write(CDPCFG_EEPROM_CONTROL_USERNAME + i, 0x00);
+      }
+      EEPROM.write(CDPCFG_EEPROM_CONTROL_USERNAME + i + 1, ssid[i]);
       loginfo("Wrote: ");
       loginfo(ssid[i]);
+      
     }
     loginfo("writing EEPROM Password:");
     for (int i = 0; i < password.length(); ++i)
@@ -445,11 +457,22 @@ int DuckNet::loadControlCredentials(){
   String esid;
   for (int i = 0; i < CDPCFG_EEPROM_CRED_MAX; ++i)
   {
-    esid += char(EEPROM.read(CDPCFG_EEPROM_CONTROL_USERNAME + i));
+    if(i == 0) {
+      byte b = 0x00;
+      if(b != EEPROM.read(CDPCFG_EEPROM_CONTROL_USERNAME + i)) {
+        Serial.println("Fill in Control");
+        saveControlCredentials(control_username, control_password);
+        return 0;
+      } else {
+        esid += char(EEPROM.read(CDPCFG_EEPROM_CONTROL_USERNAME + i));
+      }
+    } 
+    
   }
   // lopp through saved SSID carachters
   loginfo("Reading EEPROM SSID: " + esid);
   setControlSsid(esid);
+  Serial.println("Exit Set Control");
 
   String epass = "";
   for (int i = 0; i < CDPCFG_EEPROM_CRED_MAX; ++i)
@@ -459,6 +482,7 @@ int DuckNet::loadControlCredentials(){
   // lopp through saved Password carachters
   loginfo("Reading EEPROM Password: " + epass);
   setControlPassword(epass);
+  Serial.println("Exit Set Password");
 
   if (esid.length() == 0 || epass.length() == 0){
     loginfo("ERROR no Control Panel SSID and PASSWORD set: Stored SSID and PASSWORD empty");
@@ -529,20 +553,28 @@ void DuckNet::setSsid(String val) { ssid = val; }
 
 void DuckNet::setPassword(String val) { password = val; }
 
-void DuckNet::setControlSsid(String val) { 
+void DuckNet::setControlSsid(String val) {
+  Serial.println("Set Control SSID"); 
   int n = val.length();
-  char temp[n + 1];
+  Serial.println(n);
+
+  char * temp;
+  temp = new char[n + 1];
+
   strcpy(temp, val.c_str());
+  Serial.println(temp);
   this->controlSsid = temp;
-  delete[] temp; 
+  Serial.println(controlSsid);
+  //delete[] temp; 
 }
 
-void DuckNet::setControlPassword(String val) { 
+void DuckNet::setControlPassword(String val) {
+  Serial.println("Set Control Password");  
   int n = val.length();
   char temp[n + 1];
   strcpy(temp, val.c_str());
   this->controlPassword = temp;
-  delete[] temp;
+  //delete[] temp;
  }
 
 String DuckNet::getSsid() { return ssid; }
