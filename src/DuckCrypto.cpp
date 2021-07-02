@@ -13,6 +13,12 @@ namespace duckcrypto {
 
    bool getState() { return encryptOn; }
 
+   void setDecrypt(bool state) {
+      decryptOn = state;
+   }
+
+   bool getDecrypt() { return decryptOn; }
+
    void encryptData(uint8_t* text, uint8_t* encryptedData, size_t inc)
    {
       

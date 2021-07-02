@@ -67,10 +67,20 @@ const char controlPanel[] PROGMEM = R"=====(
         <form action='/flipDetector' method='post'>
     <input type='submit' value='Detector On' />
     </form>
+    <form action='/flipDecrypt' method='post'>
+    <input type='submit' value='Decrypt On' />
+    </form>
      </div>
      <div class="control-box">
            <h5>Channel Select</h5>
-<p>Set your duck to one of these 5 channels</p>
+    <p>Set your duck to one of these 5 channels</p>
+
+
+    <p>Channel Select</p>
+    <form action='/setChannel' method='post'>
+
+    <input type="radio" id="channel1" name="channel" value=1>
+    <label for="channel1">1</label><br>
 
 
     

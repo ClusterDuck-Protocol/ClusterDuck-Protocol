@@ -6,7 +6,7 @@
 #include "DuckRadio.h"
 #include "DuckTypes.h"
 #include "DuckPacket.h"
-#include "DuckCrypto.h"
+//#include "DuckCrypto.h"
 #include "DuckUtils.h"
 #include "cdpcfg.h"
 #include <Arduino.h>
@@ -224,6 +224,27 @@ public:
    * @param state true for on, false for off
    */
   void setEncrypt(bool state);
+
+  /**
+   * @brief get encryption state.
+   * 
+   * @return true for on, false for off
+   */
+  bool getEncrypt();
+
+  /**
+   * @brief Turn on or off decryption. Used with MamaDuck
+   * 
+   * @param state true for on, false for off
+   */
+  void setDecrypt(bool state);
+
+  /**
+   * @brief get decryption state.
+   * 
+   * @return true for on, false for off
+   */
+  bool getDecrypt();
 
   /**
    * @brief Set new AES key for encryption.
