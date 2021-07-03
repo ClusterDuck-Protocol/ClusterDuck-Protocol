@@ -38,6 +38,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     portal = html;
   }
   webServer.onNotFound([&](AsyncWebServerRequest* request) {
+    logwarn("DuckNet - onNotFound: " + request->url());
     request->send(200, "text/html", portal);
   });
 
