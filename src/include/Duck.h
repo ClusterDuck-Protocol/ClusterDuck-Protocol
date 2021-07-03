@@ -15,6 +15,13 @@
 #include "DuckTypes.h"
 #include "DuckUtils.h"
 
+enum muidStatus : int {
+  invalid, // The MUID was not given in the correct format.
+  unrecognized, // The MUID was not recognized. The Duck may have forgotten it.
+  not_acked, // The MUID was recognized but not yet ack'd.
+  acked // The MUID was recognized and has been ack'd.
+};
+
 class Duck {
 
 public:
@@ -195,6 +202,11 @@ public:
    * @return An MUID as a vector that's owned by this Duck.
    */
   const std::vector<byte> & getLastTxMuid();
+
+  /**
+   * @brief Get the status of an MUID
+   */
+  const muidStatus getMuidStatus(const std::vector<byte> & muid);
 
   /**
    * @brief Check wifi connection status

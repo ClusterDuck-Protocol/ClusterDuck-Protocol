@@ -41,6 +41,7 @@
 #endif
 
 class Duck;
+enum muidStatus : int; // TODO[Rory Olsen 2021-07-02]: Remove forward declarations from here, or put them in a new header file
 
 #define AP_SCAN_INTERVAL_MS 10
 
@@ -191,6 +192,11 @@ public:
   DuckNet(Duck* duck);
 
 private:
+
+  String getMuidStatusMessage(muidStatus status);
+  String getMuidStatusString(muidStatus status);
+  String createMuidResponseJson(muidStatus status);
+
   DuckNet(DuckNet const&) = delete;
   DuckNet& operator=(DuckNet const&) = delete;
 

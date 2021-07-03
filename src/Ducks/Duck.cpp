@@ -309,6 +309,20 @@ const std::vector<byte> & Duck::getLastTxMuid() {
   return lastMessageMuid;
 }
 
+const muidStatus Duck::getMuidStatus(const std::vector<byte> & muid) {
+  if (duckutils::isEqual(muid, lastMessageMuid)) {
+    if (lastMessageAck) {
+      return muidStatus::acked;
+    } else {
+      return muidStatus::not_acked;
+    }
+  } else if (muid.size() != MUID_LENGTH) {
+    return muidStatus::invalid;
+  } else {
+    return muidStatus::unrecognized;
+  }
+}
+
 // TODO: implement this using new packet format
 bool Duck::reboot(void*) {
   /*

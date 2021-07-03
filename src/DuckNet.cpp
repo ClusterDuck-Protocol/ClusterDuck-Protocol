@@ -27,6 +27,38 @@ void DuckNet::setDeviceId(std::vector<byte> deviceId) {
   this->deviceId.insert(this->deviceId.end(), deviceId.begin(), deviceId.end());
 }
 
+String DuckNet::getMuidStatusMessage(muidStatus status) {
+  switch (status) {
+  case invalid:
+    return "Invalid MUID.";
+  case unrecognized:
+    return "Unrecognized MUID. Please try again.";
+  case not_acked:
+    return "Message sent, waiting for server to acknowledge.";
+  case acked:
+    return "Message acknowledged.";
+  }
+}
+
+String DuckNet::getMuidStatusString(muidStatus status) {
+  switch (status) {
+  case invalid:
+    return "invalid";
+  case unrecognized:
+    return "unrecognized";
+  case not_acked:
+    return "not_acked";
+  case acked:
+    return "acked";
+  }
+}
+
+String DuckNet::createMuidResponseJson(muidStatus status) {
+  String statusStr = getMuidStatusString(status);
+  String message = getMuidStatusMessage(status);
+  return "{\"status\":\"" + statusStr + "\", \"message\":\"" + message + "\"}";
+}
+
 int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
   loginfo("Setting up Web Server");
 
@@ -88,30 +120,66 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
       // TODO: request->send
     });
 
+  webServer.on("/muidStatus.json", HTTP_GET, [&](AsyncWebServerRequest* request) {
+    logdbg(request->url());
+
+    String muid;
+    int paramsNumber = request->params();
+    for (int i = 0; i < paramsNumber; i++) {
+      AsyncWebParameter* p = request->getParam(i);
+      logdbg(p->name() + ": " + p->value());
+      if (p->name() == "muid") {
+        muid = p->value();
+      }
+    }
+
+    std::vector<byte> muidVect = {muid[0], muid[1], muid[2], muid[3]};
+    muidStatus status = duck->getMuidStatus(muidVect);
+
+    String jsonResponse = createMuidResponseJson(status);
+    switch (status) {
+    case invalid:
+      request->send(400, "text/json", jsonResponse);
+      break;
+    case unrecognized:
+    case not_acked:
+    case acked:
+      request->send(200, "text/json", jsonResponse);
+      break;
+    }
+  });
+
   // Captive Portal form submission
-  webServer.on("/formSubmit", HTTP_POST, [&](AsyncWebServerRequest* request) {
-    loginfo("Submitting Form");
+  webServer.on("/formSubmit.json", HTTP_POST, [&](AsyncWebServerRequest* request) {
+    loginfo("Submitting Form to /formSubmit.json");
 
     int err = DUCK_ERR_NONE;
 
     int paramsNumber = request->params();
     String val = "";
+    String clientId = "";
 
     for (int i = 0; i < paramsNumber; i++) {
       AsyncWebParameter* p = request->getParam(i);
       logdbg(p->name() + ": " + p->value());
 
-      val = val + p->value().c_str() + "*";
+      if (p->name() == "clientId") {
+        clientId = p->value();
+      } else {
+        val = val + p->value().c_str() + "*";
+      }
     }
 
-    err = duck->sendData(topics::status, val, ZERO_DUID);
+    val = "[" + clientId + "]" + val;
+    err = duck->sendData(topics::cpm, val, ZERO_DUID);
 
     switch (err) {
       case DUCK_ERR_NONE:
       {
-        // TODO: Return something reasonably user-friendly
         auto muid = duck->getLastTxMuid();
-        request->send(200, "text/html", "<h2>" + duckutils::toString(muid) + "</h2>");
+        String response = "{\"muid\":\"" + duckutils::toString(muid) + "\"}";
+        request->send(200, "text/html", response);
+        logdbg("Sent 200 response: " + response);
       }
       break;
       case DUCKLORA_ERR_MSG_TOO_LARGE:
