@@ -1,9 +1,8 @@
 #include "include/DuckRadio.h"
 
-#include <RadioLib.h>
-
 #if !defined(CDPCFG_HELTEC_CUBE_CELL)
 #include "include/DuckUtils.h"
+#include <RadioLib.h>
 
 #ifdef CDPCFG_PIN_LORA_SPI_SCK
 #include "SPI.h"
