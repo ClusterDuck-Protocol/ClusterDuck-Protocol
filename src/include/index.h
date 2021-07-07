@@ -12,7 +12,6 @@ const char MAIN_page[] PROGMEM = R"=====(
         <style>
             body {
                 font: 14px "Avenir", helvetica, sans-serif;
-                color: white;
                 -webkit-font-smoothing: antialiased;
             }
             h2 {
