@@ -144,6 +144,7 @@ const char MAIN_page[] PROGMEM = R"=====(
                     <label for="status">How are you?</label><br />
                     <textarea class="textbox comments textbox-full" name="message" id="commentsInput" cols="30" rows="2"></textarea>
                     <button type="button" id="sendBtn" class="sendReportBtn">Send</button>
+                    <p id="makeshiftErrorOutput" class="hidden"></p>
                 </form>
                 <h6 style="font-size: 10px; text-align: center;margin-top: 24px;">Powered by the ClusterDuck Protocol</h6>
             </div>
@@ -155,15 +156,17 @@ const char MAIN_page[] PROGMEM = R"=====(
                 <div id="bupdate" class="b update">Send Update</div>
             </div>
         </div>
-        <div id="lastMessage">
-            <h2>Last Message</h2>
-            <p id="lastMessageField"></p>
-            <p id="lastMessageMuid"></p>
-            <p id="muidStatus"></p>
-            <p id="muidStatusMessage"></p>
-        </div>
-        <div>
-            <p id="errorOutput"></p>
+        <div id="lastMessageSection" class="hidden">
+            <dl>
+                <dt>Last message:</dt>
+                <dd id="lastMessageField"></dd>
+                <dt>Last message ID:</dt>
+                <dd id="lastMessageMuid"></dd>
+                <dt>Status:</dt>
+                <dd id="muidStatus"></dd>
+                <dt>Status Message:</dt>
+                <dd id="muidStatusMessage"></dd>
+            </dl>
         </div>
         <!-- Run javascript actions here -->
         <script type="text/javascript">
@@ -171,6 +174,7 @@ const char MAIN_page[] PROGMEM = R"=====(
             const MUID_PARAM_NAME = 'muid';
             const CLIENT_ID_LENGTH = 4;
             const CLIENT_ID_KEY = 'CLIENT_ID';
+            const NOT_ACKED_MSG = "The message may have been received, but we're still waiting for confirmation."
 
             var messageController;
             var muidRequest;
@@ -183,20 +187,34 @@ const char MAIN_page[] PROGMEM = R"=====(
                 );
             }
 
-            function ShowDebugStatus(errorMessage) {
-                var el = document.getElementById('errorOutput');
-                el.innerHTML = el.innerHTML + "</br>" + errorMessage;
-            }
-
-            var MessageControllerMaker = function() {
+            var MessageController = function() {
                 var loadListener = function() {
                     // this.responseText should be something like: {"muid":"ABCD"}
                     var res = JSON.parse(this.responseText);
                     messageController.saveLastMuid(res.muid);
+
+                    var errEl = document.getElementById('makeshiftErrorOutput');
+                    if (!errEl.classList.toString().includes("hidden")) {
+                        errEl.innerHTML = '';
+                        errEl.classList.add("hidden");
+                    }
                 };
 
                 var errorListener = function() {
-                    ShowDebugStatus('There was an error sending the message. Please try again.');
+                    var errorMessage = 'There was an error sending the message. Please try again.';
+                    console.log(errorMessage);
+                    var errEl = document.getElementById('makeshiftErrorOutput');
+                    errEl.innerHTML = errorMessage;
+                    errEl.classList.remove("hidden");
+                };
+
+                var showSentMessage = function(commentsInput) {
+                    var lastMessageField = document.getElementById('lastMessageField');
+                    lastMessageField.innerHTML = commentsInput.value;
+                    // TODO: Create a new DOM view so multiple messages can be shown
+
+                    var msgSection = document.getElementById('lastMessageSection');
+                    msgSection.classList.remove("hidden");
                 };
 
                 return {
@@ -215,14 +233,7 @@ const char MAIN_page[] PROGMEM = R"=====(
                         req.open("POST", "/formSubmit.json?" + params.toString());
                         req.send();
 
-                        var lastMessageField = document.getElementById('lastMessageField');
-                        lastMessageField.innerHTML = commentsInput.value;
-                        // TODO: Create a new DOM view so multiple messages can be shown
-
-                        // var lastMessageContainer = document.getElementById('lastMessage');
-                        // var classes = lastMessageContainer.classList;
-                        // classes.remove("hidden");
-                        // lastMessageContainer.textContent = classes;
+                        showSentMessage(commentsInput);
                     },
                     saveLastMuid: function(muid) {
                         document.getElementById('lastMessageMuid').innerHTML = muid;
@@ -234,20 +245,23 @@ const char MAIN_page[] PROGMEM = R"=====(
 
             var MuidRequest = function(muid, statusEl, messageEl) {
 
+                var showStatus = function(status, message) {
+                    statusEl.innerHTML = status;
+                    messageEl.innerHTML = message;
+                };
+
                 var loadListener = function() {
                     var res = JSON.parse(this.responseText);
-                    statusEl.innerHTML = res.status;
-                    messageEl.innerHTML = res.message;
+                    showStatus(res.status, res.message);
 
                     if (res.status === 'not_acked') {
-                        ShowDebugStatus('not_acked, retrying')
+                        showStatus('not_acked', NOT_ACKED_MSG)
                         setTimeout(requestMuidStatus, 1000);
                     }
                 };
 
                 var errorListener = function() {
-                    statusEl.innerHTML = 'error';
-                    messageEl.innerHTML = ''; // TODO
+                    showStatus('error', 'There was an unknown error');
                     setTimeout(requestMuidStatus, 1000);
                 };
 
@@ -325,7 +339,7 @@ const char MAIN_page[] PROGMEM = R"=====(
                     document.getElementById('clientId').value = '';
                 }
 
-                messageController = MessageControllerMaker();
+                messageController = MessageController();
                 document.getElementById('sendBtn').addEventListener('click', messageController.sendMessage);
             }
 
