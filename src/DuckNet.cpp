@@ -170,6 +170,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
       }
     }
 
+    clientId.toUpperCase();
     val = "[" + clientId + "]" + val;
     err = duck->sendData(topics::cpm, val, ZERO_DUID);
 

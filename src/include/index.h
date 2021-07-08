@@ -139,8 +139,8 @@ const char MAIN_page[] PROGMEM = R"=====(
             <div id="form">
                 <form>
                     <label for="clientId">Your ID:</label>
-                    <input type="text" id="clientId" name="clientId" pattern="[A-Z1-9]{4}" maxlength=4>
-                    <p>ID must be four characters long. It can be any capital letters of the Latin alphabet A-Z or any numbers 1-9.</p>
+                    <input type="text" id="clientId" name="clientId" pattern="[A-NPZ1-9]{4}" maxlength=4>
+                    <p>ID must be four characters long. It can be any capital letters of the Latin alphabet A-Z except O, or any numbers 1-9.</p>
                     <label for="status">How are you?</label><br />
                     <textarea class="textbox comments textbox-full" name="message" id="commentsInput" cols="30" rows="2"></textarea>
                     <button type="button" id="sendBtn" class="sendReportBtn">Send</button>
@@ -317,7 +317,7 @@ const char MAIN_page[] PROGMEM = R"=====(
 
             function generateClientId() {
                 var result = '';
-                var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789';
+                var characters = 'ABCDEFGHIJKLMNPQRSTUVWXYZ123456789';
                 for ( var i = 0; i < CLIENT_ID_LENGTH; i++ ) {
                     var randomIndex = Math.floor(Math.random() * characters.length);
                     result += characters.charAt(randomIndex);
