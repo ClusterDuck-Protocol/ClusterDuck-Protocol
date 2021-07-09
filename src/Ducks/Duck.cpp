@@ -309,7 +309,7 @@ const std::vector<byte> & Duck::getLastTxMuid() {
   return lastMessageMuid;
 }
 
-const muidStatus Duck::getMuidStatus(const std::vector<byte> & muid) {
+muidStatus Duck::getMuidStatus(const std::vector<byte> & muid) const {
   if (duckutils::isEqual(muid, lastMessageMuid)) {
     if (lastMessageAck) {
       return muidStatus::acked;

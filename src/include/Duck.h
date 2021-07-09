@@ -206,7 +206,7 @@ public:
   /**
    * @brief Get the status of an MUID
    */
-  const muidStatus getMuidStatus(const std::vector<byte> & muid);
+  muidStatus getMuidStatus(const std::vector<byte> & muid) const;
 
   /**
    * @brief Check wifi connection status

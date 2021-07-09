@@ -37,6 +37,10 @@ String DuckNet::getMuidStatusMessage(muidStatus status) {
     return "Message sent, waiting for server to acknowledge.";
   case acked:
     return "Message acknowledged.";
+  default:
+    const char * str = "__FILE__:__LINE__ error: Unrecognized muidStatus";
+    logerr(str);
+    return str;
   }
 }
 
@@ -50,6 +54,8 @@ String DuckNet::getMuidStatusString(muidStatus status) {
     return "not_acked";
   case acked:
     return "acked";
+  default:
+    return "error";
   }
 }
 
