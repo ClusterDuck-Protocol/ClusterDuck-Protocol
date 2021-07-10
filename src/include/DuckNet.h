@@ -17,6 +17,12 @@
 
 #include "cdpcfg.h"
 
+class DuckNet;
+// Since Duck needs to know about DuckNet and DuckNet needs to know about Duck,
+// this forward declaration allows a DuckNet reference to be declared in Duck.h.
+
+#include "Duck.h"
+
 #ifdef CDPCFG_WIFI_NONE
 
 #include "DuckUtils.h"
@@ -39,9 +45,6 @@
 #include "controlPanel.h"
 
 #endif
-
-class Duck;
-enum muidStatus : int; // TODO[Rory Olsen 2021-07-02]: Remove forward declarations from here, or put them in a new header file
 
 #define AP_SCAN_INTERVAL_MS 10
 

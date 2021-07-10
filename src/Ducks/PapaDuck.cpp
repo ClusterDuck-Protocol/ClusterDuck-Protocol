@@ -56,7 +56,7 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid,
   // If WiFi credentials inside the INO are empty use the saved credentials
   // TODO: if the portal credentials were saved and the INO contains credentials it won't
   // take the Portal credentials on setup
-    err = duckNet.loadWiFiCredentials();
+    err = duckNet->loadWiFiCredentials();
 
     if (err != DUCK_ERR_NONE) {
       logerr("ERROR setupWithDefaults  rc = " + String(err));
@@ -143,11 +143,11 @@ int PapaDuck::reconnectWifi(String ssid, String password) {
   logwarn("WARNING reconnectWifi skipped, device has no WiFi.");
   return DUCK_ERR_NONE;
 #else
-  if (!duckNet.ssidAvailable(ssid)) {
+  if (!duckNet->ssidAvailable(ssid)) {
     return DUCKWIFI_ERR_NOT_AVAILABLE;
   }
-  duckNet.setupInternet(ssid, password);
-  duckNet.setupDns();
+  duckNet->setupInternet(ssid, password);
+  duckNet->setupDns();
   if (WiFi.status() != WL_CONNECTED) {
     logerr("ERROR WiFi reconnection failed!");
     return DUCKWIFI_ERR_DISCONNECTED;

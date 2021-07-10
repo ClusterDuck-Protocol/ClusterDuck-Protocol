@@ -6,14 +6,26 @@
 #include <Update.h>
 
 #include "include/DuckEsp.h"
+#include "include/DuckNet.h"
 
 volatile bool Duck::receivedFlag = false;
 
 Duck::Duck(String name):
-  duckNet(this)
+  duckNet(new DuckNet(this))
 {
   duckutils::setInterrupt(true);
   duckName = name;
+}
+
+Duck::~Duck() {
+  if (txPacket != NULL) {
+    delete txPacket;
+  }
+  if (rxPacket != NULL) {
+    delete rxPacket;
+  }
+
+  delete duckNet;
 }
 
 void Duck::setEncrypt(bool state) {
@@ -126,8 +138,8 @@ void Duck::setSyncWord(byte syncWord) {
 
 int Duck::setupWebServer(bool createCaptivePortal, String html) {
   int err = DUCK_ERR_NONE;
-  duckNet.setDeviceId(duid);
-  err = duckNet.setupWebServer(createCaptivePortal, html);
+  duckNet->setDeviceId(duid);
+  err = duckNet->setupWebServer(createCaptivePortal, html);
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR setupWebServer rc = " + String(err));
   } else {
@@ -137,7 +149,7 @@ int Duck::setupWebServer(bool createCaptivePortal, String html) {
 }
 
 int Duck::setupWifi(const char* ap) {
-  int err = duckNet.setupWifiAp(ap);
+  int err = duckNet->setupWifiAp(ap);
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR setupWifi rc = " + String(err));
   } else {
@@ -147,7 +159,7 @@ int Duck::setupWifi(const char* ap) {
 }
 
 int Duck::setupDns() {
-  int err = duckNet.setupDns();
+  int err = duckNet->setupDns();
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR setupDns rc = " + String(err));
   } else {
@@ -157,7 +169,7 @@ int Duck::setupDns() {
 }
 
 int Duck::setupInternet(String ssid, String password) {
-  int err = duckNet.setupInternet(ssid, password);
+  int err = duckNet->setupInternet(ssid, password);
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR setupInternet rc = " + String(err));
   } else {
@@ -225,7 +237,7 @@ void Duck::handleOtaUpdate() { ArduinoOTA.handle(); }
 #ifdef CDPCFG_WIFI_NONE
 void Duck::processPortalRequest() {}
 #else
-void Duck::processPortalRequest() { duckNet.dnsServer.processNextRequest(); }
+void Duck::processPortalRequest() { duckNet->dnsServer.processNextRequest(); }
 #endif
 
 int Duck::sendData(byte topic, const String data, const std::vector<byte> targetDevice) {
@@ -382,6 +394,22 @@ int Duck::sendPing() {
     logerr("ERROR Lora sendData failed, err = " + err);
   }
   return err;
+}
+
+bool Duck::isWifiConnected() {
+  return duckNet->isWifiConnected();
+}
+
+bool Duck::ssidAvailable(String ssid) {
+  return duckNet->ssidAvailable(ssid);
+}
+
+String Duck::getSsid() {
+  return duckNet->getSsid();
+}
+
+String Duck::getPassword() {
+  return duckNet->getPassword();
 }
 
 String Duck::getErrorString(int error) {

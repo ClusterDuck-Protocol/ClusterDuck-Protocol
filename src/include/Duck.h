@@ -6,6 +6,17 @@
 #include <Arduino.h>
 #include <WString.h>
 
+class Duck;
+// Since Duck needs to know about DuckNet and DuckNet needs to know about Duck,
+// this forward declaration allows a Duck pointer to be declared in DuckNet.h.
+// Similarly, muidStatus needs to be declared before DuckNet.h is included.
+enum muidStatus {
+  invalid, // The MUID was not given in the correct format.
+  unrecognized, // The MUID was not recognized. The Duck may have forgotten it.
+  not_acked, // The MUID was recognized but not yet ack'd.
+  acked // The MUID was recognized and has been ack'd.
+};
+
 #include "../DuckError.h"
 #include "cdpcfg.h"
 #include "DuckCrypto.h"
@@ -14,13 +25,6 @@
 #include "DuckRadio.h"
 #include "DuckTypes.h"
 #include "DuckUtils.h"
-
-enum muidStatus : int {
-  invalid, // The MUID was not given in the correct format.
-  unrecognized, // The MUID was not recognized. The Duck may have forgotten it.
-  not_acked, // The MUID was recognized but not yet ack'd.
-  acked // The MUID was recognized and has been ack'd.
-};
 
 class Duck {
 
@@ -31,14 +35,7 @@ public:
    */
   Duck(String name="");
 
-  virtual ~Duck() {
-    if (txPacket != NULL) {
-      delete txPacket;
-    }
-    if (rxPacket != NULL) {
-      delete rxPacket;
-    }
-  }
+  virtual ~Duck();
 
   std::string getCDPVersion() { return duckutils::getCDPVersion(); }
 
@@ -213,27 +210,27 @@ public:
    * 
    * @returns true if device wifi is connected, false otherwise. 
    */
-  bool isWifiConnected() { return duckNet.isWifiConnected(); }
+  bool isWifiConnected();
   /**
    * @brief Check if the give access point is available.
    * 
    * @param ssid access point to check
    * @returns true if the access point is available, false otherwise.
    */
-  bool ssidAvailable(String ssid) { return duckNet.ssidAvailable(ssid); }
+  bool ssidAvailable(String ssid);
 
   /**
    * @brief Get the access point ssid
    * 
    * @returns the wifi access point as a string
    */
-  String getSsid() { return duckNet.getSsid(); }
+  String getSsid();
   /**
    * @brief Get the wifi access point password.
    * 
    * @returns the wifi access point password as a string. 
    */
-  String getPassword() { return duckNet.getPassword(); }
+  String getPassword();
 
   /**
    * @brief Get an error code description.
@@ -291,7 +288,10 @@ protected:
   String deviceId;
   std::vector<byte> duid;
   DuckRadio duckRadio;
-  DuckNet duckNet;
+
+  DuckNet * const duckNet;// The pointer itself is never modified, though the
+  // duckNet instance itself can be modified.
+
   DuckPacket* txPacket = NULL;
   DuckPacket* rxPacket = NULL;
   std::vector<byte> lastMessageMuid;
