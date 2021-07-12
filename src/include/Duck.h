@@ -148,9 +148,11 @@ public:
    * @param topic the message topic
    * @param data a string representing the data
    * @param targetDevice the device UID to receive the message (default is no target device)
+   * @param outgoingMuid Output parameter that returns the MUID of the sent packet. NULL is ignored.
    * @return DUCK_ERR_NONE if the data was send successfully, an error code otherwise. 
    */
-  int sendData(byte topic, const String data, const std::vector<byte> targetDevice = ZERO_DUID);
+  int sendData(byte topic, const String data,
+    const std::vector<byte> targetDevice = ZERO_DUID, std::vector<byte> * outgoingMuid = NULL);
 
   /**
    * @brief Sends data into the mesh network.
@@ -158,10 +160,12 @@ public:
    * @param topic the message topic
    * @param data a vector of bytes representing the data to send
    * @param targetDevice the device UID to receive the message (default is no target device)
+   * @param outgoingMuid Output parameter that returns the MUID of the sent packet. NULL is ignored.
    * @return DUCK_ERR_NONE if the data was send successfully, an error code
    otherwise.
    */
-  int sendData(byte topic, std::vector<byte> bytes, const std::vector<byte> targetDevice = ZERO_DUID);
+  int sendData(byte topic, std::vector<byte> bytes,
+    const std::vector<byte> targetDevice = ZERO_DUID, std::vector<byte> * outgoingMuid = NULL);
 
   /**
    * @brief Sends data into the mesh network.
@@ -169,10 +173,12 @@ public:
    * @param topic the message topic
    * @param data a string representing the data to send
    * @param targetDevice the device UID to receive the message (default is no target device)
+   * @param outgoingMuid Output parameter that returns the MUID of the sent packet. NULL is ignored.
    * @return DUCK_ERR_NONE if the data was send successfully, an error code
    * otherwise.
    */
-  int sendData(byte topic, const std::string data, const std::vector<byte> targetDevice = ZERO_DUID);
+  int sendData(byte topic, const std::string data,
+    const std::vector<byte> targetDevice = ZERO_DUID, std::vector<byte> * outgoingMuid = NULL);
 
   /**
    * @brief Sends data into the mesh network.
@@ -181,10 +187,12 @@ public:
    * @param data a byte buffer representing the data to send
    * @param length the length of the byte buffer
    * @param targetDevice the device UID to receive the message (default is no target device)
+   * @param outgoingMuid Output parameter that returns the MUID of the sent packet. NULL is ignored.
    * @return DUCK_ERR_NONE if the data was send successfully, an error code
    * otherwise.
    */
-  int sendData(byte topic, const byte* data, int length, const std::vector<byte> targetDevice = ZERO_DUID);
+  int sendData(byte topic, const byte* data, int length,
+    const std::vector<byte> targetDevice = ZERO_DUID, std::vector<byte> * outgoingMuid = NULL);
 
   /**
    * @brief Updates the firmware on the device
@@ -192,13 +200,6 @@ public:
    * TODO: Additional documentation
    */
   void updateFirmware(const String & filename, size_t index, uint8_t* data, size_t len, bool final);
-
-  /**
-   * @brief Get the MUID of the last packet that was sent into the mesh network.
-   *
-   * @return An MUID as a vector that's owned by this Duck.
-   */
-  const std::vector<byte> & getLastTxMuid();
 
   /**
    * @brief Get the status of an MUID

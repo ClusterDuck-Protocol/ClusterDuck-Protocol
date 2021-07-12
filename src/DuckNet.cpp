@@ -178,12 +178,12 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
 
     clientId.toUpperCase();
     val = "[" + clientId + "]" + val;
-    err = duck->sendData(topics::cpm, val, ZERO_DUID);
+    std::vector<byte> muid;
+    err = duck->sendData(topics::cpm, val, ZERO_DUID, &muid);
 
     switch (err) {
       case DUCK_ERR_NONE:
       {
-        auto muid = duck->getLastTxMuid();
         String response = "{\"muid\":\"" + duckutils::toString(muid) + "\"}";
         request->send(200, "text/html", response);
         logdbg("Sent 200 response: " + response);

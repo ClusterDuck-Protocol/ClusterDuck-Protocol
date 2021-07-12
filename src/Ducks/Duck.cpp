@@ -240,28 +240,36 @@ void Duck::processPortalRequest() {}
 void Duck::processPortalRequest() { duckNet->dnsServer.processNextRequest(); }
 #endif
 
-int Duck::sendData(byte topic, const String data, const std::vector<byte> targetDevice) {
+int Duck::sendData(byte topic, const String data,
+  const std::vector<byte> targetDevice, std::vector<byte> * outgoingMuid)
+{
 
   const byte* buffer = (byte*)data.c_str();
-  int err = sendData(topic, buffer, data.length(), targetDevice);
+  int err = sendData(topic, buffer, data.length(), targetDevice, outgoingMuid);
   return err;
 }
 
-int Duck::sendData(byte topic, const std::string data, const std::vector<byte> targetDevice) {
+int Duck::sendData(byte topic, const std::string data,
+  const std::vector<byte> targetDevice, std::vector<byte> * outgoingMuid)
+{
   std::vector<byte> app_data;
   app_data.insert(app_data.end(), data.begin(), data.end());
-  int err = sendData(topic, app_data);
+  int err = sendData(topic, app_data, targetDevice, outgoingMuid);
   return err;
 }
 
-int Duck::sendData(byte topic, const byte* data, int length, const std::vector<byte> targetDevice) {
+int Duck::sendData(byte topic, const byte* data, int length,
+  const std::vector<byte> targetDevice, std::vector<byte> * outgoingMuid)
+{
   std::vector<byte> app_data;
   app_data.insert(app_data.end(), &data[0], &data[length]);
-  int err = sendData(topic, app_data, targetDevice);
+  int err = sendData(topic, app_data, targetDevice, outgoingMuid);
   return err;
 }
 
-int Duck::sendData(byte topic, std::vector<byte> data, const std::vector<byte> targetDevice) {
+int Duck::sendData(byte topic, std::vector<byte> data,
+  const std::vector<byte> targetDevice, std::vector<byte> * outgoingMuid)
+{
   if (topic < reservedTopic::max_reserved) {
     logerr("ERROR send data failed, topic is reserved.");
     return DUCKPACKET_ERR_TOPIC_INVALID;
@@ -279,11 +287,17 @@ int Duck::sendData(byte topic, std::vector<byte> data, const std::vector<byte> t
   }
 
   err = duckRadio.sendData(txPacket->getBuffer());
+
   lastMessageAck = false;
   CdpPacket packet = CdpPacket(txPacket->getBuffer());
   lastMessageMuid.assign(packet.muid.begin(), packet.muid.end());
   assert(lastMessageMuid.size() == MUID_LENGTH);
+  if (outgoingMuid != NULL) {
+    outgoingMuid->assign(packet.muid.begin(), packet.muid.end());
+    assert(outgoingMuid->size() == MUID_LENGTH);
+  }
   txPacket->reset();
+
   return err;
 }
 
@@ -316,10 +330,6 @@ void Duck::updateFirmware(const String & filename, size_t index, uint8_t* data, 
   }
 }
 #endif
-
-const std::vector<byte> & Duck::getLastTxMuid() {
-  return lastMessageMuid;
-}
 
 muidStatus Duck::getMuidStatus(const std::vector<byte> & muid) const {
   if (duckutils::isEqual(muid, lastMessageMuid)) {
