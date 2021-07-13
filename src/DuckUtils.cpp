@@ -13,7 +13,7 @@ volatile bool interruptEnabled = true;
 Timer<> duckTimer = timer_create_default();
 bool detectState = false;
 
-volatile bool isInterruptEnabled() { return interruptEnabled; }
+bool isInterruptEnabled() { return interruptEnabled; }
 void setInterrupt(bool enable) { interruptEnabled = enable; }
 
 std::string getCDPVersion() {
