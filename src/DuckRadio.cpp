@@ -83,8 +83,8 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
   lora.setDio0Action(config.func);
 
   // set sync word to private network
-  err = lora.setSyncWord(0x12);
-  if (err != ERR_NONE) {
+  rc = lora.setSyncWord(0x12);
+  if (rc != ERR_NONE) {
     logerr("ERROR  sync word is invalid");
     return DUCKLORA_ERR_SETUP;
   }
