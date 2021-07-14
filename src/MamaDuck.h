@@ -50,6 +50,13 @@ public:
 
 private :
   void handleReceivedPacket();
+
+  /**
+   * @brief Handles if there were any acks addressed to this duck.
+   *
+   * @param packet The a broadcast ack, which has topic type reservedTopic::ack
+   */
+  void handleAck(const CdpPacket & packet);
 };
 
 #endif

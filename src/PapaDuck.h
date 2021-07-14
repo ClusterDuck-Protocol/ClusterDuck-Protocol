@@ -68,8 +68,40 @@ public:
   int getType() { return DuckType::PAPA; }
 
 private:
-  rxDoneCallback recvDataCallback;
+
   void handleReceivedPacket();
+
+  /**
+   * @brief Indicates whether the packet should be acked or not.
+   *
+   * @param packet A valid, received CDP packet
+   * @returns True if so, false if not
+   */
+  bool needsAck(const CdpPacket & packet);
+
+  /**
+   * @brief Stores information from packet such that it will be acked later.
+   *
+   * @param packet A valid, received CDP packet
+   */
+  void storeForAck(const CdpPacket & packet);
+
+  /**
+   * @brief Indicates whether the ack buffer is full.
+   *
+   * @returns True if true, false if not
+   */
+  bool ackBufferIsFull();
+
+  /**
+   * @brief Sends a broadcast ack, containing one or more DUID/MUIDs to ack.
+   */
+  void broadcastAck();
+
+  typedef std::vector<std::pair<Duid, Muid> > AckStore;
+
+  AckStore ackStore;
+  rxDoneCallback recvDataCallback;
 };
 
 #endif

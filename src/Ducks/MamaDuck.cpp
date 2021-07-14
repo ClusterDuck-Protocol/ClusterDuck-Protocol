@@ -90,43 +90,7 @@ void MamaDuck::handleReceivedPacket() {
 
     if (rxPacket->getTopic() == reservedTopic::ack) {
       CdpPacket packet = CdpPacket(rxPacket->getBuffer());
-
-      if (duckutils::isEqual(duid, packet.dduid)) {
-        if (lastMessageMuid.size() != MUID_LENGTH) {
-          // This may indicate a duplicate DUID (if this MamaDuck hasn't
-          // previously sent any packets on the network) or may indicate that
-          // this MamaDuck has recently rebooted (and a previous message is
-          // being ack'd).
-          logwarn("handleReceivedPacket: received ack with matching DUID "
-            + duckutils::toString(duid)
-            + " but no ack is expected. Not relaying.");
-        } else if(duckutils::isEqual(lastMessageMuid, packet.data)) {
-          loginfo("handleReceivedPacket: matched ack. Not relaying. Matching DDUID "
-            + duckutils::toString(duid) + " and ack-MUID "
-            + duckutils::toString(lastMessageMuid));
-          lastMessageAck = true;
-        } else {
-          // This may indicate a duplicate DUID on the network or it may be a
-          // ack for a previous message.
-          logwarn("handleReceivedPacket: received ack with matching DUID "
-            + duckutils::toString(duid) + " but ack-MUID "
-            + duckutils::toString(packet.data)
-            + " does not match. Expected ack for MUID "
-            + duckutils::toString(lastMessageMuid)
-            + ". Not relaying.");
-        }
-
-        // Returning here prevents anything else from happening.
-        // TODO[Rory Olsen: 2021-06-23]: The application may need to know about
-        //   acks. I recommend a callback specifically for acks, or
-        //   similar.
-        return;
-      } else {
-        loginfo("handleReceivedPacket: relaying ack for DDUID "
-            + duckutils::toString(packet.dduid)
-            + " and ack-MUID "
-            + duckutils::toString(packet.muid));
-      }
+      handleAck(packet);
     }
 
     err = duckRadio.relayPacket(rxPacket);
@@ -135,6 +99,34 @@ void MamaDuck::handleReceivedPacket() {
     } else {
       loginfo("handleReceivedPacket: packet RELAY DONE");
     }
+  }
+}
+
+void MamaDuck::handleAck(const CdpPacket & packet) {
+  if (duckutils::isEqual(duid, packet.dduid)
+    || duckutils::isEqual(BROADCAST_DUID, packet.dduid)
+  ) {
+    if (lastMessageMuid.size() == MUID_LENGTH) {
+      const byte numPairs = packet.data[0];
+      static const int NUM_PAIRS_LENGTH = 1;
+      static const int PAIR_LENGTH = DUID_LENGTH + MUID_LENGTH;
+      for (int i = 0; i < numPairs; i++) {
+        int pairOffset = NUM_PAIRS_LENGTH + i*PAIR_LENGTH;
+        std::vector<byte>::const_iterator duidOffset = packet.data.begin() + pairOffset;
+        std::vector<byte>::const_iterator muidOffset = packet.data.begin() + pairOffset + DUID_LENGTH;
+        if (std::equal(duid.begin(), duid.end(), duidOffset)
+          || std::equal(lastMessageMuid.begin(), lastMessageMuid.end(), muidOffset)
+        ) {
+          loginfo("handleReceivedPacket: matched ack-MUID "
+            + duckutils::toString(lastMessageMuid));
+          lastMessageAck = true;
+        }
+      }
+    }
+
+    // TODO[Rory Olsen: 2021-06-23]: The application may need to know about
+    //   acks. I recommend a callback specifically for acks, or
+    //   similar.
   }
 }
 

@@ -115,27 +115,69 @@ void PapaDuck::handleReceivedPacket() {
 
     const CdpPacket packet = CdpPacket(rxPacket->getBuffer());
 
-    logdbg("Sending ack to DUID " + duckutils::toString(packet.sduid)
-      + " for MUID " + duckutils::toString(packet.muid));
-
-    // The data payload of a ack is the MUID of the received packet
-    err = txPacket->prepareForSending(packet.sduid, DuckType::PAPA,
-      reservedTopic::ack, packet.muid);
-    if (err != DUCK_ERR_NONE) {
-      logerr("ERROR handleReceivedPacket. Failed to prepare ack. Error: " +
-        String(err));
-      return;
+    if (needsAck(packet)) {
+      storeForAck(packet);
     }
 
-    err = duckRadio.sendData(txPacket->getBuffer());
-    if (err != DUCK_ERR_NONE) {
-      logerr("ERROR handleReceivedPacket. Failed to send ack. Error: " +
-        String(err));
-      return;
+    if (ackBufferIsFull()) {
+      broadcastAck();
     }
 
     loginfo("handleReceivedPacket() DONE");
   }
+}
+
+void PapaDuck::storeForAck(const CdpPacket & packet) {
+  if (ackStore.size() >= MAX_MUID_PER_ACK) {
+    logerr("ackStore.size() >= " + String(MAX_MUID_PER_ACK)); // Test
+    return;
+  }
+
+  ackStore.push_back(std::pair<Duid, Muid>(packet.sduid, packet.muid));
+}
+
+bool PapaDuck::ackBufferIsFull() {
+  logwarn("TODO: Finish PapaDuck::ackBufferIsFull");
+  // if (ackStore.size() >= MAX_MUID_PER_ACK) {
+  return true;
+}
+
+bool PapaDuck::needsAck(const CdpPacket & packet) {
+  logwarn("TODO: Finish PapaDuck::needsAck");
+  return true;
+}
+
+void PapaDuck::broadcastAck() {
+
+  logwarn("TODO: Finish PapaDuck::broadcastAck");
+
+  const byte num = static_cast<byte>(ackStore.size());
+
+  std::vector<byte> dataPayload;
+  dataPayload.push_back(num);
+  for (int i = 0; i < num; i++) {
+    Duid duid = ackStore[i].first;
+    Muid muid = ackStore[i].second;
+    logdbg("Sending ack to DUID " + duckutils::toString(duid)
+      + " for MUID " + duckutils::toString(muid));
+    dataPayload.insert(dataPayload.end(), duid.begin(), duid.end());
+    dataPayload.insert(dataPayload.end(), muid.begin(), muid.end());
+  }
+
+  int err = txPacket->prepareForSending(BROADCAST_DUID, DuckType::PAPA,
+    reservedTopic::ack, dataPayload);
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR handleReceivedPacket. Failed to prepare ack. Error: " +
+      String(err));
+  }
+
+  err = duckRadio.sendData(txPacket->getBuffer());
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR handleReceivedPacket. Failed to send ack. Error: " +
+      String(err));
+  }
+
+  ackStore.clear();
 }
 
 int PapaDuck::reconnectWifi(String ssid, String password) {
