@@ -1,15 +1,15 @@
 /**
- * @file PapaDuck.ino
+ * @file Papa-Downtime-Counter.ino
  * @author 
- * @brief Uses built-in PapaDuck from the SDK to create a WiFi enabled Papa Duck
+ * @brief Uses pre-built PapaDuck and will send downtime data after reconnecting
  * 
  * This example will configure and run a Papa Duck that connects to the cloud
- * and forwards all messages (except  pings) to the cloud. When disconnected
- * it will add received packets to a queue. When it reconnects to MQTT it will
- * try to publish all messages in the queue. You can change the size of the queue
- * by changing `QUEUE_SIZE_MAX`.
+ * and forwards all messages (except  pings) to the cloud. It will also send
+ * how long it was disconnected from cloud network as well as how many times
+ * it has disconnected. Watch working session
+ * https://www.youtube.com/watch?v=xx4aYct8m7o&t
  * 
- * @date 2021-06-17
+ * @date 2021-04-08
  * 
  */
 
@@ -27,40 +27,6 @@
 #define MQTT_RETRY_DELAY_MS 500
 #define WIFI_RETRY_DELAY_MS 5000
 
-//Uncomment CA_CERT if you want to use the certificate auth method
-//#define CA_CERT
-#ifdef CA_CERT
-const char* example_root_ca = \
-  "-----BEGIN CERTIFICATE-----\n" \
-  "MIIDrzCCApegAwIBAgIQCDvgVpBCRrGhdWrJWZHHSjANBgkqhkiG9w0BAQUFADBh\n" \
-  "MQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3\n" \
-  "d3cuZGlnaWNlcnQuY29tMSAwHgYDVQQDExdEaWdpQ2VydCBHbG9iYWwgUm9vdCBD\n" \
-  "QTAeFw0wNjExMTAwMDAwMDBaFw0zMTExMTAwMDAwMDBaMGExCzAJBgNVBAYTAlVT\n" \
-  "MRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5j\n" \
-  "b20xIDAeBgNVBAMTF0RpZ2lDZXJ0IEdsb2JhbCBSb290IENBMIIBIjANBgkqhkiG\n" \
-  "9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4jvhEXLeqKTTo1eqUKKPC3eQyaKl7hLOllsB\n" \
-  "CSDMAZOnTjC3U/dDxGkAV53ijSLdhwZAAIEJzs4bg7/fzTtxRuLWZscFs3YnFo97\n" \
-  "nh6Vfe63SKMI2tavegw5BmV/Sl0fvBf4q77uKNd0f3p4mVmFaG5cIzJLv07A6Fpt\n" \
-  "43C/dxC//AH2hdmoRBBYMql1GNXRor5H4idq9Joz+EkIYIvUX7Q6hL+hqkpMfT7P\n" \
-  "T19sdl6gSzeRntwi5m3OFBqOasv+zbMUZBfHWymeMr/y7vrTC0LUq7dBMtoM1O/4\n" \
-  "gdW7jVg/tRvoSSiicNoxBN33shbyTApOB6jtSj1etX+jkMOvJwIDAQABo2MwYTAO\n" \
-  "BgNVHQ8BAf8EBAMCAYYwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUA95QNVbR\n" \
-  "TLtm8KPiGxvDl7I90VUwHwYDVR0jBBgwFoAUA95QNVbRTLtm8KPiGxvDl7I90VUw\n" \
-  "DQYJKoZIhvcNAQEFBQADggEBAMucN6pIExIK+t1EnE9SsPTfrgT1eXkIoyQY/Esr\n" \
-  "hMAtudXH/vTBH1jLuG2cenTnmCmrEbXjcKChzUyImZOMkXDiqw8cvpOp/2PV5Adg\n" \
-  "06O/nVsJ8dWO41P0jmP6P6fbtGbfYmbW0W5BjfIttep3Sp+dWOIrWcBAI+0tKIJF\n" \
-  "PnlUkiaY4IBIqDfv8NZ5YBberOgOzW6sRBc4L0na4UU+Krk2U886UAb3LujEV0ls\n" \
-  "YSEY1QSteDwsOoBrp+uvFRTp2InBuThs4pFsiv9kuXclVzDAGySj4dzp30d8tbQk\n" \
-  "CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=\n" \
-  "-----END CERTIFICATE-----\n";
-  // This is the DigiCert Global Root CA, which is the root CA cert for
-  // https://internetofthings.ibmcloud.com/
-  // It expires November 9, 2031.
-  // To connect to a different cloud provider or server, you may need to use a
-  // different cert. For details, see
-  // https://github.com/espressif/arduino-esp32/tree/master/libraries/WiFiClientSecure
-#endif
-
 #define SSID ""
 #define PASSWORD ""
 
@@ -72,7 +38,6 @@ const char* example_root_ca = \
 #define DEVICE_TYPE ""
 #define TOKEN       ""
 char server[] = ORG ".messaging.internetofthings.ibmcloud.com";
-const int port = 8883;
 char authMethod[] = "use-token-auth";
 char token[] = TOKEN;
 char clientId[] = "d:" ORG ":" DEVICE_TYPE ":" DEVICE_ID;
@@ -82,6 +47,7 @@ PapaDuck duck = PapaDuck();
 
 DuckDisplay* display = NULL;
 
+// Set this to false if testing quickstart on IBM IoT Platform
 bool use_auth_method = true;
 
 auto timer = timer_create_default();
@@ -89,8 +55,12 @@ auto timer = timer_create_default();
 int QUEUE_SIZE_MAX = 5;
 std::queue<std::vector<byte>> packetQueue;
 
+int disconnectTime;
+bool disconnect = false;
+int failCounter = 0;
+
 WiFiClientSecure wifiClient;
-PubSubClient client(server, port, wifiClient);
+PubSubClient client(server, 8883, wifiClient);
 // / DMS locator URL requires a topicString, so we need to convert the topic
 // from the packet to a string based on the topics code
 std::string toTopicString(byte topic) {
@@ -199,6 +169,7 @@ int quackJson(std::vector<byte> packetBuffer) {
     Serial.println("[PAPA] Publish failed");
     display->drawString(0, 60, "Publish failed");
     display->sendBuffer();
+    failCounter++;
     return -1;
   }
 }
@@ -239,14 +210,9 @@ void setup() {
 
   // register a callback to handle incoming data from duck in the network
   duck.onReceiveDuckData(handleDuckData);
-
-  #ifdef CA_CERT
-  Serial.println("[PAPA] Using root CA cert");
-  wifiClient.setCACert(example_root_ca);
-  #else
-  Serial.println("[PAPA] Using insecure TLS");
-  wifiClient.setInsecure();
-  #endif
+  
+  //Send report on how many disconnects in a period
+  timer.every(3000000, sendFailReport);
 
   Serial.println("[PAPA] Setup OK! ");
   
@@ -257,7 +223,13 @@ void setup() {
 
 
 void loop() {
+
   if (!duck.isWifiConnected() && retry) {
+    if(!disconnect) {
+      disconnectTime = millis();
+      disconnect = true;
+    }
+
     String ssid = duck.getSsid();
     String password = duck.getPassword();
 
@@ -282,7 +254,6 @@ void loop() {
 void setup_mqtt(bool use_auth) {
   bool connected = client.connected();
   if (connected) {
-
     //Once reconnected check queue and publish all queued messages
     if(packetQueue.size() > 0) {
       publishQueue();
@@ -290,32 +261,85 @@ void setup_mqtt(bool use_auth) {
     return;
   }
 
-  
+  if(!disconnect) {
+    disconnectTime = millis();
+    disconnect = true;
+  }
+
   if (use_auth) {
     connected = client.connect(clientId, authMethod, token);
   } else {
     connected = client.connect(clientId);
   }
   if (connected) {
+    Serial.println("[PAPA] Mqtt client is connected!");
+    disconnect = false;
+    int timeDisconnected = millis() - disconnectTime;
+    timeDisconnected = timeDisconnected/1000; //Time in seconds
+
+    //It is normal to not have a continous connection to MQTT and disconnect for a short period
+    if(timeDisconnected > 1) quackDownReport("Time Disconnected: " + String(timeDisconnected));
     if(packetQueue.size() > 0) {
       publishQueue();
     }
-    Serial.println("[PAPA] Mqtt client is connected!");
     return;
   }
   retry_mqtt_connection(1000);
   
 }
 
-bool enableRetry(void*) {
-  retry = true;
-  return retry;
+void quackDownReport(String payload) {
+  Serial.println("Send QuackDownReport");
+
+  const int bufferSize = 4 * JSON_OBJECT_SIZE(4);
+  StaticJsonDocument<bufferSize> doc;
+
+  doc["DeviceID"] = "PAPADUCK";
+  doc["MessageID"] = createUuid(4);
+  doc["Payload"].set(payload);
+  doc["path"] = "PAPADUCK";
+  doc["hops"] = "0";
+  doc["duckType"] = "1";
+    
+  std::string topic = "iot-2/evt/health/fmt/json";
+
+  String jsonstat;
+  serializeJson(doc, jsonstat);
+
+  if (client.publish(topic.c_str(), jsonstat.c_str())) {
+    Serial.println("[PAPA] Packet forwarded:");
+    serializeJsonPretty(doc, Serial);
+    Serial.println("");
+    Serial.println("[PAPA] Publish ok");
+    display->drawString(0, 60, "Publish ok");
+    display->sendBuffer();
+  } else {
+    Serial.println("[PAPA] Publish failed");
+    display->drawString(0, 60, "Publish failed");
+    display->sendBuffer();
+    failCounter++;
+  }
+
 }
 
-void retry_mqtt_connection(int delay_ms) {
-  Serial.println("[PAPA] Could not connect to MQTT...............................");
-  retry = false;
-  timer.in(delay_ms, enableRetry);
+// Creates a unique id for the message
+String createUuid(int length) {
+  String msg = "";
+  int i;
+
+  for (i = 0; i < length; i++) {
+    byte randomValue = random(0, 36);
+    if (randomValue < 26) {
+      msg = msg + char(randomValue + 'a');
+    } else {
+      msg = msg + char((randomValue - 26) + '0');
+    }
+  }
+  return msg;
+}
+
+bool sendFailReport(void*) {
+  quackDownReport("Packet Fail count: " + String(failCounter));
 }
 
 void publishQueue() {
@@ -328,4 +352,15 @@ void publishQueue() {
       return;
     }
   }
+}
+
+bool enableRetry(void*) {
+  retry = true;
+  return retry;
+}
+
+void retry_mqtt_connection(int delay_ms) {
+  Serial.println("[PAPA] Could not connect to MQTT...............................");
+  retry = false;
+  timer.in(delay_ms, enableRetry);
 }

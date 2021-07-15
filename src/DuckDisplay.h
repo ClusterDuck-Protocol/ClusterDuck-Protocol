@@ -16,12 +16,9 @@
 #include <Arduino.h>
 #include <vector>
 #include <WString.h>
-#include "include/DuckTypes.h"
-#include "include/DuckEsp.h"
-#include "include/DuckUtils.h"
 #ifndef CDPCFG_OLED_NONE
 #include <U8g2lib.h>
-#endif
+#endif // CDPCFG_OLED_NONE
 /**
  * @brief Internal OLED Display abstraction.
  *
@@ -104,17 +101,20 @@ public:
   
   //TODO implement this for the U8g2 library
   void log(String text) {}
-#endif
+#endif // CDPCFG_OLED_NONE
 private:
   DuckDisplay();
   DuckDisplay(DuckDisplay const&) = delete;
   DuckDisplay& operator=(DuckDisplay const&) = delete;
   static DuckDisplay* instance;
+
+#ifndef CDPCFG_OLED_NONE
   int duckType;
   String duckName;
   String duckTypeToString(int duckType);
   uint8_t width;
   uint8_t height;
+#endif // CDPCFG_OLED_NONE
 };
 
 #endif /* DUCKDISPLAY_H_ */

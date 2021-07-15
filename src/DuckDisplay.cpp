@@ -1,5 +1,11 @@
 #include "DuckDisplay.h"
-#include <iostream>
+
+#ifdef CDPCFG_OLED_CLASS
+#include "include/DuckTypes.h"
+#include "include/DuckEsp.h"
+#include "include/DuckUtils.h"
+#endif
+
 #include <vector>
 
 #ifdef CDPCFG_OLED_CLASS
@@ -100,7 +106,7 @@ static const unsigned char u8g_logo_bits[] U8X8_PROGMEM = {
     0x00, 0x00, 0x00, 0x00,
 };
 
-#endif
+#endif // CDPCFG_OLED_CLASS
 
 #define u8g_logo_width 128
 #define u8g_logo_height 64
@@ -115,6 +121,7 @@ DuckDisplay* DuckDisplay::getInstance() {
   }
   return instance;
 }
+
 #ifndef CDPCFG_OLED_NONE
 
 void DuckDisplay::setupDisplay(int duckType, std::vector<byte> name) {
@@ -168,7 +175,8 @@ void DuckDisplay::print(String s) { u8g2.print(s); }
 void DuckDisplay::clear(void) { u8g2.clear(); }
 
 void DuckDisplay::sendBuffer(void){  u8g2.sendBuffer();}
- 
+
+#ifndef CDPCFG_OLED_NONE
 String DuckDisplay::duckTypeToString(int duckType) {
   String duckTypeStr = "";
   switch (duckType) {
@@ -189,7 +197,7 @@ String DuckDisplay::duckTypeToString(int duckType) {
   }
   return duckTypeStr;
 }
-
+#endif // CDPCFG_OLED_NONE
 
 
 
@@ -218,6 +226,6 @@ void DuckDisplay::showDefaultScreen() {
   setCursor(0, 70);
   print("MC: " + duckesp::getDuckMacAddress(false));
   u8g2.sendBuffer(); 
-#endif
+#endif // CDPCFG_OLED_64x32
 }
 #endif // CDPCFG_OLED_NONE

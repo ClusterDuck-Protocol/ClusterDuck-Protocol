@@ -64,7 +64,7 @@ public:
    * 
    * @return true if interrupt is enabled, false otherwise.
    */
-  volatile bool getInterrupt();
+  bool getInterrupt();
 
   /**
    * @brief Toggle the flag that indicates a message is received.
@@ -164,7 +164,7 @@ public:
    * 
    * @return true if a received packet is available, false otherwise. 
    */
-  volatile bool getFlag();
+  bool getFlag();
 
   /**
    * @brief Set the Duck to be ready to recieve LoRa packets.

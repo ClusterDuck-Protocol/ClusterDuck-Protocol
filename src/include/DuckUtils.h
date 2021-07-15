@@ -13,6 +13,7 @@
 #include "cdpcfg.h"
 #include "arduino-timer.h"
 #include <Arduino.h>
+#include <string>
 #include <WString.h>
 
 namespace duckutils {
@@ -53,7 +54,7 @@ String convertToHex(byte* data, int size);
  * 
  * @returns true if interrupt is enabled, false otherwise.
  */
-volatile bool isInterruptEnabled();
+bool isInterruptEnabled();
 
 /**
  * @brief Toggle the duck Interrupt

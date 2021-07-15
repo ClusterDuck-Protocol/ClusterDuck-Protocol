@@ -6,14 +6,14 @@
 namespace duckutils {
 
   namespace {
-    std::string cdpVersion = "2.9.6";
+    std::string cdpVersion = "2.9.14";
   }
 
 volatile bool interruptEnabled = true;
 Timer<> duckTimer = timer_create_default();
 bool detectState = false;
 
-volatile bool isInterruptEnabled() { return interruptEnabled; }
+bool isInterruptEnabled() { return interruptEnabled; }
 void setInterrupt(bool enable) { interruptEnabled = enable; }
 
 std::string getCDPVersion() {
@@ -35,7 +35,7 @@ void  getRandomBytes(int length, byte* bytes) {
   for (i = 0; i < length; i++) {
     //TODO: Random generator here isn't seeded properly
     //We can use RSSI value to seed it or use a frame counter if available
-    bytes[i] = digits[random(0, 35)];
+    bytes[i] = digits[random(36)];    
   }
 }
 
@@ -44,7 +44,7 @@ String createUuid(int length) {
   int i;
 
   for (i = 0; i < length; i++) {
-    byte randomValue = random(0, 36);
+    byte randomValue = random(36);
     if (randomValue < 26) {
       msg = msg + char(randomValue + 'a');
     } else {

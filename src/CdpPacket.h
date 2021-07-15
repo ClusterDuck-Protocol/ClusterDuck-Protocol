@@ -108,7 +108,7 @@ public:
   /// Path section (48 bytes max)
   std::vector<byte> path;
 
-  CdpPacket(std::vector<byte> buffer) {
+  CdpPacket(std::vector<byte> & buffer) {
     int buffer_length = buffer.size();
     // sduid
     sduid.assign(&buffer[SDUID_POS], &buffer[DDUID_POS]);
