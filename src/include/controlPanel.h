@@ -46,7 +46,6 @@ const char controlPanel[] PROGMEM = R"=====(
         font-size: 0.8em;
         padding: 0.4em;
         border-radius: 12px;
-
       }
       select{
         width: 100%;
@@ -74,16 +73,7 @@ const char controlPanel[] PROGMEM = R"=====(
      <div class="control-box">
            <h5>Channel Select</h5>
     <p>Set your duck to one of these 5 channels</p>
-
-
-    <p>Channel Select</p>
     <form action='/setChannel' method='post'>
-
-    <input type="radio" id="channel1" name="channel" value=1>
-    <label for="channel1">1</label><br>
-
-
-    
     <form action='/setChannel' method='post'>
      <p>Channel:</p>
      <select name="channels">
@@ -95,8 +85,6 @@ const char controlPanel[] PROGMEM = R"=====(
      </select>
      <input type="submit" name="submit"/>
 </form>
-
-
      </div>
    
  <div class="control-box">
