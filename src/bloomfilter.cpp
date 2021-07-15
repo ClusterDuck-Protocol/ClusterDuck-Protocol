@@ -19,7 +19,7 @@ struct BloomFilter* bloom_init(int m, int k, int w, int activeFilter, int maxN) 
     struct BloomFilter * BF;
     BF->M = m;
     BF->K = k;
-    BF->W = w;
+    BF->W = w; //Max value is how many bits in an unsigned int
     BF->activeFilter = activeFilter;
     BF->maxN = maxN;
     BF->nMsg = 0;
