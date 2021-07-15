@@ -2,7 +2,7 @@
 #define DUCK_H
 
 #include "../DuckError.h"
-#include "bloom_filter.hpp"
+#include "bloomfilter.h"
 #include "DuckNet.h"
 #include "DuckRadio.h"
 #include "DuckTypes.h"
@@ -37,18 +37,8 @@ public:
    * @returns DUCK_ERROR_NONE if successful, an error code otherwise.
    */
   int setupMessageRouting() {
-    // How many elements roughly do we expect to insert?
-    parameters.projected_element_count = 1000;
-    // Maximum tolerable false positive probability? (0,1)
-    parameters.false_positive_probability = 0.0001; // 1 in 10000
-    // Simple randomizer (optional)
-    parameters.random_seed = 0xA5A5A5A5;
-    if (!parameters.compute_optimal_parameters()) {
-      logerr("Failed to set routing parameters!");
-      return DUCK_ERR_SETUP;
-    }
     //Instantiate Bloom Filter
-    filter = new bloom_filter(parameters);
+    filter = bloom_init(16, 2, 4, 1, 8);
     return DUCK_ERR_NONE;
   }
 
@@ -285,8 +275,7 @@ protected:
   DuckPacket* txPacket = NULL;
   DuckPacket* rxPacket = NULL;
 
-  bloom_parameters parameters;
-  bloom_filter *filter;
+  BloomFilter* filter;
 
   /**
    * @brief sends a pong message

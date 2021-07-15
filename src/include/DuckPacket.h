@@ -5,7 +5,7 @@
 #include "Arduino.h"
 #include "DuckUtils.h"
 #include "cdpcfg.h"
-#include "bloom_filter.hpp"
+#include "bloomfilter.h"
 #include <CRC32.h>
 #include <WString.h>
 #include <vector>
@@ -59,7 +59,7 @@ public:
      * @returns true if the packet needs to be relayed
      * @returns false if the packet does not need to be replayed
      */
-    bool prepareForRelaying(bloom_filter *filter, std::vector<byte> dataBuffer);
+    bool prepareForRelaying(BloomFilter *filter, std::vector<byte> dataBuffer);
     
     /**
      * @brief Get the Cdp Packet byte vector.

@@ -4,11 +4,11 @@
 #include "MemoryFree.h"
 #include "include/DuckUtils.h"
 #include "include/DuckCrypto.h"
-#include "include/bloom_filter.hpp"
+#include "include/bloomfilter.h"
 #include <string>
 
 
-bool DuckPacket::prepareForRelaying(bloom_filter *filter, std::vector<byte> dataBuffer) {
+bool DuckPacket::prepareForRelaying(BloomFilter *filter, std::vector<byte> dataBuffer) {
 
 
   this->reset();
@@ -22,12 +22,13 @@ bool DuckPacket::prepareForRelaying(bloom_filter *filter, std::vector<byte> data
   //TODO: Add backwards compatibility
 
   // Query the existence of strings
-  bool alreadySeen = filter->contains(&dataBuffer[MUID_POS], MUID_LENGTH);
-  if (alreadySeen) {
+  // bool alreadySeen = filter->contains(&dataBuffer[MUID_POS], MUID_LENGTH);
+  bool alreadySeen = bloom_check(filter, &dataBuffer[MUID_POS], MUID_LENGTH);
+  if (!alreadySeen) {
     logdbg("handleReceivedPacket: Packet already seen. No relay.");
     return false;
   } else {
-    filter->insert(&dataBuffer[MUID_POS], MUID_LENGTH);
+    bloom_add(filter, &dataBuffer[MUID_POS], MUID_LENGTH);
     logdbg("handleReceivedPacket: Relaying packet: "  + duckutils::convertToHex(&dataBuffer[MUID_POS], MUID_LENGTH));
   }
 
