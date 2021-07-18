@@ -210,31 +210,31 @@ void DuckRadio::setChannel(int channelNum) {
   int err;
   switch(channelNum) {
     case 1:
-      loginfo("Set channel: 1");
+      loginfo("Set channel: " + String(channelNum));
       err = lora.setFrequency(CHANNEL_1);
       break;
     case 2:
-      loginfo("Set channel: 2");
+      loginfo("Set channel: " + String(channelNum));
       err = lora.setFrequency(CHANNEL_2);
       break;
     case 3:
-      loginfo("Set channel: 3");
+      loginfo("Set channel: " + String(channelNum));
       err = lora.setFrequency(CHANNEL_3);
       break;
     case 4:
-      loginfo("Set channel: 4");
+      loginfo("Set channel: " + String(channelNum));
       err = lora.setFrequency(CHANNEL_4);
       break;
     case 5:
-      loginfo("Set channel: 5");
+      loginfo("Set channel: " + String(channelNum));
       err = lora.setFrequency(CHANNEL_5);
       break;
     case 6:
-      loginfo("Set channel: 6");
+      loginfo("Set channel: " + String(channelNum));
       err = lora.setFrequency(CHANNEL_6);
       break;
     default:
-      loginfo("Set channel: 1");
+      loginfo("Set channel: " + String(channelNum));
       err = lora.setFrequency(CHANNEL_1);
     
     if (err != ERR_NONE) {

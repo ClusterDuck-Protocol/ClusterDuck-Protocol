@@ -86,6 +86,7 @@ void PapaDuck::run() {
     duckutils::setInterrupt(true);
     startReceive();
   }
+  processPortalRequest();
 }
 
 void PapaDuck::handleReceivedPacket() {
