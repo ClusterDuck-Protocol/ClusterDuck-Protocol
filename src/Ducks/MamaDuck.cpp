@@ -74,6 +74,7 @@ void MamaDuck::handleReceivedPacket() {
   logdbg("Got data from radio, prepare for relay. size: "+ String(data.size()));
 
   relay = rxPacket->prepareForRelaying(duid, data);
+  recvDataCallback(rxPacket->getBuffer());
   if (relay) {
     loginfo("handleReceivedPacket: packet RELAY START");
     // NOTE:

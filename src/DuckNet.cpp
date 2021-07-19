@@ -97,7 +97,11 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
 
   webServer.on("/flipDecrypt", HTTP_POST, [&](AsyncWebServerRequest* request) {
     //Flip Decrypt State
+    Serial.println("Flipping Decrypt");
     duckcrypto::setDecrypt(!duckcrypto::getDecrypt());
+    Serial.print("Decrypt is now: ");
+    Serial.println(duckcrypto::getDecrypt());
+    request->send(200, "text/plain", "Success");
   });
 
   webServer.on("/setChannel", HTTP_POST, [&](AsyncWebServerRequest* request) {
