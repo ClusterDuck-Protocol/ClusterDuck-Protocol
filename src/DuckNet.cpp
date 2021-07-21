@@ -97,10 +97,11 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
 
   webServer.on("/flipDecrypt", HTTP_POST, [&](AsyncWebServerRequest* request) {
     //Flip Decrypt State
-    Serial.println("Flipping Decrypt");
+    loginfo("Flipping Decrypt");
+
     duckcrypto::setDecrypt(!duckcrypto::getDecrypt());
-    Serial.print("Decrypt is now: ");
-    Serial.println(duckcrypto::getDecrypt());
+    loginfo("Decrypt is now: ");
+    loginfo(duckcrypto::getDecrypt());
     request->send(200, "text/plain", "Success");
   });
 
@@ -108,7 +109,6 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     AsyncWebParameter* p = request->getParam(0);
     logdbg(p->name() + ": " + p->value());
     int val = std::atoi(p->value().c_str());
-    
     duckRadio->setChannel(val);
     request->send(200, "text/plain", "Success");
   });

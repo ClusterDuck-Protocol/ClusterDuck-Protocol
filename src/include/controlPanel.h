@@ -72,25 +72,20 @@ const char controlPanel[] PROGMEM = R"=====(
     </form>
      </div>
      <div class="control-box">
-           <h5>Channel Select</h5>
-
-    <p>Channel Select</p>
-    <form action='/setChannel' method='post'>
-
-    <form action='/setChannel' method='post'>
-     <p>Channel:</p>
-     <select name="channels">
+      <h5>Channel Select</h5>
+      <p>Channel Select</p>
+       <form action='/setChannel' method='post'>
+       <p>Channel:</p>
+        <select name="channels">
         <option value="1">1</option>
         <option value="2">2</option>
         <option value="3">3</option>
         <option value="4">4</option>
         <option value="5">5</option>
         <option value="6">6</option>
-     </select>
-     <input type="submit" name="submit"/>
-</form>
-
-
+        </select>
+        <input type="submit" name="submit"/>
+      </form>
      </div>
    
  <div class="control-box">

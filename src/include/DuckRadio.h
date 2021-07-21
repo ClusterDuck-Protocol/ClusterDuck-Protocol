@@ -126,6 +126,13 @@ public:
    */
   int startTransmitData(byte* data, int length);
 
+   /**
+   * @brief change the duck channel.
+   * 
+   * @param channelNum set the channel number 1-6.
+   */
+  void setChannel(int channelNum);
+
   /**
    * @brief Get the current RSSI value.
    *
@@ -170,12 +177,7 @@ public:
    */
   void processRadioIrq();
 
-  /**
-   * @brief change the duck channel.
-   * 
-   * @param channelNum set the channel number 1-6.
-   */
-  void setChannel(int channelNum);
+ 
 
 private:
   DuckRadio();
