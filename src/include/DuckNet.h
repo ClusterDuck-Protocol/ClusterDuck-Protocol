@@ -151,6 +151,10 @@ public:
 
   int loadControlCredentials();
 
+  void saveChannel(int val);
+
+  void loadChannel();
+
   /**
    * @brief Load Wifi credentials from EEPROM
    * @return DUCK_ERR_NONE if successful, an error code otherwise.

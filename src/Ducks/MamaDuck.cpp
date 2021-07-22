@@ -40,6 +40,8 @@ int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String 
   }
   duckutils::getTimer().every(CDPCFG_MILLIS_ALIVE, imAlive);
 
+  duckNet->loadChannel();
+
   return DUCK_ERR_NONE;
 }
 

@@ -110,6 +110,9 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     logdbg(p->name() + ": " + p->value());
     int val = std::atoi(p->value().c_str());
     duckRadio->setChannel(val);
+    saveChannel(val);
+
+
     request->send(200, "text/plain", "Success");
   });
 
@@ -335,6 +338,27 @@ int DuckNet::setupDns() {
 
   return DUCK_ERR_NONE;
 }
+
+void DuckNet::saveChannel(int val){
+
+    EEPROM.begin(512);
+    EEPROM.write(CDPCFG_EEPROM_CHANNEL_VALUE, val);
+    EEPROM.commit();
+    loginfo("Wrote channel val to EEPROM");
+    loginfo(val);
+    
+}
+
+void DuckNet::loadChannel(){
+      EEPROM.begin(512);
+    int val = EEPROM.read(CDPCFG_EEPROM_CHANNEL_VALUE);
+    duckRadio->setChannel(val);
+    loginfo("Read channel val to EEPROM, setting channel: ");
+    loginfo(val);
+    
+}
+
+
 
 //TODO: EEPROM saving should probably be moved out of DuckNet.cpp
 
