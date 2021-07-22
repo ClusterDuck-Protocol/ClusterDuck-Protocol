@@ -206,7 +206,8 @@ int DuckRadio::sleep() { return lora.sleep(); }
 void DuckRadio::processRadioIrq() {}
 
 void DuckRadio::setChannel(int channelNum) {
-  logdbg("Setting Channel to : " + channelNum.c_str());
+  logdbg("Setting Channel to : ");
+  logdbg(channelNum);
   
   int err;
   switch(channelNum) {
