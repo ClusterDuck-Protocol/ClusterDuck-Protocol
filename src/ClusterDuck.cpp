@@ -25,7 +25,7 @@ void handleFirmwareUpload(AsyncWebServerRequest* request, String filename,
                           bool final) {
   // handle upload and update
   if (!index) {
-    //FIXME: printf may not be implemented on some Arduiono platforms
+    //FIXME: printf may not be implemented on some Arduino platforms
     loginfo_f("Update: %s\n", filename.c_str());
     if (!Update.begin(UPDATE_SIZE_UNKNOWN)) { // start with max available size
       Update.printError(Serial);

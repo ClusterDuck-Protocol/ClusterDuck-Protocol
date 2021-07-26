@@ -116,15 +116,3 @@ bool sendData(const byte* buffer, int length) {
   return sentOk;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-

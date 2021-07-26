@@ -1,7 +1,7 @@
 # Contributing
 
 When contributing a major change to this repository, please first discuss the change you wish to make via an [issue](contributing/ISSUES.md) or via
-[Slack](https://www.project-owl.com/slack). Minor issues can simply be addressed by sending by a pull request.
+[Slack](https://www.project-owl.com/slack). Minor issues can simply be addressed by sending a pull request.
 
 > Join our weekly town hall meeting at [2pm ET every Monday](https://meet.google.com/unq-duaq-ygj) to learn about project priorities, milestones, and upcoming events.
 
