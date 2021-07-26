@@ -140,7 +140,7 @@
 
 /*
  * BOARD "heltec wireless stick lite"
- * ARDUIONO BOARD PACKAGE URL:
+ * ARDUINO BOARD PACKAGE URL:
  * https://resource.heltec.cn/download/package_heltec_esp32_index.json
  * DOCS:
  * http://www.heltec.cn/project/wireless-stick-lite/
