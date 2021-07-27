@@ -170,7 +170,6 @@ private:
   DuckRadio& operator=(DuckRadio const&) = delete;
   static DuckRadio* instance;
   DuckDisplay* display = DuckDisplay::getInstance();
-  int err;
 };
 
 #endif
