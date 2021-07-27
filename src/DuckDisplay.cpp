@@ -168,6 +168,13 @@ void DuckDisplay::drawString(bool cls, u8g2_uint_t x, u8g2_uint_t y, const char 
   drawString(x, y, s);
 }
 
+void DuckDisplay::clearLine(u8g2_uint_t x, u8g2_uint_t y) {
+  u8g2.setDrawColor(0);
+  u8g2.drawBox(x, y, 100, 10);
+  sendBuffer();
+  u8g2.setDrawColor(1);
+}
+
 void DuckDisplay::setCursor(u8g2_uint_t x, u8g2_uint_t y) { u8g2.setCursor(x, y); }
 
 void DuckDisplay::print(String s) { u8g2.print(s); }
