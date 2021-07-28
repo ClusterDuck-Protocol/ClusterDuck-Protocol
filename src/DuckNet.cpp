@@ -116,38 +116,38 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     request->send(200, "text/plain", "Success");
   });
 
-  webServer.on("/changeControlPassword", HTTP_POST, [&](AsyncWebServerRequest* request) {
-    int paramsNumber = request->params();
-    String val = "";
-    String ssid = "";
-    String password = "";
-    String newSsid = "";
-    String newPassword = "";
+  // webServer.on("/changeControlPassword", HTTP_POST, [&](AsyncWebServerRequest* request) {
+  //   int paramsNumber = request->params();
+  //   String val = "";
+  //   String ssid = "";
+  //   String password = "";
+  //   String newSsid = "";
+  //   String newPassword = "";
 
-    for (int i = 0; i < paramsNumber; i++) {
-      AsyncWebParameter* p = request->getParam(i);
+  //   for (int i = 0; i < paramsNumber; i++) {
+  //     AsyncWebParameter* p = request->getParam(i);
 
-      String name = String(p->name());
-      String value = String(p->value());
+  //     String name = String(p->name());
+  //     String value = String(p->value());
 
-      if (name == "ssid") {
-        ssid = String(p->value());
-      } else if (name == "pass") {
-        password = String(p->value());
-      } else if (name == "newSsid") {
-        newSsid = String(p->value());
-      } else if (name == "newPassword") {
-        newPassword = String(p->value());
-      }
-    }
+  //     if (name == "ssid") {
+  //       ssid = String(p->value());
+  //     } else if (name == "pass") {
+  //       password = String(p->value());
+  //     } else if (name == "newSsid") {
+  //       newSsid = String(p->value());
+  //     } else if (name == "newPassword") {
+  //       newPassword = String(p->value());
+  //     }
+  //   }
 
-    if (ssid == controlSsid && password == controlPassword && newSsid != "" && newPassword != "") {
-      saveControlCredentials(newSsid, newPassword);
-      request->send(200, "text/plain", "Success");
-    } else {
-      request->send(500, "text/plain", "There was an error");
-    }
-  });
+  //   if (ssid == controlSsid && password == controlPassword && newSsid != "" && newPassword != "") {
+  //     saveControlCredentials(newSsid, newPassword);
+  //     request->send(200, "text/plain", "Success");
+  //   } else {
+  //     request->send(500, "text/plain", "There was an error");
+  //   }
+  // });
 
   // Update Firmware OTA
   webServer.on("/update", HTTP_GET, [&](AsyncWebServerRequest* request) {
