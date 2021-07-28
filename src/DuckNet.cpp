@@ -361,17 +361,11 @@ void DuckNet::loadChannel(){
 
 
 //TODO: EEPROM saving should probably be moved out of DuckNet.cpp
-
 int DuckNet::saveWifiCredentials(String ssid, String password) {
   this->ssid = ssid;
   this->password = password;
 
-  if(ssid.length() > 32 || password.length() > 32) {
-    //Too long
-    logdbg("Password or SSID too long");
-    return -1;
-  }
- 
+
   EEPROM.begin(512);
 
   if (ssid.length() > 0 && password.length() > 0) {
@@ -383,23 +377,18 @@ int DuckNet::saveWifiCredentials(String ssid, String password) {
     loginfo("writing EEPROM SSID:");
     for (int i = 0; i < ssid.length(); i++)
     {
-      int addr = CDPCFG_EEPROM_WIFI_USERNAME + i;
-      loginfo("Writing to address " + addr);
-      EEPROM.write(addr, ssid[i]);
+      EEPROM.write(i, ssid[i]);
       loginfo("Wrote: ");
       loginfo(ssid[i]);
     }
     loginfo("writing EEPROM Password:");
     for (int i = 0; i < password.length(); ++i)
     {
-      int addr = CDPCFG_EEPROM_WIFI_PASSWORD + i;
-      loginfo("Writing to address " + addr);
-      EEPROM.write(addr, password[i]);
+      EEPROM.write(32 + i, password[i]);
       loginfo("Wrote: ");
       loginfo(password[i]);
     }
     EEPROM.commit();
-    return 0;
   }
   return DUCK_ERR_NONE;
 }
@@ -410,18 +399,18 @@ int DuckNet::loadWiFiCredentials(){
   EEPROM.begin(512); //Initialasing EEPROM
 
   String esid;
-  for (int i = 0; i < CDPCFG_EEPROM_CRED_MAX; ++i)
+  for (int i = 0; i < 32; ++i)
   {
-    esid += char(EEPROM.read(CDPCFG_EEPROM_WIFI_USERNAME + i));
+    esid += char(EEPROM.read(i));
   }
   // lopp through saved SSID carachters
   loginfo("Reading EEPROM SSID: " + esid);
   setSsid(esid);
 
   String epass = "";
-  for (int i = 0; i < 96; ++i)
+  for (int i = 32; i < 96; ++i)
   {
-    epass += char(EEPROM.read(CDPCFG_EEPROM_WIFI_PASSWORD + i));
+    epass += char(EEPROM.read(i));
   }
   // lopp through saved Password carachters
   loginfo("Reading EEPROM Password: " + epass);
@@ -436,6 +425,7 @@ int DuckNet::loadWiFiCredentials(){
   }
   return DUCK_ERR_NONE;
 }
+
 
 // int DuckNet::saveControlCredentials(String ssid, String password) {
 //   int n = ssid.length();
