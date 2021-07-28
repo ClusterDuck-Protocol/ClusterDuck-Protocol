@@ -371,7 +371,7 @@ int DuckNet::saveWifiCredentials(String ssid, String password) {
     logdbg("Password or SSID too long");
     return -1;
   }
-
+ 
   EEPROM.begin(512);
 
   if (ssid.length() > 0 && password.length() > 0) {
@@ -383,14 +383,18 @@ int DuckNet::saveWifiCredentials(String ssid, String password) {
     loginfo("writing EEPROM SSID:");
     for (int i = 0; i < ssid.length(); i++)
     {
-      EEPROM.write(CDPCFG_EEPROM_WIFI_USERNAME + i, ssid[i]);
+      int addr = CDPCFG_EEPROM_WIFI_USERNAME + i;
+      loginfo("Writing to address " + addr);
+      EEPROM.write(addr, ssid[i]);
       loginfo("Wrote: ");
       loginfo(ssid[i]);
     }
     loginfo("writing EEPROM Password:");
     for (int i = 0; i < password.length(); ++i)
     {
-      EEPROM.write(CDPCFG_EEPROM_WIFI_PASSWORD + i, password[i]);
+      int addr = CDPCFG_EEPROM_WIFI_PASSWORD + i;
+      loginfo("Writing to address " + addr);
+      EEPROM.write(addr, password[i]);
       loginfo("Wrote: ");
       loginfo(password[i]);
     }
