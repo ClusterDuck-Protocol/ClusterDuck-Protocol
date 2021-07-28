@@ -368,6 +368,7 @@ int DuckNet::saveWifiCredentials(String ssid, String password) {
 
   if(ssid.length() > 32 || password.length() > 32) {
     //Too long
+    logdbg("Password or SSID too long");
     return -1;
   }
 
@@ -376,7 +377,7 @@ int DuckNet::saveWifiCredentials(String ssid, String password) {
 
   if (ssid.length() > 0 && password.length() > 0) {
     loginfo("Clearing EEPROM");
-    for (int i = 0; i < 64; i++) {
+    for (int i = 0; i < 96; i++) {
       EEPROM.write(i, 0);
     }
 
@@ -418,7 +419,7 @@ int DuckNet::loadWiFiCredentials(){
   setSsid(esid);
 
   String epass = "";
-  for (int i = 0; i < CDPCFG_EEPROM_CRED_MAX; ++i)
+  for (int i = 0; i < 96; ++i)
   {
     epass += char(EEPROM.read(CDPCFG_EEPROM_WIFI_PASSWORD + i));
   }
@@ -438,100 +439,100 @@ int DuckNet::loadWiFiCredentials(){
   return DUCK_ERR_NONE;
 }
 
-int DuckNet::saveControlCredentials(String ssid, String password) {
-  int n = ssid.length();
-  char temp[n + 1];
-  strcpy(temp, ssid.c_str());
-  this->controlSsid = temp;
-  //delete[] temp;
+// int DuckNet::saveControlCredentials(String ssid, String password) {
+//   int n = ssid.length();
+//   char temp[n + 1];
+//   strcpy(temp, ssid.c_str());
+//   this->controlSsid = temp;
+//   //delete[] temp;
 
-  n = password.length();
-  char temp2[n + 1];
-  strcpy(temp2, password.c_str());
-  this->controlPassword = temp2;
-  //delete[] temp2;
+//   n = password.length();
+//   char temp2[n + 1];
+//   strcpy(temp2, password.c_str());
+//   this->controlPassword = temp2;
+//   //delete[] temp2;
 
-  if(ssid.length() > 32 || password.length() > 32) {
-    //Too long
-    return -1;
-  }
+//   if(ssid.length() > 32 || password.length() > 32) {
+//     //Too long
+//     return -1;
+//   }
 
-  EEPROM.begin(512);
+//   EEPROM.begin(512);
 
-  if (ssid.length() > 0 && password.length() > 0) {
-    loginfo("Clearing EEPROM");
-    for (int i = CDPCFG_EEPROM_CONTROL_USERNAME; 
-      i < CDPCFG_EEPROM_CONTROL_PASSWORD + CDPCFG_EEPROM_CRED_MAX; i++) {
-      EEPROM.write(i, 0);
-    }
+//   if (ssid.length() > 0 && password.length() > 0) {
+//     loginfo("Clearing EEPROM");
+//     for (int i = CDPCFG_EEPROM_CONTROL_USERNAME; 
+//       i < CDPCFG_EEPROM_CONTROL_PASSWORD + CDPCFG_EEPROM_CRED_MAX; i++) {
+//       EEPROM.write(i, 0);
+//     }
 
-    loginfo("writing EEPROM SSID:");
-    for (int i = 0; i < ssid.length(); i++)
-    {
-      if(i == 0) {
-        EEPROM.write(CDPCFG_EEPROM_CONTROL_USERNAME + i, 0x00);
-      }
-      EEPROM.write(CDPCFG_EEPROM_CONTROL_USERNAME + i + 1, ssid[i]);
-      loginfo("Wrote: ");
-      loginfo(ssid[i]);
+//     loginfo("writing EEPROM SSID:");
+//     for (int i = 0; i < ssid.length(); i++)
+//     {
+//       if(i == 0) {
+//         EEPROM.write(CDPCFG_EEPROM_CONTROL_USERNAME + i, 0x00);
+//       }
+//       EEPROM.write(CDPCFG_EEPROM_CONTROL_USERNAME + i + 1, ssid[i]);
+//       loginfo("Wrote: ");
+//       loginfo(ssid[i]);
       
-    }
-    loginfo("writing EEPROM Password:");
-    for (int i = 0; i < password.length(); ++i)
-    {
-      EEPROM.write(CDPCFG_EEPROM_CONTROL_PASSWORD + i, password[i]);
-      loginfo("Wrote: ");
-      loginfo(password[i]);
-    }
-    EEPROM.commit();
-    return 0;
-  }
-}
+//     }
+//     loginfo("writing EEPROM Password:");
+//     for (int i = 0; i < password.length(); ++i)
+//     {
+//       EEPROM.write(CDPCFG_EEPROM_CONTROL_PASSWORD + i, password[i]);
+//       loginfo("Wrote: ");
+//       loginfo(password[i]);
+//     }
+//     EEPROM.commit();
+//     return 0;
+//   }
+// }
 
-int DuckNet::loadControlCredentials(){
+// int DuckNet::loadControlCredentials(){
 
-  // This method will look for any saved WiFi credntials on the device and set up a internet connection
-  EEPROM.begin(512); //Initialasing EEPROM
+//   // This method will look for any saved WiFi credntials on the device and set up a internet connection
+//   EEPROM.begin(512); //Initialasing EEPROM
 
-  String esid;
-  for (int i = 0; i < CDPCFG_EEPROM_CRED_MAX; ++i)
-  {
-    if(i == 0) {
-      byte b = 0x00;
-      if(b != EEPROM.read(CDPCFG_EEPROM_CONTROL_USERNAME + i)) {
-        Serial.println("Fill in Control");
-        saveControlCredentials(control_username, control_password);
-        return 0;
-      } else {
-        esid += char(EEPROM.read(CDPCFG_EEPROM_CONTROL_USERNAME + i));
-      }
-    } 
+//   String esid;
+//   for (int i = 0; i < CDPCFG_EEPROM_CRED_MAX; ++i)
+//   {
+//     if(i == 0) {
+//       byte b = 0x00;
+//       if(b != EEPROM.read(CDPCFG_EEPROM_CONTROL_USERNAME + i)) {
+//         Serial.println("Fill in Control");
+//         saveControlCredentials(control_username, control_password);
+//         return 0;
+//       } else {
+//         esid += char(EEPROM.read(CDPCFG_EEPROM_CONTROL_USERNAME + i));
+//       }
+//     } 
     
-  }
-  // lopp through saved SSID carachters
-  loginfo("Reading EEPROM SSID: " + esid);
-  setControlSsid(esid);
-  Serial.println("Exit Set Control");
+//   }
+//   // lopp through saved SSID carachters
+//   loginfo("Reading EEPROM SSID: " + esid);
+//   setControlSsid(esid);
+//   Serial.println("Exit Set Control");
 
-  String epass = "";
-  for (int i = 0; i < CDPCFG_EEPROM_CRED_MAX; ++i)
-  {
-    epass += char(EEPROM.read(CDPCFG_EEPROM_CONTROL_PASSWORD + i));
-  }
-  // lopp through saved Password carachters
-  loginfo("Reading EEPROM Password: " + epass);
-  setControlPassword(epass);
-  Serial.println("Exit Set Password");
+//   String epass = "";
+//   for (int i = 0; i < CDPCFG_EEPROM_CRED_MAX; ++i)
+//   {
+//     epass += char(EEPROM.read(CDPCFG_EEPROM_CONTROL_PASSWORD + i));
+//   }
+//   // lopp through saved Password carachters
+//   loginfo("Reading EEPROM Password: " + epass);
+//   setControlPassword(epass);
+//   Serial.println("Exit Set Password");
 
-  if (esid.length() == 0 || epass.length() == 0){
-    loginfo("ERROR no Control Panel SSID and PASSWORD set: Stored SSID and PASSWORD empty");
-    return 1;
-  } else{
-    loginfo("Control panel credentials loaded");
-    return 0;
-  }
+//   if (esid.length() == 0 || epass.length() == 0){
+//     loginfo("ERROR no Control Panel SSID and PASSWORD set: Stored SSID and PASSWORD empty");
+//     return 1;
+//   } else{
+//     loginfo("Control panel credentials loaded");
+//     return 0;
+//   }
 
-}
+// }
 
 
 int DuckNet::setupInternet(String ssid, String password) {
