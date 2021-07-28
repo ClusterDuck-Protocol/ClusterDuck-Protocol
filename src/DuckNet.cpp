@@ -372,7 +372,6 @@ int DuckNet::saveWifiCredentials(String ssid, String password) {
     return -1;
   }
 
-  duckutils::setInterrupt(true);
   EEPROM.begin(512);
 
   if (ssid.length() > 0 && password.length() > 0) {
@@ -396,17 +395,14 @@ int DuckNet::saveWifiCredentials(String ssid, String password) {
       loginfo(password[i]);
     }
     EEPROM.commit();
-    duckutils::setInterrupt(false);
     return 0;
   }
-  duckutils::setInterrupt(false);
   return DUCK_ERR_NONE;
 }
 
 int DuckNet::loadWiFiCredentials(){
 
   // This method will look for any saved WiFi credntials on the device and set up a internet connection
-  duckutils::setInterrupt(true);
   EEPROM.begin(512); //Initialasing EEPROM
 
   String esid;
@@ -429,12 +425,10 @@ int DuckNet::loadWiFiCredentials(){
 
   if (esid.length() == 0 || epass.length() == 0){
     loginfo("ERROR setupInternet: Stored SSID and PASSWORD empty");
-    duckutils::setInterrupt(false);
     return DUCK_ERR_SETUP;
   } else{
     loginfo("Setup Internet with saved credentials");
     setupInternet(esid, epass);
-    duckutils::setInterrupt(false);
   }
   return DUCK_ERR_NONE;
 }
