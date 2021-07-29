@@ -584,29 +584,29 @@ void DuckNet::setSsid(String val) { ssid = val; }
 
 void DuckNet::setPassword(String val) { password = val; }
 
-void DuckNet::setControlSsid(String val) {
-  Serial.println("Set Control SSID"); 
-  int n = val.length();
-  Serial.println(n);
+// void DuckNet::setControlSsid(String val) {
+//   Serial.println("Set Control SSID"); 
+//   int n = val.length();
+//   Serial.println(n);
 
-  char * temp;
-  temp = new char[n + 1];
+//   char * temp;
+//   temp = new char[n + 1];
 
-  strcpy(temp, val.c_str());
-  Serial.println(temp);
-  this->controlSsid = temp;
-  Serial.println(controlSsid);
-  //delete[] temp; 
-}
+//   strcpy(temp, val.c_str());
+//   Serial.println(temp);
+//   this->controlSsid = temp;
+//   Serial.println(controlSsid);
+//   //delete[] temp; 
+// }
 
-void DuckNet::setControlPassword(String val) {
-  Serial.println("Set Control Password");  
-  int n = val.length();
-  char temp[n + 1];
-  strcpy(temp, val.c_str());
-  this->controlPassword = temp;
-  //delete[] temp;
- }
+// void DuckNet::setControlPassword(String val) {
+//   Serial.println("Set Control Password");  
+//   int n = val.length();
+//   char temp[n + 1];
+//   strcpy(temp, val.c_str());
+//   this->controlPassword = temp;
+//   //delete[] temp;
+//  }
 
 String DuckNet::getSsid() { return ssid; }
 

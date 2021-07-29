@@ -226,6 +226,6 @@ private:
   String portal = "";
   String ssid = "";
   String password = "";
-  char* controlSsid = "";
-  char* controlPassword = "";
+  // char* controlSsid = "";
+  // char* controlPassword = "";
 };
