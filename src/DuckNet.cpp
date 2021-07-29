@@ -280,9 +280,12 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
       }
     }
 
+    Serial.println(ssid);
+    Serial.println(password);
+
     if (ssid != "" && password != "") {
       setupInternet(ssid, password);
-      saveWifiCredentials(ssid, password);
+      //saveWifiCredentials(ssid, password);
       request->send(200, "text/plain", "Success");
     } else {
       request->send(500, "text/plain", "There was an error");
@@ -457,6 +460,25 @@ bool DuckNet::ssidAvailable(String val) {
   loginfo("No ssid available");
 
   return false;
+}
+
+void DuckNet::saveChannel(int val){
+
+    EEPROM.begin(512);
+    EEPROM.write(CDPCFG_EEPROM_CHANNEL_VALUE, val);
+    EEPROM.commit();
+    loginfo("Wrote channel val to EEPROM");
+    loginfo(val);
+    
+}
+
+void DuckNet::loadChannel(){
+      EEPROM.begin(512);
+    int val = EEPROM.read(CDPCFG_EEPROM_CHANNEL_VALUE);
+    duckRadio->setChannel(val);
+    loginfo("Read channel val to EEPROM, setting channel: ");
+    loginfo(val);
+    
 }
 
 void DuckNet::setSsid(String val) { ssid = val; }

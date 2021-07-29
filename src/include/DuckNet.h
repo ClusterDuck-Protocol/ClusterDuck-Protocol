@@ -146,10 +146,6 @@ public:
    * @return DUCK_ERR_NONE if successful, an error code otherwise.
    */
   int saveWifiCredentials(String ssid, String password);
-  
-  int saveControlCredentials(String ssid, String password);
-
-  int loadControlCredentials();
 
   void saveChannel(int val);
 
@@ -174,10 +170,6 @@ public:
    * @param val  the password string to set
    */
   void setPassword(String val);
-
-  void setControlSsid(String val);
-
-  void setControlPassword(String val);
 
   /**
    * @brief Get the WiFi network ssid.
