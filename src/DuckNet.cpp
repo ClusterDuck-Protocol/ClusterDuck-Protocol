@@ -372,8 +372,10 @@ int DuckNet::saveWifiCredentials(String ssid, String password) {
     loginfo("Clearing EEPROM");
     for (int i = 0; i < 96; i++) {
       EEPROM.write(i, 0);
-      EEPROM.commit();
     }
+
+    EEPROM.commit();
+    delay(500);
 
     loginfo("writing EEPROM SSID:");
     for (int i = 0; i < ssid.length(); i++)
@@ -381,13 +383,18 @@ int DuckNet::saveWifiCredentials(String ssid, String password) {
       EEPROM.write(i, ssid[i]);
       loginfo("Wrote: ");
       loginfo(ssid[i]);
+      delay(100);
     }
+
+    // EEPROM.commit();
+
     loginfo("writing EEPROM Password:");
     for (int i = 0; i < password.length(); ++i)
     {
       EEPROM.write(32 + i, password[i]);
       loginfo("Wrote: ");
       loginfo(password[i]);
+      delay(100);
     }
     EEPROM.commit();
   }
