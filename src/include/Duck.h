@@ -377,12 +377,6 @@ protected:
    */
   void handleOtaUpdate();
 
-  static volatile bool receivedFlag;
-  static void setReceiveFlag(bool value) { receivedFlag = value; }
-  static bool getReceiveFlag() { return receivedFlag; }
-
-  static void onRadioRxTxDone();
-
   static bool imAlive(void*);
   static bool reboot(void*);
 };

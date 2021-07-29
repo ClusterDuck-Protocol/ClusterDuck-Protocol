@@ -16,6 +16,9 @@ CDPCFG_LORA_CLASS lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO0,
                                     CDPCFG_PIN_LORA_RST, CDPCFG_PIN_LORA_DIO1);
 #endif
 
+volatile uint16_t DuckRadio::interruptFlags = 0;
+volatile bool DuckRadio::receivedFlag = false;
+
 DuckRadio::DuckRadio() {}
 
 int DuckRadio::setupRadio(LoraConfigParams config) {
@@ -125,6 +128,13 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
     return DUCKLORA_ERR_HANDLE_PACKET;
   }
 
+  DuckRadio::setReceiveFlag(false);
+
+  int rxState = startReceive();
+
+  loginfo("Rx packet: " + duckutils::convertToHex(packetBytes->data(), packetBytes->size()));
+  loginfo("Rx packet: " + duckutils::toString(*packetBytes));
+
   loginfo("readReceivedData: checking path offset integrity");
 
   // Do some sanity checks on the received packet here before we continue
@@ -157,6 +167,10 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
           " snr: " + String(lora.getSNR()) +
           " fe: " + String(lora.getFrequencyError(true)) +
           " size: " + String(packet_length));
+
+  if (rxState != ERR_NONE) {
+    return rxState;
+  }
 
   return err;
 }
@@ -199,15 +213,47 @@ int DuckRadio::sleep() { return lora.sleep(); }
 
 void DuckRadio::processRadioIrq() {}
 
+void DuckRadio::serviceInterruptFlags() {
+  if (DuckRadio::interruptFlags != 0) {
+    if (DuckRadio::interruptFlags & SX127X_CLEAR_IRQ_FLAG_RX_TIMEOUT) {
+      loginfo("Interrupt flag was set: timeout");
+    }
+    if (DuckRadio::interruptFlags & SX127X_CLEAR_IRQ_FLAG_RX_DONE) {
+      loginfo("Interrupt flag was set: packet reception complete");
+      DuckRadio::setReceiveFlag(true);
+    }
+    if (DuckRadio::interruptFlags & SX127X_CLEAR_IRQ_FLAG_PAYLOAD_CRC_ERROR) {
+      loginfo("Interrupt flag was set: payload CRC error");
+    }
+    if (DuckRadio::interruptFlags & SX127X_CLEAR_IRQ_FLAG_VALID_HEADER) {
+      loginfo("Interrupt flag was set: valid header received");
+    }
+    if (DuckRadio::interruptFlags & SX127X_CLEAR_IRQ_FLAG_TX_DONE) {
+      loginfo("Interrupt flag was set: payload transmission complete");
+      startReceive();
+    }
+    if (DuckRadio::interruptFlags & SX127X_CLEAR_IRQ_FLAG_CAD_DONE) {
+      loginfo("Interrupt flag was set: CAD complete");
+    }
+    if (DuckRadio::interruptFlags & SX127X_CLEAR_IRQ_FLAG_FHSS_CHANGE_CHANNEL) {
+      loginfo("Interrupt flag was set: FHSS change channel");
+    }
+    if (DuckRadio::interruptFlags & SX127X_CLEAR_IRQ_FLAG_CAD_DETECTED) {
+      loginfo("Interrupt flag was set: valid LoRa signal detected during CAD operation");
+    }
+
+    DuckRadio::interruptFlags = 0;
+  }
+}
+
+// IMPORTANT: this function MUST be 'void' type and MUST NOT have any arguments!
+void DuckRadio::onInterrupt(void) {
+  interruptFlags = lora.getIRQFlags();
+}
+
 int DuckRadio::startTransmitData(byte* data, int length) {
-
-  bool interruptWasEnabled = duckutils::isInterruptEnabled();
-  // we are ready to transmit so radio cannot be interrupted
-  duckutils::setInterrupt(false);
-
   int err = DUCK_ERR_NONE;
   int tx_err = ERR_NONE;
-  int rx_err = ERR_NONE;
   loginfo("TX data");
   logdbg(" -> " + duckutils::convertToHex(data, length));
   logdbg(" -> length: " + String(length));
@@ -241,17 +287,6 @@ int DuckRadio::startTransmitData(byte* data, int length) {
       break;
   }
 
-  if (interruptWasEnabled) {
-    duckutils::setInterrupt(true);
-    // we can set the radio back to receive mode
-    // di0 interrupt will trigger again and set a receive flag
-    // if a packet is received. See void Duck::onRadioRxTxDone(void)
-    rx_err = startReceive();
-    if (rx_err != ERR_NONE) {
-      display->log("strt-rx-fail");
-      err = DUCKLORA_ERR_RECEIVE;
-    }
-  }
   return err;
 }
 #endif

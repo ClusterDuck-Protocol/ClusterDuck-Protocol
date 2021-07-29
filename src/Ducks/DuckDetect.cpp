@@ -44,15 +44,11 @@ int DuckDetect::setupWithDefaults(std::vector<byte> deviceId, String ssid,
 }
 
 void DuckDetect::run() {
+  duckRadio.serviceInterruptFlags();
+
   handleOtaUpdate();
-  if (getReceiveFlag()) {
-    setReceiveFlag(false);
-    duckutils::setInterrupt(false);
-
+  if (DuckRadio::getReceiveFlag()) {
     handleReceivedPacket();
-
-    duckutils::setInterrupt(true);
-    startReceive();
   }
 }
 

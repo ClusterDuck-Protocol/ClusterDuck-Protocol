@@ -75,17 +75,20 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid,
 
 void PapaDuck::run() {
 
-  handleOtaUpdate();
-  if (getReceiveFlag()) {
-    duckutils::setInterrupt(false);
-    setReceiveFlag(false);
+  duckRadio.serviceInterruptFlags();
 
+  handleOtaUpdate();
+  if (DuckRadio::getReceiveFlag()) {
     handleReceivedPacket();
-    rxPacket->reset();
-    
-    duckutils::setInterrupt(true);
-    startReceive();
+    rxPacket->reset(); // TODO(rolsen): Make rxPacket local to handleReceivedPacket
   }
+
+  // TODO(rolsen): Enforce mutually exclusive access to duckRadio.
+  // ackTimer.tick() calls broadcastAck, which calls duckRadio. Since duckRadio
+  // is a shared resource, we should synchronize everything in ackTimer.tick()
+  // so the thread in AsyncWebServer cannot modify duckRadio while broadcastAck
+  // is also modifying duckRadio.
+  ackTimer.tick();
 }
 
 void PapaDuck::handleReceivedPacket() {
@@ -116,10 +119,17 @@ void PapaDuck::handleReceivedPacket() {
     const CdpPacket packet = CdpPacket(rxPacket->getBuffer());
 
     if (needsAck(packet)) {
+      if (ackTimer.empty()) {
+        logdbg("Starting new ack broadcast timer with a delay of " +
+          String(timerDelay) + " ms");
+        ackTimer.in(timerDelay, ackHandler, this);
+      }
       storeForAck(packet);
     }
 
     if (ackBufferIsFull()) {
+      logdbg("Ack buffer is full. Sending broadcast ack immediately.");
+      ackTimer.cancel();
       broadcastAck();
     }
 
@@ -127,29 +137,30 @@ void PapaDuck::handleReceivedPacket() {
   }
 }
 
-void PapaDuck::storeForAck(const CdpPacket & packet) {
-  if (ackStore.size() >= MAX_MUID_PER_ACK) {
-    logerr("ackStore.size() >= " + String(MAX_MUID_PER_ACK)); // Test
-    return;
-  }
+bool PapaDuck::ackHandler(PapaDuck * duck)
+{
+  duck->broadcastAck();
+  return false;
+}
 
+void PapaDuck::storeForAck(const CdpPacket & packet) {
   ackStore.push_back(std::pair<Duid, Muid>(packet.sduid, packet.muid));
 }
 
 bool PapaDuck::ackBufferIsFull() {
-  logwarn("TODO: Finish PapaDuck::ackBufferIsFull");
-  // if (ackStore.size() >= MAX_MUID_PER_ACK) {
-  return true;
+  return (ackStore.size() >= MAX_MUID_PER_ACK);
 }
 
 bool PapaDuck::needsAck(const CdpPacket & packet) {
-  logwarn("TODO: Finish PapaDuck::needsAck");
-  return true;
+  if (packet.topic == reservedTopic::ack) {
+    return false;
+  } else {
+    return true;
+  }
 }
 
 void PapaDuck::broadcastAck() {
-
-  logwarn("TODO: Finish PapaDuck::broadcastAck");
+  assert(ackStore.size() <= MAX_MUID_PER_ACK);
 
   const byte num = static_cast<byte>(ackStore.size());
 

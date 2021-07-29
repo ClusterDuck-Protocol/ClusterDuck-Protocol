@@ -44,17 +44,12 @@ int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String 
 }
 
 void MamaDuck::run() {
+  duckRadio.serviceInterruptFlags();
 
   handleOtaUpdate();
-  if (getReceiveFlag()) {
-    duckutils::setInterrupt(false);
-    setReceiveFlag(false);
-
+  if (DuckRadio::getReceiveFlag()) {
     handleReceivedPacket();
     rxPacket->reset();
-    
-    duckutils::setInterrupt(true);
-    startReceive();
   }
   processPortalRequest();
 }

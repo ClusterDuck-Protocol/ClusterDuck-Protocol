@@ -9,12 +9,8 @@ namespace duckutils {
     std::string cdpVersion = "2.9.16";
   }
 
-volatile bool interruptEnabled = true;
 Timer<> duckTimer = timer_create_default();
 bool detectState = false;
-
-bool isInterruptEnabled() { return interruptEnabled; }
-void setInterrupt(bool enable) { interruptEnabled = enable; }
 
 std::string getCDPVersion() {
   return cdpVersion;

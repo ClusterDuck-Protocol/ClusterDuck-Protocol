@@ -171,6 +171,14 @@ private:
   void processRadioIrq();
 
 private:
+  static volatile uint16_t interruptFlags;
+  void serviceInterruptFlags();
+  static void onInterrupt();
+
+  static volatile bool receivedFlag;
+  static void setReceiveFlag(bool value) { receivedFlag = value; }
+  static bool getReceiveFlag() { return receivedFlag; }
+
   DuckRadio(DuckRadio const&) = delete;
   DuckRadio& operator=(DuckRadio const&) = delete;
 

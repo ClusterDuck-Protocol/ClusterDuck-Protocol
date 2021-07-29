@@ -18,7 +18,6 @@
 
 namespace duckutils {
 
-extern volatile bool interruptEnabled;
 extern Timer<> duckTimer;
 extern bool detectState;
 
@@ -75,13 +74,6 @@ bool isEqual(const std::vector<T> & a, const std::vector<T> & b) {
   }
   return std::equal(a.begin(), a.end(), b.begin());
 }
-
-/**
- * @brief Get the Duck Interrupt state
- * 
- * @returns true if interrupt is enabled, false otherwise.
- */
-bool isInterruptEnabled();
 
 /**
  * @brief Toggle the duck Interrupt

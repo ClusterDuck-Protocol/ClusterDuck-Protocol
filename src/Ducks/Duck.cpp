@@ -8,12 +8,9 @@
 #include "include/DuckEsp.h"
 #include "include/DuckNet.h"
 
-volatile bool Duck::receivedFlag = false;
-
 Duck::Duck(String name):
   duckNet(new DuckNet(this))
 {
-  duckutils::setInterrupt(true);
   duckName = name;
 }
 
@@ -85,18 +82,6 @@ int Duck::setupSerial(int baudRate) {
   return DUCK_ERR_NONE;
 }
 
-// this function is called when a complete packet is transmitted by the module
-// IMPORTANT: this function MUST be 'void' type and MUST NOT have any arguments!
-void Duck::onRadioRxTxDone(void) {
-  if (!duckutils::isInterruptEnabled()) {
-    return;
-  }
-  // we set a "received" flag here because after transmiting a packet we
-  // re-enabled the RX on the radio
-  // see DuckRadio::startTransmitData(byte* data, int length)
-  setReceiveFlag(true);
-}
-
 // TODO: use LoraConfigParams directly as argument to setupRadio
 int Duck::setupRadio(float band, int ss, int rst, int di0, int di1,
                      int txPower) {
@@ -108,7 +93,7 @@ int Duck::setupRadio(float band, int ss, int rst, int di0, int di1,
   config.di0 = di0;
   config.di1 = di1;
   config.txPower = txPower;
-  config.func = Duck::onRadioRxTxDone;
+  config.func = DuckRadio::onInterrupt;
 
   int err = duckRadio.setupRadio(config);
 
@@ -282,7 +267,6 @@ int Duck::sendData(byte topic, std::vector<byte> data,
   int err = txPacket->prepareForSending(targetDevice, this->getType(), topic, data);
 
   if (err != DUCK_ERR_NONE) {
-    duckutils::setInterrupt(false);
     return err;
   }
 

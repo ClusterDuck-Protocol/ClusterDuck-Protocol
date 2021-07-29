@@ -43,6 +43,7 @@ int DuckLink::setupWithDefaults(std::vector<byte> deviceId, String ssid,
 }
 
 void DuckLink::run() {
+  // TODO(rolsen): duckRadio.serviceInterruptFlags();
   duckRadio.processRadioIrq();
   handleOtaUpdate();
   processPortalRequest();

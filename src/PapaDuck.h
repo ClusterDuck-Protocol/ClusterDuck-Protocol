@@ -2,6 +2,7 @@
 #define PAPADUCK_H
 
 #include <Arduino.h>
+#include <arduino-timer.h>
 #include <WString.h>
 
 #include "include/Duck.h"
@@ -98,8 +99,12 @@ private:
    */
   void broadcastAck();
 
+  static bool ackHandler(PapaDuck * duck);
+
   typedef std::vector<std::pair<Duid, Muid> > AckStore;
 
+  Timer<1, millis, PapaDuck*> ackTimer;
+  size_t timerDelay{1000}; // TODO(rolsen): Set to something more reasonable.
   AckStore ackStore;
   rxDoneCallback recvDataCallback;
 };
