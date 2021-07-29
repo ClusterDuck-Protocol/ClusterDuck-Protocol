@@ -82,9 +82,6 @@ public:
    * @param x X coordinate value
    * @param y Y coordinate value
    */
-
-  void clearLine(u8g2_uint_t x, u8g2_uint_t y);
-  
   void setCursor(u8g2_uint_t x, u8g2_uint_t y);
   /**
    * @brief Print a string at the current cursor position.
@@ -97,6 +94,9 @@ public:
    * 
    */
   void clear(void);
+
+  void clearLine(u8g2_uint_t x, u8g2_uint_t y);
+
   void sendBuffer(void);
   void showDefaultScreen();
   uint8_t getWidth() {return width;}

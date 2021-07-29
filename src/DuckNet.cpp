@@ -280,9 +280,12 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
       }
     }
 
+    Serial.println(ssid);
+    Serial.println(password);
+
     if (ssid != "" && password != "") {
       setupInternet(ssid, password);
-      saveWifiCredentials(ssid, password);
+      //saveWifiCredentials(ssid, password);
       request->send(200, "text/plain", "Success");
     } else {
       request->send(500, "text/plain", "There was an error");
@@ -366,31 +369,38 @@ int DuckNet::saveWifiCredentials(String ssid, String password) {
   this->password = password;
 
 
-  EEPROM.begin(512);
+  // EEPROM.begin(512);
 
-  if (ssid.length() > 0 && password.length() > 0) {
-    loginfo("Clearing EEPROM");
-    for (int i = 0; i < 96; i++) {
-      EEPROM.write(i, 0);
-      EEPROM.commit();
-    }
+  // if (ssid.length() > 0 && password.length() > 0) {
+  //   loginfo("Clearing EEPROM");
+  //   for (int i = 0; i < 96; i++) {
+  //     EEPROM.write(i, 0);
+  //   }
 
-    loginfo("writing EEPROM SSID:");
-    for (int i = 0; i < ssid.length(); i++)
-    {
-      EEPROM.write(i, ssid[i]);
-      loginfo("Wrote: ");
-      loginfo(ssid[i]);
-    }
-    loginfo("writing EEPROM Password:");
-    for (int i = 0; i < password.length(); ++i)
-    {
-      EEPROM.write(32 + i, password[i]);
-      loginfo("Wrote: ");
-      loginfo(password[i]);
-    }
-    EEPROM.commit();
-  }
+  //   EEPROM.commit();
+  //   delay(500);
+
+  //   loginfo("writing EEPROM SSID:");
+  //   for (int i = 0; i < ssid.length(); i++)
+  //   {
+  //     EEPROM.write(i, ssid[i]);
+  //     loginfo("Wrote: ");
+  //     loginfo(ssid[i]);
+  //     delay(100);
+  //   }
+
+  //   // EEPROM.commit();
+
+  //   loginfo("writing EEPROM Password:");
+  //   for (int i = 0; i < password.length(); ++i)
+  //   {
+  //     EEPROM.write(32 + i, password[i]);
+  //     loginfo("Wrote: ");
+  //     loginfo(password[i]);
+  //     delay(100);
+  //   }
+  //   EEPROM.commit();
+  // }
   return DUCK_ERR_NONE;
 }
 
@@ -528,30 +538,34 @@ int DuckNet::setupInternet(String ssid, String password) {
   this->ssid = ssid;
   this->password = password;
 
+  Serial.println("In setupInternet: ");
+  Serial.println(ssid);
+  Serial.println(password);
+
   
   // Check if SSID is available
-  if (!ssidAvailable(ssid)) {
-    logerr("ERROR setupInternet: " + ssid + " is not available. Please check the provided ssid and/or passwords");
-    return DUCK_INTERNET_ERR_SSID;
-  }
+  // if (!ssidAvailable(ssid)) {
+  //   logerr("ERROR setupInternet: " + ssid + " is not available. Please check the provided ssid and/or passwords");
+  //   return DUCK_INTERNET_ERR_SSID;
+  // }
 
 
 
-  //  Connect to Access Point
-  logdbg("setupInternet: connecting to WiFi access point SSID: " + ssid);
-  WiFi.begin(ssid.c_str(), password.c_str());
-  // We need to wait here for the connection to estanlish. Otherwise the WiFi.status() may return a false negative
-  Serial.println("BAAAAAMMMMMM!!!");
-  WiFi.waitForConnectResult();
-  Serial.println("BOOOOOMMMMMM!!!");
+  // //  Connect to Access Point
+  // logdbg("setupInternet: connecting to WiFi access point SSID: " + ssid);
+  // WiFi.begin(ssid.c_str(), password.c_str());
+  // // We need to wait here for the connection to estanlish. Otherwise the WiFi.status() may return a false negative
+  // Serial.println("BAAAAAMMMMMM!!!");
+  // WiFi.waitForConnectResult();
+  // Serial.println("BOOOOOMMMMMM!!!");
   
-  //TODO: Handle bad password better
-  if(WiFi.status() != WL_CONNECTED) {
-    logerr("ERROR setupInternet: failed to connect to " + ssid);
-    return DUCK_INTERNET_ERR_CONNECT;
-  }
+  // //TODO: Handle bad password better
+  // if(WiFi.status() != WL_CONNECTED) {
+  //   logerr("ERROR setupInternet: failed to connect to " + ssid);
+  //   return DUCK_INTERNET_ERR_CONNECT;
+  // }
 
-  loginfo("Duck connected to internet!");
+  // loginfo("Duck connected to internet!");
 
   return DUCK_ERR_NONE;
 
