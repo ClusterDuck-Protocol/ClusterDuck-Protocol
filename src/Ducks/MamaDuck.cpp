@@ -110,11 +110,12 @@ void MamaDuck::handleAck(const CdpPacket & packet) {
         std::vector<byte>::const_iterator duidOffset = packet.data.begin() + pairOffset;
         std::vector<byte>::const_iterator muidOffset = packet.data.begin() + pairOffset + DUID_LENGTH;
         if (std::equal(duid.begin(), duid.end(), duidOffset)
-          || std::equal(lastMessageMuid.begin(), lastMessageMuid.end(), muidOffset)
+          && std::equal(lastMessageMuid.begin(), lastMessageMuid.end(), muidOffset)
         ) {
           loginfo("handleReceivedPacket: matched ack-MUID "
             + duckutils::toString(lastMessageMuid));
           lastMessageAck = true;
+          break;
         }
       }
     }
