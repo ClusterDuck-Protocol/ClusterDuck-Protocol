@@ -272,8 +272,15 @@ int Duck::sendData(byte topic, std::vector<byte> data,
 
   err = duckRadio.sendData(txPacket->getBuffer());
 
-  lastMessageAck = false;
   CdpPacket packet = CdpPacket(txPacket->getBuffer());
+
+  if (!lastMessageAck) {
+    loginfo("Previous `lastMessageMuid` " + duckutils::toString(lastMessageMuid) +
+      " was not acked. Overwriting `lastMessageMuid` with " +
+      duckutils::toString(packet.muid));
+  }
+
+  lastMessageAck = false;
   lastMessageMuid.assign(packet.muid.begin(), packet.muid.end());
   assert(lastMessageMuid.size() == MUID_LENGTH);
   if (outgoingMuid != NULL) {
