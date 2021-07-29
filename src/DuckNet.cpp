@@ -280,12 +280,9 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
       }
     }
 
-    Serial.println(ssid);
-    Serial.println(password);
-
     if (ssid != "" && password != "") {
       setupInternet(ssid, password);
-      //saveWifiCredentials(ssid, password);
+      saveWifiCredentials(ssid, password);
       request->send(200, "text/plain", "Success");
     } else {
       request->send(500, "text/plain", "There was an error");
@@ -342,69 +339,39 @@ int DuckNet::setupDns() {
   return DUCK_ERR_NONE;
 }
 
-void DuckNet::saveChannel(int val){
-
-    EEPROM.begin(512);
-    EEPROM.write(CDPCFG_EEPROM_CHANNEL_VALUE, val);
-    EEPROM.commit();
-    loginfo("Wrote channel val to EEPROM");
-    loginfo(val);
-    
-}
-
-void DuckNet::loadChannel(){
-      EEPROM.begin(512);
-    int val = EEPROM.read(CDPCFG_EEPROM_CHANNEL_VALUE);
-    duckRadio->setChannel(val);
-    loginfo("Read channel val to EEPROM, setting channel: ");
-    loginfo(val);
-    
-}
-
-
-
-//TODO: EEPROM saving should probably be moved out of DuckNet.cpp
 int DuckNet::saveWifiCredentials(String ssid, String password) {
   this->ssid = ssid;
   this->password = password;
 
 
-  // EEPROM.begin(512);
+  EEPROM.begin(512);
 
-  // if (ssid.length() > 0 && password.length() > 0) {
-  //   loginfo("Clearing EEPROM");
-  //   for (int i = 0; i < 96; i++) {
-  //     EEPROM.write(i, 0);
-  //   }
+  if (ssid.length() > 0 && password.length() > 0) {
+    loginfo("Clearing EEPROM");
+    for (int i = 0; i < 96; i++) {
+      EEPROM.write(i, 0);
+    }
 
-  //   EEPROM.commit();
-  //   delay(500);
-
-  //   loginfo("writing EEPROM SSID:");
-  //   for (int i = 0; i < ssid.length(); i++)
-  //   {
-  //     EEPROM.write(i, ssid[i]);
-  //     loginfo("Wrote: ");
-  //     loginfo(ssid[i]);
-  //     delay(100);
-  //   }
-
-  //   // EEPROM.commit();
-
-  //   loginfo("writing EEPROM Password:");
-  //   for (int i = 0; i < password.length(); ++i)
-  //   {
-  //     EEPROM.write(32 + i, password[i]);
-  //     loginfo("Wrote: ");
-  //     loginfo(password[i]);
-  //     delay(100);
-  //   }
-  //   EEPROM.commit();
-  // }
+    loginfo("writing EEPROM SSID:");
+    for (int i = 0; i < ssid.length(); i++)
+    {
+      EEPROM.write(i, ssid[i]);
+      loginfo("Wrote: ");
+      loginfo(ssid[i]);
+    }
+    loginfo("writing EEPROM Password:");
+    for (int i = 0; i < password.length(); ++i)
+    {
+      EEPROM.write(32 + i, password[i]);
+      loginfo("Wrote: ");
+      loginfo(password[i]);
+    }
+    EEPROM.commit();
+  }
   return DUCK_ERR_NONE;
 }
 
-int DuckNet::loadWiFiCredentials(){
+  int DuckNet::loadWiFiCredentials(){
 
   // This method will look for any saved WiFi credntials on the device and set up a internet connection
   EEPROM.begin(512); //Initialasing EEPROM
@@ -438,134 +405,32 @@ int DuckNet::loadWiFiCredentials(){
 }
 
 
-// int DuckNet::saveControlCredentials(String ssid, String password) {
-//   int n = ssid.length();
-//   char temp[n + 1];
-//   strcpy(temp, ssid.c_str());
-//   this->controlSsid = temp;
-//   //delete[] temp;
-
-//   n = password.length();
-//   char temp2[n + 1];
-//   strcpy(temp2, password.c_str());
-//   this->controlPassword = temp2;
-//   //delete[] temp2;
-
-//   if(ssid.length() > 32 || password.length() > 32) {
-//     //Too long
-//     return -1;
-//   }
-
-//   EEPROM.begin(512);
-
-//   if (ssid.length() > 0 && password.length() > 0) {
-//     loginfo("Clearing EEPROM");
-//     for (int i = CDPCFG_EEPROM_CONTROL_USERNAME; 
-//       i < CDPCFG_EEPROM_CONTROL_PASSWORD + CDPCFG_EEPROM_CRED_MAX; i++) {
-//       EEPROM.write(i, 0);
-//     }
-
-//     loginfo("writing EEPROM SSID:");
-//     for (int i = 0; i < ssid.length(); i++)
-//     {
-//       if(i == 0) {
-//         EEPROM.write(CDPCFG_EEPROM_CONTROL_USERNAME + i, 0x00);
-//       }
-//       EEPROM.write(CDPCFG_EEPROM_CONTROL_USERNAME + i + 1, ssid[i]);
-//       loginfo("Wrote: ");
-//       loginfo(ssid[i]);
-      
-//     }
-//     loginfo("writing EEPROM Password:");
-//     for (int i = 0; i < password.length(); ++i)
-//     {
-//       EEPROM.write(CDPCFG_EEPROM_CONTROL_PASSWORD + i, password[i]);
-//       loginfo("Wrote: ");
-//       loginfo(password[i]);
-//     }
-//     EEPROM.commit();
-//     return 0;
-//   }
-// }
-
-// int DuckNet::loadControlCredentials(){
-
-//   // This method will look for any saved WiFi credntials on the device and set up a internet connection
-//   EEPROM.begin(512); //Initialasing EEPROM
-
-//   String esid;
-//   for (int i = 0; i < CDPCFG_EEPROM_CRED_MAX; ++i)
-//   {
-//     if(i == 0) {
-//       byte b = 0x00;
-//       if(b != EEPROM.read(CDPCFG_EEPROM_CONTROL_USERNAME + i)) {
-//         Serial.println("Fill in Control");
-//         saveControlCredentials(control_username, control_password);
-//         return 0;
-//       } else {
-//         esid += char(EEPROM.read(CDPCFG_EEPROM_CONTROL_USERNAME + i));
-//       }
-//     } 
-    
-//   }
-//   // lopp through saved SSID carachters
-//   loginfo("Reading EEPROM SSID: " + esid);
-//   setControlSsid(esid);
-//   Serial.println("Exit Set Control");
-
-//   String epass = "";
-//   for (int i = 0; i < CDPCFG_EEPROM_CRED_MAX; ++i)
-//   {
-//     epass += char(EEPROM.read(CDPCFG_EEPROM_CONTROL_PASSWORD + i));
-//   }
-//   // lopp through saved Password carachters
-//   loginfo("Reading EEPROM Password: " + epass);
-//   setControlPassword(epass);
-//   Serial.println("Exit Set Password");
-
-//   if (esid.length() == 0 || epass.length() == 0){
-//     loginfo("ERROR no Control Panel SSID and PASSWORD set: Stored SSID and PASSWORD empty");
-//     return 1;
-//   } else{
-//     loginfo("Control panel credentials loaded");
-//     return 0;
-//   }
-
-// }
-
-
 int DuckNet::setupInternet(String ssid, String password) {
   this->ssid = ssid;
   this->password = password;
 
-  Serial.println("In setupInternet: ");
-  Serial.println(ssid);
-  Serial.println(password);
 
-  
   // Check if SSID is available
-  // if (!ssidAvailable(ssid)) {
-  //   logerr("ERROR setupInternet: " + ssid + " is not available. Please check the provided ssid and/or passwords");
-  //   return DUCK_INTERNET_ERR_SSID;
-  // }
+  if (!ssidAvailable(ssid)) {
+    logerr("ERROR setupInternet: " + ssid + " is not available. Please check the provided ssid and/or passwords");
+    return DUCK_INTERNET_ERR_SSID;
+  }
 
 
 
-  // //  Connect to Access Point
-  // logdbg("setupInternet: connecting to WiFi access point SSID: " + ssid);
-  // WiFi.begin(ssid.c_str(), password.c_str());
-  // // We need to wait here for the connection to estanlish. Otherwise the WiFi.status() may return a false negative
-  // Serial.println("BAAAAAMMMMMM!!!");
-  // WiFi.waitForConnectResult();
-  // Serial.println("BOOOOOMMMMMM!!!");
-  
-  // //TODO: Handle bad password better
-  // if(WiFi.status() != WL_CONNECTED) {
-  //   logerr("ERROR setupInternet: failed to connect to " + ssid);
-  //   return DUCK_INTERNET_ERR_CONNECT;
-  // }
+  //  Connect to Access Point
+  logdbg("setupInternet: connecting to WiFi access point SSID: " + ssid);
+  WiFi.begin(ssid.c_str(), password.c_str());
+  // We need to wait here for the connection to estanlish. Otherwise the WiFi.status() may return a false negative
+  WiFi.waitForConnectResult();
 
-  // loginfo("Duck connected to internet!");
+  //TODO: Handle bad password better
+  if(WiFi.status() != WL_CONNECTED) {
+    logerr("ERROR setupInternet: failed to connect to " + ssid);
+    return DUCK_INTERNET_ERR_CONNECT;
+  }
+
+  loginfo("Duck connected to internet!");
 
   return DUCK_ERR_NONE;
 
@@ -597,30 +462,6 @@ bool DuckNet::ssidAvailable(String val) {
 void DuckNet::setSsid(String val) { ssid = val; }
 
 void DuckNet::setPassword(String val) { password = val; }
-
-// void DuckNet::setControlSsid(String val) {
-//   Serial.println("Set Control SSID"); 
-//   int n = val.length();
-//   Serial.println(n);
-
-//   char * temp;
-//   temp = new char[n + 1];
-
-//   strcpy(temp, val.c_str());
-//   Serial.println(temp);
-//   this->controlSsid = temp;
-//   Serial.println(controlSsid);
-//   //delete[] temp; 
-// }
-
-// void DuckNet::setControlPassword(String val) {
-//   Serial.println("Set Control Password");  
-//   int n = val.length();
-//   char temp[n + 1];
-//   strcpy(temp, val.c_str());
-//   this->controlPassword = temp;
-//   //delete[] temp;
-//  }
 
 String DuckNet::getSsid() { return ssid; }
 
