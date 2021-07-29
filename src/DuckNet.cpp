@@ -528,7 +528,7 @@ int DuckNet::setupInternet(String ssid, String password) {
   this->ssid = ssid;
   this->password = password;
 
-
+  
   // Check if SSID is available
   if (!ssidAvailable(ssid)) {
     logerr("ERROR setupInternet: " + ssid + " is not available. Please check the provided ssid and/or passwords");
@@ -541,8 +541,10 @@ int DuckNet::setupInternet(String ssid, String password) {
   logdbg("setupInternet: connecting to WiFi access point SSID: " + ssid);
   WiFi.begin(ssid.c_str(), password.c_str());
   // We need to wait here for the connection to estanlish. Otherwise the WiFi.status() may return a false negative
+  Serial.println("BAAAAAMMMMMM!!!");
   WiFi.waitForConnectResult();
-
+  Serial.println("BOOOOOMMMMMM!!!");
+  
   //TODO: Handle bad password better
   if(WiFi.status() != WL_CONNECTED) {
     logerr("ERROR setupInternet: failed to connect to " + ssid);
