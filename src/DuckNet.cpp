@@ -372,6 +372,7 @@ int DuckNet::saveWifiCredentials(String ssid, String password) {
     loginfo("Clearing EEPROM");
     for (int i = 0; i < 96; i++) {
       EEPROM.write(i, 0);
+      EEPROM.commit();
     }
 
     loginfo("writing EEPROM SSID:");
