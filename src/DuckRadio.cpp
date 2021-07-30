@@ -123,14 +123,13 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
   err = lora.readData(packetBytes->data(), packet_length);
   loginfo("readReceivedData() - lora.readData returns: " + String(err));
 
+  DuckRadio::setReceiveFlag(false);
+  int rxState = startReceive();
+
   if (err != ERR_NONE) {
     logerr("ERROR  readReceivedData failed. err: " + String(err));
     return DUCKLORA_ERR_HANDLE_PACKET;
   }
-
-  DuckRadio::setReceiveFlag(false);
-
-  int rxState = startReceive();
 
   loginfo("Rx packet: " + duckutils::convertToHex(packetBytes->data(), packetBytes->size()));
   loginfo("Rx packet: " + duckutils::toString(*packetBytes));
