@@ -152,7 +152,6 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
   uint32_t packet_data_crc = duckutils::toUnit32(&data[DATA_CRC_POS]);
   uint32_t computed_data_crc =
       CRC32::calculate(data_section.data(), data_section.size());
-
   if (computed_data_crc != packet_data_crc) {
     logerr("ERROR data crc mismatch: received: " + String(packet_data_crc) +
            " calculated:" + String(computed_data_crc));

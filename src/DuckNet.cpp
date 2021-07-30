@@ -285,7 +285,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
 
     if (ssid != "" && password != "") {
       setupInternet(ssid, password);
-      //saveWifiCredentials(ssid, password);
+      saveWifiCredentials(ssid, password);
       request->send(200, "text/plain", "Success");
     } else {
       request->send(500, "text/plain", "There was an error");
@@ -413,11 +413,11 @@ int DuckNet::setupInternet(String ssid, String password) {
   this->password = password;
 
 
-  // Check if SSID is available
-  if (!ssidAvailable(ssid)) {
-    logerr("ERROR setupInternet: " + ssid + " is not available. Please check the provided ssid and/or passwords");
-    return DUCK_INTERNET_ERR_SSID;
-  }
+  // // Check if SSID is available
+  // if (!ssidAvailable(ssid)) {
+  //   logerr("ERROR setupInternet: " + ssid + " is not available. Please check the provided ssid and/or passwords");
+  //   return DUCK_INTERNET_ERR_SSID;
+  // }
 
 
 
@@ -425,7 +425,8 @@ int DuckNet::setupInternet(String ssid, String password) {
   logdbg("setupInternet: connecting to WiFi access point SSID: " + ssid);
   WiFi.begin(ssid.c_str(), password.c_str());
   // We need to wait here for the connection to estanlish. Otherwise the WiFi.status() may return a false negative
-  WiFi.waitForConnectResult();
+  // WiFi.waitForConnectResult();
+  delay(100);
 
   //TODO: Handle bad password better
   if(WiFi.status() != WL_CONNECTED) {
