@@ -87,23 +87,6 @@ const char controlPanel[] PROGMEM = R"=====(
         <input type="submit" name="submit"/>
       </form>
      </div>
-   
- <div class="control-box">
-       <h5>Username /Password </h5>
-      <p>Change username and password for this control panel</p>
-    <form action='/changeControlPassword' method='post'>
-    <label for='ssid'>Current Username:</label><br> 
-    <input name='ssid' type='text' placeholder='SSID' /><br><br>
-    <label for='pass'>Current Password:</label><br>
-    <input name='pass' type='text' placeholder='Password' /><br><br>
-    <hr>
-    <label for='newSsid'>New username:</label><br> 
-    <input name='newSsid' type='text' placeholder='New SSID' /><br><br>
-    <label for='newPass'>New Password:</label><br>
-    <input name='newPass' type='text' placeholder='New Password' /><br><br>
-    <input type="submit" value="Submit">
-    </form>
-  </div>
     </div>
   </body></html>
   

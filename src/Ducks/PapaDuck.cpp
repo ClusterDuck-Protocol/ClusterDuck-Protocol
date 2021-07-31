@@ -17,7 +17,9 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid,
     return err;
   }
 
-  err = setupWifi("PapaDuck Setup");
+  std::string name(deviceId.begin(),deviceId.end());
+
+  err = setupWifi(name.c_str());
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR setupWithDefaults  rc = " + String(err));
     return err;
