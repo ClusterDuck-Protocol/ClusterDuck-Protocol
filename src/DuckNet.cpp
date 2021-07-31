@@ -42,7 +42,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
 
   if (html == "") {
     logdbg("Web Server using main page");
-    portal = MAIN_page;
+    portal = home_page;
   } else {
     logdbg("Web Server using custom main page");
     portal = html;
@@ -53,6 +53,10 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
 
   webServer.on("/", HTTP_GET, [&](AsyncWebServerRequest* request) {
     request->send(200, "text/html", portal);
+  });
+
+  webServer.on("/main", HTTP_GET, [&](AsyncWebServerRequest* request) {
+    request->send(200, "text/html", MAIN_page);
   });
   
   // This will serve as an easy to access "control panel" to change settings of devices easily

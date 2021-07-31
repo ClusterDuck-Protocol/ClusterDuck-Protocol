@@ -43,6 +43,7 @@
 #include "index.h"
 #include "wifiCredentials.h"
 #include "controlPanel.h"
+#include "cdpHome.h"
 
 #endif
 
