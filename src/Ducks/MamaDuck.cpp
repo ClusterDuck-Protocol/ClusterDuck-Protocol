@@ -15,7 +15,8 @@ int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String 
     return err;
   }
 
-  err = setupWifi("DuckLink");
+  std::string name(deviceId.begin(),deviceId.end());
+  err = setupWifi(name.c_str());
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR setupWithDefaults rc = " + String(err));
     return err;
@@ -27,7 +28,7 @@ int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String 
     return err;
   }
 
-  err = setupWebServer(true);
+  err = setupWebServer(false);
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR setupWithDefaults rc = " + String(err));
     return err;

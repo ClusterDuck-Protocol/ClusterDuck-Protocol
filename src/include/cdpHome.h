@@ -6,7 +6,6 @@ const char home_page[] PROGMEM = R"=====(
 <html>
   <head>
     <title>Welcome to DuckLink</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
   </head>
 
   <body>
@@ -64,6 +63,7 @@ a {
   
 )=====";
 
-// <a href="/wifi">Set WiFi Credentials</a>
 
 #endif
+
+// <a href="/wifi">Set WiFi Credentials</a>

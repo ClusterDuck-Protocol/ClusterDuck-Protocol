@@ -35,7 +35,6 @@ const char wifi_page[] PROGMEM = R"=====(
         border-radius: 6px;
         padding: .35em 0 .35em .3em;
         color: #000;
-        text-transform: uppercase;
       }
    
       
