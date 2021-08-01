@@ -58,6 +58,10 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
   webServer.on("/main", HTTP_GET, [&](AsyncWebServerRequest* request) {
     request->send(200, "text/html", MAIN_page);
   });
+
+  webServer.on("/papamain", HTTP_GET, [&](AsyncWebServerRequest* request) {
+    request->send(200, "text/html", papa_page);
+  });
   
   // This will serve as an easy to access "control panel" to change settings of devices easily
   // TODO: Need to be able to turn off this feature from the application layer for security

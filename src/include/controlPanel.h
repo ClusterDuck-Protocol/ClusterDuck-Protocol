@@ -10,7 +10,7 @@ const char controlPanel[] PROGMEM = R"=====(
         font: 26px "Avenir", helvetica, sans-serif;
         border-radius: 8px;
         background-color:#f0f0f0;
-        height: 100vh;
+        min-height: 100vh;
       }
       .control-box{
         background-color: white;
@@ -25,9 +25,12 @@ const char controlPanel[] PROGMEM = R"=====(
         border-style: none;
         padding: 1em;
         border-radius: 8px;
-        background: #05172d;
-        color: white;
+        background: #f7cf02;
+        color: #000;
+        text-transform: uppercase;
+        font-weight: 700;
         width: 8em;
+        margin-bottom:16px;
       }
       .fileupload {
         border-style: none;
@@ -42,11 +45,14 @@ const char controlPanel[] PROGMEM = R"=====(
       input{
         width:100%; 
         height: 3em;  
-        border: 0.3px solid lightgray;
+        border: 3px solid #bbb;
         font-size: 0.8em;
         padding: 0.4em;
         border-radius: 12px;
-
+        background: #f7cf02;
+        color: #000;
+        text-transform: uppercase;
+        font-weight: 700;
       }
       select{
         width: 100%;
@@ -59,33 +65,37 @@ const char controlPanel[] PROGMEM = R"=====(
         font-weight: bold;
       }
     </style></head><body>
-     <div class="main-box">
+    <div class="main-box">
      <h1>Control <b>Panel</b></h1>
      <div class="control-box">
-      <h5>DetectorDuck </h5>
-      <p>Switch between DetectorDuck and normal duck</p>
-        <form action='/flipDetector' method='post'>
-    <input type='submit' value='Detector On' />
-    </form>
-    <form action='/flipDecrypt' method='post'>
-    <input type='submit' value='Decrypt On' />
-    </form>
+      <h5>DetectorDuck Settings</h5>
+      <p>Switch to/from DetectorDuck mode.</p>
+      <form action='/flipDetector' method='post'>
+        <input type='submit' value='Detector On' />
+      </form>
      </div>
      <div class="control-box">
-      <h5>Channel Select</h5>
-      <p>Channel Select</p>
+       <h5>Decryption Settings</h5>
+       <p>Activate decryption on this DuckLink.</p>
+       <form action='/flipDecrypt' method='post'>
+        <input type='submit' value='Turn Decrypt On' />
+       </form>
+     </div>
+     <div class="control-box">
+       <h5>Channel Select</h5>
+       <p>Channel Select</p>
        <form action='/setChannel' method='post'>
-       <p>Channel:</p>
-        <select name="channels">
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-        <option value="6">6</option>
-        </select>
-        <input type="submit" name="submit"/>
-      </form>
+        <p>Channel:</p>
+          <select name="channels">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+          </select>
+          <input type="submit" name="submit"/>
+       </form>
      </div>
     </div>
   </body></html>

@@ -33,7 +33,7 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid,
 
 
 
-  err = setupWebServer(false);
+  err = setupWebServer();
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR setupWithDefaults  rc = " + String(err));
     return err;

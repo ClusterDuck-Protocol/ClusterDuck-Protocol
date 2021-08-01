@@ -1,11 +1,11 @@
-#ifndef HOME_H
-#define HOME_H
+#ifndef PAPAHOME_H
+#define PAPAHOME_H
 
-const char home_page[] PROGMEM = R"=====(
+const char papa_page[] PROGMEM = R"=====(
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Welcome to DuckLink</title>
+    <title>Welcome to HybridDuck</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
   </head>
 
@@ -14,7 +14,6 @@ const char home_page[] PROGMEM = R"=====(
 		<h1>DuckLink Dashboard</h1>
 		<p>What would you like to do?</p>
 		<br>
-		
 		<a href="/controlpanel">Control Panel</a>
 		<a href="/main">Message Portal</a>
 	</div>
@@ -63,7 +62,5 @@ a {
 </style>
   
 )=====";
-
-// <a href="/wifi">Set WiFi Credentials</a>
 
 #endif

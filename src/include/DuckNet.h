@@ -44,6 +44,7 @@
 #include "wifiCredentials.h"
 #include "controlPanel.h"
 #include "cdpHome.h"
+#include "papaHome.h"
 
 #endif
 
