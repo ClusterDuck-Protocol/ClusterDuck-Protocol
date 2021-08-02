@@ -177,7 +177,7 @@ public:
    */
   void processRadioIrq();
 
- 
+  int getChannel() { return channel; }
 
 private:
   DuckRadio();
@@ -186,6 +186,7 @@ private:
   static DuckRadio* instance;
   DuckDisplay* display = DuckDisplay::getInstance();
   int err;
+  int channel;  
 };
 
 #endif

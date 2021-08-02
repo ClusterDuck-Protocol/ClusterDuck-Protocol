@@ -83,7 +83,6 @@ const char controlPanel[] PROGMEM = R"=====(
      </div>
      <div class="control-box">
        <h5>Channel Select</h5>
-       <p>Channel Select</p>
        <form action='/setChannel' method='post'>
         <p>Channel:</p>
           <select name="channels">

@@ -64,6 +64,8 @@ public:
    */
   static DuckNet* getInstance();
 
+  int channel;
+
 #ifdef CDPCFG_WIFI_NONE
   int setupWebServer(bool createCaptivePortal = false, String html = "") {
     logwarn("WARNING setupWebServer skipped, device has no WiFi.");
@@ -88,6 +90,7 @@ public:
   void setPassword(String val) {}
   String getSsid() { return ""; }
   String getPassword() { return ""; }
+  // int getChannel();
   void setDeviceId(std::vector<byte> deviceId) {}
   bool isWifiConnected() { return false; }
   int loadWiFiCredentials(){return DUCK_ERR_NONE; };
@@ -186,6 +189,13 @@ public:
    * @returns a string representing the current network password
    */
   String getPassword();
+
+  /**
+   * @brief Get the current channel.
+   *
+   * @returns an int representing the current channel
+   */
+  int getChannel();
 
   /**
    * @brief Set the Duck's device id.

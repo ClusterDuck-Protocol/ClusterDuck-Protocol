@@ -25,13 +25,19 @@ const char* update_password = CDPCFG_UPDATE_PASSWORD;
 const char* control_username = CDPCFG_UPDATE_USERNAME;
 const char* control_password = CDPCFG_UPDATE_PASSWORD;
 
-
 bool restartRequired = false;
 size_t content_len;
 
 void DuckNet::setDeviceId(std::vector<byte> deviceId) {
   this->deviceId.insert(this->deviceId.end(), deviceId.begin(), deviceId.end());
 }
+
+// //Working on channelset
+// String processor(const String& var) {
+//     if(var == "channel")
+//       return String(duckRadio->getChannel()); 
+//     return String();
+// }
 
 int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
   loginfo("Setting up Web Server");
@@ -89,11 +95,11 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     //   if (!request->authenticate(controlSsid, controlPassword))
     //   return request->requestAuthentication();
     // }
+    
+    // AsyncWebServerResponse* response =
+    request->send_P(200, "text/html", controlPanel);
 
-    AsyncWebServerResponse* response =
-    request->beginResponse(200, "text/html", controlPanel);
-
-    request->send(response);
+    // request->send(response);
     
   });
 
@@ -119,7 +125,6 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     int val = std::atoi(p->value().c_str());
     duckRadio->setChannel(val);
     saveChannel(val);
-
 
     request->send(200, "text/plain", "Success");
   });
@@ -487,7 +492,6 @@ void DuckNet::loadChannel(){
     duckRadio->setChannel(val);
     loginfo("Read channel val to EEPROM, setting channel: ");
     loginfo(val);
-    
 }
 
 void DuckNet::setSsid(String val) { ssid = val; }
