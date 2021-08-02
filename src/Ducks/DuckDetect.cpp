@@ -38,6 +38,7 @@ int DuckDetect::setupWithDefaults(std::vector<byte> deviceId, String ssid,
   //   logerr("ERROR setupWithDefaults - setupOTA src = " + String(err));
   //   return err;
   // }
+  duckNet->loadChannel();
 
   loginfo("DuckDetect setup done");
   return DUCK_ERR_NONE;

@@ -248,6 +248,7 @@ void DuckRadio::setChannel(int channelNum) {
     if (err != ERR_NONE) {
       logerr("ERROR Failed to set channel");
     } else {
+      lora.startReceive();
       loginfo("Channel Set");
     }
   }

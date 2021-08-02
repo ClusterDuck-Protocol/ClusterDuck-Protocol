@@ -482,7 +482,7 @@ void DuckNet::saveChannel(int val){
 }
 
 void DuckNet::loadChannel(){
-      EEPROM.begin(512);
+    EEPROM.begin(512);
     int val = EEPROM.read(CDPCFG_EEPROM_CHANNEL_VALUE);
     duckRadio->setChannel(val);
     loginfo("Read channel val to EEPROM, setting channel: ");

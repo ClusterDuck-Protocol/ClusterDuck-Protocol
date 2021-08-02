@@ -116,6 +116,7 @@ void PapaDuck::handleReceivedPacket() {
       duckutils::convertToHex(rxPacket->getBuffer().data(),
         rxPacket->getBuffer().size()));
     loginfo("invoking callback in the duck application...");
+    
     recvDataCallback(rxPacket->getBuffer());
     loginfo("handleReceivedPacket() DONE");
   }
