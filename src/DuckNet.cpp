@@ -32,7 +32,7 @@ void DuckNet::setDeviceId(std::vector<byte> deviceId) {
   this->deviceId.insert(this->deviceId.end(), deviceId.begin(), deviceId.end());
 }
 
-// //Working on channelset
+// //Working on
 // String processor(const String& var) {
 //     if(var == "channel")
 //       return String(duckRadio->getChannel()); 
@@ -99,7 +99,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     // AsyncWebServerResponse* response =
     request->send_P(200, "text/html", controlPanel);
 
-    // request->send(response);
+    request->send(response);
     
   });
 
