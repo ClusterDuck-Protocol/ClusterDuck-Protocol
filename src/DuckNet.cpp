@@ -96,8 +96,8 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     //   return request->requestAuthentication();
     // }
     
-    // AsyncWebServerResponse* response =
-    request->send_P(200, "text/html", controlPanel);
+    AsyncWebServerResponse* response =
+    request->beginResponse(200, "text/html", controlPanel);
 
     request->send(response);
     

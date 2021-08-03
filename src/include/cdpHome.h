@@ -13,7 +13,7 @@ const char home_page[] PROGMEM = R"=====(
 		<h1>DuckLink Dashboard</h1>
 		<p>What would you like to do?</p>
 		<br>
-		
+		<a href="/wifi">Set WiFi Credentials</a>
 		<a href="/controlpanel">Control Panel</a>
 		<a href="/main">Message Portal</a>
 	</div>

@@ -71,7 +71,7 @@ const char controlPanel[] PROGMEM = R"=====(
       <h5>DetectorDuck Settings</h5>
       <p>Switch to/from DetectorDuck mode.</p>
       <form action='/flipDetector' method='post'>
-        <input type='submit' value='Detector On' />
+        <input type='submit' value='Detector On/Off' />
       </form>
      </div>
      <div class="control-box">
