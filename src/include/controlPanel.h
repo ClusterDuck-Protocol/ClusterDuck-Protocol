@@ -68,20 +68,6 @@ const char controlPanel[] PROGMEM = R"=====(
     <div class="main-box">
      <h1>Control <b>Panel</b></h1>
      <div class="control-box">
-      <h5>DetectorDuck Settings</h5>
-      <p>Switch to/from DetectorDuck mode.</p>
-      <form action='/flipDetector' method='post'>
-        <input type='submit' value='Detector On/Off' />
-      </form>
-     </div>
-     <div class="control-box">
-       <h5>Decryption Settings</h5>
-       <p>Activate decryption on this DuckLink.</p>
-       <form action='/flipDecrypt' method='post'>
-        <input type='submit' value='Turn Decrypt On' />
-       </form>
-     </div>
-     <div class="control-box">
        <h5>Channel Select</h5>
        <form action='/setChannel' method='post'>
         <p>Channel:</p>
@@ -102,3 +88,18 @@ const char controlPanel[] PROGMEM = R"=====(
 )=====";
 
 #endif
+
+// <div class="control-box">
+//       <h5>DetectorDuck Settings</h5>
+//       <p>Switch to/from DetectorDuck mode.</p>
+//       <form action='/flipDetector' method='post'>
+//         <input type='submit' value='Detector On/Off' />
+//       </form>
+//      </div>
+// <div class="control-box">
+//        <h5>Decryption Settings</h5>
+//        <p>Activate decryption on this DuckLink.</p>
+//        <form action='/flipDecrypt' method='post'>
+//         <input type='submit' value='Turn Decrypt On/Off' />
+//        </form>
+//      </div>
