@@ -116,25 +116,35 @@ void PapaDuck::handleReceivedPacket() {
     loginfo("invoking callback in the duck application...");
     recvDataCallback(rxPacket->getBuffer());
 
-    const CdpPacket packet = CdpPacket(rxPacket->getBuffer());
-
-    if (needsAck(packet)) {
-      if (ackTimer.empty()) {
-        logdbg("Starting new ack broadcast timer with a delay of " +
-          String(timerDelay) + " ms");
-        ackTimer.in(timerDelay, ackHandler, this);
+    if (acksEnabled) {
+      const CdpPacket packet = CdpPacket(rxPacket->getBuffer());
+      if (needsAck(packet)) {
+        handleAck(packet);
       }
-      storeForAck(packet);
-    }
-
-    if (ackBufferIsFull()) {
-      logdbg("Ack buffer is full. Sending broadcast ack immediately.");
-      ackTimer.cancel();
-      broadcastAck();
     }
 
     loginfo("handleReceivedPacket() DONE");
   }
+}
+
+void PapaDuck::handleAck(const CdpPacket & packet) {
+  if (ackTimer.empty()) {
+    logdbg("Starting new ack broadcast timer with a delay of " +
+      String(timerDelay) + " ms");
+    ackTimer.in(timerDelay, ackHandler, this);
+  }
+
+  storeForAck(packet);
+
+  if (ackBufferIsFull()) {
+    logdbg("Ack buffer is full. Sending broadcast ack immediately.");
+    ackTimer.cancel();
+    broadcastAck();
+  }
+}
+
+void PapaDuck::enableAcks(bool enable) {
+  acksEnabled = enable;
 }
 
 bool PapaDuck::ackHandler(PapaDuck * duck)

@@ -68,9 +68,28 @@ public:
    */
   int getType() { return DuckType::PAPA; }
 
+  /**
+   * @brief Enable or disable the sending of acknowledgements.
+   *
+   * The PapaDuck can send acknowledgements for each packet received. See
+   * `reservedTopic::ack`. By default, the PapaDuck will not send acks.
+   *
+   * @param enable `true` if PapaDuck should send acks, `false` if not.
+   */
+  void enableAcks(bool enable);
+
 private:
 
   void handleReceivedPacket();
+
+  /**
+   * @brief Either store a DUID/MUID pair for later or send an ack broadcast.
+   *
+   * Also can enable the timer if necessary.
+   *
+   * @param packet The recently received packet.
+   */
+  void handleAck(const CdpPacket & packet);
 
   /**
    * @brief Indicates whether the packet should be acked or not.
@@ -103,6 +122,7 @@ private:
 
   typedef std::vector<std::pair<Duid, Muid> > AckStore;
 
+  bool acksEnabled{false};
   Timer<1, millis, PapaDuck*> ackTimer;
   size_t timerDelay{1000}; // TODO(rolsen): Set to something more reasonable.
   AckStore ackStore;
