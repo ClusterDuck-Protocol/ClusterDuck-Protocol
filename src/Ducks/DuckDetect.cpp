@@ -44,6 +44,9 @@ int DuckDetect::setupWithDefaults(std::vector<byte> deviceId, String ssid,
 }
 
 void DuckDetect::run() {
+  
+  Duck::logIfLowMemory();
+  
   handleOtaUpdate();
   if (getReceiveFlag()) {
     setReceiveFlag(false);

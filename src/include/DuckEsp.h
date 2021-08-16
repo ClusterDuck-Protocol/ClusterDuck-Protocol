@@ -25,6 +25,20 @@ namespace duckesp {
 int freeHeapMemory();
 
 /**
+ * @brief Get lowest level of free heap since boot
+ * 
+ * @returns memory size in bytes
+ */
+int getMinFreeHeap();
+
+/**
+ * @brief Get largest block of heap that can be allocated at once
+ * 
+ * @returns memory size in bytes
+ */
+int getMaxAllocHeap();
+
+/**
  * @brief Restart the duck device.
  * 
  */
