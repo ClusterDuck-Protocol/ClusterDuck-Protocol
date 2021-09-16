@@ -18,9 +18,9 @@ struct BloomFilter {
 };
 
 
-struct BloomFilter* bloom_init(int m, int k, int w, int activeFilter, int maxN) {
+struct BloomFilter* bloom_init(int m, int k, int w, int maxN) {
     logdbg("bloom_init start");
-    struct BloomFilter * BF = (BloomFilter*) malloc( sizeof( struct BloomFilter ) );
+    struct BloomFilter * BF = new BloomFilter;
     logdbg("BF created");
     logdbg(m);
     BF->M = m;
@@ -29,44 +29,40 @@ struct BloomFilter* bloom_init(int m, int k, int w, int activeFilter, int maxN) 
     logdbg("added to BF");
     BF->W = w; //Max value is how many bits in an unsigned int
     logdbg("added to BF");
-    BF->activeFilter = activeFilter;
+    BF->activeFilter = 1;
     BF->maxN = maxN;
     BF->nMsg = 0;
 
-    int byteSize = (m/w)*sizeof(unsigned int); // how much space a bloom filter takes up
-                                               // unsigned int-- M therefore must be less than 2^32
+    int numRows = m; // how much space a bloom filter takes up in rows
 
     logdbg("initialize bloom filter 1");
     // Initialize the bloom filters, fill with 0's
-    BF->filter1 = (unsigned int*)malloc( (m/w) * sizeof(unsigned int));
-    printf("Filter 1 address %d\n", BF->filter1);
+    BF->filter1 = new unsigned int[numRows];
+    printf("Filter 1 address %p\n", BF->filter1);
     if (BF->filter1 == NULL) {
         printf("Memory allocation for Bloom Filter 1 failed!\n");
         exit(0);
     }
-    // for (int n = 0; n < m; n++) {
-    //     BF->filter1[n] = 0;
-    //     printf("Filter 1 wrote %d\n", BF->filter1[n]);
-    // }
-    printf("Initialized BF1, %d slots, %d bytes of memory\n", m, byteSize);
+    for (int n = 0; n < numRows; n++) {
+        BF->filter1[n] = 0;
+    }
+    printf("Initialized BF1, %d slots, %d numRows\n", m, numRows);
     
     logdbg("initialize bloom filter 2");
-    BF->filter2 = (unsigned int*)malloc( (m/w) * sizeof(unsigned int));
-    printf("Filter 2 address %d\n", BF->filter2);
+    BF->filter2 = new unsigned int[numRows];
+    printf("Filter 2 address %p\n", BF->filter2);
     if (BF->filter2 == NULL) {
         printf("Memory allocation for Bloom Filter 2 failed!\n");
         exit(0);
     }
-    // for (int n = 0; n < m; n++) {
-    //     BF->filter2[n] = 0;
-    //     printf("Filter 2 wrote %d\n", BF->filter2[n]);
-    //     printf("Filter 2 wrote %d\n", BF->filter2[n]);
-    // }
-    printf("Initialized BF2, %d slots, %d bytes of memory\n", m, byteSize);
+    for (int n = 0; n < numRows; n++) {
+        BF->filter2[n] = 0;
+    }
+    printf("Initialized BF2, %d slots, %d numRows\n", m, numRows);
 
     logdbg("initialize random seeds");
     //get random seeds for hash functions 
-    int* Seeds = (int*)malloc(k * sizeof(int));
+    int* Seeds = new int[k];
     if (Seeds == NULL) {
         printf("Memory allocation for seeds failed!\n");
         exit(0);
@@ -106,7 +102,8 @@ int bloom_check(struct BloomFilter* filter, unsigned char* msg, int msgSize) {
     int k = filter->K;
 
     // generate hash indices for string
-    unsigned int* indSet = (unsigned int*)malloc(k*sizeof(unsigned int)); // array to hold string hash indices
+    unsigned int* indSet = new unsigned int[k]; // array to hold string hash indices
+    // TODO: Deallocate indSet using RAII, or allocate it in bloom_init
     
     for (int i = 0; i < k; i++){
         unsigned int ind = djb2Hash(msg, filter->Seeds[i], msgSize);
@@ -167,7 +164,8 @@ void bloom_add(struct BloomFilter* filter, unsigned char* msg, int msgSize) {
     int m = filter->M;
 
     // generate hash indices for string
-    unsigned int* indSet = (unsigned int*)malloc(k*sizeof(unsigned int)); // array to hold string hash indices
+    unsigned int* indSet = new unsigned int[k]; // array to hold string hash indices
+    // TODO: Deallocate indSet using RAII, or allocate it in bloom_init
    
     for (int i = 0; i < k; i++){
       unsigned int ind = djb2Hash(msg, filter->Seeds[i], msgSize);
