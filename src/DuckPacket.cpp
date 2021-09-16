@@ -120,8 +120,8 @@ int DuckPacket::prepareForSending(std::vector<byte> targetDevice, byte duckType,
   }
   
   // ----- insert path -----
-  buffer.insert(buffer.end(), duid.begin(), duid.end());
-  logdbg("Path:      " + duckutils::convertToHex(buffer.data(), buffer.size()));
+  // buffer.insert(buffer.end(), duid.begin(), duid.end());
+  // logdbg("Path:      " + duckutils::convertToHex(buffer.data(), buffer.size()));
 
   logdbg("Built packet: " +
          duckutils::convertToHex(buffer.data(), buffer.size()));

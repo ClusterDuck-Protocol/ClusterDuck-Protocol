@@ -1,4 +1,7 @@
+#include "Arduino.h"
 #include "include/bloomfilter.h"
+#include "DuckLogger.h"
+
 
 
 // two-phase bloom filter data sturcture 
@@ -16,10 +19,16 @@ struct BloomFilter {
 
 
 struct BloomFilter* bloom_init(int m, int k, int w, int activeFilter, int maxN) {
-    struct BloomFilter * BF;
+    logdbg("bloom_init start");
+    struct BloomFilter * BF = (BloomFilter*) malloc( sizeof( struct BloomFilter ) );
+    logdbg("BF created");
+    logdbg(m);
     BF->M = m;
+    logdbg("added to BF");
     BF->K = k;
+    logdbg("added to BF");
     BF->W = w; //Max value is how many bits in an unsigned int
+    logdbg("added to BF");
     BF->activeFilter = activeFilter;
     BF->maxN = maxN;
     BF->nMsg = 0;
@@ -27,27 +36,35 @@ struct BloomFilter* bloom_init(int m, int k, int w, int activeFilter, int maxN) 
     int byteSize = (m/w)*sizeof(unsigned int); // how much space a bloom filter takes up
                                                // unsigned int-- M therefore must be less than 2^32
 
+    logdbg("initialize bloom filter 1");
     // Initialize the bloom filters, fill with 0's
     BF->filter1 = (unsigned int*)malloc( (m/w) * sizeof(unsigned int));
+    printf("Filter 1 address %d\n", BF->filter1);
     if (BF->filter1 == NULL) {
         printf("Memory allocation for Bloom Filter 1 failed!\n");
         exit(0);
     }
-    for (int n = 0; n < m; n++) {
-        BF->filter1[n] = 0;
-    }
+    // for (int n = 0; n < m; n++) {
+    //     BF->filter1[n] = 0;
+    //     printf("Filter 1 wrote %d\n", BF->filter1[n]);
+    // }
     printf("Initialized BF1, %d slots, %d bytes of memory\n", m, byteSize);
     
+    logdbg("initialize bloom filter 2");
     BF->filter2 = (unsigned int*)malloc( (m/w) * sizeof(unsigned int));
+    printf("Filter 2 address %d\n", BF->filter2);
     if (BF->filter2 == NULL) {
         printf("Memory allocation for Bloom Filter 2 failed!\n");
         exit(0);
     }
-    for (int n = 0; n < m; n++) {
-        BF->filter2[n] = 0;
-    }
+    // for (int n = 0; n < m; n++) {
+    //     BF->filter2[n] = 0;
+    //     printf("Filter 2 wrote %d\n", BF->filter2[n]);
+    //     printf("Filter 2 wrote %d\n", BF->filter2[n]);
+    // }
     printf("Initialized BF2, %d slots, %d bytes of memory\n", m, byteSize);
 
+    logdbg("initialize random seeds");
     //get random seeds for hash functions 
     int* Seeds = (int*)malloc(k * sizeof(int));
     if (Seeds == NULL) {
@@ -78,6 +95,7 @@ struct BloomFilter* bloom_init(int m, int k, int w, int activeFilter, int maxN) 
     }
     BF->Seeds = Seeds;
 
+    logdbg("bloom_init end");
     return BF;
 }
 
@@ -143,15 +161,15 @@ int bloom_check(struct BloomFilter* filter, unsigned char* msg, int msgSize) {
 
 void bloom_add(struct BloomFilter* filter, unsigned char* msg, int msgSize) {
 
-   filter->nMsg += 1;
+    filter->nMsg += 1;
 
-   int k = filter->K;
-   int m = filter->M;
+    int k = filter->K;
+    int m = filter->M;
 
-   // generate hash indices for string
-   unsigned int* indSet = (unsigned int*)malloc(k*sizeof(unsigned int)); // array to hold string hash indices
+    // generate hash indices for string
+    unsigned int* indSet = (unsigned int*)malloc(k*sizeof(unsigned int)); // array to hold string hash indices
    
-   for (int i = 0; i < k; i++){
+    for (int i = 0; i < k; i++){
       unsigned int ind = djb2Hash(msg, filter->Seeds[i], msgSize);
       ind = ind % m;
       // ensure index to set is unique
@@ -164,13 +182,13 @@ void bloom_add(struct BloomFilter* filter, unsigned char* msg, int msgSize) {
                }
          }
          if (indCollision == 1) { // index already taken; try a new one
-               ind = (ind + 1) % m;
+            ind = (ind + 1) % m;
          }
       } while(indCollision == 1);
       
       indSet[i] = ind; // the final index 
       
-   }
+    }
    // indSet array now contains all indices we need to set
    for (int i = 0; i < k; i++) {
       // printf("index %d: %d\n", i+1, indSet[i]);
@@ -204,26 +222,26 @@ void bloom_add(struct BloomFilter* filter, unsigned char* msg, int msgSize) {
       
    }
 
-// switch filters if necessary 
-if (filter->nMsg >= filter->maxN) {
-   if (filter->activeFilter == 1){
-      printf("Freezing filter 1, switching to filter 2\n");
-      // clear filter 2 and set it active
-      for (int i = 0; i < (filter->M)/(filter->W); i++) {
-            filter->filter2[i] = 0;
-      }
-      filter->activeFilter = 2;
-   }
-   else{
-      printf("Freezing filter 2, switching to filter 1\n");
-      // clear filter 1 and set it active
-      for (int i = 0; i < (filter->M)/(filter->W); i++) {
-            filter->filter1[i] = 0;
-      }
-      filter->activeFilter = 1;
-   }
+    // switch filters if necessary 
+    if (filter->nMsg >= filter->maxN) {
+        if (filter->activeFilter == 1){
+            printf("Freezing filter 1, switching to filter 2\n");
+            // clear filter 2 and set it active
+            for (int i = 0; i < (filter->M)/(filter->W); i++) {
+                    filter->filter2[i] = 0;
+            }
+            filter->activeFilter = 2;
+        }
+        else{
+        printf("Freezing filter 2, switching to filter 1\n");
+        // clear filter 1 and set it active
+        for (int i = 0; i < (filter->M)/(filter->W); i++) {
+                filter->filter1[i] = 0;
+        }
+        filter->activeFilter = 1;
+        }
    filter->nMsg = 0;
-}
+    }
 
 }
 
