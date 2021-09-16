@@ -101,8 +101,8 @@
   #define CDPCFG_PIN_LORA_DIO0 26 
   #define CDPCFG_PIN_LORA_RST 14 
   // Oled Display settings 
-  #define CDPCFG_PIN_OLED_CLOCK 22 
-  #define CDPCFG_PIN_OLED_DATA 21 
+  #define CDPCFG_PIN_OLED_CLOCK 21
+  #define CDPCFG_PIN_OLED_DATA 22
   #define CDPCFG_PIN_OLED_RESET 16 
   #define CDPCFG_PIN_OLED_ROTATION U8G2_R0 
   // actualy missing 
@@ -140,7 +140,7 @@
 
 /*
  * BOARD "heltec wireless stick lite"
- * ARDUIONO BOARD PACKAGE URL:
+ * ARDUINO BOARD PACKAGE URL:
  * https://resource.heltec.cn/download/package_heltec_esp32_index.json
  * DOCS:
  * http://www.heltec.cn/project/wireless-stick-lite/
