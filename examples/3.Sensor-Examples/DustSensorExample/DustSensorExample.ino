@@ -28,7 +28,7 @@ const uint8_t SHARP_VO_PIN = 0;    // Sharp Dust/particle analog out pin used fo
 GP2YDustSensor dustSensor(GP2YDustSensorType::GP2Y1010AU0F, SHARP_LED_PIN, SHARP_VO_PIN);
 
 // create a built-in mama duck
-MamaDuck duck = MamaDuck();
+MamaDuck duck;
 
 auto timer = timer_create_default();
 const int INTERVAL_MS = 60000;

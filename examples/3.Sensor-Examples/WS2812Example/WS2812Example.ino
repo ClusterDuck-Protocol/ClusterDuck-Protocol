@@ -30,7 +30,7 @@
 CRGB leds[NUM_LEDS];
 
 
-MamaDuck duck = MamaDuck();
+MamaDuck duck;
 
 auto timer = timer_create_default();
 const int INTERVAL_MS = 60000;

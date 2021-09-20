@@ -24,7 +24,7 @@ Adafruit_BMP085_Unified bmp = Adafruit_BMP085_Unified(10085);
 #endif
 
 // create a built-in mama duck
-MamaDuck duck = MamaDuck();
+MamaDuck duck;
 
 auto timer = timer_create_default();
 const int INTERVAL_MS = 60000;

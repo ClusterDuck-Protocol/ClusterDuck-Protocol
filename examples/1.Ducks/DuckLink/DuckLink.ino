@@ -13,7 +13,7 @@
 #endif
 
 // create a built-in duck link
-DuckLink duck = DuckLink();
+DuckLink duck;
 
 // create a timer with default settings
 auto timer = timer_create_default();

@@ -12,6 +12,9 @@
 static std::vector<byte> ZERO_DUID = {0x00, 0x00, 0x00, 0x00,
                                       0x00, 0x00, 0x00, 0x00};
 
+static std::vector<byte> BROADCAST_DUID = {0xFF, 0xFF, 0xFF, 0xFF,
+                                           0xFF, 0xFF, 0xFF, 0xFF};
+
 /**
  * @brief Encapsulate the protocol packet attributes and operations
  * 

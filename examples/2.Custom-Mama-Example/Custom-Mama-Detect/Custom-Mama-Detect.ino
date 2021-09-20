@@ -19,8 +19,8 @@
 #endif
 
 // create a built-in mama duck
-MamaDuck duck = MamaDuck();
-DuckDetect detect = DuckDetect();
+MamaDuck duck;
+DuckDetect detect;
 
 bool detectOn = false;
 

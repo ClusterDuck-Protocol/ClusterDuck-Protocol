@@ -33,6 +33,25 @@
 #define MAX_DATA_LENGTH (PACKET_LENGTH - HEADER_LENGTH - MAX_PATH_LENGTH)
 #define MAX_PATH_OFFSET (PACKET_LENGTH - DUID_LENGTH - 1)
 
+/*
+Data Section of a broadcast ack (max 180 bytes):
+0 1      8    12...
+| |      |    |
++-+------+----+-...
+|N| DUID |MUID|
++-+------+----+-...
+
+Maximum number of DUID/MUID pairs is:
+  floor( (maximum data payload size - N) / (DUID size + MUID size) )
+Which is:
+  floor( (180 - 1) / 12 ) = 14
+
+N:              1  byte                - Number of DUID/MUID pairs
+Each DUID:     08  byte array          - A Device Unique ID
+Each MUID:     04  byte array          - Message unique ID
+*/
+#define MAX_MUID_PER_ACK 14
+
 // header + 1 hop + 1 byte data
 #define MIN_PACKET_LENGTH (HEADER_LENGTH + DUID_LENGTH + 1)
 
@@ -64,6 +83,7 @@ enum reservedTopic {
   ping = 0x01,
   pong = 0x02,
   gps = 0x03,
+  ack = 0x04,
   max_reserved = 0x0F
 };
 
@@ -86,6 +106,9 @@ DCRC:      04  byte value          - Data section CRC
 DATA:      188 byte array          - Data payload (e.g sensor read, text,...)
 PATH:      048 byte array of DUIDs - Device UIDs having seen this packet - Max is 48 bytes (6 hops)
 */
+
+typedef std::vector<byte> Duid;
+typedef std::vector<byte> Muid;
 
 class CdpPacket {
 public:
@@ -110,7 +133,7 @@ public:
   /// Path section (48 bytes max)
   std::vector<byte> path;
 
-  CdpPacket(std::vector<byte> & buffer) {
+  CdpPacket(const std::vector<byte> & buffer) {
     int buffer_length = buffer.size();
     
     // get path start position

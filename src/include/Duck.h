@@ -1,17 +1,30 @@
 #ifndef DUCK_H
 #define DUCK_H
 
-#include "../DuckError.h"
-#include "DuckNet.h"
-#include "DuckRadio.h"
-#include "DuckTypes.h"
-#include "DuckPacket.h"
-#include "DuckCrypto.h"
-#include "DuckUtils.h"
-#include "cdpcfg.h"
+#include <string>
+
 #include <Arduino.h>
 #include <WString.h>
-#include <string>
+
+class Duck;
+// Since Duck needs to know about DuckNet and DuckNet needs to know about Duck,
+// this forward declaration allows a Duck pointer to be declared in DuckNet.h.
+// Similarly, muidStatus needs to be declared before DuckNet.h is included.
+enum muidStatus {
+  invalid, // The MUID was not given in the correct format.
+  unrecognized, // The MUID was not recognized. The Duck may have forgotten it.
+  not_acked, // The MUID was recognized but not yet ack'd.
+  acked // The MUID was recognized and has been ack'd.
+};
+
+#include "../DuckError.h"
+#include "cdpcfg.h"
+#include "DuckCrypto.h"
+#include "DuckNet.h"
+#include "DuckPacket.h"
+#include "DuckRadio.h"
+#include "DuckTypes.h"
+#include "DuckUtils.h"
 
 class Duck {
 
@@ -22,14 +35,7 @@ public:
    */
   Duck(String name="");
 
-  virtual ~Duck() {
-    if (txPacket != NULL) {
-      delete txPacket;
-    }
-    if (rxPacket != NULL) {
-      delete rxPacket;
-    }
-  }
+  virtual ~Duck();
 
   std::string getCDPVersion() { return duckutils::getCDPVersion(); }
 
@@ -142,9 +148,11 @@ public:
    * @param topic the message topic
    * @param data a string representing the data
    * @param targetDevice the device UID to receive the message (default is no target device)
+   * @param outgoingMuid Output parameter that returns the MUID of the sent packet. NULL is ignored.
    * @return DUCK_ERR_NONE if the data was send successfully, an error code otherwise. 
    */
-  int sendData(byte topic, const String data, const std::vector<byte> targetDevice = ZERO_DUID);
+  int sendData(byte topic, const String data,
+    const std::vector<byte> targetDevice = ZERO_DUID, std::vector<byte> * outgoingMuid = NULL);
 
   /**
    * @brief Sends data into the mesh network.
@@ -152,10 +160,12 @@ public:
    * @param topic the message topic
    * @param data a vector of bytes representing the data to send
    * @param targetDevice the device UID to receive the message (default is no target device)
+   * @param outgoingMuid Output parameter that returns the MUID of the sent packet. NULL is ignored.
    * @return DUCK_ERR_NONE if the data was send successfully, an error code
    otherwise.
    */
-  int sendData(byte topic, std::vector<byte> bytes, const std::vector<byte> targetDevice = ZERO_DUID);
+  int sendData(byte topic, std::vector<byte> bytes,
+    const std::vector<byte> targetDevice = ZERO_DUID, std::vector<byte> * outgoingMuid = NULL);
 
   /**
    * @brief Sends data into the mesh network.
@@ -163,10 +173,12 @@ public:
    * @param topic the message topic
    * @param data a string representing the data to send
    * @param targetDevice the device UID to receive the message (default is no target device)
+   * @param outgoingMuid Output parameter that returns the MUID of the sent packet. NULL is ignored.
    * @return DUCK_ERR_NONE if the data was send successfully, an error code
    * otherwise.
    */
-  int sendData(byte topic, const std::string data, const std::vector<byte> targetDevice = ZERO_DUID);
+  int sendData(byte topic, const std::string data,
+    const std::vector<byte> targetDevice = ZERO_DUID, std::vector<byte> * outgoingMuid = NULL);
 
   /**
    * @brief Sends data into the mesh network.
@@ -175,37 +187,51 @@ public:
    * @param data a byte buffer representing the data to send
    * @param length the length of the byte buffer
    * @param targetDevice the device UID to receive the message (default is no target device)
+   * @param outgoingMuid Output parameter that returns the MUID of the sent packet. NULL is ignored.
    * @return DUCK_ERR_NONE if the data was send successfully, an error code
    * otherwise.
    */
-  int sendData(byte topic, const byte* data, int length, const std::vector<byte> targetDevice = ZERO_DUID);
+  int sendData(byte topic, const byte* data, int length,
+    const std::vector<byte> targetDevice = ZERO_DUID, std::vector<byte> * outgoingMuid = NULL);
+
+  /**
+   * @brief Updates the firmware on the device
+   *
+   * TODO: Additional documentation
+   */
+  void updateFirmware(const String & filename, size_t index, uint8_t* data, size_t len, bool final);
+
+  /**
+   * @brief Get the status of an MUID
+   */
+  muidStatus getMuidStatus(const std::vector<byte> & muid) const;
 
   /**
    * @brief Check wifi connection status
    * 
    * @returns true if device wifi is connected, false otherwise. 
    */
-  bool isWifiConnected() { return duckNet->isWifiConnected(); }
+  bool isWifiConnected();
   /**
    * @brief Check if the give access point is available.
    * 
    * @param ssid access point to check
    * @returns true if the access point is available, false otherwise.
    */
-  bool ssidAvailable(String ssid) { return duckNet->ssidAvailable(ssid); }
+  bool ssidAvailable(String ssid);
 
   /**
    * @brief Get the access point ssid
    * 
    * @returns the wifi access point as a string
    */
-  String getSsid() { return duckNet->getSsid(); }
+  String getSsid();
   /**
    * @brief Get the wifi access point password.
    * 
    * @returns the wifi access point password as a string. 
    */
-  String getPassword() { return duckNet->getPassword(); }
+  String getPassword();
 
   /**
    * @brief Get an error code description.
@@ -255,14 +281,25 @@ public:
   void decrypt(uint8_t* encryptedData, uint8_t* text, size_t inc);
 
 protected:
+  Duck(Duck const&) = delete;
+  Duck& operator=(Duck const&) = delete;
+
   String duckName="";
 
   String deviceId;
   std::vector<byte> duid;
-  DuckRadio* duckRadio = DuckRadio::getInstance();
-  DuckNet* duckNet = DuckNet::getInstance();
+  DuckRadio duckRadio;
+
+  DuckNet * const duckNet;// The pointer itself is never modified, though the
+  // duckNet instance itself can be modified.
+
   DuckPacket* txPacket = NULL;
   DuckPacket* rxPacket = NULL;
+  std::vector<byte> lastMessageMuid;
+
+  bool lastMessageAck = true;
+  // Since this may be used to throttle outgoing packets, start out in a state
+  // that indicates we're not waiting for a ack
 
   /**
    * @brief sends a pong message
@@ -344,12 +381,6 @@ protected:
    * @brief Log an error message if the system's memory is too low.
    */
   static void logIfLowMemory();
-
-  static volatile bool receivedFlag;
-  static void setReceiveFlag(bool value) { receivedFlag = value; }
-  static bool getReceiveFlag() { return receivedFlag; }
-
-  static void onRadioRxTxDone();
 
   static bool imAlive(void*);
   static bool reboot(void*);

@@ -30,7 +30,7 @@
 BluetoothSerial SerialBT;
 
 // create a built-in mama duck
-MamaDuck duck = MamaDuck();
+MamaDuck duck;
 
 char message[32]; 
 int counter = 1;
