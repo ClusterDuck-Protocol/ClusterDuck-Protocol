@@ -74,6 +74,7 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid,
 }
 
 void PapaDuck::run() {
+  Duck::logIfLowMemory();
 
   duckRadio.serviceInterruptFlags();
 

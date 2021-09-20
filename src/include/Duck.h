@@ -377,6 +377,11 @@ protected:
    */
   void handleOtaUpdate();
 
+  /**
+   * @brief Log an error message if the system's memory is too low.
+   */
+  static void logIfLowMemory();
+
   static bool imAlive(void*);
   static bool reboot(void*);
 };

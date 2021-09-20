@@ -7,6 +7,9 @@
 
 #include "include/DuckEsp.h"
 #include "include/DuckNet.h"
+#include "../CdpPacket.h"
+
+const int MEMORY_LOW_THRESHOLD = PACKET_LENGTH + sizeof(CdpPacket);
 
 Duck::Duck(String name):
   duckNet(new DuckNet(this))
@@ -43,6 +46,14 @@ void Duck::encrypt(uint8_t* text, uint8_t* encryptedData, size_t inc) {
 
 void Duck::decrypt(uint8_t* encryptedData, uint8_t* text, size_t inc) {
   duckcrypto::decryptData(encryptedData, text, inc);
+}
+
+void Duck::logIfLowMemory() {
+  if (duckesp::getMinFreeHeap() < MEMORY_LOW_THRESHOLD
+    || duckesp::getMaxAllocHeap() < MEMORY_LOW_THRESHOLD
+  ) {
+    logwarn("WARNING heap memory is low");
+  }
 }
 
 int Duck::setDeviceId(std::vector<byte> id) {
