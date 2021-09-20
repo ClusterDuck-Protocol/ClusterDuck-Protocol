@@ -143,8 +143,9 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
 
   byte* data = packetBytes->data();
   int path_pos = data[PATH_OFFSET_POS];
-  if (path_pos >= packetBytes->size()) {
-    logerr("ERROR path offset out of bound. Data is probably corrupted.");
+  if (path_pos <= DATA_POS || path_pos >= packetBytes->size()) {
+    logerr("ERROR path offset " + String(path_pos) +
+      " out of bound. Data is probably corrupted.");
     return DUCKLORA_ERR_HANDLE_PACKET;
   }
 
