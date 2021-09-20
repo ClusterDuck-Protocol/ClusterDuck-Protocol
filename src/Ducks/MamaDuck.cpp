@@ -44,7 +44,9 @@ int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String 
 }
 
 void MamaDuck::run() {
-
+  
+  Duck::logIfLowMemory();
+  
   handleOtaUpdate();
   if (getReceiveFlag()) {
     duckutils::setInterrupt(false);

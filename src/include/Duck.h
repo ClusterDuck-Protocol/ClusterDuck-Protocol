@@ -340,6 +340,11 @@ protected:
    */
   void handleOtaUpdate();
 
+  /**
+   * @brief Log an error message if the system's memory is too low.
+   */
+  static void logIfLowMemory();
+
   static volatile bool receivedFlag;
   static void setReceiveFlag(bool value) { receivedFlag = value; }
   static bool getReceiveFlag() { return receivedFlag; }
