@@ -26,7 +26,7 @@
 #define LORA_RST_PIN 14
 
 // Use pre-built papa duck
-PapaDuck duck = PapaDuck();
+PapaDuck duck;
 
 DuckDisplay* display = NULL;
 

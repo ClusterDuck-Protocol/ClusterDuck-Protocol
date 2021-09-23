@@ -6,15 +6,11 @@
 namespace duckutils {
 
   namespace {
-    std::string cdpVersion = "2.9.14";
+    std::string cdpVersion = "2.10.0";
   }
 
-volatile bool interruptEnabled = true;
 Timer<> duckTimer = timer_create_default();
 bool detectState = false;
-
-bool isInterruptEnabled() { return interruptEnabled; }
-void setInterrupt(bool enable) { interruptEnabled = enable; }
 
 std::string getCDPVersion() {
   return cdpVersion;
@@ -66,7 +62,7 @@ String convertToHex(byte* data, int size) {
   return buf;
 }
 
-uint32_t toUnit32(byte* data) {
+uint32_t toUnit32(const byte* data) {
     uint32_t value = 0;
 
     value |= data[0] << 24;

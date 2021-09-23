@@ -28,7 +28,7 @@
 DHT dht(DHTPIN, DHTTYPE);
 
 // create a built-in mama duck
-MamaDuck duck = MamaDuck();
+MamaDuck duck;
 
 auto timer = timer_create_default();
 const int INTERVAL_MS = 10000;

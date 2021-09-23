@@ -43,7 +43,11 @@ int DuckLink::setupWithDefaults(std::vector<byte> deviceId, String ssid,
 }
 
 void DuckLink::run() {
-  duckRadio->processRadioIrq();
+  Duck::logIfLowMemory();
+
+  // TODO(rolsen): duckRadio.serviceInterruptFlags();
+  duckRadio.processRadioIrq();
+
   handleOtaUpdate();
   processPortalRequest();
 }

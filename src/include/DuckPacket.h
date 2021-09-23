@@ -13,6 +13,9 @@
 static std::vector<byte> ZERO_DUID = {0x00, 0x00, 0x00, 0x00,
                                       0x00, 0x00, 0x00, 0x00};
 
+static std::vector<byte> BROADCAST_DUID = {0xFF, 0xFF, 0xFF, 0xFF,
+                                           0xFF, 0xFF, 0xFF, 0xFF};
+
 /**
  * @brief Encapsulate the protocol packet attributes and operations
  * 
@@ -59,7 +62,7 @@ public:
      * @returns true if the packet needs to be relayed
      * @returns false if the packet does not need to be replayed
      */
-    bool prepareForRelaying(BloomFilter *filter, std::vector<byte> dataBuffer);
+    bool prepareForRelaying(BloomFilter *filter, std::vector<byte> duid, std::vector<byte> dataBuffer);
     
     /**
      * @brief Get the Cdp Packet byte vector.

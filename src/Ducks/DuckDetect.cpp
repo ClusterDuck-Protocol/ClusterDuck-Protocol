@@ -44,15 +44,13 @@ int DuckDetect::setupWithDefaults(std::vector<byte> deviceId, String ssid,
 }
 
 void DuckDetect::run() {
+  Duck::logIfLowMemory();
+
+  duckRadio.serviceInterruptFlags();
+
   handleOtaUpdate();
-  if (getReceiveFlag()) {
-    setReceiveFlag(false);
-    duckutils::setInterrupt(false);
-
+  if (DuckRadio::getReceiveFlag()) {
     handleReceivedPacket();
-
-    duckutils::setInterrupt(true);
-    startReceive();
   }
 }
 
@@ -61,7 +59,7 @@ void DuckDetect::handleReceivedPacket() {
   loginfo("handleReceivedPacket()...");
 
   std::vector<byte> data;
-  int err = duckRadio->readReceivedData(&data);
+  int err = duckRadio.readReceivedData(&data);
 
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR Failed to get data from DuckRadio. rc = " + String(err));
@@ -70,7 +68,7 @@ void DuckDetect::handleReceivedPacket() {
 
   if (data[TOPIC_POS] == reservedTopic::pong) {
     logdbg("run() - got ping response!");
-    rssiCb(duckRadio->getRSSI());
+    rssiCb(duckRadio.getRSSI());
   }
 }
 
@@ -80,9 +78,9 @@ void DuckDetect::sendPing(bool startReceive) {
   err = txPacket->prepareForSending(ZERO_DUID, DuckType::DETECTOR, reservedTopic::ping, data);
 
   if (err == DUCK_ERR_NONE) {
-    err = duckRadio->sendData(txPacket->getBuffer());
+    err = duckRadio.sendData(txPacket->getBuffer());
     if (startReceive) {
-      duckRadio->startReceive();
+      duckRadio.startReceive();
     }
     if (err != DUCK_ERR_NONE) {
       logerr("ERROR Failed to ping, err = " + String(err));

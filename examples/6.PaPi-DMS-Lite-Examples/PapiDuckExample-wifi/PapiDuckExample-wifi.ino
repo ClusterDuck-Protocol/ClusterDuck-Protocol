@@ -30,7 +30,7 @@
 
 
 // Use pre-built papa duck.
-PapaDuck duck = PapaDuck();
+PapaDuck duck;
 
 // create a timer with default settings
 auto timer = timer_create_default();
@@ -105,7 +105,7 @@ void callback(char* topic, byte* message, unsigned int length) {
  */
 void reconnect() {
   while (!mqttClient.connected()) {
-    Serial.print("[PAPI] Attempting MQTT connection...");
+    Serial.println("[PAPI] Attempting MQTT connection...");
     if (mqttClient.connect("ESP32Client")) {
       Serial.println("[PAPI] connected");
       mqttClient.subscribe("status");

@@ -22,7 +22,7 @@
 #endif
 
 // create an instance of a built-in Duck Detector
-DuckDetect duck = DuckDetect();
+DuckDetect duck;
 
 // Create a timer with default settings
 auto timer = timer_create_default();
