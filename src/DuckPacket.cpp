@@ -41,7 +41,9 @@ bool DuckPacket::prepareForRelaying(BloomFilter *filter, std::vector<byte> dataB
   
 }
 
-int DuckPacket::prepareForSending(std::vector<byte> targetDevice, byte duckType, byte topic, std::vector<byte> app_data) {
+int DuckPacket::prepareForSending(BloomFilter *filter,
+                                  std::vector<byte> targetDevice, byte duckType,
+                                  byte topic, std::vector<byte> app_data) {
 
   std::vector<uint8_t> encryptedData;
   uint8_t app_data_length = app_data.size();

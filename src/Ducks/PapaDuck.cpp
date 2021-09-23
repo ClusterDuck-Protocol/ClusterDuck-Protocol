@@ -186,7 +186,7 @@ void PapaDuck::broadcastAck() {
     dataPayload.insert(dataPayload.end(), muid.begin(), muid.end());
   }
 
-  int err = txPacket->prepareForSending(BROADCAST_DUID, DuckType::PAPA,
+  int err = txPacket->prepareForSending(filter, BROADCAST_DUID, DuckType::PAPA,
     reservedTopic::ack, dataPayload);
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR handleReceivedPacket. Failed to prepare ack. Error: " +
