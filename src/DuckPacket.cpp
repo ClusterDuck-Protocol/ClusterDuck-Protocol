@@ -22,13 +22,12 @@ bool DuckPacket::prepareForRelaying(BloomFilter *filter, std::vector<byte> dataB
   //TODO: Add backwards compatibility
 
   // Query the existence of strings
-  // bool alreadySeen = filter->contains(&dataBuffer[MUID_POS], MUID_LENGTH);
-  bool alreadySeen = bloom_check(filter, &dataBuffer[MUID_POS], MUID_LENGTH);
+  bool alreadySeen = filter->bloom_check(&dataBuffer[MUID_POS], MUID_LENGTH);
   if (alreadySeen) {
     logdbg("handleReceivedPacket: Packet already seen. No relay.");
     return false;
   } else {
-    bloom_add(filter, &dataBuffer[MUID_POS], MUID_LENGTH);
+    filter->bloom_add(&dataBuffer[MUID_POS], MUID_LENGTH);
     logdbg("handleReceivedPacket: Relaying packet: "  + duckutils::convertToHex(&dataBuffer[MUID_POS], MUID_LENGTH));
   }
 
@@ -46,7 +45,7 @@ void DuckPacket::getUniqueMessageId(BloomFilter * filter, byte message_id[MUID_L
   bool getNewUnique = true;
   while (getNewUnique) {
     duckutils::getRandomBytes(MUID_LENGTH, message_id);
-    getNewUnique = bloom_check(filter, message_id, MUID_LENGTH);
+    getNewUnique = filter->bloom_check(message_id, MUID_LENGTH);
     loginfo("prepareForSending: new MUID");
   }
 }

@@ -1,31 +1,51 @@
+#ifndef BLOOM_FILTER_H
+#define BLOOM_FILTER_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
 #include <math.h>
 
+// two-phase bloom filter
+class BloomFilter {
+private:
 
-struct BloomFilter;
+  unsigned int* filter1;
+  unsigned int* filter2;
+  int activeFilter; // 1 or 2 
+  int M; // power of 2
+  int K;  
+  int W; // power of 2 (less than M)
+  int nMsg;
+  int maxN;
+  int* Seeds;
 
+  static unsigned int djb2Hash(unsigned char* str, int seed, int msgSize);
 
-/**
-* @brief Initialize a bloom filter
-* 
-* @param m, The Bloom filter size
-* @param k, The number of hash functions
-* @param w, The number of slots per array entry
-* @param maxN, The maximum number of messages until the next filter is used.
-* 
-* @returns An initialized Bloom filter, to be owned by the caller
-*/
-struct BloomFilter * bloom_init(int m, int k, int w, int maxN);
+public:
 
-/**
- * @return 1 if we (possibly) found word; for a new word returns 0
- */
-int bloom_check(struct BloomFilter* filter, unsigned char* msg, int msgSize);
+  friend class BloomFilterTester;
 
-void bloom_add(struct BloomFilter* filter, unsigned char* msg, int msgSize);
+  /**
+  * @brief Initialize a bloom filter
+  * 
+  * @param m, The Bloom filter size
+  * @param k, The number of hash functions
+  * @param w, The number of slots per array entry
+  * @param maxN, The maximum number of messages until the next filter is used.
+  */
+  BloomFilter(int m, int k, int w, int maxN);
 
-unsigned int djb2Hash(unsigned char* str, int seed, int msgSize);
+  ~BloomFilter();
 
+  /**
+   * @return 1 if we (possibly) found word; for a new word returns 0
+   */
+  int bloom_check(unsigned char* msg, int msgSize);
+
+  void bloom_add(unsigned char* msg, int msgSize);
+
+};
+
+#endif

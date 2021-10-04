@@ -1,7 +1,10 @@
 #ifndef DUCKLOGGER_H
 #define DUCKLOGGER_H
 
+#ifndef CDP_NO_LOG
+#include "Arduino.h"
 #define CDP_DEBUG
+#endif
 
 #ifdef CDP_DEBUG
 #define CDP_LOG_ERROR
