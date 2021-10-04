@@ -230,12 +230,12 @@ void bloom_add(struct BloomFilter* filter, unsigned char* msg, int msgSize) {
             filter->activeFilter = 2;
         }
         else{
-        printf("Freezing filter 2, switching to filter 1\n");
-        // clear filter 1 and set it active
-        for (int i = 0; i < (filter->M)/(filter->W); i++) {
-                filter->filter1[i] = 0;
-        }
-        filter->activeFilter = 1;
+            printf("Freezing filter 2, switching to filter 1\n");
+            // clear filter 1 and set it active
+            for (int i = 0; i < (filter->M)/(filter->W); i++) {
+                    filter->filter1[i] = 0;
+            }
+            filter->activeFilter = 1;
         }
    filter->nMsg = 0;
     }
