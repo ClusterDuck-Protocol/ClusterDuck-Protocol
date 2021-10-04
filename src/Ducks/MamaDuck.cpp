@@ -39,12 +39,6 @@ int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String 
     return err;
   }
 
-  err = setupMessageRouting();
-  if(err != DUCK_ERR_NONE) {
-    logerr("ERROR setupWithDefaults rc = " + String(err));
-    return err;
-  }
-
   duckutils::getTimer().every(CDPCFG_MILLIS_ALIVE, imAlive);
 
   return DUCK_ERR_NONE;

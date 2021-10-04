@@ -17,6 +17,8 @@ Duck::Duck(String name):
   duckNet(new DuckNet(this))
 {
   duckName = name;
+
+  filter = bloom_init(16, 2, 4, 8);
 }
 
 Duck::~Duck() {

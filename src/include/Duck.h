@@ -37,17 +37,6 @@ public:
 
   virtual ~Duck();
 
-    /**
-   * @brief Setup message Rrouting parameters and instanciates router
-   * @returns DUCK_ERROR_NONE if successful, an error code otherwise.
-   */
-  int setupMessageRouting() {
-    //Instantiate Bloom Filter
-    logdbg("bloom_init call");
-    filter = bloom_init(16, 2, 4, 8);
-    return DUCK_ERR_NONE;
-  }
-
   std::string getCDPVersion() { return duckutils::getCDPVersion(); }
 
   /**
