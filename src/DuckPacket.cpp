@@ -100,11 +100,6 @@ int DuckPacket::prepareForSending(BloomFilter *filter,
   buffer.insert(buffer.end(), topic);
   logdbg("Topic:     " + duckutils::convertToHex(buffer.data(), buffer.size()));
 
-  // path offset
-  byte offset = HEADER_LENGTH + app_data_length;
-  buffer.insert(buffer.end(), offset);
-  logdbg("Offset:    " + duckutils::convertToHex(buffer.data(), buffer.size()));
-
   // duckType
   buffer.insert(buffer.end(), duckType);
   logdbg("duck type: " + duckutils::convertToHex(buffer.data(), buffer.size()));
