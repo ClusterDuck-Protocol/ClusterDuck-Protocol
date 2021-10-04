@@ -87,6 +87,8 @@ public:
     std::vector<byte> duid;
     std::vector<byte> buffer;
 
+    static void getUniqueMessageId(BloomFilter * filter, byte message_id[MUID_LENGTH]);
+
 };
 
 #endif

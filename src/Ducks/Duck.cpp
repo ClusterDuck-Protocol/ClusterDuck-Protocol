@@ -289,6 +289,10 @@ int Duck::sendData(byte topic, std::vector<byte> data,
 
   CdpPacket packet = CdpPacket(txPacket->getBuffer());
 
+  if (err == DUCK_ERR_NONE) {
+    bloom_add(filter, packet.muid.data(), MUID_LENGTH);
+  }
+
   if (!lastMessageAck) {
     loginfo("Previous `lastMessageMuid` " + duckutils::toString(lastMessageMuid) +
       " was not acked. Overwriting `lastMessageMuid` with " +

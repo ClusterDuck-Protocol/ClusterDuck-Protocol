@@ -24,7 +24,7 @@ bool DuckPacket::prepareForRelaying(BloomFilter *filter, std::vector<byte> dataB
   // Query the existence of strings
   // bool alreadySeen = filter->contains(&dataBuffer[MUID_POS], MUID_LENGTH);
   bool alreadySeen = bloom_check(filter, &dataBuffer[MUID_POS], MUID_LENGTH);
-  if (!alreadySeen) {
+  if (alreadySeen) {
     logdbg("handleReceivedPacket: Packet already seen. No relay.");
     return false;
   } else {
@@ -39,6 +39,16 @@ bool DuckPacket::prepareForRelaying(BloomFilter *filter, std::vector<byte> dataB
   return true;
   
   
+}
+
+void DuckPacket::getUniqueMessageId(BloomFilter * filter, byte message_id[MUID_LENGTH]) {
+
+  bool getNewUnique = true;
+  while (getNewUnique) {
+    duckutils::getRandomBytes(MUID_LENGTH, message_id);
+    getNewUnique = bloom_check(filter, message_id, MUID_LENGTH);
+    loginfo("prepareForSending: new MUID");
+  }
 }
 
 int DuckPacket::prepareForSending(BloomFilter *filter,
@@ -58,14 +68,7 @@ int DuckPacket::prepareForSending(BloomFilter *filter,
           " TOPIC: " + String(topic));
 
   byte message_id[MUID_LENGTH];
-  // bool getNewUnique = true;
-  // while (getNewUnique) {
-  duckutils::getRandomBytes(MUID_LENGTH, message_id);
-  //   getNewUnique = bloom_check(filter, message_id, MUID_LENGTH);
-  // }
-  // TODO: Ensure the message has been sent before adding to bloom filter. I.e.
-  // move this to Duck::sendData().
-  // bloom_add(filter, message_id, MUID_LENGTH);
+  getUniqueMessageId(filter, message_id);
 
   byte crc_bytes[DATA_CRC_LENGTH];
   uint32_t value;

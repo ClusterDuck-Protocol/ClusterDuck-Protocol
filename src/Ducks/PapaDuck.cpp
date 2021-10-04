@@ -194,7 +194,11 @@ void PapaDuck::broadcastAck() {
   }
 
   err = duckRadio.sendData(txPacket->getBuffer());
-  if (err != DUCK_ERR_NONE) {
+
+  if (err == DUCK_ERR_NONE) {
+    CdpPacket packet = CdpPacket(txPacket->getBuffer());
+    bloom_add(filter, packet.muid.data(), MUID_LENGTH);
+  } else {
     logerr("ERROR handleReceivedPacket. Failed to send ack. Error: " +
       String(err));
   }
