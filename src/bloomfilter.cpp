@@ -1,3 +1,5 @@
+#include <memory>
+
 #include "Arduino.h"
 #include "include/bloomfilter.h"
 #include "DuckLogger.h"
@@ -102,7 +104,7 @@ int bloom_check(struct BloomFilter* filter, unsigned char* msg, int msgSize) {
     int k = filter->K;
 
     // generate hash indices for string
-    unsigned int* indSet = new unsigned int[k]; // array to hold string hash indices
+    std::unique_ptr<unsigned int[]> indSet(new unsigned int[k]); // array to hold string hash indices
     // TODO: Deallocate indSet using RAII, or allocate it in bloom_init
     
     for (int i = 0; i < k; i++){
@@ -164,7 +166,7 @@ void bloom_add(struct BloomFilter* filter, unsigned char* msg, int msgSize) {
     int m = filter->M;
 
     // generate hash indices for string
-    unsigned int* indSet = new unsigned int[k]; // array to hold string hash indices
+    std::unique_ptr<unsigned int[]> indSet(new unsigned int[k]); // array to hold string hash indices
     // TODO: Deallocate indSet using RAII, or allocate it in bloom_init
    
     for (int i = 0; i < k; i++){
