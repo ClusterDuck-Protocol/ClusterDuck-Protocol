@@ -19,7 +19,12 @@ struct BloomFilter;
 * @returns An initialized Bloom filter, to be owned by the caller
 */
 struct BloomFilter * bloom_init(int m, int k, int w, int maxN);
+
+/**
+ * @return 1 if we (possibly) found word; for a new word returns 0
+ */
 int bloom_check(struct BloomFilter* filter, unsigned char* msg, int msgSize);
+
 void bloom_add(struct BloomFilter* filter, unsigned char* msg, int msgSize);
 
 unsigned int djb2Hash(unsigned char* str, int seed, int msgSize);

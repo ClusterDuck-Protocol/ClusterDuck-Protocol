@@ -97,7 +97,6 @@ struct BloomFilter* bloom_init(int m, int k, int w, int maxN) {
     return BF;
 }
 
-// returns 1 if we (possibly) found word; for a new word returns 0
 int bloom_check(struct BloomFilter* filter, unsigned char* msg, int msgSize) {
 
     int m = filter->M;
