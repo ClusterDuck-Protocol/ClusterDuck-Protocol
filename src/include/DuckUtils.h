@@ -13,9 +13,10 @@
 #include "cdpcfg.h"
 #include "arduino-timer.h"
 #include <Arduino.h>
+#include <vector>
 #include <string>
 #include <WString.h>
-#include <vector>
+
 
 namespace duckutils {
 
