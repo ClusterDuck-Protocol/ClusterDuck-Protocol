@@ -15,6 +15,7 @@
 #include <Arduino.h>
 #include <string>
 #include <WString.h>
+#include <vector>
 
 namespace duckutils {
 
@@ -56,7 +57,7 @@ String convertToHex(byte* data, int size);
  * 
  */
 template<typename T>
-String toString(const std::vector<byte> & vec) {
+String toString(const std::vector<T> & vec) {
   return std::string(vec.begin(), vec.end()).c_str();
 }
 
