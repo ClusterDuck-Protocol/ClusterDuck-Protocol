@@ -114,12 +114,6 @@ private:
   /**
    * @brief Set the Duck to be ready to transmit packets.
    *
-   * @returns DUCK_ERR_NONE if the call was successful, an error code otherwise.
-   */
-  int startTransmitData();
-  /**
-   * @brief Set the Duck to be ready to transmit packets.
-   *
    * @param data data to transmit
    * @param length data length in bytes
    * @returns DUCK_ERR_NONE if the call was successful, an error code otherwise.
