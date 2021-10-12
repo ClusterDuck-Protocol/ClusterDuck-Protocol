@@ -38,6 +38,7 @@ int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String 
     logerr("ERROR setupWithDefaults rc = " + String(err));
     return err;
   }
+
   duckutils::getTimer().every(CDPCFG_MILLIS_ALIVE, imAlive);
 
   return DUCK_ERR_NONE;
@@ -70,7 +71,7 @@ void MamaDuck::handleReceivedPacket() {
   }
   logdbg("Got data from radio, prepare for relay. size: "+ String(data.size()));
 
-  relay = rxPacket->prepareForRelaying(duid, data);
+  relay = rxPacket->prepareForRelaying(&filter, data);
   if (relay) {
     loginfo("handleReceivedPacket: packet RELAY START");
     // NOTE:
