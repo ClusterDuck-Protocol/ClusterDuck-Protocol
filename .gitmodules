@@ -57,3 +57,6 @@
 [submodule "Libraries/TinyGPSPlus"]
 	path = Libraries/TinyGPSPlus
 	url = https://github.com/mikalhart/TinyGPSPlus.git
+[submodule "Libraries/ArduinoSTL"]
+	path = Libraries/ArduinoSTL
+	url = https://github.com/mike-matera/ArduinoSTL.git
