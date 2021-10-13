@@ -15,8 +15,7 @@
 #include <Arduino.h>
 #include <string>
 #include <WString.h>
-#include <StandardCplusplus.h>
-#include <vector>
+#include "ArduinoSTL.h"
 
 namespace duckutils {
 
@@ -58,7 +57,7 @@ String convertToHex(byte* data, int size);
  * 
  */
 template<typename T>
-String toString(const std::vector<T> & vec) {
+String toString(const vector<T> & vec) {
   return std::string(vec.begin(), vec.end()).c_str();
 }
 
@@ -70,7 +69,7 @@ String toString(const std::vector<T> & vec) {
  * @returns True if a and b have the same size and contents, false if not.
  */
 template<typename T>
-bool isEqual(const std::vector<T> & a, const std::vector<T> & b) {
+bool isEqual(const vector<T> & a, const vector<T> & b) {
   if (a.size() != b.size()) {
     return false;
   }
