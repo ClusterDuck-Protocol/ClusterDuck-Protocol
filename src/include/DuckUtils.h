@@ -15,7 +15,8 @@
 #include <Arduino.h>
 #include <string>
 #include <WString.h>
-#include "ArduinoSTL.h"
+#include <StandardCplusplus.h>
+#include <vector>
 
 namespace duckutils {
 

@@ -60,3 +60,6 @@
 [submodule "Libraries/ArduinoSTL"]
 	path = Libraries/ArduinoSTL
 	url = https://github.com/mike-matera/ArduinoSTL.git
+[submodule "Libraries/StandardCplusplus"]
+	path = Libraries/StandardCplusplus
+	url = https://github.com/maniacbug/StandardCplusplus.git
