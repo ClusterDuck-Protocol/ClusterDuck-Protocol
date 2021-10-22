@@ -36,6 +36,7 @@ before_install:
   - arduino-cli lib install --git-url https://github.com/luciansabo/GP2YDustSensor.git
   - arduino-cli lib install --git-url https://github.com/adafruit/DHT-sensor-library
   - arduino-cli lib install --git-url https://github.com/adafruit/Adafruit_BMP280_Library
+  - arduino-cli lib install --git-url https://github.com/adafruit/Adafruit_BusIO
   - arduino-cli lib install --git-url https://github.com/miguel5612/MQSensorsLib.git
   - arduino-cli lib install --git-url https://github.com/FastLED/FastLED.git
   - arduino-cli lib install --git-url https://github.com/mikalhart/IridiumSBD.git
