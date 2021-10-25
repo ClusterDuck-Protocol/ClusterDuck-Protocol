@@ -57,3 +57,6 @@
 [submodule "Libraries/TinyGPSPlus"]
 	path = Libraries/TinyGPSPlus
 	url = https://github.com/mikalhart/TinyGPSPlus.git
+[submodule "Libraries/Adafruit_BusIO"]
+	path = Libraries/Adafruit_BusIO
+	url = https://github.com/adafruit/Adafruit_BusIO
