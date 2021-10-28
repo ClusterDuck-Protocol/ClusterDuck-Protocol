@@ -56,7 +56,7 @@ public:
 int main() {
   const int NUM_SECTORS = 16;
   const int NUM_HASH_FUNCS = 2;
-  const int BITS_PER_SECTOR = 4;
+  const int BITS_PER_SECTOR = 32;
   const int MAX_MESSAGES = 8;
   BloomFilter filter = BloomFilter(NUM_SECTORS, NUM_HASH_FUNCS,
     BITS_PER_SECTOR, MAX_MESSAGES);
