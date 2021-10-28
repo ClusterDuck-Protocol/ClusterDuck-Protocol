@@ -54,12 +54,12 @@ public:
 };
 
 int main() {
-  const int FILTER_SIZE = 16;
+  const int NUM_SECTORS = 16;
   const int NUM_HASH_FUNCS = 2;
-  const int NUM_SLOTS_PER_ARRAY = 4;
+  const int BITS_PER_SECTOR = 4;
   const int MAX_MESSAGES = 8;
-  BloomFilter filter = BloomFilter(FILTER_SIZE, NUM_HASH_FUNCS,
-    NUM_SLOTS_PER_ARRAY, MAX_MESSAGES);
+  BloomFilter filter = BloomFilter(NUM_SECTORS, NUM_HASH_FUNCS,
+    BITS_PER_SECTOR, MAX_MESSAGES);
 
   const int SEED_0 = 0;
   const int SEED_1 = 1;
@@ -69,7 +69,7 @@ int main() {
   assert(BloomFilterTester::activeFilter(filter) == 1);
   assert(BloomFilterTester::nMsg(filter) == 0);
   unsigned int * filter1 = BloomFilterTester::filter1(filter);
-  for (int i = 0; i < FILTER_SIZE; i++) {
+  for (int i = 0; i < NUM_SECTORS; i++) {
     assert(filter1[i] == 0);
   }
 
