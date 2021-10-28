@@ -6,6 +6,7 @@
 #include <time.h>
 #include <string.h>
 #include <math.h>
+#include <memory>
 
 // two-phase bloom filter
 class BloomFilter {
@@ -14,14 +15,33 @@ private:
   unsigned int* filter1;
   unsigned int* filter2;
   int activeFilter; // 1 or 2 
-  int M; // power of 2
-  int K;  
-  int W; // power of 2 (less than M)
+  int numSectors; // power of 2
+  int numHashes;  
+  int bitsPerSector; //power of 2, smaller than numSectors
   int nMsg;
-  int maxN;
+  int maxMsgs;
   int* Seeds;
 
   static unsigned int djb2Hash(unsigned char* str, int seed, int msgSize);
+
+  /**
+   * Generates a unique unsigned int index for each hash
+   * 
+   * @param msg, The message being hashed and converted into an index
+   * @param msgSize, The size of msg
+   * @param hashResults, Output as the bit index within the filter
+   */
+  void set_hash_results(unsigned char* msg, int msgSize,
+    std::unique_ptr<unsigned int[]> & hashResults);
+
+  void set_sectors_and_slots(const std::unique_ptr<unsigned int[]> & hashResults,
+    std::unique_ptr<int[]> & sectors, std::unique_ptr<unsigned int[]> & slots
+  );
+
+  int is_collision(const unsigned int* filter,
+    const std::unique_ptr<int[]> & sectors,
+    const std::unique_ptr<unsigned int[]> & slots
+  );
 
 public:
 
@@ -30,12 +50,12 @@ public:
   /**
   * @brief Initialize a bloom filter
   * 
-  * @param m, The Bloom filter size
-  * @param k, The number of hash functions
-  * @param w, The number of slots per array entry
-  * @param maxN, The maximum number of messages until the next filter is used.
+  * @param numSectors, The number of sectors in filter
+  * @param numHashes, The number of hash functions
+  * @param bitsPerSector, The size of a sector in bits
+  * @param maxMsgs, The maximum number of messages until the next filter is used.
   */
-  BloomFilter(int m, int k, int w, int maxN);
+  BloomFilter(int numSectors, int numHashes, int bitsPerSector, int maxMsgs);
 
   ~BloomFilter();
 
