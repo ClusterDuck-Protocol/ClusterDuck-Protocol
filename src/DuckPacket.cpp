@@ -56,7 +56,14 @@ int DuckPacket::prepareForSending(std::vector<byte> targetDevice, byte duckType,
           " TOPIC: " + String(topic));
 
   byte message_id[MUID_LENGTH];
+  // bool getNewUnique = true;
+  // while (getNewUnique) {
   duckutils::getRandomBytes(MUID_LENGTH, message_id);
+  //   getNewUnique = bloom_check(filter, message_id, MUID_LENGTH);
+  // }
+  // TODO: Ensure the message has been sent before adding to bloom filter. I.e.
+  // move this to Duck::sendData().
+  // bloom_add(filter, message_id, MUID_LENGTH);
 
   byte crc_bytes[DATA_CRC_LENGTH];
   uint32_t value;

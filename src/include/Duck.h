@@ -39,7 +39,7 @@ public:
   int setupMessageRouting() {
     //Instantiate Bloom Filter
     logdbg("bloom_init call");
-    filter = bloom_init(16, 2, 4, 1, 8);
+    filter = bloom_init(16, 2, 4, 8);
     return DUCK_ERR_NONE;
   }
 
