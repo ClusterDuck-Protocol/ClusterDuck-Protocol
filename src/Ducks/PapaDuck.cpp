@@ -74,25 +74,29 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid,
 }
 
 void PapaDuck::run() {
+  Duck::logIfLowMemory();
+
+  duckRadio.serviceInterruptFlags();
 
   handleOtaUpdate();
-  if (getReceiveFlag()) {
-    duckutils::setInterrupt(false);
-    setReceiveFlag(false);
-
+  if (DuckRadio::getReceiveFlag()) {
     handleReceivedPacket();
-    rxPacket->reset();
-    
-    duckutils::setInterrupt(true);
-    startReceive();
+    rxPacket->reset(); // TODO(rolsen): Make rxPacket local to handleReceivedPacket
   }
+
+  // TODO(rolsen): Enforce mutually exclusive access to duckRadio.
+  // ackTimer.tick() calls broadcastAck, which calls duckRadio. Since duckRadio
+  // is a shared resource, we should synchronize everything in ackTimer.tick()
+  // so the thread in AsyncWebServer cannot modify duckRadio while broadcastAck
+  // is also modifying duckRadio.
+  ackTimer.tick();
 }
 
 void PapaDuck::handleReceivedPacket() {
 
   loginfo("handleReceivedPacket() START");
   std::vector<byte> data;
-  int err = duckRadio->readReceivedData(&data);
+  int err = duckRadio.readReceivedData(&data);
 
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR handleReceivedPacket. Failed to get data. rc = " +
@@ -105,15 +109,101 @@ void PapaDuck::handleReceivedPacket() {
     return;
   }
   // build our RX DuckPacket which holds the updated path in case the packet is relayed
-  bool relay = rxPacket->prepareForRelaying(filter, data);
+  bool relay = rxPacket->prepareForRelaying(&filter, data);
   if (relay) {
     logdbg("relaying:  " +
       duckutils::convertToHex(rxPacket->getBuffer().data(),
         rxPacket->getBuffer().size()));
     loginfo("invoking callback in the duck application...");
     recvDataCallback(rxPacket->getBuffer());
+
+    if (acksEnabled) {
+      const CdpPacket packet = CdpPacket(rxPacket->getBuffer());
+      if (needsAck(packet)) {
+        handleAck(packet);
+      }
+    }
+
     loginfo("handleReceivedPacket() DONE");
   }
+}
+
+void PapaDuck::handleAck(const CdpPacket & packet) {
+  if (ackTimer.empty()) {
+    logdbg("Starting new ack broadcast timer with a delay of " +
+      String(timerDelay) + " ms");
+    ackTimer.in(timerDelay, ackHandler, this);
+  }
+
+  storeForAck(packet);
+
+  if (ackBufferIsFull()) {
+    logdbg("Ack buffer is full. Sending broadcast ack immediately.");
+    ackTimer.cancel();
+    broadcastAck();
+  }
+}
+
+void PapaDuck::enableAcks(bool enable) {
+  acksEnabled = enable;
+}
+
+bool PapaDuck::ackHandler(PapaDuck * duck)
+{
+  duck->broadcastAck();
+  return false;
+}
+
+void PapaDuck::storeForAck(const CdpPacket & packet) {
+  ackStore.push_back(std::pair<Duid, Muid>(packet.sduid, packet.muid));
+}
+
+bool PapaDuck::ackBufferIsFull() {
+  return (ackStore.size() >= MAX_MUID_PER_ACK);
+}
+
+bool PapaDuck::needsAck(const CdpPacket & packet) {
+  if (packet.topic == reservedTopic::ack) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+void PapaDuck::broadcastAck() {
+  assert(ackStore.size() <= MAX_MUID_PER_ACK);
+
+  const byte num = static_cast<byte>(ackStore.size());
+
+  std::vector<byte> dataPayload;
+  dataPayload.push_back(num);
+  for (int i = 0; i < num; i++) {
+    Duid duid = ackStore[i].first;
+    Muid muid = ackStore[i].second;
+    logdbg("Sending ack to DUID " + duckutils::toString(duid)
+      + " for MUID " + duckutils::toString(muid));
+    dataPayload.insert(dataPayload.end(), duid.begin(), duid.end());
+    dataPayload.insert(dataPayload.end(), muid.begin(), muid.end());
+  }
+
+  int err = txPacket->prepareForSending(&filter, BROADCAST_DUID, DuckType::PAPA,
+    reservedTopic::ack, dataPayload);
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR handleReceivedPacket. Failed to prepare ack. Error: " +
+      String(err));
+  }
+
+  err = duckRadio.sendData(txPacket->getBuffer());
+
+  if (err == DUCK_ERR_NONE) {
+    CdpPacket packet = CdpPacket(txPacket->getBuffer());
+    filter.bloom_add(packet.muid.data(), MUID_LENGTH);
+  } else {
+    logerr("ERROR handleReceivedPacket. Failed to send ack. Error: " +
+      String(err));
+  }
+
+  ackStore.clear();
 }
 
 int PapaDuck::reconnectWifi(String ssid, String password) {

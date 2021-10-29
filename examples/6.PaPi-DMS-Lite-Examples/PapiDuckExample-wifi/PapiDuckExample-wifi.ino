@@ -30,7 +30,7 @@
 
 
 // Use pre-built papa duck.
-PapaDuck duck = PapaDuck();
+PapaDuck duck;
 
 // create a timer with default settings
 auto timer = timer_create_default();

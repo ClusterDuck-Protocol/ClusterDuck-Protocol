@@ -13,30 +13,31 @@
 
 #pragma once
 
-#include "cdpcfg.h"
 #include <WString.h>
+
+#include "cdpcfg.h"
+
+class DuckNet;
+// Since Duck needs to know about DuckNet and DuckNet needs to know about Duck,
+// this forward declaration allows a DuckNet reference to be declared in Duck.h.
+
+#include "Duck.h"
 
 #ifdef CDPCFG_WIFI_NONE
 
-#include "DuckRadio.h"
 #include "DuckUtils.h"
 
 #else
 
-#include <ArduinoOTA.h>
 #include <DNSServer.h>
 #include <ESPAsyncWebServer.h>
 #include <ESPmDNS.h>
-#include <Update.h>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
-#include <esp_int_wdt.h>
 #include <EEPROM.h>
-#include <esp_task_wdt.h>
 
 #include "../DuckError.h"
 #include "DuckEsp.h"
-#include "DuckRadio.h"
 #include "DuckUtils.h"
 #include "OTAPage.h"
 #include "index.h"
@@ -54,12 +55,6 @@
  */
 class DuckNet {
 public:
-  /**
-   * @brief Get a singletom instance of the DuckNet class.
-   *
-   * @returns A pointer to DuckNet object.
-   */
-  static DuckNet* getInstance();
 
 #ifdef CDPCFG_WIFI_NONE
   int setupWebServer(bool createCaptivePortal = false, String html = "") {
@@ -197,15 +192,19 @@ public:
   static DNSServer dnsServer;
 #endif
 
+  DuckNet(Duck* duck);
+
 private:
-  DuckNet();
+
+  String getMuidStatusMessage(muidStatus status);
+  String getMuidStatusString(muidStatus status);
+  String createMuidResponseJson(muidStatus status);
+
   DuckNet(DuckNet const&) = delete;
   DuckNet& operator=(DuckNet const&) = delete;
-  static DuckNet* instance;
 
-  DuckRadio* duckRadio;
+  Duck* duck;
   std::vector<byte> deviceId;
-  DuckPacket* txPacket = NULL;
 
   static const byte DNS_PORT;
   static const char* DNS;

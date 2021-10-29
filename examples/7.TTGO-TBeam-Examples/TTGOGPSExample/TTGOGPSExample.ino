@@ -26,7 +26,7 @@ TinyGPSPlus tgps;
 HardwareSerial GPS(1);
 AXP20X_Class axp;
 
-MamaDuck duck = MamaDuck();
+MamaDuck duck;
 
 auto timer = timer_create_default();
 const int INTERVAL_MS = 20000;

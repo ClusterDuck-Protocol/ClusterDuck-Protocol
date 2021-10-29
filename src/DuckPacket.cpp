@@ -22,13 +22,12 @@ bool DuckPacket::prepareForRelaying(BloomFilter *filter, std::vector<byte> dataB
   //TODO: Add backwards compatibility
 
   // Query the existence of strings
-  // bool alreadySeen = filter->contains(&dataBuffer[MUID_POS], MUID_LENGTH);
-  bool alreadySeen = bloom_check(filter, &dataBuffer[MUID_POS], MUID_LENGTH);
-  if (!alreadySeen) {
+  bool alreadySeen = filter->bloom_check(&dataBuffer[MUID_POS], MUID_LENGTH);
+  if (alreadySeen) {
     logdbg("handleReceivedPacket: Packet already seen. No relay.");
     return false;
   } else {
-    bloom_add(filter, &dataBuffer[MUID_POS], MUID_LENGTH);
+    filter->bloom_add(&dataBuffer[MUID_POS], MUID_LENGTH);
     logdbg("handleReceivedPacket: Relaying packet: "  + duckutils::convertToHex(&dataBuffer[MUID_POS], MUID_LENGTH));
   }
 
@@ -41,7 +40,19 @@ bool DuckPacket::prepareForRelaying(BloomFilter *filter, std::vector<byte> dataB
   
 }
 
-int DuckPacket::prepareForSending(std::vector<byte> targetDevice, byte duckType, byte topic, std::vector<byte> app_data) {
+void DuckPacket::getUniqueMessageId(BloomFilter * filter, byte message_id[MUID_LENGTH]) {
+
+  bool getNewUnique = true;
+  while (getNewUnique) {
+    duckutils::getRandomBytes(MUID_LENGTH, message_id);
+    getNewUnique = filter->bloom_check(message_id, MUID_LENGTH);
+    loginfo("prepareForSending: new MUID");
+  }
+}
+
+int DuckPacket::prepareForSending(BloomFilter *filter,
+                                  std::vector<byte> targetDevice, byte duckType,
+                                  byte topic, std::vector<byte> app_data) {
 
   std::vector<uint8_t> encryptedData;
   uint8_t app_data_length = app_data.size();
@@ -56,14 +67,7 @@ int DuckPacket::prepareForSending(std::vector<byte> targetDevice, byte duckType,
           " TOPIC: " + String(topic));
 
   byte message_id[MUID_LENGTH];
-  // bool getNewUnique = true;
-  // while (getNewUnique) {
-  duckutils::getRandomBytes(MUID_LENGTH, message_id);
-  //   getNewUnique = bloom_check(filter, message_id, MUID_LENGTH);
-  // }
-  // TODO: Ensure the message has been sent before adding to bloom filter. I.e.
-  // move this to Duck::sendData().
-  // bloom_add(filter, message_id, MUID_LENGTH);
+  getUniqueMessageId(filter, message_id);
 
   byte crc_bytes[DATA_CRC_LENGTH];
   uint32_t value;
@@ -97,11 +101,6 @@ int DuckPacket::prepareForSending(std::vector<byte> targetDevice, byte duckType,
   // topic
   buffer.insert(buffer.end(), topic);
   logdbg("Topic:     " + duckutils::convertToHex(buffer.data(), buffer.size()));
-
-  // path offset
-  byte offset = HEADER_LENGTH + app_data_length;
-  buffer.insert(buffer.end(), offset);
-  logdbg("Offset:    " + duckutils::convertToHex(buffer.data(), buffer.size()));
 
   // duckType
   buffer.insert(buffer.end(), duckType);
