@@ -17,7 +17,7 @@
 #endif
 
 // create a built-in mama duck
-MamaDuck duck = MamaDuck();
+MamaDuck duck;
 
 // create a timer with default settings
 auto timer = timer_create_default();
