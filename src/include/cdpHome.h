@@ -5,16 +5,17 @@ const char home_page[] PROGMEM = R"=====(
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Welcome to DuckLink</title>
+    <title>ClusterDuck Network</title>
   </head>
 
   <body>
 	<div class="main-box">
-		<h1>Hybrid-Satellite Dashboard</h1>
+		<h1>Welcome to the ClusterDuck Network</h1>
 		<p>What would you like to do?</p>
 		<br>
 		
 		<a href="/controlpanel">Control Panel</a>
+		<a href="/main">Send Message</a>
 	</div>
   </body>
 </html>
