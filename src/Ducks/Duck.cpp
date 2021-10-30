@@ -15,7 +15,7 @@ const int MEMORY_LOW_THRESHOLD = PACKET_LENGTH + sizeof(CdpPacket);
 
 Duck::Duck(String name):
   duckNet(new DuckNet(this)),
-  filter(16, 2, 4, 8)
+  filter(10000, 4, 4, 100)
 {
   duckName = name;
 }

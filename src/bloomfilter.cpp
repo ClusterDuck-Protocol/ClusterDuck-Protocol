@@ -198,7 +198,7 @@ void BloomFilter::bloom_add(unsigned char* msg, int msgSize) {
       }
       
       // set bit based on active filter
-      if (this->activeFilter == 1){ 
+      if (this->activeFilter == 1){
          this->filter1[arrIndex] = bitUpdate;
       }
       else{
