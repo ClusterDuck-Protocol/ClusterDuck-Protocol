@@ -43,6 +43,10 @@ bool Duck::getDecrypt() {
   return duckcrypto::getDecrypt();
 }
 
+void Duck::setDecrypt(bool state) {
+  duckcrypto::setDecrypt(state);
+}
+
 void Duck::setAESKey(uint8_t newKEY[32]) {
   duckcrypto::setAESKey(newKEY);
 }
@@ -445,6 +449,8 @@ String Duck::getSsid() {
 String Duck::getPassword() {
   return duckNet->getPassword();
 }
+
+
 
 String Duck::getErrorString(int error) {
   String errorStr = String(error) + ": ";
