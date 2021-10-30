@@ -15,7 +15,8 @@ const int MEMORY_LOW_THRESHOLD = PACKET_LENGTH + sizeof(CdpPacket);
 
 Duck::Duck(String name):
   duckNet(new DuckNet(this)),
-  filter(10000, 4, 4, 100)
+  filter(10000, 4, 4, 100) //At 100 messages you have a 1 in 423,046 of the next message returning a false positive
+                           //Increase the hashes to 5 and you will have a 1 in 3,624,187 chance
 {
   duckName = name;
 }
