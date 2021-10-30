@@ -39,7 +39,6 @@ class DuckNet;
 #include "../DuckError.h"
 #include "DuckEsp.h"
 #include "DuckUtils.h"
-#include "DuckCrypto.h"
 #include "OTAPage.h"
 #include "index.h"
 #include "wifiCredentials.h"
