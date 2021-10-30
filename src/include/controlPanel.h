@@ -12,6 +12,19 @@ const char controlPanel[] PROGMEM = R"=====(
         background-color:#f0f0f0;
         min-height: 100vh;
       }
+      a {
+        display: block;
+        margin-bottom: 14px;
+        border: 3px solid #bbb;
+        font-weight: 700;
+        text-decoration: none;
+        background: #f7cf02;
+        border-radius: 12px;
+        text-align: center;
+        padding: .4em;
+        color: #000;
+        text-transform: uppercase;
+      }
       .control-box{
         background-color: white;
         padding: 1em;
@@ -82,6 +95,7 @@ const char controlPanel[] PROGMEM = R"=====(
           <input type="submit" name="submit"/>
        </form>
      </div>
+     <a href="/flipDetector">Flip Detector</a>
     </div>
   </body></html>
   

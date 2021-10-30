@@ -34,7 +34,7 @@ DuckDisplay* display = NULL;
 
 // Set device ID between ""
 String deviceId = "MAMA001";
-MamaDuck duck = MamaDuck(deviceId);
+MamaDuck duck;
 
 auto timer = timer_create_default();
 const int INTERVAL_MS = 60000;
