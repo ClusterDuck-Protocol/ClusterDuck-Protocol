@@ -35,6 +35,14 @@ void Duck::setEncrypt(bool state) {
   duckcrypto::setEncrypt(state);
 }
 
+bool Duck::getEncrypt() {
+  return duckcrypto::getState();
+}
+
+bool Duck::getDecrypt() {
+  return duckcrypto::getDecrypt();
+}
+
 void Duck::setAESKey(uint8_t newKEY[32]) {
   duckcrypto::setAESKey(newKEY);
 }
@@ -98,7 +106,7 @@ int Duck::setupSerial(int baudRate) {
 
 // TODO: use LoraConfigParams directly as argument to setupRadio
 int Duck::setupRadio(float band, int ss, int rst, int di0, int di1,
-                     int txPower) {
+                     int txPower, float bw, uint8_t sf, uint8_t gain) {
   LoraConfigParams config;
 
   config.band = band;
@@ -107,6 +115,9 @@ int Duck::setupRadio(float band, int ss, int rst, int di0, int di1,
   config.di0 = di0;
   config.di1 = di1;
   config.txPower = txPower;
+  config.bw = bw;
+  config.sf = sf;
+  config.gain = gain;
   config.func = DuckRadio::onInterrupt;
 
   int err = duckRadio.setupRadio(config);
@@ -133,6 +144,10 @@ int Duck::setupRadio(float band, int ss, int rst, int di0, int di1,
 
 void Duck::setSyncWord(byte syncWord) {
   duckRadio.setSyncWord(syncWord);
+}
+
+void Duck::setChannel(int channelNum) {
+  duckRadio.setChannel(channelNum);
 }
 
 int Duck::setupWebServer(bool createCaptivePortal, String html) {

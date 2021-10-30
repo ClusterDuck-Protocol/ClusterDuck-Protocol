@@ -359,9 +359,16 @@
  *
  */
 
-// Username and Password for OTA web page
-#define CDPCFG_UPDATE_USERNAME "username"
-#define CDPCFG_UPDATE_PASSWORD "password"
+//Default Username and Password
+#define CDPCFG_UPDATE_USERNAME "user"
+#define CDPCFG_UPDATE_PASSWORD "pass"
+
+#define CDPCFG_EEPROM_CRED_MAX 32
+#define CDPCFG_EEPROM_WIFI_USERNAME 0
+#define CDPCFG_EEPROM_WIFI_PASSWORD 32
+#define CDPCFG_EEPROM_CONTROL_USERNAME 64
+#define CDPCFG_EEPROM_CONTROL_PASSWORD 96
+#define CDPCFG_EEPROM_CHANNEL_VALUE 128
 
 /// Serial Console Baud Rate
 #define CDPCFG_SERIAL_BAUD 115200
@@ -404,6 +411,14 @@
 #define CDPCFG_PIN_RGBLED_G 4
 /// CDP RGB Led BLUE Pin default value
 #define CDPCFG_PIN_RGBLED_B 2
+
+/// CDP Channel Frequencies
+#define CHANNEL_1 915.0
+#define CHANNEL_2 914.0
+#define CHANNEL_3 913.0
+#define CHANNEL_4 912.0
+#define CHANNEL_5 911.0
+#define CHANNEL_6 910.0
 
 /// Default LoRa Module supported chipset when using the RadioLib library
 #if !defined(CDPCFG_LORA_CLASS) && !defined(CDPCFG_HELTEC_CUBE_CELL)

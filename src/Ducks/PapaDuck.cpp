@@ -17,7 +17,9 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid,
     return err;
   }
 
-  err = setupWifi("PapaDuck Setup");
+  std::string name(deviceId.begin(),deviceId.end());
+
+  err = setupWifi(name.c_str());
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR setupWithDefaults  rc = " + String(err));
     return err;
@@ -31,7 +33,7 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid,
 
 
 
-  err = setupWebServer(false);
+  err = setupWebServer();
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR setupWithDefaults  rc = " + String(err));
     return err;
@@ -51,6 +53,8 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid,
       return err;
     }
   } 
+
+  duckNet->loadChannel();
 
   if (ssid.length() == 0 && password.length() == 0) {
   // If WiFi credentials inside the INO are empty use the saved credentials
@@ -115,6 +119,7 @@ void PapaDuck::handleReceivedPacket() {
       duckutils::convertToHex(rxPacket->getBuffer().data(),
         rxPacket->getBuffer().size()));
     loginfo("invoking callback in the duck application...");
+    
     recvDataCallback(rxPacket->getBuffer());
 
     if (acksEnabled) {

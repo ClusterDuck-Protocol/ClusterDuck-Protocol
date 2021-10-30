@@ -26,6 +26,12 @@ namespace duckcrypto {
       bool encryptOn = false;
 
       /**
+       * @brief Enable or disable decryption flag.
+       *
+       */
+      bool decryptOn = false;
+
+      /**
        * @brief Default encryption key, can be set in application layer using `void setAESKey(uint8_t newKEY[32])`.
        *
        */
@@ -54,6 +60,19 @@ namespace duckcrypto {
     * 
     */
    bool getState();
+
+   /**
+    * @brief Setter for decryption flag.
+    * 
+    * @param state sets `decryptOn` flag. 
+    */
+   void setDecrypt(bool state);
+
+   /**
+    * @brief Getter for decryption flag.
+    * 
+    */
+   bool getDecrypt();
 
    /**
     * @brief Encrypt data function.

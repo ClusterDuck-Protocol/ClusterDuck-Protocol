@@ -40,6 +40,7 @@ void setup() {
   std::vector<byte> devId;
   devId.insert(devId.end(), deviceId.begin(), deviceId.end());
   duck.setupWithDefaults(devId);
+  detect.setDeviceId(devId);
   
   // Load DetectorDuck profile
   detect.setupRadio();
@@ -48,6 +49,7 @@ void setup() {
   // Initialize the timer. The timer thread runs separately from the main loop
   // and will trigger sending a counter message.
   timer.every(INTERVAL_MS, runSensor);
+  duck.onReceiveDuckData(handleDuckData);
   Serial.println("[MAMA] Setup OK!");
 
 }
@@ -78,6 +80,10 @@ void loop() {
     duck.run();
   }
   
+}
+
+void handleDuckData(std::vector<byte> packetBuffer) {
+
 }
 
 bool runSensor(void *) {
