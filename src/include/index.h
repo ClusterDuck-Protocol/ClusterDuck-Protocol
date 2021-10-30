@@ -39,15 +39,15 @@ const char MAIN_page[] PROGMEM = R"=====(
                 text-align: center;
                 padding: 0 16px;
             }
-            .body.on {
+            .main.on {
                display: block;
             }
-            .body.off {
+            .main.off {
                display: none;
             }
-            .body.sent {
+            .main.sent {
             }
-            .body.sent .c {
+            .main.sent .updateBox {
                background: #fff;
                color: #111;
                width: auto;
@@ -55,17 +55,17 @@ const char MAIN_page[] PROGMEM = R"=====(
                margin: 0 auto;
                padding: 14px;
             }
-            .body.sent .c h4 {
+            .main.sent .updateBox h4 {
                margin: 0 0 1em;
                font-size: 1.5em;
             }
-            .b {
+            .updateClass {
                display: block;
                padding: 20px;
                text-align: center;
                cursor: pointer;
             }
-            .b:hover {
+            .updateClass:hover {
                opacity: .7;
             }
             .update {
@@ -134,7 +134,7 @@ const char MAIN_page[] PROGMEM = R"=====(
     <body>
         <!-- HTML content of the captive portal below -->
         <h2 class="">You are Connected to a ClusterDuck</h2>
-        <div class="content body" id="formContent">
+        <div class="content main" id="formContent">
             <h3>Fill out the form below to submit information to the ClusterDuck network.</h3>
             <div id="form">
                 <form>
@@ -149,11 +149,11 @@ const char MAIN_page[] PROGMEM = R"=====(
                 <h6 style="font-size: 10px; text-align: center;margin-top: 24px;">Powered by the ClusterDuck Protocol</h6>
             </div>
         </div>
-        <div id="bodySent" class="body off sent">
-            <div class="c">
+        <div id="mainSent" class="=main off sent">
+            <div class="updateBox">
                 <div class="gps"><h4>Message Sent</h4><h5 id="dateNow">March 13, 2019 @ 1:00 PM</h5><p>Your message ID#: XXXXXX</p></div>
                 <p class="disclaimer">If your situation changes, please send another update.</p>
-                <div id="bupdate" class="b update">Send Update</div>
+                <div id="updateClassupdate" class="updateClass update">Send Update</div>
             </div>
         </div>
         <div id="lastMessageSection" class="hidden">
