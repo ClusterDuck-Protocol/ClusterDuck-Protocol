@@ -34,7 +34,6 @@ class DuckNet;
 #include <ESPmDNS.h>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
-#include <EEPROM.h>
 
 #include "../DuckError.h"
 #include "DuckEsp.h"
@@ -131,16 +130,6 @@ public:
    */
   bool ssidAvailable(String val = "");
 
-  
-  /**
-   * @brief Save / Write Wifi credentials to EEPROM
-   *
-   * @param ssid        the ssid of the WiFi network
-   * @param password    password to join the network
-   * @return DUCK_ERR_NONE if successful, an error code otherwise.
-   */
-  int saveWifiCredentials(String ssid, String password);
-  
   /**
    * @brief Load Wifi credentials from EEPROM
    * @return DUCK_ERR_NONE if successful, an error code otherwise.
