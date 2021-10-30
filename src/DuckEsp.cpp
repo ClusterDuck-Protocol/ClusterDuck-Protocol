@@ -4,9 +4,13 @@ namespace duckesp {
 #ifdef ESP32
 void restartDuck() { ESP.restart(); }
 int freeHeapMemory() {return ESP.getFreeHeap();}
+int getMinFreeHeap() { return ESP.getMinFreeHeap(); }
+int getMaxAllocHeap() { return ESP.getMaxAllocHeap(); }
 #else 
 void restartDuck() {}
 int freeHeapMemory() {}
+int getMinFreeHeap() {}
+int getMaxAllocHeap() {}
 #endif
 
 #ifdef ESP32

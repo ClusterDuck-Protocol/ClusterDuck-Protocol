@@ -78,7 +78,7 @@ char token[] = TOKEN;
 char clientId[] = "d:" ORG ":" DEVICE_TYPE ":" DEVICE_ID;
 
 // Use pre-built papa duck
-PapaDuck duck = PapaDuck();
+PapaDuck duck;
 
 DuckDisplay* display = NULL;
 

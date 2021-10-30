@@ -16,7 +16,7 @@
 #endif
 
 // create a built-in mama duck
-MamaDuck duck = MamaDuck();
+MamaDuck duck;
 
 // Create a Display Instance
 DuckDisplay* display = NULL;
@@ -115,16 +115,4 @@ bool sendData(const byte* buffer, int length) {
   }
   return sentOk;
 }
-
-
-
-
-
-
-
-
-
-
-
-
 

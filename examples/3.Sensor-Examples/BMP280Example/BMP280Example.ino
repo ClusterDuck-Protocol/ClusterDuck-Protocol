@@ -25,7 +25,7 @@
 Adafruit_BMP280 bmp;
 
 // create a built-in mama duck
-MamaDuck duck = MamaDuck();
+MamaDuck duck;
 
 auto timer = timer_create_default();
 const int INTERVAL_MS = 60000;

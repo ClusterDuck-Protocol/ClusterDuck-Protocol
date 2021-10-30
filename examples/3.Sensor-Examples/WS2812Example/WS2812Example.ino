@@ -22,12 +22,15 @@
 #include "FastLED.h"
 
 // Setup for The W2812 LED
-#define LED_TYPE NEOPIXEL   // See FastLED library for all the different leds supprt 
-#define DATA_PIN 4         // Pin on the board for connecting data in for LED
-#define NUM_LEDS 1        // Nuber of LEDS on your Led Strip (use 1 for single LED)
-CRGB leds[NUM_LEDS];  
+#define LED_PIN     4
+#define NUM_LEDS    1
+#define BRIGHTNESS  100
+#define LED_TYPE    WS2812
+#define COLOR_ORDER GRB
+CRGB leds[NUM_LEDS];
 
-MamaDuck duck = MamaDuck();
+
+MamaDuck duck;
 
 auto timer = timer_create_default();
 const int INTERVAL_MS = 60000;
@@ -43,7 +46,15 @@ void setup() {
   std::vector<byte> devId;
   devId.insert(devId.end(), deviceId.begin(), deviceId.end());
   duck.setupWithDefaults(devId);
+  // Setup LED
+   delay( 3000 ); // power-up safety delay
+   FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+   FastLED.setBrightness(  BRIGHTNESS );
+
+  
   Serial.println("MAMA-DUCK...READY!");
+
+
 
 
 

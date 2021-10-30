@@ -1,14 +1,13 @@
 #include "include/DuckNet.h"
 
-DuckNet* DuckNet::instance = NULL;
+#include <Update.h>
 
-DuckNet::DuckNet() { duckRadio = DuckRadio::getInstance(); }
-DuckNet* DuckNet::getInstance() {
-  if (instance == NULL) {
-    instance = new DuckNet();
-  }
-  return instance;
-}
+#include "DuckLogger.h"
+#include "include/Duck.h"
+
+DuckNet::DuckNet(Duck* duckIn):
+  duck(duckIn)
+{}
 
 #ifndef CDPCFG_WIFI_NONE
 IPAddress apIP(CDPCFG_AP_IP1, CDPCFG_AP_IP2, CDPCFG_AP_IP3, CDPCFG_AP_IP4);
@@ -26,25 +25,51 @@ const char* control_username = CDPCFG_UPDATE_USERNAME;
 const char* control_password = CDPCFG_UPDATE_PASSWORD;
 
 bool restartRequired = false;
-size_t content_len;
 
 void DuckNet::setDeviceId(std::vector<byte> deviceId) {
   this->deviceId.insert(this->deviceId.end(), deviceId.begin(), deviceId.end());
 }
 
-// //Working on
-// String processor(const String& var) {
-//     if(var == "channel")
-//       return String(duckRadio->getChannel()); 
-//     return String();
-// }
+String DuckNet::getMuidStatusMessage(muidStatus status) {
+  switch (status) {
+  case invalid:
+    return "Invalid MUID.";
+  case unrecognized:
+    return "Unrecognized MUID. Please try again.";
+  case not_acked:
+    return "Message sent, waiting for server to acknowledge.";
+  case acked:
+    return "Message acknowledged.";
+  default:
+    const char * str = "__FILE__:__LINE__ error: Unrecognized muidStatus";
+    logerr(str);
+    return str;
+  }
+}
+
+String DuckNet::getMuidStatusString(muidStatus status) {
+  switch (status) {
+  case invalid:
+    return "invalid";
+  case unrecognized:
+    return "unrecognized";
+  case not_acked:
+    return "not_acked";
+  case acked:
+    return "acked";
+  default:
+    return "error";
+  }
+}
+
+String DuckNet::createMuidResponseJson(muidStatus status) {
+  String statusStr = getMuidStatusString(status);
+  String message = getMuidStatusMessage(status);
+  return "{\"status\":\"" + statusStr + "\", \"message\":\"" + message + "\"}";
+}
 
 int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
   loginfo("Setting up Web Server");
-
-  if (txPacket == NULL) {
-    txPacket = new DuckPacket(deviceId);
-  }
 
   if (html == "") {
     logdbg("Web Server using main page");
@@ -54,6 +79,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     portal = html;
   }
   webServer.onNotFound([&](AsyncWebServerRequest* request) {
+    logwarn("DuckNet - onNotFound: " + request->url());
     request->send(200, "text/html", portal);
   });
 
@@ -123,7 +149,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     AsyncWebParameter* p = request->getParam(0);
     logdbg(p->name() + ": " + p->value());
     int val = std::atoi(p->value().c_str());
-    duckRadio->setChannel(val);
+    duck->setChannel(val);
     saveChannel(val);
 
     request->send(200, "text/plain", "Success");
@@ -185,61 +211,75 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
       restartRequired = true;
     },
     [&](AsyncWebServerRequest* request, String filename, size_t index,
-      uint8_t* data, size_t len, bool final) {
-      if (!index) {
-
-        loginfo("Pause Radio and starting OTA update");
-        duckRadio->standBy();
-        content_len = request->contentLength();
-
-        int cmd = (filename.indexOf("spiffs") > -1) ? U_SPIFFS : U_FLASH;
-        if (!Update.begin(UPDATE_SIZE_UNKNOWN, cmd)) {
-
-          Update.printError(Serial);
-        }
-      }
-
-      if (Update.write(data, len) != len) {
-        Update.printError(Serial);
-        duckRadio->startReceive();
-      }
-
-      if (final) {
-        if (Update.end(true)) {
-          ESP.restart();
-          esp_task_wdt_init(1, true);
-          esp_task_wdt_add(NULL);
-          while (true)
-            ;
-        }
-      }
+      uint8_t* data, size_t len, bool final)
+    {
+      duck->updateFirmware(filename, index, data, len, final);
+      // TODO: error/exception handling
+      // TODO: request->send
     });
 
+  webServer.on("/muidStatus.json", HTTP_GET, [&](AsyncWebServerRequest* request) {
+    logdbg(request->url());
+
+    String muid;
+    int paramsNumber = request->params();
+    for (int i = 0; i < paramsNumber; i++) {
+      AsyncWebParameter* p = request->getParam(i);
+      logdbg(p->name() + ": " + p->value());
+      if (p->name() == "muid") {
+        muid = p->value();
+      }
+    }
+
+    std::vector<byte> muidVect = {muid[0], muid[1], muid[2], muid[3]};
+    muidStatus status = duck->getMuidStatus(muidVect);
+
+    String jsonResponse = createMuidResponseJson(status);
+    switch (status) {
+    case invalid:
+      request->send(400, "text/json", jsonResponse);
+      break;
+    case unrecognized:
+    case not_acked:
+    case acked:
+      request->send(200, "text/json", jsonResponse);
+      break;
+    }
+  });
+
   // Captive Portal form submission
-  webServer.on("/formSubmit", HTTP_POST, [&](AsyncWebServerRequest* request) {
-    loginfo("Submitting Form");
+  webServer.on("/formSubmit.json", HTTP_POST, [&](AsyncWebServerRequest* request) {
+    loginfo("Submitting Form to /formSubmit.json");
 
     int err = DUCK_ERR_NONE;
 
     int paramsNumber = request->params();
     String val = "";
+    String clientId = "";
 
     for (int i = 0; i < paramsNumber; i++) {
       AsyncWebParameter* p = request->getParam(i);
       logdbg(p->name() + ": " + p->value());
 
-      val = val + p->value().c_str() + "*";
+      if (p->name() == "clientId") {
+        clientId = p->value();
+      } else {
+        val = val + p->value().c_str() + "*";
+      }
     }
 
-    std::vector<byte> data;
-    data.insert(data.end(), val.begin(), val.end());
-    //TODO: send the correct ducktype
-    txPacket->prepareForSending(ZERO_DUID, DuckType::UNKNOWN, topics::status, data );
-    err = duckRadio->sendData(txPacket->getBuffer());
+    clientId.toUpperCase();
+    val = "[" + clientId + "]" + val;
+    std::vector<byte> muid;
+    err = duck->sendData(topics::cpm, val, ZERO_DUID, &muid);
 
     switch (err) {
       case DUCK_ERR_NONE:
-      request->send(200, "text/html", portal);
+      {
+        String response = "{\"muid\":\"" + duckutils::toString(muid) + "\"}";
+        request->send(200, "text/html", response);
+        logdbg("Sent 200 response: " + response);
+      }
       break;
       case DUCKLORA_ERR_MSG_TOO_LARGE:
       request->send(413, "text/html", "Message payload too big!");
@@ -489,7 +529,7 @@ void DuckNet::saveChannel(int val){
 void DuckNet::loadChannel(){
     EEPROM.begin(512);
     int val = EEPROM.read(CDPCFG_EEPROM_CHANNEL_VALUE);
-    duckRadio->setChannel(val);
+    duck->setChannel(val);
     loginfo("Read channel val to EEPROM, setting channel: ");
     loginfo(val);
 }

@@ -31,7 +31,7 @@
 IridiumSBD modem(IridiumSerial);
 //============== IRIDIUM Setup ================
 
-PapaDuck duck = PapaDuck();
+PapaDuck duck;
 
 bool retry = true;
 

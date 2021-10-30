@@ -11,14 +11,14 @@
 #ifndef DUCKLORA_H_
 #define DUCKLORA_H_
 
+#include <Arduino.h>
+
 #include "../DuckDisplay.h"
 #include "../DuckError.h"
 #include "../DuckLogger.h"
-#include <Arduino.h>
-
+#include "cdpcfg.h"
 #include "DuckPacket.h"
 #include "LoraPacket.h"
-#include "cdpcfg.h"
 
 /**
  * @brief Internal structure to hold the LoRa module configuration
@@ -55,14 +55,20 @@ typedef struct {
  *
  */
 class DuckRadio {
+  friend class Duck;
+  friend class DuckDetect;
+  friend class DuckLink;
+  friend class MamaDuck;
+  friend class PapaDuck;
 
-public:
-  /**
-   * @brief Get a singletom instance of the DuckRadio class,\.
-   *
-   * @returns A pointer to a DuckRadio object
-   */
-  static DuckRadio* getInstance();
+private:
+  // Everything is private to force Duck (and Duck descendants) to be the only
+  // way to interact with the radio. There should only be one Duck per sketch
+  // so that arbitrary pieces of code cannot interfere with the radio. Also,
+  // Duck does things like recording the outgoing MUIDs so that it can wait for
+  // acknowledgments to those MUIDs.
+
+  DuckRadio();
 
   /**
    * @brief Initialize the LoRa chip.
@@ -111,12 +117,6 @@ public:
    */
   int startReceive();
 
-  /**
-   * @brief Set the Duck to be ready to transmit packets.
-   *
-   * @returns DUCK_ERR_NONE if the call was successful, an error code otherwise.
-   */
-  int startTransmitData();
   /**
    * @brief Set the Duck to be ready to transmit packets.
    *
@@ -180,10 +180,17 @@ public:
   int getChannel() { return channel; }
 
 private:
-  DuckRadio();
+  static volatile uint16_t interruptFlags;
+  void serviceInterruptFlags();
+  static void onInterrupt();
+
+  static volatile bool receivedFlag;
+  static void setReceiveFlag(bool value) { receivedFlag = value; }
+  static bool getReceiveFlag() { return receivedFlag; }
+
   DuckRadio(DuckRadio const&) = delete;
   DuckRadio& operator=(DuckRadio const&) = delete;
-  static DuckRadio* instance;
+
   DuckDisplay* display = DuckDisplay::getInstance();
   int err;
   int channel;  

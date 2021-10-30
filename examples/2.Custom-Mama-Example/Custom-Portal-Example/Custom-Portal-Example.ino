@@ -18,7 +18,7 @@
 #endif
 
 // create a built-in mama duck
-MamaDuck duck = MamaDuck();
+MamaDuck duck;
 
 // Create a Display Instance
 DuckDisplay* display = NULL;
