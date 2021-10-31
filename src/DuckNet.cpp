@@ -243,7 +243,9 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
 
     if (ssid != "" && password != "") {
       setupInternet(ssid, password);
-      saveWifiCredentials(ssid, password);
+      this->ssid = ssid;
+      this->password = password;
+      duckutils::saveWifiCredentials(ssid, password);
       request->send(200, "text/plain", "Success");
     } else {
       request->send(500, "text/plain", "There was an error");
@@ -300,67 +302,16 @@ int DuckNet::setupDns() {
   return DUCK_ERR_NONE;
 }
 
-int DuckNet::saveWifiCredentials(String ssid, String password) {
-  this->ssid = ssid;
-  this->password = password;
+int DuckNet::loadWiFiCredentials(){
+  setSsid(duckutils::loadWifiSsid());
+  setPassword(duckutils::loadWifiPassword());
 
-
-  EEPROM.begin(512);
-
-  if (ssid.length() > 0 && password.length() > 0) {
-    loginfo("Clearing EEPROM");
-    for (int i = 0; i < 96; i++) {
-      EEPROM.write(i, 0);
-    }
-
-    loginfo("writing EEPROM SSID:");
-    for (int i = 0; i < ssid.length(); i++)
-    {
-      EEPROM.write(i, ssid[i]);
-      loginfo("Wrote: ");
-      loginfo(ssid[i]);
-    }
-    loginfo("writing EEPROM Password:");
-    for (int i = 0; i < password.length(); ++i)
-    {
-      EEPROM.write(32 + i, password[i]);
-      loginfo("Wrote: ");
-      loginfo(password[i]);
-    }
-    EEPROM.commit();
-  }
-  return DUCK_ERR_NONE;
-}
-
-  int DuckNet::loadWiFiCredentials(){
-
-  // This method will look for any saved WiFi credntials on the device and set up a internet connection
-  EEPROM.begin(512); //Initialasing EEPROM
-
-  String esid;
-  for (int i = 0; i < 32; ++i)
-  {
-    esid += char(EEPROM.read(i));
-  }
-  // lopp through saved SSID carachters
-  loginfo("Reading EEPROM SSID: " + esid);
-  setSsid(esid);
-
-  String epass = "";
-  for (int i = 32; i < 96; ++i)
-  {
-    epass += char(EEPROM.read(i));
-  }
-  // lopp through saved Password carachters
-  loginfo("Reading EEPROM Password: " + epass);
-  setPassword(epass);
-
-  if (esid.length() == 0 || epass.length() == 0){
+  if (ssid.length() == 0 || password.length() == 0){
     loginfo("ERROR setupInternet: Stored SSID and PASSWORD empty");
     return DUCK_ERR_SETUP;
   } else{
     loginfo("Setup Internet with saved credentials");
-    setupInternet(esid, epass);
+    setupInternet(ssid, password);
   }
   return DUCK_ERR_NONE;
 }
