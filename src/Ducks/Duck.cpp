@@ -12,10 +12,14 @@
 #include "include/DuckNet.h"
 
 const int MEMORY_LOW_THRESHOLD = PACKET_LENGTH + sizeof(CdpPacket);
+const int NUM_SECTORS = 16;
+const int NUM_HASH_FUNCS = 2;
+const int BITS_PER_SECTOR = 32;
+const int MAX_MESSAGES = 8;
 
 Duck::Duck(String name):
   duckNet(new DuckNet(this)),
-  filter(16, 2, 4, 8)
+  filter(NUM_SECTORS, NUM_HASH_FUNCS, BITS_PER_SECTOR, MAX_MESSAGES)
 {
   duckName = name;
 }
