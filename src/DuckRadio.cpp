@@ -46,31 +46,31 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
 
   // Lora is started, we need to set all the radio parameters, before it can
   // start receiving packets
-  rc = lora.setFrequency(config.band ?: CDPCFG_RF_LORA_FREQ);
+  rc = lora.setFrequency(config.band);
   if (rc == ERR_INVALID_FREQUENCY) {
     logerr("ERROR  frequency is invalid");
     return DUCKLORA_ERR_SETUP;
   }
 
-  rc = lora.setBandwidth(CDPCFG_RF_LORA_BW);
+  rc = lora.setBandwidth(config.bw);
   if (rc == ERR_INVALID_BANDWIDTH) {
     logerr("ERROR  bandwidth is invalid");
     return DUCKLORA_ERR_SETUP;
   }
 
-  rc = lora.setSpreadingFactor(CDPCFG_RF_LORA_SF);
+  rc = lora.setSpreadingFactor(config.sf);
   if (rc == ERR_INVALID_SPREADING_FACTOR) {
     logerr("ERROR  spreading factor is invalid");
     return DUCKLORA_ERR_SETUP;
   }
 
-  rc = lora.setOutputPower(CDPCFG_RF_LORA_TXPOW);
+  rc = lora.setOutputPower(config.txPower);
   if (rc == ERR_INVALID_OUTPUT_POWER) {
     logerr("ERROR  output power is invalid");
     return DUCKLORA_ERR_SETUP;
   }
 
-  rc = lora.setGain(CDPCFG_RF_LORA_GAIN);
+  rc = lora.setGain(config.gain);
   if (rc == ERR_INVALID_GAIN) {
     logerr("ERROR  gain is invalid");
     return DUCKLORA_ERR_SETUP;
@@ -150,7 +150,6 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
   uint32_t packet_data_crc = duckutils::toUnit32(&data[DATA_CRC_POS]);
   uint32_t computed_data_crc =
       CRC32::calculate(data_section.data(), data_section.size());
-
   if (computed_data_crc != packet_data_crc) {
     logerr("ERROR data crc mismatch: received: " + String(packet_data_crc) +
            " calculated:" + String(computed_data_crc));
@@ -206,6 +205,53 @@ int DuckRadio::standBy() { return lora.standby(); }
 int DuckRadio::sleep() { return lora.sleep(); }
 
 void DuckRadio::processRadioIrq() {}
+
+void DuckRadio::setChannel(int channelNum) {
+  logdbg("Setting Channel to : ");
+  logdbg(channelNum);
+  
+  int err;
+  switch(channelNum) {
+    case 2:
+      loginfo("Set channel: " + String(channelNum));
+      err = lora.setFrequency(CHANNEL_2);
+      lora.startReceive();
+      break;
+    case 3:
+      loginfo("Set channel: " + String(channelNum));
+      err = lora.setFrequency(CHANNEL_3);
+      lora.startReceive();
+      break;
+    case 4:
+      loginfo("Set channel: " + String(channelNum));
+      err = lora.setFrequency(CHANNEL_4);
+      lora.startReceive();
+      break;
+    case 5:
+      loginfo("Set channel: " + String(channelNum));
+      err = lora.setFrequency(CHANNEL_5);
+      lora.startReceive();
+      break;
+    case 6:
+      loginfo("Set channel: " + String(channelNum));
+      err = lora.setFrequency(CHANNEL_6);
+      lora.startReceive();
+      break;
+    case 1:
+    default:
+      loginfo("Set channel: " + String(channelNum));
+      err = lora.setFrequency(CHANNEL_1);
+      lora.startReceive();
+      break;
+  }
+  if (err != ERR_NONE) {
+    logerr("ERROR Failed to set channel");
+  } else {
+    lora.startReceive();
+    channel = channelNum;
+    loginfo("Channel Set");
+  }
+}
 
 void DuckRadio::serviceInterruptFlags() {
   if (DuckRadio::interruptFlags != 0) {

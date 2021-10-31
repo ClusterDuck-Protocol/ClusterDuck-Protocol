@@ -2,4 +2,6 @@
 .vscode
 .pio
 .project
+a.out
+test
 ClusterDuck-Protokoll.code-workspace

@@ -12,10 +12,10 @@
 #include "include/DuckNet.h"
 
 const int MEMORY_LOW_THRESHOLD = PACKET_LENGTH + sizeof(CdpPacket);
-const int NUM_SECTORS = 16;
+const int NUM_SECTORS = 312; //total desired bits divided by bits per sector
 const int NUM_HASH_FUNCS = 2;
-const int BITS_PER_SECTOR = 32;
-const int MAX_MESSAGES = 8;
+const int BITS_PER_SECTOR = 32; //size of unsigned int is 32 bits
+const int MAX_MESSAGES = 100;
 
 Duck::Duck(String name):
   duckNet(new DuckNet(this)),
@@ -37,6 +37,18 @@ Duck::~Duck() {
 
 void Duck::setEncrypt(bool state) {
   duckcrypto::setEncrypt(state);
+}
+
+bool Duck::getEncrypt() {
+  return duckcrypto::getState();
+}
+
+bool Duck::getDecrypt() {
+  return duckcrypto::getDecrypt();
+}
+
+void Duck::setDecrypt(bool state) {
+  duckcrypto::setDecrypt(state);
 }
 
 void Duck::setAESKey(uint8_t newKEY[32]) {
@@ -102,7 +114,7 @@ int Duck::setupSerial(int baudRate) {
 
 // TODO: use LoraConfigParams directly as argument to setupRadio
 int Duck::setupRadio(float band, int ss, int rst, int di0, int di1,
-                     int txPower) {
+                     int txPower, float bw, uint8_t sf, uint8_t gain) {
   LoraConfigParams config;
 
   config.band = band;
@@ -111,6 +123,9 @@ int Duck::setupRadio(float band, int ss, int rst, int di0, int di1,
   config.di0 = di0;
   config.di1 = di1;
   config.txPower = txPower;
+  config.bw = bw;
+  config.sf = sf;
+  config.gain = gain;
   config.func = DuckRadio::onInterrupt;
 
   int err = duckRadio.setupRadio(config);
@@ -137,6 +152,10 @@ int Duck::setupRadio(float band, int ss, int rst, int di0, int di1,
 
 void Duck::setSyncWord(byte syncWord) {
   duckRadio.setSyncWord(syncWord);
+}
+
+void Duck::setChannel(int channelNum) {
+  duckRadio.setChannel(channelNum);
 }
 
 int Duck::setupWebServer(bool createCaptivePortal, String html) {
@@ -434,6 +453,8 @@ String Duck::getSsid() {
 String Duck::getPassword() {
   return duckNet->getPassword();
 }
+
+
 
 String Duck::getErrorString(int error) {
   String errorStr = String(error) + ": ";

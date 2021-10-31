@@ -1,3 +1,4 @@
+#include "Arduino.h"
 #include "include/DuckPacket.h"
 #include "DuckError.h"
 #include "DuckLogger.h"
@@ -46,7 +47,8 @@ void DuckPacket::getUniqueMessageId(BloomFilter * filter, byte message_id[MUID_L
   while (getNewUnique) {
     duckutils::getRandomBytes(MUID_LENGTH, message_id);
     getNewUnique = filter->bloom_check(message_id, MUID_LENGTH);
-    loginfo("prepareForSending: new MUID");
+    loginfo("prepareForSending: new MUID -> " + duckutils::convertToHex(message_id, MUID_LENGTH));
+    
   }
 }
 

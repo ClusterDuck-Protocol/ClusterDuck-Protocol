@@ -15,7 +15,8 @@ int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String 
     return err;
   }
 
-  err = setupWifi("DuckLink");
+  std::string name(deviceId.begin(),deviceId.end());
+  err = setupWifi(name.c_str());
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR setupWithDefaults rc = " + String(err));
     return err;
@@ -27,7 +28,7 @@ int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String 
     return err;
   }
 
-  err = setupWebServer(true);
+  err = setupWebServer(false);
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR setupWithDefaults rc = " + String(err));
     return err;
@@ -40,6 +41,8 @@ int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String 
   }
 
   duckutils::getTimer().every(CDPCFG_MILLIS_ALIVE, imAlive);
+
+  duckNet->loadChannel();
 
   return DUCK_ERR_NONE;
 }
@@ -73,6 +76,8 @@ void MamaDuck::handleReceivedPacket() {
 
   relay = rxPacket->prepareForRelaying(&filter, data);
   if (relay) {
+    //TODO: this callback is causing an issue, needs to be fixed for mamaduck to get packet data
+    //recvDataCallback(rxPacket->getBuffer());
     loginfo("handleReceivedPacket: packet RELAY START");
     // NOTE:
     // Ducks will only handle received message one at a time, so there is a chance the
