@@ -34,7 +34,6 @@ class DuckNet;
 #include <ESPmDNS.h>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
-#include <EEPROM.h>
 
 #include "../DuckError.h"
 #include "DuckEsp.h"
@@ -136,7 +135,6 @@ public:
    */
   bool ssidAvailable(String val = "");
 
-  
   /**
    * @brief Save / Write Wifi credentials to EEPROM
    *
@@ -145,11 +143,19 @@ public:
    * @return DUCK_ERR_NONE if successful, an error code otherwise.
    */
   int saveWifiCredentials(String ssid, String password);
-
+  
+  /**
+   * @brief save set radio channel
+   *
+   * @param val channel number to be set
+   */
   void saveChannel(int val);
-
+  
+  /**
+   * @brief Load channel number saved in eeprom
+   */
   void loadChannel();
-
+  
   /**
    * @brief Load Wifi credentials from EEPROM
    * @return DUCK_ERR_NONE if successful, an error code otherwise.
