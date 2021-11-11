@@ -8,7 +8,7 @@
 namespace duckutils {
 
   namespace {
-    std::string cdpVersion = "2.11.0";
+    std::string cdpVersion = "3.0.2";
   }
 
 Timer<> duckTimer = timer_create_default();
