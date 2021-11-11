@@ -9,6 +9,7 @@
         "url": "https://www.project-owl.com"
     },
     "version": "2.11.0",
+
     "repository":
     {
         "type": "git",
