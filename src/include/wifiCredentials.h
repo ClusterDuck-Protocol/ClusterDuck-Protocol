@@ -20,18 +20,21 @@ const char wifi_page[] PROGMEM = R"=====(
       }
       .submit {
         border-style: none;
-        padding: 0,6em;
-        border-radius: 8px;
-        background: yellow;
+        padding: 0.6em;
         font-size: 1em; 
         margin-bottom: 3em;
-
-      
+        background: #f7cf02;
+        border-radius: 12px;
+        color: #000;
+        text-transform: uppercase;
       }
       input{
-        width:100%; 
+        width:98%; 
         height: 3em;  
         font-size: 1.4em;
+        border-radius: 6px;
+        padding: .35em 0 .35em .3em;
+        color: #000;
       }
    
       
@@ -39,8 +42,8 @@ const char wifi_page[] PROGMEM = R"=====(
 
     
      <div class="main-box">
-     <h1>Use this page to update your WiFi credentials</h1>
-    <p>Fill in your SSID and WiFi Password from your local network below.</p>
+     <h1>Update your WiFi credentials</h1>
+    <p>Fill in your SSID and password for your local WiFi.</p>
  <form action='/changeSSID' method='post'>
     <label for='ssid'>SSID:</label><br> 
     <input name='ssid' type='text' placeholder='SSID' /><br><br>

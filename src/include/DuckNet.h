@@ -42,6 +42,8 @@ class DuckNet;
 #include "index.h"
 #include "wifiCredentials.h"
 #include "controlPanel.h"
+#include "cdpHome.h"
+#include "papaHome.h"
 
 #endif
 
@@ -54,6 +56,8 @@ class DuckNet;
  */
 class DuckNet {
 public:
+
+  int channel;
 
 #ifdef CDPCFG_WIFI_NONE
   int setupWebServer(bool createCaptivePortal = false, String html = "") {
@@ -79,6 +83,7 @@ public:
   void setPassword(String val) {}
   String getSsid() { return ""; }
   String getPassword() { return ""; }
+  // int getChannel();
   void setDeviceId(std::vector<byte> deviceId) {}
   bool isWifiConnected() { return false; }
   int loadWiFiCredentials(){return DUCK_ERR_NONE; };
@@ -131,6 +136,27 @@ public:
   bool ssidAvailable(String val = "");
 
   /**
+   * @brief Save / Write Wifi credentials to EEPROM
+   *
+   * @param ssid        the ssid of the WiFi network
+   * @param password    password to join the network
+   * @return DUCK_ERR_NONE if successful, an error code otherwise.
+   */
+  int saveWifiCredentials(String ssid, String password);
+  
+  /**
+   * @brief save set radio channel
+   *
+   * @param val channel number to be set
+   */
+  void saveChannel(int val);
+  
+  /**
+   * @brief Load channel number saved in eeprom
+   */
+  void loadChannel();
+  
+  /**
    * @brief Load Wifi credentials from EEPROM
    * @return DUCK_ERR_NONE if successful, an error code otherwise.
    */
@@ -163,6 +189,13 @@ public:
    * @returns a string representing the current network password
    */
   String getPassword();
+
+  /**
+   * @brief Get the current channel.
+   *
+   * @returns an int representing the current channel
+   */
+  int getChannel();
 
   /**
    * @brief Set the Duck's device id.
@@ -201,4 +234,6 @@ private:
   String portal = "";
   String ssid = "";
   String password = "";
+  // char* controlSsid = "";
+  // char* controlPassword = "";
 };

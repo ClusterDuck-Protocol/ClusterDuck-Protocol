@@ -94,6 +94,9 @@ public:
    * 
    */
   void clear(void);
+
+  void clearLine(u8g2_uint_t x, u8g2_uint_t y);
+
   void sendBuffer(void);
   void showDefaultScreen();
   uint8_t getWidth() {return width;}
