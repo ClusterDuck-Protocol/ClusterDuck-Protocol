@@ -162,11 +162,11 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
            " calculated:" + String(computed_data_crc));
     return DUCKLORA_ERR_HANDLE_PACKET;
   }
-  // we have a good packet
-  // loginfo("RX: rssi: " + String(lora.getRSSI()) +
-  //         " snr: " + String(lora.getSNR()) +
-  //         " fe: " + String(lora.getFrequencyError(true)) +
-  //         " size: " + String(packet_length));
+  we have a good packet
+  loginfo("RX: rssi: " + String(lora.getRSSI()) +
+          " snr: " + String(lora.getSNR()) +
+          " fe: " + String(lora.getFrequencyError(true)) +
+          " size: " + String(packet_length));
 
   if (rxState != ERR_NONE) {
     return rxState;
@@ -202,7 +202,7 @@ int DuckRadio::startReceive() {
   return DUCK_ERR_NONE;
 }
 
-// int DuckRadio::getRSSI() { return lora.getRSSI(); }
+int DuckRadio::getRSSI() { return lora.getRSSI(); }
 
 // TODO: implement this
 int DuckRadio::ping() { return DUCK_ERR_NOT_SUPPORTED; }

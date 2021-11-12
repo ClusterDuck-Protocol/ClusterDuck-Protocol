@@ -13,16 +13,13 @@
 #include "cdpcfg.h"
 #include "arduino-timer.h"
 #include <Arduino.h>
-#include <vector>
 #include <string>
 #include <WString.h>
-
 
 namespace duckutils {
 
 extern Timer<> duckTimer;
 extern bool detectState;
-
 
 std::string getCDPVersion();
 
