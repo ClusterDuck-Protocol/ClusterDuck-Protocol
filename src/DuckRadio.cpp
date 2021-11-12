@@ -162,7 +162,7 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
            " calculated:" + String(computed_data_crc));
     return DUCKLORA_ERR_HANDLE_PACKET;
   }
-  we have a good packet
+  // we have a good packet
   loginfo("RX: rssi: " + String(lora.getRSSI()) +
           " snr: " + String(lora.getSNR()) +
           " fe: " + String(lora.getFrequencyError(true)) +
