@@ -10,9 +10,17 @@
 #include <WString.h>
 #include <vector>
 
+/**
+ * @brief Use this DUID to send to all PapaDucks
+ * 
+ */
 static std::vector<byte> ZERO_DUID = {0x00, 0x00, 0x00, 0x00,
                                       0x00, 0x00, 0x00, 0x00};
 
+/**
+ * @brief Use this DUID to be received by every duck in the network
+ * 
+ */
 static std::vector<byte> BROADCAST_DUID = {0xFF, 0xFF, 0xFF, 0xFF,
                                            0xFF, 0xFF, 0xFF, 0xFF};
 

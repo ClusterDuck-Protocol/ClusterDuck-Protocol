@@ -34,7 +34,7 @@
 //#define MAX_PATH_OFFSET (PACKET_LENGTH - DUID_LENGTH - 1)
 
 /*
-Data Section of a broadcast ack (max 180 bytes):
+Data Section of a broadcast ack (max 229 bytes):
 0 1      8    12...
 | |      |    |
 +-+------+----+-...
@@ -44,13 +44,31 @@ Data Section of a broadcast ack (max 180 bytes):
 Maximum number of DUID/MUID pairs is:
   floor( (maximum data payload size - N) / (DUID size + MUID size) )
 Which is:
-  floor( (180 - 1) / 12 ) = 14
+  floor( (229 - 1) / 12 ) = 19
 
 N:              1  byte                - Number of DUID/MUID pairs
 Each DUID:     08  byte array          - A Device Unique ID
 Each MUID:     04  byte array          - Message unique ID
 */
-#define MAX_MUID_PER_ACK 14
+#define MAX_MUID_PER_ACK 19
+
+/*
+Data Section of a duck command (max 229 bytes):
+0 1    229...
+| |     |
++-+-----+-...
+|N| VAL
++-+-----+-...
+
+N:              1  byte                - Command lookup value
+VAL:          228  bytes               - Value to set for command
+
+*/
+
+//Available command IDs (N)
+#define CMD_PING 0
+#define CMD_WIFI 1
+#define CMD_CHANNEL 2
 
 // header
 // Should be header + 1 but need to test to make sure detector still works
@@ -85,6 +103,7 @@ enum reservedTopic {
   pong = 0x02,
   gps = 0x03,
   ack = 0x04,
+  cmd = 0x05,
   max_reserved = 0x0F
 };
 
