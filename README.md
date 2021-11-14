@@ -49,7 +49,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our Code of Conduc
 This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE) file for details.
 
 ## Version
-v3.0.1
+v3.0.2
 
 
 [Project OWL]: <https://www.project-owl.com/>
