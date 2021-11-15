@@ -87,9 +87,7 @@ void MamaDuck::handleReceivedPacket() {
     CdpPacket packet = CdpPacket(rxPacket->getBuffer());
 
     //Check if Duck is desitination for this packet before relaying
-    if (duckutils::isEqual(duid, packet.dduid)
-      || duckutils::isEqual(BROADCAST_DUID, packet.dduid)
-    ) {
+    if (duckutils::isEqual(BROADCAST_DUID, packet.dduid)) {
       switch(packet.topic) {
         case reservedTopic::ping:
           err = sendPong();
@@ -100,21 +98,41 @@ void MamaDuck::handleReceivedPacket() {
         break;
         case reservedTopic::ack:
           handleAck(packet);
+          //TODO: relay only on batch acks or if not destination 
+          err = duckRadio.relayPacket(rxPacket);
+          if (err != DUCK_ERR_NONE) {
+            logerr("====> ERROR handleReceivedPacket failed to relay. rc = " + String(err));
+          } else {
+            loginfo("handleReceivedPacket: packet RELAY DONE");
+          }
         break;
+        default:
+          err = duckRadio.relayPacket(rxPacket);
+          if (err != DUCK_ERR_NONE) {
+            logerr("====> ERROR handleReceivedPacket failed to relay. rc = " + String(err));
+          } else {
+            loginfo("handleReceivedPacket: packet RELAY DONE");
+          }
+      }
+    } else if(duckutils::isEqual(duid, packet.dduid)) {
+      //Relay packet
+      switch(packet.topic) {
         case reservedTopic::cmd:
 
         break;
         default:
-
+          err = duckRadio.relayPacket(rxPacket);
+          if (err != DUCK_ERR_NONE) {
+            logerr("====> ERROR handleReceivedPacket failed to relay. rc = " + String(err));
+          } else {
+            loginfo("handleReceivedPacket: packet RELAY DONE");
+          }
       }
+
+    } else {
+
     }
 
-    err = duckRadio.relayPacket(rxPacket);
-    if (err != DUCK_ERR_NONE) {
-      logerr("====> ERROR handleReceivedPacket failed to relay. rc = " + String(err));
-    } else {
-      loginfo("handleReceivedPacket: packet RELAY DONE");
-    }
   }
 }
 
