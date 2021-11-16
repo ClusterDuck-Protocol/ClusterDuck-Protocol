@@ -15,23 +15,23 @@
 #define DUID_LENGTH 8
 #define MUID_LENGTH 4
 #define DATA_CRC_LENGTH 4
-#define HEADER_LENGTH 28
+#define HEADER_LENGTH 27
 
 // field/section offsets
 #define SDUID_POS 0
 #define DDUID_POS 8
 #define MUID_POS 16
 #define TOPIC_POS 20
-#define PATH_OFFSET_POS 21
-#define DUCK_TYPE_POS 22
-#define HOP_COUNT_POS 23
-#define DATA_CRC_POS 24
+//#define PATH_OFFSET_POS 21
+#define DUCK_TYPE_POS 21
+#define HOP_COUNT_POS 22
+#define DATA_CRC_POS 23
 #define DATA_POS HEADER_LENGTH // Data section starts immediately after header
 
 #define RESERVED_LENGTH 2
-#define MAX_PATH_LENGTH (MAX_HOPS * DUID_LENGTH)
-#define MAX_DATA_LENGTH (PACKET_LENGTH - HEADER_LENGTH - MAX_PATH_LENGTH)
-#define MAX_PATH_OFFSET (PACKET_LENGTH - DUID_LENGTH - 1)
+//#define MAX_PATH_LENGTH (MAX_HOPS * DUID_LENGTH)
+#define MAX_DATA_LENGTH (PACKET_LENGTH - HEADER_LENGTH)
+//#define MAX_PATH_OFFSET (PACKET_LENGTH - DUID_LENGTH - 1)
 
 /*
 Data Section of a broadcast ack (max 180 bytes):
@@ -88,23 +88,21 @@ enum reservedTopic {
 };
 
 /*
-0        7       15   19      23   27                  PO                  255
-|        |        |    | | | | |    |                  |                     |
-+--------+--------+----+-+-+-+-+----+------------------+---------------------+
-| SDUID  | DDUID  |MUID|T|P|D|H|DCRC|      DATA        | PATH (max 48 bytes) |
-|        |        |    | |O|T|C|    | (max 180 bytes)  |                     |
-+--------+--------+----+-+-+-+-+----+------------------+---------------------+
+|0       |8       |16  |20|21|22|23  |27                                   255|
+|        |        |    |  |  |  |    |                                        |
++--------+--------+----+--+--+--+----+----------------------------------------+
+| SDUID  | DDUID  |MUID|T |DT|HC|DCRC|                 DATA                   |
+|        |        |    |  |  |  |    |            (max 229 bytes)             |
++--------+--------+----+--+--+--+----+----------------------------------------+
 
 SDUID:     08  byte array          - Source Device Unique ID
 DDUID:     08  byte array          - Destination Device Unique ID
 MUID:      04  byte array          - Message unique ID
 T   :      01  byte value          - Topic (topic 0..15 are reserved for internal use)
-PO  :      01  byte value          - Offset to the start of the Path section
 DT  :      01  byte value          - Duck Type 
 HC  :      01  byte value          - Hop count (the number of times the packet was relayed)
 DCRC:      04  byte value          - Data section CRC
-DATA:      188 byte array          - Data payload (e.g sensor read, text,...)
-PATH:      048 byte array of DUIDs - Device UIDs having seen this packet - Max is 48 bytes (6 hops)
+DATA:      229 byte array          - Data payload (e.g sensor read, text,...)
 */
 
 typedef std::vector<byte> Duid;
@@ -135,10 +133,6 @@ public:
 
   CdpPacket(const std::vector<byte> & buffer) {
     int buffer_length = buffer.size();
-    
-    // get path start position
-    int path_pos = buffer[PATH_OFFSET_POS];
-    
     // sduid
     sduid.assign(&buffer[SDUID_POS], &buffer[DDUID_POS]);
     // dduid
@@ -147,8 +141,6 @@ public:
     muid.assign(&buffer[MUID_POS], &buffer[TOPIC_POS]);
     // topic
     topic = buffer[TOPIC_POS];
-    // path offset
-    path_offset = buffer[PATH_OFFSET_POS];
     // duckType
     duckType = buffer[DUCK_TYPE_POS];
     // hop count
@@ -156,9 +148,8 @@ public:
     // data crc
     dcrc = duckutils::toUnit32(&buffer[DATA_CRC_POS]);
     // data section
-    data.assign(&buffer[DATA_POS], &buffer[path_pos]);
-    // path section
-    path.assign(&buffer[path_pos], &buffer[buffer_length]);
+    data.assign(&buffer[DATA_POS], &buffer[buffer_length]);
+
   }
 
   ~CdpPacket() {}

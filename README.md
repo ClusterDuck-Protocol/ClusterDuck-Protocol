@@ -27,6 +27,14 @@ Check out the [Wiki](https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki)
 **To use the ClusterDuck Protocol follow the [Installation Manual](https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki/getting-started).**
 
 
+## Testing
+
+From the project root, run the following snippet:
+
+`g++ -g -Wall -DCDP_NO_LOG test_bloomfilter.cpp src/bloomfilter.cpp -o test_bloomfilter && ./test_bloomfilter`
+
+This runs an acceptance test for the bloom filter. 
+
 ## Contributing
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our Code of Conduct, the process for submitting ClusterDuck Protocol improvements, and how to join our town halls and livestreams.
@@ -41,7 +49,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our Code of Conduc
 This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE) file for details.
 
 ## Version
-v2.11.0
+v3.0.1
 
 
 

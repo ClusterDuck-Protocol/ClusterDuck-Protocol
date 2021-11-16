@@ -139,9 +139,9 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     //Flip Decrypt State
     loginfo("Flipping Decrypt");
 
-    duckcrypto::setDecrypt(!duckcrypto::getDecrypt());
+    duck->setDecrypt(!duck->getDecrypt());
     loginfo("Decrypt is now: ");
-    loginfo(duckcrypto::getDecrypt());
+    loginfo(duck->getDecrypt());
     request->send(200, "text/plain", "Success");
   });
 

@@ -18,8 +18,8 @@ enum muidStatus {
 };
 
 #include "../DuckError.h"
+#include "bloomfilter.h"
 #include "cdpcfg.h"
-#include "DuckCrypto.h"
 #include "DuckNet.h"
 #include "DuckPacket.h"
 #include "DuckRadio.h"
@@ -331,6 +331,8 @@ protected:
   bool lastMessageAck = true;
   // Since this may be used to throttle outgoing packets, start out in a state
   // that indicates we're not waiting for a ack
+
+  BloomFilter filter;
 
   /**
    * @brief sends a pong message
