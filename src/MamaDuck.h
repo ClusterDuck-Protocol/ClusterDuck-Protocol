@@ -61,6 +61,8 @@ private :
   rxDoneCallback recvDataCallback;
   void handleReceivedPacket();
 
+  void handleCommand(const CdpPacket & packet);
+
   /**
    * @brief Handles if there were any acks addressed to this duck.
    *

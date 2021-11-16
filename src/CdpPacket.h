@@ -93,6 +93,8 @@ enum topics {
   alert = 0x14,
   /// Device health status
   health = 0x15,
+  // Send commands
+  cmd = 0x16,
   /// Max supported topics
   max_topics = 0xFF
 };
@@ -103,7 +105,6 @@ enum reservedTopic {
   pong = 0x02,
   gps = 0x03,
   ack = 0x04,
-  cmd = 0x05,
   max_reserved = 0x0F
 };
 

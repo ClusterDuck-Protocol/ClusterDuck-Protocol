@@ -88,6 +88,7 @@ void MamaDuck::handleReceivedPacket() {
 
     //Check if Duck is desitination for this packet before relaying
     if (duckutils::isEqual(BROADCAST_DUID, packet.dduid)) {
+      
       switch(packet.topic) {
         case reservedTopic::ping:
           err = sendPong();
@@ -98,7 +99,7 @@ void MamaDuck::handleReceivedPacket() {
         break;
         case reservedTopic::ack:
           handleAck(packet);
-          //TODO: relay only on batch acks or if not destination 
+          //relay batch ack 
           err = duckRadio.relayPacket(rxPacket);
           if (err != DUCK_ERR_NONE) {
             logerr("====> ERROR handleReceivedPacket failed to relay. rc = " + String(err));
@@ -115,10 +116,14 @@ void MamaDuck::handleReceivedPacket() {
           }
       }
     } else if(duckutils::isEqual(duid, packet.dduid)) {
-      //Relay packet
+      
       switch(packet.topic) {
-        case reservedTopic::cmd:
-
+        case topics::cmd:
+          loginfo("Command received");
+          handleCommand(packet);
+        break;
+        case reservedTopic::ack:
+          handleAck(packet);
         break;
         default:
           err = duckRadio.relayPacket(rxPacket);
@@ -130,10 +135,36 @@ void MamaDuck::handleReceivedPacket() {
       }
 
     } else {
-
+      err = duckRadio.relayPacket(rxPacket);
+      if (err != DUCK_ERR_NONE) {
+        logerr("====> ERROR handleReceivedPacket failed to relay. rc = " + String(err));
+      } else {
+        loginfo("handleReceivedPacket: packet RELAY DONE");
+      }
     }
 
   }
+}
+
+void MamaDuck::handleCommand(const CdpPacket & packet) {
+
+  switch(packet.data[0]) {
+    case 1:
+      //Change wifi status
+      if(packet.data[1]) {
+        loginfo("Command WiFi ON");
+        WiFi.mode(WIFI_AP);
+
+      } else if (!packet.data[1]) {
+        loginfo("Command WiFi OFF");
+        WiFi.mode( WIFI_MODE_NULL );
+      }
+      
+    break;
+    default:
+      logerr("Command not recognized");
+  }
+
 }
 
 void MamaDuck::handleAck(const CdpPacket & packet) {
