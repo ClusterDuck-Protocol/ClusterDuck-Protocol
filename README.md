@@ -13,7 +13,7 @@ The network is made up of multiple nodes called **"Ducks"**. There are 3 core ro
 ![overview](https://www.project-owl.com/assets/wiki/cdp-explain-gif.gif)
 
 ## Captive Portal
-The Captive Portal is an important feature in the ClusterDuck Protocol network. The Captive Portal allows devices such as smartphones and laptops to access the network without the need to download additional software as it takes advantage a system that is native to smartphones such as Android and iPhone devices and laptops. 
+The Captive Portal is an important feature in the ClusterDuck Protocol network. The Captive Portal allows devices such as smartphones and laptops to access the network without the need to download additional software as it takes advantage of a system that is native to smartphones such as Android and iPhone devices and laptops. 
 
 This is beneficial after events such as earthquakes or hurricanes where traditional communication infrastructure is crippled. Users are able to connect to the WiFi access point of a DuckLink or MamaDuck which will in turn relay their message onward.
 
@@ -26,14 +26,6 @@ Check out the [Wiki](https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki)
 
 **To use the ClusterDuck Protocol follow the [Installation Manual](https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki/getting-started).**
 
-
-## Testing
-
-From the project root, run the following snippet:
-
-`g++ -g -Wall -DCDP_NO_LOG test_bloomfilter.cpp src/bloomfilter.cpp -o test_bloomfilter && ./test_bloomfilter`
-
-This runs an acceptance test for the bloom filter. 
 
 ## Contributing
 

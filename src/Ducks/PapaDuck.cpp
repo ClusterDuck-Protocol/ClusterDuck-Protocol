@@ -113,7 +113,7 @@ void PapaDuck::handleReceivedPacket() {
     return;
   }
   // build our RX DuckPacket which holds the updated path in case the packet is relayed
-  bool relay = rxPacket->prepareForRelaying(&filter, data);
+  bool relay = rxPacket->prepareForRelaying(duid, data);
   if (relay) {
     logdbg("relaying:  " +
       duckutils::convertToHex(rxPacket->getBuffer().data(),
@@ -191,7 +191,7 @@ void PapaDuck::broadcastAck() {
     dataPayload.insert(dataPayload.end(), muid.begin(), muid.end());
   }
 
-  int err = txPacket->prepareForSending(&filter, BROADCAST_DUID, DuckType::PAPA,
+  int err = txPacket->prepareForSending(BROADCAST_DUID, DuckType::PAPA,
     reservedTopic::ack, dataPayload);
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR handleReceivedPacket. Failed to prepare ack. Error: " +
@@ -199,11 +199,7 @@ void PapaDuck::broadcastAck() {
   }
 
   err = duckRadio.sendData(txPacket->getBuffer());
-
-  if (err == DUCK_ERR_NONE) {
-    CdpPacket packet = CdpPacket(txPacket->getBuffer());
-    filter.bloom_add(packet.muid.data(), MUID_LENGTH);
-  } else {
+  if (err != DUCK_ERR_NONE) {
     logerr("ERROR handleReceivedPacket. Failed to send ack. Error: " +
       String(err));
   }
