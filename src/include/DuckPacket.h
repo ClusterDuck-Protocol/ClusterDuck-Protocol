@@ -5,7 +5,6 @@
 #include "Arduino.h"
 #include "DuckUtils.h"
 #include "cdpcfg.h"
-#include "bloomfilter.h"
 #include <CRC32.h>
 #include <WString.h>
 #include <vector>
@@ -47,23 +46,22 @@ public:
     /**
      * @brief Build a packet from the given topic and provided byte buffer.
      *
-     * @param targetDevice the target device DUID to receive the message
+     * @param targetDevice the target device to receive the message
      * @param topic a message topic
      * @param app_data a byte buffer that contains the packet data section
      * @returns DUCK_ERR_NONE if the operation was successful, otherwise an error code.
      */
-    int prepareForSending(BloomFilter *filter, const std::vector<byte> targetDevice,
-                          byte duckType, byte topic, std::vector<byte> app_data);
+    int prepareForSending(const std::vector<byte> targetDevice, byte duckType, byte topic, std::vector<byte> app_data);
 
     /**
      * @brief Update a received packet if it needs to be relayed in the mesh.
      * 
-     * @param filter The bloom filter describing what packets have already been seen
+     * @param duid unique Id of the device relaying the packet
      * @param dataBuffer buffer containing the packet data
      * @returns true if the packet needs to be relayed
      * @returns false if the packet does not need to be replayed
      */
-    bool prepareForRelaying(BloomFilter *filter, std::vector<byte> dataBuffer);
+    bool prepareForRelaying(std::vector<byte> duid, std::vector<byte> dataBuffer);
     
     /**
      * @brief Get the Cdp Packet byte vector.
@@ -71,6 +69,17 @@ public:
      * @returns a vector of bytes representing the cdp packet 
      */
     std::vector<byte> getBuffer() { return buffer;}
+    
+    /**
+     * @brief Checks if a packet needs to be relayed and update the path section.
+     * of the cdp packet
+     * 
+     * @param duid the device uid to add to the path section if packet is relayed
+     * @param path_section the path section of the cdp packet to check
+     * @returns true if packet should be relayed.
+     * @returns false if packet should not be relayed.
+     */
+    bool relay(std::vector<byte> duid, std::vector<byte> path_section);
 
     /**
      * @brief Resets the packet byte buffer.
@@ -86,9 +95,6 @@ public:
   private: 
     std::vector<byte> duid;
     std::vector<byte> buffer;
-
-    static void getUniqueMessageId(BloomFilter * filter, byte message_id[MUID_LENGTH]);
-
 };
 
 #endif
