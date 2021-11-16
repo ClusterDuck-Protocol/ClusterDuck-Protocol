@@ -5,21 +5,14 @@
 #include <esp_task_wdt.h>
 #include <Update.h>
 
-#include "../CdpPacket.h"
-#include "include/bloomfilter.h"
-#include "include/DuckCrypto.h"
 #include "include/DuckEsp.h"
 #include "include/DuckNet.h"
+#include "../CdpPacket.h"
 
 const int MEMORY_LOW_THRESHOLD = PACKET_LENGTH + sizeof(CdpPacket);
-const int NUM_SECTORS = 312; //total desired bits divided by bits per sector
-const int NUM_HASH_FUNCS = 2;
-const int BITS_PER_SECTOR = 32; //size of unsigned int is 32 bits
-const int MAX_MESSAGES = 100;
 
 Duck::Duck(String name):
-  duckNet(new DuckNet(this)),
-  filter(NUM_SECTORS, NUM_HASH_FUNCS, BITS_PER_SECTOR, MAX_MESSAGES)
+  duckNet(new DuckNet(this))
 {
   duckName = name;
 }
@@ -45,10 +38,6 @@ bool Duck::getEncrypt() {
 
 bool Duck::getDecrypt() {
   return duckcrypto::getDecrypt();
-}
-
-void Duck::setDecrypt(bool state) {
-  duckcrypto::setDecrypt(state);
 }
 
 void Duck::setAESKey(uint8_t newKEY[32]) {
@@ -301,7 +290,7 @@ int Duck::sendData(byte topic, std::vector<byte> data,
            " bytes");
     return DUCKPACKET_ERR_SIZE_INVALID;
   }
-  int err = txPacket->prepareForSending(&filter, targetDevice, this->getType(), topic, data);
+  int err = txPacket->prepareForSending(targetDevice, this->getType(), topic, data);
 
   if (err != DUCK_ERR_NONE) {
     return err;
@@ -310,10 +299,6 @@ int Duck::sendData(byte topic, std::vector<byte> data,
   err = duckRadio.sendData(txPacket->getBuffer());
 
   CdpPacket packet = CdpPacket(txPacket->getBuffer());
-
-  if (err == DUCK_ERR_NONE) {
-    filter.bloom_add(packet.muid.data(), MUID_LENGTH);
-  }
 
   if (!lastMessageAck) {
     loginfo("Previous `lastMessageMuid` " + duckutils::toString(lastMessageMuid) +
@@ -410,7 +395,7 @@ int Duck::startReceive() {
 int Duck::sendPong() {
   int err = DUCK_ERR_NONE;
   std::vector<byte> data(1, 0);
-  err = txPacket->prepareForSending(&filter, ZERO_DUID, this->getType(), reservedTopic::pong, data);
+  err = txPacket->prepareForSending(ZERO_DUID, this->getType(), reservedTopic::pong, data);
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR Oops! failed to build pong packet, err = " + err);
     return err;
@@ -426,7 +411,7 @@ int Duck::sendPong() {
 int Duck::sendPing() {
   int err = DUCK_ERR_NONE;
   std::vector<byte> data(1, 0);
-  err = txPacket->prepareForSending(&filter, ZERO_DUID, this->getType(), reservedTopic::ping, data);
+  err = txPacket->prepareForSending(ZERO_DUID, this->getType(), reservedTopic::ping, data);
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR Failed to build ping packet, err = " + err);
     return err;
@@ -453,8 +438,6 @@ String Duck::getSsid() {
 String Duck::getPassword() {
   return duckNet->getPassword();
 }
-
-
 
 String Duck::getErrorString(int error) {
   String errorStr = String(error) + ": ";

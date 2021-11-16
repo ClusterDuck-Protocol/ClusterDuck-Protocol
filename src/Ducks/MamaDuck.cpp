@@ -39,7 +39,6 @@ int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String 
     logerr("ERROR setupWithDefaults rc = " + String(err));
     return err;
   }
-
   duckutils::getTimer().every(CDPCFG_MILLIS_ALIVE, imAlive);
 
   duckNet->loadChannel();
@@ -74,10 +73,9 @@ void MamaDuck::handleReceivedPacket() {
   }
   logdbg("Got data from radio, prepare for relay. size: "+ String(data.size()));
 
-  relay = rxPacket->prepareForRelaying(&filter, data);
+  relay = rxPacket->prepareForRelaying(duid, data);
   if (relay) {
-    //TODO: this callback is causing an issue, needs to be fixed for mamaduck to get packet data
-    //recvDataCallback(rxPacket->getBuffer());
+    recvDataCallback(rxPacket->getBuffer());
     loginfo("handleReceivedPacket: packet RELAY START");
     // NOTE:
     // Ducks will only handle received message one at a time, so there is a chance the

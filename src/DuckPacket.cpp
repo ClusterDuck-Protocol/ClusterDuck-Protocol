@@ -1,60 +1,70 @@
-#include "Arduino.h"
 #include "include/DuckPacket.h"
 #include "DuckError.h"
 #include "DuckLogger.h"
 #include "MemoryFree.h"
 #include "include/DuckUtils.h"
 #include "include/DuckCrypto.h"
-#include "include/bloomfilter.h"
 #include <string>
 
+#define ENCRYPTION
 
-bool DuckPacket::prepareForRelaying(BloomFilter *filter, std::vector<byte> dataBuffer) {
 
+bool DuckPacket::prepareForRelaying(std::vector<byte> duid, std::vector<byte> dataBuffer) {
+
+  bool relaying;
+
+
+  int packet_length = dataBuffer.size();
+  int path_pos = dataBuffer.data()[PATH_OFFSET_POS];
+
+  std::vector<byte> path_section;
+
+  // extract path section from the packet buffer
+  path_section.assign(&dataBuffer[path_pos], &dataBuffer[packet_length]);
 
   this->reset();
 
   loginfo("prepareForRelaying: START");
+
+  // update the rx packet byte buffer
+  buffer.assign(dataBuffer.begin(), dataBuffer.end());
+
   loginfo("prepareForRelaying: Packet is built. Checking for relay...");
 
-  //TODO: Add bloom filter empty when full
-  //TODO: Add 2nd bloom filter
-  //TODO: Calculate false positive chance
-  //TODO: Add backwards compatibility
+  // when a packet is relayed the given duid is added to the path section of the
+  // packet
+  relaying = relay(duid, path_section);
+  if (!relaying) {
+    this->reset();
+  }
+  loginfo("prepareForRelaying: DONE. Relay = " + String(relaying));
+  return relaying;
+}
 
-  // Query the existence of strings
-  bool alreadySeen = filter->bloom_check(&dataBuffer[MUID_POS], MUID_LENGTH);
-  if (alreadySeen) {
-    logdbg("handleReceivedPacket: Packet already seen. No relay.");
+bool DuckPacket::relay(std::vector<byte> duid, std::vector<byte> path_section) {
+
+  int path_length = path_section.size();
+
+  if (path_length == MAX_PATH_LENGTH) {
+    logerr("ERROR Max hops reached. Cannot relay packet.");
     return false;
-  } else {
-    filter->bloom_add(&dataBuffer[MUID_POS], MUID_LENGTH);
-    logdbg("handleReceivedPacket: Relaying packet: "  + duckutils::convertToHex(&dataBuffer[MUID_POS], MUID_LENGTH));
   }
 
-  // update the rx packet internal byte buffer
-  buffer.assign(dataBuffer.begin(), dataBuffer.end());
-  int hops = buffer[HOP_COUNT_POS]++;
-  loginfo("prepareForRelaying: hops count: "+ String(hops));
+  // we don't have a contains() method but we can use indexOf()
+  // if the result is > 0 then the substring was found
+  // starting at the returned index value.
+  String id = duckutils::convertToHex(duid.data(), duid.size());
+  String path_string = duckutils::convertToHex(path_section.data(), path_length);
+  if (path_string.indexOf(id) >= 0) {
+    loginfo("Packet already seen. ignore it.");
+    return false;
+  }
+  buffer.insert(buffer.end(), duid.begin(), duid.end());
+  buffer[HOP_COUNT_POS]++;
   return true;
-  
-  
 }
 
-void DuckPacket::getUniqueMessageId(BloomFilter * filter, byte message_id[MUID_LENGTH]) {
-
-  bool getNewUnique = true;
-  while (getNewUnique) {
-    duckutils::getRandomBytes(MUID_LENGTH, message_id);
-    getNewUnique = filter->bloom_check(message_id, MUID_LENGTH);
-    loginfo("prepareForSending: new MUID -> " + duckutils::convertToHex(message_id, MUID_LENGTH));
-    
-  }
-}
-
-int DuckPacket::prepareForSending(BloomFilter *filter,
-                                  std::vector<byte> targetDevice, byte duckType,
-                                  byte topic, std::vector<byte> app_data) {
+int DuckPacket::prepareForSending(std::vector<byte> targetDevice, byte duckType, byte topic, std::vector<byte> app_data) {
 
   std::vector<uint8_t> encryptedData;
   uint8_t app_data_length = app_data.size();
@@ -69,7 +79,7 @@ int DuckPacket::prepareForSending(BloomFilter *filter,
           " TOPIC: " + String(topic));
 
   byte message_id[MUID_LENGTH];
-  getUniqueMessageId(filter, message_id);
+  duckutils::getRandomBytes(MUID_LENGTH, message_id);
 
   byte crc_bytes[DATA_CRC_LENGTH];
   uint32_t value;
@@ -104,6 +114,11 @@ int DuckPacket::prepareForSending(BloomFilter *filter,
   buffer.insert(buffer.end(), topic);
   logdbg("Topic:     " + duckutils::convertToHex(buffer.data(), buffer.size()));
 
+  // path offset
+  byte offset = HEADER_LENGTH + app_data_length;
+  buffer.insert(buffer.end(), offset);
+  logdbg("Offset:    " + duckutils::convertToHex(buffer.data(), buffer.size()));
+
   // duckType
   buffer.insert(buffer.end(), duckType);
   logdbg("duck type: " + duckutils::convertToHex(buffer.data(), buffer.size()));
@@ -128,8 +143,8 @@ int DuckPacket::prepareForSending(BloomFilter *filter,
   }
   
   // ----- insert path -----
-  // buffer.insert(buffer.end(), duid.begin(), duid.end());
-  // logdbg("Path:      " + duckutils::convertToHex(buffer.data(), buffer.size()));
+  buffer.insert(buffer.end(), duid.begin(), duid.end());
+  logdbg("Path:      " + duckutils::convertToHex(buffer.data(), buffer.size()));
 
   logdbg("Built packet: " +
          duckutils::convertToHex(buffer.data(), buffer.size()));
