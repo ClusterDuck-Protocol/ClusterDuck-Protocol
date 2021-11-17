@@ -105,6 +105,7 @@ enum reservedTopic {
   pong = 0x02,
   gps = 0x03,
   ack = 0x04,
+  cmd = 0x05,
   max_reserved = 0x0F
 };
 
