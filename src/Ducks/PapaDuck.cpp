@@ -212,6 +212,7 @@ void PapaDuck::broadcastAck() {
 }
 
 void PapaDuck::sendCommand(byte cmd, std::vector<byte> value) {
+  loginfo("Initiate sending command");
   std::vector<byte> dataPayload;
   dataPayload.push_back(cmd);
   dataPayload.insert(dataPayload.end(), value.begin(), value.end());
@@ -235,6 +236,7 @@ void PapaDuck::sendCommand(byte cmd, std::vector<byte> value) {
 }
 
 void PapaDuck::sendCommand(byte cmd, std::vector<byte> value, std::vector<byte> dduid) {
+  loginfo("Initiate sending command");
   std::vector<byte> dataPayload;
   dataPayload.push_back(cmd);
   dataPayload.insert(dataPayload.end(), value.begin(), value.end());
@@ -242,7 +244,7 @@ void PapaDuck::sendCommand(byte cmd, std::vector<byte> value, std::vector<byte> 
   int err = txPacket->prepareForSending(&filter, dduid, DuckType::PAPA,
     reservedTopic::cmd, dataPayload);
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR handleReceivedPacket. Failed to prepare ack. Error: " +
+    logerr("ERROR handleReceivedPacket. Failed to prepare cmd. Error: " +
       String(err));
   }
 
@@ -252,7 +254,7 @@ void PapaDuck::sendCommand(byte cmd, std::vector<byte> value, std::vector<byte> 
     CdpPacket packet = CdpPacket(txPacket->getBuffer());
     filter.bloom_add(packet.muid.data(), MUID_LENGTH);
   } else {
-    logerr("ERROR handleReceivedPacket. Failed to send ack. Error: " +
+    logerr("ERROR handleReceivedPacket. Failed to send cmd. Error: " +
       String(err));
   }
 }
