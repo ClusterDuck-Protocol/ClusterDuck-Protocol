@@ -94,7 +94,7 @@ enum topics {
   /// Device health status
   health = 0x15,
   // Send commands
-  cmd = 0x16,
+  cmdd = 0x16,
   /// Max supported topics
   max_topics = 0xFF
 };

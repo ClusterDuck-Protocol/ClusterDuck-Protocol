@@ -110,7 +110,7 @@ void MamaDuck::handleReceivedPacket() {
         case reservedTopic::cmd:
           loginfo("Command received");
           handleCommand(packet);
-          
+
           err = duckRadio.relayPacket(rxPacket);
           if (err != DUCK_ERR_NONE) {
             logerr("====> ERROR handleReceivedPacket failed to relay. rc = " + String(err));
@@ -129,7 +129,7 @@ void MamaDuck::handleReceivedPacket() {
     } else if(duckutils::isEqual(duid, packet.dduid)) {
       
       switch(packet.topic) {
-        case topics::cmd:
+        case topics::cmdd:
           loginfo("Command received");
           handleCommand(packet);
         break;
