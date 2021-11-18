@@ -223,6 +223,7 @@ void handleDuckData(std::vector<byte> packetBuffer) {
     Serial.print("New size of queue: ");
     Serial.println(packetQueue.size());
   }
+  subscribeTo(commandTopic);
 }
 
 void setup() {
