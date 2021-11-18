@@ -9,7 +9,7 @@
  * try to publish all messages in the queue. You can change the size of the queue
  * by changing `QUEUE_SIZE_MAX`.
  * 
- * @date 2021-06-17
+ * @date 2021-11-18
  * 
  */
 
@@ -23,9 +23,6 @@
 #include <PapaDuck.h>
 #include <CdpPacket.h>
 #include <queue>
-
-#define MQTT_RETRY_DELAY_MS 500
-#define WIFI_RETRY_DELAY_MS 5000
 
 //Uncomment CA_CERT if you want to use the certificate auth method
 //#define CA_CERT
@@ -60,22 +57,29 @@ const char* example_root_ca = \
   // different cert. For details, see
   // https://github.com/espressif/arduino-esp32/tree/master/libraries/WiFiClientSecure
 #endif
+ 
+#define SSID "Chiao"
+#define PASSWORD "Chifa2018"
 
-#define SSID ""
-#define PASSWORD ""
+#define ORG         "9c6nfo"
+#define DEVICE_ID   "OWL_HQ"
+#define DEVICE_TYPE "PAPA"
+#define TOKEN       "Hln+?PfEy7!FsaZr1S"
 
 
-// Used for Mqtt client connection
-// Provided when a Papa Duck device is created in DMS
-#define ORG         ""
-#define DEVICE_ID   ""
-#define DEVICE_TYPE ""
-#define TOKEN       ""
 char server[] = ORG ".messaging.internetofthings.ibmcloud.com";
-const int port = 8883;
 char authMethod[] = "use-token-auth";
 char token[] = TOKEN;
 char clientId[] = "d:" ORG ":" DEVICE_TYPE ":" DEVICE_ID;
+
+#define CMD_STATE "/wifi/" 
+#define LED 2
+
+
+// use the '+' wildcard so it subscribes to any command with any message format
+const char commandTopic[] = "iot-2/cmd/+/fmt/+";
+
+void gotMsg(char* topic, byte* payload, unsigned int payloadLength);
 
 // Use pre-built papa duck
 PapaDuck duck;
@@ -90,7 +94,8 @@ int QUEUE_SIZE_MAX = 5;
 std::queue<std::vector<byte>> packetQueue;
 
 WiFiClientSecure wifiClient;
-PubSubClient client(server, port, wifiClient);
+PubSubClient client(server, 8883, gotMsg, wifiClient);
+
 // / DMS locator URL requires a topicString, so we need to convert the topic
 // from the packet to a string based on the topics code
 std::string toTopicString(byte topic) {
@@ -221,7 +226,7 @@ void handleDuckData(std::vector<byte> packetBuffer) {
 }
 
 void setup() {
-  // We are using a hardcoded device id here, but it should be retrieved or
+ // We are using a hardcoded device id here, but it should be retrieved or
   // given during the device provisioning then converted to a byte vector to
   // setup the duck NOTE: The Device ID must be exactly 8 bytes otherwise it
   // will get rejected
@@ -251,71 +256,100 @@ void setup() {
   Serial.println("[PAPA] Setup OK! ");
   
   // we are done
-  display->showDefaultScreen();
+  display->showDefaultScreen();; 
 }
-
-
 
 void loop() {
-  if (!duck.isWifiConnected() && retry) {
-    String ssid = duck.getSsid();
-    String password = duck.getPassword();
 
-    Serial.println("[PAPA] WiFi disconnected, reconnecting to local network: " +
-                   ssid);
+   if (!duck.isWifiConnected() && retry) {
+      String ssid = duck.getSsid();
+      String password = duck.getPassword();
 
-    int err = duck.reconnectWifi(ssid, password);
+      Serial.println("[PAPA] WiFi disconnected, reconnecting to local network: " +
+                     ssid);
 
-    if (err != DUCK_ERR_NONE) {
-      retry = false;
+      int err = duck.reconnectWifi(ssid, password);
+
+      if (err != DUCK_ERR_NONE) {
+         retry = false;
+      }
       timer.in(5000, enableRetry);
-    }
-  }
-  if (duck.isWifiConnected() && retry) {
-    setup_mqtt(use_auth_method);
-  }
+   }
 
-  duck.run();
-  timer.tick();
+   if (!client.loop()) {
+     if(duck.isWifiConnected()) {
+        mqttConnect();
+     }
+      
+   }
+   
+   duck.run();
+   timer.tick();
+ 
 }
 
-void setup_mqtt(bool use_auth) {
-  bool connected = client.connected();
-  if (connected) {
+void gotMsg(char* topic, byte* payload, unsigned int payloadLength) {
+ Serial.print("gotMsg: invoked for topic: "); Serial.println(topic);
+ 
+ if (String(topic).indexOf(CMD_STATE) > 0) {
+   String cmd = "";
+   for (int i=0; i<payloadLength; i++) {
+     cmd += (char)payload[i];
+   }
+   doCommand(cmd);
+ } else {
+   Serial.print("gotMsg: unexpected topic: "); Serial.println(topic); 
+ }
+}
 
-    //Once reconnected check queue and publish all queued messages
-    if(packetQueue.size() > 0) {
-      publishQueue();
-    }
-    return;
-  }
+void doCommand(String cmd) {
+ int currentState = digitalRead(LED);
+ int newState = (cmd == "on");
+ digitalWrite(LED, newState);
+ Serial.print("LED switched from "); 
+ Serial.print(currentState ? "On" : "Off");Serial.print(" to "); Serial.println(newState ? "On" : "Off");
+}
 
-  
-  if (use_auth) {
-    connected = client.connect(clientId, authMethod, token);
-  } else {
-    connected = client.connect(clientId);
-  }
-  if (connected) {
-    if(packetQueue.size() > 0) {
-      publishQueue();
-    }
-    Serial.println("[PAPA] Mqtt client is connected!");
-    return;
-  }
-  retry_mqtt_connection(1000);
-  
+void wifiConnect() {
+ Serial.print("Connecting to "); Serial.print(SSID);
+ WiFi.begin(SSID, PASSWORD);
+ while (WiFi.status() != WL_CONNECTED) {
+   delay(500);
+   Serial.print(".");
+ } 
+ Serial.print("\nWiFi connected, IP address: "); Serial.println(WiFi.localIP());
+}
+
+void mqttConnect() {
+   if (!!!client.connected()) {
+      Serial.print("Reconnecting MQTT client to "); Serial.println(server);
+      if(!!!client.connect(clientId, authMethod, token) && retry) {
+         Serial.print("Connection failed, retry in 5 seconds");
+         retry = false;
+         timer.in(5000, enableRetry);
+      }
+      Serial.println();
+   } else {
+      if(packetQueue.size() > 0) {
+         publishQueue();
+      }
+      subscribeTo(commandTopic);
+   }
+
+}
+
+void subscribeTo(const char* topic) {
+ Serial.print("subscribe to "); Serial.print(topic);
+ if (client.subscribe(topic)) {
+   Serial.println(" OK");
+ } else {
+   Serial.println(" FAILED");
+ }
 }
 
 bool enableRetry(void*) {
   retry = true;
   return retry;
-}
-
-void retry_mqtt_connection(int delay_ms) {
-  Serial.println("[PAPA] Could not connect to MQTT...............................");
-  retry = false;
-  timer.in(delay_ms, enableRetry);
 }
 
 void publishQueue() {
