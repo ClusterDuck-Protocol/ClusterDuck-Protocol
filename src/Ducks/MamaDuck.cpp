@@ -166,11 +166,11 @@ void MamaDuck::handleCommand(const CdpPacket & packet) {
   switch(packet.data[0]) {
     case 1:
       //Change wifi status
-      if(packet.data[1]) {
+      if((char)packet.data[1] == '1') {
         loginfo("Command WiFi ON");
         WiFi.mode(WIFI_AP);
 
-      } else if (!packet.data[1]) {
+      } else if ((char)packet.data[1] == '0') {
         loginfo("Command WiFi OFF");
         WiFi.mode( WIFI_MODE_NULL );
       }

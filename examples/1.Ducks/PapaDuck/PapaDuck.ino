@@ -292,13 +292,19 @@ void gotMsg(char* topic, byte* payload, unsigned int payloadLength) {
   Serial.print("gotMsg: invoked for topic: "); Serial.println(topic);
  
   if (String(topic).indexOf(CMD_STATE) > 0) {
-    byte sCmd = payload[1];
+    byte sCmd = 1;
     std::vector<byte> sValue = {payload[3]};
 
     if(payloadLength > 5) {
-      std::vector<byte> ddevId;
-      ddevId.insert(ddevId.end(),payload[5], payload[payloadLength-1]);
-      duck.sendCommand(sCmd, sValue, ddevId);
+      std::string destination = "";
+      for (int i=5; i<payloadLength; i++) {
+        destination += (char)payload[i];
+      }
+      
+      std::vector<byte> dDevId;
+      dDevId.insert(dDevId.end(),destination.begin(),destination.end());
+      
+      duck.sendCommand(sCmd, sValue, dDevId);
     } else {
       duck.sendCommand(sCmd, sValue);
     }
