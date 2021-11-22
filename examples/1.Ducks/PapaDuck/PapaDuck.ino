@@ -58,13 +58,13 @@ const char* example_root_ca = \
   // https://github.com/espressif/arduino-esp32/tree/master/libraries/WiFiClientSecure
 #endif
  
-#define SSID "Chiao"
-#define PASSWORD "Chifa2018"
+#define SSID ""
+#define PASSWORD ""
 
-#define ORG         "9c6nfo"
-#define DEVICE_ID   "OWL_HQ"
-#define DEVICE_TYPE "PAPA"
-#define TOKEN       "Hln+?PfEy7!FsaZr1S"
+#define ORG         ""
+#define DEVICE_ID   ""
+#define DEVICE_TYPE ""
+#define TOKEN       ""
 
 
 char server[] = ORG ".messaging.internetofthings.ibmcloud.com";
@@ -73,7 +73,6 @@ char token[] = TOKEN;
 char clientId[] = "d:" ORG ":" DEVICE_TYPE ":" DEVICE_ID;
 
 #define CMD_STATE "/wifi/" 
-#define LED 2
 
 
 // use the '+' wildcard so it subscribes to any command with any message format
@@ -290,25 +289,22 @@ void loop() {
 }
 
 void gotMsg(char* topic, byte* payload, unsigned int payloadLength) {
- Serial.print("gotMsg: invoked for topic: "); Serial.println(topic);
+  Serial.print("gotMsg: invoked for topic: "); Serial.println(topic);
  
- if (String(topic).indexOf(CMD_STATE) > 0) {
-   String cmd = "";
-   for (int i=0; i<payloadLength; i++) {
-     cmd += (char)payload[i];
-   }
-   doCommand(cmd);
- } else {
-   Serial.print("gotMsg: unexpected topic: "); Serial.println(topic); 
- }
-}
+  if (String(topic).indexOf(CMD_STATE) > 0) {
+    byte sCmd = payload[1];
+    std::vector<byte> sValue = {payload[3]};
 
-void doCommand(String cmd) {
- int currentState = digitalRead(LED);
- int newState = (cmd == "on");
- digitalWrite(LED, newState);
- Serial.print("LED switched from "); 
- Serial.print(currentState ? "On" : "Off");Serial.print(" to "); Serial.println(newState ? "On" : "Off");
+    if(payloadLength > 5) {
+      std::vector<byte> ddevId;
+      ddevId.insert(ddevId.end(),payload[5], payload[payloadLength-1]);
+      duck.sendCommand(sCmd, sValue, ddevId);
+    } else {
+      duck.sendCommand(sCmd, sValue);
+    }
+  } else {
+    Serial.print("gotMsg: unexpected topic: "); Serial.println(topic); 
+  }
 }
 
 void wifiConnect() {
