@@ -91,6 +91,7 @@ void MamaDuck::handleReceivedPacket() {
       
       switch(packet.topic) {
         case reservedTopic::ping:
+          loginfo("ping received");
           err = sendPong();
           if (err != DUCK_ERR_NONE) {
             logerr("ERROR failed to send pong message. rc = " + String(err));
