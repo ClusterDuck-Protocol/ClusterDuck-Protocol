@@ -39,15 +39,15 @@ const char MAIN_page[] PROGMEM = R"=====(
                 text-align: center;
                 padding: 0 16px;
             }
-            .main.on {
+            .body.on {
                display: block;
             }
-            .main.off {
+            .body.off {
                display: none;
             }
-            .main.sent {
+            .body.sent {
             }
-            .main.sent .updateBox {
+            .body.sent .c {
                background: #fff;
                color: #111;
                width: auto;
@@ -55,17 +55,17 @@ const char MAIN_page[] PROGMEM = R"=====(
                margin: 0 auto;
                padding: 14px;
             }
-            .main.sent .updateBox h4 {
+            .body.sent .c h4 {
                margin: 0 0 1em;
                font-size: 1.5em;
             }
-            .updateClass {
+            .b {
                display: block;
                padding: 20px;
                text-align: center;
                cursor: pointer;
             }
-            .updateClass:hover {
+            .b:hover {
                opacity: .7;
             }
             .update {
@@ -134,14 +134,41 @@ const char MAIN_page[] PROGMEM = R"=====(
     <body>
         <!-- HTML content of the captive portal below -->
         <h2 class="">You are Connected to a ClusterDuck</h2>
-        <div class="content main" id="formContent">
+        <div class="content body" id="formContent">
             <h3>Fill out the form below to submit information to the ClusterDuck network.</h3>
-            <div id="form">
+        <div id="form">
                 <form>
-                    <label for="clientId">Your ID:</label>
-                    <input type="text" id="clientId" name="clientId" pattern="[A-NPZ1-9]{4}" maxlength=4>
-                    <p>ID must be four characters long. It can be any capital letters of the Latin alphabet A-Z except O, or any numbers 1-9.</p>
-                    <label for="status">How are you?</label><br />
+
+                    <label for="firstName">First Name / नाम </label><br>
+                    <input class="textbox textbox-full" id="clientId" name="clientId" type="text" placeholder="Arun" /><br><br>
+                    <label for="lastName">Surname(s) / उपनाम</label><br>
+                    <input class="textbox textbox-full" name="lastName" id="lastName" type="text" placeholder="Rana" /> <br /><br>
+                    <label for="streetAddress">Location of Disaster / Emergency <br>आपदा / आपात स्थिति का स्थान</label>
+                    <input class="textbox textbox-full" name="streetAddress" id="streetAddress" type="text" placeholder="Jutogh" /> <br /> <br />
+                    <label for="city">City / शहर</label><br>
+                    <input class="textbox textbox-full" name="city" type="text" placeholder="Shimla" /><br><br>
+                    <label for="zipcode">Pincode / पिन कोड</label><br>
+                    <input class="textbox textbox-full" name="zipcode" type="number" placeholder="171011" /> <br /> <br />
+                    <label for="phone">Phone / फ़ोन नंबर </label><br />
+                    <input class="textbox textbox-full" name="phone" id="phoneNumber" type="tel" placeholder="787-123-1234" />
+                    <br /> <br />
+                    <label for="status">Current Status / वर्तमान स्थिति</label><br />
+                    <input name="status" id="currentStatusSos" type="radio" value="sos" /> I'm in danger (SOS)/ ख़तरे में
+
+                    <br><input name="status" id="currentStatusOk" type="radio" value="ok" /> OK <br />
+                    <br />
+                    <label for="status">Needs / ज़रूरत</label><br />
+                    <input type="checkbox" name="water" id="waterNeed" type="radio" value="water" /> Water
+                    <input name="transportation" id="transportationNeed" type="checkbox" value="transportation" /> Transportation <br />
+                    <input type="checkbox" name="food" id="foodNeed" type="radio" value="food" /> Food
+                    <input name="inspection" id="inspectionNeed" type="checkbox" value="inspection" /> Structural Inspection <br />
+                    <input type="checkbox" name="firstaid" id="firstAidNeed" type="radio" value="firstaid" /> First Aid
+                    <input name="shelter" type="checkbox" id="shelterNeed" value="shelter" /> Shelter <br />
+                    <br />
+                    <label for="status">How many people are with you?<br> आपके साथ कितने लोग हैं?</label><br />
+                    <span>Adults </span><input class="textbox textbox-small" name="adults" id="adultsInput" type="number" placeholder="2" />
+                    <span>Children </span><input class="textbox textbox-small" name="children" id="childrenInput" type="number" placeholder="2" />
+                    <span>Elderly </span><input class="textbox textbox-small" name="elderly" id="elderlyInput" type="number" placeholder="2"/>
                     <textarea class="textbox comments textbox-full" name="message" id="commentsInput" cols="30" rows="2"></textarea>
                     <button type="button" id="sendBtn" class="sendReportBtn">Send</button>
                     <p id="makeshiftErrorOutput" class="hidden"></p>
@@ -149,11 +176,11 @@ const char MAIN_page[] PROGMEM = R"=====(
                 <h6 style="font-size: 10px; text-align: center;margin-top: 24px;">Powered by the ClusterDuck Protocol</h6>
             </div>
         </div>
-        <div id="mainSent" class="=main off sent">
-            <div class="updateBox">
+        <div id="bodySent" class="body off sent">
+            <div class="c">
                 <div class="gps"><h4>Message Sent</h4><h5 id="dateNow">March 13, 2019 @ 1:00 PM</h5><p>Your message ID#: XXXXXX</p></div>
                 <p class="disclaimer">If your situation changes, please send another update.</p>
-                <div id="updateClassupdate" class="updateClass update">Send Update</div>
+                <div id="bupdate" class="b update">Send Update</div>
             </div>
         </div>
         <div id="lastMessageSection" class="hidden">
@@ -175,10 +202,8 @@ const char MAIN_page[] PROGMEM = R"=====(
             const CLIENT_ID_LENGTH = 4;
             const CLIENT_ID_KEY = 'CLIENT_ID';
             const NOT_ACKED_MSG = "The message may have been received, but we're still waiting for confirmation."
-
             var messageController;
             var muidRequest;
-
             function CreateMuidRequest(muid) {
                 return MuidRequest(
                     muid,
@@ -186,20 +211,17 @@ const char MAIN_page[] PROGMEM = R"=====(
                     document.getElementById('muidStatusMessage')
                 );
             }
-
             var MessageController = function() {
                 var loadListener = function() {
                     // this.responseText should be something like: {"muid":"ABCD"}
                     var res = JSON.parse(this.responseText);
                     messageController.saveLastMuid(res.muid);
-
                     var errEl = document.getElementById('makeshiftErrorOutput');
                     if (!errEl.classList.toString().includes("hidden")) {
                         errEl.innerHTML = '';
                         errEl.classList.add("hidden");
                     }
                 };
-
                 var errorListener = function() {
                     var errorMessage = 'There was an error sending the message. Please try again.';
                     console.log(errorMessage);
@@ -207,32 +229,25 @@ const char MAIN_page[] PROGMEM = R"=====(
                     errEl.innerHTML = errorMessage;
                     errEl.classList.remove("hidden");
                 };
-
                 var showSentMessage = function(commentsInput) {
                     var lastMessageField = document.getElementById('lastMessageField');
                     lastMessageField.innerHTML = commentsInput.value;
                     // TODO: Create a new DOM view so multiple messages can be shown
-
                     var msgSection = document.getElementById('lastMessageSection');
                     msgSection.classList.remove("hidden");
                 };
-
                 return {
                     sendMessage: function() {
                         var clientIdInput = document.getElementById('clientId');
                         var commentsInput = document.getElementById('commentsInput');
-
                         var params = new URLSearchParams("");
                         params.append(clientIdInput.name, clientIdInput.value);
                         params.append(commentsInput.name, commentsInput.value);
-
                         var req = new XMLHttpRequest();
                         req.addEventListener("load", loadListener);
                         req.addEventListener("error", errorListener);
-
                         req.open("POST", "/formSubmit.json?" + params.toString());
                         req.send();
-
                         showSentMessage(commentsInput);
                     },
                     saveLastMuid: function(muid) {
@@ -242,54 +257,43 @@ const char MAIN_page[] PROGMEM = R"=====(
                     },
                 };
             };
-
             var MuidRequest = function(muid, statusEl, messageEl) {
-
                 var showStatus = function(status, message) {
                     statusEl.innerHTML = status;
                     messageEl.innerHTML = message;
                 };
-
                 var loadListener = function() {
                     var res = JSON.parse(this.responseText);
                     showStatus(res.status, res.message);
-
                     if (res.status === 'not_acked') {
                         showStatus('not_acked', NOT_ACKED_MSG)
                         setTimeout(requestMuidStatus, 1000);
                     }
                 };
-
                 var errorListener = function() {
                     showStatus('error', 'There was an unknown error');
                     setTimeout(requestMuidStatus, 1000);
                 };
-
                 var requestMuidStatus = function() {
                     var req = new XMLHttpRequest();
                     req.addEventListener("load", loadListener);
                     req.addEventListener("error", errorListener);
-
                     var url = MUID_URL;
                     var params = new URLSearchParams("");
                     params.append(MUID_PARAM_NAME, muid);
                     url += "?" + params.toString();
-
                     req.open("GET", makeUrlUnique(url));
                     req.send();
                 };
-
                 return {
                     requestMuidStatus: requestMuidStatus,
                 };
             };
-
             function makeUrlUnique(url) {
                 // Makes the URL bypass the browser's cache.
                 // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest#bypassing_the_cache
                 return url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime();
             }
-
             function storageAvailable(type) {
                 var storage;
                 try {
@@ -314,7 +318,6 @@ const char MAIN_page[] PROGMEM = R"=====(
                         (storage && storage.length !== 0);
                 }
             }
-
             function generateClientId() {
                 var result = '';
                 var characters = 'ABCDEFGHIJKLMNPQRSTUVWXYZ123456789';
@@ -324,7 +327,6 @@ const char MAIN_page[] PROGMEM = R"=====(
                }
                return result;
             }
-
             function initialize() {
                 var clientId;
                 if (storageAvailable('localStorage')) {
@@ -338,11 +340,9 @@ const char MAIN_page[] PROGMEM = R"=====(
                 } else {
                     document.getElementById('clientId').value = '';
                 }
-
                 messageController = MessageController();
                 document.getElementById('sendBtn').addEventListener('click', messageController.sendMessage);
             }
-
             initialize();
         </script>
     </body>

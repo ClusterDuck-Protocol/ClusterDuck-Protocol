@@ -384,8 +384,8 @@
 #define CDPCFG_WEB_PORT 80
 
 /// Frequency Range. Set for US Region 915.0Mhz
-#define CDPCFG_RF_LORA_FREQ 915.0
-#define CDPCFG_RF_LORA_FREQ_HZ 915000000
+#define CDPCFG_RF_LORA_FREQ 867.0
+#define CDPCFG_RF_LORA_FREQ_HZ 867000000
 /// Bandwidth. Default is 125Mhz
 #define CDPCFG_RF_LORA_BW 125.0
 /// Spread Factor
@@ -413,12 +413,12 @@
 #define CDPCFG_PIN_RGBLED_B 2
 
 /// CDP Channel Frequencies
-#define CHANNEL_1 915.0
-#define CHANNEL_2 914.0
-#define CHANNEL_3 913.0
-#define CHANNEL_4 912.0
-#define CHANNEL_5 911.0
-#define CHANNEL_6 910.0
+#define CHANNEL_1 867.0
+#define CHANNEL_2 867.0
+#define CHANNEL_3 867.0
+#define CHANNEL_4 867.0
+#define CHANNEL_5 867.0
+#define CHANNEL_6 867.0
 
 /// Default LoRa Module supported chipset when using the RadioLib library
 #if !defined(CDPCFG_LORA_CLASS) && !defined(CDPCFG_HELTEC_CUBE_CELL)

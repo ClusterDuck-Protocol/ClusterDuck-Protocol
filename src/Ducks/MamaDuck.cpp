@@ -1,6 +1,7 @@
 #include "../MamaDuck.h"
 #include "../MemoryFree.h"
 
+
 int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String password) {
   
   int err = Duck::setupWithDefaults(deviceId, ssid, password);
@@ -16,7 +17,13 @@ int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String 
   }
 
   std::string name(deviceId.begin(),deviceId.end());
-  err = setupWifi(name.c_str());
+
+  std::string nameportal = "EMERGENCY PORTAL + " + name; // ok
+
+
+
+  err = setupWifi(nameportal.c_str());
+
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR setupWithDefaults rc = " + String(err));
     return err;
