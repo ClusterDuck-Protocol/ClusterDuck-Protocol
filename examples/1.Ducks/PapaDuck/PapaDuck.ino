@@ -297,7 +297,7 @@ void gotMsg(char* topic, byte* payload, unsigned int payloadLength) {
 
     if(payloadLength > 5) {
       std::string destination = "";
-      for (int i=5; i<payloadLength; i++) {
+      for (int i=5; i<payloadLength-1; i++) {
         destination += (char)payload[i];
       }
       
