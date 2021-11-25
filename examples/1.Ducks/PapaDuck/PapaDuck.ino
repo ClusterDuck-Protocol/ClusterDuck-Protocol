@@ -141,9 +141,8 @@ String convertToHex(byte* data, int size) {
 
 // WiFi connection retry
 bool retry = true;
-int quackJson(std::vector<byte> packetBuffer) {
+int quackJson(CdpPacket packet) {
 
-  CdpPacket packet = CdpPacket(packetBuffer);
   const int bufferSize = 4 * JSON_OBJECT_SIZE(4);
   StaticJsonDocument<bufferSize> doc;
 
@@ -212,16 +211,21 @@ int quackJson(std::vector<byte> packetBuffer) {
 void handleDuckData(std::vector<byte> packetBuffer) {
   Serial.println("[PAPA] got packet: " +
                  convertToHex(packetBuffer.data(), packetBuffer.size()));
-  if(quackJson(packetBuffer) == -1) {
-    if(packetQueue.size() > QUEUE_SIZE_MAX) {
-      packetQueue.pop();
-      packetQueue.push(packetBuffer);
-    } else {
-      packetQueue.push(packetBuffer);
+  
+  CdpPacket packet = CdpPacket(packetBuffer);
+  if(packet.topic != reservedTopic::ack) {
+    if(quackJson(packet) == -1) {
+      if(packetQueue.size() > QUEUE_SIZE_MAX) {
+        packetQueue.pop();
+        packetQueue.push(packetBuffer);
+      } else {
+        packetQueue.push(packetBuffer);
+      }
+      Serial.print("New size of queue: ");
+      Serial.println(packetQueue.size());
     }
-    Serial.print("New size of queue: ");
-    Serial.println(packetQueue.size());
   }
+  
   subscribeTo(commandTopic);
 }
 
