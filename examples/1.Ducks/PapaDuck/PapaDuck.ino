@@ -147,6 +147,9 @@ int quackJson(std::vector<byte> packetBuffer) {
   const int bufferSize = 4 * JSON_OBJECT_SIZE(4);
   StaticJsonDocument<bufferSize> doc;
 
+  std::vector<uint8_t> encrypted;
+  encrypted.insert(encrypted.end(), packet.data.begin(), packet.data.end());
+  duck.decrypt(encrypted.data(), packet.data.data(), encrypted.size());
   // Here we treat the internal payload of the CDP packet as a string
   // but this is mostly application dependent. 
   // The parsingf here is optional. The Papa duck could simply decide to
@@ -242,6 +245,21 @@ void setup() {
   // display the functions will not do anything
   display->setupDisplay(duck.getType(), devId);
 
+  // Encryption Setup
+
+  // SET KEY
+  uint8_t KEY[32] = {0x02, 0x02, 0x02, 0x04, 0x04, 0x05, 0x06, 0x08,
+                     0x08, 0x09, 0x0A, 0x0B, 0x0A, 0x0D, 0x0E, 0x0F,
+                     0x10, 0x11, 0x12, 0x15, 0x14, 0x15, 0x16, 0x17,
+                     0x18, 0x19, 0x11, 0x1B, 0x1C, 0x13, 0x1E, 0x1F};
+
+  // SET IV
+  uint8_t IV[16] = {0x01, 0x01, 0x03, 0x03, 0x06, 0x06, 0x00, 0x07,
+                    0x08, 0x02, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x00};
+  
+  duck.setAESKey(KEY);
+  duck.setAESIv(IV);
+
   // register a callback to handle incoming data from duck in the network
   duck.onReceiveDuckData(handleDuckData);
 
@@ -255,8 +273,9 @@ void setup() {
 
   Serial.println("[PAPA] Setup OK! ");
   
+   duck.enableAcks(true);
   // we are done
-  display->showDefaultScreen();; 
+  display->showDefaultScreen();
 }
 
 void loop() {
@@ -297,7 +316,7 @@ void gotMsg(char* topic, byte* payload, unsigned int payloadLength) {
 
     if(payloadLength > 5) {
       std::string destination = "";
-      for (int i=5; i<payloadLength; i++) {
+      for (int i=5; i<payloadLength-1; i++) {
         destination += (char)payload[i];
       }
       

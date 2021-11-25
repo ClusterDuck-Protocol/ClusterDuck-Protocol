@@ -427,7 +427,7 @@ int DuckNet::setupInternet(String ssid, String password) {
 
   //  Connect to Access Point
   logdbg("setupInternet: connecting to WiFi access point SSID: " + ssid);
-  WiFi.begin(ssid.c_str(), password.c_str());
+  WiFi.begin(ssid.c_str());
   // We need to wait here for the connection to estanlish. Otherwise the WiFi.status() may return a false negative
   // WiFi.waitForConnectResult();
   delay(100);
