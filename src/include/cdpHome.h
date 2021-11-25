@@ -137,7 +137,7 @@ const char home_page[] PROGMEM = R"=====(
         <!-- HTML content of the captive portal below -->
         <h2 class="">SHIMLA EMERGENCY NETWORK</h2>
         <div class="content body" id="formContent">
-          <h3>Fill out the form below to submit information to HP Univeristy UIT </h3>
+          <h3>Fill out the form below to submit information to HP SDMA</h3>
         <div class="form">
                 <form>
 
