@@ -280,7 +280,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
       case DUCK_ERR_NONE:
       {
         // String response = "{\"muid\":\"" + duckutils::toString(muid) + "\"}";
-        String response = "MESSAGE SENT!"
+        String response = "MESSAGE SENT!";
         request->send(200, "text/html", response);
         logdbg("Sent 200 response: " + response);
       }
