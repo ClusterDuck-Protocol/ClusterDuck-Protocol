@@ -47,25 +47,25 @@ BloomFilter::BloomFilter(int numSectors, int numHashes, int bitsPerSector, int m
         exit(0);
     }
     srand(time(NULL));
-    int i;
-    for (i = 0; i < numHashes; i++){
-        int r = rand();
-        // Ensure we have no repeat seeds
-        int seedCollision = 1;
-        while (seedCollision == 1) {
-            seedCollision = 0;
-            for (int i = 0; i < numHashes; i++){
-                if (Seeds[i] == r) {
-                    seedCollision = 1;
-                }
-            }
-            if (seedCollision == 1){
+    bool seedCollision = true;
+    bool collision;
+    while (seedCollision) {
+        collision = false;
+        for (int i = 0; i < numHashes; i++) {
+            int r = rand();
+            if (Seeds[i] == r) {
                 r = rand();
+                collision = true;
+                break;
             }
+            Seeds[i] = r;
         }
-        Seeds[i] = r;
+        if (!collision) {
+            seedCollision = false;
+        }
     }
-    for (i = 0; i < numHashes; i++){
+
+    for (int i = 0; i < numHashes; i++) {
         logdbg_f("random seed %d: %d\n", i+1, Seeds[i]);
     }
     this->Seeds = Seeds;
