@@ -2,13 +2,13 @@
 
 int DuckDetect::setupWithDefaults(std::vector<byte> deviceId, String ssid,
                                   String password) {
-  // int err = Duck::setupWithDefaults(deviceId, ssid, password);
-  // if (err != DUCK_ERR_NONE) {
-  //   logerr("ERROR setupWithDefaults rc = " + String(err));
-  //   return err;
-  // }
+  int err = Duck::setupWithDefaults(deviceId, ssid, password);
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR setupWithDefaults rc = " + String(err));
+    return err;
+  }
 
-  int err = setDeviceId(deviceId);
+  err = setDeviceId(deviceId);
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR setupWithDefaults rc = " + String(err));
     return err;
@@ -82,7 +82,7 @@ void DuckDetect::handleReceivedPacket() {
 void DuckDetect::sendPing(bool startReceive) {
   int err = DUCK_ERR_NONE;
   std::vector<byte> data(1, 0);
-  err = txPacket->prepareForSending(&filter, ZERO_DUID, DuckType::DETECTOR, reservedTopic::ping, data);
+  err = txPacket->prepareForSending(&filter, BROADCAST_DUID, DuckType::DETECTOR, reservedTopic::ping, data);
 
   if (err == DUCK_ERR_NONE) {
     err = duckRadio.sendData(txPacket->getBuffer());

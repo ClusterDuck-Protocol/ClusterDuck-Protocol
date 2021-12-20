@@ -27,7 +27,7 @@ DuckDetect duck;
 // Create a timer with default settings
 auto timer = timer_create_default();
 
-const int INTERVAL_MS = 20000;
+const int INTERVAL_MS = 3000;
 
 void setup() {
   // We are using a hardcoded device id here, but it should be retrieved or
