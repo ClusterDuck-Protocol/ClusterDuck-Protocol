@@ -52,8 +52,10 @@ Each MUID:     04  byte array          - Message unique ID
 */
 #define MAX_MUID_PER_ACK 14
 
+
 // header + 1 hop + 1 byte data
 #define MIN_PACKET_LENGTH (HEADER_LENGTH + 1)
+
 
 #define ARRAY_LENGTH(array) (sizeof(array) / sizeof((array)[0]))
 

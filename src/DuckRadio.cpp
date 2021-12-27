@@ -113,6 +113,9 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
   if (packet_length < MIN_PACKET_LENGTH) {
     logerr("ERROR  handlePacket rx data size invalid: " +
            String(packet_length));
+           
+    DuckRadio::setReceiveFlag(false);
+    int rxState = startReceive();
     return DUCKLORA_ERR_HANDLE_PACKET;
   }
 

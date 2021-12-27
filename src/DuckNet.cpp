@@ -129,13 +129,13 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     
   });
 
-  webServer.on("/flipDetector", HTTP_POST, [&](AsyncWebServerRequest* request) {
+  webServer.on("/flipDetector", HTTP_GET, [&](AsyncWebServerRequest* request) {
     //Run flip method
     duckutils::flipDetectState();
     request->send(200, "text/plain", "Success");
   });
 
-  webServer.on("/flipDecrypt", HTTP_POST, [&](AsyncWebServerRequest* request) {
+  webServer.on("/flipDecrypt", HTTP_GET, [&](AsyncWebServerRequest* request) {
     //Flip Decrypt State
     loginfo("Flipping Decrypt");
 
