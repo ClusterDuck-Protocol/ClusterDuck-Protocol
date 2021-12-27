@@ -96,6 +96,8 @@ enum topics {
   // Send commands
   cmdd = 0x16,
   /// Max supported topics
+  BMP = 0x17,
+  /// Max supported topics
   max_topics = 0xFF
 };
 
@@ -106,6 +108,7 @@ enum reservedTopic {
   gps = 0x03,
   ack = 0x04,
   cmd = 0x05,
+  // BMP = 0x06,
   max_reserved = 0x0F
 };
 
