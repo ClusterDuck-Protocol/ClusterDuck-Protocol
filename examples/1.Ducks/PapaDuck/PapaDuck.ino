@@ -340,6 +340,7 @@ void mqttConnect() {
       if(packetQueue.size() > 0) {
          publishQueue();
       }
+      //Subscribe to command topic to receive commands from cloud
       subscribeTo(commandTopic);
    }
 
