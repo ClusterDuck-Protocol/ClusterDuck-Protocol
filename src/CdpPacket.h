@@ -96,7 +96,7 @@ enum topics {
   // Send commands
   cmdd = 0x16,
   /// Max supported topics
-  BMP = 0x17,
+  bmp180 = 0xFE,
   /// Max supported topics
   max_topics = 0xFF
 };
