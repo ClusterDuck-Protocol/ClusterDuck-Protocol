@@ -127,16 +127,41 @@ void MamaDuck::handleReceivedPacket() {
             loginfo("handleReceivedPacket: packet RELAY DONE");
           }
       }
-    } else if(duckutils::isEqual(duid, packet.dduid)) {
+    } else if(duckutils::isEqual(duid, packet.dduid)) { //Target device check
       
       switch(packet.topic) {
-        case topics::cmdd:
-          loginfo("Command received");
-          handleCommand(packet);
+        case topics::dcmd:
+          loginfo("Duck command received");
+          //handleCommand(packet);
         break;
         case reservedTopic::cmd:
           loginfo("Command received");
           handleCommand(packet);
+
+          std::vector<byte> dataPayload;
+
+          byte num = 1;
+          dataPayload.push_back(num);
+
+          dataPayload.insert(dataPayload.end(), packet.sduid.begin(), packet.sduid.end());
+          dataPayload.insert(dataPayload.end(), packet.muid.begin(), packet.muid.end());
+
+          int err = txPacket->prepareForSending(&filter, DuckType::PAPA, 
+            DuckType::MAMA, reservedTopic::ack, dataPayload);
+          if (err != DUCK_ERR_NONE) {
+          logerr("ERROR handleReceivedPacket. Failed to prepare ack. Error: " +
+            String(err));
+          }
+
+          err = duckRadio.sendData(txPacket->getBuffer());
+          if (err == DUCK_ERR_NONE) {
+            CdpPacket packet = CdpPacket(txPacket->getBuffer());
+            filter.bloom_add(packet.muid.data(), MUID_LENGTH);
+          } else {
+            logerr("ERROR handleReceivedPacket. Failed to send ack. Error: " +
+              String(err));
+          }
+
         break;
         case reservedTopic::ack:
           handleAck(packet);
