@@ -134,7 +134,7 @@ void MamaDuck::handleReceivedPacket() {
       switch(packet.topic) {
         case topics::dcmd:
           loginfo("Duck command received");
-          //handleCommand(packet);
+          handleDuckCommand(packet);
         break;
         case reservedTopic::cmd:
           loginfo("Command received");
@@ -205,6 +205,10 @@ void MamaDuck::handleCommand(const CdpPacket & packet) {
       logerr("Command not recognized");
   }
 
+}
+
+void MamaDuck::handleDuckCommand(const CdpPacket & packet) {
+  
 }
 
 void MamaDuck::handleAck(const CdpPacket & packet) {
