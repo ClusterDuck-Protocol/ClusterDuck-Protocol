@@ -25,6 +25,13 @@ static std::vector<byte> BROADCAST_DUID = {0xFF, 0xFF, 0xFF, 0xFF,
                                            0xFF, 0xFF, 0xFF, 0xFF};
 
 /**
+ * @brief Use this DUID to be received by every duck in the network
+ * 
+ */
+static std::vector<byte> PAPADUCK_DUID = {0x50, 0x61, 0x70, 0x61,
+                                           0x44, 0x75, 0x63, 0x6B};
+
+/**
  * @brief Encapsulate the protocol packet attributes and operations
  * 
  */

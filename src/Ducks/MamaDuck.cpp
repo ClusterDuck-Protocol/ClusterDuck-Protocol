@@ -128,6 +128,8 @@ void MamaDuck::handleReceivedPacket() {
           }
       }
     } else if(duckutils::isEqual(duid, packet.dduid)) { //Target device check
+        std::vector<byte> dataPayload;
+        byte num = 1;
       
       switch(packet.topic) {
         case topics::dcmd:
@@ -137,16 +139,13 @@ void MamaDuck::handleReceivedPacket() {
         case reservedTopic::cmd:
           loginfo("Command received");
           handleCommand(packet);
-
-          std::vector<byte> dataPayload;
-
-          byte num = 1;
+          
           dataPayload.push_back(num);
 
           dataPayload.insert(dataPayload.end(), packet.sduid.begin(), packet.sduid.end());
           dataPayload.insert(dataPayload.end(), packet.muid.begin(), packet.muid.end());
 
-          int err = txPacket->prepareForSending(&filter, DuckType::PAPA, 
+          int err = txPacket->prepareForSending(&filter, PAPADUCK_DUID, 
             DuckType::MAMA, reservedTopic::ack, dataPayload);
           if (err != DUCK_ERR_NONE) {
           logerr("ERROR handleReceivedPacket. Failed to prepare ack. Error: " +
