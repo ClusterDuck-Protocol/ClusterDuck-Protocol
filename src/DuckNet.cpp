@@ -12,6 +12,8 @@ DuckNet::DuckNet(Duck* duckIn):
 #ifndef CDPCFG_WIFI_NONE
 IPAddress apIP(CDPCFG_AP_IP1, CDPCFG_AP_IP2, CDPCFG_AP_IP3, CDPCFG_AP_IP4);
 AsyncWebServer webServer(CDPCFG_WEB_PORT);
+AsyncEventSource events("/events");
+
 DNSServer DuckNet::dnsServer;
 
 const char* DuckNet::DNS = "duck";
@@ -68,8 +70,20 @@ String DuckNet::createMuidResponseJson(muidStatus status) {
   return "{\"status\":\"" + statusStr + "\", \"message\":\"" + message + "\"}";
 }
 
+int DuckNet::sendNewMessageBoardMessage(std::vector<unsigned char> html){
+  char *buffer = new char[html.size()];
+  std::copy(html.begin(), html.end(), buffer);
+  events.send(buffer, "newMessage", millis());
+  delete(buffer);
+  return 0;
+}
 int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
   loginfo("Setting up Web Server");
+  events.onConnect([](AsyncEventSourceClient *client){
+    client->send("hello!",NULL,millis(),1000);
+  });
+  //HTTP Basic authentication
+  webServer.addHandler(&events);
 
   if (html == "") {
     logdbg("Web Server using main page");
@@ -84,7 +98,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
   });
 
   webServer.on("/", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    request->send(200, "text/html", portal);
+    request->send(200, "text/html", MAIN_page);
   });
 
   webServer.on("/main", HTTP_GET, [&](AsyncWebServerRequest* request) {

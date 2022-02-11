@@ -63,7 +63,7 @@ void MamaDuck::run() {
 }
 
 void MamaDuck::handleReceivedPacket() {
-
+ 
   std::vector<byte> data;
   bool relay = false;
   
@@ -121,6 +121,13 @@ void MamaDuck::handleReceivedPacket() {
             loginfo("handleReceivedPacket: packet RELAY DONE");
           }
         break;
+        case reservedTopic::mbm:
+        {
+          CdpPacket packet = CdpPacket(rxPacket->getBuffer());
+          packet.timeReceived = millis();
+          duckNet->addMessageToBuffer(packet);
+        }
+        break;
         default:
           err = duckRadio.relayPacket(rxPacket);
           if (err != DUCK_ERR_NONE) {
@@ -169,6 +176,13 @@ void MamaDuck::handleReceivedPacket() {
         break;
         case reservedTopic::ack:
           handleAck(packet);
+        break;
+        case reservedTopic::mbm:
+        {
+          CdpPacket packet = CdpPacket(rxPacket->getBuffer());
+          packet.timeReceived = millis();
+          duckNet->addMessageToBuffer(packet);
+        }
         break;
         default:
           err = duckRadio.relayPacket(rxPacket);

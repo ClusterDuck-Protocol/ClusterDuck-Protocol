@@ -103,6 +103,15 @@ public:
   int setupWebServer(bool createCaptivePortal = false, String html = "");
 
   /**
+   * @brief 
+   *
+   * @param 
+   *
+   * @returns 
+   */
+  int sendNewMessageBoardMessage(std::vector<unsigned char> html);
+
+  /**
    * @brief Set up the WiFi access point.
    *
    * @param accessPoint a string representing the access point. Default to  "DuckLink"
