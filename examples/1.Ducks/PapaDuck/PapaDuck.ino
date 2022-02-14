@@ -120,7 +120,7 @@ std::string toTopicString(byte topic) {
     case topics::health:
       topicString ="health";
       break;
-    case topics::BMP:
+    case topics::bmp180:
       topicString ="bmp";
       break;
     default:
