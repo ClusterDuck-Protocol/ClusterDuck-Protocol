@@ -95,9 +95,11 @@ enum topics {
   health = 0x15,
   // Send commands
   cmdd = 0x16,
-  /// Max supported topics
+  // ir sensor
+  pir = 0xFD,
+  // bmp180 
   bmp180 = 0xFE,
-  /// Max supported topics
+  // Max supported topics
   max_topics = 0xFF
 };
 

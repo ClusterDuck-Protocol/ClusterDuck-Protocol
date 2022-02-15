@@ -89,6 +89,9 @@ std::string toTopicString(byte topic) {
     case topics::bmp180:
       topicString ="bmp";
       break;
+    case topics::pir:
+      topicString ="pir";
+      break;
     default:
       topicString = "status";
   }
