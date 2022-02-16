@@ -138,14 +138,14 @@ void MamaDuck::handleReceivedPacket() {
         break;
         case reservedTopic::cmd:
           loginfo("Command received");
-          handleCommand(packet);
           
+          //Start send ack that command was received
           dataPayload.push_back(num);
 
           dataPayload.insert(dataPayload.end(), packet.sduid.begin(), packet.sduid.end());
           dataPayload.insert(dataPayload.end(), packet.muid.begin(), packet.muid.end());
 
-          int err = txPacket->prepareForSending(&filter, PAPADUCK_DUID, 
+          err = txPacket->prepareForSending(&filter, PAPADUCK_DUID, 
             DuckType::MAMA, reservedTopic::ack, dataPayload);
           if (err != DUCK_ERR_NONE) {
           logerr("ERROR handleReceivedPacket. Failed to prepare ack. Error: " +
@@ -160,6 +160,9 @@ void MamaDuck::handleReceivedPacket() {
             logerr("ERROR handleReceivedPacket. Failed to send ack. Error: " +
               String(err));
           }
+          
+          //Handle Command
+          handleCommand(packet);
 
         break;
         case reservedTopic::ack:
@@ -187,8 +190,31 @@ void MamaDuck::handleReceivedPacket() {
 }
 
 void MamaDuck::handleCommand(const CdpPacket & packet) {
+  int err;
+  std::vector<byte> dataPayload;
 
   switch(packet.data[0]) {
+    case 0:
+      //Send health quack
+      loginfo("Health request received");
+      dataPayload.push_back(1);
+      err = txPacket->prepareForSending(&filter, PAPADUCK_DUID, 
+        DuckType::MAMA, topics::health, dataPayload);
+      if (err != DUCK_ERR_NONE) {
+      logerr("ERROR handleReceivedPacket. Failed to prepare ack. Error: " +
+        String(err));
+      }
+
+      err = duckRadio.sendData(txPacket->getBuffer());
+      if (err == DUCK_ERR_NONE) {
+        CdpPacket healthPacket = CdpPacket(txPacket->getBuffer());
+        filter.bloom_add(healthPacket.muid.data(), MUID_LENGTH);
+      } else {
+        logerr("ERROR handleReceivedPacket. Failed to send ack. Error: " +
+          String(err));
+      }
+
+    break;
     case 1:
       //Change wifi status
       if((char)packet.data[1] == '1') {
@@ -208,7 +234,7 @@ void MamaDuck::handleCommand(const CdpPacket & packet) {
 }
 
 void MamaDuck::handleDuckCommand(const CdpPacket & packet) {
-  
+  loginfo("Doesn't do anything yet. But Duck Command was received.");
 }
 
 void MamaDuck::handleAck(const CdpPacket & packet) {
