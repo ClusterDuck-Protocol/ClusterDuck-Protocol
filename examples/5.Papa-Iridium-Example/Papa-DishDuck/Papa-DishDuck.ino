@@ -106,6 +106,9 @@ std::string toTopicString(byte topic) {
     case topics::pir:
       topicString ="pir";
       break;
+    case topics::dht11:
+      topicString ="dht";
+      break;
     default:
       topicString = "status";
   }

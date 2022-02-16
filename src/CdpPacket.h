@@ -95,6 +95,8 @@ enum topics {
   health = 0x15,
   // Send commands
   cmdd = 0x16,
+  // DHT11 sensor
+  dht11 = 0xFC,
   // ir sensor
   pir = 0xFD,
   // bmp180 

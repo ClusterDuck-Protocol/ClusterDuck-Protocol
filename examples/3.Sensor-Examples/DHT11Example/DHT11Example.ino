@@ -66,7 +66,7 @@ bool runSensor(void *) {
   sensorVal += "Humidity: ";
   sensorVal += dht.readHumidity();
 
-  duck.sendData(topics::sensor, sensorVal);
+  duck.sendData(topics::dht11, sensorVal);
 
   return true;
 }
