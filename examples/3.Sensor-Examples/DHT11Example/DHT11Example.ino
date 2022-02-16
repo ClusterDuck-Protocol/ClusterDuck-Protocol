@@ -23,7 +23,7 @@
 //Setup DHT11
 #include <DHT.h>
 #define DHTTYPE DHT11
-#define DHTPIN  23
+#define DHTPIN  4
 #define TIMEOUT 5000
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -65,6 +65,8 @@ bool runSensor(void *) {
   sensorVal += dht.readTemperature();
   sensorVal += "Humidity: ";
   sensorVal += dht.readHumidity();
+
+  Serial.println(sensorVal);
 
   duck.sendData(topics::dht11, sensorVal);
 
