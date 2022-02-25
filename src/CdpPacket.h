@@ -70,9 +70,10 @@ VAL:          228  bytes               - Value to set for command
 #define CMD_WIFI 1
 #define CMD_CHANNEL 2
 
-// header
-// Should be header + 1 but need to test to make sure detector still works
-#define MIN_PACKET_LENGTH HEADER_LENGTH
+
+// header + 1 hop + 1 byte data
+#define MIN_PACKET_LENGTH (HEADER_LENGTH + 1)
+
 
 #define ARRAY_LENGTH(array) (sizeof(array) / sizeof((array)[0]))
 
@@ -94,7 +95,7 @@ enum topics {
   /// Device health status
   health = 0x15,
   // Send commands
-  cmdd = 0x16,
+  dcmd = 0x16,
   // DHT11 sensor
   dht11 = 0xFC,
   // ir sensor

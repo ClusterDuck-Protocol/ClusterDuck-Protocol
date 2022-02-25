@@ -237,6 +237,7 @@ void handleDuckData(std::vector<byte> packetBuffer) {
       Serial.println(packetQueue.size());
     }
   }
+  
   subscribeTo(commandTopic);
 }
 
@@ -367,6 +368,7 @@ void mqttConnect() {
       if(packetQueue.size() > 0) {
          publishQueue();
       }
+      //Subscribe to command topic to receive commands from cloud
       subscribeTo(commandTopic);
    }
 
