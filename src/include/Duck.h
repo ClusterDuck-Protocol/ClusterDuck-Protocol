@@ -37,6 +37,9 @@ public:
 
   virtual ~Duck();
 
+  using cpSubmitCallback = void (*)(String* s);
+  cpSubmitCallback formSubmissionCallback;
+
   std::string getCDPVersion() { return duckutils::getCDPVersion(); }
 
   /**
@@ -145,6 +148,14 @@ public:
    * @param password    password to join the network
    */
   int setupInternet(String ssid, String password);
+
+  /**
+   * @brief Register callback for handling and/or manipulating the text sent via the captive portal.
+   * Will be invoked when the user sends a message through the captive portal interface.
+   *
+   * @param cb A callback to handle the text string that is about to be sent
+   */
+  void onCaptivePortalFormSubmission(cpSubmitCallback cb) { this->formSubmissionCallback = cb; }
 
   /**
    * @brief

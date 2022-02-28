@@ -325,6 +325,10 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
 
     clientId.toUpperCase();
     val = "[" + clientId + "]" + val;
+
+    if(duck->formSubmissionCallback)
+      duck->formSubmissionCallback(&val);
+
     std::vector<byte> muid;
     err = duck->sendData(topics::cpm, val, ZERO_DUID, &muid);
 
