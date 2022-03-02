@@ -414,11 +414,11 @@
 
 /// CDP Channel Frequencies
 #define CHANNEL_1 915.0
-#define CHANNEL_2 915.0
-#define CHANNEL_3 915.0
-#define CHANNEL_4 915.0
-#define CHANNEL_5 915.0
-#define CHANNEL_6 915.0
+#define CHANNEL_2 914.0
+#define CHANNEL_3 913.0
+#define CHANNEL_4 912.0
+#define CHANNEL_5 911.0
+#define CHANNEL_6 910.0
 
 /// Default LoRa Module supported chipset when using the RadioLib library
 #if !defined(CDPCFG_LORA_CLASS) && !defined(CDPCFG_HELTEC_CUBE_CELL)
