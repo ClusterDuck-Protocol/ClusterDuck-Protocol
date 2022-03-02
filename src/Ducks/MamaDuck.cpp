@@ -17,12 +17,7 @@ int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String 
   }
 
   std::string name(deviceId.begin(),deviceId.end());
-
-  std::string nameportal = "EMERGENCY PORTAL + " + name; // ok
-
-
-
-  err = setupWifi(nameportal.c_str());
+  err = setupWifi(name.c_str());
 
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR setupWithDefaults rc = " + String(err));

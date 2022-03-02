@@ -75,7 +75,7 @@ bool runSensor(void *) {
   
   String sensorVal = "Temp: " + String(T) + " Pres: " + String(P); //Store Data
 
-  duck.sendData(topics::BMP, sensorVal);
+  duck.sendData(topics::bmp280, sensorVal);
   
   return true;
 }

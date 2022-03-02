@@ -158,6 +158,15 @@ std::string toTopicString(byte topic) {
     case topics::dht11:
       topicString ="dht";
       break;
+    case topics::bmp280:
+      topicString ="bmp280";
+      break;
+    case topics::mq7:
+      topicString ="mq7";
+      break;
+    case topics::gp2y:
+      topicString ="gp2y";
+      break;
     default:
       topicString = "status";
   }

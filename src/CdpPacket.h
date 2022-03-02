@@ -94,8 +94,14 @@ enum topics {
   alert = 0x14,
   /// Device health status
   health = 0x15,
-  // Send commands
+  // Send duck commands
   dcmd = 0x16,
+  // MQ7 Gas Sensor
+  mq7 = 0xEF,
+  // GP2Y Dust Sensor
+  gp2y = 0xFA,
+  // bmp280
+  bmp280 = 0xFB,
   // DHT11 sensor
   dht11 = 0xFC,
   // ir sensor
@@ -113,7 +119,6 @@ enum reservedTopic {
   gps = 0x03,
   ack = 0x04,
   cmd = 0x05,
-  // BMP = 0x06,
   max_reserved = 0x0F
 };
 

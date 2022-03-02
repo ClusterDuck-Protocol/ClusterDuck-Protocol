@@ -248,7 +248,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
   });
 
   // Captive Portal form submission
-  webServer.on("/formSubmit", HTTP_POST, [&](AsyncWebServerRequest* request) {
+  webServer.on("/formSubmit.json", HTTP_POST, [&](AsyncWebServerRequest* request) {
     loginfo("Submitting Form to /formSubmit.json");
 
     int err = DUCK_ERR_NONE;
@@ -260,27 +260,23 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     for (int i = 0; i < paramsNumber; i++) {
       AsyncWebParameter* p = request->getParam(i);
       logdbg(p->name() + ": " + p->value());
-      
-      val = val + p->value().c_str() + "*";
-      // if (p->name() == "clientId") {
-      //   clientId = p->value();
-      // } else {
-      //   val = val + p->value().c_str() + "*";
-      // }
+
+      if (p->name() == "clientId") {
+        clientId = p->value();
+      } else {
+        val = val + p->value().c_str() + "*";
+      }
     }
-    logdbg(val);
-    // clientId.toUpperCase();
-    // val = "[" + clientId + "]" + val;
-    std::vector<byte> data;
-    data.insert(data.end(), val.begin(), val.end());
+
+    clientId.toUpperCase();
+    val = "[" + clientId + "]" + val;
     std::vector<byte> muid;
-    err = duck->sendData(topics::cpm, data, ZERO_DUID, &muid);
+    err = duck->sendData(topics::cpm, val, ZERO_DUID, &muid);
 
     switch (err) {
       case DUCK_ERR_NONE:
       {
-        // String response = "{\"muid\":\"" + duckutils::toString(muid) + "\"}";
-        String response = "MESSAGE SENT!";
+        String response = "{\"muid\":\"" + duckutils::toString(muid) + "\"}";
         request->send(200, "text/html", response);
         logdbg("Sent 200 response: " + response);
       }
