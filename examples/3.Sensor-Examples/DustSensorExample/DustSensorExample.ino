@@ -70,7 +70,7 @@ bool runSensor(void *) {
   String sensorVal = "Current dust concentration: " + dustSensor.getDustDensity();
   sensorVal += " ug/m3";
 
-  duck.sendData(topics::sensor, sensorVal);
+  duck.sendData(topics::gp2y, sensorVal);
 
   return true;
 }
