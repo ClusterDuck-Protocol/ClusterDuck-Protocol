@@ -72,7 +72,9 @@ char authMethod[] = "use-token-auth";
 char token[] = TOKEN;
 char clientId[] = "d:" ORG ":" DEVICE_TYPE ":" DEVICE_ID;
 
-#define CMD_STATE "/wifi/" 
+#define CMD_STATE_WIFI "/wifi/" 
+#define CMD_STATE_HEALTH "/health/"
+#define CMD_STATE_CHANNEL "/channel/"
 
 
 // use the '+' wildcard so it subscribes to any command with any message format
@@ -295,7 +297,8 @@ void loop() {
 void gotMsg(char* topic, byte* payload, unsigned int payloadLength) {
   Serial.print("gotMsg: invoked for topic: "); Serial.println(topic);
  
-  if (String(topic).indexOf(CMD_STATE) > 0) {
+  if (String(topic).indexOf(CMD_STATE_WIFI) > 0) {
+    Serial.println("Start WiFi Command");
     byte sCmd = 1;
     std::vector<byte> sValue = {payload[3]};
 
@@ -312,9 +315,15 @@ void gotMsg(char* topic, byte* payload, unsigned int payloadLength) {
     } else {
       duck.sendCommand(sCmd, sValue);
     }
+  } else if (String(topic).indexOf(CMD_STATE_HEALTH) > 0) {
+    if(payloadLength >= 9) {
+      
+    } else {
+      Serial.println("Payload size too small");
+    }
   } else {
     Serial.print("gotMsg: unexpected topic: "); Serial.println(topic); 
-  }
+  } 
 }
 
 void wifiConnect() {

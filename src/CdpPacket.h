@@ -52,6 +52,12 @@ Each MUID:     04  byte array          - Message unique ID
 */
 #define MAX_MUID_PER_ACK 19
 
+
+//Available command IDs (N)
+#define CMD_HEALTH 0
+#define CMD_WIFI 1
+#define CMD_CHANNEL 2
+
 /*
 Data Section of a duck command (max 229 bytes):
 0 1    229...
@@ -64,12 +70,6 @@ N:              1  byte                - Command lookup value
 VAL:          228  bytes               - Value to set for command
 
 */
-
-//Available command IDs (N)
-#define CMD_PING 0
-#define CMD_WIFI 1
-#define CMD_CHANNEL 2
-
 
 // header + 1 hop + 1 byte data
 #define MIN_PACKET_LENGTH (HEADER_LENGTH + 1)
