@@ -122,6 +122,24 @@ std::string toTopicString(byte topic) {
     case topics::health:
       topicString ="health";
       break;
+    case topics::bmp180:
+      topicString ="bmp180";
+      break;
+    case topics::pir:
+      topicString ="pir";
+      break;
+    case topics::dht11:
+      topicString ="dht";
+      break;
+    case topics::bmp280:
+      topicString ="bmp280";
+      break;
+    case topics::mq7:
+      topicString ="mq7";
+      break;
+    case topics::gp2y:
+      topicString ="gp2y";
+      break;
     default:
       topicString = "status";
   }
@@ -261,8 +279,9 @@ void setup() {
 
   Serial.println("[PAPA] Setup OK! ");
   
+   duck.enableAcks(true);
   // we are done
-  display->showDefaultScreen();; 
+  display->showDefaultScreen();
 }
 
 void loop() {
