@@ -319,11 +319,11 @@ void gotMsg(char* topic, byte* payload, unsigned int payloadLength) {
   if (String(topic).indexOf(CMD_STATE_WIFI) > 0) {
     Serial.println("Start WiFi Command");
     byte sCmd = 1;
-    std::vector<byte> sValue = {payload[3]};
+    std::vector<byte> sValue = {payload[0]};
 
-    if(payloadLength > 5) {
+    if(payloadLength > 3) {
       std::string destination = "";
-      for (int i=5; i<payloadLength-1; i++) {
+      for (int i=1; i<payloadLength; i++) {
         destination += (char)payload[i];
       }
       
@@ -335,7 +335,18 @@ void gotMsg(char* topic, byte* payload, unsigned int payloadLength) {
       duck.sendCommand(sCmd, sValue);
     }
   } else if (String(topic).indexOf(CMD_STATE_HEALTH) > 0) {
-    if(payloadLength >= 9) {
+    byte sCmd = 0;
+    std::vector<byte> sValue = {payload[0]};
+    if(payloadLength >= 8) {
+      std::string destination = "";
+      for (int i=1; i<payloadLength; i++) {
+        destination += (char)payload[i];
+      }
+      
+      std::vector<byte> dDevId;
+      dDevId.insert(dDevId.end(),destination.begin(),destination.end());
+      
+      duck.sendCommand(sCmd, sValue, dDevId);
       
     } else {
       Serial.println("Payload size too small");
