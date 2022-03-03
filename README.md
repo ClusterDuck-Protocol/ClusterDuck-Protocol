@@ -1,6 +1,6 @@
 ![Logo](docs/assets/images/CDP_LOGO_small.png)
 
-[![License](https://img.shields.io/badge/License-Apache2-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![Slack](https://img.shields.io/badge/Join-Slack-blue)](https://www.project-owl.com/slack) [![Wiki](https://img.shields.io/badge/Read-Wiki-blue)](https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki) [![Build Status](https://travis-ci.com/Call-for-Code/ClusterDuck-Protocol.svg?branch=master)](https://travis-ci.com/Call-for-Code/ClusterDuck-Protocol)
+[![License](https://img.shields.io/badge/License-Apache2-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![Slack](https://img.shields.io/badge/Join-Slack-blue)](https://www.project-owl.com/slack) [![Wiki](https://img.shields.io/badge/Read-Wiki-blue)](https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki) [![Build Status](https://travis-ci.com/Call-for-Code/ClusterDuck-Protocol.svg?branch=master)](https://app.travis-ci.com/github/Call-for-Code/ClusterDuck-Protocol)
 
 ## Why are We Building CDP?
 In 2017 a category-5 Atlantic hurricane, Maria, hit Puerto Rico and destroyed most of the island's infrastructure. Cellular and power were disabled for an extended period of time leaving medical and communications problems long after the hurricane passed. If access to a basic communications network was available, the community could have connected with emergency services, local government, or family to mitigate some of the widespread problems resulting from this disaster.
