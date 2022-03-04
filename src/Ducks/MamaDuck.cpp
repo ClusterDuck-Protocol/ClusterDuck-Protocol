@@ -194,12 +194,13 @@ void MamaDuck::handleReceivedPacket() {
 void MamaDuck::handleCommand(const CdpPacket & packet) {
   int err;
   std::vector<byte> dataPayload;
+  std::vector<byte> alive {'I','m',' ','a','l','i','v','e'};
 
   switch(packet.data[0]) {
     case 0:
       //Send health quack
       loginfo("Health request received");
-      dataPayload.push_back(1);
+      dataPayload.insert(dataPayload.end(), alive.begin(), alive.end());
       err = txPacket->prepareForSending(&filter, PAPADUCK_DUID, 
         DuckType::MAMA, topics::health, dataPayload);
       if (err != DUCK_ERR_NONE) {

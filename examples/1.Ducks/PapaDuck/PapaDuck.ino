@@ -120,25 +120,28 @@ std::string toTopicString(byte topic) {
       topicString = "gps";
       break;
     case topics::health:
-      topicString ="health";
+      topicString = "health";
       break;
     case topics::bmp180:
-      topicString ="bmp180";
+      topicString = "bmp180";
       break;
     case topics::pir:
-      topicString ="pir";
+      topicString = "pir";
       break;
     case topics::dht11:
-      topicString ="dht";
+      topicString = "dht";
       break;
     case topics::bmp280:
-      topicString ="bmp280";
+      topicString = "bmp280";
       break;
     case topics::mq7:
-      topicString ="mq7";
+      topicString = "mq7";
       break;
     case topics::gp2y:
-      topicString ="gp2y";
+      topicString = "gp2y";
+      break;
+    case reservedTopic::ack:
+      topicString = "ack";
       break;
     default:
       topicString = "status";
