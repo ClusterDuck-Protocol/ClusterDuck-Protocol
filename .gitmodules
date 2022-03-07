@@ -60,3 +60,6 @@
 [submodule "Libraries/Adafruit_BusIO"]
 	path = Libraries/Adafruit_BusIO
 	url = https://github.com/adafruit/Adafruit_BusIO
+[submodule "Libraries/ESPAsyncTCP"]
+	path = Libraries/ESPAsyncTCP
+	url = https://github.com/me-no-dev/ESPAsyncTCP.git

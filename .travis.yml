@@ -62,8 +62,9 @@ script:
   - if [[ "$BOARD" != "esp32:esp32:t-beam" ]]; 
     then buildExampleSketch 4.Ble-Duck-App Ble-Duck-App;
     fi
-  - buildExampleSketch 5.Papa-Iridium-Example Papa-DishDuck
-  - buildExampleSketch 5.Papa-Iridium-Example Papa-DishDuck-WiFi
+  - buildExampleSketch 5.Custom-Papa-Examples Papa-Iridium-Example Papa-DishDuck
+  - buildExampleSketch 5.Custom-Papa-Examples Papa-Iridium-Example Papa-DishDuck-WiFi
+  - buildExampleSketch 5.Custom-Papa-Examples Papa-Downtime-Counter
   - buildExampleSketch 6.PaPi-DMS-Lite-Examples PapiDuckExample-wifi
   - buildExampleSketch 6.PaPi-DMS-Lite-Examples Serial-PaPiDuckExample
   - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]]; 
@@ -76,4 +77,3 @@ script:
     then buildExampleSketch 7.TTGO-TBeam-Examples TTGOAPX-Example;
     fi
   - buildExampleSketch 8.Encryption DecryptionPapaDuck
-  - buildExampleSketch 9.Telemetry Papa-Downtime-Counter

@@ -74,9 +74,9 @@ bool runSensor(void*) {
   bmp.getPressure(&P);
   Serial.println(P);
 
-  String sensorVal = "Temp: " + String(T) + " Pres: " + String(P);
+  String sensorVal = String(T) + "/" + String(P);
 
-  duck.sendData(topics::sensor, sensorVal);
+  duck.sendData(topics::bmp180, sensorVal);
 
   return true;
 }

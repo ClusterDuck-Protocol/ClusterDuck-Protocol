@@ -119,6 +119,6 @@ bool runSensor(void *) {
 
  
 
-  duck.sendData(topics::sensor, sensorVal);
+  duck.sendData(topics::mq7, sensorVal);
   return true;
 }

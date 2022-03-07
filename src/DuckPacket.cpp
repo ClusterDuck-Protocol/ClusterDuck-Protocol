@@ -17,11 +17,6 @@ bool DuckPacket::prepareForRelaying(BloomFilter *filter, std::vector<byte> dataB
   loginfo("prepareForRelaying: START");
   loginfo("prepareForRelaying: Packet is built. Checking for relay...");
 
-  //TODO: Add bloom filter empty when full
-  //TODO: Add 2nd bloom filter
-  //TODO: Calculate false positive chance
-  //TODO: Add backwards compatibility
-
   // Query the existence of strings
   bool alreadySeen = filter->bloom_check(&dataBuffer[MUID_POS], MUID_LENGTH);
   if (alreadySeen) {
