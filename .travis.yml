@@ -62,9 +62,9 @@ script:
   - if [[ "$BOARD" != "esp32:esp32:t-beam" ]]; 
     then buildExampleSketch 4.Ble-Duck-App Ble-Duck-App;
     fi
-  - buildExampleSketch 5.Custom-Papa-Example Papa-Iridium-Example Papa-DishDuck
-  - buildExampleSketch 5.Custom-Papa-Example Papa-Iridium-Example Papa-DishDuck-WiFi
-  - buildExampleSketch 5.Custom-Papa-Example Papa-Downtime-Counter
+  - buildExampleSketch 5.Custom-Papa-Examples Papa-Iridium-Example Papa-DishDuck
+  - buildExampleSketch 5.Custom-Papa-Examples Papa-Iridium-Example Papa-DishDuck-WiFi
+  - buildExampleSketch 5.Custom-Papa-Examples Papa-Downtime-Counter
   - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]]; 
     then buildExampleSketch 6.TTGO-TBeam-Examples TTGO-Telemetry;
     fi
