@@ -50,9 +50,9 @@ script:
   - buildExampleSketch 1.Ducks MamaDuck
   - buildExampleSketch 1.Ducks PapaDuck
   - buildExampleSketch 1.Ducks DetectorDuck
-  - buildExampleSketch 2.Custom-Mama-Example Custom-Mama-Example
-  - buildExampleSketch 2.Custom-Mama-Example Custom-Portal-Example
-  - buildExampleSketch 2.Custom-Mama-Example Custom-Mama-Detect
+  - buildExampleSketch 2.Custom-Mama-Examples Custom-Mama-Example
+  - buildExampleSketch 2.Custom-Mama-Examples Custom-Portal-Example
+  - buildExampleSketch 2.Custom-Mama-Examples Custom-Mama-Detect
   - buildExampleSketch 3.Sensor-Examples BMP180Example
   - buildExampleSketch 3.Sensor-Examples BMP280Example
   - buildExampleSketch 3.Sensor-Examples DHT11Example
@@ -65,15 +65,13 @@ script:
   - buildExampleSketch 5.Custom-Papa-Examples Papa-Iridium-Example Papa-DishDuck
   - buildExampleSketch 5.Custom-Papa-Examples Papa-Iridium-Example Papa-DishDuck-WiFi
   - buildExampleSketch 5.Custom-Papa-Examples Papa-Downtime-Counter
-  - buildExampleSketch 6.PaPi-DMS-Lite-Examples PapiDuckExample-wifi
-  - buildExampleSketch 6.PaPi-DMS-Lite-Examples Serial-PaPiDuckExample
   - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]]; 
-    then buildExampleSketch 7.TTGO-TBeam-Examples TTGO-Telemetry;
+    then buildExampleSketch 6.TTGO-TBeam-Examples TTGO-Telemetry;
     fi
   - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]]; 
-    then buildExampleSketch 7.TTGO-TBeam-Examples TTGOGPSExample;
+    then buildExampleSketch 6.TTGO-TBeam-Examples TTGOGPSExample;
     fi
   - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]]; 
-    then buildExampleSketch 7.TTGO-TBeam-Examples TTGOAPX-Example;
+    then buildExampleSketch 6.TTGO-TBeam-Examples TTGOAPX-Example;
     fi
-  - buildExampleSketch 8.Encryption DecryptionPapaDuck
+  - buildExampleSketch 7.Encryption DecryptionPapaDuck
