@@ -166,7 +166,10 @@ public:
   std::vector<byte> data;
   /// Path section (48 bytes max)
   std::vector<byte> path;
+  //time received
+  unsigned long timeReceived;
 
+  CdpPacket(){}
   CdpPacket(const std::vector<byte> & buffer) {
     int buffer_length = buffer.size();
     // sduid

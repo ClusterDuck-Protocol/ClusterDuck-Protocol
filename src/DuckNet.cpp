@@ -9,6 +9,10 @@ DuckNet::DuckNet(Duck* duckIn):
   duck(duckIn)
 {}
 
+//when initializing the buffer, the buffer created will be one larger than the provided size
+//one slot in the buffer is used as a waste slot
+CircularBuffer messageBuffer = CircularBuffer(5);
+
 #ifndef CDPCFG_WIFI_NONE
 IPAddress apIP(CDPCFG_AP_IP1, CDPCFG_AP_IP2, CDPCFG_AP_IP3, CDPCFG_AP_IP4);
 AsyncWebServer webServer(CDPCFG_WEB_PORT);
@@ -70,12 +74,38 @@ String DuckNet::createMuidResponseJson(muidStatus status) {
   return "{\"status\":\"" + statusStr + "\", \"message\":\"" + message + "\"}";
 }
 
-int DuckNet::sendNewMessageBoardMessage(std::vector<unsigned char> html){
-  char *buffer = new char[html.size()];
-  std::copy(html.begin(), html.end(), buffer);
-  events.send(buffer, "newMessage", millis());
-  delete(buffer);
-  return 0;
+void DuckNet::addMessageToBuffer(CdpPacket message)
+{
+  messageBuffer.push(message);
+}
+std::string DuckNet::retrieveMessageHistory(){
+  int tail = messageBuffer.getTail();
+  std::string json = "{\"posts\":[";
+  bool firstMessage = true;
+
+  while(tail != messageBuffer.getHead()){
+    if(firstMessage){
+      firstMessage = false;
+    } else{
+      json = json + ", ";
+    }
+
+    CdpPacket packet = messageBuffer.getMessage(tail);
+    unsigned long messageAge = millis() - packet.timeReceived;
+    std::string messageAgeString = String(messageAge).c_str();
+    std::string messageBody(packet.data.begin(),packet.data.end());
+
+    json = json + "{\"title\":\"PLACEHOLDER TITLE\", \"body\":\"" + messageBody + "\" , \"messageAge\":\"" + messageAgeString + "\"}";
+
+    tail++;
+    if(tail == messageBuffer.getBufferEnd()){
+      tail = 0;
+    }
+  }
+  json = json + "]}";
+  Serial.print(json.c_str());
+  return json;
+
 }
 int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
   loginfo("Setting up Web Server");
@@ -98,7 +128,11 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
   });
 
   webServer.on("/", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    request->send(200, "text/html", MAIN_page);
+    request->send(200, "text/html", portal);
+  });
+
+  webServer.on("/message-board", HTTP_GET, [&](AsyncWebServerRequest* request) {
+    request->send(200, "text/html", message_board);
   });
 
   webServer.on("/main", HTTP_GET, [&](AsyncWebServerRequest* request) {
@@ -259,6 +293,12 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
       request->send(200, "text/json", jsonResponse);
       break;
     }
+  });
+
+  webServer.on("/messageHistory", HTTP_GET, [&](AsyncWebServerRequest* request){
+    std::string response = DuckNet::retrieveMessageHistory();
+    const char *cstr = response.c_str();
+    request->send(200, "text/json", cstr);
   });
 
   // Captive Portal form submission
