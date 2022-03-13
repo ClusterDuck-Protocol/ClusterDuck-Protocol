@@ -10,9 +10,8 @@ const char message_board[] PROGMEM = R"=====(
     </head>
 
     <body>
-        <div id="message-container">
-            <h5>MOST RECENT</h5>
-        </div>
+        <h5>MOST RECENT</h5>
+        <div id="message-container"></div>
 
         <script>
              function displayNewMessage(newMessage){
@@ -51,8 +50,8 @@ const char message_board[] PROGMEM = R"=====(
                     }
                 }, false);
 
-                source.addEventListener('newMessage', function(newMessage) {
-                    displayNewMessage(newMessage.data);
+                source.addEventListener('refreshPage', function(data) {
+                    location.reload(); 
                 }, false);
             }
             

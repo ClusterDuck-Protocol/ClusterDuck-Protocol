@@ -105,7 +105,8 @@ public:
   int setupWebServer(bool createCaptivePortal = false, String html = "");
 
   /**
-   * @brief insert received packet into the message circular buffer
+   * @brief insert received packet into the message circular buffer and
+   * send refresh page event to client
    *
    * @param message the packet to add to the buffer
    */

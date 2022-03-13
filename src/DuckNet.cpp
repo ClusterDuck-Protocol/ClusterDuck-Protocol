@@ -77,6 +77,7 @@ String DuckNet::createMuidResponseJson(muidStatus status) {
 void DuckNet::addMessageToBuffer(CdpPacket message)
 {
   messageBuffer.push(message);
+  events.send("refresh" ,"refreshPage",millis());
 }
 std::string DuckNet::retrieveMessageHistory(){
   int tail = messageBuffer.getTail();
