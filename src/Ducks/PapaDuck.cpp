@@ -276,3 +276,23 @@ int PapaDuck::reconnectWifi(String ssid, String password) {
   return DUCK_ERR_NONE;
 #endif
 }
+
+void PapaDuck::sendMessageBoardMessage(std::vector<byte> dataPayload, std::vector<byte> duid) {
+  int err = txPacket->prepareForSending(&filter, duid, DuckType::PAPA,
+    reservedTopic::mbm, dataPayload);
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR handleReceivedPacket. Failed to prepare ack. Error: " +
+      String(err));
+  }
+
+  err = duckRadio.sendData(txPacket->getBuffer());
+
+  if (err == DUCK_ERR_NONE) {
+    CdpPacket packet = CdpPacket(txPacket->getBuffer());
+    filter.bloom_add(packet.muid.data(), MUID_LENGTH);
+  } else {
+    logerr("ERROR handleReceivedPacket. Failed to send ack. Error: " +
+      String(err));
+  }
+  
+}

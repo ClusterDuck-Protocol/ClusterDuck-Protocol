@@ -44,6 +44,8 @@ class DuckNet;
 #include "controlPanel.h"
 #include "cdpHome.h"
 #include "papaHome.h"
+#include "messageBoard.h"
+#include "circularBuffer.h"
 
 #endif
 
@@ -77,7 +79,7 @@ public:
     logwarn("WARNING setupInternet skipped, device has no WiFi.");
     return DUCK_ERR_NONE;
   }
-  
+
   bool ssidAvailable(String val = "") { return false; }
   void setSsid(String val) {}
   void setPassword(String val) {}
@@ -101,6 +103,21 @@ public:
    * empty
    */
   int setupWebServer(bool createCaptivePortal = false, String html = "");
+
+  /**
+   * @brief insert received packet into the message circular buffer and
+   * send refresh page event to client
+   *
+   * @param message the packet to add to the buffer
+   */
+  void addMessageToBuffer(CdpPacket message);
+  
+  /**
+   * @brief retrieve all messages from from message circular buffer
+   *
+   * @returns a json array of messages with a title, body, and messageAge
+   */
+  std::string retrieveMessageHistory();
 
   /**
    * @brief Set up the WiFi access point.
@@ -143,25 +160,25 @@ public:
    * @return DUCK_ERR_NONE if successful, an error code otherwise.
    */
   int saveWifiCredentials(String ssid, String password);
-  
+
   /**
    * @brief save set radio channel
    *
    * @param val channel number to be set
    */
   void saveChannel(int val);
-  
+
   /**
    * @brief Load channel number saved in eeprom
    */
   void loadChannel();
-  
+
   /**
    * @brief Load Wifi credentials from EEPROM
    * @return DUCK_ERR_NONE if successful, an error code otherwise.
    */
   int loadWiFiCredentials();
-  
+
   /**
    * @brief Set the WiFi network ssid.
    *

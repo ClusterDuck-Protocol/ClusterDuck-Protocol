@@ -1,7 +1,7 @@
 #ifndef INDEX_H
 #define INDEX_H
 const char MAIN_page[] PROGMEM = R"=====(
-<!DOCTYPE html>
+<!DOCTYPE html>                                                                                                                                                                                                                                                                         
 <html>
     <head>
         <meta charset="utf-8">
@@ -154,6 +154,7 @@ const char MAIN_page[] PROGMEM = R"=====(
                 <div class="gps"><h4>Message Sent</h4><h5 id="dateNow">March 13, 2019 @ 1:00 PM</h5><p>Your message ID#: XXXXXX</p></div>
                 <p class="disclaimer">If your situation changes, please send another update.</p>
                 <div id="updateClassupdate" class="updateClass update">Send Update</div>
+                <div id="messages-container"></div>
             </div>
         </div>
         <div id="lastMessageSection" class="hidden">
@@ -223,7 +224,7 @@ const char MAIN_page[] PROGMEM = R"=====(
                         req.send();
                         showSentMessage(commentsInput);
                     },
-                    saveLastMuid: function(muid) {
+                    saveLastMuid: function(muid) { <!-- for checking if message was acked on duk, needs fixed -->
                         document.getElementById('lastMessageMuid').innerHTML = muid;
                         muidRequest = CreateMuidRequest(muid);
                         muidRequest.requestMuidStatus();

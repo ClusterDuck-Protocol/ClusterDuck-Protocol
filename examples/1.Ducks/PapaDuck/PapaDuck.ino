@@ -75,6 +75,7 @@ char clientId[] = "d:" ORG ":" DEVICE_TYPE ":" DEVICE_ID;
 #define CMD_STATE_WIFI "/wifi/" 
 #define CMD_STATE_HEALTH "/health/"
 #define CMD_STATE_CHANNEL "/channel/"
+#define CMD_STATE_MBM "/messageBoard/"
 
 
 // use the '+' wildcard so it subscribes to any command with any message format
@@ -354,6 +355,15 @@ void gotMsg(char* topic, byte* payload, unsigned int payloadLength) {
     } else {
       Serial.println("Payload size too small");
     }
+  } else if (String(topic).indexOf(CMD_STATE_MBM) > 0){
+      std::vector<byte> message;
+      std::string output;
+      for (int i = 0; i<payloadLength; i++) {
+        output = output + (char)payload[i];
+      }
+   
+      message.insert(message.end(),output.begin(),output.end());
+      duck.sendMessageBoardMessage(message);
   } else {
     Serial.print("gotMsg: unexpected topic: "); Serial.println(topic); 
   } 
