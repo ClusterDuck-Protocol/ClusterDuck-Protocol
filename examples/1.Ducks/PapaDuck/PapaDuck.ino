@@ -358,7 +358,7 @@ void gotMsg(char* topic, byte* payload, unsigned int payloadLength) {
   } else if (String(topic).indexOf(CMD_STATE_MBM) > 0){
       std::vector<byte> message;
       std::string output;
-      for (int i=1; i<payloadLength; i++) {
+      for (int i = 0; i<payloadLength; i++) {
         output = output + (char)payload[i];
       }
    
