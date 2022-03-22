@@ -30,9 +30,11 @@ This runs an acceptance test for the bloom filter.
 
 ## How to Contribute
 
-We host a weekly CDP Town Hall every Monday at 2pm EST. The town hall is the place to get updates on protocol, get your questions about CDP answered, and discuss on-going projects. All the current projects is documented in a public [roadmap in Trello](https://trello.com/b/bU0cZuUJ/cdp-roadmap). 
+We host a bi-weekly CDP Town Hall on Mondays at 2pm EST. The town hall is the place to get updates on protocol, get your questions about CDP answered, and discuss on-going projects. All the current projects is documented in a public [roadmap in Trello](https://trello.com/b/bU0cZuUJ/cdp-roadmap). 
 
 [CDP Town Hall](meet.google.com/unq-duaq-ygj)
+
+On the other Mondays (when there is no Town Hall), we host a live stream. Visit OWL's [Youtube Channel](https://www.youtube.com/c/OWLIntegrations) for updates. 
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our Code of Conduct, the process for submitting ClusterDuck Protocol improvements, and how to join our town halls and livestreams.
 
@@ -54,4 +56,3 @@ v3.2.5
 [Project OWL]: <https://www.project-owl.com/>
 [ClusterDuck Protocol]: <https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki>
 [Slack Workspace]: <https://www.project-owl.com/slack>
-
