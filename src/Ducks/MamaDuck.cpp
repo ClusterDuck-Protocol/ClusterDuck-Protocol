@@ -90,7 +90,6 @@ void MamaDuck::handleReceivedPacket() {
 
     //Check if Duck is desitination for this packet before relaying
     if (duckutils::isEqual(BROADCAST_DUID, packet.dduid)) {
-      
       switch(packet.topic) {
         case reservedTopic::ping:
           loginfo("ping received");
@@ -122,11 +121,12 @@ void MamaDuck::handleReceivedPacket() {
           }
         break;
         case reservedTopic::mbm:
-        {
-          CdpPacket packet = CdpPacket(rxPacket->getBuffer());
           packet.timeReceived = millis();
-          duckNet->addMessageToBuffer(packet);
-        }
+          duckNet->addToMessageBoardBuffer(packet);
+        break;
+        case topics::chat:
+          packet.timeReceived = millis();
+          duckNet->addToChatBuffer(packet);
         break;
         default:
           err = duckRadio.relayPacket(rxPacket);
@@ -163,7 +163,6 @@ void MamaDuck::handleReceivedPacket() {
 
           err = duckRadio.sendData(txPacket->getBuffer());
           if (err == DUCK_ERR_NONE) {
-            CdpPacket packet = CdpPacket(txPacket->getBuffer());
             filter.bloom_add(packet.muid.data(), MUID_LENGTH);
           } else {
             logerr("ERROR handleReceivedPacket. Failed to send ack. Error: " +
@@ -178,11 +177,12 @@ void MamaDuck::handleReceivedPacket() {
           handleAck(packet);
         break;
         case reservedTopic::mbm:
-        {
-          CdpPacket packet = CdpPacket(rxPacket->getBuffer());
           packet.timeReceived = millis();
-          duckNet->addMessageToBuffer(packet);
-        }
+          duckNet->addToMessageBoardBuffer(packet);
+        break;
+        case topics::chat:
+          packet.timeReceived = millis();
+          duckNet->addToChatBuffer(packet);
         break;
         default:
           err = duckRadio.relayPacket(rxPacket);

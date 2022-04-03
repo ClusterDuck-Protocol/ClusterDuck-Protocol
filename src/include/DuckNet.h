@@ -45,6 +45,9 @@ class DuckNet;
 #include "cdpHome.h"
 #include "papaHome.h"
 #include "messageBoard.h"
+#include "chatPage.h"
+#include "privateChat.h"
+#include "privateChatPrompt.h"
 #include "circularBuffer.h"
 
 #endif
@@ -105,19 +108,20 @@ public:
   int setupWebServer(bool createCaptivePortal = false, String html = "");
 
   /**
-   * @brief insert received packet into the message circular buffer and
+   * @brief insert received packet into the message board circular buffer and
    * send refresh page event to client
    *
    * @param message the packet to add to the buffer
    */
-  void addMessageToBuffer(CdpPacket message);
-  
+  void addToMessageBoardBuffer(CdpPacket message);
+
   /**
-   * @brief retrieve all messages from from message circular buffer
+   * @brief insert received packet into the chat circular buffer and
+   * send refresh page event to client
    *
-   * @returns a json array of messages with a title, body, and messageAge
+   * @param message the packet to add to the buffer
    */
-  std::string retrieveMessageHistory();
+  void addToChatBuffer(CdpPacket message);
 
   /**
    * @brief Set up the WiFi access point.
@@ -253,4 +257,12 @@ private:
   String password = "";
   // char* controlSsid = "";
   // char* controlPassword = "";
+
+
+    /**
+   * @brief retrieve all messages from from message circular buffer
+   *
+   * @returns a json array of messages with a title, body, and messageAge
+   */
+  std::string retrieveMessageHistory(CircularBuffer* buffer);
 };
