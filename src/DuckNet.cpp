@@ -13,6 +13,7 @@ DuckNet::DuckNet(Duck* duckIn):
 //one slot in the buffer is used as a waste slot
 CircularBuffer messageBuffer = CircularBuffer(5);
 CircularBuffer chatBuffer = CircularBuffer(20);
+std::map<std::vector<byte>, CircularBuffer*> chatHistories;
 std::vector<byte> duckSession = BROADCAST_DUID;
 
 #ifndef CDPCFG_WIFI_NONE
@@ -327,6 +328,31 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     const char *cstr = response.c_str();
     request->send(200, "text/json", cstr);
   });
+  webServer.on("/privateChatHistory", HTTP_GET, [&](AsyncWebServerRequest* request){
+    if(chatHistories.find(duckSession) != chatHistories.end()){
+      CircularBuffer* history = chatHistories[duckSession];
+      std::string response = DuckNet::retrieveMessageHistory(history);
+      const char *cstr = response.c_str();
+      request->send(200, "text/json", cstr);
+    } else{
+      request->send(500, "text/html", "could not retrieve chat history");
+    }
+  });
+  webServer.on("/privateChatHistories", HTTP_GET, [&](AsyncWebServerRequest* request){
+    std::string json = "{\"histories\":[";
+    int keyNum = 0;
+    for(const auto &myPair : chatHistories) {
+      if(keyNum != 0){
+        json = json + ", ";
+      }
+      // std::vector<int> key;
+      // key.insert(key.end(), myPair.first.begin(), myPair.first.end());
+      // json = json + key.c_str();
+      keyNum++;
+    }
+    json = json + "]}";
+    request->send(200, "text/json", "{\"histories\":[\"MAMALINK\"]}");
+  });
   
   webServer.on("/chatSubmit.json", HTTP_POST, [&](AsyncWebServerRequest* request) {
     int err = DUCK_ERR_NONE;
@@ -370,16 +396,35 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     dduidParam.insert(dduidParam.end(), sdduid.begin(), sdduid.end());
     
     duckSession = dduidParam;
-    const String pass = String(sdduid.c_str());
+    CircularBuffer* privateChatBuffer = new CircularBuffer(20);
 
-    AsyncWebServerResponse *response = request->beginResponse(200, "text/html", private_chat_page);
-    response->addHeader("dduid", pass);
-    request->send(response);
-    //verify duid
-    //duckSession = duid
+    if(chatHistories.size() >= 3){
+      delete chatHistories.begin()->second;
+      chatHistories.erase(chatHistories.begin());
+    }
+    
+    chatHistories.insert({dduidParam, privateChatBuffer});
+    // const String pass = String(sdduid.c_str());
 
-    //send either success redirect to private chat or
-    //send error 
+    // AsyncWebServerResponse *response = request->beginResponse(200, "text/html", private_chat_page);
+    // response->addHeader("dduid", pass);
+    // request->send(response);
+    // request->send(200, "text/html", private_chat_page);
+    // request->redirect("/private-chat");
+    events.send("redirect" ,"redirectPage",millis());
+  });
+
+  webServer.on("/openChatHistory.json", HTTP_POST, [&](AsyncWebServerRequest* request) {
+    std::vector<byte> dduidParam;
+
+    AsyncWebParameter* p = request->getParam(0);
+    std::string sdduid = p->value().c_str();
+    dduidParam.insert(dduidParam.end(), sdduid.begin(), sdduid.end());
+    
+    duckSession = dduidParam;
+    // request->send(200, "text/html", private_chat_page);
+    // request->redirect("/private-chat");
+    events.send("redirect" ,"redirectPage",millis());
   });
 
   // Captive Portal form submission
