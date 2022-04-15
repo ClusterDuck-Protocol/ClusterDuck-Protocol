@@ -40,8 +40,7 @@
  * BOARD "ttgo lora" and "heltec lora" v1
  *
  * heltec pcb is white, ttgo pcb has heltec+ttgo markings
- * left top+middle in this picture
- * https://github.com/Xinyuan-LilyGO/TTGO-LoRa-Series
+ * left middle in this picture: https://github.com/Xinyuan-LilyGO/TTGO-LoRa-Series
  * pio: board = ttgo-lora32-v1
  */
 #if defined(ARDUINO_TTGO_LoRa32_V1)
@@ -65,8 +64,8 @@
 /**
  * BOARD "ttgo lora v2"
  *
- * Top right in this picture
- * https://github.com/Xinyuan-LilyGO/TTGO-LoRa-Series
+ * Top right in this picture: https://github.com/Xinyuan-LilyGO/TTGO-LoRa-Series
+ * (antenna attached directly to port on board)
  * pio: board = ttgo-lora32-v2
  */
 #elif defined(ARDUINO_TTGO_LoRa32_V2)
@@ -83,13 +82,39 @@
 
 // Oled Display settings
 
-#define CDPCFG_PIN_OLED_CLOCK 15
-#define CDPCFG_PIN_OLED_DATA 4
+#define CDPCFG_PIN_OLED_CLOCK 22
+#define CDPCFG_PIN_OLED_DATA 21
 #define CDPCFG_PIN_OLED_RESET 16
 #define CDPCFG_PIN_OLED_ROTATION U8G2_R0
 
 // actualy missing
 #define CDPCFG_PIN_LORA_DIO1 -1
+
+/**
+ * BOARD "ttgo lora v2.1.6"
+ *
+ * Top left in this picture: https://github.com/Xinyuan-LilyGO/TTGO-LoRa-Series
+ * (antenna attached with small cable, "chiseled" edges next to buttons
+ * pio: board = ttgo_lora32_v21
+ */
+#elif defined(ARDUINO_TTGO_LoRa32_v21new)
+
+#define CDPCFG_PIN_BAT 35
+#define CDPCFG_BAT_MULDIV 200 / 100
+
+#define CDPCFG_PIN_LED1 25
+
+// Lora configurations
+#define CDPCFG_PIN_LORA_CS 18
+#define CDPCFG_PIN_LORA_DIO0 26
+#define CDPCFG_PIN_LORA_DIO1 33
+#define CDPCFG_PIN_LORA_RST 14
+
+// Oled Display settings
+#define CDPCFG_PIN_OLED_CLOCK 22
+#define CDPCFG_PIN_OLED_DATA 21
+#define CDPCFG_PIN_OLED_RESET 16
+#define CDPCFG_PIN_OLED_ROTATION U8G2_R0
 
 // T-Beam
  #elif defined(ARDUINO_T_Beam)
