@@ -34,6 +34,7 @@ class DuckNet;
 #include <ESPmDNS.h>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
+#include <map>
 
 #include "../DuckError.h"
 #include "DuckEsp.h"
@@ -122,6 +123,15 @@ public:
    * @param message the packet to add to the buffer
    */
   void addToChatBuffer(CdpPacket message);
+
+  /**
+   * @brief insert received packet into the private chat circular buffer and
+   * send refresh page event to client
+   *
+   * @param message the packet to add to the buffer
+   * @param chatSession the session of the chat buffer you want to add to.
+   */
+  void addToPrivateChatBuffer(CdpPacket message, std::string chatSession);
 
   /**
    * @brief Set up the WiFi access point.

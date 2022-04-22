@@ -377,6 +377,29 @@ muidStatus Duck::getMuidStatus(const std::vector<byte> & muid) const {
   }
 }
 
+CdpPacket Duck::buildCdpPacket(byte topic, const std::vector<byte> data,
+    const std::vector<byte> targetDevice, const std::vector<byte> &muid)
+{
+  if (data.size() > MAX_DATA_LENGTH)
+  {
+    logerr("ERROR send data failed, message too large: " + String(data.size()) +
+           " bytes");
+    logerr(DUCKPACKET_ERR_SIZE_INVALID);
+  }
+  int err = txPacket->prepareForSending(&filter, targetDevice, this->getType(), topic, data);
+  //txPacket unintended side effects?
+
+  if (err != DUCK_ERR_NONE)
+  {
+    logerr("prepare for sending failed. " + err);
+  }
+  //todo error not handled properly
+  CdpPacket packet = CdpPacket(txPacket->getBuffer());
+  packet.muid = muid;
+
+  return packet;
+}
+
 // TODO: implement this using new packet format
 bool Duck::reboot(void*) {
   /*

@@ -13,10 +13,13 @@ const char private_chat_prompt[] PROGMEM = R"=====(
         <div id="form">
             <form>
                 <label for="dduid">Which device do you want to start a chat with?</label><br>
-                <textarea pattern="[A-NPZ1-9]{8}" maxlength=8 class="textbox textbox-full" name="dduid" placeholder="MAMA0001" cols="30" rows="2"></textarea>
+                <textarea pattern="[A-NPZ1-9]{8}" maxlength=8 class="textbox textbox-full" id="dduid" name="dduid" placeholder="MAMA0001" cols="30" rows="2"></textarea>
                 <button type="button" id="sendBtn">Start Chat</button>
                 <p id="makeshiftErrorOutput" class="hidden"></p>
             </form>
+        </div>
+        <h3>Chat Histories</h3>
+        <div id="histories">
         </div>
 
         <script>
@@ -25,18 +28,13 @@ const char private_chat_prompt[] PROGMEM = R"=====(
                 let params = new URLSearchParams("");
                 params.append(dduidInput.name, dduidInput.value);
                 let req = new XMLHttpRequest();
-                req.addEventListener("load", loadListener);
+                req.addEventListener("load", openChatListener);
                 req.addEventListener("error", errorListener);
-                req.open("POST", "/newPrivateChat.json?" + params.toString());
+                req.open("POST", "/openPrivateChat.json?" + params.toString());
                 req.send();
             }
-
-            function loadListener(){
-                let errEl = document.getElementById('makeshiftErrorOutput');
-                if (!errEl.classList.toString().includes("hidden")) {
-                    errEl.innerHTML = '';
-                    errEl.classList.add("hidden");
-                }
+            function openChatListener(){
+                window.location.replace("/private-chat");
             };
             function errorListener(){
                 let errorMessage = 'There was an error sending the message. Please try again.';
@@ -45,6 +43,39 @@ const char private_chat_prompt[] PROGMEM = R"=====(
                 errEl.innerHTML = errorMessage;
                 errEl.classList.remove("hidden");
             };
+            function openChatHistory(dduid){
+                let params = new URLSearchParams("");
+                params.append("dduid", dduid);
+                let req = new XMLHttpRequest();
+                req.addEventListener("load", openChatListener);
+                req.addEventListener("error", errorListener);
+                req.open("POST", "/openPrivateChat.json?" + params.toString());
+                req.send();
+                console.log('chat history opened');
+            };
+            function createHistoryButton(btnName){
+                var button = document.createElement("button");
+                button.classList.add("historyBtn");
+                button.innerHTML = btnName;
+                document.getElementById('histories').prepend(button);
+                button.onclick = ()=>openChatHistory(btnName);
+            }
+            function historiesListener () {
+                console.log(JSON.parse(this.responseText));
+                var data = JSON.parse(this.responseText);
+                console.log(this.responseText);
+                data.histories.forEach(item => {
+                        createHistoryButton(item);
+                    });
+            }
+            function retrieveHistories(){
+                var req = new XMLHttpRequest();
+                req.addEventListener("load", historiesListener);
+                req.open("GET", "/privateChatHistories");
+                req.send();
+            }
+            retrieveHistories();
+            document.getElementById('sendBtn').addEventListener('click', submit);
         </script>
     </body>
 </html>
@@ -83,11 +114,21 @@ const char private_chat_prompt[] PROGMEM = R"=====(
         margin-top: 10px;
     }
     #sendBtn:hover {
-        background-color:#ccc;;
+        background-color:#ccc;
     }
     #sendBtn:active {
         position:relative;
         top:1px;
+    }
+    .historyBtn {
+        background-color: #ffe421;
+        max-width: 250px;
+        margin: auto;
+        padding: 18px 24px 14px;
+        border-radius: 3px;
+    }
+    #histories{
+
     }
     #title{
         font-size: 1.2em;

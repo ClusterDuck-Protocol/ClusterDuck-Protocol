@@ -40,6 +40,7 @@ const char private_chat_page[] PROGMEM = R"=====(
                 document.getElementById('message-container').prepend(card);
             }
             function chatHistoryListener () {
+                console.log(this.responseText);
                 var data = JSON.parse(this.responseText);
                 data.posts.forEach(item => {
                         let sent = sduid == item.sduid ? true : false;
@@ -52,15 +53,18 @@ const char private_chat_page[] PROGMEM = R"=====(
             }
 
             function requestChatHistory(){
+                //set dduid here?
                 var req = new XMLHttpRequest();
                 req.addEventListener("load", chatHistoryListener);
-                req.open("GET", "/chatHistory");
+                req.addEventListener("error", errorListener);
+                req.open("GET", "/privateChatHistory");
                 req.send();
             }
 
             function requestSduid(){
                 var req = new XMLHttpRequest();
                 req.addEventListener("load", sduidListener);
+                req.addEventListener("error", errorListener);
                 req.open("GET", "/id");
                 req.send();
             }
@@ -89,7 +93,7 @@ const char private_chat_page[] PROGMEM = R"=====(
                 var req = new XMLHttpRequest();
                 req.addEventListener("load", loadListener);
                 req.addEventListener("error", errorListener);
-                req.open("POST", "/chatSubmit.json?" + params.toString());
+                req.open("POST", "/privateChatSubmit.json?" + params.toString());
                 req.send();
                 displayNewMessage({body: message.value, messageAge: 0, sduid: sduid}, true);
             }

@@ -212,7 +212,7 @@ public:
    * @param length the length of the byte buffer
    * @param targetDevice the device UID to receive the message
    * @param muid the muid that should be associated with this packet
-   * @return 
+   * @return a new CdpPacket
    * */
   CdpPacket buildCdpPacket(byte topic, const std::vector<byte> data,
     const std::vector<byte> targetDevice, const std::vector<byte> &muid);
