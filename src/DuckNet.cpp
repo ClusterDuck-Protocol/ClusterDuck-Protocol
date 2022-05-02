@@ -98,10 +98,8 @@ void DuckNet::addToPrivateChatBuffer(CdpPacket message, std::string chatSession)
 void DuckNet::createPrivateHistory(std::string session)
 {
   if(chatHistories.find(session) == chatHistories.end()){
-    loginfo("creating chat history");
       CircularBuffer* privateChatBuffer = new CircularBuffer(20);
       if(chatHistories.size() >= 3){
-        loginfo("deleting chat history");
         delete chatHistories.begin()->second;
         chatHistories.erase(chatHistories.begin());
       }
@@ -365,8 +363,6 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
         json = json + ", ";
       }
       json = json + "\"" +  myPair.first + "\"";
-      loginfo("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! json !!!!!!!!!!!!!!!!!!!!!!!!!!");
-      loginfo(myPair.first.c_str());
       keyNum++;
     }
     json = json + "]}";

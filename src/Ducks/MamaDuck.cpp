@@ -186,8 +186,6 @@ void MamaDuck::handleReceivedPacket() {
         break;
         case topics::pchat:{
           packet.timeReceived = millis();
-          loginfo("!!!!!!!!!!!!!!!!!!!!!!!!!!------- DUCKINFO -----!!!!!!!!!!!!!!!!!!");
-          loginfo(duckNet->duckSession.c_str());
           std::string session(packet.sduid.begin(), packet.sduid.end());
 
           duckNet->createPrivateHistory(session);
