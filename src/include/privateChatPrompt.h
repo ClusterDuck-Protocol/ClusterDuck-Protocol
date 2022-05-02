@@ -51,7 +51,6 @@ const char private_chat_prompt[] PROGMEM = R"=====(
                 req.addEventListener("error", errorListener);
                 req.open("POST", "/openPrivateChat.json?" + params.toString());
                 req.send();
-                console.log('chat history opened');
             };
             function createHistoryButton(btnName){
                 var button = document.createElement("button");
@@ -61,9 +60,8 @@ const char private_chat_prompt[] PROGMEM = R"=====(
                 button.onclick = ()=>openChatHistory(btnName);
             }
             function historiesListener () {
-                console.log(JSON.parse(this.responseText));
-                var data = JSON.parse(this.responseText);
                 console.log(this.responseText);
+                var data = JSON.parse(this.responseText);
                 data.histories.forEach(item => {
                         createHistoryButton(item);
                     });

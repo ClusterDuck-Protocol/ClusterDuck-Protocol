@@ -124,7 +124,7 @@ void MamaDuck::handleReceivedPacket() {
           packet.timeReceived = millis();
           duckNet->addToMessageBoardBuffer(packet);
         break;
-        case topics::chat:
+        case topics::gchat:
           packet.timeReceived = millis();
           duckNet->addToChatBuffer(packet);
         break;
@@ -180,9 +180,19 @@ void MamaDuck::handleReceivedPacket() {
           packet.timeReceived = millis();
           duckNet->addToMessageBoardBuffer(packet);
         break;
-        case topics::chat:
+        case topics::gchat:
           packet.timeReceived = millis();
           duckNet->addToChatBuffer(packet);
+        break;
+        case topics::pchat:{
+          packet.timeReceived = millis();
+          loginfo("!!!!!!!!!!!!!!!!!!!!!!!!!!------- DUCKINFO -----!!!!!!!!!!!!!!!!!!");
+          loginfo(duckNet->duckSession.c_str());
+          std::string session(packet.sduid.begin(), packet.sduid.end());
+
+          duckNet->createPrivateHistory(session);
+          duckNet->addToPrivateChatBuffer(packet, session);
+        }
         break;
         default:
           err = duckRadio.relayPacket(rxPacket);

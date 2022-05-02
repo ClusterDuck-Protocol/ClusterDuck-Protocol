@@ -64,6 +64,7 @@ class DuckNet {
 public:
 
   int channel;
+  std::string duckSession;
 
 #ifdef CDPCFG_WIFI_NONE
   int setupWebServer(bool createCaptivePortal = false, String html = "") {
@@ -132,6 +133,8 @@ public:
    * @param chatSession the session of the chat buffer you want to add to.
    */
   void addToPrivateChatBuffer(CdpPacket message, std::string chatSession);
+
+  void createPrivateHistory(std::string session);
 
   /**
    * @brief Set up the WiFi access point.

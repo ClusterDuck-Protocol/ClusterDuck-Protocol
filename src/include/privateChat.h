@@ -9,7 +9,7 @@ const char private_chat_page[] PROGMEM = R"=====(
     </head>
 
     <body>
-        <nav class="title-bar"><span id="title">PRIVATE CHAT</span></nav>
+        <nav class="title-bar"><span id="title">PRIVATE CHAT:</span></nav>
         <div id="chat-display">
             <div id="message-container"></div>
             <div class="chat-bar">
@@ -37,7 +37,7 @@ const char private_chat_page[] PROGMEM = R"=====(
                  + newMessage.sduid + '</span></p><span class="time">' 
                  + newMessage.messageAge + ' seconds ago</span>';
 
-                document.getElementById('message-container').prepend(card);
+                document.getElementById('message-container').append(card);
             }
             function chatHistoryListener () {
                 console.log(this.responseText);
@@ -46,14 +46,14 @@ const char private_chat_page[] PROGMEM = R"=====(
                         let sent = sduid == item.sduid ? true : false;
                         displayNewMessage(item, sent);
                     });
+                //document.getElementById('dduid').innerHtml = "PRIVATE CHAT: " + ;
                 
             }
             function sduidListener () {
-                sduid = JSON.parse(this.responseText);
+                sduid = this.responseText;
             }
 
             function requestChatHistory(){
-                //set dduid here?
                 var req = new XMLHttpRequest();
                 req.addEventListener("load", chatHistoryListener);
                 req.addEventListener("error", errorListener);
@@ -72,7 +72,6 @@ const char private_chat_page[] PROGMEM = R"=====(
 
 
             function loadListener(){
-                console.log('request returned');
                 var errEl = document.getElementById('makeshiftErrorOutput');
                 if (!errEl.classList.toString().includes("hidden")) {
                     errEl.innerHTML = '';
@@ -96,6 +95,8 @@ const char private_chat_page[] PROGMEM = R"=====(
                 req.open("POST", "/privateChatSubmit.json?" + params.toString());
                 req.send();
                 displayNewMessage({body: message.value, messageAge: 0, sduid: sduid}, true);
+
+                message.value = "";
             }
             
             if (!!window.EventSource) {
@@ -103,12 +104,10 @@ const char private_chat_page[] PROGMEM = R"=====(
 
                 source.addEventListener('open', function(e) {
                     console.log("Events Connected");
-                    
                 }, false);
 
                 source.addEventListener('error', function(e) {
                     if (e.target.readyState != EventSource.OPEN) {
-                    console.log("Events Disconnected");
                     }
                 }, false);
                 source.addEventListener('refreshPage', function(data) {

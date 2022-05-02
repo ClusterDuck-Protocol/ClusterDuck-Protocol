@@ -47,7 +47,7 @@ const char chat_page[] PROGMEM = R"=====(
                 
             }
             function sduidListener () {
-                sduid = JSON.parse(this.responseText);
+                sduid = this.responseText;
             }
 
             function requestChatHistory(){
@@ -91,6 +91,8 @@ const char chat_page[] PROGMEM = R"=====(
                 req.open("POST", "/chatSubmit.json?" + params.toString());
                 req.send();
                 displayNewMessage({body: message.value, messageAge: 0, sduid: sduid}, true);
+
+                message.value = "";
             }
             
             if (!!window.EventSource) {

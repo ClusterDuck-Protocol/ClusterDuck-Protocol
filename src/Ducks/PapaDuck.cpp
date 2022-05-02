@@ -120,7 +120,7 @@ void PapaDuck::handleReceivedPacket() {
         rxPacket->getBuffer().size()));
     loginfo("invoking callback in the duck application...");
     
-    if(rxPacket->getTopic() == topics::chat){
+    if(rxPacket->getTopic() == topics::gchat){
       duckNet->addToChatBuffer(CdpPacket(rxPacket->getBuffer()));
     } else{
       recvDataCallback(rxPacket->getBuffer());

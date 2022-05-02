@@ -96,8 +96,10 @@ enum topics {
   health = 0x15,
   // Send duck commands
   dcmd = 0x16,
-  //chat message
-  chat = 0x17,
+  //global chat message
+  gchat = 0x17,
+  //private chat message
+  pchat = 0x18,
   // MQ7 Gas Sensor
   mq7 = 0xEF,
   // GP2Y Dust Sensor
