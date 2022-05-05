@@ -34,7 +34,7 @@
 //#define MAX_PATH_OFFSET (PACKET_LENGTH - DUID_LENGTH - 1)
 
 /*
-Data Section of a broadcast ack (max 180 bytes):
+Data Section of a broadcast ack (max 229 bytes):
 0 1      8    12...
 | |      |    |
 +-+------+----+-...
@@ -44,16 +44,36 @@ Data Section of a broadcast ack (max 180 bytes):
 Maximum number of DUID/MUID pairs is:
   floor( (maximum data payload size - N) / (DUID size + MUID size) )
 Which is:
-  floor( (180 - 1) / 12 ) = 14
+  floor( (229 - 1) / 12 ) = 19
 
 N:              1  byte                - Number of DUID/MUID pairs
 Each DUID:     08  byte array          - A Device Unique ID
 Each MUID:     04  byte array          - Message unique ID
 */
-#define MAX_MUID_PER_ACK 14
+#define MAX_MUID_PER_ACK 19
+
+
+//Available command IDs (N)
+#define CMD_HEALTH 0
+#define CMD_WIFI 1
+#define CMD_CHANNEL 2
+
+/*
+Data Section of a duck command (max 229 bytes):
+0 1    229...
+| |     |
++-+-----+-...
+|N| VAL
++-+-----+-...
+
+N:              1  byte                - Command lookup value
+VAL:          228  bytes               - Value to set for command
+
+*/
 
 // header + 1 hop + 1 byte data
 #define MIN_PACKET_LENGTH (HEADER_LENGTH + 1)
+
 
 #define ARRAY_LENGTH(array) (sizeof(array) / sizeof((array)[0]))
 
@@ -74,7 +94,21 @@ enum topics {
   alert = 0x14,
   /// Device health status
   health = 0x15,
-  /// Max supported topics
+  // Send duck commands
+  dcmd = 0x16,
+  // MQ7 Gas Sensor
+  mq7 = 0xEF,
+  // GP2Y Dust Sensor
+  gp2y = 0xFA,
+  // bmp280
+  bmp280 = 0xFB,
+  // DHT11 sensor
+  dht11 = 0xFC,
+  // ir sensor
+  pir = 0xFD,
+  // bmp180 
+  bmp180 = 0xFE,
+  // Max supported topics
   max_topics = 0xFF
 };
 
@@ -84,6 +118,8 @@ enum reservedTopic {
   pong = 0x02,
   gps = 0x03,
   ack = 0x04,
+  cmd = 0x05,
+  mbm = 0x06,
   max_reserved = 0x0F
 };
 
@@ -130,7 +166,10 @@ public:
   std::vector<byte> data;
   /// Path section (48 bytes max)
   std::vector<byte> path;
+  //time received
+  unsigned long timeReceived;
 
+  CdpPacket(){}
   CdpPacket(const std::vector<byte> & buffer) {
     int buffer_length = buffer.size();
     // sduid

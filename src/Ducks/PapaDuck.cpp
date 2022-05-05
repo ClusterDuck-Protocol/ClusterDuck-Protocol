@@ -211,6 +211,54 @@ void PapaDuck::broadcastAck() {
   ackStore.clear();
 }
 
+void PapaDuck::sendCommand(byte cmd, std::vector<byte> value) {
+  loginfo("Initiate sending command");
+  std::vector<byte> dataPayload;
+  dataPayload.push_back(cmd);
+  dataPayload.insert(dataPayload.end(), value.begin(), value.end());
+
+  int err = txPacket->prepareForSending(&filter, BROADCAST_DUID, DuckType::PAPA,
+    reservedTopic::cmd, dataPayload);
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR handleReceivedPacket. Failed to prepare ack. Error: " +
+      String(err));
+  }
+
+  err = duckRadio.sendData(txPacket->getBuffer());
+
+  if (err == DUCK_ERR_NONE) {
+    CdpPacket packet = CdpPacket(txPacket->getBuffer());
+    filter.bloom_add(packet.muid.data(), MUID_LENGTH);
+  } else {
+    logerr("ERROR handleReceivedPacket. Failed to send ack. Error: " +
+      String(err));
+  }
+}
+
+void PapaDuck::sendCommand(byte cmd, std::vector<byte> value, std::vector<byte> dduid) {
+  loginfo("Initiate sending command");
+  std::vector<byte> dataPayload;
+  dataPayload.push_back(cmd);
+  dataPayload.insert(dataPayload.end(), value.begin(), value.end());
+
+  int err = txPacket->prepareForSending(&filter, dduid, DuckType::PAPA,
+    reservedTopic::cmd, dataPayload);
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR handleReceivedPacket. Failed to prepare cmd. Error: " +
+      String(err));
+  }
+
+  err = duckRadio.sendData(txPacket->getBuffer());
+
+  if (err == DUCK_ERR_NONE) {
+    CdpPacket packet = CdpPacket(txPacket->getBuffer());
+    filter.bloom_add(packet.muid.data(), MUID_LENGTH);
+  } else {
+    logerr("ERROR handleReceivedPacket. Failed to send cmd. Error: " +
+      String(err));
+  }
+}
+
 int PapaDuck::reconnectWifi(String ssid, String password) {
 #ifdef CDPCFG_WIFI_NONE
   logwarn("WARNING reconnectWifi skipped, device has no WiFi.");
@@ -227,4 +275,24 @@ int PapaDuck::reconnectWifi(String ssid, String password) {
   }
   return DUCK_ERR_NONE;
 #endif
+}
+
+void PapaDuck::sendMessageBoardMessage(std::vector<byte> dataPayload, std::vector<byte> duid) {
+  int err = txPacket->prepareForSending(&filter, duid, DuckType::PAPA,
+    reservedTopic::mbm, dataPayload);
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR handleReceivedPacket. Failed to prepare ack. Error: " +
+      String(err));
+  }
+
+  err = duckRadio.sendData(txPacket->getBuffer());
+
+  if (err == DUCK_ERR_NONE) {
+    CdpPacket packet = CdpPacket(txPacket->getBuffer());
+    filter.bloom_add(packet.muid.data(), MUID_LENGTH);
+  } else {
+    logerr("ERROR handleReceivedPacket. Failed to send ack. Error: " +
+      String(err));
+  }
+  
 }

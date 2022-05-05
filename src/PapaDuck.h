@@ -78,6 +78,40 @@ public:
    */
   void enableAcks(bool enable);
 
+  /**
+   * @brief Send duck command to entire network
+   *
+   * The PapaDuck can send command messages to remote ducks. There are
+   * two parts for each command. Only PapaDucks are able to send 
+   * commands to remote ducks. See `MamaDuck.cpp` for available commands.
+   * All ducks will execute this command and relay.
+   *
+   * @param cmd byte enum for command to be executed.
+   * @param value contextual data to be used in executed command.
+   */
+  void sendCommand(byte cmd, std::vector<byte> value);
+
+  /**
+   * @brief Send duck command to specific duck
+   *
+   * The PapaDuck can send command messages to remote ducks. There are
+   * two parts for each command. Only PapaDucks are able to send 
+   * commands to remote ducks. See `MamaDuck.cpp` for available commands. 
+   *
+   * @param cmd byte enum for command to be executed.
+   * @param value contextual data to be used in executed command.
+   * @param dduid destination duck ID for command to be executed.
+   */
+  void sendCommand(byte cmd, std::vector<byte> value, std::vector<byte> dduid);
+
+  /**
+   * @brief send message board message to the entire network
+   * 
+   * @param dataPayload the message to send
+   * @param duid optional -- the target device uid. Default is BROADCAST_DUID. 
+   */
+  void sendMessageBoardMessage(std::vector<byte> dataPayload, std::vector<byte> duid = BROADCAST_DUID);
+
 private:
 
   void handleReceivedPacket();

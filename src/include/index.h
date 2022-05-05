@@ -1,7 +1,7 @@
 #ifndef INDEX_H
 #define INDEX_H
 const char MAIN_page[] PROGMEM = R"=====(
-<!DOCTYPE html>
+<!DOCTYPE html>                                                                                                                                                                                                                                                                         
 <html>
     <head>
         <meta charset="utf-8">
@@ -154,6 +154,7 @@ const char MAIN_page[] PROGMEM = R"=====(
                 <div class="gps"><h4>Message Sent</h4><h5 id="dateNow">March 13, 2019 @ 1:00 PM</h5><p>Your message ID#: XXXXXX</p></div>
                 <p class="disclaimer">If your situation changes, please send another update.</p>
                 <div id="updateClassupdate" class="updateClass update">Send Update</div>
+                <div id="messages-container"></div>
             </div>
         </div>
         <div id="lastMessageSection" class="hidden">
@@ -175,10 +176,8 @@ const char MAIN_page[] PROGMEM = R"=====(
             const CLIENT_ID_LENGTH = 4;
             const CLIENT_ID_KEY = 'CLIENT_ID';
             const NOT_ACKED_MSG = "The message may have been received, but we're still waiting for confirmation."
-
             var messageController;
             var muidRequest;
-
             function CreateMuidRequest(muid) {
                 return MuidRequest(
                     muid,
@@ -186,20 +185,17 @@ const char MAIN_page[] PROGMEM = R"=====(
                     document.getElementById('muidStatusMessage')
                 );
             }
-
             var MessageController = function() {
                 var loadListener = function() {
                     // this.responseText should be something like: {"muid":"ABCD"}
                     var res = JSON.parse(this.responseText);
                     messageController.saveLastMuid(res.muid);
-
                     var errEl = document.getElementById('makeshiftErrorOutput');
                     if (!errEl.classList.toString().includes("hidden")) {
                         errEl.innerHTML = '';
                         errEl.classList.add("hidden");
                     }
                 };
-
                 var errorListener = function() {
                     var errorMessage = 'There was an error sending the message. Please try again.';
                     console.log(errorMessage);
@@ -207,89 +203,71 @@ const char MAIN_page[] PROGMEM = R"=====(
                     errEl.innerHTML = errorMessage;
                     errEl.classList.remove("hidden");
                 };
-
                 var showSentMessage = function(commentsInput) {
                     var lastMessageField = document.getElementById('lastMessageField');
                     lastMessageField.innerHTML = commentsInput.value;
                     // TODO: Create a new DOM view so multiple messages can be shown
-
                     var msgSection = document.getElementById('lastMessageSection');
                     msgSection.classList.remove("hidden");
                 };
-
                 return {
                     sendMessage: function() {
                         var clientIdInput = document.getElementById('clientId');
                         var commentsInput = document.getElementById('commentsInput');
-
                         var params = new URLSearchParams("");
                         params.append(clientIdInput.name, clientIdInput.value);
                         params.append(commentsInput.name, commentsInput.value);
-
                         var req = new XMLHttpRequest();
                         req.addEventListener("load", loadListener);
                         req.addEventListener("error", errorListener);
-
                         req.open("POST", "/formSubmit.json?" + params.toString());
                         req.send();
-
                         showSentMessage(commentsInput);
                     },
-                    saveLastMuid: function(muid) {
+                    saveLastMuid: function(muid) { <!-- for checking if message was acked on duk, needs fixed -->
                         document.getElementById('lastMessageMuid').innerHTML = muid;
                         muidRequest = CreateMuidRequest(muid);
                         muidRequest.requestMuidStatus();
                     },
                 };
             };
-
             var MuidRequest = function(muid, statusEl, messageEl) {
-
                 var showStatus = function(status, message) {
                     statusEl.innerHTML = status;
                     messageEl.innerHTML = message;
                 };
-
                 var loadListener = function() {
                     var res = JSON.parse(this.responseText);
                     showStatus(res.status, res.message);
-
                     if (res.status === 'not_acked') {
                         showStatus('not_acked', NOT_ACKED_MSG)
                         setTimeout(requestMuidStatus, 1000);
                     }
                 };
-
                 var errorListener = function() {
                     showStatus('error', 'There was an unknown error');
                     setTimeout(requestMuidStatus, 1000);
                 };
-
                 var requestMuidStatus = function() {
                     var req = new XMLHttpRequest();
                     req.addEventListener("load", loadListener);
                     req.addEventListener("error", errorListener);
-
                     var url = MUID_URL;
                     var params = new URLSearchParams("");
                     params.append(MUID_PARAM_NAME, muid);
                     url += "?" + params.toString();
-
                     req.open("GET", makeUrlUnique(url));
                     req.send();
                 };
-
                 return {
                     requestMuidStatus: requestMuidStatus,
                 };
             };
-
             function makeUrlUnique(url) {
                 // Makes the URL bypass the browser's cache.
                 // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest#bypassing_the_cache
                 return url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime();
             }
-
             function storageAvailable(type) {
                 var storage;
                 try {
@@ -314,7 +292,6 @@ const char MAIN_page[] PROGMEM = R"=====(
                         (storage && storage.length !== 0);
                 }
             }
-
             function generateClientId() {
                 var result = '';
                 var characters = 'ABCDEFGHIJKLMNPQRSTUVWXYZ123456789';
@@ -324,7 +301,6 @@ const char MAIN_page[] PROGMEM = R"=====(
                }
                return result;
             }
-
             function initialize() {
                 var clientId;
                 if (storageAvailable('localStorage')) {
@@ -338,11 +314,9 @@ const char MAIN_page[] PROGMEM = R"=====(
                 } else {
                     document.getElementById('clientId').value = '';
                 }
-
                 messageController = MessageController();
                 document.getElementById('sendBtn').addEventListener('click', messageController.sendMessage);
             }
-
             initialize();
         </script>
     </body>

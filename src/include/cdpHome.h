@@ -7,7 +7,6 @@ const char home_page[] PROGMEM = R"=====(
   <head>
     <title>ClusterDuck Network</title>
   </head>
-
   <body>
 	<div class="main-box">
 		<h1>Welcome to the ClusterDuck Network</h1>
@@ -16,27 +15,20 @@ const char home_page[] PROGMEM = R"=====(
 		
 		<a href="/controlpanel">Control Panel</a>
 		<a href="/main">Send Message</a>
+		<a href="/message-board">Message Board</a>
 	</div>
   </body>
 </html>
-
-
-
-
-
 <style>
-
 body {
 	max-width: 85%;
 	margin: auto;
 	padding-top: 14px;
 	padding-bottom: 14px;
 }
-
 h1 {
 	font-weight: bold;
 }
-
 .main-box{
 	padding:3em;
 	font: 26px "Avenir", helvetica, sans-serif;
@@ -44,7 +36,6 @@ h1 {
 	background-color:#f0f0f0;
 	min-height: 100vh;
 }
-
 a {
 	display: block;
 	margin-bottom: 14px;
@@ -58,7 +49,6 @@ a {
 	color: #000;
 	text-transform: uppercase;
 }
-
 </style>
   
 )=====";
