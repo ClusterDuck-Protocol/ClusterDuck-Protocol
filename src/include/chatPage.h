@@ -117,6 +117,7 @@ const char chat_page[] PROGMEM = R"=====(
             
             requestSduid();
             requestChatHistory();
+            document.getElementById("chatMessage").focus();
         </script>
     </body>
 </html>

@@ -35,7 +35,7 @@ CdpPacket CircularBuffer::getMessage(int index)
 }
 CircularBuffer::~CircularBuffer()
 {
-    delete buffer;
+    delete [] buffer;
 }
 
 

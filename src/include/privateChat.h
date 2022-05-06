@@ -119,6 +119,7 @@ const char private_chat_page[] PROGMEM = R"=====(
             
             requestSduid();
             requestChatHistory();
+            document.getElementById("chatMessage").focus();
         </script>
     </body>
 </html>
@@ -128,21 +129,19 @@ const char private_chat_page[] PROGMEM = R"=====(
     .received-message-card{
         border-radius: 10px;
         background-color: #F0EEF7;
-        padding: 0 3vw 1vh;
+        padding: 5px 3vw 1vh;
         margin: 2vw;
         overflow:auto;
         width: 70%;
-        padding-top: 5px;
     }
     .sent-message-card{
         border-radius: 10px;
         background-color: #ffff004f;
-        padding: 0 3vw 1vh;
+        padding: 5px 3vw 1vh;
         margin: 2vw;
         overflow:auto;
         width: 70%;
         float: right;
-        padding-top: 5px;
     }
     #message-container{
         width: 95%;

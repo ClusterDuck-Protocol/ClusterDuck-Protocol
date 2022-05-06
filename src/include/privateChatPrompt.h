@@ -37,7 +37,7 @@ const char private_chat_prompt[] PROGMEM = R"=====(
                 window.location.replace("/private-chat");
             };
             function errorListener(){
-                let errorMessage = 'There was an error sending the message. Please try again.';
+                let errorMessage = 'There was an error starting the chat. Please try again.';
                 console.log(errorMessage);
                 let errEl = document.getElementById('makeshiftErrorOutput');
                 errEl.innerHTML = errorMessage;
@@ -74,6 +74,7 @@ const char private_chat_prompt[] PROGMEM = R"=====(
             }
             retrieveHistories();
             document.getElementById('sendBtn').addEventListener('click', submit);
+            document.getElementById("dduid").focus();
         </script>
     </body>
 </html>
