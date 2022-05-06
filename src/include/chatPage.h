@@ -67,7 +67,6 @@ const char chat_page[] PROGMEM = R"=====(
 
 
             function loadListener(){
-                console.log('request returned');
                 var errEl = document.getElementById('makeshiftErrorOutput');
                 if (!errEl.classList.toString().includes("hidden")) {
                     errEl.innerHTML = '';

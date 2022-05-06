@@ -40,7 +40,6 @@ const char private_chat_page[] PROGMEM = R"=====(
                 document.getElementById('message-container').append(card);
             }
             function chatHistoryListener () {
-                console.log(this.responseText);
                 var data = JSON.parse(this.responseText);
                 data.posts.forEach(item => {
                         let sent = sduid == item.sduid ? true : false;

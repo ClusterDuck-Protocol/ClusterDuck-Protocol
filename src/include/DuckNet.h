@@ -134,7 +134,19 @@ public:
    */
   void addToPrivateChatBuffer(CdpPacket message, std::string chatSession);
 
+   /**
+   * @brief creates a new private chat history, replacing the oldest history if the limit is reached.
+   *
+   * @param session the destination device to open a chat with
+   */
   void createPrivateHistory(std::string session);
+
+  /**
+   * @brief retrieve all messages from from message circular buffer
+   *
+   * @returns a json array of messages with a title, body, and messageAge
+   */
+  std::string retrieveMessageHistory(CircularBuffer* buffer);
 
   /**
    * @brief Set up the WiFi access point.
@@ -270,12 +282,4 @@ private:
   String password = "";
   // char* controlSsid = "";
   // char* controlPassword = "";
-
-
-    /**
-   * @brief retrieve all messages from from message circular buffer
-   *
-   * @returns a json array of messages with a title, body, and messageAge
-   */
-  std::string retrieveMessageHistory(CircularBuffer* buffer);
 };

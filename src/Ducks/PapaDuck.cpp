@@ -126,7 +126,6 @@ void PapaDuck::handleReceivedPacket() {
       recvDataCallback(rxPacket->getBuffer());
     }
     
-
     if (acksEnabled) {
       const CdpPacket packet = CdpPacket(rxPacket->getBuffer());
       if (needsAck(packet)) {
