@@ -1,5 +1,10 @@
 Examples:
 
+The URL under `lib_deps` may be replaced by a path to your local ClusterDuck-Protocol folder like so:
+```
+file://<DIRECTORY>/ClusterDuck-Protocol
+```
+
 ## 1. Ducks
 
 #### MamaDuck
