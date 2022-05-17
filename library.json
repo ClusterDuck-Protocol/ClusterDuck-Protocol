@@ -47,6 +47,7 @@
         "operatorfoundation/Crypto": "^0.2.0",
         "mikalhart/TinyGPSPlus": "^1.0.3",
         "adafruit/Adafruit BusIO": "^1.11.6",
+        "jandrassy/ArduinoOTA": "^1.0.8",
         "me-no-dev/AsyncTCP": "^1.1.1",
         "me-no-dev/ESPAsyncTCP": "^1.2.2",
         "me-no-dev/ESP Async WebServer": "^1.2.3"
