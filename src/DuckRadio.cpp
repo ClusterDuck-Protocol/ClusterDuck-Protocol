@@ -38,7 +38,7 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
 
   int rc = lora.begin();
 
-  if (rc != ERR_NONE) {
+  if (rc != RADIOLIB_ERR_NONE) {
     logerr("ERROR  initializing LoRa driver. state = ");
     logerr(rc);
     return DUCKLORA_ERR_BEGIN;
@@ -47,31 +47,31 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
   // Lora is started, we need to set all the radio parameters, before it can
   // start receiving packets
   rc = lora.setFrequency(config.band);
-  if (rc == ERR_INVALID_FREQUENCY) {
+  if (rc == RADIOLIB_ERR_INVALID_FREQUENCY) {
     logerr("ERROR  frequency is invalid");
     return DUCKLORA_ERR_SETUP;
   }
 
   rc = lora.setBandwidth(config.bw);
-  if (rc == ERR_INVALID_BANDWIDTH) {
+  if (rc == RADIOLIB_ERR_INVALID_BANDWIDTH) {
     logerr("ERROR  bandwidth is invalid");
     return DUCKLORA_ERR_SETUP;
   }
 
   rc = lora.setSpreadingFactor(config.sf);
-  if (rc == ERR_INVALID_SPREADING_FACTOR) {
+  if (rc == RADIOLIB_ERR_INVALID_SPREADING_FACTOR) {
     logerr("ERROR  spreading factor is invalid");
     return DUCKLORA_ERR_SETUP;
   }
 
   rc = lora.setOutputPower(config.txPower);
-  if (rc == ERR_INVALID_OUTPUT_POWER) {
+  if (rc == RADIOLIB_ERR_INVALID_OUTPUT_POWER) {
     logerr("ERROR  output power is invalid");
     return DUCKLORA_ERR_SETUP;
   }
 
   rc = lora.setGain(config.gain);
-  if (rc == ERR_INVALID_GAIN) {
+  if (rc == RADIOLIB_ERR_INVALID_GAIN) {
     logerr("ERROR  gain is invalid");
     return DUCKLORA_ERR_SETUP;
   }
@@ -81,14 +81,14 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
 
   // set sync word to private network
   rc = lora.setSyncWord(0x12);
-  if (rc != ERR_NONE) {
+  if (rc != RADIOLIB_ERR_NONE) {
     logerr("ERROR  sync word is invalid");
     return DUCKLORA_ERR_SETUP;
   }
 
   rc = lora.startReceive();
 
-  if (rc != ERR_NONE) {
+  if (rc != RADIOLIB_ERR_NONE) {
     logerr("ERROR Failed to start receive");
     return DUCKLORA_ERR_RECEIVE;
   }
@@ -97,7 +97,7 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
 
 void DuckRadio::setSyncWord(byte syncWord) {
   int error = lora.setSyncWord(syncWord);
-  if (error != ERR_NONE) {
+  if (error != RADIOLIB_ERR_NONE) {
     logerr("ERROR  sync word is invalid");
   }
   lora.startReceive();
@@ -113,7 +113,7 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
   if (packet_length < MIN_PACKET_LENGTH) {
     logerr("ERROR  handlePacket rx data size invalid: " +
            String(packet_length));
-           
+
     DuckRadio::setReceiveFlag(false);
     int rxState = startReceive();
     return DUCKLORA_ERR_HANDLE_PACKET;
@@ -129,7 +129,7 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
   DuckRadio::setReceiveFlag(false);
   int rxState = startReceive();
 
-  if (err != ERR_NONE) {
+  if (err != RADIOLIB_ERR_NONE) {
     logerr("ERROR  readReceivedData failed. err: " + String(err));
     return DUCKLORA_ERR_HANDLE_PACKET;
   }
@@ -164,7 +164,7 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
           " fe: " + String(lora.getFrequencyError(true)) +
           " size: " + String(packet_length));
 
-  if (rxState != ERR_NONE) {
+  if (rxState != RADIOLIB_ERR_NONE) {
     return rxState;
   }
 
@@ -190,7 +190,7 @@ int DuckRadio::sendData(std::vector<byte> data) {
 int DuckRadio::startReceive() {
   int state = lora.startReceive();
 
-  if (state != ERR_NONE) {
+  if (state != RADIOLIB_ERR_NONE) {
     logerr("ERROR startReceive failed, code " + String(state));
     return DUCKLORA_ERR_RECEIVE;
   }
@@ -212,7 +212,7 @@ void DuckRadio::processRadioIrq() {}
 void DuckRadio::setChannel(int channelNum) {
   logdbg("Setting Channel to : ");
   logdbg(channelNum);
-  
+
   int err;
   switch(channelNum) {
     case 2:
@@ -247,7 +247,7 @@ void DuckRadio::setChannel(int channelNum) {
       lora.startReceive();
       break;
   }
-  if (err != ERR_NONE) {
+  if (err != RADIOLIB_ERR_NONE) {
     logerr("ERROR Failed to set channel");
   } else {
     lora.startReceive();
@@ -258,30 +258,30 @@ void DuckRadio::setChannel(int channelNum) {
 
 void DuckRadio::serviceInterruptFlags() {
   if (DuckRadio::interruptFlags != 0) {
-    if (DuckRadio::interruptFlags & SX127X_CLEAR_IRQ_FLAG_RX_TIMEOUT) {
+    if (DuckRadio::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_RX_TIMEOUT) {
       loginfo("Interrupt flag was set: timeout");
     }
-    if (DuckRadio::interruptFlags & SX127X_CLEAR_IRQ_FLAG_RX_DONE) {
+    if (DuckRadio::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_RX_DONE) {
       loginfo("Interrupt flag was set: packet reception complete");
       DuckRadio::setReceiveFlag(true);
     }
-    if (DuckRadio::interruptFlags & SX127X_CLEAR_IRQ_FLAG_PAYLOAD_CRC_ERROR) {
+    if (DuckRadio::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_PAYLOAD_CRC_ERROR) {
       loginfo("Interrupt flag was set: payload CRC error");
     }
-    if (DuckRadio::interruptFlags & SX127X_CLEAR_IRQ_FLAG_VALID_HEADER) {
+    if (DuckRadio::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_VALID_HEADER) {
       loginfo("Interrupt flag was set: valid header received");
     }
-    if (DuckRadio::interruptFlags & SX127X_CLEAR_IRQ_FLAG_TX_DONE) {
+    if (DuckRadio::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_TX_DONE) {
       loginfo("Interrupt flag was set: payload transmission complete");
       startReceive();
     }
-    if (DuckRadio::interruptFlags & SX127X_CLEAR_IRQ_FLAG_CAD_DONE) {
+    if (DuckRadio::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_CAD_DONE) {
       loginfo("Interrupt flag was set: CAD complete");
     }
-    if (DuckRadio::interruptFlags & SX127X_CLEAR_IRQ_FLAG_FHSS_CHANGE_CHANNEL) {
+    if (DuckRadio::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_FHSS_CHANGE_CHANNEL) {
       loginfo("Interrupt flag was set: FHSS change channel");
     }
-    if (DuckRadio::interruptFlags & SX127X_CLEAR_IRQ_FLAG_CAD_DETECTED) {
+    if (DuckRadio::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_CAD_DETECTED) {
       loginfo("Interrupt flag was set: valid LoRa signal detected during CAD operation");
     }
 
@@ -296,7 +296,7 @@ void DuckRadio::onInterrupt(void) {
 
 int DuckRadio::startTransmitData(byte* data, int length) {
   int err = DUCK_ERR_NONE;
-  int tx_err = ERR_NONE;
+  int tx_err = RADIOLIB_ERR_NONE;
   loginfo("TX data");
   logdbg(" -> " + duckutils::convertToHex(data, length));
   logdbg(" -> length: " + String(length));
@@ -306,18 +306,18 @@ int DuckRadio::startTransmitData(byte* data, int length) {
   // when transmit is complete, the Di0 interrupt will be triggered
   tx_err = lora.transmit(data, length);
   switch (tx_err) {
-    case ERR_NONE:
+    case RADIOLIB_ERR_NONE:
       loginfo("TX data done in : " + String((millis() - t1)) + "ms");
       // display->log(">> txdone");
       break;
 
-    case ERR_PACKET_TOO_LONG:
+    case RADIOLIB_ERR_PACKET_TOO_LONG:
       // the supplied packet was longer than 256 bytes
       logerr("ERROR startTransmitData too long!");
       err = DUCKLORA_ERR_MSG_TOO_LARGE;
       break;
 
-    case ERR_TX_TIMEOUT:
+    case RADIOLIB_ERR_TX_TIMEOUT:
       logerr("ERROR startTransmitData timeout!");
       display->log("tx-tmout");
       err = DUCKLORA_ERR_TIMEOUT;
