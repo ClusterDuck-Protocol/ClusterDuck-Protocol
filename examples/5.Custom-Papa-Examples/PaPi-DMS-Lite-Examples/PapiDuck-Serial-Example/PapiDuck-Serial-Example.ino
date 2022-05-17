@@ -1,5 +1,5 @@
 /**
- * @file Serial-PaPiDuckExample.ino
+ * @file PapiDuck-Serial-Example.ino
  * @author 
  * @brief Uses built-in PapaDuck from the SDK to create a Serial Print papaDuck for DMS Lite
  * 

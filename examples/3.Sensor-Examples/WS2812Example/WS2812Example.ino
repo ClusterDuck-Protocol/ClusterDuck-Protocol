@@ -1,11 +1,10 @@
 /**
- * @file Led-Example.ino
- * @brief Uses the built in Mama Duck with some customatizations.
+ * @file WS2812Example.ino
+ * @brief Uses the built in Mama Duck with WS2812 LEDs attached
  * 
- * This example is a Mama Duck, but it is also periodically sending a message in the Mesh
- * It is setup to provide a custom Emergency portal, instead of using the one provided by the SDK.
- * Notice the background color of the captive portal is Black instead of the default Red.
- * 
+ * This example is a Mama Duck, which also brings some light to the world by
+ * incorporating some WS2812 LEDs via the FastLED library.
+ *
  * @date 2020-11-10
  * 
  * @copyright Copyright (c) 2020
@@ -29,12 +28,11 @@
 #define COLOR_ORDER GRB
 CRGB leds[NUM_LEDS];
 
-
 MamaDuck duck;
 
 auto timer = timer_create_default();
 const int INTERVAL_MS = 60000;
-char message[32]; 
+char message[32];
 int counter = 1;
 
 void setup() {
@@ -47,16 +45,10 @@ void setup() {
   devId.insert(devId.end(), deviceId.begin(), deviceId.end());
   duck.setupWithDefaults(devId);
   // Setup LED
-   delay( 3000 ); // power-up safety delay
-   FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
-   FastLED.setBrightness(  BRIGHTNESS );
-
-  
+  delay(3000); // power-up safety delay
+  FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);
   Serial.println("MAMA-DUCK...READY!");
-
-
-
-
 
   // initialize the timer. The timer thread runs separately from the main loop
   // and will trigger sending a counter message.
@@ -75,7 +67,5 @@ void loop() {
 }
 
 bool runSensor(void *) {
-  
-  
   return true;
 }

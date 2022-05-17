@@ -1,4 +1,6 @@
 /**
+ * @file PapiDuck-WiFi-Example.ino
+ * @author
  * @brief Uses built-in PapaDuck from the SDK to create a WiFi enabled Papa Duck
  * 
  * This is to be used with a PaPi/DMS-Lite device
