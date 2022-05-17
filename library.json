@@ -8,7 +8,7 @@
         "email": "info@project-owl.com",
         "url": "https://www.project-owl.com"
     },
-    "version": "3.2.5",
+    "version": "3.3.0",
     "repository":
     {
         "type": "git",
@@ -25,7 +25,6 @@
     },
     "frameworks": "arduino",
     "platforms": "espressif32",
-    
     "examples": [
         "[Ee]xamples/*/*.ino"
     ],
@@ -37,6 +36,4 @@
         "CRC32": "~2.0.0",
         "Crypto": "0.2.0"
     }
- 
 }
-
