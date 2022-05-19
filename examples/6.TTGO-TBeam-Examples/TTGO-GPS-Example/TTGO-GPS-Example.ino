@@ -1,6 +1,6 @@
 /**
- * @file TTGOGPSExample.ino
- * @brief Uses the built in Mama Duck with some customatizations.
+ * @file TTGO-GPS-Example.ino
+ * @brief Uses the built in Mama Duck with some customization.
  * 
  * This example is a Mama Duck, that has GPS capabilities and will send the GPS data with the GPS topic based on the set timer.
  * @date 2020-09-21
@@ -17,8 +17,7 @@
 #define Serial SERIAL_PORT_USBVIRTUAL
 #endif
 
-
-//GPS
+// GPS
 #include <TinyGPS++.h>
 #include <axp20x.h>
 

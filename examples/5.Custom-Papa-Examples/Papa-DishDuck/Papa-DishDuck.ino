@@ -1,8 +1,8 @@
 /**
  * @file Papa-DishDuck.ino
- * @brief Uses built-in PapaDuck from the SDK to create a WiFi enabled Papa Duck
+ * @brief Uses built-in PapaDuck from the SDK to create a Iridium-enabled Papa Duck
  * 
- * This example will configure and run a Papa Duck that connect to the DMS-LITE over serial.
+ * This example will configure and run a Papa Duck that connect to the DMS-LITE via Iridium.
  * 
  * @date 2020-11-10
  * 

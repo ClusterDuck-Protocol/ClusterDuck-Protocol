@@ -19,11 +19,11 @@ before_install:
   - if [[ "$BOARD" =~ "esp32:esp32:" ]]; then
       arduino-cli core install esp32:esp32 --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json;
     fi
-  - arduino-cli config init 
-  - arduino-cli config set library.enable_unsafe_install true    
-  - arduino-cli lib install --git-url https://github.com/Call-for-Code/ClusterDuck-Protocol.git      
+  - arduino-cli config init
+  - arduino-cli config set library.enable_unsafe_install true
+  - arduino-cli lib install --git-url https://github.com/Call-for-Code/ClusterDuck-Protocol.git
   - arduino-cli lib install --git-url https://github.com/contrem/arduino-timer.git
-  - arduino-cli lib install radiolib@4.5.0  
+  - arduino-cli lib install radiolib@5.1.2
   - arduino-cli lib install --git-url https://github.com/bblanchon/ArduinoJson.git
   - arduino-cli lib install --git-url https://github.com/me-no-dev/AsyncTCP
   - arduino-cli lib install --git-url https://github.com/ThingPulse/esp8266-oled-ssd1306
@@ -59,19 +59,22 @@ script:
   - buildExampleSketch 3.Sensor-Examples DustSensorExample
   - buildExampleSketch 3.Sensor-Examples MQ7Example
   - buildExampleSketch 3.Sensor-Examples WS2812Example
-  - if [[ "$BOARD" != "esp32:esp32:t-beam" ]]; 
+  - if [[ "$BOARD" != "esp32:esp32:t-beam" ]];
     then buildExampleSketch 4.Ble-Duck-App Ble-Duck-App;
     fi
   - buildExampleSketch 5.Custom-Papa-Examples Papa-DishDuck
   - buildExampleSketch 5.Custom-Papa-Examples Papa-DishDuck-WiFi
   - buildExampleSketch 5.Custom-Papa-Examples Papa-Downtime-Counter
-  - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]]; 
+  - buildExampleSketch 5.Custom-Papa-Examples PapiDuck-DMS-Lite-Serial-Example
+  - buildExampleSketch 5.Custom-Papa-Examples PapiDuck-DMS-Lite-WiFi-Example
+  - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]];
     then buildExampleSketch 6.TTGO-TBeam-Examples TTGO-Telemetry;
     fi
-  - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]]; 
-    then buildExampleSketch 6.TTGO-TBeam-Examples TTGOGPSExample;
+  - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]];
+    then buildExampleSketch 6.TTGO-TBeam-Examples TTGO-GPS-Example;
     fi
-  - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]]; 
-    then buildExampleSketch 6.TTGO-TBeam-Examples TTGOAPX-Example;
+  - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]];
+    then buildExampleSketch 6.TTGO-TBeam-Examples TTGO-APX-Example;
     fi
   - buildExampleSketch 7.Encryption DecryptionPapaDuck
+  - buildExampleSketch 7.Encryption MamaDecrypt

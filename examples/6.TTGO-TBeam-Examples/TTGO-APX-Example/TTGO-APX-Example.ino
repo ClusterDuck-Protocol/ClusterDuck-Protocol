@@ -2,7 +2,7 @@
  * @file TTGO-APX-Example.ino
  * @brief Uses the built in Mama Duck with some customatizations.
  * 
- * This example is a Mama Duck for the TTGOm that provides feedback adn status on the battery and charginf of the duck.
+ * This example is a Mama Duck for the TTGO that provides feedback and status on the battery and charging of the duck.
  * 
  * @date 2020-11-10
  * 

@@ -1,5 +1,5 @@
 /**
-   @file DuckDetector.ino
+   @file DetectorDuck.ino
    @author
    @brief Builds a Duck to get RSSI signal strength value.
 
