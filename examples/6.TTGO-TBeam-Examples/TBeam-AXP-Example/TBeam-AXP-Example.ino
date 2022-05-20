@@ -11,7 +11,7 @@
  */
 
 #include <string>
-#include "timer.h"
+#include "arduino-timer.h"
 #include <MamaDuck.h>
 #include <DuckDisplay.h>
 

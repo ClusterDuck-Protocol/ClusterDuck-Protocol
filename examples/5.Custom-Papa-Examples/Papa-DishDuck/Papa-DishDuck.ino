@@ -11,7 +11,7 @@
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 #include <IridiumSBD.h>
-#include "timer.h"
+#include "arduino-timer.h"
 
 #define LORA_FREQ 915.0 // Frequency Range. Set for US Region 915.0Mhz
 #define LORA_TXPOWER 20 // Transmit Power

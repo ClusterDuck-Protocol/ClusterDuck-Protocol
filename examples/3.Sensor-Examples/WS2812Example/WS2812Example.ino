@@ -11,7 +11,7 @@
  * 
  */
 
-#include "timer.h"
+#include "arduino-timer.h"
 #include <MamaDuck.h>
 
 #ifdef SERIAL_PORT_USBVIRTUAL
