@@ -1,5 +1,5 @@
 /**
- * @brief Uses the built in Mama Duck with some customatizations.
+ * @brief Uses the built in Mama Duck with some customization.
  * 
  * This example is a Mama Duck, but it is also periodically sending a message in the Mesh
  * It is setup to provide a custom Emergency portal, instead of using the one provided by the SDK.
@@ -36,7 +36,7 @@ const int INTERVAL_MS = 10000;
 void setup() {
   // We are using a hardcoded device id here, but it should be retrieved or
   // given during the device provisioning then converted to a byte vector to
-  // setup the duck NOTE: The Device ID must be exactly 8 bytes otherwise it
+  // set up the duck NOTE: The Device ID must be exactly 8 bytes otherwise it
   // will get rejected
   std::string deviceId("MAMA0001");
   std::vector<byte> devId;

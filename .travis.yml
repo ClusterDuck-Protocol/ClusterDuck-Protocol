@@ -13,7 +13,7 @@ before_install:
   - cppcheck --version
   - cppcheck --force --error-exitcode=1 src
 
-  - curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh -s 0.17.0
+  - curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh -s
   - export PATH=$PATH:$PWD/bin/
   - arduino-cli core update-index --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
   - if [[ "$BOARD" =~ "esp32:esp32:" ]]; then
@@ -21,11 +21,11 @@ before_install:
     fi
   - arduino-cli config init
   - arduino-cli config set library.enable_unsafe_install true
-  - arduino-cli lib install --git-url https://github.com/Call-for-Code/ClusterDuck-Protocol.git
   - arduino-cli lib install --git-url https://github.com/contrem/arduino-timer.git
-  - arduino-cli lib install radiolib@5.1.2
+  - arduino-cli lib install --git-url https://github.com/jgromes/RadioLib.git
   - arduino-cli lib install --git-url https://github.com/bblanchon/ArduinoJson.git
   - arduino-cli lib install --git-url https://github.com/me-no-dev/AsyncTCP
+  - arduino-cli lib install --git-url https://github.com/me-no-dev/ESPAsyncTCP
   - arduino-cli lib install --git-url https://github.com/ThingPulse/esp8266-oled-ssd1306
   - arduino-cli lib install --git-url https://github.com/me-no-dev/ESPAsyncWebServer
   - arduino-cli lib install --git-url https://github.com/olikraus/U8g2_Arduino.git
@@ -42,9 +42,11 @@ before_install:
   - arduino-cli lib install --git-url https://github.com/mikalhart/IridiumSBD.git
   - arduino-cli lib install --git-url https://github.com/lewisxhe/AXP202X_Library
   - arduino-cli lib install --git-url https://github.com/mikalhart/TinyGPSPlus.git
-  - arduino-cli lib install --git-url https://github.com/Project-Owl/Crypto.git
-
+  - arduino-cli lib install --git-url https://github.com/OperatorFoundation/Crypto.git
+  # pack library into zip and install library in current state
+  - zip -r /tmp/cdp.zip . -x .git && arduino-cli lib install --zip-path /tmp/cdp.zip
   - buildExampleSketch() { arduino-cli compile  -t -b $BOARD $PWD/examples/$1/$2/$2.ino; }
+
 script:
   - buildExampleSketch 1.Ducks DuckLink
   - buildExampleSketch 1.Ducks MamaDuck

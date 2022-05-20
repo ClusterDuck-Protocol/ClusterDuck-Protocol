@@ -1,5 +1,5 @@
 /**
- * @brief Uses the built in Mama Duck with some customatizations.
+ * @brief Uses the built in Mama Duck with some customization.
  *
  * This example is a Mama Duck, but it is also periodically sending a message in
  * the Mesh It is setup to provide a custom Emergency portal, instead of using
