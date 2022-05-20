@@ -66,11 +66,14 @@ The WiFi Papi Example is a custom papa that will send the incoming data into the
 ## 6. TTGO T-Beam Examples
 If you have a TTGO T-Beam you can use these custom examples for it.
 
-#### TTGO-Telemetry
-Using the TTGO's hardware we can collect all different kinds of live board information such as: onboard temperature, battery voltage (if 18650 installed), and charging.
+#### TBeam-AXP-Example
+Demonstrate the power chip
 
-#### TTGOAPX-Example
-...
+#### TBeam-GPS-Example
+GPS Example using TinyGPS++
+
+#### TBeam-Telemetry
+Using the TTGO's hardware we can collect all different kinds of live board information such as: onboard temperature, battery voltage (if 18650 installed), and charging.
 
 #### TTGOGPSExample
 This example is a Mama Duck, that has GPS capabilities and will send the GPS data with the GPS topic based on the set timer.

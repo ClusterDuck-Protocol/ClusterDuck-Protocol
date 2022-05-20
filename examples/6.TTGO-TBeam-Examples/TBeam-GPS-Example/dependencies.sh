@@ -1,0 +1,1 @@
+arduino-cli lib install TinyGPSPlus
