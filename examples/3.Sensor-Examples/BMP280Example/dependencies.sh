@@ -1,0 +1,1 @@
+arduino-cli lib install "Adafruit BMP280 Library"
