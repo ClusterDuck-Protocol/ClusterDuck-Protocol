@@ -1,1 +1,1 @@
-GP2YDustSensor
+Sharp GP2Y Dust Sensor
