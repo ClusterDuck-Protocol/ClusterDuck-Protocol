@@ -44,7 +44,8 @@ before_install:
   - arduino-cli lib install --git-url https://github.com/mikalhart/TinyGPSPlus.git
   - arduino-cli lib install --git-url https://github.com/OperatorFoundation/Crypto.git
   # pack library into zip and install library in current state
-  - zip -r /tmp/cdp.zip . -x .git && arduino-cli lib install --zip-path /tmp/cdp.zip
+  - mkdir /tmp/CDP && rsync -rltv --exclude=.git ${PWD}/ /tmp/CDP/ && (cd /tmp && zip -r /tmp/cdp.zip CDP)
+  - arduino-cli lib install --zip-path /tmp/cdp.zip
   - buildExampleSketch() { arduino-cli compile  -t -b $BOARD $PWD/examples/$1/$2/$2.ino; }
 
 script:
