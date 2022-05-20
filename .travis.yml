@@ -15,13 +15,14 @@ before_install:
 
   - curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh -s
   - export PATH=$PATH:$PWD/bin/
+  - arduino-cli config init
+  - arduino-cli config set library.enable_unsafe_install true
   - arduino-cli core update-index --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
   - if [[ "$BOARD" =~ "esp32:esp32:" ]]; then
       arduino-cli core install esp32:esp32 --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json;
     fi
   - wget https://github.com/tarampampam/arduino-deps-installer/releases/download/v0.0.1/arduino-deps-installer-linux-amd64 -O /usr/local/bin/arduino-deps-installer
-  - arduino-cli config init
-  - arduino-cli config set library.enable_unsafe_install true
+  - chmod +x /usr/local/bin/arduino-deps-installer
   - arduino-deps-installer install --work-dir ${PWD}
   # install library in current state
   - rsync -rltv --exclude=.git ${PWD}/ /tmp/CDP/ && (cd /tmp && zip -r /tmp/cdp.zip CDP) && arduino-cli lib install --zip-path /tmp/cdp.zip
