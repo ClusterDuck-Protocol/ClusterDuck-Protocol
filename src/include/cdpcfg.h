@@ -40,7 +40,8 @@
  * BOARD "ttgo lora" and "heltec lora" v1
  *
  * heltec pcb is white, ttgo pcb has heltec+ttgo markings
- * left middle in this picture: https://github.com/Xinyuan-LilyGO/TTGO-LoRa-Series
+ * Top left in this picture: https://github.com/lewisxhe/TTGO-LoRa-Series
+ * (antenna attached with small cable, "chiseled" edges next to buttons
  * pio: board = ttgo-lora32-v1
  */
 #if defined(ARDUINO_TTGO_LoRa32_V1)
@@ -64,8 +65,8 @@
 /**
  * BOARD "ttgo lora v2"
  *
- * Top right in this picture: https://github.com/Xinyuan-LilyGO/TTGO-LoRa-Series
- * (antenna attached directly to port on board)
+ * Bottom right in this picture: https://github.com/lewisxhe/TTGO-LoRa-Series
+ * (antenna attached with small cable)
  * pio: board = ttgo-lora32-v2
  */
 #elif defined(ARDUINO_TTGO_LoRa32_V2)
@@ -93,8 +94,8 @@
 /**
  * BOARD "ttgo lora v2.1.6"
  *
- * Top left in this picture: https://github.com/Xinyuan-LilyGO/TTGO-LoRa-Series
- * (antenna attached with small cable, "chiseled" edges next to buttons
+ * Top right in this picture: https://github.com/lewisxhe/TTGO-LoRa-Series
+ * (antenna attached directly to port on board, sometimes the boards read T3_V1.6.1 or T3_V1.6)
  * pio: board = ttgo_lora32_v21
  */
 #elif defined(ARDUINO_TTGO_LoRa32_v21new)
