@@ -30,7 +30,6 @@
     ],
     "dependencies": {
         "contrem/arduino-timer": "^2.3.1",
-        "thingpulse/ESP8266 and ESP32 OLED driver for SSD1306 displays": "^4.3.0",
         "olikraus/U8g2": "^2.33.2",
         "knolleary/PubSubClient": "^2.8",
         "bblanchon/ArduinoJson": "^6.19.4",
@@ -39,7 +38,6 @@
         "operatorfoundation/Crypto": "^0.4.0",
         "jandrassy/ArduinoOTA": "^1.0.8",
         "me-no-dev/AsyncTCP": "^1.1.1",
-        "me-no-dev/ESPAsyncTCP": "^1.2.2",
         "me-no-dev/ESP Async WebServer": "^1.2.3"
     }
 }
