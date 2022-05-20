@@ -79,7 +79,7 @@
  * (GPS module and 18650 holder)
  * pio: board = ttgo-t-beam
  */
-#elif defined(ARDUINO_T_Beam)
+#elif defined(ARDUINO_TBeam)
 #include "include/boards/ttgo-t-beam.h"
 
 
@@ -88,7 +88,7 @@
  * http://www.heltec.cn/project/wireless-stick/
  * pio: board = heltec_wireless_stick
  */
-#elif defined(ARDUINO_HELTEC_WIRELESS_STICK)
+#elif defined(ARDUINO_heltec_wireless_stick)
 #include "include/boards/heltec_wireless_stick.h"
 
 
@@ -100,7 +100,7 @@
  * http://www.heltec.cn/project/wireless-stick-lite/
  * pio: board = WIRELESS_STICK_LITE
  */
-#elif defined(ARDUINO_WIRELESS_STICK_LITE)
+#elif defined(ARDUINO_heltec_wireless_stick_LITE)
 #include "include/boards/heltec_wireless_stick_lite.h"
 
 
@@ -166,7 +166,7 @@
 
 
 #else // Default to WIFI_LORA_32_V2 board
-#if !defined(ARDUINO_HELTEC_WIFI_LORA_32_V2)
+#if !defined(ARDUINO_heltec_wifi_lora_32_V2)
 #warning "NO BOARD DEFINED, DEFAULTING TO HELTEC v2"
 #define CDPCFG_BOARD_DEFAULT
 #endif
