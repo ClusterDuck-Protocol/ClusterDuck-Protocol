@@ -39,7 +39,6 @@
         "luciansabo/Sharp GP2Y Dust Sensor":  "^1.1.0",
         "miguel5612/MQUnifiedsensor": "^3.0.0",
         "knolleary/PubSubClient": "^2.8",
-        "fastled/FastLED":  "^3.5.0",
         "bblanchon/ArduinoJson": "^6.19.4",
         "bakercp/CRC32": "2.0.0",
         "jgromes/RadioLib": "^5.1.2",
