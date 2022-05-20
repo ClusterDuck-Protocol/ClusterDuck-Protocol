@@ -12,7 +12,6 @@ before_install:
   - sudo apt-get -y install cppcheck
   - cppcheck --version
   - cppcheck --force --error-exitcode=1 src
-
   - curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh -s
   - export PATH=$PATH:$PWD/bin/
   - arduino-cli config init
@@ -21,11 +20,10 @@ before_install:
   - if [[ "$BOARD" =~ "esp32:esp32:" ]]; then
       arduino-cli core install esp32:esp32 --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json;
     fi
-  - wget https://github.com/tarampampam/arduino-deps-installer/releases/download/v0.0.1/arduino-deps-installer-linux-amd64 -O /usr/local/bin/arduino-deps-installer
-  - chmod +x /usr/local/bin/arduino-deps-installer
+  - wget https://github.com/tarampampam/arduino-deps-installer/releases/download/v0.0.1/arduino-deps-installer-linux-amd64 -O $PWD/bin/arduino-deps-installer && chmod +x $PWD/bin/arduino-deps-installer
   - arduino-deps-installer install --work-dir ${PWD}
   # install library in current state
-  - rsync -rltv --exclude=.git ${PWD}/ /tmp/CDP/ && (cd /tmp && zip -r /tmp/cdp.zip CDP) && arduino-cli lib install --zip-path /tmp/cdp.zip
+  - rsync -rltv --exclude=.git --exclude=bin ${PWD}/ /tmp/CDP/ && (cd /tmp && zip -r /tmp/cdp.zip CDP) && arduino-cli lib install --zip-path /tmp/cdp.zip
   - installExampleArduinoDeps() { arduino-deps-installer install --work-dir $PWD/examples/$1/$2; }
   - buildExampleSketch() { installExampleArduinoDeps $1 $2 && arduino-cli compile  -t -b $BOARD $PWD/examples/$1/$2/$2.ino; }
 
