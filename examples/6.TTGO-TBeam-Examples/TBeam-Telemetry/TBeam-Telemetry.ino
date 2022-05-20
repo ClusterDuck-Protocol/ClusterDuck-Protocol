@@ -1,5 +1,5 @@
 /**
- * @file TTGO-Telemetry.ino
+ * @file TBeam-Telemetry.ino
  * @brief Uses the built in Mama Duck and reports additional telemetry data.
  * 
  * This example is a Mama Duck, that has GPS capabilities and will send telemetry data with the GPS topic based on the set timer.
@@ -26,7 +26,7 @@
 TinyGPSPlus tgps;
 HardwareSerial GPS(1);
 
-// APX setup (Power)
+// AXP setup (Power)
 #include <Wire.h>
 #include <axp20x.h>
 AXP20X_Class axp;

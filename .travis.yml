@@ -70,14 +70,14 @@ script:
   - buildExampleSketch 5.Custom-Papa-Examples Papa-Downtime-Counter
   - buildExampleSketch 5.Custom-Papa-Examples PapiDuck-DMS-Lite-Serial-Example
   - buildExampleSketch 5.Custom-Papa-Examples PapiDuck-DMS-Lite-WiFi-Example
-  - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]];
-    then buildExampleSketch 6.TTGO-TBeam-Examples TTGO-Telemetry;
+  - if [[ "$BOARD" == "esp32:esp32:t-beam" ]]; then
+      buildExampleSketch 6.TTGO-TBeam-Examples TBeam-AXP-Example
     fi
-  - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]];
-    then buildExampleSketch 6.TTGO-TBeam-Examples TTGO-GPS-Example;
+  - if [[ "$BOARD" == "esp32:esp32:t-beam" ]]; then
+      buildExampleSketch 6.TTGO-TBeam-Examples TBeam-GPS-Example
     fi
-  - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]];
-    then buildExampleSketch 6.TTGO-TBeam-Examples TTGO-APX-Example;
+  - if [[ "$BOARD" == "esp32:esp32:t-beam" ]]; then
+      buildExampleSketch 6.TTGO-TBeam-Examples TBeam-Telemetry
     fi
   - buildExampleSketch 7.Encryption DecryptionPapaDuck
   - buildExampleSketch 7.Encryption MamaDecrypt

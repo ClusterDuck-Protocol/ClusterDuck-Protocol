@@ -1,6 +1,6 @@
 /**
- * @file TTGO-GPS-Example.ino
- * @brief Uses the built in Mama Duck with some customization.
+ * @file TBeam-GPS-Example.ino
+ * @brief Uses the built in Mama Duck with some customizations.
  * 
  * This example is a Mama Duck, that has GPS capabilities and will send the GPS data with the GPS topic based on the set timer.
  * @date 2020-09-21
@@ -19,6 +19,8 @@
 
 // GPS
 #include <TinyGPS++.h>
+
+// Power chip
 #include <axp20x.h>
 
 TinyGPSPlus tgps;
@@ -45,7 +47,7 @@ void setup() {
   duck.setupWithDefaults(devId);
   Serial.println("MAMA-DUCK...READY!");
 
-  //Setup APX
+  // Setup AXP
   Wire.begin(21, 22);
   if (!axp.begin(Wire, AXP192_SLAVE_ADDRESS)) {
     Serial.println("AXP192 Begin PASS");

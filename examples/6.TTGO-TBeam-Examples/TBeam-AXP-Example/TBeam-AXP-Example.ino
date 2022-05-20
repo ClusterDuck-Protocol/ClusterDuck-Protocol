@@ -1,8 +1,8 @@
 /**
- * @file TTGO-APX-Example.ino
- * @brief Uses the built in Mama Duck with some customatizations.
+ * @file TBeam-AXP-Example.ino
+ * @brief Uses the built in Mama Duck with some customizations.
  * 
- * This example is a Mama Duck for the TTGO that provides feedback and status on the battery and charging of the duck.
+ * This example is a Mama Duck for the TTGO T-Beam that provides feedback and status on the battery and charging of the duck.
  * 
  * @date 2020-11-10
  * 
@@ -19,7 +19,7 @@
 #define Serial SERIAL_PORT_USBVIRTUAL
 #endif
 
-// APX setup
+// AXP setup
 #include <Wire.h>
 #include <axp20x.h>
 
