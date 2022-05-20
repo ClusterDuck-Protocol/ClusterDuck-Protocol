@@ -40,7 +40,6 @@ before_install:
   - arduino-cli lib install --git-url https://github.com/miguel5612/MQSensorsLib.git
   - arduino-cli lib install --git-url https://github.com/FastLED/FastLED.git
   - arduino-cli lib install --git-url https://github.com/mikalhart/IridiumSBD.git
-  - arduino-cli lib install --git-url https://github.com/lewisxhe/AXP202X_Library
   - arduino-cli lib install --git-url https://github.com/OperatorFoundation/Crypto.git
   # pack library into zip and install library in current state
   - rsync -rltv --exclude=.git ${PWD}/ /tmp/CDP/ && (cd /tmp && zip -r /tmp/cdp.zip CDP)
@@ -71,6 +70,7 @@ script:
   - buildExampleSketch 5.Custom-Papa-Examples PapiDuck-DMS-Lite-Serial-Example
   - buildExampleSketch 5.Custom-Papa-Examples PapiDuck-DMS-Lite-WiFi-Example
   - if [[ "$BOARD" == "esp32:esp32:t-beam" ]]; then
+      installExampleArduinoDeps 6.TTGO-TBeam-Examples TBeam-AXP-Example
       buildExampleSketch 6.TTGO-TBeam-Examples TBeam-AXP-Example
     fi
   - if [[ "$BOARD" == "esp32:esp32:t-beam" ]]; then
