@@ -48,13 +48,13 @@ script:
   - buildExampleSketch 5.Custom-Papa-Examples PapiDuck-DMS-Lite-Serial-Example
   - buildExampleSketch 5.Custom-Papa-Examples PapiDuck-DMS-Lite-WiFi-Example
   - if [[ "$BOARD" == "esp32:esp32:t-beam" ]]; then
-      buildExampleSketch 6.TTGO-TBeam-Examples TBeam-AXP-Example
+    buildExampleSketch 6.TTGO-TBeam-Examples TBeam-AXP-Example;
     fi
   - if [[ "$BOARD" == "esp32:esp32:t-beam" ]]; then
-      buildExampleSketch 6.TTGO-TBeam-Examples TBeam-GPS-Example
+    buildExampleSketch 6.TTGO-TBeam-Examples TBeam-GPS-Example;
     fi
   - if [[ "$BOARD" == "esp32:esp32:t-beam" ]]; then
-      buildExampleSketch 6.TTGO-TBeam-Examples TBeam-Telemetry
+    buildExampleSketch 6.TTGO-TBeam-Examples TBeam-Telemetry;
     fi
   - buildExampleSketch 7.Encryption DecryptionPapaDuck
   - buildExampleSketch 7.Encryption MamaDecrypt

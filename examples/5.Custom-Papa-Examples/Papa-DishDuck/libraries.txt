@@ -1,2 +1,2 @@
-IridiumSBD
+Iridium SBD
 PubSubClient
