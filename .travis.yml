@@ -41,7 +41,9 @@ script:
   - buildExampleSketch 3.Sensor-Examples DustSensorExample
   - buildExampleSketch 3.Sensor-Examples MQ7Example
   - buildExampleSketch 3.Sensor-Examples WS2812Example
-  - buildExampleSketch 4.Ble-Duck-App Ble-Duck-App
+  - if [[ "$BOARD" != "esp32:esp32:t-beam" ]];
+    then buildExampleSketch 4.Ble-Duck-App Ble-Duck-App
+    fi
   - buildExampleSketch 5.Custom-Papa-Examples Papa-DishDuck
   - buildExampleSketch 5.Custom-Papa-Examples Papa-DishDuck-WiFi
   - buildExampleSketch 5.Custom-Papa-Examples Papa-Downtime-Counter
