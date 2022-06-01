@@ -16,6 +16,8 @@ const char home_page[] PROGMEM = R"=====(
 		<a href="/controlpanel">Control Panel</a>
 		<a href="/main">Send Message</a>
 		<a href="/message-board">Message Board</a>
+		<a href="/chat">Global Chat</a>
+		<a href="/new-private-chat">Start a Private Chat</a>
 	</div>
   </body>
 </html>
