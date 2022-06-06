@@ -4,58 +4,203 @@
 const char home_page[] PROGMEM = R"=====(
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>ClusterDuck Network</title>
-  </head>
-  <body>
-	<div class="main-box">
-		<h1>Welcome to the ClusterDuck Network</h1>
-		<p>What would you like to do?</p>
-		<br>
-		
-		<a href="/controlpanel">Control Panel</a>
-		<a href="/main">Send Message</a>
-		<a href="/message-board">Message Board</a>
-		<a href="/chat">Global Chat</a>
-		<a href="/new-private-chat">Start a Private Chat</a>
-	</div>
-  </body>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>ClusterDuck Portal</title>
+        <meta name="description" content="ClusterDuck Network Portal by the ClusterDuck Protocol">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            body {
+                font: 14px "Avenir", helvetica, sans-serif;
+                -webkit-font-smoothing: antialiased;
+            }
+            h2 {
+                text-align: center;
+                color: #111;
+                margin: 16px 0 8px;
+            }
+            h3 {
+                font-size: 14px;
+                margin: 0 0 24px;
+                color: #111;
+                font-weight: 400;
+            }
+            h6 {
+                font-size: 12px;
+                font-weight: 300;
+                line-height: 16px;
+                margin: 16px 0 0;
+                color: rgba(0,0,0,.5);
+            }
+            p {
+                color: #111;
+            }
+            .content {
+                text-align: center;
+                padding: 0 16px;
+            }
+            .body.on {
+               display: block;
+            }
+            .body.off {
+               display: none;
+            }
+            .body.sent {
+            }
+            .body.sent .c {
+               background: #fff;
+               color: #111;
+               width: auto;
+               max-width: 80%;
+               margin: 0 auto;
+               padding: 14px;
+            }
+            .body.sent .c h4 {
+               margin: 0 0 1em;
+               font-size: 1.5em;
+            }
+            .b {
+               display: block;
+               padding: 20px;
+               text-align: center;
+               cursor: pointer;
+            }
+            .b:hover {
+               opacity: .7;
+            }
+            .update {
+               border: 0;
+               background: #fe5454;
+            }
+            .sendReportBtn {
+                box-shadow: 0px 1px 0px 0px #fff6af;
+                background:linear-gradient(to bottom, #ffec64 5%, #ffab23 100%);
+                background-color:#ffec64;
+                border-radius:6px;
+                border:1px solid #ffaa22;
+                display:block;
+                cursor:pointer;
+                color:#333333;
+                font-family:Arial;
+                font-size:15px;
+                font-weight:bold;
+                padding: 10px 24px;
+                text-decoration: none;
+                text-shadow: 0px 1px 0px #ffee66;
+                text-align: center;
+                width: 100%;
+                margin-top: 10px;
+            }
+            .sendReportBtn:hover {
+                background:linear-gradient(to bottom, #ffab23 5%, #ffec64 100%);
+                background-color:#ffab23;
+            }
+            .sendReportBtn:active {
+                position:relative;
+                top:1px;
+            }
+            .form {
+                background-color: #F5F5F5;
+                color: #333333;
+                width: 100%;
+                max-width: 250px;
+                margin: auto;
+                padding: 18px 24px 14px;
+                border-radius: 8px;
+                text-align: left;
+                margin-bottom:2em;
+            }
+            .textbox {
+                padding: .5em;
+                border-radius: 4px;
+                border:solid 1px;
+                margin: .5em 0;
+                display: block;
+            }
+            .textbox-small {
+                width: 20px;
+            }
+            .textbox-full {
+                width: 100%;
+            
+            }
+            label  {
+                font-weight: bold;
+            }
+            .hidden {
+                display: none;
+            }
+        </style>
+        </head>
+    <body>
+        <!-- HTML content of the captive portal below -->
+        <h2 class="">SHIMLA EMERGENCY NETWORK</h2>
+        <div class="content body" id="formContent">
+          <h3>Fill out the form below to submit information to HP SDMA</h3>
+        <div class="form">
+                <form action="/formSubmit" method="post">
+
+                    <label for="firstName">First Name / नाम </label>
+                    <input class="textbox textbox-full" id="clientId" name="clientId" type="text" placeholder="Arun" />
+                    <label for="lastName">Surname(s) / उपनाम</label>
+                    <input class="textbox textbox-full" name="lastName" id="lastName" type="text" placeholder="Rana" /> 
+                    <label for="streetAddress">Location of Disaster / Emergency <br>आपदा / आपात स्थिति का स्थान</label>
+                    <input class="textbox textbox-full" name="streetAddress" id="streetAddress" type="text" placeholder="Jutogh" /> 
+                    <label for="city">City / शहर</label>
+                    <input class="textbox textbox-full" name="city" type="text" placeholder="Shimla" />
+                    <label for="zipcode">Pincode / पिन कोड</label><br>
+                    <input class="textbox textbox-full" name="zipcode" type="number" placeholder="171011" /> 
+                    <label for="phone">Phone / फ़ोन नंबर </label><br />
+                    <input class="textbox textbox-full" name="phone" id="phoneNumber" type="tel" placeholder="787-123-1234" />
+            
+                    <label for="status">Current Status / वर्तमान स्थिति</label><br />
+                    <input name="status" id="currentStatusSos" type="radio" value="sos" /> I'm in danger (SOS)/ ख़तरे में
+
+                    <br><input name="status" id="currentStatusOk" type="radio" value="ok" /> OK <br />
+                    <br />
+                    <label for="status">Needs / ज़रूरत</label><br />
+                    <input type="checkbox" name="water" id="waterNeed" type="radio" value="water" /> Water
+                    <input name="transportation" id="transportationNeed" type="checkbox" value="transportation" /> Transportation <br />
+                    <input type="checkbox" name="food" id="foodNeed" type="radio" value="food" /> Food
+                    <input name="inspection" id="inspectionNeed" type="checkbox" value="inspection" /> Structural Inspection <br />
+                    <input type="checkbox" name="firstaid" id="firstAidNeed" type="radio" value="firstaid" /> First Aid
+                    <input name="shelter" type="checkbox" id="shelterNeed" value="shelter" /> Shelter <br />
+                    <br />
+                    <label for="status">How many people are with you?<br> आपके साथ कितने लोग हैं?</label><br />
+                    <span>People: </span><input class="textbox textbox-small" name="adults" id="adultsInput" type="number" placeholder="2" />
+                    <textarea class="textbox comments textbox-full" name="message" id="commentsInput" cols="30" rows="2"></textarea>
+                    <input type="submit" class="sendReportBtn" value="SEND REPORT" />
+                    <p id="makeshiftErrorOutput" class="hidden"></p>
+                </form>
+                <h6 style="font-size: 10px; text-align: center;margin-top: 24px;">Powered by the ClusterDuck Protocol</h6>
+            </div>
+        </div>
+        <div id="bodySent" class="body off sent">
+            <div class="c">
+                <div class="gps"><h4>Message Sent</h4><h5 id="dateNow">March 13, 2019 @ 1:00 PM</h5><p>Your message ID#: XXXXXX</p></div>
+                <p class="disclaimer">If your situation changes, please send another update.</p>
+                <div id="bupdate" class="b update">Send Update</div>
+            </div>
+        </div>
+        <div id="lastMessageSection" class="form" class="hidden">
+            <dl>
+                <dt>Last message:</dt>
+                <dd id="lastMessageField"></dd>
+                <dt>Last message ID:</dt>
+                <dd id="lastMessageMuid"></dd>
+                <dt>Status:</dt>
+                <dd id="muidStatus"></dd>
+                <dt>Status Message:</dt>
+                <dd id="muidStatusMessage"></dd>
+            </dl>
+        </div>
+        <!-- Run javascript actions here -->
+        <script type="text/javascript">
+        </script>
+    </body>
 </html>
-<style>
-body {
-	max-width: 85%;
-	margin: auto;
-	padding-top: 14px;
-	padding-bottom: 14px;
-}
-h1 {
-	font-weight: bold;
-}
-.main-box{
-	padding:3em;
-	font: 26px "Avenir", helvetica, sans-serif;
-	border-radius: 8px;
-	background-color:#f0f0f0;
-	min-height: 100vh;
-}
-a {
-	display: block;
-	margin-bottom: 14px;
-	border: 3px solid #bbb;
-	font-weight: 700;
-	text-decoration: none;
-	background: #f7cf02;
-	border-radius: 12px;
-	text-align: center;
-	padding: .4em;
-	color: #000;
-	text-transform: uppercase;
-}
-</style>
-  
 )=====";
-
-
 #endif
 
 // <a href="/wifi">Set WiFi Credentials</a>
