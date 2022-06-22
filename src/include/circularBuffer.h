@@ -52,6 +52,8 @@ public:
    */
     CdpPacket getMessage(int index);
 
+    int findMuid(std::vector<byte> muid);
+
 };
 
 #endif

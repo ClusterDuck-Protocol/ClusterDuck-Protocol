@@ -30,9 +30,15 @@ const char private_chat_page[] PROGMEM = R"=====(
                 var card = document.createElement("div");
                 if(sent){
                     card.classList.add("sent-message-card");
+                    console.log(newMessage.acked);
+                    if(newMessage.acked == 1){
+                        
+                        card.classList.add("acked");
+                    }
                 }else{
                     card.classList.add("received-message-card");
                 }
+                
                 card.innerHTML = newMessage.body + '</p><span class="duid">FROM DUCKID: '
                  + newMessage.sduid + '</span></p><span class="time">' 
                  + newMessage.messageAge + ' seconds ago</span>';
@@ -199,6 +205,9 @@ const char private_chat_page[] PROGMEM = R"=====(
     body{
         font-family: sans-serif;
         font-size: .9em;
+    }
+    .acked{
+        background-color: #c1ff91 !important;
     }
 
 </style>

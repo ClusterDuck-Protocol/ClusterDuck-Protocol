@@ -124,8 +124,15 @@ std::string DuckNet::retrieveMessageHistory(CircularBuffer* buffer)
     std::string messageAgeString = String(messageAge).c_str();
     std::string messageBody(packet.data.begin(),packet.data.end());
     std::string sduid(packet.sduid.begin(), packet.sduid.end());
-
-    json = json + "{\"sduid\":\"" + sduid  + "\" , \"title\":\"PLACEHOLDER TITLE\", \"body\":\"" + messageBody + "\", \"messageAge\":\"" + messageAgeString + "\"}";
+    std::string acked;
+    if(packet.acked){
+      acked = "1";
+    } else{
+      acked = "0";
+    }
+    loginfo(acked.c_str());
+    loginfo("======================== acked ====================");
+    json = json + "{\"sduid\":\"" + sduid  + "\" , \"title\":\"PLACEHOLDER TITLE\", \"body\":\"" + messageBody + "\", \"messageAge\":\"" + messageAgeString + "\", \"acked\":\"" + acked + "\"}";
 
     tail++;
     if(tail == buffer->getBufferEnd()){
@@ -135,6 +142,32 @@ std::string DuckNet::retrieveMessageHistory(CircularBuffer* buffer)
   json = json + "]}";
   return json;
 
+}
+
+void DuckNet::checkForPrivateMessage(std::vector<byte> muid, std::vector<byte> sduid)
+{
+  loginfo("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! CHECKING FOR MESSAGE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+  std::string chatSession(sduid.begin(), sduid.end());
+
+  if(chatHistories.find(chatSession) != chatHistories.end()){
+    loginfo("found history");
+    int index = chatHistories.find(chatSession)->second->findMuid(muid);
+    loginfo(index);
+    if(index >= 0){
+      loginfo("found index");
+        CdpPacket p = chatHistories.find(chatSession)->second->getMessage(index);
+        p.acked = true;
+    } 
+  }
+}
+
+void DuckNet::checkForPublicMessage(std::vector<byte> muid)
+{
+  int index = chatBuffer.findMuid(muid);
+    if(index >= 0){
+        CdpPacket p = chatBuffer.getMessage(index);
+        p.acked = true;
+    }
 }
 
 int DuckNet::setupWebServer(bool createCaptivePortal, String html) {

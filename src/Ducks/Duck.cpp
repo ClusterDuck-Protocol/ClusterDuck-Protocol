@@ -292,10 +292,10 @@ int Duck::sendData(byte topic, const byte* data, int length,
 int Duck::sendData(byte topic, std::vector<byte> data,
   const std::vector<byte> targetDevice, std::vector<byte> * outgoingMuid)
 {
-  if (topic < reservedTopic::max_reserved) {
-    logerr("ERROR send data failed, topic is reserved.");
-    return DUCKPACKET_ERR_TOPIC_INVALID;
-  }
+  // if (topic < reservedTopic::max_reserved) {
+  //   logerr("ERROR send data failed, topic is reserved.");
+  //   return DUCKPACKET_ERR_TOPIC_INVALID;
+  // }
   if (data.size() > MAX_DATA_LENGTH) {
     logerr("ERROR send data failed, message too large: " + String(data.size()) +
            " bytes");
