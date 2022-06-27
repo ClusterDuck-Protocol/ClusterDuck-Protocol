@@ -152,6 +152,7 @@ void DuckNet::checkForPrivateMessage(std::vector<byte> muid, std::vector<byte> s
   if(chatHistories.find(chatSession) != chatHistories.end()){
     loginfo("found history");
     int index = chatHistories.find(chatSession)->second->findMuid(muid);
+    loginfo("pppppp");
     loginfo(index);
     if(index >= 0){
       loginfo("found index");

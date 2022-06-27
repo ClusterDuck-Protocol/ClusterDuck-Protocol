@@ -174,9 +174,12 @@ void MamaDuck::handleReceivedPacket() {
           handleCommand(packet);
 
         break;
-        case reservedTopic::ack:
-          duckNet->checkForPrivateMessage(packet.muid, packet.sduid);
+        case reservedTopic::ack:{
+          std::vector<byte> sMuid;
+          sMuid.insert(sMuid.end(), (packet.data.begin() + 1), packet.data.end());
+          duckNet->checkForPrivateMessage(sMuid, packet.sduid);
           handleAck(packet);
+        }
         break;
         case reservedTopic::mbm:
           packet.timeReceived = millis();
@@ -195,10 +198,11 @@ void MamaDuck::handleReceivedPacket() {
           std::vector<byte> data;
           byte numPairs = 1;
           data.insert(data.end(), numPairs);
-          data.insert(data.end(), packet.sduid.begin(), packet.sduid.end());
+          // data.insert(data.end(), packet.sduid.begin(), packet.sduid.end());
           data.insert(data.end(), packet.muid.begin(), packet.muid.end());
-          std::vector<byte> muid;
-          sendData(reservedTopic::ack, data, packet.sduid, &muid);
+          // std::vector<byte> muid;
+          // sendData(reservedTopic::ack, data, packet.sduid, &muid);
+          sendAck(data, packet.sduid);
         }
         break;
         default:
