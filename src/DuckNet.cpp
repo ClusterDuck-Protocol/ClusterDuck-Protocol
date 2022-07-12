@@ -91,6 +91,7 @@ void DuckNet::addToChatBuffer(CdpPacket message)
 
 void DuckNet::addToPrivateChatBuffer(CdpPacket message, std::string chatSession)
 {
+  message.timeReceived = millis();
   chatHistories.find(chatSession)->second->push(message);
   events.send("refresh" ,"refreshPage",millis());
 }
@@ -121,6 +122,7 @@ std::string DuckNet::retrieveMessageHistory(CircularBuffer* buffer)
 
     CdpPacket packet = buffer->getMessage(tail);
     unsigned long messageAge = millis() - packet.timeReceived;
+    unsigned long milAge = millis();
     std::string messageAgeString = String(messageAge).c_str();
     std::string messageBody(packet.data.begin(),packet.data.end());
     std::string sduid(packet.sduid.begin(), packet.sduid.end());
@@ -130,8 +132,8 @@ std::string DuckNet::retrieveMessageHistory(CircularBuffer* buffer)
     } else{
       acked = "0";
     }
+    loginfo("======================== ACKED ====================");
     loginfo(acked.c_str());
-    loginfo("======================== acked ====================");
     json = json + "{\"sduid\":\"" + sduid  + "\" , \"title\":\"PLACEHOLDER TITLE\", \"body\":\"" + messageBody + "\", \"messageAge\":\"" + messageAgeString + "\", \"acked\":\"" + acked + "\"}";
 
     tail++;
@@ -146,16 +148,12 @@ std::string DuckNet::retrieveMessageHistory(CircularBuffer* buffer)
 
 void DuckNet::checkForPrivateMessage(std::vector<byte> muid, std::vector<byte> sduid)
 {
-  loginfo("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! CHECKING FOR MESSAGE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
   std::string chatSession(sduid.begin(), sduid.end());
 
   if(chatHistories.find(chatSession) != chatHistories.end()){
-    loginfo("found history");
     int index = chatHistories.find(chatSession)->second->findMuid(muid);
-    loginfo("pppppp");
     loginfo(index);
     if(index >= 0){
-      loginfo("found index");
         CdpPacket p = chatHistories.find(chatSession)->second->getMessage(index);
         p.acked = true;
     } 
@@ -480,6 +478,12 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
 
     createPrivateHistory(duckSession);
     
+    request->send(200, "text/html", "OK.");
+  });
+  
+  webServer.on("/requestMessageResend", HTTP_GET, [&](AsyncWebServerRequest* request) {
+    loginfo("message resent!");
+  
     request->send(200, "text/html", "OK.");
   });
 
