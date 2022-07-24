@@ -25,6 +25,11 @@
 #define LORA_DIO1_PIN -1 // unused
 #define LORA_RST_PIN 14
 
+#define CMD_STATE_WIFI "/wifi/" 
+#define CMD_STATE_HEALTH "/health/"
+#define CMD_STATE_CHANNEL "/channel/"
+#define CMD_STATE_MBM "/messageBoard/"
+
 // Use pre-built papa duck
 PapaDuck duck;
 
@@ -139,6 +144,79 @@ void handleDuckData(std::vector<byte> packetBuffer) {
   quackJson(packetBuffer);
 }
 
+//executes Duck Commands (identical to IBM cloud version)
+void gotMsg(char* topic, byte* payload, unsigned int payloadLength) {
+  Serial.print("gotMsg: invoked for topic: "); Serial.println(topic);
+ 
+  if (String(topic).indexOf(CMD_STATE_WIFI) > 0) {
+    Serial.println("Start WiFi Command");
+    byte sCmd = 1;
+    std::vector<byte> sValue = {payload[0]};
+
+    if(payloadLength > 3) {
+      std::string destination = "";
+      for (int i=1; i<payloadLength; i++) {
+        destination += (char)payload[i];
+      }
+      std::vector<byte> dDevId;
+      dDevId.insert(dDevId.end(),destination.begin(),destination.end());
+      
+      duck.sendCommand(sCmd, sValue, dDevId);
+    } else {
+      duck.sendCommand(sCmd, sValue);
+    }
+  } else if (String(topic).indexOf(CMD_STATE_HEALTH) > 0) {
+    byte sCmd = 0;
+    std::vector<byte> sValue = {payload[0]};
+    if(payloadLength >= 8) {
+      std::string destination = "";
+      for (int i=1; i<payloadLength; i++) {
+        destination += (char)payload[i];
+      }
+      
+      std::vector<byte> dDevId;
+      dDevId.insert(dDevId.end(),destination.begin(),destination.end());
+      
+      duck.sendCommand(sCmd, sValue, dDevId);
+      
+    } else {
+      Serial.println("Payload size too small");
+    }
+  } else if (String(topic).indexOf(CMD_STATE_MBM) > 0){
+      std::vector<byte> message;
+      std::string output;
+      for (int i = 0; i<payloadLength; i++) {
+        output = output + (char)payload[i];
+      }
+   
+      message.insert(message.end(),output.begin(),output.end());
+      duck.sendMessageBoardMessage(message);
+  } else {
+    Serial.print("gotMsg: unexpected topic: "); Serial.println(topic); 
+  } 
+}
+
+//Reads Commands from Serial and passes them on to gotMsg()
+void readCommands() {
+
+   if (Serial.available())
+  {
+    String command = Serial.readString();
+    DynamicJsonDocument doc(65536);
+    deserializeJson(doc, command);
+
+    char str_payload[strlen(doc["payload"])];
+    strcpy(str_payload,doc["payload"]);
+    String payload = String(str_payload);
+     
+    char topic[strlen(doc["topic"])];
+    strcpy(topic,doc["topic"]);
+      
+    Serial.print("Handling Command: " + command);
+    gotMsg(topic,(byte*)payload.c_str(),payload.length());
+  }
+}
+
 void setup() {
   
   // We are using a hardcoded device id here, but it should be retrieved or
@@ -149,6 +227,9 @@ void setup() {
   std::vector<byte> devId;
   devId.insert(devId.end(), deviceId.begin(), deviceId.end());
 
+  //Set the Device ID
+  duck.setDeviceId(devId);
+
   // the default setup is equivalent to the above setup sequence
 // duck.setupSerial(115200);
   Serial.begin(115200);
@@ -156,6 +237,7 @@ void setup() {
                   LORA_DIO1_PIN, LORA_TXPOWER);
   duck.setDeviceId(devId);
 
+  duck.enableAcks(true);
  
   // register a callback to handle incoming data from duck in the network
   duck.onReceiveDuckData(handleDuckData);
@@ -164,5 +246,6 @@ void setup() {
 
 void loop() {
   duck.run();
+  readCommands();
   timer.tick();
 }
