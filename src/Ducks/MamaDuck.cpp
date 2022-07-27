@@ -202,6 +202,8 @@ void MamaDuck::handleReceivedPacket() {
           data.insert(data.end(), packet.muid.begin(), packet.muid.end());
           // std::vector<byte> muid;
           // sendData(reservedTopic::ack, data, packet.sduid, &muid);
+
+          //check for ack option
           sendAck(data, packet.sduid);
         }
         break;

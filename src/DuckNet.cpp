@@ -126,15 +126,14 @@ std::string DuckNet::retrieveMessageHistory(CircularBuffer* buffer)
     std::string messageAgeString = String(messageAge).c_str();
     std::string messageBody(packet.data.begin(),packet.data.end());
     std::string sduid(packet.sduid.begin(), packet.sduid.end());
+    std::string muid(packet.muid.begin(), packet.muid.end());
     std::string acked;
     if(packet.acked){
       acked = "1";
     } else{
       acked = "0";
     }
-    loginfo("======================== ACKED ====================");
-    loginfo(acked.c_str());
-    json = json + "{\"sduid\":\"" + sduid  + "\" , \"title\":\"PLACEHOLDER TITLE\", \"body\":\"" + messageBody + "\", \"messageAge\":\"" + messageAgeString + "\", \"acked\":\"" + acked + "\"}";
+    json = json + "{\"sduid\":\"" + sduid + "\", \"muid\":\"" + muid +  "\" , \"title\":\"PLACEHOLDER TITLE\", \"body\":\"" + messageBody + "\", \"messageAge\":\"" + messageAgeString + "\", \"acked\":\"" + acked + "\"}";
 
     tail++;
     if(tail == buffer->getBufferEnd()){
@@ -152,10 +151,8 @@ void DuckNet::checkForPrivateMessage(std::vector<byte> muid, std::vector<byte> s
 
   if(chatHistories.find(chatSession) != chatHistories.end()){
     int index = chatHistories.find(chatSession)->second->findMuid(muid);
-    loginfo(index);
     if(index >= 0){
-        CdpPacket p = chatHistories.find(chatSession)->second->getMessage(index);
-        p.acked = true;
+        chatHistories.find(chatSession)->second->ackMessage(muid);
     } 
   }
 }
@@ -165,7 +162,8 @@ void DuckNet::checkForPublicMessage(std::vector<byte> muid)
   int index = chatBuffer.findMuid(muid);
     if(index >= 0){
         CdpPacket p = chatBuffer.getMessage(index);
-        p.acked = true;
+        chatBuffer.ackMessage(muid);
+        // p.acked = true;
     }
 }
 
@@ -481,10 +479,55 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     request->send(200, "text/html", "OK.");
   });
   
-  webServer.on("/requestMessageResend", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    loginfo("message resent!");
-  
-    request->send(200, "text/html", "OK.");
+  webServer.on("/requestMessageResend.json", HTTP_POST, [&](AsyncWebServerRequest* request) {
+    int err = DUCK_ERR_NONE;
+
+    std::vector<byte> message;
+    String clientId = "";
+
+    AsyncWebParameter* p = request->getParam(0);
+    std::string muidParam = p->value().c_str();
+    std::vector<byte> oldMuid;
+    oldMuid.insert(oldMuid.end(), muidParam.begin(), muidParam.end());
+
+    if(chatHistories.find(duckSession) != chatHistories.end()){
+      int index = chatHistories[duckSession]->findMuid(oldMuid);
+      
+      if(index >= 0){
+          CdpPacket packetToResend = chatHistories.find(duckSession)->second->getMessage(index);
+
+          std::vector<byte> newMuid;
+          std::vector<byte> session;
+          session.insert(session.end(), duckSession.begin(), duckSession.end());
+
+          std::string messageBody(packetToResend.data.begin(), packetToResend.data.end());
+
+          err = duck->sendData(topics::pchat, messageBody, session, &newMuid);
+
+          switch (err) {
+            case DUCK_ERR_NONE:
+            {
+              // request->send(200, "text/html", "OK.");
+              std::string privateHistory = DuckNet::retrieveMessageHistory(chatHistories[duckSession]);
+              request->send(200, "text/json", privateHistory.c_str());
+              chatHistories[duckSession]->updateMuid(packetToResend.muid, newMuid);
+            }
+            break;
+            case DUCKLORA_ERR_MSG_TOO_LARGE:
+            request->send(413, "text/html", "Message payload too big!");
+            break;
+            case DUCKLORA_ERR_HANDLE_PACKET:
+            request->send(400, "text/html", "BadRequest");
+            break;
+            default:
+            request->send(500, "text/html", "Oops! Unknown error.");
+            break;
+          }
+          
+      }
+    } else{
+          request->send(500, "text/html", "could not retrieve chat history");
+    }
   });
 
   // Captive Portal form submission

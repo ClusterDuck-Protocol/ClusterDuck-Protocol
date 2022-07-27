@@ -25,20 +25,23 @@ const char private_chat_page[] PROGMEM = R"=====(
 
         <script>
             var sduid = "you";
-            var resendValue;
              function displayNewMessage(newMessage, sent){
                 newMessage.messageAge = parseInt(newMessage.messageAge  / 1000);
                 var card = document.createElement("div");
                 if(sent){
                     card.classList.add("sent-message-card");
-                    //newMessage.acked = 0;
-                    //console.log("acked " + newMessage.acked);
+                    // newMessage.acked = 0;
+                    console.log(newMessage.acked);
+                    console.log(newMessage.acked == 0);
+                    console.log(newMessage.messageAge >= 30);
+                    console.log(!newMessage.acked && newMessage.messageAge >= 30);
 
-                    if( !newMessage.acked && newMessage.messageAge >= 30){
+                    if( (newMessage.acked == 0) && newMessage.messageAge >= 30){
                        card.classList.add("resend-message");
                        
-                       card.addEventListener('click', requestResend);
-                       resendValue = newMessage.body;
+                    card.addEventListener('click', function(){
+                        requestResend(newMessage.muid);
+                    }, true);
                     }
                 } else{
                     card.classList.add("received-message-card");
@@ -85,12 +88,13 @@ const char private_chat_page[] PROGMEM = R"=====(
                 req.open("GET", "/id");
                 req.send();
             }
-            function requestResend(){
-                //resendValue
+            function requestResend(resendMuid){
+                let params = new URLSearchParams("");
+                params.append("resendMuid", resendMuid);
                 var req = new XMLHttpRequest();
-                req.addEventListener("load", requestChatHistory);
+                req.addEventListener("load", loadListener);
                 req.addEventListener("error", errorListener);
-                req.open("GET", "/requestMessageResend");
+                req.open("POST", "/requestMessageResend.json?" + params.toString());
                 req.send();
             }
 
