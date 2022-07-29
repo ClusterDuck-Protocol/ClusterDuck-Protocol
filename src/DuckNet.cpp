@@ -128,10 +128,10 @@ std::string DuckNet::retrieveMessageHistory(CircularBuffer* buffer)
     std::string sduid(packet.sduid.begin(), packet.sduid.end());
     std::string muid(packet.muid.begin(), packet.muid.end());
     std::string acked;
-    if(packet.acked){
-      acked = "1";
-    } else{
+    if(!packet.acked && duckutils::getAckingState()){
       acked = "0";
+    } else{
+      acked = "1";
     }
     json = json + "{\"sduid\":\"" + sduid + "\", \"muid\":\"" + muid +  "\" , \"title\":\"PLACEHOLDER TITLE\", \"body\":\"" + messageBody + "\", \"messageAge\":\"" + messageAgeString + "\", \"acked\":\"" + acked + "\"}";
 
@@ -259,6 +259,15 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     duck->setDecrypt(!duck->getDecrypt());
     loginfo("Decrypt is now: ");
     loginfo(duck->getDecrypt());
+    request->send(200, "text/plain", "Success");
+  });
+
+  webServer.on("/flipAcking", HTTP_GET, [&](AsyncWebServerRequest* request) {
+    //Flip Acking State
+   
+    duckutils::flipAckingState();
+     loginfo("Acking is now: ");
+    loginfo(duckutils::getAckingState());
     request->send(200, "text/plain", "Success");
   });
 

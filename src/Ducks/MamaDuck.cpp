@@ -198,13 +198,11 @@ void MamaDuck::handleReceivedPacket() {
           std::vector<byte> data;
           byte numPairs = 1;
           data.insert(data.end(), numPairs);
-          // data.insert(data.end(), packet.sduid.begin(), packet.sduid.end());
           data.insert(data.end(), packet.muid.begin(), packet.muid.end());
-          // std::vector<byte> muid;
-          // sendData(reservedTopic::ack, data, packet.sduid, &muid);
-
-          //check for ack option
-          sendAck(data, packet.sduid);
+          if(duckutils::getAckingState()){
+            sendAck(data, packet.sduid);
+            loginfo("ack sent !!!!!!!!!!!!!!");
+          }
         }
         break;
         default:
