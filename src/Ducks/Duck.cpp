@@ -446,9 +446,8 @@ int Duck::sendPong() {
   return err;
 }
 
-int Duck::sendAck(std::vector<byte> data, const std::vector<byte> dduid) { //reservedTopic::ack, data, packet.sduid, &muid
+int Duck::sendAck(std::vector<byte> data, const std::vector<byte> dduid) { 
   int err = DUCK_ERR_NONE;
-  //std::vector<byte> data(1, 0);
   err = txPacket->prepareForSending(&filter, dduid, this->getType(), reservedTopic::ack, data);
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR Oops! failed to build pong packet, err = " + err);

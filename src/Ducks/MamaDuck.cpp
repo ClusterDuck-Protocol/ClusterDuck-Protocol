@@ -128,6 +128,9 @@ void MamaDuck::handleReceivedPacket() {
         case topics::gchat:
           packet.timeReceived = millis();
           duckNet->addToChatBuffer(packet);
+          if(duckutils::getAckingState()){
+            sendAck(data, BROADCAST_DUID);
+          }
         break;
         default:
           err = duckRadio.relayPacket(rxPacket);
@@ -188,6 +191,9 @@ void MamaDuck::handleReceivedPacket() {
         case topics::gchat:
           packet.timeReceived = millis();
           duckNet->addToChatBuffer(packet);
+          if(duckutils::getAckingState()){
+            sendAck(data, BROADCAST_DUID);
+          }
         break;
         case topics::pchat:{
           packet.timeReceived = millis();
@@ -201,7 +207,6 @@ void MamaDuck::handleReceivedPacket() {
           data.insert(data.end(), packet.muid.begin(), packet.muid.end());
           if(duckutils::getAckingState()){
             sendAck(data, packet.sduid);
-            loginfo("ack sent !!!!!!!!!!!!!!");
           }
         }
         break;

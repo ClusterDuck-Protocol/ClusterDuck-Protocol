@@ -79,12 +79,14 @@ String DuckNet::createMuidResponseJson(muidStatus status) {
 
 void DuckNet::addToMessageBoardBuffer(CdpPacket message)
 {
+  message.timeReceived = millis();
   messageBuffer.push(message);
   events.send("refresh" ,"refreshPage",millis());
 }
 
 void DuckNet::addToChatBuffer(CdpPacket message)
 {
+  message.timeReceived = millis();
   chatBuffer.push(message);
   events.send("refresh" ,"refreshPage",millis());
 }
@@ -540,6 +542,55 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     } else{
           request->send(500, "text/html", "could not retrieve chat history");
     }
+  });
+
+  webServer.on("/requestPublicMessageResend.json", HTTP_POST, [&](AsyncWebServerRequest* request) {
+    int err = DUCK_ERR_NONE;
+
+    std::vector<byte> message;
+    String clientId = "";
+
+    AsyncWebParameter* p = request->getParam(0);
+    std::string muidParam = p->value().c_str();
+    std::vector<byte> oldMuid;
+    oldMuid.insert(oldMuid.end(), muidParam.begin(), muidParam.end());
+      int index = chatBuffer.findMuid(oldMuid);
+      
+      if(index >= 0){
+          CdpPacket packetToResend = chatBuffer.getMessage(index);
+
+          std::vector<byte> newMuid;
+          std::vector<byte> session;
+          session.insert(session.end(), duckSession.begin(), duckSession.end());
+          loginfo(duckSession.c_str());
+
+          std::string messageBody(packetToResend.data.begin(), packetToResend.data.end());
+
+          err = duck->sendData(topics::gchat, messageBody, session, &newMuid);
+
+          switch (err) {
+            case DUCK_ERR_NONE:
+            {
+              std::string publicHistory = DuckNet::retrieveMessageHistory(&chatBuffer);
+              request->send(200, "text/json", publicHistory.c_str());
+              chatBuffer.updateMuid(packetToResend.muid, newMuid);
+            }
+            break;
+            case DUCKLORA_ERR_MSG_TOO_LARGE:
+            request->send(413, "text/html", "Message payload too big!");
+            break;
+            case DUCKLORA_ERR_HANDLE_PACKET:
+            request->send(400, "text/html", "BadRequest");
+            break;
+            default:
+            request->send(500, "text/html", "Oops! Unknown error.");
+            break;
+          }
+          
+      } else{
+          request->send(500, "text/html", "could not resend message");
+      }
+    
   });
 
   // Captive Portal form submission
