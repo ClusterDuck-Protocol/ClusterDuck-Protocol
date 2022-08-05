@@ -45,7 +45,7 @@ const char private_chat_page[] PROGMEM = R"=====(
                     card.classList.add("received-message-card");
                 }
                 
-                if( (newMessage.acked == 0) && (newMessage.messageAge >= 30) && ackOption){
+                if( (newMessage.acked == 0) && (newMessage.messageAge >= 30) && ackOption && sent){
                     card.innerHTML = newMessage.body + '</p><span class="duid">Click Message to Resend</span></p><span class="time">' 
                     + newMessage.messageAge + ' seconds ago</span>';
                 } else{

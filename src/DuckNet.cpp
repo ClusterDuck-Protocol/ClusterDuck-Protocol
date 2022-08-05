@@ -168,7 +168,6 @@ void DuckNet::checkForPublicMessage(std::vector<byte> muid)
     if(index >= 0){
         CdpPacket p = chatBuffer.getMessage(index);
         chatBuffer.ackMessage(muid);
-        // p.acked = true;
     }
 }
 
@@ -425,11 +424,9 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     message.insert(message.end(), msg.begin(), msg.end());
 
     std::vector<byte> muid;
-    std::vector<byte> session;
-    session.insert(session.end(), duckSession.begin(), duckSession.end());
 
-    err = duck->sendData(topics::gchat, message, session, &muid);
-    addToChatBuffer(duck->buildCdpPacket(topics::gchat, message, session, muid));
+    err = duck->sendData(topics::gchat, message, BROADCAST_DUID, &muid);
+    addToChatBuffer(duck->buildCdpPacket(topics::gchat, message, BROADCAST_DUID, muid));
 
     switch (err) {
       case DUCK_ERR_NONE:
@@ -521,7 +518,6 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
           switch (err) {
             case DUCK_ERR_NONE:
             {
-              // request->send(200, "text/html", "OK.");
               std::string privateHistory = DuckNet::retrieveMessageHistory(chatHistories[duckSession]);
               request->send(200, "text/json", privateHistory.c_str());
               chatHistories[duckSession]->updateMuid(packetToResend.muid, newMuid);
@@ -560,13 +556,11 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
           CdpPacket packetToResend = chatBuffer.getMessage(index);
 
           std::vector<byte> newMuid;
-          std::vector<byte> session;
-          session.insert(session.end(), duckSession.begin(), duckSession.end());
           loginfo(duckSession.c_str());
 
           std::string messageBody(packetToResend.data.begin(), packetToResend.data.end());
 
-          err = duck->sendData(topics::gchat, messageBody, session, &newMuid);
+          err = duck->sendData(topics::gchat, messageBody, BROADCAST_DUID, &newMuid);
 
           switch (err) {
             case DUCK_ERR_NONE:

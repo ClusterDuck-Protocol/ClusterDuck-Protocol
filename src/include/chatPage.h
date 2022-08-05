@@ -44,7 +44,7 @@ const char chat_page[] PROGMEM = R"=====(
                     card.classList.add("received-message-card");
                 }
                 
-                if( (newMessage.acked == 0) && (newMessage.messageAge >= 30) && ackOption){
+                if( (newMessage.acked == 0) && (newMessage.messageAge >= 30) && ackOption && sent){
                     card.innerHTML = newMessage.body + '</p><span class="duid">Click Message to Resend</span></p><span class="time">' 
                     + newMessage.messageAge + ' seconds ago</span>';
                 } else{
@@ -87,6 +87,16 @@ const char chat_page[] PROGMEM = R"=====(
                 var req = new XMLHttpRequest();
                 req.addEventListener("load", sduidListener);
                 req.open("GET", "/id");
+                req.send();
+            }
+
+            function requestResend(resendMuid){
+                let params = new URLSearchParams("");
+                params.append("resendMuid", resendMuid);
+                var req = new XMLHttpRequest();
+                req.addEventListener("load", loadListener);
+                req.addEventListener("error", errorListener);
+                req.open("POST", "/requestPublicMessageResend.json?" + params.toString());
                 req.send();
             }
 
