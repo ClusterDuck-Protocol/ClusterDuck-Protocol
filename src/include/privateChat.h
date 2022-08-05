@@ -25,37 +25,41 @@ const char private_chat_page[] PROGMEM = R"=====(
 
         <script>
             var sduid = "you";
+            var ackOption = true;
              function displayNewMessage(newMessage, sent){
                 newMessage.messageAge = parseInt(newMessage.messageAge  / 1000);
                 var card = document.createElement("div");
                 if(sent){
                     card.classList.add("sent-message-card");
-                    // newMessage.acked = 0;
-                    console.log(newMessage.acked);
-                    console.log(newMessage.acked == 0);
-                    console.log(newMessage.messageAge >= 30);
-                    console.log(!newMessage.acked && newMessage.messageAge >= 30);
 
-                    if( (newMessage.acked == 0) && newMessage.messageAge >= 30){
-                       card.classList.add("resend-message");
+                    if( (newMessage.acked == 0) && (newMessage.messageAge >= 30) && ackOption){
+                        card.classList.add("resend-message");
                        
-                    card.addEventListener('click', function(){
-                        requestResend(newMessage.muid);
-                    }, true);
+                        card.addEventListener('click', function(){
+                            requestResend(newMessage.muid);
+                        }, true);
+                    } else if((newMessage.acked == 1) && ackOption){
+                        card.classList.add("acked-message");
                     }
                 } else{
                     card.classList.add("received-message-card");
                 }
                 
-                card.innerHTML = newMessage.body + '</p><span class="duid">FROM DUCKID: '
-                 + newMessage.sduid + '</span></p><span class="time">' 
-                 + newMessage.messageAge + ' seconds ago</span>';
+                if( (newMessage.acked == 0) && (newMessage.messageAge >= 30) && ackOption){
+                    card.innerHTML = newMessage.body + '</p><span class="duid">Click Message to Resend</span></p><span class="time">' 
+                    + newMessage.messageAge + ' seconds ago</span>';
+                } else{
+                    card.innerHTML = newMessage.body + '</p><span class="duid">FROM DUCKID: '
+                    + newMessage.sduid + '</span></p><span class="time">' 
+                    + newMessage.messageAge + ' seconds ago</span>';
+                }
 
                 document.getElementById('message-container').append(card);
             }
             function chatHistoryListener () {
                 document.getElementById('message-container').innerHTML = "";
                 var data = JSON.parse(this.responseText);
+                ackOption = data.ackOption;
                 data.posts.forEach(item => {
                         let sent = sduid == item.sduid ? true : false;
                         displayNewMessage(item, sent);
@@ -174,7 +178,7 @@ const char private_chat_page[] PROGMEM = R"=====(
         float: right;
     }
     .resend-message{
-        background-color: red !important;
+        background-color: rgba(255, 0, 20, .35) !important;
     }
     #message-container{
         width: 95%;
@@ -234,7 +238,7 @@ const char private_chat_page[] PROGMEM = R"=====(
         font-family: sans-serif;
         font-size: .9em;
     }
-    .acked{
+    .acked-message{
         background-color: #c1ff91 !important;
     }
 

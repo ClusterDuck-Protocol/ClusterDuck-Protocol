@@ -110,7 +110,10 @@ void DuckNet::createPrivateHistory(std::string session)
 std::string DuckNet::retrieveMessageHistory(CircularBuffer* buffer)
 {
   int tail = buffer->getTail();
-  std::string json = "{\"posts\":[";
+  std::string json = "{ \"ackOption\":";
+  std::string ackOption = duckutils::getAckingState() ? "true" : "false";
+  json = json + ackOption;
+  json = json + ", \"posts\":[";
   bool firstMessage = true;
 
   while(tail != buffer->getHead()){
@@ -128,7 +131,7 @@ std::string DuckNet::retrieveMessageHistory(CircularBuffer* buffer)
     std::string sduid(packet.sduid.begin(), packet.sduid.end());
     std::string muid(packet.muid.begin(), packet.muid.end());
     std::string acked;
-    if(!packet.acked && duckutils::getAckingState()){
+    if(!packet.acked){
       acked = "0";
     } else{
       acked = "1";
