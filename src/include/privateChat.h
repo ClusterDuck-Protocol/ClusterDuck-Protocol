@@ -36,6 +36,10 @@ const char private_chat_page[] PROGMEM = R"=====(
                         card.classList.add("resend-message");
                        
                         card.addEventListener('click', function(){
+                            card.classList.remove("resend-message");
+                            card.classList.add("sent-message-card");
+                            card.innerHTML = newMessage.body + '</p><span class="duid">Resending...</span></p><span class="time">' 
+                            + newMessage.messageAge + ' seconds ago</span>';
                             requestResend(newMessage.muid);
                         }, true);
                     } else if((newMessage.acked == 1) && ackOption){
@@ -105,6 +109,7 @@ const char private_chat_page[] PROGMEM = R"=====(
 
 
             function loadListener(){
+                requestChatHistory
                 var errEl = document.getElementById('makeshiftErrorOutput');
                 if (!errEl.classList.toString().includes("hidden")) {
                     errEl.innerHTML = '';

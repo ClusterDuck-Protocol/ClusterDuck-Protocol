@@ -35,6 +35,8 @@ const char chat_page[] PROGMEM = R"=====(
                         card.classList.add("resend-message");
                        
                         card.addEventListener('click', function(){
+                            card.classList.remove("resend-message");
+                            card.classList.add("sent-message-card");
                             requestResend(newMessage.muid);
                         }, true);
                     } else if((newMessage.acked == 1) && ackOption){
@@ -103,6 +105,7 @@ const char chat_page[] PROGMEM = R"=====(
 
 
             function loadListener(){
+                requestChatHistory
                 var errEl = document.getElementById('makeshiftErrorOutput');
                 if (!errEl.classList.toString().includes("hidden")) {
                     errEl.innerHTML = '';
