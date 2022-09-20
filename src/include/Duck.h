@@ -205,6 +205,19 @@ public:
     const std::vector<byte> targetDevice = ZERO_DUID, std::vector<byte> * outgoingMuid = NULL);
 
   /**
+   * @brief Builds a CdpPacket with a specified muid.
+   *
+   * @param topic the message topic
+   * @param data a byte buffer representing the data to send
+   * @param length the length of the byte buffer
+   * @param targetDevice the device UID to receive the message
+   * @param muid the muid that should be associated with this packet
+   * @return a new CdpPacket
+   * */
+  CdpPacket buildCdpPacket(byte topic, const std::vector<byte> data,
+    const std::vector<byte> targetDevice, const std::vector<byte> &muid);
+
+  /**
    * @brief Updates the firmware on the device
    *
    * TODO: Additional documentation

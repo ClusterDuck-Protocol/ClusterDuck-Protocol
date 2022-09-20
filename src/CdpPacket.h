@@ -96,6 +96,10 @@ enum topics {
   health = 0x15,
   // Send duck commands
   dcmd = 0x16,
+  //global chat message
+  gchat = 0x17,
+  //private chat message
+  pchat = 0x18,
   // MQ7 Gas Sensor
   mq7 = 0xEF,
   // GP2Y Dust Sensor
@@ -203,6 +207,12 @@ public:
     return duckutils::convertToHex(path.data(), path.size());
   }
 
+  std::vector<byte> converToBuffer(){
+    std::vector<byte> sendBuffer;
+    sendBuffer.insert(sendBuffer.end(), sduid.begin(), sduid.end());
+    //sendBuffer.pushback for topic
+    return sendBuffer;
+  }
   /**
    * @brief Resets the cdp packet and underlying byte buffers.
    *

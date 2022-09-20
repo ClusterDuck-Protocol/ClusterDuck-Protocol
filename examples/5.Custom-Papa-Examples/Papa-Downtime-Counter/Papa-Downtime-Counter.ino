@@ -319,7 +319,7 @@ void quackDownReport(String payload) {
   doc["hops"] = "0";
   doc["duckType"] = "1";
     
-  std::string topic = "iot-2/evt/health/fmt/json";
+  std::string topic = "iot-2/evt/papahealth/fmt/json";
 
   String jsonstat;
   serializeJson(doc, jsonstat);

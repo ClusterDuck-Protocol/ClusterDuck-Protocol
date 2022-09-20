@@ -120,8 +120,12 @@ void PapaDuck::handleReceivedPacket() {
         rxPacket->getBuffer().size()));
     loginfo("invoking callback in the duck application...");
     
-    recvDataCallback(rxPacket->getBuffer());
-
+    if(rxPacket->getTopic() == topics::gchat){
+      duckNet->addToChatBuffer(CdpPacket(rxPacket->getBuffer()));
+    } else{
+      recvDataCallback(rxPacket->getBuffer());
+    }
+    
     if (acksEnabled) {
       const CdpPacket packet = CdpPacket(rxPacket->getBuffer());
       if (needsAck(packet)) {

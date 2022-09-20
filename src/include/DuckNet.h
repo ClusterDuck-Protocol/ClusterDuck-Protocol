@@ -34,6 +34,7 @@ class DuckNet;
 #include <ESPmDNS.h>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
+#include <map>
 
 #include "../DuckError.h"
 #include "DuckEsp.h"
@@ -45,6 +46,9 @@ class DuckNet;
 #include "cdpHome.h"
 #include "papaHome.h"
 #include "messageBoard.h"
+#include "chatPage.h"
+#include "privateChat.h"
+#include "privateChatPrompt.h"
 #include "circularBuffer.h"
 
 #endif
@@ -60,6 +64,7 @@ class DuckNet {
 public:
 
   int channel;
+  std::string duckSession;
 
 #ifdef CDPCFG_WIFI_NONE
   int setupWebServer(bool createCaptivePortal = false, String html = "") {
@@ -105,19 +110,43 @@ public:
   int setupWebServer(bool createCaptivePortal = false, String html = "");
 
   /**
-   * @brief insert received packet into the message circular buffer and
+   * @brief insert received packet into the message board circular buffer and
    * send refresh page event to client
    *
    * @param message the packet to add to the buffer
    */
-  void addMessageToBuffer(CdpPacket message);
-  
+  void addToMessageBoardBuffer(CdpPacket message);
+
+  /**
+   * @brief insert received packet into the chat circular buffer and
+   * send refresh page event to client
+   *
+   * @param message the packet to add to the buffer
+   */
+  void addToChatBuffer(CdpPacket message);
+
+  /**
+   * @brief insert received packet into the private chat circular buffer and
+   * send refresh page event to client
+   *
+   * @param message the packet to add to the buffer
+   * @param chatSession the session of the chat buffer you want to add to.
+   */
+  void addToPrivateChatBuffer(CdpPacket message, std::string chatSession);
+
+   /**
+   * @brief creates a new private chat history, replacing the oldest history if the limit is reached.
+   *
+   * @param session the destination device to open a chat with
+   */
+  void createPrivateHistory(std::string session);
+
   /**
    * @brief retrieve all messages from from message circular buffer
    *
    * @returns a json array of messages with a title, body, and messageAge
    */
-  std::string retrieveMessageHistory();
+  std::string retrieveMessageHistory(CircularBuffer* buffer);
 
   /**
    * @brief Set up the WiFi access point.
