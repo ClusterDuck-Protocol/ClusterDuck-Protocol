@@ -49,7 +49,7 @@ https://github.com/Project-Owl/DuckApp
 ## 5. Custom Papa Examples
 
 #### PaPa-DishDuck and PaPa-DishDuck-WiFi
-The papa Iridium Example is built to have an extra Iridium Satelite Backhaul when WiFi brakes down.
+The papa Iridium Example is built to have an extra Iridium Satelite Backhaul when WiFi breakes down.
 
 #### Papa-Downtime-Counter
 ...
@@ -83,3 +83,4 @@ You can enable encryption. CDP comes with default settings, but set your own IV 
 
 #### DecryptionPapa
 Decryption is a very fast operation and using this example your messages will be decrypted before sending to the cloud. Remember to set IV and AES256 key to be the same as what you use on other devices.
+

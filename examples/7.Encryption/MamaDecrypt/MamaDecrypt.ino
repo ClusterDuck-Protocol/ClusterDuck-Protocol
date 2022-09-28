@@ -1,11 +1,6 @@
 /**
  * @file MamaDecrypt.ino
  * @brief Uses the built in Mama Duck.
- * 
- * This example is a Mama Duck, but it is also periodically sending a message in the Mesh
- * It is setup to provide a custom Emergency portal, instead of using the one provided by the SDK.
- * Notice the background color of the captive portal is Black instead of the default Red.
- * 
  */
 
 #include <string>
