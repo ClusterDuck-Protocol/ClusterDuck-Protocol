@@ -1,5 +1,6 @@
 /**
- * @brief Uses built-in PapaDuck from the SDK to create a WiFi and Sattelite enabled Papa Duck
+ * @file Papa-DishDuck-WiFi.ino
+ * @brief Uses built-in PapaDuck from the SDK to create a WiFi and Satellite enabled Papa Duck
  * 
  * This example will configure and run a Papa Duck that connects to the cloud
  * and forwards all messages (except  pings) to the cloud.

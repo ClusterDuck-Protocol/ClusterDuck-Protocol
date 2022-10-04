@@ -16,9 +16,7 @@ The network is made up of multiple nodes called **"Ducks"**. There are 3 core ro
 ## Installation
 Check out the [Wiki](https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki) to learn how to build your own ClusterDuck Protocol Network. And go to the [ClusterDuck Protocol](https://clusterduckprotocol.org/) website for more information and to learn about projects built upon this codebase. You can reach out directly on our [Slack Workspace] for any questions and work with the community. 
 
-
 **To use the ClusterDuck Protocol follow the [Installation Manual](https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki/getting-started).**
-
 
 ## Testing
 
@@ -49,7 +47,10 @@ This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE)
 
 ## Version
 
+See `library.json` (PlatformIO) or `library.properties` (Arduino).
+
 v3.3.5
+
 
 
 

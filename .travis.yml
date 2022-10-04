@@ -12,39 +12,21 @@ before_install:
   - sudo apt-get -y install cppcheck
   - cppcheck --version
   - cppcheck --force --error-exitcode=1 src
-
-  - curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh -s 0.17.0
+  - curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh -s
   - export PATH=$PATH:$PWD/bin/
+  - arduino-cli config init
+  - arduino-cli config set library.enable_unsafe_install true
   - arduino-cli core update-index --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
   - if [[ "$BOARD" =~ "esp32:esp32:" ]]; then
       arduino-cli core install esp32:esp32 --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json;
     fi
-  - arduino-cli config init 
-  - arduino-cli config set library.enable_unsafe_install true    
-  - arduino-cli lib install --git-url https://github.com/Call-for-Code/ClusterDuck-Protocol.git      
-  - arduino-cli lib install --git-url https://github.com/contrem/arduino-timer.git
-  - arduino-cli lib install radiolib@4.5.0  
-  - arduino-cli lib install --git-url https://github.com/bblanchon/ArduinoJson.git
-  - arduino-cli lib install --git-url https://github.com/me-no-dev/AsyncTCP
-  - arduino-cli lib install --git-url https://github.com/ThingPulse/esp8266-oled-ssd1306
-  - arduino-cli lib install --git-url https://github.com/me-no-dev/ESPAsyncWebServer
-  - arduino-cli lib install --git-url https://github.com/olikraus/U8g2_Arduino.git
-  - arduino-cli lib install --git-url https://github.com/bakercp/CRC32.git
-  - arduino-cli lib install --git-url https://github.com/adafruit/Adafruit_Sensor
-  - arduino-cli lib install --git-url https://github.com/knolleary/pubsubclient.git
-  - arduino-cli lib install --git-url https://github.com/adafruit/Adafruit_BMP085_Unified
-  - arduino-cli lib install --git-url https://github.com/luciansabo/GP2YDustSensor.git
-  - arduino-cli lib install --git-url https://github.com/adafruit/DHT-sensor-library
-  - arduino-cli lib install --git-url https://github.com/adafruit/Adafruit_BMP280_Library
-  - arduino-cli lib install --git-url https://github.com/adafruit/Adafruit_BusIO
-  - arduino-cli lib install --git-url https://github.com/miguel5612/MQSensorsLib.git
-  - arduino-cli lib install --git-url https://github.com/FastLED/FastLED.git
-  - arduino-cli lib install --git-url https://github.com/mikalhart/IridiumSBD.git
-  - arduino-cli lib install --git-url https://github.com/lewisxhe/AXP202X_Library
-  - arduino-cli lib install --git-url https://github.com/mikalhart/TinyGPSPlus.git
-  - arduino-cli lib install --git-url https://github.com/Project-Owl/Crypto.git
+  - wget https://github.com/tarampampam/arduino-deps-installer/releases/download/v0.0.1/arduino-deps-installer-linux-amd64 -O $PWD/bin/arduino-deps-installer && chmod +x $PWD/bin/arduino-deps-installer
+  - arduino-deps-installer install --work-dir ${PWD}
+  # install library in current state
+  - rsync -rltv --exclude=.git --exclude=bin ${PWD}/ /tmp/CDP/ && (cd /tmp && zip -r /tmp/cdp.zip CDP) && arduino-cli lib install --zip-path /tmp/cdp.zip
+  - installExampleArduinoDeps() { arduino-deps-installer install --work-dir $PWD/examples/$1/$2; }
+  - buildExampleSketch() { installExampleArduinoDeps $1 $2; arduino-cli compile  -t -b $BOARD $PWD/examples/$1/$2/$2.ino; }
 
-  - buildExampleSketch() { arduino-cli compile  -t -b $BOARD $PWD/examples/$1/$2/$2.ino; }
 script:
   - buildExampleSketch 1.Ducks DuckLink
   - buildExampleSketch 1.Ducks MamaDuck
@@ -59,19 +41,22 @@ script:
   - buildExampleSketch 3.Sensor-Examples DustSensorExample
   - buildExampleSketch 3.Sensor-Examples MQ7Example
   - buildExampleSketch 3.Sensor-Examples WS2812Example
-  - if [[ "$BOARD" != "esp32:esp32:t-beam" ]]; 
-    then buildExampleSketch 4.Ble-Duck-App Ble-Duck-App;
+  - if [[ "$BOARD" != "esp32:esp32:t-beam" ]]; then
+    buildExampleSketch 4.Ble-Duck-App Ble-Duck-App;
     fi
   - buildExampleSketch 5.Custom-Papa-Examples Papa-DishDuck
   - buildExampleSketch 5.Custom-Papa-Examples Papa-DishDuck-WiFi
   - buildExampleSketch 5.Custom-Papa-Examples Papa-Downtime-Counter
-  - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]]; 
-    then buildExampleSketch 6.TTGO-TBeam-Examples TTGO-Telemetry;
+  - buildExampleSketch 5.Custom-Papa-Examples PapiDuck-DMS-Lite-Serial-Example
+  - buildExampleSketch 5.Custom-Papa-Examples PapiDuck-DMS-Lite-WiFi-Example
+  - if [[ "$BOARD" == "esp32:esp32:t-beam" ]]; then
+    buildExampleSketch 6.TTGO-TBeam-Examples TBeam-AXP-Example;
     fi
-  - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]]; 
-    then buildExampleSketch 6.TTGO-TBeam-Examples TTGOGPSExample;
+  - if [[ "$BOARD" == "esp32:esp32:t-beam" ]]; then
+    buildExampleSketch 6.TTGO-TBeam-Examples TBeam-GPS-Example;
     fi
-  - if [[ "$BOARD" != "esp32:esp32:heltec_wifi_lora_32_V2" ]]; 
-    then buildExampleSketch 6.TTGO-TBeam-Examples TTGOAPX-Example;
+  - if [[ "$BOARD" == "esp32:esp32:t-beam" ]]; then
+    buildExampleSketch 6.TTGO-TBeam-Examples TBeam-Telemetry;
     fi
   - buildExampleSketch 7.Encryption DecryptionPapaDuck
+  - buildExampleSketch 7.Encryption MamaDecrypt

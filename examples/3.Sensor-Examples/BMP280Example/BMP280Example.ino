@@ -1,9 +1,5 @@
 /**
- * @brief Uses the built in Mama Duck with some customatizations.
- * 
- * This example is a Mama Duck, but it is also periodically sending a message in the Mesh
- * It is setup to provide a custom Emergency portal, instead of using the one provided by the SDK.
- * Notice the background color of the captive portal is Black instead of the default Red.
+ * @brief Uses the built in Mama Duck with a BMP280 sensor
  * 
  * @date 2020-09-21
  * 
@@ -19,8 +15,7 @@
 #define Serial SERIAL_PORT_USBVIRTUAL
 #endif
 
-
-//Setup BMP280
+// Setup BMP280
 #include <Adafruit_BMP280.h>
 Adafruit_BMP280 bmp;
 

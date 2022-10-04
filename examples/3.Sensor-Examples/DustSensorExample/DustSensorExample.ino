@@ -1,9 +1,5 @@
 /**
- * @brief Uses the built in Mama Duck with some customatizations.
- * 
- * This example is a Mama Duck, but it is also periodically sending a message in the Mesh
- * It is setup to provide a custom Emergency portal, instead of using the one provided by the SDK.
- * Notice the background color of the captive portal is Black instead of the default Red.
+ * @brief Uses the built in Mama Duck with a GP2YDustSensor
  * 
  * @date 2020-09-21
  * 
@@ -19,7 +15,7 @@
 #define Serial SERIAL_PORT_USBVIRTUAL
 #endif
 
-//Include for DustSensor
+// Include for DustSensor
 #include <GP2YDustSensor.h>
 
 const uint8_t SHARP_LED_PIN = 22;   // Sharp Dust/particle sensor Led Pin

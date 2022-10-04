@@ -1,7 +1,9 @@
-
 /**
- * This example creates a duck link that sends a counter message periodically
- * It's using a pre-built ducklink available from the ClsuterDuck SDK 
+ * @file DuckLink.ino
+ * @author
+ * @brief This example creates a duck link that sends a counter message periodically.
+ *
+ * It's using a pre-built DuckLink available from the ClusterDuck SDK
  */
 
 #include <arduino-timer.h>
