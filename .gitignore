@@ -5,4 +5,5 @@
 .idea
 a.out
 test
+cmake-build-*
 ClusterDuck-Protokoll.code-workspace

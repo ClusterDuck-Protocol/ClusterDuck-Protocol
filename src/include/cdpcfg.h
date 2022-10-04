@@ -66,7 +66,7 @@
  *
  * Top right in this picture: https://github.com/lewisxhe/TTGO-LoRa-Series
  * (antenna attached directly to port on board, sometimes the boards read T3_V1.6.1 or T3_V1.6)
- * pio: board = ttgo-lora32-v21
+ * pio: board = ttgo_lora32_v21
  */
 #elif defined(ARDUINO_TTGO_LoRa32_v21new)
 #include "include/boards/ttgo-lora32-v21.h"

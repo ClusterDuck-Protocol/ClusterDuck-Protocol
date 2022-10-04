@@ -2,10 +2,6 @@
  * @file MQ7Example.ino
  * @brief Uses the built in Mama Duck with a MQ7 sensor attached
  * 
- * This example is a Mama Duck, but it is also periodically sending a message in the Mesh
- * It is setup to provide a custom Emergency portal, instead of using the one provided by the SDK.
- * Notice the background color of the captive portal is Black instead of the default Red.
- * 
  * @date 2020-09-21
  * 
  * @copyright Copyright (c) 2020
@@ -17,11 +13,10 @@
 #include <string>   
 
 #ifdef SERIAL_PORT_USBVIRTUAL
-#define Serial SERIAL_PORT_USBVIRTUAL
+    #define Serial SERIAL_PORT_USBVIRTUAL
 #endif
 
-
-//Include the MQ7 library
+// Include the MQ7 library
 #include <MQUnifiedsensor.h>
 
 //Definitions
@@ -58,19 +53,18 @@ void setup() {
   duck.setupWithDefaults(devId);
   Serial.println("MAMA-DUCK...READY!");
 
-
-   //Set math model to calculate the PPM concentration and the value of constants
+  //Set math model to calculate the PPM concentration and the value of constants
   MQ7.setRegressionMethod(1); //_PPM =  a*ratio^b
   MQ7.setA(99.042); MQ7.setB(-1.518); // Configurate the ecuation values to get CO concentration
 
   // init the sensor
-  /*****************************  MQInicializar****************************************
+  /*****************************  MQInicializar*********************************
   Input:  pin, type 
   Output:  
   Remarks: This function create the sensor object.
-  ************************************************************************************/
+  *****************************************************************************/
   MQ7.init();
-    /*****************************  MQ CAlibration ********************************************/ 
+  /*****************************  MQ CAlibration ******************************/
   // Explanation: 
   // In this routine the sensor will measure the resistance of the sensor supposing before was pre-heated
   // and now is on clean air (Calibration conditions), and it will setup R0 value.
@@ -79,20 +73,18 @@ void setup() {
   // Acknowledgements: https://jayconsystems.com/blog/understanding-a-gas-sensor
   Serial.print("Calibrating please wait.");
   float calcR0 = 0;
-  for(int i = 1; i<=10; i ++)
-  {
+  for (int i = 1; i<=10; i ++) {
     MQ7.update(); // Update data, the arduino will be read the voltage on the analog pin
     calcR0 += MQ7.calibrate(RatioMQ7CleanAir);
     Serial.print(".");
   }
   MQ7.setR0(calcR0/10);
   Serial.println("  done!.");
-  
+
   if(isinf(calcR0)) {Serial.println("Warning: Conection issue founded, R0 is infite (Open circuit detected) please check your wiring and supply"); while(1);}
   if(calcR0 == 0){Serial.println("Warning: Conection issue founded, R0 is zero (Analog pin with short circuit to ground) please check your wiring and supply"); while(1);}
-  /*****************************  MQ CAlibration ********************************************/ 
+  /*****************************  MQ CAlibration ******************************/
   MQ7.serialDebug(true);
-  
 
   // initialize the timer. The timer thread runs separately from the main loop
   // and will trigger sending a counter message.
@@ -108,8 +100,6 @@ void loop() {
 }
 
 bool runSensor(void *) {
-
- 
     MQ7.update(); // Update data, the arduino will be read the voltage on the analog pin
     MQ7.readSensor(); // Sensor will read PPM concentration using the model and a and b values setted before or in the setup
     MQ7.serialDebug(); // Will print the table on the serial port
@@ -117,8 +107,7 @@ bool runSensor(void *) {
     float sensorRead = MQ7.readSensor(); 
     String sensorVal = String(sensorRead);
 
- 
-
   duck.sendData(topics::mq7, sensorVal);
   return true;
 }
+

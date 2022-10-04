@@ -1,16 +1,16 @@
 /**
- * @file TTGOGPSExample.ino
- * @brief Uses the built in Mama Duck with some customatizations.
+ * @file TBeam-Telemetry.ino
+ * @brief Uses the built in Mama Duck and reports additional telemetry data.
  * 
- * This example is a Mama Duck, that has GPS capabilities and will send the GPS data with the GPS topic based on the set timer.
- * @date 2020-09-21
+ * This example is a Mama Duck, that has GPS capabilities and will send telemetry data with the GPS topic based on the set timer.
+ * @date 2021-04-08
  * 
- * @copyright Copyright (c) 2020
+ * @copyright Copyright (c) 2021
  * ClusterDuck Protocol
  */
 
 #include <string>
-#include "timer.h"
+#include <arduino-timer.h>
 #include <MamaDuck.h>
 
 #ifdef SERIAL_PORT_USBVIRTUAL
@@ -24,30 +24,30 @@
 
 TinyGPSPlus tgps;
 HardwareSerial GPS(1);
+
+// AXP setup (Power)
+#include <Wire.h>
+#include <axp20x.h>
 AXP20X_Class axp;
 
 MamaDuck duck;
 
 auto timer = timer_create_default();
-const int INTERVAL_MS = 20000;
+const int INTERVAL_MS = 10000;
 char message[32]; 
 int counter = 1;
 
 void setup() {
-  // We are using a hardcoded device id here, but it should be retrieved or
-  // given during the device provisioning then converted to a byte vector to
-  // setup the duck NOTE: The Device ID must be exactly 8 bytes otherwise it
-  // will get rejected
-  std::string deviceId("MAMAGPS1");
+  // The Device ID must be unique and 8 bytes long. Typically the ID is stored
+  // in a secure nvram, or provided to the duck during provisioning/registration
+  std::string deviceId("MAMADUCK");
   std::vector<byte> devId;
   devId.insert(devId.end(), deviceId.begin(), deviceId.end());
-
   // Use the default setup provided by the SDK
   duck.setupWithDefaults(devId);
-  Serial.println("MAMA-DUCK...READY!");
 
-  //Setup APX
-  Wire.begin(21, 22);
+  Serial.println("MAMA-DUCK...READY!");
+   Wire.begin(21, 22);
   if (!axp.begin(Wire, AXP192_SLAVE_ADDRESS)) {
     Serial.println("AXP192 Begin PASS");
   } else {
@@ -71,6 +71,7 @@ void loop() {
   // from other ducks, across the network. It has a basic routing mechanism built-in
   // to prevent messages from hoping endlessly.
   duck.run();
+
 }
 
 
@@ -82,6 +83,34 @@ static void smartDelay(unsigned long ms)
     while (GPS.available())
       tgps.encode(GPS.read());
   } while (millis() - start < ms);
+}
+
+bool runSensor(void *) {
+    
+  // Creating a boolean to store the result
+  bool result;
+  
+  // Creating a buffer to save message
+  const byte* buffer;
+
+  // Creating the message to be sent 
+  String message = "Counter:" + String(counter)+ " " +getGPSData() + " " + getBatteryData();
+  Serial.print("[MAMA] sensor data: ");
+  Serial.println(message);
+  
+  // Converting the message from string tp bytes
+  int length = message.length();
+  buffer = (byte*) message.c_str(); 
+  
+  // Sending the data
+  result = sendData(buffer, length);
+  if (result) {
+     Serial.println("[MAMA] runSensor ok.");
+  } else {
+     Serial.println("[MAMA] runSensor failed.");
+  }
+  // Return result
+  return result;
 }
 
 // Getting GPS data
@@ -123,14 +152,55 @@ String getGPSData() {
   return sensorVal;
 }
 
-bool runSensor(void *) {
-  bool result;
-  String sensorVal = getGPSData();
+bool sendData(const byte* buffer, int length) {
+  bool sentOk = false;
+  
+  // Send Data can either take a byte buffer (unsigned char) or a vector
+  int err = duck.sendData(topics::location, buffer, length);
+  if (err == DUCK_ERR_NONE) {
+     counter++;
+     sentOk = true;
+  }
+  if (!sentOk) {
+    Serial.println("[MAMA] Failed to send data. error = " + String(err));
+  }
+  return sentOk;
+}
 
-  Serial.print("[MAMA] sensor data: ");
-  Serial.println(sensorVal);
+// Getting the battery data
+String getBatteryData() {
+  
+  int isCharging = axp.isChargeing();
+  boolean isFullyCharged = axp.isChargingDoneIRQ();
+  float batteryVoltage = axp.getBattVoltage();
+  float batteryDischarge = axp.getAcinCurrent();
+  float getTemp = axp.getTemp();  
+  float battPercentage = axp.getBattPercentage();
+   
+  Serial.println("--- Power ---");
+  Serial.print("Duck charging (1 = Yes): ");
+  Serial.println(isCharging);
+  Serial.print("Fully Charged: ");
+  Serial.println(isFullyCharged);
+  Serial.print("Battery Voltage: ");
+  Serial.println(batteryVoltage);
+  Serial.print("Battery Discharge: ");
+  Serial.println(batteryDischarge);  
+  Serial.print("Board Temperature: ");
+  Serial.println(getTemp);
+  Serial.print("battery Percentage: ");
+  Serial.println(battPercentage);
+   
 
-  //Send gps data
-  duck.sendData(topics::location, sensorVal);
-  return true;
+  String sensorVal = 
+  "Charging:" + 
+  String(isCharging) +  
+  " Full:" +
+  String(isFullyCharged)+
+  " Volts:" +
+  String(batteryVoltage) + 
+  " Temp:" +
+  String(getTemp);
+
+  return sensorVal;
 }

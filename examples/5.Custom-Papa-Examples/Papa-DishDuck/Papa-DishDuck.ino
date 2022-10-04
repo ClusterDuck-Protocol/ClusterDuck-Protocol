@@ -1,8 +1,8 @@
 /**
  * @file Papa-DishDuck.ino
- * @brief Uses built-in PapaDuck from the SDK to create a WiFi enabled Papa Duck
+ * @brief Uses built-in PapaDuck from the SDK to create a Iridium-enabled Papa Duck
  * 
- * This example will configure and run a Papa Duck that connect to the DMS-LITE over serial.
+ * This example will configure and run a Papa Duck that connect to the DMS-LITE via Iridium.
  * 
  * @date 2020-11-10
  * 
@@ -11,7 +11,7 @@
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 #include <IridiumSBD.h>
-#include "timer.h"
+#include "arduino-timer.h"
 
 #define LORA_FREQ 915.0 // Frequency Range. Set for US Region 915.0Mhz
 #define LORA_TXPOWER 20 // Transmit Power
