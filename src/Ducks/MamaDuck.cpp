@@ -264,27 +264,17 @@ void MamaDuck::handleDuckCommand(const CdpPacket & packet) {
 
 void MamaDuck::handleAck(const CdpPacket & packet) {
   //TODO: we're starting over...
-    auto ack = msgpack::unpack<Ack>(packet.data.data());
-    if(ack != msgpack::UnpackerError){
-
-/*  if (lastMessageMuid.size() == MUID_LENGTH) {
-    const byte numPairs = packet.data[0];
-    static const int NUM_PAIRS_LENGTH = 1;
-    static const int PAIR_LENGTH = DUID_LENGTH + MUID_LENGTH;
-    for (int i = 0; i < numPairs; i++) {
-      int pairOffset = NUM_PAIRS_LENGTH + i*PAIR_LENGTH;
-      std::vector<byte> duidOffset = packet.data();
-      std::vector<byte>::const_iterator muidOffset = packet.data.begin() + pairOffset + DUID_LENGTH;
-      if (std::equal(duid.begin(), duid.end(), )
-        && std::equal(lastMessageMuid.begin(), lastMessageMuid.end(), *muidOffset)
-      ) {
-        loginfo("handleReceivedPacket: matched ack-MUID "
-          + duckutils::toString(lastMessageMuid));
-        lastMessageAck = true;
-        break;
-      }
-    }
-*/
+    std::error_code ec{};
+    auto ack = msgpack::unpack<Ack>(packet.data.data(),ec);
+    if(ec != msgpack::UnpackerError::OutOfRange){
+       auto it = ack.pairs.find(lastMessageMuid);
+       //string comparison to see if message id matches duck that sent it
+       bool same = it->second.compare(std::string(duid.begin(),duid.end())) == 0;
+       if(it != ack.pairs.end() && same) {
+           loginfo("handleReceivedPacket: matched ack-MUID "
+                   + duckutils::toString(lastMessageMuid));
+           lastMessageAck = true;
+       }
 
     // TODO[Rory Olsen: 2021-06-23]: The application may need to know about
     //   acks. I recommend a callback specifically for acks, or
