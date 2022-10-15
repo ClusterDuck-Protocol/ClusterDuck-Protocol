@@ -180,7 +180,9 @@ bool PapaDuck::needsAck(const CdpPacket & packet) {
 }
 
 void PapaDuck::broadcastAck() {
-  assert(ackStore.size() <= MAX_MUID_PER_ACK);
+    //TODO: we're starting over...
+
+    /* assert(ackStore.size() <= MAX_MUID_PER_ACK);
 
   const byte num = static_cast<byte>(ackStore.size());
 
@@ -211,6 +213,7 @@ void PapaDuck::broadcastAck() {
     logerr("ERROR handleReceivedPacket. Failed to send ack. Error: " +
       String(err));
   }
+     */
 
   ackStore.clear();
 }
