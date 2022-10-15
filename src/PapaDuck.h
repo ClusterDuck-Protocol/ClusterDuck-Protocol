@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <arduino-timer.h>
 #include <WString.h>
+#include <ctime>
 
 #include "include/Duck.h"
 #include "include/cdpcfg.h"
@@ -154,7 +155,7 @@ private:
 
   static bool ackHandler(PapaDuck * duck);
 
-  typedef std::vector<std::pair<Duid, Muid> > AckStore;
+  typedef std::unordered_map<std::string,std::string> AckStore;
 
   bool acksEnabled{false};
   Timer<1, millis, PapaDuck*> ackTimer;

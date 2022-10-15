@@ -339,13 +339,23 @@ protected:
 
   DuckPacket* txPacket = NULL;
   DuckPacket* rxPacket = NULL;
-  std::vector<byte> lastMessageMuid;
+  std::string lastMessageMuid;
 
   bool lastMessageAck = true;
   // Since this may be used to throttle outgoing packets, start out in a state
   // that indicates we're not waiting for a ack
 
   BloomFilter filter;
+
+  struct Ack {
+      std::vector<std::pair<std::string,std::string>> pairs;
+      std::time_t txTime;
+      template<class T>
+      void msgpack(T &pack) {
+          pack(pairs,txTime);
+      }
+
+  };
 
   /**
    * @brief sends a pong message

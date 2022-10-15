@@ -164,7 +164,9 @@ bool PapaDuck::ackHandler(PapaDuck * duck)
 }
 
 void PapaDuck::storeForAck(const CdpPacket & packet) {
-  ackStore.push_back(std::pair<Duid, Muid>(packet.sduid, packet.muid));
+    std::string MUID(packet.muid.begin(),packet.muid.end());
+    std::string DUID(packet.duid.begin(),packet.duid.end());
+  ackStore.insert(std::make_pair<std::string,std::string>(MUID,DUID));
 }
 
 bool PapaDuck::ackBufferIsFull() {
@@ -182,23 +184,23 @@ bool PapaDuck::needsAck(const CdpPacket & packet) {
 void PapaDuck::broadcastAck() {
     //TODO: we're starting over...
 
-    /* assert(ackStore.size() <= MAX_MUID_PER_ACK);
-
-  const byte num = static_cast<byte>(ackStore.size());
-
-  std::vector<byte> dataPayload;
-  dataPayload.push_back(num);
-  for (int i = 0; i < num; i++) {
-    Duid duid = ackStore[i].first;
-    Muid muid = ackStore[i].second;
-    logdbg("Sending ack to DUID " + duckutils::toString(duid)
-      + " for MUID " + duckutils::toString(muid));
-    dataPayload.insert(dataPayload.end(), duid.begin(), duid.end());
-    dataPayload.insert(dataPayload.end(), muid.begin(), muid.end());
-  }
+     assert(ackStore.size() <= MAX_MUID_PER_ACK);
+     auto it = ackStore.find();
+    /* Finding every message uid and generating an ack for it */
+    Ack dataPayload;
+    std::vector<std::pair<std::string,std::string> pairs;
+    foreach (std::string muid, ackStore){
+        auto it = ackStore.find(muid);
+        if(it != ackStore.end){
+            pairs.push_back(std::make_pair<>(it->first,it->second))
+        }
+    }
+    dataPayload{pairs,std::time::now()};
+    std::time_t now = std::time(nullptr);
+    auto acks = msgpack::pack(dataPayload,now);
 
   int err = txPacket->prepareForSending(&filter, BROADCAST_DUID, DuckType::PAPA,
-    reservedTopic::ack, dataPayload);
+    reservedTopic::ack, acks);
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR handleReceivedPacket. Failed to prepare ack. Error: " +
       String(err));
@@ -213,7 +215,6 @@ void PapaDuck::broadcastAck() {
     logerr("ERROR handleReceivedPacket. Failed to send ack. Error: " +
       String(err));
   }
-     */
 
   ackStore.clear();
 }
