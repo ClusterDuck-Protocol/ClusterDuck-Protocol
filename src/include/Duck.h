@@ -2,7 +2,7 @@
 #define DUCK_H
 
 #include <string>
-
+#include <msgpack.hpp>
 #include <Arduino.h>
 #include <WString.h>
 

@@ -264,6 +264,8 @@ void MamaDuck::handleDuckCommand(const CdpPacket & packet) {
 
 void MamaDuck::handleAck(const CdpPacket & packet) {
   //TODO: we're starting over...
+    auto ack = msgpack::unpack<Ack>(packet.data.data());
+    if(ack != msgpack::UnpackerError){
 
 /*  if (lastMessageMuid.size() == MUID_LENGTH) {
     const byte numPairs = packet.data[0];
