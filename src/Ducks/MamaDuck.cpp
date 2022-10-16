@@ -264,17 +264,29 @@ void MamaDuck::handleDuckCommand(const CdpPacket & packet) {
 
 void MamaDuck::handleAck(const CdpPacket & packet) {
   //TODO: we're starting over...
-    std::error_code ec{};
-    auto ack = msgpack::unpack<Ack>(packet.data.data(),ec);
-    if(ec != msgpack::UnpackerError::OutOfRange){
-       auto it = ack.pairs.find(lastMessageMuid);
-       //string comparison to see if message id matches duck that sent it
-       bool same = it->second.compare(std::string(duid.begin(),duid.end())) == 0;
-       if(it != ack.pairs.end() && same) {
-           loginfo("handleReceivedPacket: matched ack-MUID "
-                   + duckutils::toString(lastMessageMuid));
-           lastMessageAck = true;
-       }
+    StaticJsonDocument doc(400);
+    DeserializationError err = deserialzeMsgPack(doc,packet.data.data());
+
+    switch(err.code()){
+        case DeserializationError::Ok: {
+            lastMessageAcked = false;
+            for(int i=0; i < MAX_MUID_PER_ACK,i++) {
+                if (lastMessageMuid == doc["pairs"][i]) {
+                    loginfo("Message acked at time: %u",doc["txTime"]);
+                    lastMessageAcked = true;
+                }
+                break;
+            }
+        }
+        case DeserializationError::InvalidInput:
+            logerr("ERROR: %s",err.c_str());
+            break;
+        case DeserializationError::NoMemory:
+            logerr("ERROR: %s",err.c_str());
+            break;
+        default:
+            logerr("ERROR: %s",err.c_str());
+            break;
 
     // TODO[Rory Olsen: 2021-06-23]: The application may need to know about
     //   acks. I recommend a callback specifically for acks, or

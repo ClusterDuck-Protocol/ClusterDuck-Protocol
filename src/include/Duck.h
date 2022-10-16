@@ -347,16 +347,6 @@ protected:
 
   BloomFilter filter;
 
-  struct Ack {
-      std::vector<std::pair<std::string,std::string>> pairs;
-      std::time_t txTime;
-      template<class T>
-      void msgpack(T &pack) {
-          pack(pairs,txTime);
-      }
-
-  };
-
   /**
    * @brief sends a pong message
    * 

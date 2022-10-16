@@ -185,22 +185,26 @@ void PapaDuck::broadcastAck() {
     //TODO: we're starting over...
 
      assert(ackStore.size() <= MAX_MUID_PER_ACK);
-     auto it = ackStore.find();
-    /* Finding every message uid and generating an ack for it */
-    Ack dataPayload;
-    std::vector<std::pair<std::string,std::string> pairs;
+    /* Finding every message uid and generating an ack for all of them*/
+    StaticJsonDocument acks(229);
+    StaticJsonDocument msg(20);
+    JsonObject ack = acks.to<JsonObject>();
+    JsonArray pairs = ack.createNestedArray("pairs");
     foreach (std::string muid, ackStore){
         auto it = ackStore.find(muid);
         if(it != ackStore.end){
-            pairs.push_back(std::make_pair<>(it->first,it->second))
+            msg["muid"] = muid;
+            msg["duid"] = *it;
+            pairs.add(msg);
         }
     }
-    dataPayload{pairs,std::time::now()};
-    std::time_t now = std::time(nullptr);
-    auto acks = msgpack::pack(dataPayload,now);
+
+    ack["txTime"] = std::time(nullptr);
+    std::string payload;
+    serializeJson(acks,payload);
 
   int err = txPacket->prepareForSending(&filter, BROADCAST_DUID, DuckType::PAPA,
-    reservedTopic::ack, acks);
+    reservedTopic::ack, );
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR handleReceivedPacket. Failed to prepare ack. Error: " +
       String(err));
