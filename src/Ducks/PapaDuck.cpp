@@ -201,16 +201,6 @@ void PapaDuck::broadcastAck() {
 
     int err = txPacket->prepareForSending(&filter, BROADCAST_DUID, DuckType::PAPA,
                                           reservedTopic::ack, std::vector<byte>(payload.begin(),payload.end()));
-    ack["txTime"] = std::time(nullptr);
-    std::string payload;
-    serializeJson(acks,payload);
-
-  int err = txPacket->prepareForSending(&filter, BROADCAST_DUID, DuckType::PAPA,
-    reservedTopic::ack, );
-  if (err != DUCK_ERR_NONE) {
-    logerr("ERROR handleReceivedPacket. Failed to prepare ack. Error: " +
-      String(err));
-  }
 
   err = duckRadio.sendData(txPacket->getBuffer());
 
@@ -218,7 +208,7 @@ void PapaDuck::broadcastAck() {
     CdpPacket packet = CdpPacket(txPacket->getBuffer());
     filter.bloom_add(packet.muid.data(), MUID_LENGTH);
   } else {
-    logerr("ERROR handleReceivedPacket. Failed to send ack. Error: " +
+    logerr("Failed to send ack. Error: " +
       String(err));
   }
 
