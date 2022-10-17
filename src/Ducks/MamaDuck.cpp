@@ -271,7 +271,7 @@ void MamaDuck::handleAck(const CdpPacket & packet) {
         case DeserializationError::Ok: {
             lastMessageAck = false;
             for(int i=0; i < MAX_MUID_PER_ACK;i++) {
-                if (duckutils::toString(lastMessageMuid) == doc["pairs"][i]) {
+                if (lastMessageMuid == doc["pairs"][i]) {
                     loginfo("Message acked at time: "+ String((int)doc["txTime"]));
                     lastMessageAck = true;
                 }
