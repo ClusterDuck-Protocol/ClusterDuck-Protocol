@@ -316,9 +316,9 @@ int Duck::sendData(byte topic, std::vector<byte> data,
   }
 
   if (!lastMessageAck) {
-    loginfo("Previous `lastMessageMuid` " + duckutils::toString(lastMessageMuid) +
-      " was not acked. Overwriting `lastMessageMuid` with " +
-      duckutils::toString(packet.muid));
+      std::string message = "Previous `lastMessageMuid` " + lastMessageMuid +
+                            " was not acked. Overwriting `lastMessageMuid` with ";
+      loginfo(message.append(packet.muid.begin(), packet.muid.end()).c_str());
   }
 
   lastMessageAck = false;
@@ -364,7 +364,11 @@ void Duck::updateFirmware(const String & filename, size_t index, uint8_t* data, 
 #endif
 
 muidStatus Duck::getMuidStatus(const std::vector<byte> & muid) const {
-  if (duckutils::isEqual(muid, lastMessageMuid)) {
+    if (muid.size() != MUID_LENGTH) {
+        return muidStatus::invalid;
+    }
+    auto equal = duckutils::isEqual(muid, std::vector<byte>(lastMessageMuid.begin(), lastMessageMuid.end()));
+    if (equal) {
     if (lastMessageAck) {
       return muidStatus::acked;
     } else {
