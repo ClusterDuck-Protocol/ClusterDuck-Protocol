@@ -3,7 +3,8 @@
 
 #include <Arduino.h>
 #include <WString.h>
-
+#include <utility>
+#include <ArduinoJson.h>
 #include "include/Duck.h"
 #include "include/cdpcfg.h"
 #include "include/DuckUtils.h"

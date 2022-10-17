@@ -4,6 +4,8 @@
 #include <Arduino.h>
 #include <arduino-timer.h>
 #include <WString.h>
+#include <utility>
+#include <ArduinoJson.h>
 #include <unordered_map>
 #include "include/Duck.h"
 #include "include/cdpcfg.h"

@@ -52,7 +52,7 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid,
       logerr("ERROR setupWithDefaults  rc = " + String(err));
       return err;
     }
-  } 
+  }
 
   duckNet->loadChannel();
 
@@ -64,11 +64,11 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid,
 
     if (err != DUCK_ERR_NONE) {
       logerr("ERROR setupWithDefaults  rc = " + String(err));
-     
+
       return err;
     }
-    
-    
+
+
   }
 
 
@@ -119,13 +119,13 @@ void PapaDuck::handleReceivedPacket() {
       duckutils::convertToHex(rxPacket->getBuffer().data(),
         rxPacket->getBuffer().size()));
     loginfo("invoking callback in the duck application...");
-    
+
     if(rxPacket->getTopic() == topics::gchat){
       duckNet->addToChatBuffer(CdpPacket(rxPacket->getBuffer()));
     } else{
       recvDataCallback(rxPacket->getBuffer());
     }
-    
+
     if (acksEnabled) {
       const CdpPacket packet = CdpPacket(rxPacket->getBuffer());
       if (needsAck(packet)) {
@@ -164,9 +164,9 @@ bool PapaDuck::ackHandler(PapaDuck * duck)
 }
 
 void PapaDuck::storeForAck(const CdpPacket & packet) {
-    std::string MUID(packet.muid.begin(),packet.muid.end());
-    std::string DUID(packet.duid.begin(),packet.duid.end());
-  ackStore.insert(std::make_pair<std::string,std::string>(MUID,DUID));
+    std::string MUID = std::string(packet.muid.begin(),packet.muid.end());
+    std::string DUID = std::string(packet.dduid.begin(),packet.dduid.end());
+    ackStore.insert(std::make_pair(MUID, DUID));
 }
 
 bool PapaDuck::ackBufferIsFull() {
@@ -186,19 +186,21 @@ void PapaDuck::broadcastAck() {
 
      assert(ackStore.size() <= MAX_MUID_PER_ACK);
     /* Finding every message uid and generating an ack for all of them*/
-    StaticJsonDocument acks(229);
-    StaticJsonDocument msg(20);
-    JsonObject ack = acks.to<JsonObject>();
-    JsonArray pairs = ack.createNestedArray("pairs");
-    foreach (std::string muid, ackStore){
-        auto it = ackStore.find(muid);
-        if(it != ackStore.end){
-            msg["muid"] = muid;
-            msg["duid"] = *it;
-            pairs.add(msg);
-        }
+    DynamicJsonDocument acks(229);
+    DynamicJsonDocument msg(20);
+    JsonArray pairs = acks.createNestedArray("pairs");
+    int i = 0;
+    for (auto it = ackStore.begin(); it == ackStore.end(); it++) {
+        pairs[i]["muid"] = it->first;
+        pairs[i]["duid"] = it->second;
     }
 
+    acks["txTime"] = std::time(nullptr);
+    std::string payload;
+    serializeJson(acks,payload);
+
+    int err = txPacket->prepareForSending(&filter, BROADCAST_DUID, DuckType::PAPA,
+                                          reservedTopic::ack, std::vector<byte>(payload.begin(),payload.end()));
     ack["txTime"] = std::time(nullptr);
     std::string payload;
     serializeJson(acks,payload);
@@ -306,5 +308,5 @@ void PapaDuck::sendMessageBoardMessage(std::vector<byte> dataPayload, std::vecto
     logerr("ERROR handleReceivedPacket. Failed to send ack. Error: " +
       String(err));
   }
-  
+
 }
