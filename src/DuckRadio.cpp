@@ -144,15 +144,19 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
   // to the app despite CRC check being enabled in the radio by both sender and
   // receiver.
 
-  byte* data = packetBytes->data();
+    auto packet = CdpPacket(*packetBytes);
 
-  loginfo("readReceivedData: checking data section CRC");
+    loginfo("readReceivedData: checking data section CRC");
 
-  std::vector<byte> data_section;
-  data_section.insert(data_section.end(), &data[DATA_POS], &data[packet_length]);
-  uint32_t packet_data_crc = duckutils::toUnit32(&data[DATA_CRC_POS]);
-  uint32_t computed_data_crc =
-      CRC32::calculate(data_section.data(), data_section.size());
+    std::vector<byte> data_section;
+    //data_section.insert(data_section.end(), &data[DATA_POS], &data[packet_length]);
+    uint32_t packet_data_crc = packet.dcrc;
+    uint32_t computed_data_crc = CRC32::calculate(packet.data.data(), packet.data.size());
+    Serial.printf("Packet_Data: %s \n",packet.data.data());
+    //Serial.printf("Computed_Data: %s \n",data_section.data());
+    Serial.printf("Packet_Data_CRC: %u \n",packet_data_crc);
+    Serial.printf("Computed_Data_CRC: %u \n",computed_data_crc);
+
   if (String(packet_data_crc) != String(computed_data_crc)) {
     logerr("ERROR data crc mismatch: received: " + String(packet_data_crc) +
            " calculated:" + String(computed_data_crc));
