@@ -198,13 +198,9 @@ void PapaDuck::broadcastAck() {
 
     acks["txTime"] = std::time(nullptr);
     std::string payload;
-    serializeJson(acks,payload);
+    serializeMsgPack(acks,payload);
 
     printf("payload: %s",payload.c_str());
-
-    acks["txTime"] = std::time(nullptr);
-    std::string payload;
-    serializeJson(acks,payload);
 
     int err = txPacket->prepareForSending(&filter, BROADCAST_DUID, DuckType::PAPA,
                                           reservedTopic::ack, std::vector<byte>(payload.begin(),payload.end()));
