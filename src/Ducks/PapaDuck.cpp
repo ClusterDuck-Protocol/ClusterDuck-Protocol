@@ -165,7 +165,7 @@ bool PapaDuck::ackHandler(PapaDuck * duck)
 
 void PapaDuck::storeForAck(const CdpPacket & packet) {
     std::string MUID = std::string(packet.muid.begin(),packet.muid.end());
-    std::string DUID = std::string(packet.dduid.begin(),packet.dduid.end());
+    std::string DUID = std::string(packet.sduid.begin(),packet.sduid.end());
     ackStore.insert(std::make_pair(MUID, DUID));
 }
 
@@ -187,13 +187,20 @@ void PapaDuck::broadcastAck() {
      assert(ackStore.size() <= MAX_MUID_PER_ACK);
     /* Finding every message uid and generating an ack for all of them*/
     DynamicJsonDocument acks(229);
-    DynamicJsonDocument msg(20);
     JsonArray pairs = acks.createNestedArray("pairs");
-    int i = 0;
-    for (auto it = ackStore.begin(); it == ackStore.end(); it++) {
-        pairs[i]["muid"] = it->first;
-        pairs[i]["duid"] = it->second;
+    JsonObject msg = pairs.createNestedObject();
+
+    for (auto& it: ackStore) {
+        printf("MUID: %s, DUID: %s\n", it.first.c_str(),it.second.c_str());
+        msg["muid"] = it.first;
+        msg["duid"] = it.second;
     }
+
+    acks["txTime"] = std::time(nullptr);
+    std::string payload;
+    serializeJson(acks,payload);
+
+    printf("payload: %s",payload.c_str());
 
     acks["txTime"] = std::time(nullptr);
     std::string payload;

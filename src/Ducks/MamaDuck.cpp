@@ -270,12 +270,14 @@ void MamaDuck::handleAck(const CdpPacket & packet) {
     switch(err.code()){
         case DeserializationError::Ok: {
             lastMessageAck = false;
-            for(int i=0; i < MAX_MUID_PER_ACK;i++) {
-                if (lastMessageMuid == doc["pairs"][i]) {
+            for(int i = 0; i < MAX_MUID_PER_ACK; i++) {
+                if (lastMessageMuid == doc["pairs"][i]["muid"]) {
                     loginfo("Message acked at time: "+ String((int)doc["txTime"]));
                     lastMessageAck = true;
                 }
-                break;
+                if(lastMessageAck) {
+                    break;
+                }
             }
         }
         case DeserializationError::InvalidInput:
