@@ -195,12 +195,12 @@ void PapaDuck::broadcastAck() {
         msg["muid"] = it.first;
         msg["duid"] = it.second;
     }
-
+    //TODO: we should probably figure out a better way to do time of transmission
     acks["txTime"] = std::time(nullptr);
     std::string payload;
     serializeMsgPack(acks,payload);
 
-    printf("payload: %s",payload.c_str());
+    printf("payload: %s\n",payload.c_str());
 
     int err = txPacket->prepareForSending(&filter, BROADCAST_DUID, DuckType::PAPA,
                                           reservedTopic::ack, std::vector<byte>(payload.begin(),payload.end()));
