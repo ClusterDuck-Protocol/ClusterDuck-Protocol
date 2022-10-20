@@ -189,18 +189,19 @@ void PapaDuck::broadcastAck() {
     DynamicJsonDocument acks(229);
     JsonArray pairs = acks.createNestedArray("pairs");
     JsonObject msg = pairs.createNestedObject();
-
+    std::string checksum("");
     for (auto& it: ackStore) {
         printf("MUID: %s, DUID: %s\n", it.first.c_str(),it.second.c_str());
         msg["muid"] = it.first;
         msg["duid"] = it.second;
+        checksum.append(it.first);
+        checksum.append(it.second);
     }
+    checksum.shrink_to_fit();
     //TODO: we should probably figure out a better way to do time of transmission
-    acks["txTime"] = std::time(nullptr);
+    acks["checksum"] = CRC32::calculate(checksum.c_str(),checksum.length());
     std::string payload;
     serializeMsgPack(acks,payload);
-
-    printf("payload: %s\n",payload.c_str());
 
     int err = txPacket->prepareForSending(&filter, BROADCAST_DUID, DuckType::PAPA,
                                           reservedTopic::ack, std::vector<byte>(payload.begin(),payload.end()));

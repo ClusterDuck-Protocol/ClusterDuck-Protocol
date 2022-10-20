@@ -1,5 +1,5 @@
 #include "include/DuckRadio.h"
-
+#include <ArduinoJson.h>
 #if !defined(CDPCFG_HELTEC_CUBE_CELL)
 #include "include/DuckUtils.h"
 #include <RadioLib.h>
@@ -145,10 +145,14 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
   // receiver.
 
     auto packet = CdpPacket(*packetBytes);
-
+    packet.data.shrink_to_fit();
     loginfo("readReceivedData: checking data section CRC");
 
-    std::vector<byte> data_section;
+    if(packet.topic == reservedTopic::ack
+    && forwardAckPacket(packet,rxState) == RADIOLIB_ERR_NONE){
+      return DUCK_ERR_NONE;
+    }
+
     //data_section.insert(data_section.end(), &data[DATA_POS], &data[packet_length]);
     uint32_t packet_data_crc = packet.dcrc;
     uint32_t computed_data_crc = CRC32::calculate(packet.data.data(), packet.data.size());
@@ -173,6 +177,40 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
   }
 
   return err;
+}
+
+int DuckRadio::forwardAckPacket(CdpPacket packet, int rxState) {
+    loginfo("readReceivedData: received ACK");
+    DynamicJsonDocument ack(229);
+
+    DeserializationError er = deserializeMsgPack(ack,packet.data.data());
+    if(er.code() == DeserializationError::Code::Ok){
+        std::string sum("");
+        for(int i = 0; i < MAX_MUID_PER_ACK; i++) {
+            sum.append(ack["pairs"][i]["muid"].as<std::string>());
+            sum.append(ack["pairs"][i]["duid"].as<std::string>());
+        }
+        sum.shrink_to_fit();
+        uint32_t checksum = CRC32::calculate(sum.c_str(), sum.length());
+        if(checksum == ack["checksum"].as<uint32_t>()){
+            loginfo("readReceivedData: ACK checksum is valid");
+
+            loginfo("RX: rssi: " + String(lora.getRSSI()) +
+                    " snr: " + String(lora.getSNR()) +
+                    " fe: " + String(lora.getFrequencyError(true)) +
+                    " size: " + String(sizeof(packet)));
+
+            if (rxState != RADIOLIB_ERR_NONE) {
+                return rxState;
+            }
+
+            return err;
+        }
+    } else {
+        logerr("readReceivedData: failed to deserialize ACK");
+        return DUCKLORA_ERR_HANDLE_PACKET;
+    }
+    return err;
 }
 
 int DuckRadio::sendData(byte* data, int length) {

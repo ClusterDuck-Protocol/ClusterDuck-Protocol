@@ -177,6 +177,13 @@ private:
    */
   void processRadioIrq();
 
+  /**
+   * @brief Helper function to forward acks.
+   *
+   * @return int
+   */
+  int forwardAckPacket(CdpPacket packet, int rxState);
+
   int getChannel() { return channel; }
 
 private:
