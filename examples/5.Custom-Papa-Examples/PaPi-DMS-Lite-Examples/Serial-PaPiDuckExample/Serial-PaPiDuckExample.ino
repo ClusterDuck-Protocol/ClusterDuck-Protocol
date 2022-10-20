@@ -102,7 +102,6 @@ String convertToHex(byte* data, int size) {
   return buf;
 }
 
-
 void quackJson(std::vector<byte> packetBuffer) {
 
   CdpPacket packet = CdpPacket(packetBuffer);
@@ -121,7 +120,6 @@ void quackJson(std::vector<byte> packetBuffer) {
 
   std::string muid(packet.muid.begin(), packet.muid.end());
   std::string path(packet.path.begin(), packet.path.end());
-
 
   doc["DeviceID"] = sduid;
   doc["MessageID"] = muid;
