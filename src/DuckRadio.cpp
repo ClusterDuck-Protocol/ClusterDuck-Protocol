@@ -193,8 +193,10 @@ int DuckRadio::forwardAckPacket(CdpPacket packet) {
             sum.append(ack["pairs"][i]["duid"].as<std::string>());
         }
         sum.shrink_to_fit();
+        printf("INFO: ack: %s\n",sum.c_str());
         uint32_t checksum = CRC32::calculate(sum.c_str(), sum.length());
         loginfo("checksum: "+ String(checksum));
+        loginfo("ack checksum: "+ String(ack["checksum"].as<uint32_t>()));
         if(checksum == ack["checksum"].as<uint32_t>()){
             loginfo("readReceivedData: ACK checksum is valid");
 
