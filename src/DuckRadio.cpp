@@ -149,7 +149,7 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
     loginfo("readReceivedData: checking data section CRC");
 
     if(packet.topic == reservedTopic::ack){
-        int e = forwardAckPacket(packet,rxState);
+        int e = forwardAckPacket(packet);
         if (e == RADIOLIB_ERR_NONE)
             return DUCK_ERR_NONE;
         else return DUCKLORA_ERR_HANDLE_PACKET;
@@ -181,7 +181,7 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
   return err;
 }
 
-int DuckRadio::forwardAckPacket(CdpPacket packet, int rxState) {
+int DuckRadio::forwardAckPacket(CdpPacket packet) {
     loginfo("readReceivedData: received ACK");
     DynamicJsonDocument ack(229);
 
@@ -203,11 +203,7 @@ int DuckRadio::forwardAckPacket(CdpPacket packet, int rxState) {
                     " fe: " + String(lora.getFrequencyError(true)) +
                     " size: " + String(sizeof(packet)));
 
-            if (rxState != RADIOLIB_ERR_NONE) {
-                return rxState;
-            }
-
-            return err;
+            return RADIOLIB_ERR_NONE;
         }
     } else {
         logerr("readReceivedData: failed to deserialize ACK");

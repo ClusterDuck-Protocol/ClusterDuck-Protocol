@@ -182,7 +182,7 @@ private:
    *
    * @return int
    */
-  int forwardAckPacket(CdpPacket packet, int rxState);
+  int forwardAckPacket(CdpPacket packet);
 
   int getChannel() { return channel; }
 
