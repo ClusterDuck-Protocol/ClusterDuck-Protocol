@@ -186,7 +186,7 @@ int DuckRadio::forwardAckPacket(CdpPacket packet) {
     loginfo("readReceivedData: received ACK");
     DynamicJsonDocument ack(229);
 
-    DeserializationError er = deserializeMsgPack(ack,packet.data.data());
+    DeserializationError er = deserializeJson(ack,packet.data.data());
     if(er.code() == DeserializationError::Code::Ok){
         std::string sum("");
         for(int i = 0; i < MAX_MUID_PER_ACK; i++) {
