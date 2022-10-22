@@ -266,7 +266,7 @@ void MamaDuck::handleAck(const CdpPacket & packet) {
     //TODO: we're starting over...
     DynamicJsonDocument doc(400);
     DeserializationError err = deserializeJson(doc,packet.data.data());
-
+    Serial.printf("handleAck: %s: ",doc.as<std::string>().c_str());
     switch(err.code()){
         case DeserializationError::Ok: {
             lastMessageAck = false;
