@@ -148,13 +148,13 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
     packet.data.shrink_to_fit();
     loginfo("readReceivedData: checking data section CRC");
 
-    if(packet.topic == reservedTopic::ack){
-        loginfo("readReceivedData: received ACK");
-        int e = forwardAckPacket(packet);
-        if (e == RADIOLIB_ERR_NONE)
-            return DUCK_ERR_NONE;
-        else return rxState;
-    }
+//    if(packet.topic == reservedTopic::ack){
+//        loginfo("readReceivedData: received ACK");
+//        int e = forwardAckPacket(packet);
+//        if (e == RADIOLIB_ERR_NONE)
+//            return DUCK_ERR_NONE;
+//        else return rxState;
+//    }
 
     //data_section.insert(data_section.end(), &data[DATA_POS], &data[packet_length]);
     uint32_t packet_data_crc = packet.dcrc;

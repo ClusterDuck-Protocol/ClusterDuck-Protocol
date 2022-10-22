@@ -265,14 +265,14 @@ void MamaDuck::handleDuckCommand(const CdpPacket & packet) {
 void MamaDuck::handleAck(const CdpPacket & packet) {
     //TODO: we're starting over...
     DynamicJsonDocument doc(400);
-    DeserializationError err = deserializeMsgPack(doc,packet.data.data());
+    DeserializationError err = deserializeJson(doc,packet.data.data());
 
     switch(err.code()){
         case DeserializationError::Ok: {
             lastMessageAck = false;
             for(int i = 0; i < MAX_MUID_PER_ACK; i++) {
                 if (lastMessageMuid == doc["pairs"][i]["muid"].as<std::string>()) {
-                    loginfo("Message acked at time: "+ String((int)doc["txTime"]));
+                    loginfo("Message acked.");
                     lastMessageAck = true;
                 }
                 if(lastMessageAck) {
