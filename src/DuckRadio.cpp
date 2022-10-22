@@ -149,10 +149,11 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
     loginfo("readReceivedData: checking data section CRC");
 
     if(packet.topic == reservedTopic::ack){
+        loginfo("readReceivedData: received ACK");
         int e = forwardAckPacket(packet);
         if (e == RADIOLIB_ERR_NONE)
             return DUCK_ERR_NONE;
-        else return DUCKLORA_ERR_HANDLE_PACKET;
+        else return rxState;
     }
 
     //data_section.insert(data_section.end(), &data[DATA_POS], &data[packet_length]);

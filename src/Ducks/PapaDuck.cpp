@@ -201,12 +201,20 @@ void PapaDuck::broadcastAck() {
     //TODO: we should probably figure out a better way to do time of transmission
     acks["checksum"] = CRC32::calculate(checksum.c_str(),checksum.length());
     std::string payload;
+    serializeJson(acks, payload);
+    loginfo("Sending acks: " + String(payload.c_str()));
+    payload.clear();
     serializeMsgPack(acks,payload);
 
     int err = txPacket->prepareForSending(&filter, BROADCAST_DUID, DuckType::PAPA,
                                           reservedTopic::ack, std::vector<byte>(payload.begin(),payload.end()));
-
-  err = duckRadio.sendData(txPacket->getBuffer());
+    if (err != DUCK_ERR_NONE) {
+        err = duckRadio.sendData(txPacket->getBuffer());
+    }
+    else {
+        logerr("Failed to prepare packet for sending. rc = " +
+               String(err));
+    }
 
   if (err == DUCK_ERR_NONE) {
     CdpPacket packet = CdpPacket(txPacket->getBuffer());
