@@ -206,7 +206,7 @@ void PapaDuck::broadcastAck() {
 
     int err = txPacket->prepareForSending(&filter, BROADCAST_DUID, DuckType::PAPA,
                                           reservedTopic::ack, std::vector<byte>(payload.begin(),payload.end()));
-    if (err != DUCK_ERR_NONE) {
+    if (err == DUCK_ERR_NONE) {
         err = duckRadio.sendData(txPacket->getBuffer());
     }
     else {
