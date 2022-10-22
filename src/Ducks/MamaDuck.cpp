@@ -265,7 +265,7 @@ void MamaDuck::handleDuckCommand(const CdpPacket & packet) {
 void MamaDuck::handleAck(const CdpPacket & packet) {
     //TODO: we're starting over...
     DynamicJsonDocument doc(400);
-    DeserializationError err = deserializeMsgPack(doc,packet.data.data());
+    DeserializationError err = deserializeJson(doc,packet.data.data());
 
     switch(err.code()){
         case DeserializationError::Ok: {

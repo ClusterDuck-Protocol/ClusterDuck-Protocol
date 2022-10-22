@@ -203,8 +203,6 @@ void PapaDuck::broadcastAck() {
     std::string payload;
     serializeJson(acks, payload);
     loginfo("Sending acks: " + String(payload.c_str()));
-    payload.clear();
-    serializeMsgPack(acks,payload);
 
     int err = txPacket->prepareForSending(&filter, BROADCAST_DUID, DuckType::PAPA,
                                           reservedTopic::ack, std::vector<byte>(payload.begin(),payload.end()));
