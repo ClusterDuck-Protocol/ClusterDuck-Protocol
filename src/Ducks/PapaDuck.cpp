@@ -202,7 +202,7 @@ void PapaDuck::broadcastAck() {
     acks["checksum"] = CRC32::calculate(checksum.c_str(),checksum.length());
     std::string payload;
     serializeJson(acks, payload);
-    loginfo("Sending acks: " + String(payload.c_str()));
+    //loginfo("Sending acks: " + String(payload.c_str()));
 
     int err = txPacket->prepareForSending(&filter, BROADCAST_DUID, DuckType::PAPA,
                                           reservedTopic::ack, std::vector<byte>(payload.begin(),payload.end()));
