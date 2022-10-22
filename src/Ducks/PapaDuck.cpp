@@ -200,7 +200,7 @@ void PapaDuck::broadcastAck() {
     checksum.shrink_to_fit();
     //TODO: we should probably figure out a better way to do time of transmission
     acks["checksum"] = CRC32::calculate(checksum.c_str(),checksum.length());
-    std::string payload;
+    String payload;
     serializeJson(acks, payload);
     //loginfo("Sending acks: " + String(payload.c_str()));
 
