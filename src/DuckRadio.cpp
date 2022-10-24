@@ -150,10 +150,12 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
 
     if(packet.topic == reservedTopic::ack){
         loginfo("readReceivedData: received ACK");
-        int e = forwardAckPacket(packet);
-        if (e == RADIOLIB_ERR_NONE)
-            return DUCK_ERR_NONE;
-        else return rxState;
+        err = forwardAckPacket(packet);
+        if (err == RADIOLIB_ERR_NONE) {
+            return err;
+        }
+        else
+            return rxState;
     }
 
     //data_section.insert(data_section.end(), &data[DATA_POS], &data[packet_length]);
