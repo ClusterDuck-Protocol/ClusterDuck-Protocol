@@ -118,6 +118,15 @@ std::string toTopicString(byte topic) {
     case topics::gp2y:
       topicString ="gp2y";
       break;
+    case topics::pchat:
+      topicString = "pchat";
+      break;
+    case topics::gchat:
+      topicString = "gchat";
+      break;
+    case reservedTopic::ack:
+      topicString = "ack";
+      break;
     default:
       topicString = "status";
   }
