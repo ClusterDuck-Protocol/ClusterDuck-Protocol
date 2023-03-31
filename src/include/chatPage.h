@@ -96,7 +96,7 @@ const char chat_page[] PROGMEM = R"=====(
                 req.send();
                 displayNewMessage({message: { body: messageBody, username: username} , sduid: sduid}, true);
 
-                messageBody = "";
+                document.getElementById('chatMessage').value = "";
             }
             
             if (!!window.EventSource) {
