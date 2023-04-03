@@ -13,7 +13,9 @@ const char private_chat_prompt[] PROGMEM = R"=====(
         <div id="form">
             <form>
                 <label for="dduid">Which device do you want to start a chat with?</label><br>
-                <textarea pattern="[A-NPZ1-9]{8}" maxlength=8 class="textbox textbox-full" id="dduid" name="dduid" placeholder="MAMA0001" cols="30" rows="2"></textarea>
+                <textarea pattern="[A-NPZ1-9]{8}" maxlength=8 class="textbox textbox-full" id="dduid" name="dduid" placeholder="MAMA0001" cols="30" rows="2" required></textarea>
+                <label for="username">Username: </label><br>
+                <textarea pattern="[A-NPZ1-9]{15}" maxlength=15 class="textbox textbox-full" id="username" name="username" placeholder="John" cols="30" rows="2" required></textarea>
                 <button type="button" id="sendBtn">Start Chat</button>
                 <p id="makeshiftErrorOutput" class="hidden"></p>
             </form>
@@ -23,8 +25,14 @@ const char private_chat_prompt[] PROGMEM = R"=====(
         </div>
 
         <script>
+            if(sessionStorage.getItem("username")){
+                document.getElementById("username").value = sessionStorage.getItem("username");
+            }
+
+        //actually save the name in the chatbuffer
             function submit(){
                 let dduidInput = document.getElementById('dduid');
+                sessionStorage.setItem("username", document.getElementById('username').value);
                 let params = new URLSearchParams("");
                 params.append(dduidInput.name, dduidInput.value);
                 let req = new XMLHttpRequest();
