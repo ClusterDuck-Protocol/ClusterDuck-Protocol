@@ -384,11 +384,9 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     message.insert(message.end(), msg.begin(), msg.end());
 
     std::vector<byte> muid;
-    std::vector<byte> session;
-    session.insert(session.end(), duckSession.begin(), duckSession.end());
 
-    err = duck->sendData(topics::gchat, message, session, &muid);
-    addToChatBuffer(duck->buildCdpPacket(topics::gchat, message, session, muid));
+    err = duck->sendData(topics::gchat, message, BROADCAST_DUID, &muid);
+    addToChatBuffer(duck->buildCdpPacket(topics::gchat, message, BROADCAST_DUID, muid));
 
     switch (err) {
       case DUCK_ERR_NONE:
