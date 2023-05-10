@@ -11,8 +11,8 @@ DuckNet::DuckNet(Duck* duckIn):
 
 //when initializing the buffer, the buffer created will be one larger than the provided size
 //one slot in the buffer is used as a waste slot
-CircularBuffer messageBuffer = CircularBuffer(5);
-CircularBuffer chatBuffer = CircularBuffer(20);
+CircularBuffer messageBuffer = CircularBuffer(CDPCFG_CDP_CHATBUF_SIZE);
+CircularBuffer chatBuffer = CircularBuffer(CDPCFG_CDP_CHATBUF_SIZE);
 std::map<std::string, CircularBuffer*> chatHistories;
 std::string duckSession = duckutils::toString(BROADCAST_DUID).c_str();
 
@@ -98,7 +98,7 @@ void DuckNet::addToPrivateChatBuffer(CdpPacket message, std::string chatSession)
 void DuckNet::createPrivateHistory(std::string session)
 {
   if(chatHistories.find(session) == chatHistories.end()){
-      CircularBuffer* privateChatBuffer = new CircularBuffer(20);
+      CircularBuffer* privateChatBuffer = new CircularBuffer(CDPCFG_CDP_CHATBUF_SIZE);
       if(chatHistories.size() >= 3){
         delete chatHistories.begin()->second;
         chatHistories.erase(chatHistories.begin());
