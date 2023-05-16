@@ -7,7 +7,6 @@
 #if defined (WIFI_LoRa_32_V3)
 #define CDPCFG_BOARD WiFi_Lora_32_V3
 #define CDPCFG_RADIO_SX126X
-#define CDPCFG_LORA_CLASS SX1262
 
 // Lora configurations 
 #define CDPCFG_LORA_CLASS SX1262             

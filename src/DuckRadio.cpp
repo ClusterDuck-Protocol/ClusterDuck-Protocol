@@ -13,40 +13,26 @@
 #endif
 
 #ifdef CDPCFG_RADIO_SX126X
-CDPCFG_LORA_CLASS lora;
-lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO1 /*IRQ*/,
+
+CDPCFG_LORA_CLASS lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO1 /*IRQ*/,
                     CDPCFG_PIN_LORA_RST, CDPCFG_PIN_LORA_BUSY /*GPIO*/);
+
+// set the interrupt handler to execute when packet tx or rx is done.
+  lora.setDio1Action(config.func);
 #else
-lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO0,
-                  CDPCFG_PIN_LORA_RST, CDPCFG_PIN_LORA_DIO1);
-#endif
-
-
-#if !defined (CDPCFG_RADIO_SX126X)
-rc = lora.setGain(CDPCFG_RF_LORA_GAIN);
+rc = lora.setCad(CDPCFG_RF_LORA_GAIN);
 if (rc == RADIOLIB_ERR_INVALID_GAIN) {
 logerr("ERROR  gain is invalid");
 return DUCKLORA_ERR_SETUP;
 }
 // set the interrupt handler to execute when packet tx or rx is done.
 lora.setDio0Action(config.func);
-#else
-// set the interrupt handler to execute when packet tx or rx is done.
-  lora.setDio1Action(config.func);
 #endif
 
-#if defined (CDPCFG_RADIO_SX126X)
-// we have a good packet
-  loginfo("RX: rssi: " + String(lora.getRSSI()) +
-          " snr: " + String(lora.getSNR()) +
-          " size: " + String(packet_length));
-#else
 // we have a good packet
 loginfo("RX: rssi: " + String(lora.getRSSI()) +
         " snr: " + String(lora.getSNR()) +
-        " fe: " + String(lora.getFrequencyError(true)) +
         " size: " + String(packet_length));
-#endif
 
 #if !defined(CDPCFG_HELTEC_CUBE_CELL)
 #include "include/DuckUtils.h"
@@ -117,7 +103,10 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
         logerr("ERROR  output power is invalid");
         return DUCKLORA_ERR_SETUP;
     }
+#ifdef CDPCFG_RADIO_SX126X
 
+    lora.setDio1Action(config.func);
+#else
     rc = lora.setGain(config.gain);
     if (rc == RADIOLIB_ERR_INVALID_GAIN) {
         logerr("ERROR  gain is invalid");
@@ -126,6 +115,7 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
 
     // set the interrupt handler to execute when packet tx or rx is done.
     lora.setDio0Action(config.func);
+#endif
 
     // set sync word to private network
     rc = lora.setSyncWord(0x12);
@@ -206,11 +196,18 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
                " calculated:" + String(computed_data_crc));
         return DUCKLORA_ERR_HANDLE_PACKET;
     }
-    // we have a good packet
+        // we have a good packet
+#ifndef CDPCFG_RADIO_SX126X
     loginfo("RX: rssi: " + String(lora.getRSSI()) +
             " snr: " + String(lora.getSNR()) +
             " fe: " + String(lora.getFrequencyError(true)) +
             " size: " + String(packet_length));
+#else
+    loginfo("RX: rssi: " + String(lora.getRSSI()) +
+            " snr: " + String(lora.getSNR()) +
+            " size: " + String(packet_length));
+#endif
+
 
     if (rxState != RADIOLIB_ERR_NONE) {
         return rxState;
