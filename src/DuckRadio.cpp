@@ -1,4 +1,52 @@
 #include "include/DuckRadio.h"
+#ifdef CDPCFG_RADIO_SX126X
+#define DUCK_RADIO_IRQ_TIMEOUT RADIOLIB_SX126X_IRQ_TIMEOUT
+#define DUCK_RADIO_IRQ_TX_DONE RADIOLIB_SX126X_IRQ_TX_DONE
+#define DUCK_RADIO_IRQ_RX_DONE RADIOLIB_SX126X_IRQ_RX_DONE
+#define DUCK_RADIO_IRQ_CRC_ERROR RADIOLIB_SX126X_IRQ_CRC_ERR
+#define DUCK_RADIO_IRQ_HEADER_ERR RADIOLIB_SX126X_IRQ_HEADER_ERR
+#else
+#define DUCK_RADIO_IRQ_TIMEOUT RADIOLIB_SX127X_CLEAR_IRQ_FLAG_RX_TIMEOUT
+#define DUCK_RADIO_IRQ_TX_DONE RADIOLIB_SX127X_CLEAR_IRQ_FLAG_TX_DONE
+#define DUCK_RADIO_IRQ_RX_DONE RADIOLIB_SX127X_CLEAR_IRQ_FLAG_RX_DONE
+#define DUCK_RADIO_IRQ_CRC_ERROR RADIOLIB_SX127X_CLEAR_IRQ_FLAG_PAYLOAD_CRC_ERROR
+#endif
+
+#ifdef CDPCFG_RADIO_SX126X
+CDPCFG_LORA_CLASS lora;
+lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO1 /*IRQ*/,
+                    CDPCFG_PIN_LORA_RST, CDPCFG_PIN_LORA_BUSY /*GPIO*/);
+#else
+lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO0,
+                  CDPCFG_PIN_LORA_RST, CDPCFG_PIN_LORA_DIO1);
+#endif
+
+
+#if !defined (CDPCFG_RADIO_SX126X)
+rc = lora.setGain(CDPCFG_RF_LORA_GAIN);
+if (rc == RADIOLIB_ERR_INVALID_GAIN) {
+logerr("ERROR  gain is invalid");
+return DUCKLORA_ERR_SETUP;
+}
+// set the interrupt handler to execute when packet tx or rx is done.
+lora.setDio0Action(config.func);
+#else
+// set the interrupt handler to execute when packet tx or rx is done.
+  lora.setDio1Action(config.func);
+#endif
+
+#if defined (CDPCFG_RADIO_SX126X)
+// we have a good packet
+  loginfo("RX: rssi: " + String(lora.getRSSI()) +
+          " snr: " + String(lora.getSNR()) +
+          " size: " + String(packet_length));
+#else
+// we have a good packet
+loginfo("RX: rssi: " + String(lora.getRSSI()) +
+        " snr: " + String(lora.getSNR()) +
+        " fe: " + String(lora.getFrequencyError(true)) +
+        " size: " + String(packet_length));
+#endif
 
 #if !defined(CDPCFG_HELTEC_CUBE_CELL)
 #include "include/DuckUtils.h"
@@ -291,7 +339,11 @@ void DuckRadio::serviceInterruptFlags() {
 
 // IMPORTANT: this function MUST be 'void' type and MUST NOT have any arguments!
 void DuckRadio::onInterrupt(void) {
+#ifdef CDPCFG_RADIO_SX126X
+    interruptFlags = lora.getIrqStatus();
+#else
     interruptFlags = lora.getIRQFlags();
+#endif
 }
 
 int DuckRadio::startTransmitData(byte* data, int length) {
