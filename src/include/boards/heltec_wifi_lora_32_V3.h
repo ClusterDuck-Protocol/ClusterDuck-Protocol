@@ -1,10 +1,8 @@
-#pragma once
 
 /*
  * BOARD "WIFI_LoRa_32_V3"
  * https://heltec.org/project/wifi-lora-32-v3/
  */
-#if defined (WIFI_LoRa_32_V3)
 #define CDPCFG_BOARD WiFi_Lora_32_V3
 #define CDPCFG_RADIO_SX126X
 
@@ -21,8 +19,9 @@
 
 #define CDPCFG_PIN_LORA_CS RADIO_CS_PIN
 #define CDPCFG_PIN_LORA_RST RADIO_RST_PIN 
-#define CDPCFG_PIN_LORA_DIO0 RADIO_BUSY_PIN
+#define CDPCFG_PIN_LORA_DIO0 -1
 #define CDPCFG_PIN_LORA_DIO1 RADIO_DIO1_PIN
+#define CDPCFG_PIN_LORA_BUSY RADIO_BUSY_PIN
 
 // Oled Display settings
 #define CDPCFG_PIN_OLED_CLOCK SCL_OLED
