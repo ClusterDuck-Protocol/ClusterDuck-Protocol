@@ -16,6 +16,7 @@ const char papa_page[] PROGMEM = R"=====(
 		<br>
 		<a href="/controlpanel">Control Panel</a>
 		<a href="/main">Message Portal</a>
+		<a href="/wifi">Set WiFi Credentials</a>
 	</div>
   </body>
 </html>

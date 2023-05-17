@@ -41,19 +41,17 @@ const char wifi_page[] PROGMEM = R"=====(
     </style></head><body>
 
     
-     <div class="main-box">
-     <h1>Update your WiFi credentials</h1>
-    <p>Fill in your SSID and password for your local WiFi.</p>
- <form action='/changeSSID' method='post'>
-    <label for='ssid'>SSID:</label><br> 
-    <input name='ssid' type='text' placeholder='SSID' /><br><br>
-    <label for='pass'>Password:</label><br>
-    <input name='pass' type='text' placeholder='Password' /><br><br>
-    <input class="submit" type='submit' value='Submit' />
- </form>
- 
-   
-      </div>
+    <div class="main-box">
+      <h1>Update your WiFi credentials</h1>
+      <p>Fill in your SSID and password for your local WiFi.</p>
+      <form action='/changeSSID' method='post'>
+          <label for='ssid'>SSID:</label><br> 
+          <input name='ssid' type='text' placeholder='SSID' /><br><br>
+          <label for='pass'>Password:</label><br>
+          <input name='pass' type='text' placeholder='Password' /><br><br>
+          <input class="submit" type='submit' value='Submit' />
+      </form>
+    </div>
 
   </body></html>
   
