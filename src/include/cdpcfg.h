@@ -111,7 +111,6 @@
  * pio: board = cubecell_board
  */
 #elif defined(ARDUINO_heltec_wifi_lora_32_V3)
-#include "../src/modules/SX126x/SX1262.h"
 #include "include/boards/heltec_wifi_lora_32_V3.h"
 
 #elif defined(CubeCell_Board)

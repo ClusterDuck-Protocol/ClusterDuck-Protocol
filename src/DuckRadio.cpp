@@ -12,6 +12,10 @@
 #define DUCK_RADIO_IRQ_CRC_ERROR RADIOLIB_SX127X_CLEAR_IRQ_FLAG_PAYLOAD_CRC_ERROR
 #endif
 
+#if !defined(CDPCFG_HELTEC_CUBE_CELL)
+#include "include/DuckUtils.h"
+#include <RadioLib.h>
+
 #ifdef CDPCFG_RADIO_SX126X
 
 CDPCFG_LORA_CLASS lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO1 /*IRQ*/,
@@ -30,10 +34,6 @@ return DUCKLORA_ERR_SETUP;
 // set the interrupt handler to execute when packet tx or rx is done.
 lora.setDio0Action(config.func);
 #endif
-
-#if !defined(CDPCFG_HELTEC_CUBE_CELL)
-#include "include/DuckUtils.h"
-#include <RadioLib.h>
 
 #ifdef CDPCFG_PIN_LORA_SPI_SCK
 #include "SPI.h"
