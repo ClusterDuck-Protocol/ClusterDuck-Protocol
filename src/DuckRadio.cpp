@@ -33,26 +33,6 @@ lora.setDio1Action(config.func);
 lora.setDio0Action(config.func);
 #endif
 
-#if defined(CDPCFG_PIN_LORA_SCLK) & defined(CDPCFG_RADIO_SX126X)
-#include <SPI.h>
-SPIClass spi;
-SPISettings spiSettings;
-CDPCFG_LORA_CLASS lora =
-        new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO1, CDPCFG_PIN_LORA_RST,
-                   CDPCFG_PIN_LORA_BUSY, spi);
-#elif CDPCFG_RADIO_SX126X
-CDPCFG_LORA_CLASS lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO1 /*IRQ*/,
-                                    CDPCFG_PIN_LORA_RST, CDPCFG_PIN_LORA_BUSY /*GPIO*/);
-
-#else
-lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO0,
-                  CDPCFG_PIN_LORA_RST, CDPCFG_PIN_LORA_DIO1);
-lora.setDio1Action(config.func);
-
-// set the interrupt handler to execute when packet tx or rx is done.
-lora.setDio0Action(config.func);
-#endif
-
 volatile uint16_t DuckRadio::interruptFlags = 0;
 volatile bool DuckRadio::receivedFlag = false;
 
