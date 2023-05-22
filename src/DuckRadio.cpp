@@ -24,6 +24,7 @@ CDPCFG_LORA_CLASS lora =
         new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO1, CDPCFG_PIN_LORA_RST,
                    CDPCFG_PIN_LORA_BUSY, spi);
 #elif CDPCFG_RADIO_SX126X
+//do nothing?
 #else
 lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO0,
                   CDPCFG_PIN_LORA_RST, CDPCFG_PIN_LORA_DIO1);
@@ -96,7 +97,11 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
 #endif
 
     // set sync word to private network
+#if defined(CDPCFG_RADIO_SX126X)
+    rc = lora.setSyncWord(0x1424);
+#else
     rc = lora.setSyncWord(0x12);
+#endif
     if (rc != RADIOLIB_ERR_NONE) {
         logerr("ERROR  sync word is invalid");
         return DUCKLORA_ERR_SETUP;
