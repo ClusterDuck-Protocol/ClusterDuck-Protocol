@@ -13,11 +13,11 @@ const char home_page[] PROGMEM = R"=====(
     <p>Open one of the menus to send a message or read from the Public or a Private chat.</p>
     <br>
 
-    <a id="message-button" href="/main">Send A Message</a>
-    <a href="/controlpanel">Control Panel</a>
-    <a href="/message-board">View The Message Board</a>
-    <a href="/join-chat">Open Global Chat</a>
-    <a href="/new-private-chat">Start a Private Chat</a>
+    <a id="message-button" href="/main">Send A Message &#x1F4E9</a>
+    <a href="/controlpanel">Control Panel &#x2699</a>
+    <a href="/message-board">View The Message Board &#x1F4CB</a>
+    <a href="/join-chat">Open Global Chat &#x1F310 &#x1F4AC </a>
+    <a href="/new-private-chat">Start a Private Chat &#x1F512 &#x1F4AC</a>
 </div>
 </body>
 </html>
@@ -36,18 +36,18 @@ const char home_page[] PROGMEM = R"=====(
     }
 
     p {
-        font-size: 18px;
+        font-size: 24px;
     }
 
     a {
         display: block;
         margin-bottom: 32px;
         font-weight: 700;
-        font-size: 18px;
+        font-size: 28px;
         text-decoration: none;
         border-radius: 16px;
         text-align: center;
-        padding: 1.5em;
+        padding: 2.5em;
         background: #2A2C49;
         color: #fff;
         text-transform: uppercase;
