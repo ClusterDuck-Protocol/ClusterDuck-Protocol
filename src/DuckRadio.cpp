@@ -28,10 +28,6 @@ CDPCFG_LORA_CLASS lora =
 #else
 lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO0,
                   CDPCFG_PIN_LORA_RST, CDPCFG_PIN_LORA_DIO1);
-lora.setDio1Action(config.func);
-
-// set the interrupt handler to execute when packet tx or rx is done.
-lora.setDio0Action(config.func);
 #endif
 
 volatile uint16_t DuckRadio::interruptFlags = 0;
