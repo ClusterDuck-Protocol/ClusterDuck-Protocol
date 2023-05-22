@@ -353,6 +353,13 @@ protected:
    * @return DUCK_ERR_NONE if successfull. An error code otherwise 
    */
   int sendPong();
+
+  /**
+   * @brief sends an ack message
+   * 
+   * @return DUCK_ERR_NONE if successfull. An error code otherwise 
+   */
+  int sendAck(std::vector<byte> data, const std::vector<byte> dduid);
   
   /**
    * @brief sends a ping message

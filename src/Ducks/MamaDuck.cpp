@@ -99,7 +99,10 @@ void MamaDuck::handleReceivedPacket() {
           }
           return;
         break;
-        case reservedTopic::ack:
+        case reservedTopic::ack:{
+          std::vector<byte> sMuid;
+          sMuid.insert(sMuid.end(), (packet.data.begin() + 1), packet.data.end());
+          duckNet->checkForPublicMessage(sMuid);
           handleAck(packet);
           //relay batch ack 
           err = duckRadio.relayPacket(rxPacket);
@@ -108,6 +111,7 @@ void MamaDuck::handleReceivedPacket() {
           } else {
             loginfo("handleReceivedPacket: packet RELAY DONE");
           }
+        }
         break;
         case reservedTopic::cmd:
           loginfo("Command received");
@@ -124,9 +128,18 @@ void MamaDuck::handleReceivedPacket() {
           packet.timeReceived = millis();
           duckNet->addToMessageBoardBuffer(packet);
         break;
-        case topics::gchat:
+        case topics::gchat:{
           packet.timeReceived = millis();
           duckNet->addToChatBuffer(packet);
+
+          std::vector<byte> data;
+          byte numPairs = 1;
+          data.insert(data.end(), numPairs);
+          data.insert(data.end(), packet.muid.begin(), packet.muid.end());
+          if(duckutils::getAckingState()){
+            sendAck(data, BROADCAST_DUID);
+          }
+        }
         break;
         default:
           err = duckRadio.relayPacket(rxPacket);
@@ -173,16 +186,31 @@ void MamaDuck::handleReceivedPacket() {
           handleCommand(packet);
 
         break;
-        case reservedTopic::ack:
+        case reservedTopic::ack:{
+          std::vector<byte> sMuid;
+          sMuid.insert(sMuid.end(), (packet.data.begin() + 1), packet.data.end());
+          duckNet->checkForPrivateMessage(sMuid, packet.sduid);
           handleAck(packet);
+        }
         break;
         case reservedTopic::mbm:
           packet.timeReceived = millis();
           duckNet->addToMessageBoardBuffer(packet);
         break;
         case topics::gchat:
+        {
           packet.timeReceived = millis();
           duckNet->addToChatBuffer(packet);
+
+          std::vector<byte> data;
+          byte numPairs = 1;
+          data.insert(data.end(), numPairs);
+          data.insert(data.end(), packet.muid.begin(), packet.muid.end());
+
+          if(duckutils::getAckingState()){
+            sendAck(data, BROADCAST_DUID);
+          }
+        } 
         break;
         case topics::pchat:{
           packet.timeReceived = millis();
@@ -190,6 +218,13 @@ void MamaDuck::handleReceivedPacket() {
 
           duckNet->createPrivateHistory(session);
           duckNet->addToPrivateChatBuffer(packet, session);
+          std::vector<byte> data;
+          byte numPairs = 1;
+          data.insert(data.end(), numPairs);
+          data.insert(data.end(), packet.muid.begin(), packet.muid.end());
+          if(duckutils::getAckingState()){
+            sendAck(data, packet.sduid);
+          }
         }
         break;
         default:

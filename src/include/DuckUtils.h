@@ -97,7 +97,9 @@ uint32_t toUnit32(const byte* data);
 Timer<> getTimer();
 
 bool getDetectState();
+bool getAckingState();
 bool flipDetectState();
+bool flipAckingState();
 
 /**
  * @brief Save / Write Wifi credentials to EEPROM
