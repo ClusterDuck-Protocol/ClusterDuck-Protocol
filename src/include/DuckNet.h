@@ -150,6 +150,15 @@ public:
   std::string retrieveMessageHistory(CircularBuffer* buffer);
 
   /**
+ * @brief sets a message's ack value if the packet exists in a private chat buffer
+ * @param muid the message uid to check for in the buffer
+ * @param sduid the source device that sent the ack
+ */
+  void checkForPrivateMessage(std::vector<byte> muid, std::vector<byte> sduid);
+
+  void checkForPublicMessage(std::vector<byte> muid);
+
+  /**
    * @brief Set up the WiFi access point.
    *
    * @param accessPoint a string representing the access point. Default to  "DuckLink"

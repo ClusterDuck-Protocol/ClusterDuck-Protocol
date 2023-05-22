@@ -30,7 +30,6 @@ const char chat_page[] PROGMEM = R"=====(
 <script>
     var sduid = "you";
     const username = sessionStorage.getItem("username");
-
     function displayNewMessage(newMessage, sent) {
         var card = document.createElement("div");
         if (sent) {
@@ -112,7 +111,6 @@ const char chat_page[] PROGMEM = R"=====(
 
         source.addEventListener('open', function (e) {
             console.log("Events Connected");
-
         }, false);
 
         source.addEventListener('error', function (e) {
@@ -161,12 +159,11 @@ const char chat_page[] PROGMEM = R"=====(
     .sent-message-card {
         border-radius: 10px;
         background-color: #ffff004f;
-        padding: 0 3vw 1vh;
+        padding: 5px 3vw 1vh;
         margin: 2vw;
         overflow: auto;
         width: 70%;
         float: right;
-        padding-top: 5px;
     }
 
     #message-container {
@@ -237,6 +234,12 @@ const char chat_page[] PROGMEM = R"=====(
     body {
         font-family: sans-serif;
         font-size: .9em;
+    }
+    .acked-message{
+        background-color: #c1ff91 !important;
+    }
+    .resend-message{
+        background-color: rgba(255, 0, 20, .35) !important;
     }
 
 </style>

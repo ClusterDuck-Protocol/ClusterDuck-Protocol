@@ -225,6 +225,9 @@ const char private_chat_page[] PROGMEM = R"=====(
         font-family: sans-serif;
         font-size: .9em;
     }
+    .acked-message{
+        background-color: #c1ff91 !important;
+    }
 
 </style>
 )=====";
