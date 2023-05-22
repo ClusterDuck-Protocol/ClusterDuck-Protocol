@@ -1,10 +1,10 @@
 /**
- * @file Decryption PapaDuck example
+ * @file DecryptionPapaDuck.ino
  * @author 
  * @brief Uses built-in PapaDuck from the SDK to create a WiFi enabled Papa Duck and decrypts messages from network
  * 
  * This example will configure and run a Papa Duck that connects to the cloud
- * and forwards all messages (except  pings) to the cloud.
+ * and forwards all messages (except pings) to the cloud.
  * 
  * @date 2021-2-25
  * 

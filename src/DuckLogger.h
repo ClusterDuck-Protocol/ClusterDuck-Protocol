@@ -13,8 +13,10 @@
 #define CDP_LOG_WARN
 #endif
 
+#ifndef __FILENAME__
 #define __FILENAME__                                                           \
   (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
+#endif
 
 #if defined(CDP_LOG_ERROR)
 #define logerr(...)                                                            \

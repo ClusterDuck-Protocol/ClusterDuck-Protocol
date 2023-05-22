@@ -139,7 +139,6 @@ std::string DuckNet::retrieveMessageHistory(CircularBuffer* buffer)
       acked = "1";
     }
     json = json + "{\"sduid\":\"" + sduid + "\", \"muid\":\"" + muid +  "\" , \"title\":\"PLACEHOLDER TITLE\", \"body\":\"" + messageBody + "\", \"messageAge\":\"" + messageAgeString + "\", \"acked\":\"" + acked + "\"}";
-
     tail++;
     if(tail == buffer->getBufferEnd()){
       tail = 0;
@@ -197,6 +196,9 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
 
   webServer.on("/message-board", HTTP_GET, [&](AsyncWebServerRequest* request) {
     request->send(200, "text/html", message_board);
+  });
+  webServer.on("/join-chat", HTTP_GET, [&](AsyncWebServerRequest* request) {
+    request->send(200, "text/html", chat_prompt);
   });
   webServer.on("/chat", HTTP_GET, [&](AsyncWebServerRequest* request) {
     request->send(200, "text/html", chat_page);

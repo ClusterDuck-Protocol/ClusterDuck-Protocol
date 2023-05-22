@@ -1,0 +1,3 @@
+Adafruit BMP085 Unified
+# BMP085 doesn't define a dependency for Unified Sensor whereas it could have...
+Adafruit Unified Sensor

@@ -3,7 +3,8 @@
  * @file Custom-Mama-Example.ino
  * @brief Uses the built in Mama Duck.
  * 
- * This example is a Custom Mama Duck with an Oled display, and it is periodically sending a message in the Mesh
+ * This example is a Custom Mama Duck with an Oled display, and it is
+ * periodically sending a message in the Mesh
  * 
  */
 

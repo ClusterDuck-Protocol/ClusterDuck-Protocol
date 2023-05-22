@@ -47,6 +47,7 @@ class DuckNet;
 #include "papaHome.h"
 #include "messageBoard.h"
 #include "chatPage.h"
+#include "chatPrompt.h"
 #include "privateChat.h"
 #include "privateChatPrompt.h"
 #include "circularBuffer.h"

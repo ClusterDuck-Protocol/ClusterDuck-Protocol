@@ -31,108 +31,56 @@
 #ifndef CDPCFG
 #define CDPCFG
 
+
 /*
  * HARDWARE SECTION // BOARD PINS
  * the ARDUINO_* defs are set by the arduino build env
  */
 
-/**
+
+/*
  * BOARD "ttgo lora" and "heltec lora" v1
  *
  * heltec pcb is white, ttgo pcb has heltec+ttgo markings
- * left middle in this picture: https://github.com/Xinyuan-LilyGO/TTGO-LoRa-Series
+ * Top left in this picture: https://github.com/lewisxhe/TTGO-LoRa-Series
+ * (antenna attached with small cable, "chiseled" edges next to buttons
  * pio: board = ttgo-lora32-v1
  */
 #if defined(ARDUINO_TTGO_LoRa32_V1)
+#include "include/boards/ttgo-lora32-v1.h"
 
-#define CDPCFG_PIN_LED1 25
 
-// Lora configurations
-#define CDPCFG_PIN_LORA_CS 18
-#define CDPCFG_PIN_LORA_DIO0 26
-#define CDPCFG_PIN_LORA_RST 23
-
-// Oled Display settings
-// #define CDPCFG_PIN_OLED_ROTATION U8G2_R0
-#define CDPCFG_PIN_OLED_CLOCK 15
-#define CDPCFG_PIN_OLED_DATA 4
-#define CDPCFG_PIN_OLED_RESET 16
-
-// actualy missing
-#define CDPCFG_PIN_LORA_DIO1 -1
-
-/**
+/*
  * BOARD "ttgo lora v2"
  *
- * Top right in this picture: https://github.com/Xinyuan-LilyGO/TTGO-LoRa-Series
- * (antenna attached directly to port on board)
+ * Bottom right in this picture: https://github.com/lewisxhe/TTGO-LoRa-Series
+ * (antenna attached with small cable)
  * pio: board = ttgo-lora32-v2
  */
 #elif defined(ARDUINO_TTGO_LoRa32_V2)
+#include "include/boards/ttgo-lora32-v2.h"
 
-#define CDPCFG_PIN_BAT 35
-#define CDPCFG_BAT_MULDIV 200 / 100
 
-#define CDPCFG_PIN_LED1 25
-
-// Lora configurations
-#define CDPCFG_PIN_LORA_CS 18
-#define CDPCFG_PIN_LORA_DIO0 26
-#define CDPCFG_PIN_LORA_RST 14
-
-// Oled Display settings
-
-#define CDPCFG_PIN_OLED_CLOCK 22
-#define CDPCFG_PIN_OLED_DATA 21
-#define CDPCFG_PIN_OLED_RESET 16
-#define CDPCFG_PIN_OLED_ROTATION U8G2_R0
-
-// actualy missing
-#define CDPCFG_PIN_LORA_DIO1 -1
-
-/**
+/*
  * BOARD "ttgo lora v2.1.6"
  *
- * Top left in this picture: https://github.com/Xinyuan-LilyGO/TTGO-LoRa-Series
- * (antenna attached with small cable, "chiseled" edges next to buttons
+ * Top right in this picture: https://github.com/lewisxhe/TTGO-LoRa-Series
+ * (antenna attached directly to port on board, sometimes the boards read T3_V1.6.1 or T3_V1.6)
  * pio: board = ttgo_lora32_v21
  */
 #elif defined(ARDUINO_TTGO_LoRa32_v21new)
+#include "include/boards/ttgo-lora32-v21.h"
 
-#define CDPCFG_PIN_BAT 35
-#define CDPCFG_BAT_MULDIV 200 / 100
 
-#define CDPCFG_PIN_LED1 25
-
-// Lora configurations
-#define CDPCFG_PIN_LORA_CS 18
-#define CDPCFG_PIN_LORA_DIO0 26
-#define CDPCFG_PIN_LORA_DIO1 33
-#define CDPCFG_PIN_LORA_RST 14
-
-// Oled Display settings
-#define CDPCFG_PIN_OLED_CLOCK 22
-#define CDPCFG_PIN_OLED_DATA 21
-#define CDPCFG_PIN_OLED_RESET 16
-#define CDPCFG_PIN_OLED_ROTATION U8G2_R0
-
-// T-Beam
- #elif defined(ARDUINO_T_Beam)
-  #define CDPCFG_PIN_BAT 35 
-  #define CDPCFG_BAT_MULDIV 200 / 100 
-  #define CDPCFG_PIN_LED1 25 
-  // Lora configurations 
-  #define CDPCFG_PIN_LORA_CS 18 
-  #define CDPCFG_PIN_LORA_DIO0 26 
-  #define CDPCFG_PIN_LORA_RST 14 
-  // Oled Display settings 
-  #define CDPCFG_PIN_OLED_CLOCK 22
-  #define CDPCFG_PIN_OLED_DATA 21
-  #define CDPCFG_PIN_OLED_RESET 16 
-  #define CDPCFG_PIN_OLED_ROTATION U8G2_R0 
-  // actualy missing 
-  #define CDPCFG_PIN_LORA_DIO1 -1
-
+/*
+ * BOARD "ttgo t-beam"
+ *
+ * http://www.lilygo.cn/prod_view.aspx?TypeId=50060&Id=1237&FId=t3:50060:3
+ * (GPS module and 18650 holder)
+ * pio: board = ttgo-t-beam
+ */
+#elif defined(ARDUINO_TBeam)
+#include "include/boards/ttgo-t-beam.h"
 
 
 /*
@@ -140,28 +88,9 @@
  * http://www.heltec.cn/project/wireless-stick/
  * pio: board = heltec_wireless_stick
  */
-#elif defined(ARDUINO_HELTEC_WIRELESS_STICK)
+#elif defined(ARDUINO_heltec_wireless_stick)
+#include "include/boards/heltec_wireless_stick.h"
 
-#define CDPCFG_PIN_BAT 37
-#define CDPCFG_BAT_MULDIV 320 / 100
-
-#define CDPCFG_PIN_VEXT 21
-
-#define CDPCFG_PIN_LED1 25
-
-// Lora configurations
-#define CDPCFG_PIN_LORA_CS 18
-#define CDPCFG_PIN_LORA_DIO0 26
-#define CDPCFG_PIN_LORA_RST 14
-
-// Oled Display settings
-#define CDPCFG_OLED_64x32
-#define CDPCFG_PIN_OLED_CLOCK 15
-#define CDPCFG_PIN_OLED_DATA 4
-#define CDPCFG_PIN_OLED_RESET 16
-
-// actualy missing
-#define CDPCFG_PIN_LORA_DIO1 -1
 
 /*
  * BOARD "heltec wireless stick lite"
@@ -171,25 +100,10 @@
  * http://www.heltec.cn/project/wireless-stick-lite/
  * pio: board = WIRELESS_STICK_LITE
  */
-#elif defined(ARDUINO_WIRELESS_STICK_LITE)
+#elif defined(ARDUINO_heltec_wireless_stick_LITE)
+#include "include/boards/heltec_wireless_stick_lite.h"
 
-#define CDPCFG_PIN_BAT 37
-#define CDPCFG_BAT_MULDIV 320 / 100
 
-#define CDPCFG_PIN_VEXT 21
-
-#define CDPCFG_PIN_LED1 25
-
-// Lora configurations
-#define CDPCFG_PIN_LORA_CS 18
-#define CDPCFG_PIN_LORA_DIO0 26
-#define CDPCFG_PIN_LORA_RST 14
-
-// Oled Display settings
-#define CDPCFG_OLED_NONE
-
-// actualy missing
-#define CDPCFG_PIN_LORA_DIO1 -1
 
 /*
  * BOARD "Heltec Cube Cell Board ASR6501 with SX1262"
@@ -197,98 +111,41 @@
  * pio: board = cubecell_board
  */
 #elif defined(CubeCell_Board)
-
 #define CDPCFG_HELTEC_CUBE_CELL
+#include "include/boards/cubecell_board.h"
 
-// TODO: These are not used by the Heltec LoRa library
-// But they still need to be defined for now because the Duck::setupRadio() uses them.
-// Update the setupRadio to use a RadioConfig data structure instead so we don't need to expose these to the apps
-#define CDPCFG_PIN_LORA_CS 10
-#define CDPCFG_PIN_LORA_DIO0 9 // BUSY PIN
-#define CDPCFG_PIN_LORA_DIO1 8
-#define CDPCFG_PIN_LORA_DIO2 -1
-#define CDPCFG_PIN_LORA_RST 14
 
-// Oled Display settings
-#define CDPCFG_OLED_NONE
-
-// Wifi module
-#define CDPCFG_WIFI_NONE
-//===== BOARD "Heltec Cube Cell Board ASR6501 with SX1262" =====
-
+/*
+ * BOARD "Heltec Cube Cell Board ASR6501 with SX1262" =====
+ * https://heltec.org/project/htcc-ab01/
+ * pio: board = ???
+ */
 #elif defined(CubeCell_GPS)
-
 #define CDPCFG_HELTEC_CUBE_CELL
-
 // Uncomment this to enable the OLED display
 //#define ENABLE_DISPLAY
+#include "include/boards/cubecell_gps.h"
 
-// TODO: These are not used by the Heltec LoRa library
-// But they still need to be defined for now because the Duck::setupRadio() uses
-// them. Update the setupRadio to use a RadioConfig data structure instead so we
-// don't need to expose these to the apps
-#define CDPCFG_PIN_LORA_CS 10
-#define CDPCFG_PIN_LORA_DIO0 9 // BUSY PIN
-#define CDPCFG_PIN_LORA_DIO1 8
-#define CDPCFG_PIN_LORA_DIO2 -1
-#define CDPCFG_PIN_LORA_RST 14
-
-// Oled Display settings
-#ifdef ENABLE_DISPLAY
-#define CDPCFG_PIN_OLED_CLOCK 15
-#define CDPCFG_PIN_OLED_DATA 4
-#define CDPCFG_PIN_OLED_RESET 16
-#else
-#define CDPCFG_OLED_NONE
-#endif
-
-// Wifi module
-#define CDPCFG_WIFI_NONE
-//===== BOARD "Heltec Cube Cell Board ASR6502+GPS+DISPLAY with SX1262" =====
 
 /*
  * BOARD "rocket scream Mini Ultra Pro v3"
+ * This is not an official ARDUINO_* but uses the same bootloader as the SAMD21 based Arduino Zero
  * https://www.rocketscream.com/blog/docs-item/mini-ultra-pro-hookup-guide/
  * pio: board = arduino_zero
  */
 #elif defined(ARDUINO_SAMD_ZERO)
-// This is not an official ARDUINO_* but uses the same bootloader
-// as the SAMD21 based Arduino Zero
-//
-// Lora configurations (HopeRF RFM95W chip)
-#define CDPCFG_PIN_LORA_CS 5
-#define CDPCFG_PIN_LORA_DIO0 2
-#define CDPCFG_PIN_LORA_DIO1 6
-#define CDPCFG_PIN_LORA_DIO2 -1 // Unused
-#define CDPCFG_PIN_LORA_RST 3
+#include "include/boards/arduino_zero.h"
 
-// Oled Display settings
-#define CDPCFG_OLED_NONE
-
-// Wifi module
-#define CDPCFG_WIFI_NONE
-
-// Required for Serial on Zero based boards
-#define Serial SERIAL_PORT_USBVIRTUAL
-//===== BOARD "rocket scream Mini Ultra Pro v3" =====
 
 /*
  * BOARD "sparkfun lora gateway 1-channel"
+ * this is not an official ARDUINO_* define since this board doesnt have one
  * https://www.sparkfun.com/products/15006
  * pio: board = sparkfun_lora_gateway_1-channel
  */
 #elif defined(SPARKFUN_LGW1C)
-// this is not an official ARDUINO_* define since this board doesnt have one
+#include "include/boards/sparkfun_lora_gateway_1.h"
 
-// Lora configurations
-#define CDPCFG_PIN_LORA_CS 16
-#define CDPCFG_PIN_LORA_DIO0 26
-#define CDPCFG_PIN_LORA_DIO1 33
-#define CDPCFG_PIN_LORA_DIO2 32
-#define CDPCFG_PIN_LORA_RST 5
-
-// Oled Display settings
-#define CDPCFG_OLED_NONE
 
 /*
  * BOARD "pycom lopy"
@@ -296,25 +153,8 @@
  * pio: board = lopy
  */
 #elif defined(ARDUINO_LoPy)
+#include "include/boards/lopy.h"
 
-#define CDPCFG_PIN_ANT 16
-
-// Lora configurations
-#define CDPCFG_PIN_LORA_CS 17
-#define CDPCFG_PIN_LORA_DIO0 23
-#define CDPCFG_PIN_LORA_RST 18
-
-// special SPI
-#define CDPCFG_PIN_LORA_SPI_SCK 5
-#define CDPCFG_PIN_LORA_SPI_MISO 19
-#define CDPCFG_PIN_LORA_SPI_MOSI 27
-#define CDPCFG_LORA_CLASS SX1272
-
-// Oled Display settings
-#define CDPCFG_OLED_NONE
-
-// actualy missing
-#define CDPCFG_PIN_LORA_DIO1 -1
 
 /*
  * BOARD "pycom lopy4"
@@ -322,29 +162,11 @@
  * pio: board = lopy4
  */
 #elif defined(ARDUINO_LoPy4)
+#include "include/boards/lopy4.h"
 
-#define CDPCFG_PIN_ANT 16
-
-// Lora configurations
-#define CDPCFG_PIN_LORA_CS 18
-#define CDPCFG_PIN_LORA_DIO0 23
-#define CDPCFG_PIN_LORA_RST -1
-
-// special SPI
-#define CDPCFG_PIN_LORA_SPI_SCK 5
-#define CDPCFG_PIN_LORA_SPI_MISO 19
-#define CDPCFG_PIN_LORA_SPI_MOSI 27
-#define CDPCFG_LORA_CLASS SX1276
-
-// Oled Display settings
-#define CDPCFG_OLED_NONE
-
-// actualy missing
-#define CDPCFG_PIN_LORA_DIO1 -1
 
 #else // Default to WIFI_LORA_32_V2 board
-
-#if !defined(ARDUINO_HELTEC_WIFI_LORA_32_V2)
+#if !defined(ARDUINO_heltec_wifi_lora_32_V2)
 #warning "NO BOARD DEFINED, DEFAULTING TO HELTEC v2"
 #define CDPCFG_BOARD_DEFAULT
 #endif
@@ -354,34 +176,15 @@
  * https://heltec.org/project/wifi-lora-32/
  * pio: board = heltec_wifi_lora_32_V2
  */
+#include "include/boards/heltec_wifi_lora_32_V2.h"
 
-#define CDPCFG_PIN_BAT 37
-#define CDPCFG_BAT_MULDIV 320 / 100
-
-#define CDPCFG_PIN_VEXT 21
-
-#define CDPCFG_PIN_LED1 25
-
-// Lora configurations
-#define CDPCFG_PIN_LORA_CS 18
-#define CDPCFG_PIN_LORA_DIO0 26
-#define CDPCFG_PIN_LORA_RST 14
+#endif // Board definitions
 
 
-// Oled Display settings
-#define CDPCFG_PIN_OLED_CLOCK 15
-#define CDPCFG_PIN_OLED_DATA 4
-#define CDPCFG_PIN_OLED_RESET 16
-#define CDPCFG_PIN_OLED_ROTATION U8G2_R0
 
-// actualy missing
-#define CDPCFG_PIN_LORA_DIO1 -1
-
-#endif  // Board definitions
 
 /**
  * @brief Non board specific configuration
- *
  */
 
 //Default Username and Password
@@ -459,9 +262,8 @@
 #else
 // classic default
 #define CDPCFG_OLED_CLASS U8G2_SSD1306_128X64_NONAME_F_SW_I2C
-
-#endif
-#endif
+#endif // CDPCFG_OLED_NONE
+#endif // CDPCFG_OLED_CLASS
 
 #endif // CDPCFG
 
