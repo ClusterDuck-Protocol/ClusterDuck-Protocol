@@ -228,6 +228,9 @@
 /// CDP UUID generator max length
 #define CDPCFG_UUID_LEN 8
 
+/// CDP chat circular buffer size
+#define CDPCFG_CDP_CHATBUF_SIZE 15
+
 /// CDP ALIVE timer duration in milliseconds
 #define CDPCFG_MILLIS_ALIVE 1800000
 /// CDP REBOOT timer duration in milliseconds
