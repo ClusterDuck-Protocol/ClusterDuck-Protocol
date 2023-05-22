@@ -97,11 +97,9 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
 #endif
 
     // set sync word to private network
-#if defined(CDPCFG_RADIO_SX126X)
-    rc = lora.setSyncWord(0x1424);
-#else
+
     rc = lora.setSyncWord(0x12);
-#endif
+
     if (rc != RADIOLIB_ERR_NONE) {
         logerr("ERROR  sync word is invalid");
         return DUCKLORA_ERR_SETUP;
