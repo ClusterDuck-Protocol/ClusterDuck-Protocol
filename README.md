@@ -56,7 +56,6 @@ v3.5.0
 
 See `library.json` (PlatformIO) or `library.properties` (Arduino).
 
-
 [Project OWL]: <https://www.project-owl.com/>
 [ClusterDuck Protocol]: <https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki>
 [Slack Workspace]: <https://www.project-owl.com/slack>
