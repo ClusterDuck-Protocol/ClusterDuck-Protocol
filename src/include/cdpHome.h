@@ -4,53 +4,58 @@
 const char home_page[] PROGMEM = R"=====(
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>ClusterDuck Network</title>
-  </head>
-  <body>
-	<div class="main-box">
-		<h1>Welcome to the ClusterDuck Network</h1>
-		<p>What would you like to do?</p>
-		<br>
-		
-		<a href="/controlpanel">Control Panel</a>
-		<a href="/main">Send Message</a>
-		<a href="/message-board">Message Board</a>
-		<a href="/join-chat">Global Chat</a>
-		<a href="/new-private-chat">Start a Private Chat</a>
-	</div>
-  </body>
+</head>
+<body>
+<div class="main-box">
+    <h1>CLUSTERDUCK PROTOCOL</h1>
+    <p>Open one of the menus to send a message or read from the Public or a Private chat.</p>
+    <br>
+
+    <a id="message-button" href="/main">Send A Message &#x1F4E9</a>
+    <a href="/controlpanel">Control Panel &#x2699</a>
+    <a href="/message-board">View The Message Board &#x1F4CB</a>
+    <a href="/join-chat">Open Global Chat &#x1F310 &#x1F4AC </a>
+    <a href="/new-private-chat">Start a Private Chat &#x1F512 &#x1F4AC</a>
+</div>
+</body>
 </html>
 <style>
-body {
-	max-width: 85%;
-	margin: auto;
-	padding-top: 14px;
-	padding-bottom: 14px;
-}
-h1 {
-	font-weight: bold;
-}
-.main-box{
-	padding:3em;
-	font: 26px "Avenir", helvetica, sans-serif;
-	border-radius: 8px;
-	background-color:#f0f0f0;
-	min-height: 100vh;
-}
-a {
-	display: block;
-	margin-bottom: 14px;
-	border: 3px solid #bbb;
-	font-weight: 700;
-	text-decoration: none;
-	background: #f7cf02;
-	border-radius: 12px;
-	text-align: center;
-	padding: .4em;
-	color: #000;
-	text-transform: uppercase;
-}
+
+    h1 {
+        font-weight: 900;
+        color: #2A2C49;
+    }
+
+    .main-box {
+        padding: 3em;
+        font: 26px "Avenir", helvetica, sans-serif;
+        border-radius: 8px;
+        min-height: 100vh;
+    }
+
+    p {
+        font-size: 24px;
+    }
+
+    a {
+        display: block;
+        margin-bottom: 32px;
+        font-weight: 700;
+        font-size: 28px;
+        text-decoration: none;
+        border-radius: 16px;
+        text-align: center;
+        padding: 2.5em;
+        background: #2A2C49;
+        color: #fff;
+        text-transform: uppercase;
+    }
+
+    #message-button {
+        background: #DF3600;
+    }
 </style>
   
 )=====";

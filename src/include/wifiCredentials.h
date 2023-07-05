@@ -4,7 +4,7 @@
 const char wifi_page[] PROGMEM = R"=====(
 
 
-   <!DOCTYPE html><html><head><title>Update WiFi Credentials</title>
+    <!DOCTYPE html><html><head><title>Update WiFi Credentials</title>
               <style type="text/css">
 
       body{
@@ -15,19 +15,40 @@ const char wifi_page[] PROGMEM = R"=====(
         padding:2em;
         font: 26px "Avenir", helvetica, sans-serif;
         border-radius: 8px;
-        background-color: lightgray; 
 
       }
       .submit {
-        border-style: none;
-        padding: 0.6em;
-        font-size: 1em; 
-        margin-bottom: 3em;
-        background: #f7cf02;
-        border-radius: 12px;
-        color: #000;
-        text-transform: uppercase;
+            width: 100%;
+            margin-top: 10px;
+            margin-bottom: 16px;
+            font-weight: 700;
+            font-size: 14px;
+            text-decoration: none;
+            border-radius: 12px;
+            text-align: center;
+            padding: 0.5em;
+            background: #2A2C49;
+            color: #fff;
+            text-transform: uppercase;
+            padding: 1em;
+
       }
+      #backBtn {
+            width: 100%;
+            margin-top: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            text-decoration: none;
+            border-radius: 12px;
+            text-align: center;
+            padding: 0.5em;
+            color: #2A2C49;
+            background: white;
+            border: 2px solid #2A2C49;
+
+        }
+
+
       input{
         width:98%; 
         height: 3em;  
@@ -51,9 +72,12 @@ const char wifi_page[] PROGMEM = R"=====(
     <input name='pass' type='text' placeholder='Password' /><br><br>
     <input class="submit" type='submit' value='Submit' />
  </form>
- 
+  <a href="/">
+        <button type="button" id="backBtn">Go Back Home</button>
+    </a>
    
       </div>
+      
 
   </body></html>
   
