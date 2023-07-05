@@ -40,12 +40,12 @@ before_install:
     for i in ${dependsvar//,/ }
     do
       echo "$i"
-      if [[ $i == *"github"* ]]; then
-        arduino-cli lib install --git-url $i
-      elif [[ $i == *".zip"* ]]; then
-        arduino-cli lib install --zip-path $i
+      if [[ "$i" == *"github"* ]]; then
+        arduino-cli lib install --git-url "$i"
+      elif [[ "$i" == *".zip"* ]]; then
+        arduino-cli lib install --zip-path "$i"
       else
-        arduino-cli lib install $i
+        arduino-cli lib install "$i"
       fi
     done
 #  - installExampleArduinoDeps() { arduino-deps-installer install --work-dir $PWD/examples/$1/$2; }
