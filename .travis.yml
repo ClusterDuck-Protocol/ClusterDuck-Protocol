@@ -29,6 +29,7 @@ before_install:
   # - arduino-deps-installer install --work-dir ${PWD}
   # install library in current state
   - rsync -rltv --exclude=.git --exclude=bin ${PWD}/ /tmp/CDP/ && (cd /tmp && zip -r /tmp/cdp.zip CDP) && arduino-cli lib install --zip-path /tmp/cdp.zip
+  - less library.properties
   - |-
     function prop {
       grep "${1}" ${file} | cut -d'-' -f2
