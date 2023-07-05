@@ -97,6 +97,7 @@ const char controlPanel[] PROGMEM = R"=====(
      </div>
      <a href="/flipDetector">Flip Detector</a>
      <a href="/flipDecrypt">Flip Decrypt</a>
+     <a href="/flipAcking">Flip Acking</a>
     </div>
   </body></html>
   

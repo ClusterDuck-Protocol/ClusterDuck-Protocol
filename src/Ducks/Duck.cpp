@@ -292,10 +292,10 @@ int Duck::sendData(byte topic, const byte* data, int length,
 int Duck::sendData(byte topic, std::vector<byte> data,
   const std::vector<byte> targetDevice, std::vector<byte> * outgoingMuid)
 {
-  if (topic < reservedTopic::max_reserved) {
-    logerr("ERROR send data failed, topic is reserved.");
-    return DUCKPACKET_ERR_TOPIC_INVALID;
-  }
+  // if (topic < reservedTopic::max_reserved) {
+  //   logerr("ERROR send data failed, topic is reserved.");
+  //   return DUCKPACKET_ERR_TOPIC_INVALID;
+  // }
   if (data.size() > MAX_DATA_LENGTH) {
     logerr("ERROR send data failed, message too large: " + String(data.size()) +
            " bytes");
@@ -434,6 +434,21 @@ int Duck::sendPong() {
   int err = DUCK_ERR_NONE;
   std::vector<byte> data(1, 0);
   err = txPacket->prepareForSending(&filter, ZERO_DUID, this->getType(), reservedTopic::pong, data);
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR Oops! failed to build pong packet, err = " + err);
+    return err;
+  }
+  err = duckRadio.sendData(txPacket->getBuffer());
+  if (err != DUCK_ERR_NONE) {
+    logerr("ERROR Oops! Lora sendData failed, err = " + err);
+    return err;
+  }
+  return err;
+}
+
+int Duck::sendAck(std::vector<byte> data, const std::vector<byte> dduid) { 
+  int err = DUCK_ERR_NONE;
+  err = txPacket->prepareForSending(&filter, dduid, this->getType(), reservedTopic::ack, data);
   if (err != DUCK_ERR_NONE) {
     logerr("ERROR Oops! failed to build pong packet, err = " + err);
     return err;

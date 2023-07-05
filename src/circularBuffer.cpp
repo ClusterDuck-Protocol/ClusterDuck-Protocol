@@ -33,6 +33,28 @@ CdpPacket CircularBuffer::getMessage(int index)
 {
     return buffer[index];
 }
+
+int CircularBuffer::findMuid(std::vector<byte> muid){
+    for (int i = 0; i < (head); i++) {
+        if(buffer[i].muid == muid){
+            return i;
+        }
+    }
+    return -1;
+}
+
+int CircularBuffer::updateMuid(std::vector<byte> oldMuid, std::vector<byte> newMuid){
+    int packetIndex = findMuid(oldMuid);
+    buffer[packetIndex].muid = newMuid;
+    return 1;
+}
+
+int CircularBuffer::ackMessage(std::vector<byte> muid){
+    int packetIndex = findMuid(muid);
+    buffer[packetIndex].acked = true;
+    return 1;
+}
+
 CircularBuffer::~CircularBuffer()
 {
     delete [] buffer;

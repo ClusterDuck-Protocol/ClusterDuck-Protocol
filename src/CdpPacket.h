@@ -172,6 +172,8 @@ public:
   std::vector<byte> path;
   //time received
   unsigned long timeReceived;
+  //if the packet has been acked
+  bool acked = false;
 
   CdpPacket(){}
   CdpPacket(const std::vector<byte> & buffer) {

@@ -52,9 +52,9 @@ This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE)
 
 ## Version
 
-See `library.json` (PlatformIO) or `library.properties` (Arduino).
+[v3.4.0](https://github.com/Call-for-Code/ClusterDuck-Protocol/releases/tag/v3.4.0)
 
-v3.3.5
+See `library.json` (PlatformIO) or `library.properties` (Arduino).
 
 [Project OWL]: <https://www.project-owl.com/>
 [ClusterDuck Protocol]: <https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki>

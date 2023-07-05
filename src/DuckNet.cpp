@@ -11,8 +11,8 @@ DuckNet::DuckNet(Duck* duckIn):
 
 //when initializing the buffer, the buffer created will be one larger than the provided size
 //one slot in the buffer is used as a waste slot
-CircularBuffer messageBuffer = CircularBuffer(5);
-CircularBuffer chatBuffer = CircularBuffer(20);
+CircularBuffer messageBuffer = CircularBuffer(CDPCFG_CDP_CHATBUF_SIZE);
+CircularBuffer chatBuffer = CircularBuffer(CDPCFG_CDP_CHATBUF_SIZE);
 std::map<std::string, CircularBuffer*> chatHistories;
 std::string duckSession = duckutils::toString(BROADCAST_DUID).c_str();
 
@@ -79,18 +79,21 @@ String DuckNet::createMuidResponseJson(muidStatus status) {
 
 void DuckNet::addToMessageBoardBuffer(CdpPacket message)
 {
+  message.timeReceived = millis();
   messageBuffer.push(message);
   events.send("refresh" ,"refreshPage",millis());
 }
 
 void DuckNet::addToChatBuffer(CdpPacket message)
 {
+  message.timeReceived = millis();
   chatBuffer.push(message);
   events.send("refresh" ,"refreshPage",millis());
 }
 
 void DuckNet::addToPrivateChatBuffer(CdpPacket message, std::string chatSession)
 {
+  message.timeReceived = millis();
   chatHistories.find(chatSession)->second->push(message);
   events.send("refresh" ,"refreshPage",millis());
 }
@@ -98,7 +101,7 @@ void DuckNet::addToPrivateChatBuffer(CdpPacket message, std::string chatSession)
 void DuckNet::createPrivateHistory(std::string session)
 {
   if(chatHistories.find(session) == chatHistories.end()){
-      CircularBuffer* privateChatBuffer = new CircularBuffer(20);
+      CircularBuffer* privateChatBuffer = new CircularBuffer(CDPCFG_CDP_CHATBUF_SIZE);
       if(chatHistories.size() >= 3){
         delete chatHistories.begin()->second;
         chatHistories.erase(chatHistories.begin());
@@ -109,7 +112,10 @@ void DuckNet::createPrivateHistory(std::string session)
 std::string DuckNet::retrieveMessageHistory(CircularBuffer* buffer)
 {
   int tail = buffer->getTail();
-  std::string json = "{\"posts\":[";
+  std::string json = "{ \"ackOption\":";
+  std::string ackOption = duckutils::getAckingState() ? "true" : "false";
+  json = json + ackOption;
+  json = json + ", \"posts\":[";
   bool firstMessage = true;
 
   while(tail != buffer->getHead()){
@@ -121,12 +127,18 @@ std::string DuckNet::retrieveMessageHistory(CircularBuffer* buffer)
 
     CdpPacket packet = buffer->getMessage(tail);
     unsigned long messageAge = millis() - packet.timeReceived;
+    unsigned long milAge = millis();
     std::string messageAgeString = String(messageAge).c_str();
     std::string messageBody(packet.data.begin(),packet.data.end());
     std::string sduid(packet.sduid.begin(), packet.sduid.end());
-
-    json = json + "{\"sduid\":\"" + sduid  + "\" , \"title\":\"PLACEHOLDER TITLE\", \"message\":" + messageBody + ", \"messageAge\":\"" + messageAgeString + "\"}";
-
+    std::string muid(packet.muid.begin(), packet.muid.end());
+    std::string acked;
+    if(!packet.acked){
+      acked = "0";
+    } else{
+      acked = "1";
+    }
+    json = json + "{\"sduid\":\"" + sduid + "\", \"muid\":\"" + muid +  "\" , \"title\":\"PLACEHOLDER TITLE\", \"body\":\"" + messageBody + "\", \"messageAge\":\"" + messageAgeString + "\", \"acked\":\"" + acked + "\"}";
     tail++;
     if(tail == buffer->getBufferEnd()){
       tail = 0;
@@ -135,6 +147,27 @@ std::string DuckNet::retrieveMessageHistory(CircularBuffer* buffer)
   json = json + "]}";
   return json;
 
+}
+
+void DuckNet::checkForPrivateMessage(std::vector<byte> muid, std::vector<byte> sduid)
+{
+  std::string chatSession(sduid.begin(), sduid.end());
+
+  if(chatHistories.find(chatSession) != chatHistories.end()){
+    int index = chatHistories.find(chatSession)->second->findMuid(muid);
+    if(index >= 0){
+        chatHistories.find(chatSession)->second->ackMessage(muid);
+    } 
+  }
+}
+
+void DuckNet::checkForPublicMessage(std::vector<byte> muid)
+{
+  int index = chatBuffer.findMuid(muid);
+    if(index >= 0){
+        CdpPacket p = chatBuffer.getMessage(index);
+        chatBuffer.ackMessage(muid);
+    }
 }
 
 int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
@@ -232,6 +265,15 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     duck->setDecrypt(!duck->getDecrypt());
     loginfo("Decrypt is now: ");
     loginfo(duck->getDecrypt());
+    request->send(200, "text/plain", "Success");
+  });
+
+  webServer.on("/flipAcking", HTTP_GET, [&](AsyncWebServerRequest* request) {
+    //Flip Acking State
+   
+    duckutils::flipAckingState();
+     loginfo("Acking is now: ");
+    loginfo(duckutils::getAckingState());
     request->send(200, "text/plain", "Success");
   });
 
@@ -384,11 +426,9 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     message.insert(message.end(), msg.begin(), msg.end());
 
     std::vector<byte> muid;
-    std::vector<byte> session;
-    session.insert(session.end(), duckSession.begin(), duckSession.end());
 
-    err = duck->sendData(topics::gchat, message, session, &muid);
-    addToChatBuffer(duck->buildCdpPacket(topics::gchat, message, session, muid));
+    err = duck->sendData(topics::gchat, message, BROADCAST_DUID, &muid);
+    addToChatBuffer(duck->buildCdpPacket(topics::gchat, message, BROADCAST_DUID, muid));
 
     switch (err) {
       case DUCK_ERR_NONE:
@@ -450,6 +490,103 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     createPrivateHistory(duckSession);
     
     request->send(200, "text/html", "OK.");
+  });
+  
+  webServer.on("/requestMessageResend.json", HTTP_POST, [&](AsyncWebServerRequest* request) {
+    int err = DUCK_ERR_NONE;
+
+    std::vector<byte> message;
+    String clientId = "";
+
+    AsyncWebParameter* p = request->getParam(0);
+    std::string muidParam = p->value().c_str();
+    std::vector<byte> oldMuid;
+    oldMuid.insert(oldMuid.end(), muidParam.begin(), muidParam.end());
+
+    if(chatHistories.find(duckSession) != chatHistories.end()){
+      int index = chatHistories[duckSession]->findMuid(oldMuid);
+      
+      if(index >= 0){
+          CdpPacket packetToResend = chatHistories.find(duckSession)->second->getMessage(index);
+
+          std::vector<byte> newMuid;
+          std::vector<byte> session;
+          session.insert(session.end(), duckSession.begin(), duckSession.end());
+
+          std::string messageBody(packetToResend.data.begin(), packetToResend.data.end());
+
+          err = duck->sendData(topics::pchat, messageBody, session, &newMuid);
+
+          switch (err) {
+            case DUCK_ERR_NONE:
+            {
+              std::string privateHistory = DuckNet::retrieveMessageHistory(chatHistories[duckSession]);
+              request->send(200, "text/json", privateHistory.c_str());
+              chatHistories[duckSession]->updateMuid(packetToResend.muid, newMuid);
+            }
+            break;
+            case DUCKLORA_ERR_MSG_TOO_LARGE:
+            request->send(413, "text/html", "Message payload too big!");
+            break;
+            case DUCKLORA_ERR_HANDLE_PACKET:
+            request->send(400, "text/html", "BadRequest");
+            break;
+            default:
+            request->send(500, "text/html", "Oops! Unknown error.");
+            break;
+          }
+          
+      }
+    } else{
+          request->send(500, "text/html", "could not retrieve chat history");
+    }
+  });
+
+  webServer.on("/requestPublicMessageResend.json", HTTP_POST, [&](AsyncWebServerRequest* request) {
+    int err = DUCK_ERR_NONE;
+
+    std::vector<byte> message;
+    String clientId = "";
+
+    AsyncWebParameter* p = request->getParam(0);
+    std::string muidParam = p->value().c_str();
+    std::vector<byte> oldMuid;
+    oldMuid.insert(oldMuid.end(), muidParam.begin(), muidParam.end());
+      int index = chatBuffer.findMuid(oldMuid);
+      
+      if(index >= 0){
+          CdpPacket packetToResend = chatBuffer.getMessage(index);
+
+          std::vector<byte> newMuid;
+          loginfo(duckSession.c_str());
+
+          std::string messageBody(packetToResend.data.begin(), packetToResend.data.end());
+
+          err = duck->sendData(topics::gchat, messageBody, BROADCAST_DUID, &newMuid);
+
+          switch (err) {
+            case DUCK_ERR_NONE:
+            {
+              std::string publicHistory = DuckNet::retrieveMessageHistory(&chatBuffer);
+              request->send(200, "text/json", publicHistory.c_str());
+              chatBuffer.updateMuid(packetToResend.muid, newMuid);
+            }
+            break;
+            case DUCKLORA_ERR_MSG_TOO_LARGE:
+            request->send(413, "text/html", "Message payload too big!");
+            break;
+            case DUCKLORA_ERR_HANDLE_PACKET:
+            request->send(400, "text/html", "BadRequest");
+            break;
+            default:
+            request->send(500, "text/html", "Oops! Unknown error.");
+            break;
+          }
+          
+      } else{
+          request->send(500, "text/html", "could not resend message");
+      }
+    
   });
 
   // Captive Portal form submission
