@@ -311,6 +311,29 @@ void DuckRadio::serviceInterruptFlags() {
         if (DuckRadio::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_CAD_DETECTED) {
             loginfo("Interrupt flag was set: valid LoRa signal detected during CAD operation");
         }
+        if (DuckRadio::interruptFlags & RADIOLIB_SX126X_CMD_CLEAR_IRQ_STATUS) {
+            loginfo("Interrupt flag was set: 126X clear IRQ status");
+        }
+        if (DuckRadio::interruptFlags & RADIOLIB_SX126X_CMD_CLEAR_DEVICE_ERRORS) {
+            loginfo("Interrupt flag was set: 126X clear device errors");
+        }
+        if (DuckRadio::interruptFlags & RADIOLIB_SX126X_IRQ_CRC_ERR ) {
+            loginfo("Interrupt flag was set: 126X payload CRC error");
+        }
+        if (DuckRadio::interruptFlags & RADIOLIB_SX126X_IRQ_HEADER_ERR ) {
+            loginfo("Interrupt flag was set: 126X header CRC error");
+        }
+        if (DuckRadio::interruptFlags & RADIOLIB_SX126X_IRQ_RX_DONE ) {
+            loginfo("Interrupt flag was set: 126X packet reception complete");
+            DuckRadio::setReceiveFlag(true);
+        }
+        if (DuckRadio::interruptFlags & RADIOLIB_SX126X_IRQ_TX_DONE ) {
+            loginfo("Interrupt flag was set: 126X payload transmission complete");
+            startReceive();
+        }
+        if (DuckRadio::interruptFlags & RADIOLIB_SX126X_IRQ_TIMEOUT ) {
+            loginfo("Interrupt flag was set: 126X timeout");
+        }
 
         DuckRadio::interruptFlags = 0;
     }
