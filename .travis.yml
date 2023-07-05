@@ -36,6 +36,7 @@ before_install:
 
     file='./library.properties'
     dependsvar="$(prop 'depends')"
+    echo $dependsvar
 
     IFS=$'\n' read -r -d '' -a the_array < <(awk -F',' '{ for( i=1; i<=NF; i++) print $i }' <<<"$dependsvar")
 
