@@ -37,7 +37,9 @@ before_install:
     file='./library.properties'
     dependsvar=$(prop 'depends')
 
-    for i in ${dependsvar//,/ }
+    IFS=$'\n' read -r -d '' -a the_array < <(awk -F',' '{ for( i=1; i<=NF; i++) print $i }' <<<"$dependsvar")
+
+    for i in "${the_array[@]}"
     do
       echo "$i"
       if [[ "$i" == *"github"* ]]; then
