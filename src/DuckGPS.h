@@ -5,7 +5,7 @@
 #ifndef CLUSTERDUCK_PROTOCOL_DUCKGPS_H
 #define CLUSTERDUCK_PROTOCOL_DUCKGPS_H
 #include <TinyGPS++.h>
-#include <cdpcfg.h>
+#include "include/cdpcfg.h"
 #include <ctime>
 #include <memory>
 

@@ -32,6 +32,7 @@
         "contrem/arduino-timer": "^2.3.1",
         "olikraus/U8g2": "^2.33.2",
         "bblanchon/ArduinoJson": "^6.19.4",
+        "mikalhart/TinyGPSPlus": "~1.0.2",
         "bakercp/CRC32": "2.0.0",
         "jgromes/RadioLib": "^5.1.2",
         "operatorfoundation/Crypto": "^0.4.0",

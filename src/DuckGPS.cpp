@@ -2,7 +2,7 @@
 // Created by brent on 7/7/2023.
 //
 
-#include "include/DuckGPS.h"
+#include "DuckGPS.h"
 
 void DuckGPS::readData(unsigned long ms) {
     unsigned long start = millis();
