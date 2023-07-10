@@ -5,16 +5,14 @@
 #ifndef CLUSTERDUCK_PROTOCOL_DUCKGPS_H
 #define CLUSTERDUCK_PROTOCOL_DUCKGPS_H
 #include <TinyGPS++.h>
+#include <cdpcfg.h>
 #include <ctime>
 #include <memory>
-
-#define GPS_RX NULL
-#define GPS_TX NULL
 
 class DuckGPS {
 public:
     DuckGPS() : GPSSerial(1) {
-        GPSSerial.begin(9600, SERIAL_8N1,GPS_RX,GPS_TX);
+        GPSSerial.begin(9600, SERIAL_8N1,CDPCFG_GPS_RX,CDPCFG_GPS_TX);
     };
     DuckGPS(int RX, int TX) : GPSSerial(1) {
         GPSSerial.begin(9600, SERIAL_8N1, RX, TX);
@@ -35,6 +33,7 @@ public:
     void printData();
     std::time_t epoch();
     double speed(SpeedUnit u);
+    uint32_t satellites();
     double altitude(AltitudeUnit u);
 protected:
     std::time_t tmConvert_t(int YYYY, byte MM, byte DD, byte hh, byte mm, byte ss);

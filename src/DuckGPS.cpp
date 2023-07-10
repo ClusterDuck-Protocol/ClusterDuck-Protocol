@@ -42,7 +42,7 @@ void DuckGPS::printData(){
     Serial.print("Longitude : ");
     Serial.println(gps.location.lng());
     Serial.print("Altitude  : ");
-    Serial.print(gps.altitude.meters());
+    Serial.print(altitude(AltitudeUnit::meter));
     Serial.println("M");
     Serial.print("Satellites: ");
     Serial.println(gps.satellites.value());
@@ -51,7 +51,7 @@ void DuckGPS::printData(){
     Serial.print("Epoch     : ");
     Serial.println(epoch());
     Serial.print("Speed     : ");
-    Serial.println(gps.speed.mps());
+    Serial.println(speed(SpeedUnit::kmph));
     Serial.println("**********************");
 }
 
@@ -73,4 +73,8 @@ double DuckGPS::speed(SpeedUnit u){
         case SpeedUnit::knots: return gps.speed.knots();
         default: return -1.0;
     }
+}
+
+uint32_t DuckGPS::satellites() {
+    return gps.satellites.value();
 }
