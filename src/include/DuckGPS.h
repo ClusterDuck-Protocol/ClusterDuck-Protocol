@@ -31,6 +31,7 @@ public:
     };
     void readData(unsigned long ms);
     void printData();
+    double lat(), lng();
     std::time_t epoch();
     double speed(SpeedUnit u);
     uint32_t satellites();

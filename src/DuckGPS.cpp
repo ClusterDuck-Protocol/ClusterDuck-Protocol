@@ -38,23 +38,29 @@ void DuckGPS::printData(){
     // Printing the GPS data
     Serial.println("--- GPS ---");
     Serial.print("Latitude  : ");
-    Serial.println(gps.location.lat());
+    Serial.println(lat());
     Serial.print("Longitude : ");
-    Serial.println(gps.location.lng());
+    Serial.println(lng());
     Serial.print("Altitude  : ");
     Serial.print(altitude(AltitudeUnit::meter));
     Serial.println("M");
     Serial.print("Satellites: ");
-    Serial.println(gps.satellites.value());
+    Serial.println(satellites());
     Serial.print("Raw Date  : ");
     Serial.println(gps.date.value());
     Serial.print("Epoch     : ");
     Serial.println(epoch());
     Serial.print("Speed     : ");
-    Serial.println(speed(SpeedUnit::kmph));
+    Serial.print(speed(SpeedUnit::kmph));
+    Serial.println("KPH");
     Serial.println("**********************");
 }
-
+double DuckGPS::lat() {
+    return gps.location.lat();
+}
+double DuckGPS::lng() {
+    return gps.location.lng();
+}
 double DuckGPS::altitude(AltitudeUnit u){
     switch(u){
         case AltitudeUnit::meter: return gps.altitude.meters();
