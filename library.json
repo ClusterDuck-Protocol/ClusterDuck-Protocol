@@ -35,6 +35,7 @@
         "bakercp/CRC32": "2.0.0",
         "jgromes/RadioLib": "^6.1.0",
         "operatorfoundation/Crypto": "^0.4.0",
-        "me-no-dev/ESP Async WebServer": "^1.2.3"
+        "me-no-dev/ESP Async WebServer": "^1.2.3",
+        "knolleary/pubsubclient":"^2.8.0"
     }
 }
