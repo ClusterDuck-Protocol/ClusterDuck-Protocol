@@ -30,12 +30,14 @@ before_install:
   # install library in current state
   - rsync -rltv --exclude=.git --exclude=bin ${PWD}/ /tmp/CDP/ && (cd /tmp && zip -r /tmp/cdp.zip CDP) && arduino-cli lib install --zip-path /tmp/cdp.zip
   - |-
+    file="library.properties"
+    
     function prop {
-      grep "${1}" ${file} | cut -d'-' -f2
+      PROP_VALUE=`cat $file | grep "${1}" | cut -d'=' -f2`
+      echo $PROP_VALUE
     }
 
-    file='./library.properties'
-    dependsvar=$(prop 'depends')
+    dependsvar=$(prop "depends")
 
     IFS=$'\n' read -r -d '' -a the_array < <(awk -F',' '{ for( i=1; i<=NF; i++) print $i }' <<<"$dependsvar")
 
