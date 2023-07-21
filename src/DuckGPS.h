@@ -30,7 +30,6 @@ public:
         knots
     };
     void readData(unsigned long ms);
-    void printData();
     double lat(), lng();
     /**
   * @brief helper method for getting [lat,lng] as a GeoJSON object.
@@ -50,6 +49,7 @@ public:
     uint32_t satellites();
     double altitude(AltitudeUnit u);
 protected:
+    void printData();
     std::time_t tmConvert_t(int YYYY, byte MM, byte DD, byte hh, byte mm, byte ss);
 private:
     TinyGPSPlus gps;

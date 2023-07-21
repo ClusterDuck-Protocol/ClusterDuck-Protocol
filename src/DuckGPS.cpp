@@ -3,6 +3,7 @@
 //
 
 #include "DuckGPS.h"
+#include "DuckLogger.h"
 
 void DuckGPS::readData(unsigned long ms) {
     unsigned long start = millis();
@@ -11,6 +12,7 @@ void DuckGPS::readData(unsigned long ms) {
         while (GPSSerial.available())
             gps.encode(GPSSerial.read());
     } while (millis() - start < ms);
+    printData();
 }
 
 std::time_t DuckGPS::tmConvert_t(int YYYY, byte MM, byte DD, byte hh, byte mm, byte ss)
@@ -36,24 +38,15 @@ std::time_t DuckGPS::epoch(){
 }
 void DuckGPS::printData(){
     // Printing the GPS data
-    Serial.println("--- GPS ---");
-    Serial.print("Latitude  : ");
-    Serial.println(lat());
-    Serial.print("Longitude : ");
-    Serial.println(lng());
-    Serial.print("Altitude  : ");
-    Serial.print(altitude(AltitudeUnit::meter));
-    Serial.println("M");
-    Serial.print("Satellites: ");
-    Serial.println(satellites());
-    Serial.print("Raw Date  : ");
-    Serial.println(gps.date.value());
-    Serial.print("Epoch     : ");
-    Serial.println(epoch());
-    Serial.print("Speed     : ");
-    Serial.print(speed(SpeedUnit::kmph));
-    Serial.println("KPH");
-    Serial.println("**********************");
+    logdbg("--- GPS ---");
+    logdbg(std::string("Latitude  : "+std::to_string(lat())).c_str());
+    logdbg(std::string("Longitude : "+std::to_string(lng())).c_str());
+    logdbg(std::string("Altitude : "+std::to_string(altitude(AltitudeUnit::meter))).append("M").c_str());
+    logdbg(std::string("Satellites : "+std::to_string(satellites())).c_str());
+    logdbg(std::string("Raw Date : "+std::to_string(gps.date.value())).c_str());
+    logdbg(std::string("Epoch : "+std::to_string(epoch())).c_str());
+    logdbg(std::string("Raw Date : "+std::to_string(speed(SpeedUnit::kmph))).append("KPH").c_str());
+    logdbg("**********************");
 }
 
 
