@@ -55,11 +55,21 @@ void DuckGPS::printData(){
     Serial.println("KPH");
     Serial.println("**********************");
 }
+
+
 double DuckGPS::lat() {
     return gps.location.lat();
 }
 double DuckGPS::lng() {
     return gps.location.lng();
+}
+std::string DuckGPS::geoJsonPoint(){
+    std::string geojsonpoint = "{\"type\": \"Point\", \"coordinates\": [";
+    return geojsonpoint
+        .append(std::to_string(lat()))
+        .append(",")
+        .append(std::to_string(lng())
+        .append("]}"));
 }
 double DuckGPS::altitude(AltitudeUnit u){
     switch(u){

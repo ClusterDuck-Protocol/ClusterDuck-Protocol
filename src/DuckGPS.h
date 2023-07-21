@@ -32,6 +32,19 @@ public:
     void readData(unsigned long ms);
     void printData();
     double lat(), lng();
+    /**
+  * @brief helper method for getting [lat,lng] as a GeoJSON object.
+  *
+  * @param none
+  * @return std::string with GeoJSON object that can be parsed by the developer
+  */
+    std::string geoJsonPoint();
+    /**
+   * @brief helper method to return time from GPS data
+   *
+   * @param none
+   * @return std::time_t in epoch seconds
+   */
     std::time_t epoch();
     double speed(SpeedUnit u);
     uint32_t satellites();
