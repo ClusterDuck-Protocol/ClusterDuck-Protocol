@@ -31,6 +31,12 @@ public:
         mph, // Speed in miles per hour
         knots
     };
+    /**
+   * @brief continuously reads data from GPS chip
+   *
+   * @param unsigned long value for number of milliseconds to read data for
+   * @return none
+   */
     void readData(unsigned long ms);
     double lat(), lng();
     /**
@@ -47,8 +53,26 @@ public:
    * @return std::time_t in epoch seconds
    */
     std::time_t epoch();
+    /**
+   * @brief helper method to return speed
+   *
+   * @param DuckGPS::SpeedUnit
+   * @return double value for chosen speed unit
+   */
     double speed(SpeedUnit u);
+    /**
+   * @brief helper method to return number of satellites
+   *
+   * @param none
+   * @return uint32_t value for number of satellites
+   */
     uint32_t satellites();
+    /**
+   * @brief helper method to return altitude
+   *
+   * @param DuckGPS::AltitudeUnit
+   * @return double value for chosen altitude unit
+   */
     double altitude(AltitudeUnit u);
 protected:
     void printData();
