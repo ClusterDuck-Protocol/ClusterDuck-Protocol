@@ -82,7 +82,6 @@
 #elif defined(ARDUINO_TBeam)
 #include "include/boards/ttgo-t-beam.h"
 
-
 /*
  * BOARD "heltec wireless stick"
  * http://www.heltec.cn/project/wireless-stick/
@@ -180,8 +179,15 @@
 
 #endif // Board definitions
 
-
-
+/**
+  * @brief conditional compilation of GPS code
+  * The the receive and transmit pins must be
+  * defined in the board definition header to
+  * activate.
+  */
+#if defined(CDPCFG_GPS_RX) && defined(CDPCFG_GPS_TX)
+#include <DuckGPS.h>
+#endif
 
 /**
  * @brief Non board specific configuration

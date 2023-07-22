@@ -4,7 +4,6 @@
 
 #include "DuckGPS.h"
 #include "DuckLogger.h"
-
 void DuckGPS::readData(unsigned long ms) {
     unsigned long start = millis();
     do

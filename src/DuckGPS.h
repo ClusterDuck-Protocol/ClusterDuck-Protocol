@@ -11,9 +11,11 @@
 
 class DuckGPS {
 public:
+#if defined(CDPCFG_GPS_RX) && defined(CDPCFG_GPS_TX)
     DuckGPS() : GPSSerial(1) {
         GPSSerial.begin(9600, SERIAL_8N1,CDPCFG_GPS_RX,CDPCFG_GPS_TX);
     };
+#endif
     DuckGPS(int RX, int TX) : GPSSerial(1) {
         GPSSerial.begin(9600, SERIAL_8N1, RX, TX);
     };
