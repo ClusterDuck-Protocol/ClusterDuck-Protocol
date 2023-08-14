@@ -81,17 +81,17 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
         logerr("ERROR  output power is invalid");
         return DUCKLORA_ERR_SETUP;
     }
-#if !defined (CDPCFG_RADIO_SX126X)
+#ifdef CDPCFG_RADIO_SX126X
+    // set the interrupt handler to execute when packet tx or rx is done.
+    lora.setDio1Action(config.func,RISING);
+#else
     rc = lora.setGain(CDPCFG_RF_LORA_GAIN);
     if (rc == RADIOLIB_ERR_INVALID_GAIN) {
         logerr("ERROR  gain is invalid");
         return DUCKLORA_ERR_SETUP;
     }
     // set the interrupt handler to execute when packet tx or rx is done.
-    lora.setDio0Action(config.func);
-#else
-    // set the interrupt handler to execute when packet tx or rx is done.
-    lora.setDio1Action(config.func);
+    lora.setDio0Action(config.func,RISING);
 #endif
 
     // set sync word to private network
