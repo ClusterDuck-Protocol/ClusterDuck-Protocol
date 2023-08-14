@@ -83,7 +83,7 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
     }
 #ifdef CDPCFG_RADIO_SX126X
     // set the interrupt handler to execute when packet tx or rx is done.
-    lora.setDio1Action(config.func,RISING);
+    lora.setDio1Action(config.func);
 #else
     rc = lora.setGain(CDPCFG_RF_LORA_GAIN);
     if (rc == RADIOLIB_ERR_INVALID_GAIN) {
