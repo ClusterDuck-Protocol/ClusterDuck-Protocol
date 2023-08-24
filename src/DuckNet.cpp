@@ -138,7 +138,7 @@ std::string DuckNet::retrieveMessageHistory(CircularBuffer* buffer)
     } else{
       acked = "1";
     }
-    json = json + "{\"sduid\":\"" + sduid + "\", \"muid\":\"" + muid +  "\" , \"title\":\"PLACEHOLDER TITLE\", \"body\":\"" + messageBody + "\", \"messageAge\":\"" + messageAgeString + "\", \"acked\":\"" + acked + "\"}";
+    json = json + "{\"sduid\":\"" + sduid + "\", \"muid\":\"" + muid +  "\" , \"title\":\"PLACEHOLDER TITLE\", \"body\":" + messageBody + ", \"messageAge\":\"" + messageAgeString + "\", \"acked\":\"" + acked + "\"}";
     tail++;
     if(tail == buffer->getBufferEnd()){
       tail = 0;
