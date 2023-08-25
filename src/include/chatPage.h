@@ -37,9 +37,9 @@ const char chat_page[] PROGMEM = R"=====(
         } else {
             card.classList.add("received-message-card");
         }
-        card.innerHTML = newMessage.message.body + '</p><span class="duid">FROM DUCKID: '
+        card.innerHTML = newMessage.body.body + '</p><span class="duid">FROM DUCKID: '
             + newMessage.sduid + '</span></p><span class="name">'
-            + newMessage.message.username + '</span>';
+            + newMessage.body.username + '</span>';
 
         document.getElementById('message-container').prepend(card);
     }
@@ -53,6 +53,12 @@ const char chat_page[] PROGMEM = R"=====(
 
     }
 
+    function startChatInterval(){
+        setInterval(function(){
+            requestChatHistory();
+        }, 20000);
+    }
+
     function sduidListener() {
         sduid = this.responseText;
     }
@@ -60,6 +66,7 @@ const char chat_page[] PROGMEM = R"=====(
     function requestChatHistory() {
         var req = new XMLHttpRequest();
         req.addEventListener("load", chatHistoryListener);
+        req.addEventListener("error", errorListener);
         req.open("GET", "/chatHistory");
         req.send();
     }
@@ -127,6 +134,7 @@ const char chat_page[] PROGMEM = R"=====(
 
     requestSduid();
     requestChatHistory();
+    startChatInterval();
     document.getElementById("chatMessage").focus();
 </script>
 </body>
