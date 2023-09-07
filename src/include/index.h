@@ -201,8 +201,21 @@ const char MAIN_page[] PROGMEM = R"=====(
             <p>ID must be four characters long. It can be any capital letters of the Latin alphabet A-Z except O, or any
                 numbers 1-9.</p>
             <label for="status">Your message:</label><br/>
-            <textarea class="textbox comments textbox-full" name="message" id="commentsInput" cols="30"
-                      rows="2"></textarea>
+            <textarea class="textbox comments textbox-full" maxlength=200 name="message" id="commentsInput" cols="30"
+                      rows="2" onkeyup="updateCounter(this)"></textarea>
+
+                    Remaining characters: <span id="counter">200</span>
+
+                    <script type="text/javascript">
+                    function updateCounter(textarea) {
+                        var currentLength = textarea.value.length;
+                        var maxCharacters = 200;
+                        var remainingCharacters = maxCharacters - currentLength;
+                        document.getElementById("counter").innerHTML = remainingCharacters;  
+                    }
+                    </script>
+            </textarea>
+                      
             <button type="button" id="sendBtn" class="sendReportBtn">Send</button>
             <p id="makeshiftErrorOutput" class="hidden"></p>
         </form>
