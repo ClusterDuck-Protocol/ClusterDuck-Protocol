@@ -79,7 +79,7 @@
  * (GPS module and 18650 holder)
  * pio: board = ttgo-t-beam
  */
-#elif defined(ARDUINO_TBeam)
+#elif defined(ARDUINO_T_Beam) or defined(ARDUINO_TBeam)
 #include "include/boards/ttgo-t-beam.h"
 
 /*
