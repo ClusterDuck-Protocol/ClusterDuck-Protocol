@@ -28,30 +28,53 @@ const char private_chat_page[] PROGMEM = R"=====(
 
 <script>
     var sduid = "you";
+    var ackOption;
     const username = sessionStorage.getItem("username");
 
     function displayNewMessage(newMessage, sent) {
         var card = document.createElement("div");
         if (sent) {
             card.classList.add("sent-message-card");
+
+            if( (newMessage.acked == 0) && (newMessage.messageAge >= 30000) && ackOption){
+                card.classList.add("resend-message");
+
+                card.addEventListener('click', function(){
+                    card.classList.remove("resend-message");
+                    card.classList.add("sent-message-card");
+                    card.innerHTML = newMessage.body.body + '</p><span class="duid">Resending...</span></p></p><span class="name">' 
+                    + newMessage.body.username + '</span>';
+                    requestResend(newMessage.muid);
+                }, true);
+            } else if((newMessage.acked == 1) && ackOption){
+                card.classList.add("acked-message");
+            }
         } else {
             card.classList.add("received-message-card");
         }
-        card.innerHTML = newMessage.body.body + '</p><span class="duid">FROM DUCKID: '
-            + newMessage.sduid + '</span></p><span class="name">'
+         if( (newMessage.acked == 0) && (newMessage.messageAge >= 30000) && ackOption && sent){
+                    card.innerHTML = newMessage.body.body + '</p><span class="duid">Click Message to Resend</span>' 
+        } else{
+            card.innerHTML = newMessage.body.body + '</p><span class="duid">FROM DUCKID: '
+            + newMessage.sduid + '</span></p><span class="name">' 
             + newMessage.body.username + '</span>';
+        }
 
         document.getElementById('message-container').append(card);
     }
 
     function chatHistoryListener() {
         var data = JSON.parse(this.responseText);
+        ackOption = data.ackOption;
+        clearMessages();
         data.posts.forEach(item => {
             let sent = sduid == item.sduid ? true : false;
             displayNewMessage(item, sent);
         });
-        //document.getElementById('dduid').innerHtml = "PRIVATE CHAT: " + ;
+    }
 
+    function clearMessages(){
+         document.getElementById('message-container').innerHTML = '';
     }
 
     function startChatInterval(){
@@ -77,6 +100,16 @@ const char private_chat_page[] PROGMEM = R"=====(
         req.addEventListener("load", chatHistoryListener);
         req.addEventListener("error", errorListener);
         req.open("GET", "/privateChatHistory");
+        req.send();
+    }
+
+    function requestResend(resendMuid){
+        let params = new URLSearchParams("");
+        params.append("resendMuid", resendMuid);
+        var req = new XMLHttpRequest();
+        req.addEventListener("load", loadListener);
+        req.addEventListener("error", errorListener);
+        req.open("POST", "/requestMessageResend.json?" + params.toString());
         req.send();
     }
 
@@ -173,6 +206,10 @@ const char private_chat_page[] PROGMEM = R"=====(
         overflow: auto;
         width: 70%;
         float: right;
+    }
+
+    .resend-message{
+        background-color: rgba(255, 0, 20, .35) !important;
     }
 
     #message-container {
