@@ -1,23 +1,19 @@
 {
-  "arduino-timer": {
-    "version": "3.0.0",
-    "url": "https://github.com/contrem/arduino-timer/archive/refs/heads/master.zip"
-  },
-  "U8g2": {
-    "version": "2.33.2",
-    "url": "https://downloads.arduino.cc/libraries/github.com/olikraus/U8g2-2.33.15.zip"
-  },
   "ArduinoJson" : {
     "version": "6.21.0",
     "url": "https://github.com/bblanchon/ArduinoJson/releases/download/v6.21.0/ArduinoJson-v6.21.0.h"
   },
+  "arduino-timer": {
+    "version": "3.0.0",
+    "url": "https://github.com/contrem/arduino-timer/archive/refs/heads/master.zip"
+  },
+  "AsyncTCP" : {
+    "version": "1.1.1",
+    "url": "https://github.com/me-no-dev/AsyncTCP/archive/refs/heads/master.zip"
+  },
   "CRC32" : {
     "version": "2.33.2",
     "url": "https://github.com/bakercp/CRC32/archive/refs/tags/2.0.0.zip"
-  },
-  "RadioLib" : {
-    "version": "5.6.0",
-    "url": "https://github.com/jgromes/RadioLib/archive/refs/tags/5.6.0.zip"
   },
   "Crypto" : {
     "version": "0.4.0",
@@ -27,12 +23,16 @@
     "version": "1.2.3",
     "url": "https://github.com/me-no-dev/ESPAsyncWebServer/archive/refs/heads/master.zip"
   },
-  "AsyncTCP" : {
-    "version": "1.1.1",
-    "url": "https://github.com/me-no-dev/AsyncTCP/archive/refs/heads/master.zip"
-  },
   "pubsubclient" : {
     "version": "2.8",
     "url": "https://github.com/knolleary/pubsubclient/archive/refs/tags/v2.8.zip"
+  },
+  "RadioLib" : {
+    "version": "5.6.0",
+    "url": "https://github.com/jgromes/RadioLib/archive/refs/tags/5.6.0.zip"
+  },
+  "U8g2": {
+    "version": "2.33.2",
+    "url": "https://downloads.arduino.cc/libraries/github.com/olikraus/U8g2-2.33.15.zip"
   }
 }
