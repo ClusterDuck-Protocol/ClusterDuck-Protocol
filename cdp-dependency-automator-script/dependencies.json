@@ -28,8 +28,8 @@
     "url": "https://github.com/knolleary/pubsubclient/archive/refs/tags/v2.8.zip"
   },
   "RadioLib" : {
-    "version": "5.6.0",
-    "url": "https://github.com/jgromes/RadioLib/archive/refs/tags/5.6.0.zip"
+    "version": "6.3.0",
+    "url": "https://github.com/jgromes/RadioLib/archive/refs/tags/6.3.0.zip"
   },
   "U8g2": {
     "version": "2.33.2",
