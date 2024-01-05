@@ -31,7 +31,7 @@ def run():
             print("Please respond with 'yes' or 'no'")
 
 
-def install(dep_file_name, destination): #update to use brentons dep version
+def install(dep_file_name, destination):
     retry_count = 0
     json_file = open(dep_file_name)
     dependencies = json.load(json_file)
