@@ -45,7 +45,11 @@ def install(dep_file_name, destination):
                 if response.status_code == 200:
                     content_type = response.headers.get('Content-Type')
                     if content_type == 'application/zip':
-                        file_path = os.path.join(destination, dependency)
+                        zip_dir = os.path.join(destination, dependency)
+                        if not os.path.exists(zip_dir):
+                            os.makedirs(zip_dir)
+
+                        file_path = os.path.join(destination, f"{dependency}.zip")
 
                         with open(file_path, 'wb') as file:
                             file.write(response.content)
