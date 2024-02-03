@@ -29,28 +29,55 @@ const char chat_page[] PROGMEM = R"=====(
 
 <script>
     var sduid = "you";
+    var ackOption;
     const username = sessionStorage.getItem("username");
     function displayNewMessage(newMessage, sent) {
         var card = document.createElement("div");
         if (sent) {
             card.classList.add("sent-message-card");
+
+            if( (newMessage.acked == 0) && (newMessage.messageAge >= 30000) && ackOption){
+                card.classList.add("resend-message");
+
+                card.addEventListener('click', function(){
+                    card.classList.remove("resend-message");
+                    card.classList.add("sent-message-card");
+                    card.innerHTML = newMessage.body.body + '</p><span class="duid">Resending...</span></p></p><span class="name">' 
+                    + newMessage.body.username + '</span>';
+                    requestResend(newMessage.muid);
+                }, true);
+            } else if((newMessage.acked == 1) && ackOption){
+                card.classList.add("acked-message");
+            }
         } else {
             card.classList.add("received-message-card");
         }
-        card.innerHTML = newMessage.body.body + '</p><span class="duid">FROM DUCKID: '
-            + newMessage.sduid + '</span></p><span class="name">'
+
+        if( (newMessage.acked == 0) && (newMessage.messageAge >= 30000) && ackOption && sent){
+            card.innerHTML = newMessage.body.body + '</p><span class="duid">Click Message to Resend</span></p>' 
+        } else{
+            card.innerHTML = newMessage.body.body + '</p><span class="duid">FROM DUCKID: '
+            + newMessage.sduid + '</span></p><span class="name">' 
             + newMessage.body.username + '</span>';
+        }
 
         document.getElementById('message-container').prepend(card);
     }
 
     function chatHistoryListener() {
         var data = JSON.parse(this.responseText);
+        ackOption = data.ackOption;
+        clearMessages();
         data.posts.forEach(item => {
             let sent = sduid == item.sduid ? true : false;
             displayNewMessage(item, sent);
         });
+    }
 
+    function startChatInterval(){
+        setInterval(function(){
+            requestChatHistory();
+        }, 20000);
     }
 
     function startChatInterval(){
@@ -71,10 +98,24 @@ const char chat_page[] PROGMEM = R"=====(
         req.send();
     }
 
+    function clearMessages(){
+         document.getElementById('message-container').innerHTML = '';
+    }
+
     function requestSduid() {
         var req = new XMLHttpRequest();
         req.addEventListener("load", sduidListener);
         req.open("GET", "/id");
+        req.send();
+    }
+
+    function requestResend(resendMuid){
+        let params = new URLSearchParams("");
+        params.append("resendMuid", resendMuid);
+        var req = new XMLHttpRequest();
+        req.addEventListener("load", loadListener);
+        req.addEventListener("error", errorListener);
+        req.open("POST", "/requestPublicMessageResend.json?" + params.toString());
         req.send();
     }
 

@@ -29,6 +29,7 @@ const char controlPanel[] PROGMEM = R"=====(
 </div>
 <a href="/flipDetector"><button id="sendBtn">Flip Detector</button></a>
 <a href="/flipDecrypt"><button id="sendBtn">Flip Decryption</button></a>
+<a href="/flipAcking"><button id="sendBtn">Flip Acking</button></a>
  <a href="/"> <button type="button" id="backBtn">Go Back Home</button> </a>
 
 

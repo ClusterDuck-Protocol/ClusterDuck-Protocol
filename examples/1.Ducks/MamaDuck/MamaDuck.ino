@@ -6,6 +6,7 @@
 #include <string>
 #include <arduino-timer.h>
 #include <MamaDuck.h>
+#include <MemoryFree.h>
 
 #ifdef SERIAL_PORT_USBVIRTUAL
 #define Serial SERIAL_PORT_USBVIRTUAL
@@ -50,7 +51,7 @@ bool runSensor(void *) {
   bool result;
   const byte* buffer;
   
-  String message = String("Counter:") + String(counter);
+  String message = String("Counter:") + String(counter)+ " " +String("Free Memory:") + String(freeMemory());
   int length = message.length();
   Serial.print("[MAMA] sensor data: ");
   Serial.println(message);
