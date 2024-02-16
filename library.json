@@ -33,7 +33,7 @@
         "olikraus/U8g2": "^2.33.2",
         "bblanchon/ArduinoJson": "^6.19.4",
         "bakercp/CRC32": "2.0.0",
-        "jgromes/RadioLib": "^5.1.2",
+        "jgromes/RadioLib": "^6.1.0",
         "operatorfoundation/Crypto": "^0.4.0",
         "me-no-dev/ESP Async WebServer": "^1.2.3",
         "knolleary/pubsubclient":"^2.8.0"

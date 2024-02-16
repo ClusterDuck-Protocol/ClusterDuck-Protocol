@@ -8,6 +8,7 @@
 namespace duckutils {
 
   namespace {
+
     std::string cdpVersion = "3.6.1";
   }
 

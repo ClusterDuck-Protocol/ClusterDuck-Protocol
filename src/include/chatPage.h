@@ -80,6 +80,12 @@ const char chat_page[] PROGMEM = R"=====(
         }, 20000);
     }
 
+    function startChatInterval(){
+        setInterval(function(){
+            requestChatHistory();
+        }, 20000);
+    }
+
     function sduidListener() {
         sduid = this.responseText;
     }
