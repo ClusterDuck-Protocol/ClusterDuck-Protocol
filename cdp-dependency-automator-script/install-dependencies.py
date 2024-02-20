@@ -60,6 +60,7 @@ def install(dep_file_name, destination):
                         with zipfile.ZipFile(file_path, 'r') as zip_ref:
                             zip_ref.extractall(destination)
 
+                        os.rmdir(zip_dir)
                         os.remove(file_path)
 
                     elif content_type == 'application/octet-stream':
