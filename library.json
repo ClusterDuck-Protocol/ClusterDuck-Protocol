@@ -12,7 +12,7 @@
     "repository":
     {
         "type": "git",
-        "url": "https://github.com/Call-for-Code/ClusterDuck-Protocol.git"
+        "url": "https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol.git"
     },
     "export":
     {
@@ -35,7 +35,7 @@
         "bakercp/CRC32": "2.0.0",
         "jgromes/RadioLib": "^5.1.2",
         "operatorfoundation/Crypto": "^0.4.0",
-        "me-no-dev/ESP Async WebServer": "^1.2.3",
+        "esphome/ESPAsyncWebServer-esphome": "^3.1.0",
         "knolleary/pubsubclient":"^2.8.0"
     }
 }
