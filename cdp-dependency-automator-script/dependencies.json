@@ -15,10 +15,6 @@
     "version": "2.33.2",
     "url": "https://github.com/bakercp/CRC32/archive/refs/tags/2.0.0.zip"
   },
-  "RadioLib" : {
-    "version": "6.1.0",
-    "url": "https://github.com/jgromes/RadioLib/archive/refs/tags/5.6.0.zip"
-  },
   "Crypto" : {
     "version": "0.4.0",
     "url": "https://github.com/OperatorFoundation/Crypto/archive/refs/tags/0.4.0.zip"
@@ -32,8 +28,8 @@
     "url": "https://github.com/knolleary/pubsubclient/archive/refs/tags/v2.8.zip"
   },
   "RadioLib" : {
-    "version": "5.6.0",
-    "url": "https://github.com/jgromes/RadioLib/archive/refs/tags/5.6.0.zip"
+    "version": "6.1.0",
+    "url": "https://github.com/jgromes/RadioLib/archive/refs/tags/6.1.0.zip"
   },
   "U8g2": {
     "version": "2.33.2",
