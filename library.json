@@ -18,7 +18,9 @@
     {
         "include": 
         [
-            "src/*/*"
+            "src/*/*.cpp",
+            "examples/*",
+            "*/*/*.h"
         ]
     },
     "frameworks": "arduino",
