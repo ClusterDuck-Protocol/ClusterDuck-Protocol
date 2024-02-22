@@ -61,7 +61,7 @@ String convertToHex(byte* data, int size);
  */
 template<typename T>
 String toString(const std::vector<T> & vec) {
-  return std::string(vec.begin(), vec.end()).c_str();
+  return std::string(vec.begin(), vec.end());
 }
 
 /**
