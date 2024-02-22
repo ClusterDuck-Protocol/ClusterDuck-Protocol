@@ -47,7 +47,7 @@
  * pio: board = ttgo-lora32-v1
  */
 #if defined(ARDUINO_TTGO_LoRa32_V1)
-#include "include/boards/ttgo-lora32-v1.h"
+#include "boards/ttgo-lora32-v1.h"
 
 
 /*
@@ -58,7 +58,7 @@
  * pio: board = ttgo-lora32-v2
  */
 #elif defined(ARDUINO_TTGO_LoRa32_V2)
-#include "include/boards/ttgo-lora32-v2.h"
+#include "boards/ttgo-lora32-v2.h"
 
 
 /*
@@ -69,7 +69,7 @@
  * pio: board = ttgo_lora32_v21
  */
 #elif defined(ARDUINO_TTGO_LoRa32_v21new)
-#include "include/boards/ttgo-lora32-v21.h"
+#include "boards/ttgo-lora32-v21.h"
 
 
 /*
@@ -80,7 +80,7 @@
  * pio: board = ttgo-t-beam
  */
 #elif defined(ARDUINO_TBeam)
-#include "include/boards/ttgo-t-beam.h"
+#include "boards/ttgo-t-beam.h"
 
 
 /*
@@ -89,7 +89,7 @@
  * pio: board = heltec_wireless_stick
  */
 #elif defined(ARDUINO_heltec_wireless_stick)
-#include "include/boards/heltec_wireless_stick.h"
+#include "boards/heltec_wireless_stick.h"
 
 
 /*
@@ -101,21 +101,26 @@
  * pio: board = WIRELESS_STICK_LITE
  */
 #elif defined(ARDUINO_heltec_wireless_stick_LITE)
-#include "include/boards/heltec_wireless_stick_lite.h"
+#include "boards/heltec_wireless_stick_lite.h"
 
 
+
+/**
+ * BOARD "ARDUINO_WIFI_LORA_32_V3"
+ * https://heltec.org/project/wifi-lora-32-v3/
+ * pio: board = heltec_wifi_lora_32_V3
+*/
+
+#elif defined(ARDUINO_WIFI_LORA_32_V3)
+#include "boards/heltec_wifi_lora_32_V3.h"
 
 /*
  * BOARD "Heltec Cube Cell Board ASR6501 with SX1262"
  * https://heltec.org/project/htcc-ab01/
  * pio: board = cubecell_board
  */
-#elif defined(ARDUINO_heltec_wifi_lora_32_V3)
-#include "include/boards/heltec_wifi_lora_32_V3.h"
-
-#elif defined(CubeCell_Board)
-#define CDPCFG_HELTEC_CUBE_CELL
-#include "include/boards/cubecell_board.h"
+#elif defined(CubeCell_Board) || defined(CubeCell_Board_V2) || defined(CubeCell_BoardPlus)
+#include "boards/cubecell_board.h"
 
 
 /*
@@ -124,10 +129,9 @@
  * pio: board = ???
  */
 #elif defined(CubeCell_GPS)
-#define CDPCFG_HELTEC_CUBE_CELL
 // Uncomment this to enable the OLED display
 //#define ENABLE_DISPLAY
-#include "include/boards/cubecell_gps.h"
+#include "boards/cubecell_gps.h"
 
 
 /*
@@ -137,7 +141,7 @@
  * pio: board = arduino_zero
  */
 #elif defined(ARDUINO_SAMD_ZERO)
-#include "include/boards/arduino_zero.h"
+#include "boards/arduino_zero.h"
 
 
 /*
@@ -147,7 +151,7 @@
  * pio: board = sparkfun_lora_gateway_1-channel
  */
 #elif defined(SPARKFUN_LGW1C)
-#include "include/boards/sparkfun_lora_gateway_1.h"
+#include "boards/sparkfun_lora_gateway_1.h"
 
 
 /*
@@ -156,7 +160,7 @@
  * pio: board = lopy
  */
 #elif defined(ARDUINO_LoPy)
-#include "include/boards/lopy.h"
+#include "boards/lopy.h"
 
 
 /*
@@ -165,7 +169,7 @@
  * pio: board = lopy4
  */
 #elif defined(ARDUINO_LoPy4)
-#include "include/boards/lopy4.h"
+#include "boards/lopy4.h"
 
 
 #else // Default to WIFI_LORA_32_V2 board
@@ -179,11 +183,9 @@
  * https://heltec.org/project/wifi-lora-32/
  * pio: board = heltec_wifi_lora_32_V2
  */
-#include "include/boards/heltec_wifi_lora_32_V2.h"
+#include "boards/heltec_wifi_lora_32_V2.h"
 
 #endif // Board definitions
-
-
 
 
 /**

@@ -12,7 +12,6 @@
 #define DUCK_RADIO_IRQ_CRC_ERROR RADIOLIB_SX127X_CLEAR_IRQ_FLAG_PAYLOAD_CRC_ERROR
 #endif
 
-#if !defined(CDPCFG_HELTEC_CUBE_CELL)
 #include "include/DuckUtils.h"
 #include <RadioLib.h>
 
@@ -23,10 +22,10 @@ SPISettings spiSettings;
 CDPCFG_LORA_CLASS lora =
         new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO1, CDPCFG_PIN_LORA_RST,
                    CDPCFG_PIN_LORA_BUSY, spi);
-#elif CDPCFG_RADIO_SX126X
+#elif defined(CDPCFG_RADIO_SX126X)
 CDPCFG_LORA_CLASS lora =
         new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO1, CDPCFG_PIN_LORA_RST,
-                   CDPCFG_PIN_LORA_BUSY, spi);
+                   CDPCFG_PIN_LORA_BUSY);
 #else
 CDPCFG_LORA_CLASS lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO0,
                   CDPCFG_PIN_LORA_RST, CDPCFG_PIN_LORA_DIO1);
@@ -386,4 +385,3 @@ int DuckRadio::startTransmitData(byte* data, int length) {
 
     return err;
 }
-#endif

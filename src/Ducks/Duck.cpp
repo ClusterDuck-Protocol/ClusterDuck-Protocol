@@ -1,10 +1,13 @@
 #include "include/Duck.h"
 
-#include <ArduinoOTA.h>
-#include <esp_int_wdt.h>
-#include <esp_task_wdt.h>
-#include <Update.h>
+#ifndef CDPCFG_WIFI_NONE
+  #include <ArduinoOTA.h>
+  #include <esp_int_wdt.h>
+  #include <esp_task_wdt.h>
+  #include <Update.h>
+#endif
 
+#include <cassert>
 #include "../CdpPacket.h"
 #include "include/bloomfilter.h"
 #include "include/DuckCrypto.h"

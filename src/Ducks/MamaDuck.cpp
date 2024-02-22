@@ -277,15 +277,18 @@ void MamaDuck::handleCommand(const CdpPacket & packet) {
     break;
     case 1:
       //Change wifi status
-      if((char)packet.data[1] == '1') {
-        loginfo("Command WiFi ON");
-        WiFi.mode(WIFI_AP);
+      #ifdef CDPCFG_WIFI_NONE
+        logwarn("WiFi not supported");
+      #else
+        if((char)packet.data[1] == '1') {
+          loginfo("Command WiFi ON");
+          WiFi.mode(WIFI_AP);
 
-      } else if ((char)packet.data[1] == '0') {
-        loginfo("Command WiFi OFF");
-        WiFi.mode( WIFI_MODE_NULL );
-      }
-      
+        } else if ((char)packet.data[1] == '0') {
+          loginfo("Command WiFi OFF");
+          WiFi.mode( WIFI_MODE_NULL );
+        }
+      #endif
     break;
     default:
       logerr("Command not recognized");

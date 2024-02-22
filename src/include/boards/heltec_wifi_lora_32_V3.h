@@ -3,7 +3,6 @@
  * BOARD "WIFI_LoRa_32_V3"
  * https://heltec.org/project/wifi-lora-32-v3/
  */
-#define CDPCFG_BOARD WiFi_Lora_32_V3
 #define CDPCFG_RADIO_SX126X
 
 // Lora configurations 

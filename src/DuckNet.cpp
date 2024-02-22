@@ -1,13 +1,9 @@
 #include "include/DuckNet.h"
 
-#include <Update.h>
+DuckNet::DuckNet(Duck* duckIn): duck(duckIn) {
+}
 
-#include "DuckLogger.h"
-#include "include/Duck.h"
-
-DuckNet::DuckNet(Duck* duckIn):
-  duck(duckIn)
-{}
+#ifndef CDPCFG_WIFI_NONE
 
 //when initializing the buffer, the buffer created will be one larger than the provided size
 //one slot in the buffer is used as a waste slot
@@ -16,7 +12,6 @@ CircularBuffer chatBuffer = CircularBuffer(CDPCFG_CDP_CHATBUF_SIZE);
 std::map<std::string, CircularBuffer*> chatHistories;
 std::string duckSession = duckutils::toString(BROADCAST_DUID).c_str();
 
-#ifndef CDPCFG_WIFI_NONE
 IPAddress apIP(CDPCFG_AP_IP1, CDPCFG_AP_IP2, CDPCFG_AP_IP3, CDPCFG_AP_IP4);
 AsyncWebServer webServer(CDPCFG_WEB_PORT);
 AsyncEventSource events("/events");

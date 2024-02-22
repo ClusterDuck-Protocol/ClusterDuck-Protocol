@@ -1,5 +1,5 @@
 #include "../PapaDuck.h"
-
+#include <cassert>
 int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid,
   String password) {
   loginfo("setupWithDefaults...");
