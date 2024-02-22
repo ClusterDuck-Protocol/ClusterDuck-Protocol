@@ -62,7 +62,7 @@ jobs:
         arduino-cli lib list    
 
     - name: Install CDP dependencies
-
+      run: |
       echo "Installing dependencies..."
       file="library.properties"
       dependsvar=$(awk -F'=' '/depends/{print $2}' $file)
