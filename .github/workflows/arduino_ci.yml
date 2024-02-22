@@ -46,46 +46,50 @@ jobs:
           arduino-cli core install CubeCell:CubeCell --additional-urls https://github.com/HelTecAutomation/CubeCell-Arduino/releases/download/V1.5.0/package_CubeCell_index.json
         fi
 
-    - name: Dependencies setup
+    - name: Install CDP
       run: |
-        rsync -rltv --exclude=.git --exclude=bin  --exclude=docs --exclude=3D-Print-Files ${PWD}/ /tmp/CDP/ > /dev/null && (cd /tmp && zip -r /tmp/cdp.zip CDP > /dev/null) && arduino-cli lib install --zip-path /tmp/cdp.zip        
-        
+        echo "Syncing files..."
+        rsync -rltv --exclude=.git --exclude=bin  --exclude=docs --exclude=3D-Print-Files ${PWD}/ /tmp/CDP/ > /dev/null
 
-        echo "[DEPS SETUP] CDP Installed."
-        arduino-cli lib list
-        pwd; ls -l
+        echo "Creating zip..."
+        (cd /tmp && zip -r /tmp/cdp.zip CDP > /dev/null)
 
-        echo "[DEPS SETUP] Installing dependencies..."
-        file="library.properties"
+        echo "Installing CDP..."
+        arduino-cli lib install --zip-path /tmp/cdp.zip        
 
-        cat $file
-        function prop {
-          PROP_VALUE=`cat $file | grep "${1}" | cut -d'=' -f2`
-          echo $PROP_VALUE
-        }
+        echo "CDP Installed."
+        echo
+        arduino-cli lib list    
 
-        dependsvar=$(prop "depends")
-        
-        # read the array from the string
-        read -ra the_array <<< "${dependsvar//,/ }"
-        echo "[DEPS SETUP ] The array: ${the_array[@]}"
+    - name: Install CDP dependencies
 
-        for i in "${the_array[@]}"
-        do
-          echo "[DEPS SETUP] Installing $i..."
-          if [[ "$i" == *"github"* ]]; then
-            arduino-cli lib install --git-url "$i"
-          elif [[ "$i" == *".zip"* ]]; then
-            arduino-cli lib install --zip-path "$i"
-          else
-            arduino-cli lib install "$i"
-          fi
-        done
-        echo "[DEPS SETUP] Dependencies installed successfully!"
+    echo "Installing dependencies..."
+    file="library.properties"
+    dependsvar=$(awk -F'=' '/depends/{print $2}' $file)
+
+    # read the array from the string
+    dependencies=(${dependsvar//,/ })
+
+    for dep in "${dependencies[@]}"
+    do
+      echo "Installing $dep..."
+      if [[ "$dep" == *"github"* ]]; then
+        arduino-cli lib install --git-url "$dep"
+      elif [[ "$dep" == *".zip"* ]]; then
+        arduino-cli lib install --zip-path "$dep"
+      else
+        arduino-cli lib install "$dep"
+      fi
+    done
+    echo "Dependencies installed successfully!"
+    echo
+    arduino-cli lib list
 
     - name: Build
       run: |
-        buildExampleSketch() { arduino-cli compile -v -t -b ${{ matrix.board }} $PWD/examples/$1/$2/$2.ino; } 
+        buildExampleSketch() { 
+          arduino-cli compile -t -b ${{ matrix.board }} $PWD/examples/$1/$2/$2.ino; 
+        } 
         buildExampleSketch 1.Ducks DuckLink
         buildExampleSketch 1.Ducks MamaDuck
         
