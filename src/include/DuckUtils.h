@@ -17,7 +17,6 @@
 #include <string>
 #include <WString.h>
 #include <vector>
-
 #include "../DuckError.h"
 
 namespace duckutils {
