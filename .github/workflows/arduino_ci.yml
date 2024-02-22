@@ -19,7 +19,6 @@ jobs:
         sudo add-apt-repository --yes ppa:nnstreamer/ppa
         sudo apt-get update
         sudo apt-get -y install cppcheck
-        sudo apt-get install -y dos2unix
         python -m pip install pyserial
         curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh -s
         echo "$PWD/bin/" >> $GITHUB_PATH
@@ -49,7 +48,6 @@ jobs:
           echo "[ARDUINO SETUP] Installing the CubeCell board"
           arduino-cli core install CubeCell:CubeCell --additional-urls https://github.com/HelTecAutomation/CubeCell-Arduino/releases/download/V1.5.0/package_CubeCell_index.json
           echo "[ARDUINO  SETUP] Patching the CubeCell board definition to fix the Arduino.h file."
-          dos2unix /home/runner/.arduino15/packages/CubeCell/hardware/CubeCell/1.5.0/cores/asr650x/Arduino.h
           # Apply patches to the CubeCell board - Path is hardcoded to the version of the board. This will need to be updated when the board version changes.
           patch /home/runner/.arduino15/packages/CubeCell/hardware/CubeCell/1.5.0/cores/asr650x/Arduino.h < ./arduino_patches/cubecell_arduino_h.patch
         fi
