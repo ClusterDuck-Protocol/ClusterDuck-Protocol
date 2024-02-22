@@ -64,10 +64,11 @@ jobs:
         }
 
         dependsvar=$(prop "depends")
-        echo "[DEPS SETUP] Dependencies: $dependsvar"
-
-        IFS=$'\n' read -r -d '' -a the_array < <(awk -F',' '{ for( i=1; i<=NF; i++) print $i }' <<<"$dependsvar")
+        
+        // read the array from the string
+        read -ra the_array <<< "${dependsvar//,/ }"
         echo "[DEPS SETUP ] The array: ${the_array[@]}"
+
         for i in "${the_array[@]}"
         do
           echo "[DEPS SETUP] Installing $i..."
