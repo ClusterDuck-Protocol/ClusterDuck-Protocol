@@ -8,9 +8,9 @@ int getMinFreeHeap() { return ESP.getMinFreeHeap(); }
 int getMaxAllocHeap() { return ESP.getMaxAllocHeap(); }
 #else 
 void restartDuck() {}
-int freeHeapMemory() {}
-int getMinFreeHeap() {}
-int getMaxAllocHeap() {}
+int freeHeapMemory() {return -1;}
+int getMinFreeHeap() {return -1;}
+int getMaxAllocHeap() {return -1;}
 #endif
 
 #ifdef ESP32
