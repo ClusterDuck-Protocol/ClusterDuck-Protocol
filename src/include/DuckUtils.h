@@ -60,8 +60,12 @@ String convertToHex(byte* data, int size);
  * 
  */
 template<typename T>
-String toString(const std::vector<T> & vec) {
-  return std::string(vec.begin(), vec.end());
+String toString(const std::vector<T>& vec) {
+    String result;
+    for (const auto& element : vec) {
+        result += String(element);
+    }
+    return result;
 }
 
 /**

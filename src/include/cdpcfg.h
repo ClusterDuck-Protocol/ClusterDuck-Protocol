@@ -110,8 +110,8 @@
  * https://heltec.org/project/wifi-lora-32-v3/
  * pio: board = heltec_wifi_lora_32_V3
 */
-
-#elif defined(ARDUINO_WIFI_LORA_32_V3)
+// make sure we have the right board defined when using Arduino IDE or PlatformIO
+#elif defined(ARDUINO_WIFI_LORA_32_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3)
 #include "boards/heltec_wifi_lora_32_V3.h"
 
 /*
