@@ -84,7 +84,7 @@ jobs:
 
     - name: Build
       run: |
-        buildExampleSketch() { arduino-cli compile -t -b ${{ matrix.board }} $PWD/examples/$1/$2/$2.ino; } 
+        buildExampleSketch() { arduino-cli compile -v -t -b ${{ matrix.board }} $PWD/examples/$1/$2/$2.ino; } 
         buildExampleSketch 1.Ducks DuckLink
         buildExampleSketch 1.Ducks MamaDuck
         
