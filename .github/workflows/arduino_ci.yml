@@ -20,10 +20,13 @@ jobs:
         sudo apt-get update
         sudo apt-get -y install cppcheck
         python -m pip install pyserial
-        cppcheck --version
-        cppcheck --force --error-exitcode=1 src
         curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh -s
         echo "$PWD/bin/" >> $GITHUB_PATH
+
+    - name: Run cppcheck
+      run: |
+        cppcheck --version
+        cppcheck --error-exitcode=1 --std=c++11 --force src
 
     - name: Arduino setup
       run: |
@@ -88,7 +91,9 @@ jobs:
     - name: Build
       run: |
         buildExampleSketch() { 
+          echo "Building $1/$2/$2.ino..."
           arduino-cli compile -t -b ${{ matrix.board }} $PWD/examples/$1/$2/$2.ino; 
+          echo "Build complete."
         } 
         buildExampleSketch 1.Ducks DuckLink
         buildExampleSketch 1.Ducks MamaDuck
