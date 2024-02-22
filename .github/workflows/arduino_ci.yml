@@ -63,27 +63,27 @@ jobs:
 
     - name: Install CDP dependencies
       run: |
-      echo "Installing dependencies..."
-      file="library.properties"
-      dependsvar=$(awk -F'=' '/depends/{print $2}' $file)
+        echo "Installing dependencies..."
+        file="library.properties"
+        dependsvar=$(awk -F'=' '/depends/{print $2}' $file)
 
-      # read the array from the string
-      dependencies=(${dependsvar//,/ })
+        # read the array from the string
+        dependencies=(${dependsvar//,/ })
 
-      for dep in "${dependencies[@]}"
-      do
-        echo "Installing $dep..."
-        if [[ "$dep" == *"github"* ]]; then
-          arduino-cli lib install --git-url "$dep"
-        elif [[ "$dep" == *".zip"* ]]; then
-          arduino-cli lib install --zip-path "$dep"
-        else
-          arduino-cli lib install "$dep"
-        fi
-      done
-      echo "Dependencies installed successfully!"
-      echo
-      arduino-cli lib list
+        for dep in "${dependencies[@]}"
+        do
+          echo "Installing $dep..."
+          if [[ "$dep" == *"github"* ]]; then
+            arduino-cli lib install --git-url "$dep"
+          elif [[ "$dep" == *".zip"* ]]; then
+            arduino-cli lib install --zip-path "$dep"
+          else
+            arduino-cli lib install "$dep"
+          fi
+        done
+        echo "Dependencies installed successfully!"
+        echo
+        arduino-cli lib list
 
     - name: Build
       run: |
