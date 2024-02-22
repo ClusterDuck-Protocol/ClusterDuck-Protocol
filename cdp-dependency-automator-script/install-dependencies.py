@@ -75,6 +75,14 @@ def install(dep_file_name, destination):
                     else:
                         print(f"{dependency} -- unsupported content type: {content_type}")
 
+            except requests.exceptions.RequestException as e:
+                print(f"Error downloading {dependency}: {e}")
+                retry_count += 1
+                if retry_count == MAX_RETRIES:
+                    print(f"Failed to download {dependency}.")
+                    retry_count = 0
+                    break
+
 
 retry_count = 0
 json_file = open('dependencies.json')
@@ -124,7 +132,6 @@ for dependency, info in dependencies.items():
                     print(f"{dependency} -- unsupported content type: {content_type}")
 
             break
-
         except requests.exceptions.RequestException as e:
             print(f"Error downloading {dependency}: {e}")
             retry_count += 1
@@ -133,13 +140,6 @@ for dependency, info in dependencies.items():
                 retry_count = 0
                 break
 
-            except requests.exceptions.RequestException as e:
-                print(f"Error downloading {dependency}: {e}")
-                retry_count += 1
-                if retry_count == MAX_RETRIES:
-                    print(f"Failed to download {dependency}.")
-                    retry_count = 0
-                    break
 
 #enforce use of python 3
 if sys.version_info[0] < 3:

@@ -1,0 +1,75 @@
+name: Arduino CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        board: ["esp32:esp32:heltec_wifi_lora_32_V3", "CubeCell:CubeCell:CubeCell-Board"]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: System setup
+      run: |
+        sudo add-apt-repository --yes ppa:nnstreamer/ppa
+        sudo apt-get update
+        sudo apt-get -y install cppcheck
+        python -m pip install pyserial
+        cppcheck --version
+        cppcheck --force --error-exitcode=1 src
+        curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh -s
+        echo "$PWD/bin/" >> $GITHUB_PATH
+
+    - name: Arduino setup
+      run: |
+        arduino-cli config init
+        arduino-cli config set library.enable_unsafe_install true
+        # udpate the index to include the Heltec ESP32 and CubeCell boards
+        arduino-cli core update-index --additional-urls https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series/releases/download/1.0.0/package_heltec_esp32_index.json
+        arduino-cli core update-index --additional-urls https://github.com/HelTecAutomation/CubeCell-Arduino/releases/download/V1.5.0/package_CubeCell_index.json
+        
+        # install the Heltec ESP32 and CubeCell boards
+        if [[ "${{ matrix.board }}" =~ "esp32:esp32:" ]]; then
+          arduino-cli core install esp32:esp32 --additional-urls https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series/releases/download/1.0.0/package_heltec_esp32_index.json
+        fi
+        if [[ "${{ matrix.board }}" =~ "CubeCell:CubeCell:" ]]; then
+          arduino-cli core install esp32:esp32 --additional-urls https://github.com/HelTecAutomation/CubeCell-Arduino/releases/download/V1.5.0/package_CubeCell_index.json
+        fi
+
+    - name: Dependencies setup
+      run: |
+        rsync -rltv --exclude=.git --exclude=bin ${PWD}/ /tmp/CDP/ && (cd /tmp && zip -r /tmp/cdp.zip CDP) && arduino-cli lib install --zip-path /tmp/cdp.zip
+        file="library.properties"
+        
+        function prop {
+          PROP_VALUE=`cat $file | grep "${1}" | cut -d'=' -f2`
+          echo $PROP_VALUE
+        }
+
+        dependsvar=$(prop "depends")
+
+        IFS=$'\n' read -r -d '' -a the_array < <(awk -F',' '{ for( i=1; i<=NF; i++) print $i }' <<<"$dependsvar")
+
+        for i in "${the_array[@]}"
+        do
+          echo "$i"
+          if [[ "$i" == *"github"* ]]; then
+            arduino-cli lib install --git-url "$i"
+          elif [[ "$i" == *".zip"* ]]; then
+            arduino-cli lib install --zip-path "$i"
+          else
+            arduino-cli lib install "$i"
+          fi
+        done
+
+    - name: Build
+      run: |
+        buildExampleSketch() { arduino-cli compile -t -b ${{ matrix.board }} $PWD/examples/$1/$2/$2.ino; } 
+        buildExampleSketch 1.Ducks DuckLink
+        buildExampleSketch 1.Ducks MamaDuck
+        buildExampleSketch 1.Ducks PapaDuck
+        buildExampleSketch 1.Ducks DetectorDuck
