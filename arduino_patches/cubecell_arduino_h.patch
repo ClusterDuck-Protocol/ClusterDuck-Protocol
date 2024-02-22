@@ -1,0 +1,31 @@
+--- Arduino_orig.h	2024-02-22 10:53:56
++++ Arduino.h	2024-02-22 10:56:06
+@@ -57,18 +57,17 @@
+ #define  _BV(b)   (1UL << (b))
+ #define yield()
+ 
+-//#ifdef __cplusplus
+-//#include <algorithm>
++#ifdef __cplusplus
++#include <algorithm>
++using std::abs;
++using std::max;
++using std::min;
++#else
++#define min(a, b) ((a)<(b)?(a):(b))
++#define max(a, b) ((a)>(b)?(a):(b))
++#define abs(x)   ((x)>0?(x):-(x))
++#endif /* __cplusplus */
+ 
+-//using std::abs;
+-//using std::max;
+-//using std::min;
+-//#else
+-//#define min(a, b) ((a)<(b)?(a):(b))
+-//#define max(a, b) ((a)>(b)?(a):(b))
+-//#define abs(x)   ((x)>0?(x):-(x))
+-//#endif /* __cplusplus */
+-
+ #define constrain(amt, low, high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
+ #define radians(deg) ((deg)*DEG_TO_RAD)
+ #define degrees(rad) ((rad)*RAD_TO_DEG)

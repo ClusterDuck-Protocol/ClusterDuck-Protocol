@@ -1,9 +1,12 @@
 #include "include/DuckCrypto.h"
 #include "include/DuckUtils.h"
 
+#include "Crypto.h"
+#include "../../Crypto/src/AES.h" // some builds can't find this file so we need explicit path
+#include "CTR.h"
+
 namespace duckcrypto {
 
-   
    // Initializing the cipher (CTR with AES256)
    CTR<AES256> ctraes256;
 
@@ -18,6 +21,7 @@ namespace duckcrypto {
    }
 
    bool getDecrypt() { return decryptOn; }
+
 
    void encryptData(uint8_t* text, uint8_t* encryptedData, size_t inc)
    {

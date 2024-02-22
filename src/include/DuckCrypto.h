@@ -10,14 +10,11 @@
  */
 
 
-#include <Crypto.h>
-#include <AES.h>
-#include <CTR.h>
 #include "../DuckLogger.h"
 
-
 namespace duckcrypto {
-   
+
+
    namespace {
       /**
        * @brief Enable or disable encryption flag.
