@@ -6,6 +6,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         board: ["esp32:esp32:heltec_wifi_lora_32_V3", "CubeCell:CubeCell:CubeCell-Board"]
 
