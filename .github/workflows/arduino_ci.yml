@@ -65,7 +65,7 @@ jobs:
 
         dependsvar=$(prop "depends")
         
-        // read the array from the string
+        # read the array from the string
         read -ra the_array <<< "${dependsvar//,/ }"
         echo "[DEPS SETUP ] The array: ${the_array[@]}"
 
