@@ -37,22 +37,22 @@ jobs:
         
         # install the Heltec ESP32 and CubeCell boards
         if [[ "${{ matrix.board }}" =~ "esp32:esp32:" ]]; then
-          echo "[ARDUINO SETUP] Installing the Heltec ESP32 board"
+          echo "[ARDUINO SETUP] Installing the Heltec ESP32 board" >> $GITHUB_OUTPUT
           arduino-cli core install esp32:esp32 --additional-urls https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series/releases/download/1.0.0/package_heltec_esp32_index.json
         fi
         if [[ "${{ matrix.board }}" =~ "CubeCell:CubeCell:" ]]; then
-          echo "[ARDUINO SETUP] Installing the CubeCell board"
+          echo "[ARDUINO SETUP] Installing the CubeCell board" >> $GITHUB_OUTPUT
           arduino-cli core install CubeCell:CubeCell --additional-urls https://github.com/HelTecAutomation/CubeCell-Arduino/releases/download/V1.5.0/package_CubeCell_index.json
         fi
 
     - name: Dependencies setup
       run: |
-        rsync -rltv --exclude=.git --exclude=bin ${PWD}/ /tmp/CDP/ && (cd /tmp && zip -r /tmp/cdp.zip CDP) && arduino-cli lib install --zip-path /tmp/cdp.zip
+        rsync -rltv --exclude=.git --exclude=bin  --exclude=docs --exclude=3D-Print-Files ${PWD}/ /tmp/CDP/ && (cd /tmp && zip -r /tmp/cdp.zip CDP) && arduino-cli lib install --zip-path /tmp/cdp.zip
         file="library.properties"
         
         function prop {
           PROP_VALUE=`cat $file | grep "${1}" | cut -d'=' -f2`
-          echo $PROP_VALUE
+          echo $PROP_VALUE >> $GITHUB_OUTPUT
         }
 
         dependsvar=$(prop "depends")
