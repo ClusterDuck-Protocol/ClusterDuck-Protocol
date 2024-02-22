@@ -26,6 +26,8 @@ jobs:
 
     - name: Arduino setup
       run: |
+        # Temporarily enable debug output
+        set -x
         arduino-cli config init
         arduino-cli config set library.enable_unsafe_install true
         # udpate the index to include the Heltec ESP32 and CubeCell boards
