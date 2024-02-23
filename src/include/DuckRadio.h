@@ -18,7 +18,6 @@
 #include "../DuckLogger.h"
 #include "cdpcfg.h"
 #include "DuckPacket.h"
-#include "LoraPacket.h"
 
 /**
  * @brief Internal structure to hold the LoRa module configuration
