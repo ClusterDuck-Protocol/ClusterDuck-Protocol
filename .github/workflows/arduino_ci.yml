@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        board: ["esp32:esp32:heltec_wifi_lora_32_V3", "CubeCell:CubeCell:CubeCell-Board-v2"]
+        board: ["esp32:esp32:heltec_wifi_lora_32_V3", "CubeCell:CubeCell:CubeCell-Board-V2"]
 
     steps:
     - name: Checkout code
