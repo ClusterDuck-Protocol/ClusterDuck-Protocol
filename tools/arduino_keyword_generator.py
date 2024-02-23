@@ -30,6 +30,6 @@ args = parser.parse_args()
 functions = extract_functions(args.filename, args.name_only)
 for function in functions:
     if args.name_only:
-        print(f"{function}\tKEYWORD2")
+        print(f"{function:<30}\tKEYWORD2")
     else:
         print(function)
