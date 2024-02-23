@@ -10,7 +10,7 @@ class DuckLink : public Duck {
 public:
   using Duck::Duck;
   
-  ~DuckLink() {}
+  ~DuckLink() override {}
 
   /**
    * @brief Provide the DuckLink specific implementation of the base `run()` method.
