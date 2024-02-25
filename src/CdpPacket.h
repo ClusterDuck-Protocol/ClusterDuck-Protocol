@@ -116,6 +116,7 @@ enum topics {
   max_topics = 0xFF
 };
 
+
 enum reservedTopic {
   unused = 0x00,
   ping = 0x01,
@@ -205,14 +206,13 @@ public:
    *
    * @returns a hex string representing the path section of a cdp packet
    */
-  String getPathAsHexString() {
+  std::string getPathAsHexString() {
     return duckutils::convertToHex(path.data(), path.size());
   }
 
   std::vector<byte> converToBuffer(){
     std::vector<byte> sendBuffer;
     sendBuffer.insert(sendBuffer.end(), sduid.begin(), sduid.end());
-    //sendBuffer.pushback for topic
     return sendBuffer;
   }
   /**
@@ -229,6 +229,43 @@ public:
     topic = 0;
     path_offset = 0;
     dcrc = 0;
+  }
+
+  static std::string topicToString(int topic) {
+    switch (topic) {
+      case topics::status:
+        return "status";
+      case topics::cpm:
+        return "cpm";
+      case topics::location:
+        return "location";
+      case topics::sensor:
+        return "sensor";
+      case topics::alert:
+        return "alert";
+      case topics::health:
+        return "health";
+      case topics::dcmd:
+        return "dcmd";
+      case topics::gchat:
+        return "gchat";
+      case topics::pchat:
+        return "pchat";
+      case topics::mq7:
+        return "mq7";
+      case topics::gp2y:
+        return "gp2y";
+      case topics::bmp280:
+        return "bmp280";
+      case topics::dht11:
+        return "dht11";
+      case topics::pir:
+        return "pir";
+      case topics::bmp180:
+        return "bmp180";
+      default:
+        return "unknown";
+    }
   }
 };
 

@@ -26,6 +26,7 @@ class DuckNet;
 #include "circularBuffer.h"
 #include "DuckUtils.h"
 #include "DuckError.h"
+#include <string>
 
 #ifdef CDPCFG_WIFI_NONE
 #pragma info "WARNING: WiFi is disabled. DuckNet will not be available."
@@ -68,103 +69,103 @@ public:
   std::string duckSession;
 
 #ifdef CDPCFG_WIFI_NONE
-  int setupWebServer(bool createCaptivePortal = false, String html = "") {
-    logwarn("WARNING setupWebServer skipped, device has no WiFi.");
+  int setupWebServer(bool createCaptivePortal = false, std::string html = "") {
+    logwarn_ln("WARNING setupWebServer skipped, device has no WiFi.");
     return DUCK_ERR_NONE;
   }
 
   int setupWifiAp(const char* accessPoint = "DuckLink") {
-    logwarn("WARNING setupWifiAp skipped, device has no WiFi.");
+    logwarn_ln("WARNING setupWifiAp skipped, device has no WiFi.");
     return DUCK_ERR_NONE;
   }
 
   int setupDns() {
-    logwarn("WARNING setupDns skipped, device has no WiFi.");
+    logwarn_ln("WARNING setupDns skipped, device has no WiFi.");
     return DUCK_ERR_NONE;
   }
 
-  int setupInternet(String ssid, String password) {
-    logwarn("WARNING setupInternet skipped, device has no WiFi.");
+  int setupInternet(std::string ssid, std::string password) {
+    logwarn_ln("WARNING setupInternet skipped, device has no WiFi.");
     return DUCK_ERR_NONE;
   }
 
-  bool ssidAvailable(String val = "") {
-    logwarn("WARNING ssidAvailable skipped, device has no WiFi.");
+  bool ssidAvailable(std::string val = "") {
+    logwarn_ln("WARNING ssidAvailable skipped, device has no WiFi.");
     return false;
   }
 
-  void setSsid(String val) {
-    logwarn("WARNING setSsid skipped, device has no WiFi.");
+  void setSsid(std::string val) {
+    logwarn_ln("WARNING setSsid skipped, device has no WiFi.");
   }
 
-  void setPassword(String val) {
-    logwarn("WARNING setPassword skipped, device has no WiFi.");
+  void setPassword(std::string val) {
+    logwarn_ln("WARNING setPassword skipped, device has no WiFi.");
   }
 
-  String getSsid() {
-    logwarn("WARNING getSsid skipped, device has no WiFi.");
-    return String("");
+  std::string getSsid() {
+    logwarn_ln("WARNING getSsid skipped, device has no WiFi.");
+    return std::string("");
   }
 
-  String getPassword() {
-    logwarn("WARNING getPassword skipped, device has no WiFi.");
-    return String("");
+  std::string getPassword() {
+    logwarn_ln("WARNING getPassword skipped, device has no WiFi.");
+    return std::string("");
   }
 
   void setDeviceId(std::vector<byte> deviceId) {
-    logwarn("WARNING setDeviceId skipped, device has no WiFi.");
+    logwarn_ln("WARNING setDeviceId skipped, device has no WiFi.");
   }
 
   bool isWifiConnected() {
-    logwarn("WARNING isWifiConnected skipped, device has no WiFi.");
+    logwarn_ln("WARNING isWifiConnected skipped, device has no WiFi.");
     return false;
   }
 
   int loadWiFiCredentials() {
-    logwarn("WARNING loadWiFiCredentials skipped, device has no WiFi.");
+    logwarn_ln("WARNING loadWiFiCredentials skipped, device has no WiFi.");
     return DUCK_ERR_NONE;
   }
 
   void saveChannel(int val) {
-    logwarn("WARNING saveChannel skipped, device has no WiFi.");
+    logwarn_ln("WARNING saveChannel skipped, device has no WiFi.");
   }
 
   int getChannel() {
-    logwarn("WARNING getChannel skipped, device has no WiFi.");
+    logwarn_ln("WARNING getChannel skipped, device has no WiFi.");
     return 0;
   }
 
   void loadChannel() {
-    logwarn("WARNING loadChannel skipped, device has no WiFi.");
+    logwarn_ln("WARNING loadChannel skipped, device has no WiFi.");
   }
 
   void addToMessageBoardBuffer(CdpPacket message) {
-    logwarn("WARNING addToMessageBoardBuffer skipped, device has no WiFi.");
+    logwarn_ln("WARNING addToMessageBoardBuffer skipped, device has no WiFi.");
   }
 
   void addToChatBuffer(CdpPacket message) {
-    logwarn("WARNING addToChatBuffer skipped, device has no WiFi.");
+    logwarn_ln("WARNING addToChatBuffer skipped, device has no WiFi.");
   }
 
   void addToPrivateChatBuffer(CdpPacket message, std::string chatSession) {
-    logwarn("WARNING addToPrivateChatBuffer skipped, device has no WiFi.");
+    logwarn_ln("WARNING addToPrivateChatBuffer skipped, device has no WiFi.");
   }
 
   void createPrivateHistory(std::string session) {
-    logwarn("WARNING createPrivateHistory skipped, device has no WiFi.");
+    logwarn_ln("WARNING createPrivateHistory skipped, device has no WiFi.");
   }
 
   std::string retrieveMessageHistory(CircularBuffer* buffer) {
-    logwarn("WARNING retrieveMessageHistory skipped, device has no WiFi.");
+    logwarn_ln("WARNING retrieveMessageHistory skipped, device has no WiFi.");
     return "";
   }
 
   void checkForPrivateMessage(std::vector<byte> muid, std::vector<byte> sduid) {
-    logwarn("WARNING checkForPrivateMessage skipped, device has no WiFi.");
+    logwarn_ln("WARNING checkForPrivateMessage skipped, device has no WiFi.");
   }
 
   void checkForPublicMessage(std::vector<byte> muid) {
-    logwarn("WARNING checkForPublicMessage skipped, device has no WiFi.");
+    logwarn_ln("WARNING checkForPublicMessage skipped, device has no WiFi.");
   }
 #else
   /**
@@ -179,7 +180,7 @@ public:
    * Default is an empty string Default portal web page is used if the string is
    * empty
    */
-  int setupWebServer(bool createCaptivePortal = false, String html = "");
+  int setupWebServer(bool createCaptivePortal = false, std::string html = "");
 
   /**
    * @brief insert received packet into the message board circular buffer and
@@ -251,7 +252,7 @@ public:
    * @param ssid        the ssid of the WiFi network
    * @param password    password to join the network
    */
-  int setupInternet(String ssid, String password);
+  int setupInternet(std::string ssid, std::string password);
 
   /**
    * @brief  Checks if the given ssid is available.
@@ -260,7 +261,7 @@ public:
    * internal default ssid
    * @returns true if the ssid is available, false otherwise.
    */
-  bool ssidAvailable(String val = "");
+  bool ssidAvailable(std::string val = "");
 
   /**
    * @brief Save / Write Wifi credentials to EEPROM
@@ -269,7 +270,7 @@ public:
    * @param password    password to join the network
    * @return DUCK_ERR_NONE if successful, an error code otherwise.
    */
-  int saveWifiCredentials(String ssid, String password);
+  int saveWifiCredentials(std::string ssid, std::string password);
 
   /**
    * @brief save set radio channel
@@ -294,28 +295,28 @@ public:
    *
    * @param val the ssid string to set
    */
-  void setSsid(String val);
+  void setSsid(std::string val);
 
   /**
    * @brief Set the WiFi password.
    *
    * @param val  the password string to set
    */
-  void setPassword(String val);
+  void setPassword(std::string val);
 
   /**
    * @brief Get the WiFi network ssid.
    *
    * @returns a string representing the current network ssid
    */
-  String getSsid();
+  std::string getSsid();
 
   /**
    * @brief Get the WiFi password ssid.
    *
    * @returns a string representing the current network password
    */
-  String getPassword();
+  std::string getPassword();
 
   /**
    * @brief Get the current channel.
@@ -345,9 +346,9 @@ public:
 
 private:
 
-  String getMuidStatusMessage(muidStatus status);
-  String getMuidStatusString(muidStatus status);
-  String createMuidResponseJson(muidStatus status);
+  std::string getMuidStatusMessage(muidStatus status);
+  std::string getMuidStatusString(muidStatus status);
+  std::string createMuidResponseJson(muidStatus status);
 
   DuckNet(DuckNet const&) = delete;
   DuckNet& operator=(DuckNet const&) = delete;
@@ -358,9 +359,9 @@ private:
   static const byte DNS_PORT;
   static const char* DNS;
   static const char* AP;
-  String portal = "";
-  String ssid = "";
-  String password = "";
+  std::string portal = "";
+  std::string ssid = "";
+  std::string password = "";
   // char* controlSsid = "";
   // char* controlPassword = "";
 };

@@ -1,19 +1,18 @@
 #include "../PapaDuck.h"
 #include <cassert>
-int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid,
-  String password) {
-  loginfo("setupWithDefaults...");
+int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, std::string ssid, std::string password) {
+  loginfo_ln("setupWithDefaults...");
 
   int err = Duck::setupWithDefaults(deviceId, ssid, password);
 
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR setupWithDefaults rc = " + String(err));
+    logerr_ln("ERROR setupWithDefaults rc = %s",err);
     return err;
   }
 
   err = setupRadio();
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR setupWithDefaults  rc = " + String(err));
+    logerr_ln("ERROR setupWithDefaults  rc = %s",err);
     return err;
   }
 
@@ -21,13 +20,13 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid,
 
   err = setupWifi(name.c_str());
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR setupWithDefaults  rc = " + String(err));
+    logerr_ln("ERROR setupWithDefaults  rc = %s",err);
     return err;
   }
 
   err = setupDns();
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR setupWithDefaults  rc = " + String(err));
+    logerr_ln("ERROR setupWithDefaults  rc = %s",err);
     return err;
   }
 
@@ -35,13 +34,13 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid,
 
   err = setupWebServer();
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR setupWithDefaults  rc = " + String(err));
+    logerr_ln("ERROR setupWithDefaults  rc = %s",err);
     return err;
   }
 
   err = setupOTA();
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR setupWithDefaults  rc = " + String(err));
+    logerr_ln("ERROR setupWithDefaults  rc = %s",err);
     return err;
   }
 
@@ -49,7 +48,7 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid,
     err = setupInternet(ssid, password);
 
     if (err != DUCK_ERR_NONE) {
-      logerr("ERROR setupWithDefaults  rc = " + String(err));
+      logerr_ln("ERROR setupWithDefaults  rc = %s",err);
       return err;
     }
   } 
@@ -63,7 +62,7 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid,
     err = duckNet->loadWiFiCredentials();
 
     if (err != DUCK_ERR_NONE) {
-      logerr("ERROR setupWithDefaults  rc = " + String(err));
+      logerr_ln("ERROR setupWithDefaults  rc = %s",err);
      
       return err;
     }
@@ -73,7 +72,7 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid,
 
 
 
-  loginfo("setupWithDefaults done");
+  loginfo_ln("setupWithDefaults done");
   return DUCK_ERR_NONE;
 }
 
@@ -98,13 +97,12 @@ void PapaDuck::run() {
 
 void PapaDuck::handleReceivedPacket() {
 
-  loginfo("handleReceivedPacket() START");
+  loginfo_ln("handleReceivedPacket() START");
   std::vector<byte> data;
   int err = duckRadio.readReceivedData(&data);
 
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR handleReceivedPacket. Failed to get data. rc = " +
-     String(err));
+    logerr_ln("ERROR handleReceivedPacket. Failed to get data. rc = %s",err);
     return;
   }
   // ignore pings
@@ -115,10 +113,8 @@ void PapaDuck::handleReceivedPacket() {
   // build our RX DuckPacket which holds the updated path in case the packet is relayed
   bool relay = rxPacket->prepareForRelaying(&filter, data);
   if (relay) {
-    logdbg("relaying:  " +
-      duckutils::convertToHex(rxPacket->getBuffer().data(),
-        rxPacket->getBuffer().size()));
-    loginfo("invoking callback in the duck application...");
+    logdbg_ln("relaying:  %s", duckutils::convertToHex(rxPacket->getBuffer().data(), rxPacket->getBuffer().size()).c_str());
+    loginfo_ln("invoking callback in the duck application...");
     
     if(rxPacket->getTopic() == topics::gchat){
       duckNet->addToChatBuffer(CdpPacket(rxPacket->getBuffer()));
@@ -133,21 +129,20 @@ void PapaDuck::handleReceivedPacket() {
       }
     }
 
-    loginfo("handleReceivedPacket() DONE");
+    loginfo_ln("handleReceivedPacket() DONE");
   }
 }
 
 void PapaDuck::handleAck(const CdpPacket & packet) {
   if (ackTimer.empty()) {
-    logdbg("Starting new ack broadcast timer with a delay of " +
-      String(timerDelay) + " ms");
+    logdbg_ln("Starting new ack broadcast timer with a delay of %d ms", timerDelay);
     ackTimer.in(timerDelay, ackHandler, this);
   }
 
   storeForAck(packet);
 
   if (ackBufferIsFull()) {
-    logdbg("Ack buffer is full. Sending broadcast ack immediately.");
+    logdbg_ln("Ack buffer is full. Sending broadcast ack immediately.");
     ackTimer.cancel();
     broadcastAck();
   }
@@ -189,8 +184,10 @@ void PapaDuck::broadcastAck() {
   for (int i = 0; i < num; i++) {
     Duid duid = ackStore[i].first;
     Muid muid = ackStore[i].second;
-    logdbg("Sending ack to DUID " + duckutils::toString(duid)
-      + " for MUID " + duckutils::toString(muid));
+    logdbg_ln("Storing ack for duid: %s, muid: %s",
+      duckutils::convertToHex(duid.data(), DUID_LENGTH).c_str(),
+      duckutils::convertToHex(muid.data(), MUID_LENGTH).c_str());
+      
     dataPayload.insert(dataPayload.end(), duid.begin(), duid.end());
     dataPayload.insert(dataPayload.end(), muid.begin(), muid.end());
   }
@@ -198,8 +195,7 @@ void PapaDuck::broadcastAck() {
   int err = txPacket->prepareForSending(&filter, BROADCAST_DUID, DuckType::PAPA,
     reservedTopic::ack, dataPayload);
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR handleReceivedPacket. Failed to prepare ack. Error: " +
-      String(err));
+    logerr_ln("ERROR handleReceivedPacket. Failed to prepare ack. Error: %d",err);
   }
 
   err = duckRadio.sendData(txPacket->getBuffer());
@@ -208,15 +204,14 @@ void PapaDuck::broadcastAck() {
     CdpPacket packet = CdpPacket(txPacket->getBuffer());
     filter.bloom_add(packet.muid.data(), MUID_LENGTH);
   } else {
-    logerr("ERROR handleReceivedPacket. Failed to send ack. Error: " +
-      String(err));
+    logerr_ln("ERROR handleReceivedPacket. Failed to send ack. Error: %d",err);
   }
 
   ackStore.clear();
 }
 
 void PapaDuck::sendCommand(byte cmd, std::vector<byte> value) {
-  loginfo("Initiate sending command");
+  loginfo_ln("Initiate sending command");
   std::vector<byte> dataPayload;
   dataPayload.push_back(cmd);
   dataPayload.insert(dataPayload.end(), value.begin(), value.end());
@@ -224,8 +219,8 @@ void PapaDuck::sendCommand(byte cmd, std::vector<byte> value) {
   int err = txPacket->prepareForSending(&filter, BROADCAST_DUID, DuckType::PAPA,
     reservedTopic::cmd, dataPayload);
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR handleReceivedPacket. Failed to prepare ack. Error: " +
-      String(err));
+    
+    logerr_ln("ERROR handleReceivedPacket. Failed to prepare ack. Error: %d",err);
   }
 
   err = duckRadio.sendData(txPacket->getBuffer());
@@ -234,13 +229,12 @@ void PapaDuck::sendCommand(byte cmd, std::vector<byte> value) {
     CdpPacket packet = CdpPacket(txPacket->getBuffer());
     filter.bloom_add(packet.muid.data(), MUID_LENGTH);
   } else {
-    logerr("ERROR handleReceivedPacket. Failed to send ack. Error: " +
-      String(err));
+    logerr_ln("ERROR handleReceivedPacket. Failed to send ack. Error: %d", err);
   }
 }
 
 void PapaDuck::sendCommand(byte cmd, std::vector<byte> value, std::vector<byte> dduid) {
-  loginfo("Initiate sending command");
+  loginfo_ln("Initiate sending command");
   std::vector<byte> dataPayload;
   dataPayload.push_back(cmd);
   dataPayload.insert(dataPayload.end(), value.begin(), value.end());
@@ -248,8 +242,7 @@ void PapaDuck::sendCommand(byte cmd, std::vector<byte> value, std::vector<byte> 
   int err = txPacket->prepareForSending(&filter, dduid, DuckType::PAPA,
     reservedTopic::cmd, dataPayload);
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR handleReceivedPacket. Failed to prepare cmd. Error: " +
-      String(err));
+    logerr_ln("ERROR handleReceivedPacket. Failed to prepare cmd. Error: %d",err);
   }
 
   err = duckRadio.sendData(txPacket->getBuffer());
@@ -258,14 +251,13 @@ void PapaDuck::sendCommand(byte cmd, std::vector<byte> value, std::vector<byte> 
     CdpPacket packet = CdpPacket(txPacket->getBuffer());
     filter.bloom_add(packet.muid.data(), MUID_LENGTH);
   } else {
-    logerr("ERROR handleReceivedPacket. Failed to send cmd. Error: " +
-      String(err));
+    logerr_ln("ERROR handleReceivedPacket. Failed to send cmd. Error: %d",err);
   }
 }
 
-int PapaDuck::reconnectWifi(String ssid, String password) {
+int PapaDuck::reconnectWifi(std::string ssid, std::string password) {
 #ifdef CDPCFG_WIFI_NONE
-  logwarn("WARNING reconnectWifi skipped, device has no WiFi.");
+  logwarn_ln("WARNING reconnectWifi skipped, device has no WiFi.");
   return DUCK_ERR_NONE;
 #else
   if (!duckNet->ssidAvailable(ssid)) {
@@ -274,7 +266,7 @@ int PapaDuck::reconnectWifi(String ssid, String password) {
   duckNet->setupInternet(ssid, password);
   duckNet->setupDns();
   if (WiFi.status() != WL_CONNECTED) {
-    logerr("ERROR WiFi reconnection failed!");
+    logerr_ln("ERROR WiFi reconnection failed!");
     return DUCKWIFI_ERR_DISCONNECTED;
   }
   return DUCK_ERR_NONE;
@@ -285,8 +277,7 @@ void PapaDuck::sendMessageBoardMessage(std::vector<byte> dataPayload, std::vecto
   int err = txPacket->prepareForSending(&filter, duid, DuckType::PAPA,
     reservedTopic::mbm, dataPayload);
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR handleReceivedPacket. Failed to prepare ack. Error: " +
-      String(err));
+    logerr_ln("ERROR handleReceivedPacket. Failed to prepare ack. Error: %d", err);
   }
 
   err = duckRadio.sendData(txPacket->getBuffer());
@@ -295,8 +286,7 @@ void PapaDuck::sendMessageBoardMessage(std::vector<byte> dataPayload, std::vecto
     CdpPacket packet = CdpPacket(txPacket->getBuffer());
     filter.bloom_add(packet.muid.data(), MUID_LENGTH);
   } else {
-    logerr("ERROR handleReceivedPacket. Failed to send ack. Error: " +
-      String(err));
+    logerr_ln("ERROR handleReceivedPacket. Failed to send ack. Error: ",err);
   }
   
 }

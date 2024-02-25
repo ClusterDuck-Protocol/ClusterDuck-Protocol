@@ -2,17 +2,17 @@
 #include "../MemoryFree.h"
 
 
-int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String password) {
+int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, std::string ssid, std::string password) {
   
   int err = Duck::setupWithDefaults(deviceId, ssid, password);
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR setupWithDefaults rc = " + String(err));
+    logerr_ln("ERROR setupWithDefaults rc = %s",err);
     return err;
   }
 
   err = setupRadio();
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR setupWithDefaults rc = " + String(err));
+    logerr_ln("ERROR setupWithDefaults rc = %s",err);
     return err;
   }
 
@@ -20,25 +20,25 @@ int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, String ssid, String 
   err = setupWifi(name.c_str());
 
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR setupWithDefaults rc = " + String(err));
+    logerr_ln("ERROR setupWithDefaults rc = %s",err);
     return err;
   }
 
   err = setupDns();
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR setupWithDefaults rc = " + String(err));
+    logerr_ln("ERROR setupWithDefaults rc = %s",err);
     return err;
   }
 
   err = setupWebServer(false);
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR setupWithDefaults rc = " + String(err));
+    logerr_ln("ERROR setupWithDefaults rc = %s",err);
     return err;
   }
 
   err = setupOTA();
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR setupWithDefaults rc = " + String(err));
+    logerr_ln("ERROR setupWithDefaults rc = %s",err);
     return err;
   }
 
@@ -67,20 +67,20 @@ void MamaDuck::handleReceivedPacket() {
   std::vector<byte> data;
   bool relay = false;
   
-  loginfo("====> handleReceivedPacket: START");
+  loginfo_ln("====> handleReceivedPacket: START");
 
   int err = duckRadio.readReceivedData(&data);
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR failed to get data from DuckRadio. rc = "+ String(err));
+    logerr_ln("ERROR failed to get data from DuckRadio. rc = %s",err);
     return;
   }
-  logdbg("Got data from radio, prepare for relay. size: "+ String(data.size()));
+  logdbg_ln("Got data from radio, prepare for relay. size: %d",data.size());
 
   relay = rxPacket->prepareForRelaying(&filter, data);
   if (relay) {
     //TODO: this callback is causing an issue, needs to be fixed for mamaduck to get packet data
     //recvDataCallback(rxPacket->getBuffer());
-    loginfo("handleReceivedPacket: packet RELAY START");
+    loginfo_ln("handleReceivedPacket: packet RELAY START");
     // NOTE:
     // Ducks will only handle received message one at a time, so there is a chance the
     // packet being sent below will never be received, especially if the cluster is small
@@ -92,10 +92,10 @@ void MamaDuck::handleReceivedPacket() {
     if (duckutils::isEqual(BROADCAST_DUID, packet.dduid)) {
       switch(packet.topic) {
         case reservedTopic::ping:
-          loginfo("ping received");
+          loginfo_ln("ping received");
           err = sendPong();
           if (err != DUCK_ERR_NONE) {
-            logerr("ERROR failed to send pong message. rc = " + String(err));
+            logerr_ln("ERROR failed to send pong message. rc = %s",err);
           }
           return;
         break;
@@ -107,21 +107,21 @@ void MamaDuck::handleReceivedPacket() {
           //relay batch ack 
           err = duckRadio.relayPacket(rxPacket);
           if (err != DUCK_ERR_NONE) {
-            logerr("====> ERROR handleReceivedPacket failed to relay. rc = " + String(err));
+            logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %s",err);
           } else {
-            loginfo("handleReceivedPacket: packet RELAY DONE");
+            loginfo_ln("handleReceivedPacket: packet RELAY DONE");
           }
         }
         break;
         case reservedTopic::cmd:
-          loginfo("Command received");
+          loginfo_ln("Command received");
           handleCommand(packet);
 
           err = duckRadio.relayPacket(rxPacket);
           if (err != DUCK_ERR_NONE) {
-            logerr("====> ERROR handleReceivedPacket failed to relay. rc = " + String(err));
+            logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %s",err);
           } else {
-            loginfo("handleReceivedPacket: packet RELAY DONE");
+            loginfo_ln("handleReceivedPacket: packet RELAY DONE");
           }
         break;
         case reservedTopic::mbm:
@@ -144,9 +144,9 @@ void MamaDuck::handleReceivedPacket() {
         default:
           err = duckRadio.relayPacket(rxPacket);
           if (err != DUCK_ERR_NONE) {
-            logerr("====> ERROR handleReceivedPacket failed to relay. rc = " + String(err));
+            logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %s",err);
           } else {
-            loginfo("handleReceivedPacket: packet RELAY DONE");
+            loginfo_ln("handleReceivedPacket: packet RELAY DONE");
           }
       }
     } else if(duckutils::isEqual(duid, packet.dduid)) { //Target device check
@@ -155,11 +155,11 @@ void MamaDuck::handleReceivedPacket() {
       
       switch(packet.topic) {
         case topics::dcmd:
-          loginfo("Duck command received");
+          loginfo_ln("Duck command received");
           handleDuckCommand(packet);
         break;
         case reservedTopic::cmd:
-          loginfo("Command received");
+          loginfo_ln("Command received");
           
           //Start send ack that command was received
           dataPayload.push_back(num);
@@ -170,16 +170,14 @@ void MamaDuck::handleReceivedPacket() {
           err = txPacket->prepareForSending(&filter, PAPADUCK_DUID, 
             DuckType::MAMA, reservedTopic::ack, dataPayload);
           if (err != DUCK_ERR_NONE) {
-          logerr("ERROR handleReceivedPacket. Failed to prepare ack. Error: " +
-            String(err));
+          logerr_ln("ERROR handleReceivedPacket. Failed to prepare ack. Error: %d",err);
           }
 
           err = duckRadio.sendData(txPacket->getBuffer());
           if (err == DUCK_ERR_NONE) {
             filter.bloom_add(packet.muid.data(), MUID_LENGTH);
           } else {
-            logerr("ERROR handleReceivedPacket. Failed to send ack. Error: " +
-              String(err));
+            logerr_ln("ERROR handleReceivedPacket. Failed to send ack. Error: %d", err);
           }
           
           //Handle Command
@@ -230,18 +228,18 @@ void MamaDuck::handleReceivedPacket() {
         default:
           err = duckRadio.relayPacket(rxPacket);
           if (err != DUCK_ERR_NONE) {
-            logerr("====> ERROR handleReceivedPacket failed to relay. rc = " + String(err));
+            logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %s",err);
           } else {
-            loginfo("handleReceivedPacket: packet RELAY DONE");
+            loginfo_ln("handleReceivedPacket: packet RELAY DONE");
           }
       }
 
     } else {
       err = duckRadio.relayPacket(rxPacket);
       if (err != DUCK_ERR_NONE) {
-        logerr("====> ERROR handleReceivedPacket failed to relay. rc = " + String(err));
+        logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %s",err);
       } else {
-        loginfo("handleReceivedPacket: packet RELAY DONE");
+        loginfo_ln("handleReceivedPacket: packet RELAY DONE");
       }
     }
 
@@ -256,13 +254,12 @@ void MamaDuck::handleCommand(const CdpPacket & packet) {
   switch(packet.data[0]) {
     case 0:
       //Send health quack
-      loginfo("Health request received");
+      loginfo_ln("Health request received");
       dataPayload.insert(dataPayload.end(), alive.begin(), alive.end());
       err = txPacket->prepareForSending(&filter, PAPADUCK_DUID, 
         DuckType::MAMA, topics::health, dataPayload);
       if (err != DUCK_ERR_NONE) {
-      logerr("ERROR handleReceivedPacket. Failed to prepare ack. Error: " +
-        String(err));
+      logerr_ln("ERROR handleReceivedPacket. Failed to prepare ack. Error: %d", err);
       }
 
       err = duckRadio.sendData(txPacket->getBuffer());
@@ -270,34 +267,33 @@ void MamaDuck::handleCommand(const CdpPacket & packet) {
         CdpPacket healthPacket = CdpPacket(txPacket->getBuffer());
         filter.bloom_add(healthPacket.muid.data(), MUID_LENGTH);
       } else {
-        logerr("ERROR handleReceivedPacket. Failed to send ack. Error: " +
-          String(err));
+        logerr_ln("ERROR handleReceivedPacket. Failed to send ack. Error: %d", err);
       }
 
     break;
     case 1:
       //Change wifi status
       #ifdef CDPCFG_WIFI_NONE
-        logwarn("WiFi not supported");
+        logwarn_ln("WiFi not supported");
       #else
         if((char)packet.data[1] == '1') {
-          loginfo("Command WiFi ON");
+          loginfo_ln("Command WiFi ON");
           WiFi.mode(WIFI_AP);
 
         } else if ((char)packet.data[1] == '0') {
-          loginfo("Command WiFi OFF");
+          loginfo_ln("Command WiFi OFF");
           WiFi.mode( WIFI_MODE_NULL );
         }
       #endif
     break;
     default:
-      logerr("Command not recognized");
+      logerr_ln("Command not recognized");
   }
 
 }
 
 void MamaDuck::handleDuckCommand(const CdpPacket & packet) {
-  loginfo("Doesn't do anything yet. But Duck Command was received.");
+  loginfo_ln("Doesn't do anything yet. But Duck Command was received.");
 }
 
 void MamaDuck::handleAck(const CdpPacket & packet) {
@@ -313,8 +309,7 @@ void MamaDuck::handleAck(const CdpPacket & packet) {
       if (std::equal(duid.begin(), duid.end(), duidOffset)
         && std::equal(lastMessageMuid.begin(), lastMessageMuid.end(), muidOffset)
       ) {
-        loginfo("handleReceivedPacket: matched ack-MUID "
-          + duckutils::toString(lastMessageMuid));
+        loginfo_ln("handleReceivedPacket: matched ack-MUID %s", duckutils::toString(lastMessageMuid).c_str());
         lastMessageAck = true;
         break;
       }

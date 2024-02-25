@@ -120,6 +120,7 @@
  * pio: board = cubecell_board
  */
 #elif defined(CubeCell_Board) || defined(CubeCell_Board_V2) || defined(CubeCell_BoardPlus)
+#define HELTEC_CUBE_CELL
 #include "boards/cubecell_board.h"
 
 

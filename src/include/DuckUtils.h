@@ -15,7 +15,6 @@
 #include <Arduino.h>
 #include <EEPROM.h>
 #include <string>
-#include <WString.h>
 #include <vector>
 #include "../DuckError.h"
 
@@ -26,6 +25,7 @@ extern bool detectState;
 
 std::string getCDPVersion();
 
+std::string toUpperCase(std::string str);
 /**
  * @brief Creates a byte array with random alpha numerical values.
  *
@@ -40,7 +40,7 @@ void getRandomBytes(int length, byte* bytes);
  * @param length the length of the UUID (defaults to CDPCFG_UUID_LEN)
  * @returns A string representing a unique id.
  */
-String createUuid(int length = CDPCFG_UUID_LEN);
+std::string createUuid(int length = CDPCFG_UUID_LEN);
 
 /**
  * @brief Convert a byte array into a hex string.
@@ -49,20 +49,20 @@ String createUuid(int length = CDPCFG_UUID_LEN);
  * @param size the size of the array
  * @returns A string representating the by array in hexadecimal.
  */
-String convertToHex(byte* data, int size);
+std::string convertToHex(byte* data, int size);
 
 /**
  * @brief Convert a vector into an ASCII string.
  * 
  * @param vec A vector to convert
- * @returns A String representing the byte array in ASCII.
+ * @returns A std::string representing the byte array in ASCII.
  * 
  */
 template<typename T>
-String toString(const std::vector<T>& vec) {
-    String result;
+std::string toString(const std::vector<T>& vec) {
+    std::string result;
     for (const auto& element : vec) {
-        result += String(element);
+        result += static_cast<char>(element);
     }
     return result;
 }
@@ -111,21 +111,21 @@ bool flipAckingState();
  * @param password    password to join the network
  * @return DUCK_ERR_NONE if successful, an error code otherwise.
  */
-int saveWifiCredentials(String ssid, String password);
+int saveWifiCredentials(std::string ssid, std::string password);
 
 /**
  * @brief Load WiFi SSID from EEPROM
  *
  * @returns A string representing the WiFi SSID
  */
-String loadWifiSsid();
+std::string loadWifiSsid();
 
 /**
  * @brief Load WiFi password from EEPROM
  *
  * @returns A string representing the WiFi password
  */
-String loadWifiPassword();
+std::string loadWifiPassword();
 
 } // namespace duckutils
 #endif

@@ -45,8 +45,8 @@ public:
    * @param password wifi password (defaults to an empty string if not provided)
    * @returns DUCK_ERR_NONE if setup is successfull, an error code otherwise.
    */
-   int setupWithDefaults(std::vector<byte> deviceId, String ssid = "",
-                            String password = "");
+   int setupWithDefaults(std::vector<byte> deviceId, std::string ssid = "",
+                            std::string password = "");
 
   /**
    * @brief Reconnect the device's WiFi access point.
@@ -59,7 +59,7 @@ public:
    * @returns DUCK_ERR_NONE if the reconnection is successful, an error code
    * otherwise.
    */
-  int reconnectWifi(String ssid, String password);
+  int reconnectWifi(std::string ssid, std::string password);
 
   /**
    * @brief Get the DuckType

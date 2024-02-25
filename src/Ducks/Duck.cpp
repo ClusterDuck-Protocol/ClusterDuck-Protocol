@@ -20,7 +20,7 @@ const int NUM_HASH_FUNCS = 2;
 const int BITS_PER_SECTOR = 32; //size of unsigned int is 32 bits
 const int MAX_MESSAGES = 100;
 
-Duck::Duck(String name):
+Duck::Duck(std::string name):
   duckNet(new DuckNet(this)),
   filter(NUM_SECTORS, NUM_HASH_FUNCS, BITS_PER_SECTOR, MAX_MESSAGES)
 {
@@ -74,32 +74,35 @@ void Duck::logIfLowMemory() {
   if (duckesp::getMinFreeHeap() < MEMORY_LOW_THRESHOLD
     || duckesp::getMaxAllocHeap() < MEMORY_LOW_THRESHOLD
   ) {
-    logwarn("WARNING heap memory is low");
+    //logwarn_ln("WARNING heap memory is low");
   }
 }
 
 int Duck::setDeviceId(std::vector<byte> id) {
   if (id.size() != DUID_LENGTH) {
-    logerr("ERROR  device id too long rc = " + String(DUCK_ERR_NONE));
+    logerr_ln("ERROR  device id too long rc = %d", DUCK_ERR_ID_TOO_LONG);
     return DUCK_ERR_ID_TOO_LONG;
   }
   
   duid.clear();
   duid.assign(id.begin(), id.end());
-  loginfo("setupDeviceId rc = " + String(DUCK_ERR_NONE));
+  loginfo_ln("setupDeviceId rc = %d",DUCK_ERR_NONE);
   return DUCK_ERR_NONE;
 }
 
 int Duck::setDeviceId(byte* id) {
   if (id == NULL) {
+    logerr_ln("ERROR  device id too long rc = %d", DUCK_ERR_SETUP);
+
     return DUCK_ERR_SETUP;
   }
   int len = *(&id + 1) - id;
   if (len > DUID_LENGTH) {
+    logerr_ln("ERROR  device id too long rc = %d", DUCK_ERR_ID_TOO_LONG);
     return DUCK_ERR_ID_TOO_LONG;
   }
   duid.assign(id, id + len);
-  loginfo("setupDeviceId rc = " + String(DUCK_ERR_NONE));
+  loginfo_ln("setupDeviceId rc = %d",DUCK_ERR_NONE);
 
   return DUCK_ERR_NONE;
 }
@@ -110,8 +113,8 @@ int Duck::setupSerial(int baudRate) {
     ;
 
   Serial.begin(baudRate);
-  loginfo("setupSerial rc = " + String(DUCK_ERR_NONE));
-  loginfo("Running CDP Version: " + String(getCDPVersion().c_str()));
+  loginfo_ln("setupSerial rc = %d",DUCK_ERR_NONE);
+  loginfo_ln("Running CDP Version: %s",getCDPVersion().c_str());
   return DUCK_ERR_NONE;
 }
 
@@ -134,21 +137,21 @@ int Duck::setupRadio(float band, int ss, int rst, int di0, int di1,
   int err = duckRadio.setupRadio(config);
 
   if (err == DUCKLORA_ERR_BEGIN) {
-    logerr("ERROR setupRadio. Starting LoRa Failed. rc = " + String(err));
+    logerr_ln("ERROR setupRadio. Starting LoRa Failed. rc = %d",err);
     return err;
   }
   if (err == DUCKLORA_ERR_SETUP) {
-    logerr("ERROR setupRadio. Failed to setup Lora. rc = " + String(err));
+    logerr_ln("ERROR setupRadio. Setup LoRa Failed. rc = %d",err);
     return err;
   }
   if (err == DUCKLORA_ERR_RECEIVE) {
-    logerr("ERROR setupRadio. Failed to start receive. rc = " + String(err));
+    logerr_ln("ERROR setupRadio. Receive LoRa Failed. rc = %d",err);
     return err;
   }
 
   txPacket = new DuckPacket(duid);
   rxPacket = new DuckPacket();
-  loginfo("setupRadio rc = " + String(DUCK_ERR_NONE));
+  loginfo_ln("setupRadio rc = %d",DUCK_ERR_NONE);
 
   return DUCK_ERR_NONE;
 }
@@ -161,14 +164,14 @@ void Duck::setChannel(int channelNum) {
   duckRadio.setChannel(channelNum);
 }
 
-int Duck::setupWebServer(bool createCaptivePortal, String html) {
+int Duck::setupWebServer(bool createCaptivePortal, std::string html) {
   int err = DUCK_ERR_NONE;
   duckNet->setDeviceId(duid);
   err = duckNet->setupWebServer(createCaptivePortal, html);
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR setupWebServer rc = " + String(err));
+    logerr_ln("ERROR setupWebServer %d",err);
   } else {
-    loginfo("setupWebServer OK");
+    loginfo_ln("setupWebServer OK");
   }
   return err;
 }
@@ -176,9 +179,9 @@ int Duck::setupWebServer(bool createCaptivePortal, String html) {
 int Duck::setupWifi(const char* ap) {
   int err = duckNet->setupWifiAp(ap);
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR setupWifi rc = " + String(err));
+    logerr_ln("ERROR setupWifi rc = %d",DUCK_ERR_NONE);
   } else {
-    loginfo("setupWifi OK");
+    loginfo_ln("setupWifi OK");
   }
   return err;
 }
@@ -186,19 +189,19 @@ int Duck::setupWifi(const char* ap) {
 int Duck::setupDns() {
   int err = duckNet->setupDns();
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR setupDns rc = " + String(err));
+    logerr_ln("ERROR setupDns rc = %d",DUCK_ERR_NONE);
   } else {
-    loginfo("setupDns OK");
+    loginfo_ln("setupDns OK");
   }
   return err;
 }
 
-int Duck::setupInternet(String ssid, String password) {
+int Duck::setupInternet(std::string ssid, std::string password) {
   int err = duckNet->setupInternet(ssid, password);
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR setupInternet rc = " + String(err));
+    logerr_ln("ERROR setupInternet rc = %d",DUCK_ERR_NONE);
   } else {
-    loginfo("setupInternet OK");
+    loginfo_ln("setupInternet OK");
   }
   return err;
 }
@@ -209,7 +212,7 @@ int Duck::setupOTA() { return DUCK_ERR_NONE; }
 int Duck::setupOTA() {
 
   ArduinoOTA.onStart([]() {
-    String type;
+    std::string type;
     if (ArduinoOTA.getCommand() == U_FLASH)
       type = "sketch";
     else // U_SPIFFS
@@ -217,38 +220,38 @@ int Duck::setupOTA() {
 
     // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using
     // SPIFFS.end()
-    loginfo("setupOTA. Start updating " + type);
+    loginfo_ln("setupOTA. Start updating %s", type);
   });
-  ArduinoOTA.onEnd([]() { loginfo("\nEnd"); });
+  ArduinoOTA.onEnd([]() { loginfo_ln("\nEnd"); });
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    loginfo_f("Progress: %u%%\r", (progress / (total / 100)));
+    loginfo_ln("Progress: %u%%\r", (progress / (total / 100)));
   });
 
   ArduinoOTA.onError([](ota_error_t error) {
-    logerr_f("Error[%u]: ", error);
+    loginfo_ln("Error[%u]: ", error);
     switch (error) {
       case OTA_AUTH_ERROR:
-        logerr("ERROR setupOTA. Auth Failed");
+        logerr_ln("ERROR setupOTA. Auth Failed");
         break;
       case OTA_BEGIN_ERROR:
-        logerr("ERROR setupOTA. Begin Failed");
+        logerr_ln("ERROR setupOTA. Begin Failed");
         break;
       case OTA_CONNECT_ERROR:
-        logerr("ERROR setupOTA. Connect Failed");
+        logerr_ln("ERROR setupOTA. Connect Failed");
         break;
       case OTA_RECEIVE_ERROR:
-        logerr("ERROR setupOTA. Receive Failed");
+        logerr_ln("ERROR setupOTA. Receive Failed");
         break;
       case OTA_END_ERROR:
-        logerr("ERROR setupOTA. End Failed");
+        logerr_ln("ERROR setupOTA. End Failed");
         break;
       default:
-        logerr("ERROR setupOTA. Unknown Error");
+        logerr_ln("ERROR setupOTA. Unknown Error");
     }
   });
 
   ArduinoOTA.begin();
-  loginfo("setupOTA rc = " + String(DUCK_ERR_NONE));
+  loginfo_ln("setupOTA rc = %d",DUCK_ERR_NONE);
   return DUCK_ERR_NONE;
 }
 #endif
@@ -264,15 +267,6 @@ void Duck::processPortalRequest() {}
 #else
 void Duck::processPortalRequest() { duckNet->dnsServer.processNextRequest(); }
 #endif
-
-int Duck::sendData(byte topic, const String data,
-  const std::vector<byte> targetDevice, std::vector<byte> * outgoingMuid)
-{
-
-  const byte* buffer = (byte*)data.c_str();
-  int err = sendData(topic, buffer, data.length(), targetDevice, outgoingMuid);
-  return err;
-}
 
 int Duck::sendData(byte topic, const std::string data,
   const std::vector<byte> targetDevice, std::vector<byte> * outgoingMuid)
@@ -296,12 +290,11 @@ int Duck::sendData(byte topic, std::vector<byte> data,
   const std::vector<byte> targetDevice, std::vector<byte> * outgoingMuid)
 {
   // if (topic < reservedTopic::max_reserved) {
-  //   logerr("ERROR send data failed, topic is reserved.");
+  //   logerr_ln("ERROR send data failed, topic is reserved.");
   //   return DUCKPACKET_ERR_TOPIC_INVALID;
   // }
   if (data.size() > MAX_DATA_LENGTH) {
-    logerr("ERROR send data failed, message too large: " + String(data.size()) +
-           " bytes");
+    logerr_ln("ERROR send data failed, message too large: %d bytes",data.size());
     return DUCKPACKET_ERR_SIZE_INVALID;
   }
   int err = txPacket->prepareForSending(&filter, targetDevice, this->getType(), topic, data);
@@ -319,9 +312,8 @@ int Duck::sendData(byte topic, std::vector<byte> data,
   }
 
   if (!lastMessageAck) {
-    loginfo("Previous `lastMessageMuid` " + duckutils::toString(lastMessageMuid) +
-      " was not acked. Overwriting `lastMessageMuid` with " +
-      duckutils::toString(packet.muid));
+    loginfo_ln("Previous `lastMessageMuid` %s not acked",duckutils::toString(lastMessageMuid).c_str());
+    loginfo_ln("Overwriting with: ",duckutils::toString(packet.muid).c_str());
   }
 
   lastMessageAck = false;
@@ -337,14 +329,14 @@ int Duck::sendData(byte topic, std::vector<byte> data,
 }
 
 #ifdef CDPCFG_WIFI_NONE
-void Duck::updateFirmware(const String & filename, size_t index, uint8_t* data, size_t len, bool final) {}
+void Duck::updateFirmware(const std::string & filename, size_t index, uint8_t* data, size_t len, bool final) {}
 #else
-void Duck::updateFirmware(const String & filename, size_t index, uint8_t* data, size_t len, bool final) {
+void Duck::updateFirmware(const std::string & filename, size_t index, uint8_t* data, size_t len, bool final) {
   if (!index) {
-    loginfo("Pause Radio and starting OTA update");
+    loginfo_ln("Pause Radio and starting OTA update");
     duckRadio.standBy();
 
-    int cmd = (filename.indexOf("spiffs") > -1) ? U_SPIFFS : U_FLASH;
+    int cmd = (filename.find("spiffs") != std::string::npos) ? U_SPIFFS : U_FLASH;
     if (!Update.begin(UPDATE_SIZE_UNKNOWN, cmd)) {
 
       Update.printError(Serial);
@@ -383,18 +375,13 @@ muidStatus Duck::getMuidStatus(const std::vector<byte> & muid) const {
 CdpPacket Duck::buildCdpPacket(byte topic, const std::vector<byte> data,
     const std::vector<byte> targetDevice, const std::vector<byte> &muid)
 {
-  if (data.size() > MAX_DATA_LENGTH)
-  {
-    logerr("ERROR send data failed, message too large: " + String(data.size()) +
-           " bytes");
-    logerr(DUCKPACKET_ERR_SIZE_INVALID);
+  if (data.size() > MAX_DATA_LENGTH) {
+    logerr_ln("ERROR send data failed, message too large: %d bytes", data.size());
   }
   int err = txPacket->prepareForSending(&filter, targetDevice, this->getType(), topic, data);
   //txPacket unintended side effects?
-
-  if (err != DUCK_ERR_NONE)
-  {
-    logerr("prepare for sending failed. " + err);
+  if (err != DUCK_ERR_NONE) {
+    logerr_ln("prepare for sending failed. " + err);
   }
   //todo error not handled properly
   CdpPacket packet = CdpPacket(txPacket->getBuffer());
@@ -406,8 +393,8 @@ CdpPacket Duck::buildCdpPacket(byte topic, const std::vector<byte> data,
 // TODO: implement this using new packet format
 bool Duck::reboot(void*) {
   /*
-    String reboot = "REBOOT";
-    loginfo(reboot);
+    std::string reboot = "REBOOT";
+    loginfo_ln(reboot);
     DuckRadio::getInstance()->sendPayloadStandard(reboot, "boot");
     duckesp::restartDuck();
   */
@@ -417,8 +404,8 @@ bool Duck::reboot(void*) {
 // TODO: implement this using new packet format
 bool Duck::imAlive(void*) {
   /*
-  String alive = "Health Quack";
-  loginfo(alive);
+  std::string alive = "Health Quack";
+  loginfo_ln(alive);
   DuckRadio::getInstance()->sendPayloadStandard(alive, "health");
   */
   return true;
@@ -427,7 +414,7 @@ bool Duck::imAlive(void*) {
 int Duck::startReceive() {
   int err = duckRadio.startReceive();
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR Restarting Duck...");
+    logerr_ln("ERROR Restarting Duck...");
     duckesp::restartDuck();
   }
   return err;
@@ -438,12 +425,12 @@ int Duck::sendPong() {
   std::vector<byte> data(1, 0);
   err = txPacket->prepareForSending(&filter, ZERO_DUID, this->getType(), reservedTopic::pong, data);
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR Oops! failed to build pong packet, err = " + err);
+    logerr_ln("ERROR Oops! failed to build pong packet, err = %d", err);
     return err;
   }
   err = duckRadio.sendData(txPacket->getBuffer());
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR Oops! Lora sendData failed, err = " + err);
+    logerr_ln("ERROR Oops! Lora sendData failed, err = %d", err);
     return err;
   }
   return err;
@@ -453,12 +440,12 @@ int Duck::sendAck(std::vector<byte> data, const std::vector<byte> dduid) {
   int err = DUCK_ERR_NONE;
   err = txPacket->prepareForSending(&filter, dduid, this->getType(), reservedTopic::ack, data);
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR Oops! failed to build pong packet, err = " + err);
+    logerr_ln("ERROR Oops! failed to build pong packet, err = %d", err);
     return err;
   }
   err = duckRadio.sendData(txPacket->getBuffer());
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR Oops! Lora sendData failed, err = " + err);
+    logerr_ln("ERROR Oops! Lora sendData failed, err = %d", err);
     return err;
   }
   return err;
@@ -469,12 +456,12 @@ int Duck::sendPing() {
   std::vector<byte> data(1, 0);
   err = txPacket->prepareForSending(&filter, ZERO_DUID, this->getType(), reservedTopic::ping, data);
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR Failed to build ping packet, err = " + err);
+    logerr_ln("ERROR Failed to build ping packet, err = " + err);
     return err;
   }
   err = duckRadio.sendData(txPacket->getBuffer());
   if (err != DUCK_ERR_NONE) {
-    logerr("ERROR Lora sendData failed, err = " + err);
+    logerr_ln("ERROR Lora sendData failed, err = %d", err);
   }
   return err;
 }
@@ -483,22 +470,22 @@ bool Duck::isWifiConnected() {
   return duckNet->isWifiConnected();
 }
 
-bool Duck::ssidAvailable(String ssid) {
+bool Duck::ssidAvailable(std::string ssid) {
   return duckNet->ssidAvailable(ssid);
 }
 
-String Duck::getSsid() {
+std::string Duck::getSsid() {
   return duckNet->getSsid();
 }
 
-String Duck::getPassword() {
+std::string Duck::getPassword() {
   return duckNet->getPassword();
 }
 
 
 
-String Duck::getErrorString(int error) {
-  String errorStr = String(error) + ": ";
+std::string Duck::getErrorString(int error) {
+  std::string errorStr = std::to_string(error) + ": ";
 
   switch (error) {
     case DUCK_ERR_NONE:
