@@ -186,6 +186,14 @@ private:
   static volatile bool receivedFlag;
   static void setReceiveFlag(bool value) { receivedFlag = value; }
   static bool getReceiveFlag() { return receivedFlag; }
+  
+  /**
+   * Set the Duck to be ready to recieve LoRa packets.
+   *
+   * params:  clearReceiveFlag if true, the receive flag will be cleared
+   * returns: DUCK_ERR_NONE if the call was successful, an error code otherwise.
+  */
+  int goToReceiveMode(bool clearReceiveFlag);
 
   DuckRadio(DuckRadio const&) = delete;
   DuckRadio& operator=(DuckRadio const&) = delete;

@@ -56,6 +56,7 @@ void MamaDuck::run() {
 
   handleOtaUpdate();
   if (DuckRadio::getReceiveFlag()) {
+    
     handleReceivedPacket();
     rxPacket->reset();
   }

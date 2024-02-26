@@ -119,18 +119,27 @@ void DuckRadio::setSyncWord(byte syncWord) {
     lora.startReceive();
 }
 
+int DuckRadio::goToReceiveMode(bool clearReceiveFlag) {
+    if (clearReceiveFlag) {
+      DuckRadio::setReceiveFlag(false);
+    }
+    return startReceive();
+}
+
 int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
 
     int packet_length = 0;
     int err = DUCK_ERR_NONE;
-
+    int rxState = DUCK_ERR_NONE;
     packet_length = lora.getPacketLength();
 
     if (packet_length < MIN_PACKET_LENGTH) {
         logerr_ln("ERROR  handlePacket rx data size invalid: %d", packet_length);
 
-        DuckRadio::setReceiveFlag(false);
-        int rxState = startReceive();
+        rxState = goToReceiveMode(true);
+        if (rxState != DUCK_ERR_NONE) {
+            return rxState;
+        }
         return DUCKLORA_ERR_HANDLE_PACKET;
     }
 
@@ -140,8 +149,7 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
     err = lora.readData(packetBytes->data(), packet_length);
     loginfo_ln("readReceivedData() - lora.readData returns: err = %d", err);
 
-    DuckRadio::setReceiveFlag(false);
-    int rxState = startReceive();
+    rxState = goToReceiveMode(true);
 
     if (err != RADIOLIB_ERR_NONE) {
         logerr_ln("ERROR  readReceivedData failed. err = %d", err);
@@ -263,67 +271,66 @@ void DuckRadio::setChannel(int channelNum) {
 
 void DuckRadio::serviceInterruptFlags() {
     if (DuckRadio::interruptFlags != 0) {
+
+        // SX127X flags
         if (DuckRadio::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_RX_TIMEOUT) {
-            loginfo_ln("Interrupt flag was set: timeout");
+            loginfo_ln("SX127x Interrupt flag was set: timeout");
         }
         if (DuckRadio::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_RX_DONE) {
-            loginfo_ln("Interrupt flag was set: packet reception complete");
-            DuckRadio::setReceiveFlag(true);
+            loginfo_ln("SX127x Interrupt flag was set: packet reception complete");
+            DuckRadio::goToReceiveMode(true);
             lora.standby(); // we are done receiving, go to standby. We can't sleep because read buffer is not empty
         }
         if (DuckRadio::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_PAYLOAD_CRC_ERROR) {
-            loginfo_ln("Interrupt flag was set: payload CRC error");
+            loginfo_ln("SX127x Interrupt flag was set: payload CRC error");
         }
         if (DuckRadio::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_VALID_HEADER) {
-            loginfo_ln("Interrupt flag was set: valid header received");
+            loginfo_ln("SX127x Interrupt flag was set: valid header received");
         }
         if (DuckRadio::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_TX_DONE) {
-            loginfo_ln("Interrupt flag was set: payload transmission complete");
-            startReceive();
-            lora.standby(); 
+            loginfo_ln("SX127x Interrupt flag was set: payload transmission complete");
+            DuckRadio::goToReceiveMode(false);
         }
         if (DuckRadio::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_CAD_DONE) {
-            loginfo_ln("Interrupt flag was set: CAD complete");
+            loginfo_ln("SX127x Interrupt flag was set: CAD complete");
         }
         if (DuckRadio::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_FHSS_CHANGE_CHANNEL) {
-            loginfo_ln("Interrupt flag was set: FHSS change channel");
+            loginfo_ln("SX127x Interrupt flag was set: FHSS change channel");
         }
         if (DuckRadio::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_CAD_DETECTED) {
-            loginfo_ln("Interrupt flag was set: valid LoRa signal detected during CAD operation");
+            loginfo_ln("SX127x Interrupt flag was set: valid LoRa signal detected during CAD operation");
         }
 
-
+        // SX126X flags
         if (DuckRadio::interruptFlags & RADIOLIB_SX126X_CMD_CLEAR_IRQ_STATUS) {
-            loginfo_ln("Interrupt flag was set: 126X clear IRQ status");
+            loginfo_ln("SX126X Interrupt flag was set: clear IRQ status");
         }
         if (DuckRadio::interruptFlags & RADIOLIB_SX126X_CMD_CLEAR_DEVICE_ERRORS) {
-            loginfo_ln("Interrupt flag was set: 126X clear device errors");
+            loginfo_ln("SX126X Interrupt flag was set: clear device errors");
         }
         if (DuckRadio::interruptFlags & RADIOLIB_SX126X_IRQ_CRC_ERR ) {
-            loginfo_ln("Interrupt flag was set: 126X payload CRC error");
-            startReceive();
+            loginfo_ln("SX126X Interrupt flag was set: payload CRC error");
+            DuckRadio::goToReceiveMode(false);
             lora.standby();
         }
         if (DuckRadio::interruptFlags & RADIOLIB_SX126X_IRQ_HEADER_ERR ) {
-            loginfo_ln("Interrupt flag was set: 126X header CRC error");
-            startReceive();
+            loginfo_ln("SX126X Interrupt flag was set: header CRC error");
+            DuckRadio::goToReceiveMode(false);
             lora.standby();
         }
         if (DuckRadio::interruptFlags & RADIOLIB_SX126X_IRQ_RX_DONE ) {
-            loginfo_ln("Interrupt flag was set: 126X packet reception complete");
+            loginfo_ln("SX126X Interrupt flag was set: packet reception complete");
             DuckRadio::setReceiveFlag(true);
             lora.standby(); // we are done receiving, go to standby. We can't sleep because read buffer is not empty
         }
         if (DuckRadio::interruptFlags & RADIOLIB_SX126X_IRQ_TX_DONE ) {
-            loginfo_ln("Interrupt flag was set: 126X payload transmission complete");
+            loginfo_ln("SX126X Interrupt flag was set: payload transmission complete");
             lora.finishTransmit();
-            startReceive();
-            lora.standby();
+            DuckRadio::goToReceiveMode(false);
         }
         if (DuckRadio::interruptFlags & RADIOLIB_SX126X_IRQ_TIMEOUT ) {
-            loginfo_ln("Interrupt flag was set: 126X timeout");
-            startReceive();
-            lora.standby();
+            loginfo_ln("SX126X Interrupt flag was set: timeout");
+            DuckRadio::goToReceiveMode(false);
         }
 
         DuckRadio::interruptFlags = 0;
