@@ -73,13 +73,13 @@
 
 
 /*
- * BOARD "ttgo t-beam"
+ * BOARD "ttgo-t-beam"
  *
- * http://www.lilygo.cn/prod_view.aspx?TypeId=50060&Id=1237&FId=t3:50060:3
+ * https://github.com/Xinyuan-LilyGO/LilyGo-LoRa-Series/tree/master
  * (GPS module and 18650 holder)
  * pio: board = ttgo-t-beam
  */
-#elif defined(ARDUINO_TBeam)
+#elif defined(ARDUINO_T_Beam)
 #include "boards/ttgo-t-beam.h"
 
 
