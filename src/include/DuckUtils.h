@@ -25,7 +25,22 @@ extern bool detectState;
 
 std::string getCDPVersion();
 
+/**
+ * @brief Convert a string to upper case.
+ *
+ * @param str the string to convert
+ * @returns A string in upper case.
+ */
 std::string toUpperCase(std::string str);
+
+/**
+ * @brief Convert a string to a byte array.
+ *
+ * @param str the string to convert
+ * @returns A vector of bytes.
+ */
+std::vector<byte> stringToByteVector(const String& str);
+
 /**
  * @brief Creates a byte array with random alpha numerical values.
  *
@@ -97,7 +112,13 @@ void setInterrupt(bool enable);
  */
 uint32_t toUnit32(const byte* data);
 
+/**
+ * @brief Get a timer instance.
+ * 
+ * @returns A Timer instance.
+ */
 Timer<> getTimer();
+
 
 bool getDetectState();
 bool getAckingState();
