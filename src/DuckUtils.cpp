@@ -7,17 +7,12 @@
 
 namespace duckutils {
 
-namespace {
-
-  std::string cdpVersion = "3.6.1";
-}
-
 Timer<> duckTimer = timer_create_default();
 bool detectState = false;
 bool ackingState = true;
 
 std::string getCDPVersion() {
-  return cdpVersion;
+  return std::to_string(CDP_VERSION_MAJOR) + "." + std::to_string(CDP_VERSION_MINOR) + "." + std::to_string(CDP_VERSION_PATCH);
 }
 
 Timer<> getTimer() { return duckTimer; }

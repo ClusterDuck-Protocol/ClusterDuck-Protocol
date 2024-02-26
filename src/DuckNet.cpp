@@ -180,7 +180,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
     portal = html;
   }
   webServer.onNotFound([&](AsyncWebServerRequest* request) {
-    logwarn_ln("DuckNet - onNotFound: %s", request->url());
+    logwarn_ln("DuckNet - onNotFound: %s", request->url().c_str());
     request->send(200, "text/html", portal.c_str());
   });
 
@@ -343,12 +343,12 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
     });
 
   webServer.on("/muidStatus.json", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    logdbg_ln("muidStatus.json: %s", request->url());
+    logdbg_ln("muidStatus.json: %s", request->url().c_str());
     std::string muid;
     int paramsNumber = request->params();
     for (int i = 0; i < paramsNumber; i++) {
       AsyncWebParameter* p = request->getParam(i);
-      logdbg_ln("%s : %s", p->name(), p->value());
+      logdbg_ln("param(%d) %s : %s", i, p->name(), p->value().c_str());
       if (p->name() == "muid") {
         muid = p->value().c_str();
       }
@@ -424,7 +424,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
     AsyncWebParameter* p = request->getParam(0);
     std::string msg = p->value().c_str();
     message.insert(message.end(), msg.begin(), msg.end());
-
+    logdbg_ln("chatSubmit: sending message. length: %d",message.size());
     std::vector<byte> muid;
 
     err = duck->sendData(topics::gchat, message, BROADCAST_DUID, &muid);
