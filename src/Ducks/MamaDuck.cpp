@@ -6,13 +6,13 @@ int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, std::string ssid, st
   
   int err = Duck::setupWithDefaults(deviceId, ssid, password);
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("ERROR setupWithDefaults rc = %s",err);
+    logerr_ln("ERROR setupWithDefaults rc = %d",err);
     return err;
   }
 
   err = setupRadio();
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("ERROR setupWithDefaults rc = %s",err);
+    logerr_ln("ERROR setupWithDefaults rc = %d",err);
     return err;
   }
 
@@ -20,25 +20,25 @@ int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, std::string ssid, st
   err = setupWifi(name.c_str());
 
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("ERROR setupWithDefaults rc = %s",err);
+    logerr_ln("ERROR setupWithDefaults rc = %d",err);
     return err;
   }
 
   err = setupDns();
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("ERROR setupWithDefaults rc = %s",err);
+    logerr_ln("ERROR setupWithDefaults rc = %d",err);
     return err;
   }
 
   err = setupWebServer(false);
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("ERROR setupWithDefaults rc = %s",err);
+    logerr_ln("ERROR setupWithDefaults rc = %d",err);
     return err;
   }
 
   err = setupOTA();
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("ERROR setupWithDefaults rc = %s",err);
+    logerr_ln("ERROR setupWithDefaults rc = %d",err);
     return err;
   }
 
@@ -71,7 +71,7 @@ void MamaDuck::handleReceivedPacket() {
 
   int err = duckRadio.readReceivedData(&data);
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("ERROR failed to get data from DuckRadio. rc = %s",err);
+    logerr_ln("ERROR failed to get data from DuckRadio. rc = %d",err);
     return;
   }
   logdbg_ln("Got data from radio, prepare for relay. size: %d",data.size());
@@ -95,7 +95,7 @@ void MamaDuck::handleReceivedPacket() {
           loginfo_ln("ping received");
           err = sendPong();
           if (err != DUCK_ERR_NONE) {
-            logerr_ln("ERROR failed to send pong message. rc = %s",err);
+            logerr_ln("ERROR failed to send pong message. rc = %d",err);
           }
           return;
         break;
@@ -107,7 +107,7 @@ void MamaDuck::handleReceivedPacket() {
           //relay batch ack 
           err = duckRadio.relayPacket(rxPacket);
           if (err != DUCK_ERR_NONE) {
-            logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %s",err);
+            logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
           } else {
             loginfo_ln("handleReceivedPacket: packet RELAY DONE");
           }
@@ -119,7 +119,7 @@ void MamaDuck::handleReceivedPacket() {
 
           err = duckRadio.relayPacket(rxPacket);
           if (err != DUCK_ERR_NONE) {
-            logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %s",err);
+            logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
           } else {
             loginfo_ln("handleReceivedPacket: packet RELAY DONE");
           }
@@ -144,7 +144,7 @@ void MamaDuck::handleReceivedPacket() {
         default:
           err = duckRadio.relayPacket(rxPacket);
           if (err != DUCK_ERR_NONE) {
-            logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %s",err);
+            logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
           } else {
             loginfo_ln("handleReceivedPacket: packet RELAY DONE");
           }
@@ -228,7 +228,7 @@ void MamaDuck::handleReceivedPacket() {
         default:
           err = duckRadio.relayPacket(rxPacket);
           if (err != DUCK_ERR_NONE) {
-            logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %s",err);
+            logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
           } else {
             loginfo_ln("handleReceivedPacket: packet RELAY DONE");
           }
@@ -237,7 +237,7 @@ void MamaDuck::handleReceivedPacket() {
     } else {
       err = duckRadio.relayPacket(rxPacket);
       if (err != DUCK_ERR_NONE) {
-        logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %s",err);
+        logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
       } else {
         loginfo_ln("handleReceivedPacket: packet RELAY DONE");
       }

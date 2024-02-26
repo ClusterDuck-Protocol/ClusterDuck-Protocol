@@ -12,7 +12,7 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, std::string ssid, st
 
   err = setupRadio();
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("ERROR setupWithDefaults  rc = %s",err);
+    logerr_ln("ERROR setupWithDefaults  rc = %d",err);
     return err;
   }
 
@@ -20,13 +20,13 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, std::string ssid, st
 
   err = setupWifi(name.c_str());
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("ERROR setupWithDefaults  rc = %s",err);
+    logerr_ln("ERROR setupWithDefaults  rc = %d",err);
     return err;
   }
 
   err = setupDns();
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("ERROR setupWithDefaults  rc = %s",err);
+    logerr_ln("ERROR setupWithDefaults  rc = %d",err);
     return err;
   }
 
@@ -34,13 +34,13 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, std::string ssid, st
 
   err = setupWebServer();
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("ERROR setupWithDefaults  rc = %s",err);
+    logerr_ln("ERROR setupWithDefaults  rc = %d",err);
     return err;
   }
 
   err = setupOTA();
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("ERROR setupWithDefaults  rc = %s",err);
+    logerr_ln("ERROR setupWithDefaults  rc = %d",err);
     return err;
   }
 
@@ -48,7 +48,7 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, std::string ssid, st
     err = setupInternet(ssid, password);
 
     if (err != DUCK_ERR_NONE) {
-      logerr_ln("ERROR setupWithDefaults  rc = %s",err);
+      logerr_ln("ERROR setupWithDefaults  rc = %d",err);
       return err;
     }
   } 
@@ -62,7 +62,7 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, std::string ssid, st
     err = duckNet->loadWiFiCredentials();
 
     if (err != DUCK_ERR_NONE) {
-      logerr_ln("ERROR setupWithDefaults  rc = %s",err);
+      logerr_ln("ERROR setupWithDefaults  rc = %d",err);
      
       return err;
     }
@@ -102,7 +102,7 @@ void PapaDuck::handleReceivedPacket() {
   int err = duckRadio.readReceivedData(&data);
 
   if (err != DUCK_ERR_NONE) {
-    logerr_ln("ERROR handleReceivedPacket. Failed to get data. rc = %s",err);
+    logerr_ln("ERROR handleReceivedPacket. Failed to get data. rc = %d",err);
     return;
   }
   // ignore pings
