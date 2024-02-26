@@ -354,10 +354,16 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
       }
     }
 
+    if (muid.length() != 4) {
+      request->send(400, "text/json", createMuidResponseJson(invalid).c_str());
+      return;
+    }
+
     std::vector<byte> muidVect = {static_cast<unsigned char>(muid[0]), 
                                   static_cast<unsigned char>(muid[1]), 
                                   static_cast<unsigned char>(muid[2]), 
                                   static_cast<unsigned char>(muid[3])};
+                                  
     muidStatus status = duck->getMuidStatus(muidVect);
 
     std::string jsonResponse = createMuidResponseJson(status);
