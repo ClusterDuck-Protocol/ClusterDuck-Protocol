@@ -13,7 +13,7 @@
 
 #include "cdpcfg.h"
 #include <Arduino.h>
-#include <WString.h>
+#include <string>
 
 namespace duckesp {
 
@@ -50,6 +50,6 @@ void restartDuck();
  * @param format true if the mac address is formated as MM:MM:MM:SS:SS:SS
  * @return A string representing the mac address.   
  */
-String getDuckMacAddress(boolean format);
+std::string getDuckMacAddress(boolean format);
 } // namespace duckesp
 #endif

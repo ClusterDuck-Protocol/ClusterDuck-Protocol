@@ -47,5 +47,8 @@
 #define DUCK_INTERNET_ERR_SETUP      -6000
 #define DUCK_INTERNET_ERR_SSID       -6001
 #define DUCK_INTERNET_ERR_CONNECT    -6002
+#define DUCK_ERR_EEPROM_INIT         -7000
+#define DUCK_ERR_EEPROM_WRITE        -7001
+#define DUCK_ERR_EEPROM_READ         -7002
 
 #endif

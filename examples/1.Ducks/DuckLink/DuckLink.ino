@@ -1,3 +1,4 @@
+
 /**
  * @file DuckLink.ino
  * @author
@@ -24,6 +25,8 @@ auto timer = timer_create_default();
 const int INTERVAL_MS = 30000;
 int counter = 1;
 
+bool setupOK = false;
+
 void setup() {
   // We are using a hardcoded device id here, but it should be retrieved or
   // given during the device provisioning then converted to a byte vector to
@@ -31,22 +34,47 @@ void setup() {
   // will get rejected
   std::string deviceId("DUCK0001");
   std::vector<byte> devId;
+  int rc;
   devId.insert(devId.end(), deviceId.begin(), deviceId.end());
-  duck.setupWithDefaults(devId);
+  rc = duck.setupWithDefaults(devId);
+  if (rc != DUCK_ERR_NONE) {
+    Serial.print("[LINK] Failed to setup ducklink: rc = ");Serial .println(rc);
+    return;
+  }
 
+  setupOK = true;
   // Initialize the timer. The timer thread runs separately from the main loop
   // and will trigger sending a counter message.
-  timer.every(INTERVAL_MS, runSensor);
   Serial.println("[LINK] Setup OK!");
-  
+
+  if (sendSensorData()) {
+    timer.every(INTERVAL_MS, runSensor);
+  } else {
+    Serial.println("[LINK] ERROR - Failed to send sensor data");
+  }
 }
 
 void loop() {
+  if (!setupOK) {
+    return; 
+  }
+  
   timer.tick();
   duck.run();
 }
 
-bool runSensor(void *) {
+std::vector<byte> stringToByteVector(const String& str) {
+    std::vector<byte> byteVec;
+    byteVec.reserve(str.length());
+
+    for (unsigned int i = 0; i < str.length(); ++i) {
+        byteVec.push_back(static_cast<byte>(str[i]));
+    }
+
+    return byteVec;
+}
+
+bool sendSensorData() {
   bool result = false;
   const byte* buffer;
   
@@ -54,13 +82,17 @@ bool runSensor(void *) {
   Serial.print("[LINK] sensor data: ");
   Serial.println(message);
   
-  // There different way of sending data. Here we simply pass in the String object
-  int err = duck.sendData(topics::status, message);
+  int err = duck.sendData(topics::status, stringToByteVector(message));
   if (err == DUCK_ERR_NONE) {
      result = true;
      counter++;
   } else {
     Serial.println("[LINK] Failed to send data. error = " + String(err));
+    return false;
   }
   return result;
+}
+
+bool runSensor(void *) {
+  return sendSensorData();
 }

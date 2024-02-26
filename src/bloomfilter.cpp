@@ -3,7 +3,7 @@
 
 
 BloomFilter::BloomFilter(int numSectors, int numHashes, int bitsPerSector, int maxMsgs) {
-    logdbg(numSectors);
+    logdbg("numSectors: %d", numSectors);
     this->numSectors = numSectors; 
     logdbg("added to BF");
     this->numHashes = numHashes;
@@ -17,7 +17,7 @@ BloomFilter::BloomFilter(int numSectors, int numHashes, int bitsPerSector, int m
     logdbg("initialize bloom filter 1");
     // Initialize the bloom filters, fill with 0's
     this->filter1 = new unsigned int[this->numSectors];
-    logdbg_f("Filter 1 address %p\n", this->filter1);
+    logdbg("Filter 1 address %p\n", this->filter1);
     if (this->filter1 == NULL) {
         logdbg("Memory allocation for Bloom Filter 1 failed!\n");
         exit(0);
@@ -25,11 +25,11 @@ BloomFilter::BloomFilter(int numSectors, int numHashes, int bitsPerSector, int m
     for (int n = 0; n < this->numSectors; n++) {
         this->filter1[n] = 0;
     }
-    logdbg_f("Initialized BF1, %d slots, %d this->numSectors\n", numSectors, this->numSectors);
+    logdbg("Initialized BF1, %d slots, %d this->numSectors\n", numSectors, this->numSectors);
     
     logdbg("initialize bloom filter 2");
     this->filter2 = new unsigned int[this->numSectors];
-    logdbg_f("Filter 2 address %p\n", this->filter2);
+    logdbg("Filter 2 address %p\n", this->filter2);
     if (this->filter2 == NULL) {
         logdbg("Memory allocation for Bloom Filter 2 failed!\n");
         exit(0);
@@ -37,7 +37,7 @@ BloomFilter::BloomFilter(int numSectors, int numHashes, int bitsPerSector, int m
     for (int n = 0; n < this->numSectors; n++) {
         this->filter2[n] = 0;
     }
-    logdbg_f("Initialized BF2, %d slots, %d this->numSectors\n", numSectors, this->numSectors);
+    logdbg("Initialized BF2, %d slots, %d this->numSectors\n", numSectors, this->numSectors);
 
     logdbg("initialize random seeds");
     //get random seeds for hash functions 
@@ -66,7 +66,7 @@ BloomFilter::BloomFilter(int numSectors, int numHashes, int bitsPerSector, int m
     }
 
     for (int i = 0; i < numHashes; i++) {
-        logdbg_f("random seed %d: %d\n", i+1, Seeds[i]);
+        logdbg("random seed %d: %d\n", i+1, Seeds[i]);
     }
     this->Seeds = Seeds;
 

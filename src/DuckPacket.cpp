@@ -14,23 +14,23 @@ bool DuckPacket::prepareForRelaying(BloomFilter *filter, std::vector<byte> dataB
 
   this->reset();
 
-  loginfo("prepareForRelaying: START");
-  loginfo("prepareForRelaying: Packet is built. Checking for relay...");
+  loginfo_ln("prepareForRelaying: START");
+  loginfo_ln("prepareForRelaying: Packet is built. Checking for relay...");
 
   // Query the existence of strings
   bool alreadySeen = filter->bloom_check(&dataBuffer[MUID_POS], MUID_LENGTH);
   if (alreadySeen) {
-    logdbg("handleReceivedPacket: Packet already seen. No relay.");
+    logdbg_ln("handleReceivedPacket: Packet already seen. No relay.");
     return false;
   } else {
     filter->bloom_add(&dataBuffer[MUID_POS], MUID_LENGTH);
-    logdbg("handleReceivedPacket: Relaying packet: "  + duckutils::convertToHex(&dataBuffer[MUID_POS], MUID_LENGTH));
+    logdbg_ln("handleReceivedPacket: Relaying packet: %s", duckutils::convertToHex(&dataBuffer[MUID_POS], MUID_LENGTH).c_str());
   }
 
   // update the rx packet internal byte buffer
   buffer.assign(dataBuffer.begin(), dataBuffer.end());
   int hops = buffer[HOP_COUNT_POS]++;
-  loginfo("prepareForRelaying: hops count: "+ String(hops));
+  loginfo_ln("prepareForRelaying: hops count: %d", hops);
   return true;
   
   
@@ -42,8 +42,7 @@ void DuckPacket::getUniqueMessageId(BloomFilter * filter, byte message_id[MUID_L
   while (getNewUnique) {
     duckutils::getRandomBytes(MUID_LENGTH, message_id);
     getNewUnique = filter->bloom_check(message_id, MUID_LENGTH);
-    loginfo("prepareForSending: new MUID -> " + duckutils::convertToHex(message_id, MUID_LENGTH));
-    
+    loginfo_ln("prepareForSending: new MUID -> %s",duckutils::convertToHex(message_id, MUID_LENGTH).c_str());
   }
 }
 
@@ -60,8 +59,7 @@ int DuckPacket::prepareForSending(BloomFilter *filter,
     return DUCKPACKET_ERR_SIZE_INVALID;
   }
 
-  loginfo("prepareForSending: DATA LENGTH: " + String(app_data_length) +
-          " TOPIC: " + String(topic));
+  loginfo_ln("prepareForSending: DATA LENGTH: %d - TOPIC (%s)", app_data_length, CdpPacket::topicToString(topic).c_str());
 
   byte message_id[MUID_LENGTH];
   getUniqueMessageId(filter, message_id);
@@ -85,49 +83,44 @@ int DuckPacket::prepareForSending(BloomFilter *filter,
   // ----- insert packet header  -----
   // source device uid
   buffer.insert(buffer.end(), duid.begin(), duid.end());
-  logdbg("SDuid:     " + duckutils::convertToHex(duid.data(), duid.size()));
+  logdbg_ln("SDuid:     %s",duckutils::convertToHex(duid.data(), duid.size()).c_str());
 
   // destination device uid
   buffer.insert(buffer.end(), targetDevice.begin(), targetDevice.end());
-  logdbg("DDuid:     " + duckutils::convertToHex(targetDevice.data(), targetDevice.size()));
+  logdbg_ln("DDuid:     %s", duckutils::convertToHex(targetDevice.data(), targetDevice.size()).c_str());
 
   // message uid
   buffer.insert(buffer.end(), &message_id[0], &message_id[MUID_LENGTH]);
-  logdbg("Muid:      " + duckutils::convertToHex(buffer.data(), buffer.size()));
+  logdbg_ln("Muid:      %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
 
   // topic
   buffer.insert(buffer.end(), topic);
-  logdbg("Topic:     " + duckutils::convertToHex(buffer.data(), buffer.size()));
+  logdbg_ln("Topic:     %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
 
   // duckType
   buffer.insert(buffer.end(), duckType);
-  logdbg("duck type: " + duckutils::convertToHex(buffer.data(), buffer.size()));
+  logdbg_ln("duck type: %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
 
   // hop count
   buffer.insert(buffer.end(), 0x00);
-  logdbg("hop count: " + duckutils::convertToHex(buffer.data(), buffer.size()));
+  logdbg_ln("hop count: %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
 
   // data crc
   buffer.insert(buffer.end(), &crc_bytes[0], &crc_bytes[DATA_CRC_LENGTH]);
-  logdbg("Data CRC:  " + duckutils::convertToHex(buffer.data(), buffer.size()));
+  logdbg_ln("Data CRC:  %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
 
   // ----- insert data -----
   if(duckcrypto::getState()) {
 
     buffer.insert(buffer.end(), encryptedData.begin(), encryptedData.end());
-    logdbg("Encrypted Data:      " + duckutils::convertToHex(buffer.data(), buffer.size()));
+    logdbg_ln("Encrypted Data:      %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
 
   } else {
     buffer.insert(buffer.end(), app_data.begin(), app_data.end());
-    logdbg("Data:      " + duckutils::convertToHex(buffer.data(), buffer.size()));
+    logdbg_ln("Data:      %s",duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
   }
   
-  // ----- insert path -----
-  // buffer.insert(buffer.end(), duid.begin(), duid.end());
-  // logdbg("Path:      " + duckutils::convertToHex(buffer.data(), buffer.size()));
-
-  logdbg("Built packet: " +
-         duckutils::convertToHex(buffer.data(), buffer.size()));
+  logdbg_ln("Built packet: %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
   return DUCK_ERR_NONE;
 }
 

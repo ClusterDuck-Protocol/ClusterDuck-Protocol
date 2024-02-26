@@ -21,6 +21,7 @@ auto timer = timer_create_default();
 // for sending the counter message
 const int INTERVAL_MS = 60000;
 int counter = 1;
+bool setupOK = false;
 
 void setup() {
   // We are using a hardcoded device id here, but it should be retrieved or
@@ -30,7 +31,12 @@ void setup() {
   std::string deviceId("MAMA0001");
   std::vector<byte> devId;
   devId.insert(devId.end(), deviceId.begin(), deviceId.end());
-  duck.setupWithDefaults(devId);
+  if (duck.setupWithDefaults(devId) != DUCK_ERR_NONE) {
+    Serial.println("[MAMA] Failed to setup MamaDuck");
+    return;
+  }
+
+  setupOK = true;
 
   // Initialize the timer. The timer thread runs separately from the main loop
   // and will trigger sending a counter message.
@@ -39,7 +45,22 @@ void setup() {
 
 }
 
+
+std::vector<byte> stringToByteVector(const String& str) {
+    std::vector<byte> byteVec;
+    byteVec.reserve(str.length());
+
+    for (unsigned int i = 0; i < str.length(); ++i) {
+        byteVec.push_back(static_cast<byte>(str[i]));
+    }
+
+    return byteVec;
+}
+
 void loop() {
+  if (!setupOK) {
+    return; 
+  }
   timer.tick();
   // Use the default run(). The Mama duck is designed to also forward data it receives
   // from other ducks, across the network. It has a basic routing mechanism built-in
@@ -49,15 +70,13 @@ void loop() {
 
 bool runSensor(void *) {
   bool result;
-  const byte* buffer;
   
   String message = String("Counter:") + String(counter)+ " " +String("Free Memory:") + String(freeMemory());
   int length = message.length();
   Serial.print("[MAMA] sensor data: ");
   Serial.println(message);
-  buffer = (byte*) message.c_str(); 
 
-  result = sendData(buffer, length);
+  result = sendData(stringToByteVector(message));
   if (result) {
      Serial.println("[MAMA] runSensor ok.");
   } else {
@@ -66,11 +85,10 @@ bool runSensor(void *) {
   return result;
 }
 
-bool sendData(const byte* buffer, int length) {
+bool sendData(std::vector<byte> message) {
   bool sentOk = false;
   
-  // Send Data can either take a byte buffer (unsigned char) or a vector
-  int err = duck.sendData(topics::status, buffer, length);
+  int err = duck.sendData(topics::status, message);
   if (err == DUCK_ERR_NONE) {
      counter++;
      sentOk = true;

@@ -7,7 +7,6 @@
 #include "cdpcfg.h"
 #include "bloomfilter.h"
 #include <CRC32.h>
-#include <WString.h>
 #include <vector>
 
 /**

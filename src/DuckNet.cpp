@@ -1,13 +1,9 @@
 #include "include/DuckNet.h"
 
-#include <Update.h>
+DuckNet::DuckNet(Duck* duckIn): duck(duckIn) {
+}
 
-#include "DuckLogger.h"
-#include "include/Duck.h"
-
-DuckNet::DuckNet(Duck* duckIn):
-  duck(duckIn)
-{}
+#ifndef CDPCFG_WIFI_NONE
 
 //when initializing the buffer, the buffer created will be one larger than the provided size
 //one slot in the buffer is used as a waste slot
@@ -16,7 +12,6 @@ CircularBuffer chatBuffer = CircularBuffer(CDPCFG_CDP_CHATBUF_SIZE);
 std::map<std::string, CircularBuffer*> chatHistories;
 std::string duckSession = duckutils::toString(BROADCAST_DUID).c_str();
 
-#ifndef CDPCFG_WIFI_NONE
 IPAddress apIP(CDPCFG_AP_IP1, CDPCFG_AP_IP2, CDPCFG_AP_IP3, CDPCFG_AP_IP4);
 AsyncWebServer webServer(CDPCFG_WEB_PORT);
 AsyncEventSource events("/events");
@@ -39,7 +34,7 @@ void DuckNet::setDeviceId(std::vector<byte> deviceId) {
   this->deviceId.insert(this->deviceId.end(), deviceId.begin(), deviceId.end());
 }
 
-String DuckNet::getMuidStatusMessage(muidStatus status) {
+std::string DuckNet::getMuidStatusMessage(muidStatus status) {
   switch (status) {
   case invalid:
     return "Invalid MUID.";
@@ -50,13 +45,12 @@ String DuckNet::getMuidStatusMessage(muidStatus status) {
   case acked:
     return "Message acknowledged.";
   default:
-    const char * str = "__FILE__:__LINE__ error: Unrecognized muidStatus";
-    logerr(str);
-    return str;
+    logerr_ln("Unrecognized muidStatus");
+    return "Unrecognized muidStatus";
   }
 }
 
-String DuckNet::getMuidStatusString(muidStatus status) {
+std::string DuckNet::getMuidStatusString(muidStatus status) {
   switch (status) {
   case invalid:
     return "invalid";
@@ -71,9 +65,9 @@ String DuckNet::getMuidStatusString(muidStatus status) {
   }
 }
 
-String DuckNet::createMuidResponseJson(muidStatus status) {
-  String statusStr = getMuidStatusString(status);
-  String message = getMuidStatusMessage(status);
+std::string DuckNet::createMuidResponseJson(muidStatus status) {
+  std::string statusStr = getMuidStatusString(status);
+  std::string message = getMuidStatusMessage(status);
   return "{\"status\":\"" + statusStr + "\", \"message\":\"" + message + "\"}";
 }
 
@@ -170,8 +164,8 @@ void DuckNet::checkForPublicMessage(std::vector<byte> muid)
     }
 }
 
-int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
-  loginfo("Setting up Web Server");
+int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
+  loginfo_ln("Setting up Web Server");
   events.onConnect([](AsyncEventSourceClient *client){
     client->send("hello!",NULL,millis(),1000);
   });
@@ -179,19 +173,19 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
   webServer.addHandler(&events);
 
   if (html == "") {
-    logdbg("Web Server using main page");
+    logdbg_ln("Web Server using main page");
     portal = home_page;
   } else {
-    logdbg("Web Server using custom main page");
+    logdbg_ln("Web Server using custom main page");
     portal = html;
   }
   webServer.onNotFound([&](AsyncWebServerRequest* request) {
-    logwarn("DuckNet - onNotFound: " + request->url());
-    request->send(200, "text/html", portal);
+    logwarn_ln("DuckNet - onNotFound: %s", request->url().c_str());
+    request->send(200, "text/html", portal.c_str());
   });
 
   webServer.on("/", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    request->send(200, "text/html", portal);
+    request->send(200, "text/html", portal.c_str());
   });
 
   webServer.on("/message-board", HTTP_GET, [&](AsyncWebServerRequest* request) {
@@ -260,11 +254,10 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
 
   webServer.on("/flipDecrypt", HTTP_GET, [&](AsyncWebServerRequest* request) {
     //Flip Decrypt State
-    loginfo("Flipping Decrypt");
+    loginfo_ln("Flipping Decrypt");
 
     duck->setDecrypt(!duck->getDecrypt());
-    loginfo("Decrypt is now: ");
-    loginfo(duck->getDecrypt());
+    loginfo_ln("Decrypt is now: %d", duck->getDecrypt());
     request->send(200, "text/plain", "Success");
   });
 
@@ -272,14 +265,13 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     //Flip Acking State
    
     duckutils::flipAckingState();
-     loginfo("Acking is now: ");
-    loginfo(duckutils::getAckingState());
+     loginfo_ln("Acking is now: %d", duckutils::getAckingState());
     request->send(200, "text/plain", "Success");
   });
 
   webServer.on("/setChannel", HTTP_POST, [&](AsyncWebServerRequest* request) {
     AsyncWebParameter* p = request->getParam(0);
-    logdbg(p->name() + ": " + p->value());
+    logdbg_ln("%s : %d", p->name(), p->value());
     int val = std::atoi(p->value().c_str());
     duck->setChannel(val);
     saveChannel(val);
@@ -289,17 +281,17 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
 
   // webServer.on("/changeControlPassword", HTTP_POST, [&](AsyncWebServerRequest* request) {
   //   int paramsNumber = request->params();
-  //   String val = "";
-  //   String ssid = "";
-  //   String password = "";
-  //   String newSsid = "";
-  //   String newPassword = "";
+  //   std::string val = "";
+  //   std::string ssid = "";
+  //   std::string password = "";
+  //   std::string newSsid = "";
+  //   std::string newPassword = "";
 
   //   for (int i = 0; i < paramsNumber; i++) {
   //     AsyncWebParameter* p = request->getParam(i);
 
-  //     String name = String(p->name());
-  //     String value = String(p->value());
+  //     std::string name = String(p->name());
+  //     std::string value = String(p->value());
 
   //     if (name == "ssid") {
   //       ssid = String(p->value());
@@ -330,7 +322,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
 
     request->send(response);
   });
-
+  
   webServer.on(
     "/update", HTTP_POST,
     [&](AsyncWebServerRequest* request) {
@@ -345,36 +337,44 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     [&](AsyncWebServerRequest* request, String filename, size_t index,
       uint8_t* data, size_t len, bool final)
     {
-      duck->updateFirmware(filename, index, data, len, final);
+      duck->updateFirmware(filename.c_str(), index, data, len, final);
       // TODO: error/exception handling
       // TODO: request->send
     });
 
   webServer.on("/muidStatus.json", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    logdbg(request->url());
-
-    String muid;
+    logdbg_ln("muidStatus.json: %s", request->url().c_str());
+    std::string muid;
     int paramsNumber = request->params();
     for (int i = 0; i < paramsNumber; i++) {
       AsyncWebParameter* p = request->getParam(i);
-      logdbg(p->name() + ": " + p->value());
+      logdbg_ln("param(%d) %s : %s", i, p->name(), p->value().c_str());
       if (p->name() == "muid") {
-        muid = p->value();
+        muid = p->value().c_str();
       }
     }
 
-    std::vector<byte> muidVect = {muid[0], muid[1], muid[2], muid[3]};
+    if (muid.length() != 4) {
+      request->send(400, "text/json", createMuidResponseJson(invalid).c_str());
+      return;
+    }
+
+    std::vector<byte> muidVect = {static_cast<unsigned char>(muid[0]), 
+                                  static_cast<unsigned char>(muid[1]), 
+                                  static_cast<unsigned char>(muid[2]), 
+                                  static_cast<unsigned char>(muid[3])};
+                                  
     muidStatus status = duck->getMuidStatus(muidVect);
 
-    String jsonResponse = createMuidResponseJson(status);
+    std::string jsonResponse = createMuidResponseJson(status);
     switch (status) {
     case invalid:
-      request->send(400, "text/json", jsonResponse);
+      request->send(400, "text/json", jsonResponse.c_str());
       break;
     case unrecognized:
     case not_acked:
     case acked:
-      request->send(200, "text/json", jsonResponse);
+      request->send(200, "text/json", jsonResponse.c_str());
       break;
     }
   });
@@ -419,12 +419,12 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     int err = DUCK_ERR_NONE;
 
     std::vector<byte> message;
-    String clientId = "";
+    std::string clientId = "";
 
     AsyncWebParameter* p = request->getParam(0);
     std::string msg = p->value().c_str();
     message.insert(message.end(), msg.begin(), msg.end());
-
+    logdbg_ln("chatSubmit: sending message. length: %d",message.size());
     std::vector<byte> muid;
 
     err = duck->sendData(topics::gchat, message, BROADCAST_DUID, &muid);
@@ -452,7 +452,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     int err = DUCK_ERR_NONE;
 
     std::vector<byte> message;
-    String clientId = "";
+    std::string clientId = "";
 
     AsyncWebParameter* p = request->getParam(0);
     std::string msg = p->value().c_str();
@@ -496,7 +496,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     int err = DUCK_ERR_NONE;
 
     std::vector<byte> message;
-    String clientId = "";
+    std::string clientId = "";
 
     AsyncWebParameter* p = request->getParam(0);
     std::string muidParam = p->value().c_str();
@@ -546,7 +546,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     int err = DUCK_ERR_NONE;
 
     std::vector<byte> message;
-    String clientId = "";
+    std::string clientId = "";
 
     AsyncWebParameter* p = request->getParam(0);
     std::string muidParam = p->value().c_str();
@@ -558,7 +558,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
           CdpPacket packetToResend = chatBuffer.getMessage(index);
 
           std::vector<byte> newMuid;
-          loginfo(duckSession.c_str());
+          loginfo_ln(duckSession.c_str());
 
           std::string messageBody(packetToResend.data.begin(), packetToResend.data.end());
 
@@ -591,26 +591,25 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
 
   // Captive Portal form submission
   webServer.on("/formSubmit.json", HTTP_POST, [&](AsyncWebServerRequest* request) {
-    loginfo("Submitting Form to /formSubmit.json");
+    loginfo_ln("Submitting Form to /formSubmit.json");
 
     int err = DUCK_ERR_NONE;
 
     int paramsNumber = request->params();
-    String val = "";
-    String clientId = "";
+    std::string val = "";
+    std::string clientId = "";
 
     for (int i = 0; i < paramsNumber; i++) {
       AsyncWebParameter* p = request->getParam(i);
-      logdbg(p->name() + ": " + p->value());
+      logdbg_ln("%s : %s", p->name(), p->value());
 
       if (p->name() == "clientId") {
-        clientId = p->value();
+        clientId = p->value().c_str();
       } else {
         val = val + p->value().c_str() + "*";
       }
     }
-
-    clientId.toUpperCase();
+    clientId = duckutils::toUpperCase(clientId); 
     val = "[" + clientId + "]" + val;
     std::vector<byte> muid;
     err = duck->sendData(topics::cpm, val, ZERO_DUID, &muid);
@@ -618,9 +617,9 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
     switch (err) {
       case DUCK_ERR_NONE:
       {
-        String response = "{\"muid\":\"" + duckutils::toString(muid) + "\"}";
-        request->send(200, "text/html", response);
-        logdbg("Sent 200 response: " + response);
+        std::string response = "{\"muid\":\"" + duckutils::toString(muid) + "\"}";
+        request->send(200, "text/html", response.c_str());
+        logdbg_ln("Sent 200 response: %s",response);
       }
       break;
       case DUCKLORA_ERR_MSG_TOO_LARGE:
@@ -647,8 +646,8 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
   });
 
   webServer.on("/mac", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    String mac = duckesp::getDuckMacAddress(true);
-    request->send(200, "text/html", mac);
+    std::string mac = duckesp::getDuckMacAddress(true);
+    request->send(200, "text/html", mac.c_str());
   });
 
   webServer.on("/wifi", HTTP_GET, [&](AsyncWebServerRequest* request) {
@@ -658,25 +657,22 @@ int DuckNet::setupWebServer(bool createCaptivePortal, String html) {
 
   webServer.on("/changeSSID", HTTP_POST, [&](AsyncWebServerRequest* request) {
     int paramsNumber = request->params();
-    String val = "";
-    String ssid = "";
-    String password = "";
+    std::string val = "";
+    std::string ssid = "";
+    std::string password = "";
 
     for (int i = 0; i < paramsNumber; i++) {
       AsyncWebParameter* p = request->getParam(i);
 
-      String name = String(p->name());
-      String value = String(p->value());
+      std::string name = p->name().c_str();
+      std::string value = p->value().c_str();
 
       if (name == "ssid") {
-        ssid = String(p->value());
+        ssid = p->value().c_str();
       } else if (name == "pass") {
-        password = String(p->value());
+        password = p->value().c_str();
       }
     }
-
-    Serial.println(ssid);
-    Serial.println(password);
 
     if (ssid != "" && password != "") {
       setupInternet(ssid, password);
@@ -714,7 +710,7 @@ int DuckNet::setupWifiAp(const char* accessPoint) {
     return DUCKWIFI_ERR_AP_CONFIG;
   }
 
-  loginfo("Created Wifi Access Point");
+  loginfo_ln("Created Wifi Access Point");
   return DUCK_ERR_NONE;
 }
 
@@ -722,18 +718,18 @@ int DuckNet::setupDns() {
   bool success = dnsServer.start(DNS_PORT, "*", apIP);
 
   if (!success) {
-    logerr("ERROR dns server start failed");
+    logerr_ln("ERROR dns server start failed");
     return DUCKDNS_ERR_STARTING;
   }
 
   success = MDNS.begin(DNS);
   
   if (!success) {
-    logerr("ERROR dns server begin failed");
+    logerr_ln("ERROR dns server begin failed");
     return DUCKDNS_ERR_STARTING;
   }
 
-  loginfo("Created local DNS");
+  loginfo_ln("Created local DNS");
   MDNS.addService("http", "tcp", CDPCFG_WEB_PORT);
 
   return DUCK_ERR_NONE;
@@ -744,31 +740,31 @@ int DuckNet::loadWiFiCredentials(){
   setPassword(duckutils::loadWifiPassword());
 
   if (ssid.length() == 0 || password.length() == 0){
-    loginfo("ERROR setupInternet: Stored SSID and PASSWORD empty");
+    loginfo_ln("ERROR setupInternet: Stored SSID and PASSWORD empty");
     return DUCK_ERR_SETUP;
   } else{
-    loginfo("Setup Internet with saved credentials");
+    loginfo_ln("Setup Internet with saved credentials");
     setupInternet(ssid, password);
   }
   return DUCK_ERR_NONE;
 }
 
 
-int DuckNet::setupInternet(String ssid, String password) {
+int DuckNet::setupInternet(std::string ssid, std::string password) {
   this->ssid = ssid;
   this->password = password;
 
 
   // // Check if SSID is available
   // if (!ssidAvailable(ssid)) {
-  //   logerr("ERROR setupInternet: " + ssid + " is not available. Please check the provided ssid and/or passwords");
+  //   logerr_ln("ERROR setupInternet: " + ssid + " is not available. Please check the provided ssid and/or passwords");
   //   return DUCK_INTERNET_ERR_SSID;
   // }
 
 
 
   //  Connect to Access Point
-  logdbg("setupInternet: connecting to WiFi access point SSID: " + ssid);
+  logdbg_ln("setupInternet: connecting to WiFi access point SSID: %s", ssid);
   WiFi.begin(ssid.c_str(), password.c_str());
   // We need to wait here for the connection to estanlish. Otherwise the WiFi.status() may return a false negative
   // WiFi.waitForConnectResult();
@@ -776,35 +772,35 @@ int DuckNet::setupInternet(String ssid, String password) {
 
   //TODO: Handle bad password better
   if(WiFi.status() != WL_CONNECTED) {
-    logerr("ERROR setupInternet: failed to connect to " + ssid);
+    logerr_ln("ERROR setupInternet: failed to connect to %s",ssid);
     return DUCK_INTERNET_ERR_CONNECT;
   }
 
-  loginfo("Duck connected to internet!");
+  loginfo_ln("Duck connected to internet!");
 
   return DUCK_ERR_NONE;
 
 }
 
-bool DuckNet::ssidAvailable(String val) {
+bool DuckNet::ssidAvailable(std::string val) {
   int n = WiFi.scanNetworks();
   
   if (n == 0 || ssid == "") {
-    logdbg("Networks found: "+String(n));
+    logdbg_ln("Networks found: %d", n);
   } else {
-    logdbg("Networks found: "+String(n));
+    logdbg_ln("Networks found: %d", n);
     if (val == "") {
       val = ssid;
     }
     for (int i = 0; i < n; ++i) {
       if (WiFi.SSID(i) == val.c_str()) {
-        logdbg("Given ssid is available!");
+        logdbg_ln("Given ssid is available!");
         return true;
       }
       delay(AP_SCAN_INTERVAL_MS);
     }
   }
-  loginfo("No ssid available");
+  loginfo_ln("No ssid available");
 
   return false;
 }
@@ -814,8 +810,7 @@ void DuckNet::saveChannel(int val){
     EEPROM.begin(512);
     EEPROM.write(CDPCFG_EEPROM_CHANNEL_VALUE, val);
     EEPROM.commit();
-    loginfo("Wrote channel val to EEPROM");
-    loginfo(val);
+    loginfo_ln("Wrote channel val to EEPROM %d", val);
     
 }
 
@@ -823,16 +818,15 @@ void DuckNet::loadChannel(){
     EEPROM.begin(512);
     int val = EEPROM.read(CDPCFG_EEPROM_CHANNEL_VALUE);
     duck->setChannel(val);
-    loginfo("Read channel val to EEPROM, setting channel: ");
-    loginfo(val);
+    loginfo_ln("Read channel val to EEPROM, setting channel: %d", val);
 }
 
-void DuckNet::setSsid(String val) { ssid = val; }
+void DuckNet::setSsid(std::string val) { ssid = val; }
 
-void DuckNet::setPassword(String val) { password = val; }
+void DuckNet::setPassword(std::string val) { password = val; }
 
-String DuckNet::getSsid() { return ssid; }
+std::string DuckNet::getSsid() { return ssid; }
 
-String DuckNet::getPassword() { return password; }
+std::string DuckNet::getPassword() { return password; }
 
 #endif
