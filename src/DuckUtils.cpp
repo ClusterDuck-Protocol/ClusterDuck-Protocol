@@ -70,7 +70,7 @@ std::string convertToHex(byte* data, int size) {
   return buf;
 }
 
-uint32_t toUnit32(const byte* data) {
+uint32_t toUint32(const byte* data) {
     uint32_t value = 0;
 
     value |= data[0] << 24;
@@ -82,16 +82,16 @@ uint32_t toUnit32(const byte* data) {
 
 #ifdef CDPCFG_WIFI_NONE
 int saveWifiCredentials(std::string ssid, std::string password) {
-  logwarn("WARNING saveWifiCredentials skipped, device has no WiFi.");
+  logwarn_ln("WARNING saveWifiCredentials skipped, device has no WiFi.");
   return DUCK_ERR_NOT_SUPPORTED;
 }
 
 std::string loadWiFiPassword() {
-  logwarn("WARNING loadWiFiPassword skipped, device has no WiFi.");
+  logwarn_ln("WARNING loadWiFiPassword skipped, device has no WiFi.");
   return "unknown";
 }
 std::string loadWifiSsid() {
-  logwarn("WARNING loadWifiSsid skipped, device has no WiFi.");
+  logwarn_ln("WARNING loadWifiSsid skipped, device has no WiFi.");
   return "unknown";
 }
 
@@ -99,6 +99,10 @@ std::string loadWifiSsid() {
 int saveWifiCredentials(std::string ssid, std::string password) {
   int err = DUCK_ERR_NONE;
 
+  if (ssid.empty() || password.empty()) {
+    logerr("Invalid SSID or password\n");
+    return DUCK_ERR_INVALID_ARGUMENT;
+  }
   if (!EEPROM.begin(512)) {
     logerr("Failed to initialise EEPROM\n");
     return DUCK_ERR_EEPROM_INIT;

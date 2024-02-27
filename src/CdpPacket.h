@@ -176,7 +176,9 @@ public:
   //if the packet has been acked
   bool acked = false;
 
-  CdpPacket(){}
+  CdpPacket() {
+    reset();
+  }
   CdpPacket(const std::vector<byte> & buffer) {
     int buffer_length = buffer.size();
     // sduid
@@ -192,7 +194,7 @@ public:
     // hop count
     hopCount = buffer[HOP_COUNT_POS];
     // data crc
-    dcrc = duckutils::toUnit32(&buffer[DATA_CRC_POS]);
+    dcrc = duckutils::toUint32(&buffer[DATA_CRC_POS]);
     // data section
     data.assign(&buffer[DATA_POS], &buffer[buffer_length]);
 

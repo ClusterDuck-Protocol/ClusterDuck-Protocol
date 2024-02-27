@@ -8,6 +8,10 @@
 #define DUCK_ERR_NOT_SUPPORTED -5000
 // Failed to setup device
 #define DUCK_ERR_SETUP         -5100
+
+// Invalid argument
+#define DUCK_ERR_INVALID_ARGUMENT -5101
+
 // Device Id is too long
 #define DUCK_ERR_ID_TOO_LONG   -5101
 #define DUCK_ERR_OTA           -5200

@@ -77,6 +77,9 @@ template<typename T>
 std::string toString(const std::vector<T>& vec) {
     std::string result;
     for (const auto& element : vec) {
+        if (!std::isprint(element)) {
+            return "ERROR: Non-printable character";
+        }
         result += static_cast<char>(element);
     }
     return result;
@@ -98,19 +101,12 @@ bool isEqual(const std::vector<T> & a, const std::vector<T> & b) {
 }
 
 /**
- * @brief Toggle the duck Interrupt
- *
- * @param enable true to enable interrupt, false otherwise.
- */
-void setInterrupt(bool enable);
-
-/**
  * @brief Convert a byte array to unsigned 32 bit integer.
  * 
  * @param data byte array to convert
  * @returns a 32 bit unsigned integer.
  */
-uint32_t toUnit32(const byte* data);
+uint32_t toUint32(const byte* data);
 
 /**
  * @brief Get a timer instance.
