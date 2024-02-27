@@ -1,0 +1,26 @@
+
+/*
+ * BOARD "WIFI_LoRa_32_V3"
+ * https://heltec.org/project/wifi-lora-32-v3/
+ */
+#define CDPCFG_BOARD WiFi_Lora_32_V3
+#define CDPCFG_RADIO_SX126X
+
+// Lora configurations 
+#define CDPCFG_LORA_CLASS SX1262
+
+#define CDPCFG_PIN_LORA_CS 8
+#define CDPCFG_PIN_LORA_RST 12
+#define CDPCFG_PIN_LORA_DIO0 13
+#define CDPCFG_PIN_LORA_DIO1 14 // SX1262 IRQ
+#define CDPCFG_PIN_LORA_BUSY 13 // SX1262 BUSY
+
+#define CDPCFG_PIN_LORA_MOSI 10
+#define CDPCFG_PIN_LORA_SCLK 9
+#define CDPCFG_PIN_LORA_MISO 11
+
+// Oled Display settings
+#define CDPCFG_PIN_OLED_CLOCK SCL_OLED
+#define CDPCFG_PIN_OLED_DATA SDA_OLED
+#define CDPCFG_PIN_OLED_RESET RST_OLED
+#define CDPCFG_PIN_OLED_ROTATION U8G2_R0

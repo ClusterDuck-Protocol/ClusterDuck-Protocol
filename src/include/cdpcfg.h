@@ -109,6 +109,9 @@
  * https://heltec.org/project/htcc-ab01/
  * pio: board = cubecell_board
  */
+#elif defined(ARDUINO_heltec_wifi_lora_32_V3)
+#include "include/boards/heltec_wifi_lora_32_V3.h"
+
 #elif defined(CubeCell_Board)
 #define CDPCFG_HELTEC_CUBE_CELL
 #include "include/boards/cubecell_board.h"
