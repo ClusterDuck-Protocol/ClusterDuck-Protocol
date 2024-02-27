@@ -24,18 +24,19 @@
         ]
     },
     "frameworks": "arduino",
-    "platforms": "espressif32",
+    "platforms": ["espressif32","heltec-cubecell"], 
     "examples": [
         "[Ee]xamples/*/*.ino"
     ],
     "dependencies": {
-        "contrem/arduino-timer": "^2.3.1",
-        "olikraus/U8g2": "^2.33.2",
-        "bblanchon/ArduinoJson": "^6.19.4",
+        "contrem/arduino-timer": "^3.0.1",
+        "olikraus/U8g2": "^2.35.9",
+        "bblanchon/ArduinoJson": "^7.0.3",
         "bakercp/CRC32": "2.0.0",
-        "jgromes/RadioLib": "^6.1.0",
+        "jgromes/RadioLib": "^6.4.2",
         "operatorfoundation/Crypto": "^0.4.0",
-        "me-no-dev/ESP Async WebServer": "^1.2.3",
+        "me-no-dev/AsyncTCP": "^1.1.1",
+        "mathieucarbou/ESP Async WebServer": "^2.7.0",
         "knolleary/pubsubclient":"^2.8.0"
     }
 }

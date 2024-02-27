@@ -12,6 +12,9 @@
 #define Serial SERIAL_PORT_USBVIRTUAL
 #endif
 
+bool sendData(std::vector<byte> message);
+bool runSensor(void *);
+
 // create a built-in mama duck
 MamaDuck duck;
 
