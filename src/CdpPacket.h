@@ -200,21 +200,6 @@ public:
 
   ~CdpPacket() {}
 
-
-  /**
-   * @brief Get the path cdp packet section as hex string.
-   *
-   * @returns a hex string representing the path section of a cdp packet
-   */
-  std::string getPathAsHexString() {
-    return duckutils::convertToHex(path.data(), path.size());
-  }
-
-  std::vector<byte> converToBuffer(){
-    std::vector<byte> sendBuffer;
-    sendBuffer.insert(sendBuffer.end(), sduid.begin(), sduid.end());
-    return sendBuffer;
-  }
   /**
    * @brief Resets the cdp packet and underlying byte buffers.
    *
