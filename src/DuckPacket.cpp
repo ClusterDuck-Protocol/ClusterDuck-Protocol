@@ -55,7 +55,7 @@ int DuckPacket::prepareForSending(BloomFilter *filter,
 
   this->reset();
 
-  if (app_data_length > MAX_DATA_LENGTH) {
+  if ( app_data.empty() || app_data_length > MAX_DATA_LENGTH) {
     return DUCKPACKET_ERR_SIZE_INVALID;
   }
 
