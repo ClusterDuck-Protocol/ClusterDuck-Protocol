@@ -31,7 +31,7 @@
 
 
 // https://github.com/esp8266/Arduino/blob/65579d29081cb8501e4d7f786747bf12e7b37da2/cores/esp8266/Print.cpp#L50
-static size_t cdpPrintf(const char *format, ...) {
+[[maybe_unused]] static size_t cdpPrintf(const char *format, ...) {
     va_list arg;
     va_start(arg, format);
     char temp[64];

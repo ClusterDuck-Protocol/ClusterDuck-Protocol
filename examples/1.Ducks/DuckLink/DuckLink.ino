@@ -76,7 +76,6 @@ std::vector<byte> stringToByteVector(const String& str) {
 
 bool sendSensorData() {
   bool result = false;
-  const byte* buffer;
   
   String message = String("Counter:") + String(counter);
   Serial.print("[LINK] sensor data: ");

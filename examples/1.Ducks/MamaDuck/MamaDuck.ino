@@ -75,7 +75,6 @@ bool runSensor(void *) {
   bool result;
   
   String message = String("Counter:") + String(counter)+ " " +String("Free Memory:") + String(freeMemory());
-  int length = message.length();
   Serial.print("[MAMA] sensor data: ");
   Serial.println(message);
 

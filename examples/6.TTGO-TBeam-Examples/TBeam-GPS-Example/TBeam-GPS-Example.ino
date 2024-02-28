@@ -125,7 +125,6 @@ String getGPSData() {
 }
 
 bool runSensor(void *) {
-  bool result;
   String sensorVal = getGPSData();
 
   Serial.print("[MAMA] sensor data: ");

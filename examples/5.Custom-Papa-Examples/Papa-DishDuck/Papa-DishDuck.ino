@@ -181,7 +181,6 @@ void quackBeam(std::vector<byte> packetBuffer) {
 }
 
 void setupRockBlock(){
-  int signalQuality = -1;
   int err;
   
   // Start the serial port connected to the satellite modem

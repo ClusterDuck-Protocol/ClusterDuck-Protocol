@@ -128,7 +128,7 @@ int saveWifiCredentials(std::string ssid, std::string password) {
       err = DUCK_ERR_EEPROM_WRITE;
     }
   }
-  return DUCK_ERR_NONE;
+  return err;
 }
 
 std::string loadWifiSsid() {
