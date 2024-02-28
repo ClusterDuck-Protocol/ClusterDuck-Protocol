@@ -14,8 +14,8 @@ void test_bloomfilter_constructor_default(void) {
 void test_bloomfilter_constructor(void) {
     BloomFilter bf(10, 5, 16, 50);
     TEST_ASSERT_EQUAL(10, bf.get_numSectors());
-    TEST_ASSERT_EQUAL(16, bf.get_numHashes());
-    TEST_ASSERT_EQUAL(100, bf.get_bitsPerSector());
+    TEST_ASSERT_EQUAL(5, bf.get_numHashes());
+    TEST_ASSERT_EQUAL(16, bf.get_bitsPerSector());
     TEST_ASSERT_EQUAL(50, bf.get_maxMsgs());
 
     TEST_ASSERT_EQUAL(0, bf.get_nMsg());
