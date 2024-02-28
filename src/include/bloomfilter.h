@@ -8,6 +8,12 @@
 #include <math.h>
 #include <memory>
 
+
+const int DEFAULT_NUM_SECTORS = 312; 
+const int DEFAULT_NUM_HASH_FUNCS = 2;
+const int DEFAULT_BITS_PER_SECTOR = 32;
+const int DEFAULT_MAX_MESSAGES = 100;
+
 // two-phase bloom filter
 class BloomFilter {
 private:
@@ -46,6 +52,14 @@ private:
 public:
 
   friend class BloomFilterTester;
+
+  /**
+   * @brief Initialize a bloom filter with default values
+   * 
+  */
+  BloomFilter() : BloomFilter(DEFAULT_NUM_SECTORS, DEFAULT_NUM_HASH_FUNCS, DEFAULT_BITS_PER_SECTOR, DEFAULT_MAX_MESSAGES) {
+
+  }
 
   /**
   * @brief Initialize a bloom filter

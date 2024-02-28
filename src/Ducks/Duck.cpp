@@ -15,14 +15,10 @@
 #include "include/DuckNet.h"
 
 const int MEMORY_LOW_THRESHOLD = PACKET_LENGTH + sizeof(CdpPacket);
-const int NUM_SECTORS = 312; //total desired bits divided by bits per sector
-const int NUM_HASH_FUNCS = 2;
-const int BITS_PER_SECTOR = 32; //size of unsigned int is 32 bits
-const int MAX_MESSAGES = 100;
 
 Duck::Duck(std::string name):
   duckNet(new DuckNet(this)),
-  filter(NUM_SECTORS, NUM_HASH_FUNCS, BITS_PER_SECTOR, MAX_MESSAGES)
+  filter() // initialized filter with default values
 {
   duckName = name;
 }

@@ -59,6 +59,12 @@ public:
     void setDeviceId(std::vector<byte> duid) { this->duid = duid; }
 
     /**
+     * @brief Get device Id.
+     *
+     * @returns a duck device unique id
+     */
+    std::vector<byte> getDeviceId() { return this->duid = duid; }
+    /**
      * @brief Build a packet from the given topic and provided byte buffer.
      *
      * @param targetDevice the target device DUID to receive the message
