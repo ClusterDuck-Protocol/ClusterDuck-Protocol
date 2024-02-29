@@ -1,4 +1,4 @@
-# CDP Project Installation Guide
+# CDP Project Developer Guide
 
 ## Table of Contents
 - [Introduction](#introduction)
