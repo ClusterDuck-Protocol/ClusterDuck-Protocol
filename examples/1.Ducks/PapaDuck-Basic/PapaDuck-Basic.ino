@@ -18,6 +18,8 @@
 #include <PapaDuck.h>
 #include <CdpPacket.h>
 #include <queue>
+#include <iomanip>
+#include <sstream>
 
 
 std::string toTopicString(byte topic);
@@ -103,9 +105,18 @@ String convertToHex(byte* data, int size)
 
 int toJSON(CdpPacket packet) 
 {
+  
+  std::stringstream ss;
+
+  // convert the dduid to a string. We should probably do this for all fields
+  // using stringstream because print will interpret 00 as a null terminator
+  for (auto &c : packet.dduid) {
+    ss << std::hex << std::setw(2) << std::setfill('0') << (int)c;
+  }
+  
   std::string payload(packet.data.begin(), packet.data.end());
   std::string sduid(packet.sduid.begin(), packet.sduid.end());
-  std::string dduid(packet.dduid.begin(), packet.dduid.end());
+  std::string dduid = ss.str();
   std::string muid(packet.muid.begin(), packet.muid.end());
 
   Serial.println("[PAPA] topic:   " + String(toTopicString(packet.topic).c_str()));

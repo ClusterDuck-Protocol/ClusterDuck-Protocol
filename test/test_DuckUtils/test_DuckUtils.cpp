@@ -96,6 +96,10 @@ void test_DuckUtils_convertToHex(void) {
     byte large[] = {0xEF, 0xFF, 0x00, 0xAB, 0xCD, 0x99, 0x12};
     std::string largeHex = duckutils::convertToHex(large, 7);
     TEST_ASSERT_EQUAL_STRING("EFFF00ABCD9912", largeHex.c_str());
+
+    byte zeros[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+    std::string zerosHex = duckutils::convertToHex(zeros, 8);
+    TEST_ASSERT_EQUAL_STRING("0000000000000000", zerosHex.c_str());
 }
 
 void test_DuckUtils_toString_printable_characters() {
