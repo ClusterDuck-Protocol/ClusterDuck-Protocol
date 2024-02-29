@@ -37,7 +37,7 @@ jobs:
         # udpate the index to include the Heltec ESP32 and CubeCell boards
         echo "[ARDUINO SETUP] Updating the index to include the Heltec ESP32 and CubeCell boards"
         arduino-cli core update-index --additional-urls https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series/releases/download/1.0.0/package_heltec_esp32_index.json
-        arduino-cli core update-index --additional-urls https://github.com/HelTecAutomation/CubeCell-Arduino/releases/download/V1.6.0/package_CubeCell_index.json
+        arduino-cli core update-index --additional-urls https://github.com/HelTecAutomation/CubeCell-Arduino/releases/download/V1.5.0/package_CubeCell_index.json
         
         # install the Heltec ESP32 and CubeCell boards
         if [[ "${{ matrix.board }}" =~ "esp32:esp32:" ]]; then
@@ -46,9 +46,9 @@ jobs:
         fi
         if [[ "${{ matrix.board }}" =~ "CubeCell:CubeCell:" ]]; then
           echo "[ARDUINO SETUP] Installing the CubeCell board"
-          arduino-cli core install CubeCell:CubeCell --additional-urls https://github.com/HelTecAutomation/CubeCell-Arduino/releases/download/V1.6.0/package_CubeCell_index.json
+          arduino-cli core install CubeCell:CubeCell --additional-urls https://github.com/HelTecAutomation/CubeCell-Arduino/releases/download/V1.5.0/package_CubeCell_index.json
           echo "[ARDUINO  SETUP] Patching the CubeCell Arduino.h file."
-          cp ./arduino_patches/CubeCell_Arduino.h /home/runner/.arduino15/packages/CubeCell/hardware/CubeCell/1.6.0/cores/asr650x/Arduino.h
+          cp ./arduino_patches/CubeCell_Arduino.h /home/runner/.arduino15/packages/CubeCell/hardware/CubeCell/1.5.0/cores/asr650x/Arduino.h
         fi
 
     - name: Install CDP
