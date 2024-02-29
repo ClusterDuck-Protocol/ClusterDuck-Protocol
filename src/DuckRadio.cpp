@@ -175,11 +175,10 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
         return DUCKLORA_ERR_HANDLE_PACKET;
     }
     // we have a good packet
-    loginfo_ln("RX: rssi: %d snr: %d size: %d", lora.getRSSI(), lora.getSNR(), packet_length);
 #ifndef CDPCFG_RADIO_SX126X
-    loginfo_ln("RX: rssi: %d snr: %d fe: %d size: %d", lora.getRSSI(), lora.getSNR(), lora.getFrequencyError(true), packet_length);
+    loginfo_ln("RX: rssi: %f snr: %f fe: %d size: %d", lora.getRSSI(), lora.getSNR(), lora.getFrequencyError(true), packet_length);
 #else
-    loginfo_ln("RX: rssi: %d snr: %d size: %d", lora.getRSSI(), lora.getSNR(), packet_length);
+    loginfo_ln("RX: rssi: %f snr: %f size: %d", lora.getRSSI(), lora.getSNR(), packet_length);
 #endif
 
 
