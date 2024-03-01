@@ -66,20 +66,18 @@ For example below is the configuration for tests on the Heltec LoRa v3 Arduino b
 ### How to run the tests
   Here are the steps to run the tests (on Linux or Mac OS). This assumes you have platformIO installed on your system.
 
-  For Platform IO VSCode and CLI installation follow these links:
+  For more details on setting up your development environment, please refer to the [developer's guide](./DEVELOPER_GUIDE.md).
 
-  https://platformio.org/install/ide?install=vscode (VSCode plugin)
- 
-  https://platformio.org/install/cli (CLI)
-  
 
+
+#### PlatformIO CLI test command
   ```
   # Open a terminal 
   # goto the project root folder (where the platformio.ini is located)
   $ cd ClusterDuckProtocol
   $ platformio test -e test_heltec_wifi_lora_32_V3
   ```
-  ### Example output
+#### Example output
 
   ```
   Processing test_DuckUtils in test_heltec_wifi_lora_32_V3 environment
@@ -106,7 +104,6 @@ test/test_DuckUtils/test_DuckUtils.cpp:195: test_DuckUtils_saveWifiCredentials_z
 test/test_DuckUtils/test_DuckUtils.cpp:196: test_DuckUtils_loadWifiSsid                         [PASSED]
 ------------------------------------------------------------- test_heltec_wifi_lora_32_V3:test_DuckUtils [PASSED] Took 23.34 seconds -------------------------------------------------------------
 ```
-
 
 ## How to Contribute
 
