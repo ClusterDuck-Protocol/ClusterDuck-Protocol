@@ -1,17 +1,37 @@
-**Describe at a high level the solution you're providing**
-A clear and concise description of what you changed.
+**What is is PR for?**
+- [ ] Code update
+- [ ] Documentation update
+- [ ] Both
 
-**Is this a patch, a minor version change, or a major version change**
-Patch, minor, or major.
+**What does this PR do?**  
+Please provide a brief description of what this PR does.
 
-**Is this related to an open issue?**
+**Is this related to an open issue?**  
 Please provide the link.
 
-**Testing Methodology. How can someone test your pull request?** 
-What result should they be looking for? What board should they use? etc..
+**Testing Methodology**  
+How can someone test your pull request?
 
-**Does the CDP Wiki need to be updated?**
-Does this change affect how the CDP is downloaded and installed? Do we need to update the wiki?
-
-**Additional context**
+**Additional context**  
 Add any other technical detail or considerations here.
+
+**Checklist**
+Before you submit this pull request, please make sure you have done the following:
+
+_General_  
+- [ ] Contribution Guidelines: Have you read the contribution guidelines?  
+- [ ] Code of Conduct: Have you read the code of conduct?
+- [ ] Documentation: If applicable, have you added or updated all relevant documentation?
+
+_For Code Updates_  
+- [ ] Hardware Validation: If relevant, have you validated your changes on actual supported Duck hardware?
+- [ ] Unit Tests: Have you run the unit tests on the device?  
+- [ ] Network Testing: If applicable, have you tested your changes on a Duck network?  
+
+Tested Targets (Please check all that apply)  
+- [ ] All
+- [ ] Heltec LoRa v3 
+- [ ] Heltec LoRa v2
+- [ ] Heltec CubeCell Series
+- [ ] TTGO T-Beam (SX1262)
+- [ ] Others
