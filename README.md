@@ -24,7 +24,7 @@ Check out the [Wiki](https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki)
 
 ## Testing
 
-Starting with release 3.7.0 we have unit tests available with the PlatformIO test framework `unity`
+Starting with release 4.0.0 we have unit tests available with the PlatformIO test framework `unity`
 
 Tests are located in the `ClusterDuckProtocol/test` folder. These tests are unit tests as
 they validate the CDP publicly accessible APIs. However they must be run on a device.
