@@ -127,7 +127,7 @@ This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE)
 
 ## Version
 
-v3.6.1
+v4.0.0
 
 See `library.json` (PlatformIO) or `library.properties` (Arduino).
 
