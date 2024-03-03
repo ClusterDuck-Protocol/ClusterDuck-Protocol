@@ -12,7 +12,7 @@
     "repository":
     {
         "type": "git",
-        "url": "https://github.com/Call-for-Code/ClusterDuck-Protocol.git"
+        "url": "https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol"
     },
     "frameworks": "arduino",
     "platforms": ["espressif32","heltec-cubecell"], 
