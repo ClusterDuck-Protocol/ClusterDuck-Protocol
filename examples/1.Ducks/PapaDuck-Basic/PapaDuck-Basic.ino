@@ -10,13 +10,12 @@
  *
  */
 
+#include <CDP.h>
+
 #include <ArduinoJson.h>
 #include <arduino-timer.h>
 #include <string>
 
-/* CDP Headers */
-#include <PapaDuck.h>
-#include <CdpPacket.h>
 #include <queue>
 #include <iomanip>
 #include <sstream>

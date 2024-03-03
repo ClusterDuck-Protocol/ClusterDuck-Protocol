@@ -1,5 +1,5 @@
 #include "include/DuckRadio.h"
-#ifdef CDPCFG_RADIO_SX126X
+#ifdef CDPCFG_RADIO_SX1262
 #define DUCK_RADIO_IRQ_TIMEOUT RADIOLIB_SX126X_IRQ_TIMEOUT
 #define DUCK_RADIO_IRQ_TX_DONE RADIOLIB_SX126X_IRQ_TX_DONE
 #define DUCK_RADIO_IRQ_RX_DONE RADIOLIB_SX126X_IRQ_RX_DONE
@@ -15,7 +15,7 @@
 #include "include/DuckUtils.h"
 #include <RadioLib.h>
 
-#if defined(CDPCFG_RADIO_SX126X)
+#if defined(CDPCFG_RADIO_SX1262)
 CDPCFG_LORA_CLASS lora =
         new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO1, CDPCFG_PIN_LORA_RST,
                    CDPCFG_PIN_LORA_BUSY);
@@ -64,7 +64,7 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
         logerr_ln("ERROR  output power is invalid");
         return DUCKLORA_ERR_SETUP;
     }
-#ifdef CDPCFG_RADIO_SX126X
+#ifdef CDPCFG_RADIO_SX1262
     // set the interrupt handler to execute when packet tx or rx is done.
     lora.setDio1Action(config.func);
 #else
@@ -175,7 +175,7 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
         return DUCKLORA_ERR_HANDLE_PACKET;
     }
     // we have a good packet
-#ifndef CDPCFG_RADIO_SX126X
+#ifndef CDPCFG_RADIO_SX1262
     loginfo_ln("RX: rssi: %f snr: %f fe: %d size: %d", lora.getRSSI(), lora.getSNR(), lora.getFrequencyError(true), packet_length);
 #else
     loginfo_ln("RX: rssi: %f snr: %f size: %d", lora.getRSSI(), lora.getSNR(), packet_length);
@@ -300,35 +300,35 @@ void DuckRadio::serviceInterruptFlags() {
             loginfo_ln("SX127x Interrupt flag was set: valid LoRa signal detected during CAD operation");
         }
 
-        // SX126X flags
+        // SX1262 flags
         if (DuckRadio::interruptFlags & RADIOLIB_SX126X_CMD_CLEAR_IRQ_STATUS) {
-            loginfo_ln("SX126X Interrupt flag was set: clear IRQ status");
+            loginfo_ln("SX1262 Interrupt flag was set: clear IRQ status");
         }
         if (DuckRadio::interruptFlags & RADIOLIB_SX126X_CMD_CLEAR_DEVICE_ERRORS) {
-            loginfo_ln("SX126X Interrupt flag was set: clear device errors");
+            loginfo_ln("SX1262 Interrupt flag was set: clear device errors");
         }
         if (DuckRadio::interruptFlags & RADIOLIB_SX126X_IRQ_CRC_ERR ) {
-            loginfo_ln("SX126X Interrupt flag was set: payload CRC error");
+            loginfo_ln("SX1262 Interrupt flag was set: payload CRC error");
             DuckRadio::goToReceiveMode(false);
             lora.standby();
         }
         if (DuckRadio::interruptFlags & RADIOLIB_SX126X_IRQ_HEADER_ERR ) {
-            loginfo_ln("SX126X Interrupt flag was set: header CRC error");
+            loginfo_ln("SX1262 Interrupt flag was set: header CRC error");
             DuckRadio::goToReceiveMode(false);
             lora.standby();
         }
         if (DuckRadio::interruptFlags & RADIOLIB_SX126X_IRQ_RX_DONE ) {
-            loginfo_ln("SX126X Interrupt flag was set: packet reception complete");
+            loginfo_ln("SX1262 Interrupt flag was set: packet reception complete");
             DuckRadio::setReceiveFlag(true);
             lora.standby(); // we are done receiving, go to standby. We can't sleep because read buffer is not empty
         }
         if (DuckRadio::interruptFlags & RADIOLIB_SX126X_IRQ_TX_DONE ) {
-            loginfo_ln("SX126X Interrupt flag was set: payload transmission complete");
+            loginfo_ln("SX1262 Interrupt flag was set: payload transmission complete");
             lora.finishTransmit();
             DuckRadio::goToReceiveMode(false);
         }
         if (DuckRadio::interruptFlags & RADIOLIB_SX126X_IRQ_TIMEOUT ) {
-            loginfo_ln("SX126X Interrupt flag was set: timeout");
+            loginfo_ln("SX1262 Interrupt flag was set: timeout");
             DuckRadio::goToReceiveMode(false);
         }
 
@@ -338,7 +338,7 @@ void DuckRadio::serviceInterruptFlags() {
 
 // IMPORTANT: this function MUST be 'void' type and MUST NOT have any arguments!
 void DuckRadio::onInterrupt(void) {
-#ifdef CDPCFG_RADIO_SX126X
+#ifdef CDPCFG_RADIO_SX1262
     interruptFlags = lora.getIrqStatus();
 #else
     interruptFlags = lora.getIRQFlags();

@@ -2,8 +2,6 @@
 #define DUCKLINK_H
 
 #include <Arduino.h>
-#include <WString.h>
-#include "include/cdpcfg.h"
 #include "include/Duck.h"
 
 class DuckLink : public Duck {

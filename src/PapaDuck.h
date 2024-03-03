@@ -3,10 +3,7 @@
 
 #include <Arduino.h>
 #include <arduino-timer.h>
-#include <WString.h>
-
 #include "include/Duck.h"
-#include "include/cdpcfg.h"
 
 class PapaDuck : public Duck {
 public:

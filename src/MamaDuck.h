@@ -2,10 +2,7 @@
 #define MAMADUCK_H
 
 #include <Arduino.h>
-#include <WString.h>
-
 #include "include/Duck.h"
-#include "include/cdpcfg.h"
 #include "include/DuckUtils.h"
 
 class MamaDuck : public Duck {
