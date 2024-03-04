@@ -96,9 +96,13 @@ jobs:
         arduino-cli core list
         buildExampleSketch() { 
           echo "Building $1/$2/$2.ino..."
-          arduino-cli compile -v -t -b ${{ matrix.board }} $PWD/examples/$1/$2/$2.ino; 
+          arduino-cli compile -v -t -b ${{ matrix.board }} $PWD/examples/$1/$2/$2.ino > build.log 2>&1; 
           echo "Build complete."
         } 
         buildExampleSketch 1.Ducks DuckLink
         buildExampleSketch 1.Ducks MamaDuck
-        
+    - name: Upload build log
+      uses: actions/upload-artifact@v2
+      with:
+        name: build-log
+        path: build.log      
