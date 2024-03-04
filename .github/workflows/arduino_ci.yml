@@ -95,14 +95,16 @@ jobs:
         echo "List of installed Arduino Cores:"
         arduino-cli core list
         buildExampleSketch() { 
+          BOARD=${{ matrix.board }}
           echo "Building $1/$2/$2.ino..."
-          arduino-cli compile -v -t -b ${{ matrix.board }} $PWD/examples/$1/$2/$2.ino > build.log 2>&1; 
+          arduino-cli compile -v -t -b ${{ matrix.board }} $PWD/examples/$1/$2/$2.ino > ${BOARD##*:}-$2-build.log 2>&1; 
           echo "Build complete."
         } 
         buildExampleSketch 1.Ducks DuckLink
         buildExampleSketch 1.Ducks MamaDuck
     - name: Upload build log
       uses: actions/upload-artifact@v2
+      if: always()
       with:
         name: build-log
         path: build.log      
