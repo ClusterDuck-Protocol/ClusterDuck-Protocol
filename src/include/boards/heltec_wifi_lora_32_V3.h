@@ -4,7 +4,7 @@
  * BOARD "WIFI_LoRa_32_V3"
  * https://heltec.org/project/wifi-lora-32-v3/
  */
-#if defined(ARDUINO_WIFI_LORA_32_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3)
+#if defined(ARDUINO_WIFI_LORA_32_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3) || ARDUINO_BOARD == "\"WIFI_LORA_32_V3\""
 
 #define CDP_BOARD_NAME "Heltec WiFi LoRa 32 V3"
 #define CDPCFG_RADIO_SX1262

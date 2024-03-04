@@ -13,6 +13,7 @@
 #define CDPCFG_H
 
 #include "boards/heltec_wifi_lora_32_V3.h"
+#include "boards/heltec_wifi_lora_32_V2.h"
 #include "boards/ttgo_t_beam_sx1262.h"
 #include "boards/heltec_cubecell_board.h"
 #include "boards/heltec_cubecell_gps.h"
