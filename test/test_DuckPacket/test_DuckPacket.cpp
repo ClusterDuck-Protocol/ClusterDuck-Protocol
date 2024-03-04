@@ -81,7 +81,7 @@ void test_DuckPacket_prepareForSending_data_length_zero(void) {
     byte duckType = DuckType::LINK;
     byte topic = topics::status;
     std::vector<byte> app_data = {};
-    BloomFilter filter;
+    BloomFilter filter(10, 5, 16, 5);
     int result = dp.prepareForSending(&filter, targetDevice, duckType, topic, app_data);
     TEST_ASSERT_EQUAL(DUCKPACKET_ERR_SIZE_INVALID, result);
 }
@@ -102,14 +102,14 @@ void test_DuckPacket_prepareForSending_data_length_exceeds_max(void) {
     for (int i = 0; i < MAX_DATA_LENGTH + 1; i++) {
         app_data.push_back(i);
     }
-    BloomFilter filter;
+    BloomFilter filter(10, 5, 16, 5);
     int result = dp.prepareForSending(&filter, targetDevice, duckType, topic, app_data);
     TEST_ASSERT_EQUAL(DUCKPACKET_ERR_SIZE_INVALID, result);
 }
 
 void test_prepareForRelaying_returns_true(void) {
     DuckPacket dp;
-    BloomFilter filter;
+    BloomFilter filter(10, 5, 16, 5);
     std::vector<byte> message = {
         // SDUID
         0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
@@ -134,7 +134,7 @@ void test_prepareForRelaying_returns_true(void) {
 
 void test_prepareForRelaying_returns_false(void) {
     DuckPacket dp;
-    BloomFilter filter;
+    BloomFilter filter(10, 5, 16, 5);
     std::vector<byte> message = {
         // SDUID
         0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,

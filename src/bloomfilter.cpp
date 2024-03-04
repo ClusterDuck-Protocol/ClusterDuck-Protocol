@@ -3,16 +3,14 @@
 
 
 BloomFilter::BloomFilter(int numSectors, int numHashes, int bitsPerSector, int maxMsgs) {
-    logdbg("numSectors: %d", numSectors);
     this->numSectors = numSectors; 
-    logdbg("added to BF");
     this->numHashes = numHashes;
-    logdbg("added to BF");
     this->bitsPerSector = bitsPerSector;
-    logdbg("added to BF");
     this->activeFilter = 1;
     this->maxMsgs = maxMsgs;
     this->nMsg = 0;
+    logdbg_ln("BloomFilter constructor: numSectors: %d, numHashes: %d, bitsPerSector: %d, maxMsgs: %d", 
+               numSectors, numHashes, bitsPerSector, maxMsgs);
 
     logdbg("initialize bloom filter 1");
     // Initialize the bloom filters, fill with 0's
@@ -70,7 +68,7 @@ BloomFilter::BloomFilter(int numSectors, int numHashes, int bitsPerSector, int m
     }
     this->Seeds = Seeds;
 
-    logdbg("bloom_init end");
+    logdbg("bloom_init end\n");
 }
 
 BloomFilter::~BloomFilter()
