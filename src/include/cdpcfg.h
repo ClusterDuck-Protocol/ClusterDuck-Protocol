@@ -14,10 +14,10 @@
 
 #include "boards/heltec_wifi_lora_32_V3.h"
 #include "boards/heltec_wifi_lora_32_V2.h"
-#include "boards/ttgo_t_beam_sx1262.h"
+#include "boards/lilygo_t_beam_sx1262.h"
+#include "boards/ttgo_t_beam_v1_sx1276.h"
 #include "boards/heltec_cubecell_board.h"
 #include "boards/heltec_cubecell_gps.h"
-#include "boards/arduino_zero.h"
 
 // version definitions
 #define CDP_VERSION_MAJOR  4
