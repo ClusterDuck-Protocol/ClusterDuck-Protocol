@@ -8,6 +8,8 @@
  * @version
 */
 
+
+#include "include/cdpcfg.h"
 #include "DuckDetect.h"
 #include "DuckLink.h"
 #include "MamaDuck.h"
@@ -23,7 +25,6 @@
 #ifndef CDP_BOARD_NAME
 #error "No board definition found! Please provide a board definition in your cdpcfg.h"
 #else
-#include "include/cdpcfg.h"
 #pragma message("\n" \
 "-- CDP Library Info --\n" \
 "Version:  \"" CDP_VALUE(CDP_VERSION_MAJOR) "." CDP_VALUE(CDP_VERSION_MINOR) "." CDP_VALUE(CDP_VERSION_PATCH) "\"\n" \
