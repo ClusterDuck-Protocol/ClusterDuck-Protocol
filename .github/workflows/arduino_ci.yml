@@ -78,7 +78,6 @@ jobs:
         for dep in "${dependencies[@]}"
         do
           echo "Installing $dep..."
-          dep="'$dep'" # enclose the library name in single quotes
           if [[ "$dep" == *"github"* ]]; then
             arduino-cli lib install --git-url "$dep" 
           elif [[ "$dep" == *".zip"* ]]; then
