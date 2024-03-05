@@ -1,9 +1,8 @@
 #pragma once
 
-#if defined(ARDUINO_heltec_wifi_lora_32_V2)
+#if defined(ARDUINO_HELTEC_WIFI_LORA_32_V2) || defined(ARDUINO_heltec_wifi_lora_32_V2) || defined(heltec_wifi_lora_32_V2)
 
 #define CDP_BOARD_NAME "Heltec WiFi LoRa 32 V2"
-#define CDPCFG_LORA_CLASS SX1276
 
 #define CDPCFG_PIN_BAT 37
 #define CDPCFG_BAT_MULDIV 320 / 100
