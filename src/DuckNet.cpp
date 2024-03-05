@@ -121,7 +121,6 @@ std::string DuckNet::retrieveMessageHistory(CircularBuffer* buffer)
 
     CdpPacket packet = buffer->getMessage(tail);
     unsigned long messageAge = millis() - packet.timeReceived;
-    unsigned long milAge = millis();
     std::string messageAgeString = String(messageAge).c_str();
     std::string messageBody(packet.data.begin(),packet.data.end());
     std::string sduid(packet.sduid.begin(), packet.sduid.end());
