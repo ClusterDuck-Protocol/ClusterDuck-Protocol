@@ -12,19 +12,12 @@
     "repository":
     {
         "type": "git",
-        "url": "https://github.com/Call-for-Code/ClusterDuck-Protocol.git"
-    },
-    "export":
-    {
-        "include": 
-        [
-            "src/*/*.cpp",
-            "examples/*",
-            "*/*/*.h"
-        ]
+        "url": "https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol"
     },
     "frameworks": "arduino",
     "platforms": ["espressif32","heltec-cubecell"], 
+    "license": "Apache-2.0",
+    "headers": "CDP.h",
     "examples": [
         "[Ee]xamples/*/*.ino"
     ],

@@ -5,8 +5,7 @@
 
 #include <string>
 #include <arduino-timer.h>
-#include <MamaDuck.h>
-#include <MemoryFree.h>
+#include <CDP.h>
 
 #ifdef SERIAL_PORT_USBVIRTUAL
 #define Serial SERIAL_PORT_USBVIRTUAL
