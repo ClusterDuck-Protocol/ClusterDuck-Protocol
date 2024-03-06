@@ -8,6 +8,10 @@
 #define DUCK_ERR_NOT_SUPPORTED -5000
 // Failed to setup device
 #define DUCK_ERR_SETUP         -5100
+
+// Invalid argument
+#define DUCK_ERR_INVALID_ARGUMENT -5101
+
 // Device Id is too long
 #define DUCK_ERR_ID_TOO_LONG   -5101
 #define DUCK_ERR_OTA           -5200
@@ -47,5 +51,8 @@
 #define DUCK_INTERNET_ERR_SETUP      -6000
 #define DUCK_INTERNET_ERR_SSID       -6001
 #define DUCK_INTERNET_ERR_CONNECT    -6002
+#define DUCK_ERR_EEPROM_INIT         -7000
+#define DUCK_ERR_EEPROM_WRITE        -7001
+#define DUCK_ERR_EEPROM_READ         -7002
 
 #endif

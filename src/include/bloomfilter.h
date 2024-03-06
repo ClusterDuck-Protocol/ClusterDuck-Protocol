@@ -8,8 +8,65 @@
 #include <math.h>
 #include <memory>
 
+
+const int DEFAULT_NUM_SECTORS = 312; 
+const int DEFAULT_NUM_HASH_FUNCS = 2;
+const int DEFAULT_BITS_PER_SECTOR = 32;
+const int DEFAULT_MAX_MESSAGES = 100;
+
 // two-phase bloom filter
 class BloomFilter {
+public:
+
+  friend class BloomFilterTester;
+
+  /**
+   * @brief Initialize a bloom filter with default values
+   * 
+  */
+  BloomFilter() : BloomFilter(DEFAULT_NUM_SECTORS, DEFAULT_NUM_HASH_FUNCS, DEFAULT_BITS_PER_SECTOR, DEFAULT_MAX_MESSAGES) {
+
+  }
+
+  /**
+  * @brief Initialize a bloom filter
+  * 
+  * @param numSectors, The number of sectors in filter
+  * @param numHashes, The number of hash functions
+  * @param bitsPerSector, The size of a sector in bits
+  * @param maxMsgs, The maximum number of messages until the next filter is used.
+  */
+  BloomFilter(int numSectors, int numHashes, int bitsPerSector, int maxMsgs);
+
+  ~BloomFilter();
+
+  /**
+   * @return 1 if we (possibly) found word; for a new word returns 0
+   */
+  int bloom_check(unsigned char* msg, int msgSize);
+
+  void bloom_add(unsigned char* msg, int msgSize);
+
+  int get_numSectors() {
+    return numSectors;
+  }
+
+  int get_numHashes() {
+    return numHashes;
+  }
+
+  int get_bitsPerSector() {
+    return bitsPerSector;
+  }
+
+  int get_maxMsgs() {
+    return maxMsgs;
+  }
+
+  int get_nMsg() {
+    return nMsg;
+  }
+
 private:
 
   unsigned int* filter1;
@@ -42,29 +99,6 @@ private:
     const std::unique_ptr<int[]> & sectors,
     const std::unique_ptr<unsigned int[]> & slots
   );
-
-public:
-
-  friend class BloomFilterTester;
-
-  /**
-  * @brief Initialize a bloom filter
-  * 
-  * @param numSectors, The number of sectors in filter
-  * @param numHashes, The number of hash functions
-  * @param bitsPerSector, The size of a sector in bits
-  * @param maxMsgs, The maximum number of messages until the next filter is used.
-  */
-  BloomFilter(int numSectors, int numHashes, int bitsPerSector, int maxMsgs);
-
-  ~BloomFilter();
-
-  /**
-   * @return 1 if we (possibly) found word; for a new word returns 0
-   */
-  int bloom_check(unsigned char* msg, int msgSize);
-
-  void bloom_add(unsigned char* msg, int msgSize);
 
 };
 

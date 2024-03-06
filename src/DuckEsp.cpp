@@ -1,21 +1,15 @@
 #include "include/DuckEsp.h"
 
 namespace duckesp {
-#ifdef ESP32
-void restartDuck() { ESP.restart(); }
-int freeHeapMemory() {return ESP.getFreeHeap();}
-int getMinFreeHeap() { return ESP.getMinFreeHeap(); }
-int getMaxAllocHeap() { return ESP.getMaxAllocHeap(); }
-#else 
-void restartDuck() {}
-int freeHeapMemory() {}
-int getMinFreeHeap() {}
-int getMaxAllocHeap() {}
-#endif
 
 #ifdef ESP32
-    String
-    getDuckMacAddress(boolean format) {
+
+  void restartDuck() { ESP.restart(); }
+  int freeHeapMemory() {return ESP.getFreeHeap();}
+  int getMinFreeHeap() { return ESP.getMinFreeHeap(); }
+  int getMaxAllocHeap() { return ESP.getMaxAllocHeap(); }
+
+  std::string getDuckMacAddress(boolean format) {
   char id1[15];
   char id2[15];
 
@@ -26,13 +20,13 @@ int getMaxAllocHeap() {}
   snprintf(id1, 15, "%04X", chip);
   snprintf(id2, 15, "%08X", (uint32_t)chipid);
 
-  String ID1 = id1;
-  String ID2 = id2;
+  std::string ID1 = id1;
+  std::string ID2 = id2;
 
-  String unformattedMac = ID1 + ID2;
+  std::string unformattedMac = ID1 + ID2;
 
   if (format == true) {
-    String formattedMac = "";
+    std::string formattedMac = "";
     for (int i = 0; i < unformattedMac.length(); i++) {
       if (i % 2 == 0 && i != 0) {
         formattedMac += ":";
@@ -47,6 +41,10 @@ int getMaxAllocHeap() {}
   }
 }
 #else
-    String getDuckMacAddress(boolean format) {return "unknown";}
+  void restartDuck() {}
+  int freeHeapMemory() {return -1;}
+  int getMinFreeHeap() {return -1;}
+  int getMaxAllocHeap() {return -1;}
+  std::string getDuckMacAddress(boolean format) {return "unknown";}
 #endif
 } // namespace duckesp
