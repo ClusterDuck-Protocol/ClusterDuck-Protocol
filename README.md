@@ -1,16 +1,16 @@
 ![Logo](docs/assets/images/CDP_LOGO_small.png)
 
-[![License](https://img.shields.io/badge/License-Apache2-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![Slack](https://img.shields.io/badge/Join-Slack-blue)](https://www.project-owl.com/slack) [![Wiki](https://img.shields.io/badge/Read-Wiki-blue)](https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki) [![Build Status](https://travis-ci.com/Call-for-Code/ClusterDuck-Protocol.svg?branch=master)](https://app.travis-ci.com/github/Call-for-Code/ClusterDuck-Protocol)
+[![License](https://img.shields.io/badge/License-Apache2-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![Discord](https://img.shields.io/badge/Join-Discord-blue)](https://discord.com/invite/Cbgbzq353z) [![Wiki](https://img.shields.io/badge/Read-Wiki-blue)](https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki) [![Build Status](https://travis-ci.com/Call-for-Code/ClusterDuck-Protocol.svg?branch=master)](https://app.travis-ci.com/github/Call-for-Code/ClusterDuck-Protocol)
 
 ## What is the CDP?
 
 The ClusterDuck Protocol (CDP), an innovative open-source project under the Linux Foundation, represents a significant leap in IoT communications, harnessing the power of low bandwidth and low power such as LoRa technology. Distinct from LoRaWAN, this protocol utilizes LoRa's point-to-multipoint capabilities to facilitate robust communication in diverse environments.
 
-The ClusterDuck Protocol was created by [OWL Integrations (formerly Project OWL)](https://www.owlintegrations.com/) to provide developers with an advanced library for crafting distributed communication networks, tailored for a variety of IoT applications. Since its creation, the vision for the [ClusterDuck Protocol] has grown beyond servicing natural disasters to large events (cellular congestion), sensor networks, and more. 
+The ClusterDuck Protocol was created by [OWL Integrations] (formerly Project OWL) to provide developers with an advanced library for crafting distributed communication networks, tailored for a variety of IoT applications. Since its creation, the vision for the [ClusterDuck Protocol] has grown beyond servicing natural disasters to large events (cellular congestion), sensor networks, and more. 
 
 ## How does it work?
 
-The network is made up of multiple nodes called **Ducks**. There are 3 basic types of Ducks in a ClusterDuck Network: DuckLink, MamaDuck, and PapaDuck. **DuckLinks** serve as edge nodes that only transmit data. **MamaDucks** inherit the same functionality of the DuckLinks, but can also receive messages. This allows the MamaDucks to relay messages from DuckLinks and/or other MamaDucks along the network (towards the gateway). **PapaDucks** are the endpoint of the network where all of the data is collected and can be stored or pushed up into the cloud. **(free tier cloud DMS platform in BETA! Reach out to us on Slack for more info)**
+The network is made up of multiple nodes called **Ducks**. There are 3 basic types of Ducks in a ClusterDuck Network: DuckLink, MamaDuck, and PapaDuck. **DuckLinks** serve as edge nodes that only transmit data. **MamaDucks** inherit the same functionality of the DuckLinks, but can also receive messages. This allows the MamaDucks to relay messages from DuckLinks and/or other MamaDucks along the network (towards the gateway). **PapaDucks** are the endpoint of the network where all of the data is collected and can be stored or pushed up into the cloud. **(free tier cloud DMS platform in BETA! Reach out to us on Discord for more info)**
 
 ![overview](https://www.project-owl.com/assets/wiki/cdp-explain-gif.gif)
 
@@ -124,4 +124,4 @@ See `library.json` (PlatformIO) or `library.properties` (Arduino).
 
 [OWL Integrations]: <https://www.owlintegrations.com/>
 [ClusterDuck Protocol]: <https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol/wiki>
-[Slack Workspace]: <https://www.project-owl.com/slack>
+[Discord]: <https://discord.com/invite/Cbgbzq353z>
