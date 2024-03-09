@@ -2,7 +2,6 @@
 #define DUCKDETECT_H
 
 #include <Arduino.h>
-#include <WString.h>
 
 #include "include/Duck.h"
 #include "include/cdpcfg.h"
@@ -42,8 +41,8 @@ public:
    * 
    * @returns DUCK_ERR_NONE if setup is successfull, an error code otherwise.
    */
-  int setupWithDefaults(std::vector<byte> deviceId, String ssid = "",
-                        String password = "");
+  int setupWithDefaults(std::vector<byte> deviceId, std::string ssid = "",
+                        std::string password = "");
 
   /// callback definition for receiving RSSI value
   using rssiCallback = void (*)(const int);

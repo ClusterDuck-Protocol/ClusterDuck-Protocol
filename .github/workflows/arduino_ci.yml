@@ -1,0 +1,110 @@
+name: Arduino CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        board: ["esp32:esp32:heltec_wifi_lora_32_V3", "CubeCell:CubeCell:CubeCell-Board-V2"]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: System setup
+      run: |
+        sudo add-apt-repository --yes ppa:nnstreamer/ppa
+        sudo apt-get update
+        sudo apt-get -y install cppcheck
+        python -m pip install pyserial
+        curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh -s
+        echo "$PWD/bin/" >> $GITHUB_PATH
+
+    - name: Run cppcheck
+      run: |
+        cppcheck --version
+        cppcheck --error-exitcode=1 --std=c++11 --force src
+
+    - name: Arduino setup
+      run: |
+        # Temporarily enable debug output
+        set -x
+        arduino-cli config init
+        arduino-cli config set library.enable_unsafe_install true
+        # udpate the index to include the Heltec ESP32 and CubeCell boards
+        echo "[ARDUINO SETUP] Updating the index to include the Heltec ESP32 and CubeCell boards"
+        arduino-cli core update-index --additional-urls https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series/releases/download/1.0.0/package_heltec_esp32_index.json
+        arduino-cli core update-index --additional-urls https://github.com/HelTecAutomation/CubeCell-Arduino/releases/download/V1.5.0/package_CubeCell_index.json
+        
+        # install the Heltec ESP32 and CubeCell boards
+        if [[ "${{ matrix.board }}" =~ "esp32:esp32:" ]]; then
+          echo "[ARDUINO SETUP] Installing the Heltec ESP32 board"
+          arduino-cli core install esp32:esp32 --additional-urls https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series/releases/download/1.0.0/package_heltec_esp32_index.json
+        fi
+        if [[ "${{ matrix.board }}" =~ "CubeCell:CubeCell:" ]]; then
+          echo "[ARDUINO SETUP] Installing the CubeCell board"
+          arduino-cli core install CubeCell:CubeCell --additional-urls https://github.com/HelTecAutomation/CubeCell-Arduino/releases/download/V1.5.0/package_CubeCell_index.json
+          echo "[ARDUINO  SETUP] Patching the CubeCell Arduino.h file."
+          cp ./arduino_patches/CubeCell_Arduino.h /home/runner/.arduino15/packages/CubeCell/hardware/CubeCell/1.5.0/cores/asr650x/Arduino.h
+        fi
+
+    - name: Install CDP
+      run: |
+        echo "Syncing files..."
+        rsync -rltv --exclude=.git --exclude=bin  --exclude=docs --exclude=3D-Print-Files ${PWD}/ /tmp/CDP/ > /dev/null
+
+        echo "Creating zip..."
+        (cd /tmp && zip -r /tmp/cdp.zip CDP > /dev/null)
+
+        echo "Installing CDP..."
+        arduino-cli lib install --zip-path /tmp/cdp.zip        
+
+        echo "CDP Installed."
+        echo
+        arduino-cli lib list    
+
+    - name: Install CDP dependencies
+      run: |
+        echo "Installing dependencies..."
+        file="library.properties"
+        dependsvar=$(awk -F'=' '/depends/{print $2}' $file)
+
+        # read the array from the string
+        IFS=',' read -r -a dependencies <<< "$dependsvar"
+
+        for dep in "${dependencies[@]}"
+        do
+          echo "Installing $dep..."
+          if [[ "$dep" == *"github"* ]]; then
+            arduino-cli lib install --git-url "$dep" 
+          elif [[ "$dep" == *".zip"* ]]; then
+            arduino-cli lib install --zip-path "$dep"
+          else
+            arduino-cli lib install "$dep"
+          fi
+        done
+        echo "Dependencies installed successfully!"
+        echo
+        arduino-cli lib list
+
+    - name: Build
+      run: |
+        echo "List of installed Arduino Cores:"
+        arduino-cli core list
+        buildExampleSketch() { 
+          BOARD=${{ matrix.board }}
+          echo "Building $1/$2/$2.ino..."
+          arduino-cli compile -v -t -b ${{ matrix.board }} $PWD/examples/$1/$2/$2.ino > ${BOARD##*:}-$2-build.log 2>&1; 
+          echo "Build complete."
+        } 
+        buildExampleSketch 1.Ducks DuckLink
+        buildExampleSketch 1.Ducks MamaDuck
+    - name: Upload build log
+      uses: actions/upload-artifact@v2
+      if: always()
+      with:
+        name: build-log
+        path: '*.log'      

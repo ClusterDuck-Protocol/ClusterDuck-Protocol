@@ -1,10 +1,7 @@
 #ifndef DUCK_H
 #define DUCK_H
 
-#include <string>
-
 #include <Arduino.h>
-#include <WString.h>
 
 class Duck;
 // Since Duck needs to know about DuckNet and DuckNet needs to know about Duck,
@@ -33,7 +30,7 @@ public:
    * @brief Construct a new Duck object.
    *
    */
-  Duck(String name="");
+  Duck(std::string name="");
 
   virtual ~Duck();
 
@@ -44,14 +41,14 @@ public:
    * 
    * @param name 
    */
-  void setName(String name) { this->duckName = name; }
+  void setName(std::string name) { this->duckName = name; }
   
   /**
    * @brief Get the duck's name.
    * 
    * @returns A string representing the duck's name
    */
-  String getName() {return duckName;}
+  std::string getName() {return duckName;}
   /**
    * @brief setup the duck unique ID
    * 
@@ -136,7 +133,7 @@ public:
    * Default is an empty string Default portal web page is used if the string is
    * empty
    */
-  int setupWebServer(bool createCaptivePortal = false, String html = "");
+  int setupWebServer(bool createCaptivePortal = false, std::string html = "");
 
   /**
    * @brief Setup internet access.
@@ -144,7 +141,7 @@ public:
    * @param ssid        the ssid of the WiFi network
    * @param password    password to join the network
    */
-  int setupInternet(String ssid, String password);
+  int setupInternet(std::string ssid, std::string password);
 
   /**
    * @brief
@@ -161,7 +158,7 @@ public:
    * @param outgoingMuid Output parameter that returns the MUID of the sent packet. NULL is ignored.
    * @return DUCK_ERR_NONE if the data was send successfully, an error code otherwise. 
    */
-  int sendData(byte topic, const String data,
+  int sendData(byte topic, const std::string data,
     const std::vector<byte> targetDevice = ZERO_DUID, std::vector<byte> * outgoingMuid = NULL);
 
   /**
@@ -176,20 +173,7 @@ public:
    */
   int sendData(byte topic, std::vector<byte> bytes,
     const std::vector<byte> targetDevice = ZERO_DUID, std::vector<byte> * outgoingMuid = NULL);
-
-  /**
-   * @brief Sends data into the mesh network.
-   *
-   * @param topic the message topic
-   * @param data a string representing the data to send
-   * @param targetDevice the device UID to receive the message (default is no target device)
-   * @param outgoingMuid Output parameter that returns the MUID of the sent packet. NULL is ignored.
-   * @return DUCK_ERR_NONE if the data was send successfully, an error code
-   * otherwise.
-   */
-  int sendData(byte topic, const std::string data,
-    const std::vector<byte> targetDevice = ZERO_DUID, std::vector<byte> * outgoingMuid = NULL);
-
+    
   /**
    * @brief Sends data into the mesh network.
    *
@@ -222,7 +206,7 @@ public:
    *
    * TODO: Additional documentation
    */
-  void updateFirmware(const String & filename, size_t index, uint8_t* data, size_t len, bool final);
+  void updateFirmware(const std::string & filename, size_t index, uint8_t* data, size_t len, bool final);
 
   /**
    * @brief Get the status of an MUID
@@ -241,20 +225,20 @@ public:
    * @param ssid access point to check
    * @returns true if the access point is available, false otherwise.
    */
-  bool ssidAvailable(String ssid);
+  bool ssidAvailable(std::string ssid);
 
   /**
    * @brief Get the access point ssid
    * 
    * @returns the wifi access point as a string
    */
-  String getSsid();
+  std::string getSsid();
   /**
    * @brief Get the wifi access point password.
    * 
    * @returns the wifi access point password as a string. 
    */
-  String getPassword();
+  std::string getPassword();
 
   /**
    * @brief Get an error code description.
@@ -262,7 +246,7 @@ public:
    * @param error an error code
    * @returns a string describing the error. 
    */
-  String getErrorString(int error);
+  std::string getErrorString(int error);
 
   /**
    * @brief Turn on or off encryption.
@@ -328,9 +312,9 @@ protected:
   Duck(Duck const&) = delete;
   Duck& operator=(Duck const&) = delete;
 
-  String duckName="";
+  std::string duckName="";
 
-  String deviceId;
+  std::string deviceId;
   std::vector<byte> duid;
   DuckRadio duckRadio;
 
@@ -388,7 +372,7 @@ protected:
    * The default implementation simply initializes the serial interface.
    * It can be overriden by each concrete Duck class implementation.
    */
-  virtual int setupWithDefaults(std::vector<byte> deviceId, String ssid, String password) {
+  virtual int setupWithDefaults(std::vector<byte> deviceId, std::string ssid, std::string password) {
     int err = setupSerial();
     if (err != DUCK_ERR_NONE) {
       return err;
@@ -414,7 +398,7 @@ protected:
    * @param password the access point password
    * @return DUCK_ERR_NONE if the duck reconnected to the AP sucessfully. An error code otherwise. 
    */
-  virtual int reconnectWifi(String ssid, String password) {
+  virtual int reconnectWifi(std::string ssid, std::string password) {
     return DUCK_ERR_NONE;
   }
 

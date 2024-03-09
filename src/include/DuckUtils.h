@@ -15,9 +15,7 @@
 #include <Arduino.h>
 #include <EEPROM.h>
 #include <string>
-#include <WString.h>
 #include <vector>
-
 #include "../DuckError.h"
 
 namespace duckutils {
@@ -26,6 +24,22 @@ extern Timer<> duckTimer;
 extern bool detectState;
 
 std::string getCDPVersion();
+
+/**
+ * @brief Convert a string to upper case.
+ *
+ * @param str the string to convert
+ * @returns A string in upper case.
+ */
+std::string toUpperCase(std::string str);
+
+/**
+ * @brief Convert a string to a byte array.
+ *
+ * @param str the string to convert
+ * @returns A vector of bytes.
+ */
+std::vector<byte> stringToByteVector(const String& str);
 
 /**
  * @brief Creates a byte array with random alpha numerical values.
@@ -41,7 +55,7 @@ void getRandomBytes(int length, byte* bytes);
  * @param length the length of the UUID (defaults to CDPCFG_UUID_LEN)
  * @returns A string representing a unique id.
  */
-String createUuid(int length = CDPCFG_UUID_LEN);
+std::string createUuid(int length = CDPCFG_UUID_LEN);
 
 /**
  * @brief Convert a byte array into a hex string.
@@ -50,18 +64,25 @@ String createUuid(int length = CDPCFG_UUID_LEN);
  * @param size the size of the array
  * @returns A string representating the by array in hexadecimal.
  */
-String convertToHex(byte* data, int size);
+std::string convertToHex(byte* data, int size);
 
 /**
  * @brief Convert a vector into an ASCII string.
  * 
  * @param vec A vector to convert
- * @returns A String representing the byte array in ASCII.
+ * @returns A std::string representing the byte array in ASCII.
  * 
  */
 template<typename T>
-String toString(const std::vector<T> & vec) {
-  return std::string(vec.begin(), vec.end()).c_str();
+std::string toString(const std::vector<T>& vec) {
+    std::string result;
+    for (const auto& element : vec) {
+        if (!std::isprint(element)) {
+            return "ERROR: Non-printable character";
+        }
+        result += static_cast<char>(element);
+    }
+    return result;
 }
 
 /**
@@ -80,21 +101,20 @@ bool isEqual(const std::vector<T> & a, const std::vector<T> & b) {
 }
 
 /**
- * @brief Toggle the duck Interrupt
- *
- * @param enable true to enable interrupt, false otherwise.
- */
-void setInterrupt(bool enable);
-
-/**
  * @brief Convert a byte array to unsigned 32 bit integer.
  * 
  * @param data byte array to convert
  * @returns a 32 bit unsigned integer.
  */
-uint32_t toUnit32(const byte* data);
+uint32_t toUint32(const byte* data);
 
+/**
+ * @brief Get a timer instance.
+ * 
+ * @returns A Timer instance.
+ */
 Timer<> getTimer();
+
 
 bool getDetectState();
 bool getAckingState();
@@ -108,21 +128,21 @@ bool flipAckingState();
  * @param password    password to join the network
  * @return DUCK_ERR_NONE if successful, an error code otherwise.
  */
-int saveWifiCredentials(String ssid, String password);
+int saveWifiCredentials(std::string ssid, std::string password);
 
 /**
  * @brief Load WiFi SSID from EEPROM
  *
  * @returns A string representing the WiFi SSID
  */
-String loadWifiSsid();
+std::string loadWifiSsid();
 
 /**
  * @brief Load WiFi password from EEPROM
  *
  * @returns A string representing the WiFi password
  */
-String loadWifiPassword();
+std::string loadWifiPassword();
 
 } // namespace duckutils
 #endif

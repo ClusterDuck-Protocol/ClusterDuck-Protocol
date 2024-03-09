@@ -24,11 +24,86 @@ Check out the [Wiki](https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki)
 
 ## Testing
 
-From the project root, run the following snippet:
+Starting with release 4.0.0 we have unit tests available with the PlatformIO test framework `unity`
 
-`g++ -g -Wall -DCDP_NO_LOG test_bloomfilter.cpp src/bloomfilter.cpp -o test_bloomfilter && ./test_bloomfilter`
+Tests are located in the `ClusterDuckProtocol/test` folder. These tests are unit tests as
+they validate the CDP publicly accessible APIs. However they must be run on a device.
+This means you have to connect a device to your development machine and build the tests to
+run on the device. Platform IO `test` command will build, deploy and run the tests and
+report back the results on your terminal console.
 
-This runs an acceptance test for the bloom filter.
+Unit tests are great in detecting problems before they make it to the release, so it is important
+no only to run them to validate your changes, but to continuously update them.
+
+### PlatformIO test environments
+The project `platformio.ini` defines environment configurations for supported boards.
+For example below is the configuration for tests on the Heltec LoRa v3 Arduino board
+```
+[env:test_heltec_wifi_lora_32_V3]
+  test_build_src = yes
+  test_filter = test_* 
+  test_framework = unity
+  platform = ${env:heltec_wifi_lora_32_V3.platform}
+  board = ${env:heltec_wifi_lora_32_V3.board}
+  framework = ${env:heltec_wifi_lora_32_V3.framework}
+  monitor_speed = ${env.monitor_speed}
+  build_src_filter  = +<./> +<./include> +<./include/boards>
+  lib_deps =
+      ${env.lib_deps} 
+      ${env:heltec_wifi_lora_32_V3.lib_deps}
+      ; why do I need to add the following libraries is a mystery to me
+      SPI
+      WIRE
+      FS
+      WIFI
+      
+  build_flags = 
+      ${env.build_flags}
+      -std=gnu++11
+      -DUNIT_TEST
+  ```
+
+### How to run the tests
+  Here are the steps to run the tests (on Linux or Mac OS). This assumes you have platformIO installed on your system.
+
+  For more details on setting up your development environment, please refer to the [developer's guide](./DEVELOPER_GUIDE.md).
+
+
+
+#### PlatformIO CLI test command
+  ```
+  # Open a terminal 
+  # goto the project root folder (where the platformio.ini is located)
+  $ cd ClusterDuckProtocol
+  $ platformio test -e test_heltec_wifi_lora_32_V3
+  ```
+#### Example output
+
+  ```
+  Processing test_DuckUtils in test_heltec_wifi_lora_32_V3 environment
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Building & Uploading...
+Testing...
+If you don't see any output for the first 10 secs, please reset board (press reset button)
+
+test/test_DuckUtils/test_DuckUtils.cpp:181: test_DuckUtils_getCdpVersion                        [PASSED]
+test/test_DuckUtils/test_DuckUtils.cpp:182: test_DuckUtils_toUpperCase                          [PASSED]
+test/test_DuckUtils/test_DuckUtils.cpp:183: test_DuckUtils_stringToByteVector                   [PASSED]
+test/test_DuckUtils/test_DuckUtils.cpp:184: test_DuckUtils_getRandomBytes                       [PASSED]
+test/test_DuckUtils/test_DuckUtils.cpp:185: test_DuckUtils_createUuid_with_given_length         [PASSED]
+test/test_DuckUtils/test_DuckUtils.cpp:186: test_DuckUtils_createUuid_with_default_length       [PASSED]
+test/test_DuckUtils/test_DuckUtils.cpp:187: test_DuckUtils_convertToHex                         [PASSED]
+test/test_DuckUtils/test_DuckUtils.cpp:188: test_DuckUtils_toString_printable_characters        [PASSED]
+test/test_DuckUtils/test_DuckUtils.cpp:189: test_DuckUtils_toString_non_printable_characters    [PASSED]
+test/test_DuckUtils/test_DuckUtils.cpp:190: test_DuckUtils_isEqual_true                         [PASSED]
+test/test_DuckUtils/test_DuckUtils.cpp:191: test_DuckUtils_isEqual_false                        [PASSED]
+test/test_DuckUtils/test_DuckUtils.cpp:192: test_DuckUtils_isEqual_false_with_different_sizes   [PASSED]
+test/test_DuckUtils/test_DuckUtils.cpp:193: test_DuckUtils_toUint32                             [PASSED]
+test/test_DuckUtils/test_DuckUtils.cpp:194: test_DuckUtils_saveWifiCredentials                  [PASSED]
+test/test_DuckUtils/test_DuckUtils.cpp:195: test_DuckUtils_saveWifiCredentials_zero_length      [PASSED]
+test/test_DuckUtils/test_DuckUtils.cpp:196: test_DuckUtils_loadWifiSsid                         [PASSED]
+------------------------------------------------------------- test_heltec_wifi_lora_32_V3:test_DuckUtils [PASSED] Took 23.34 seconds -------------------------------------------------------------
+```
 
 ## How to Contribute
 
@@ -52,7 +127,7 @@ This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE)
 
 ## Version
 
-v3.6.1
+v4.0.0
 
 See `library.json` (PlatformIO) or `library.properties` (Arduino).
 

@@ -2,16 +2,13 @@
 #define DUCKLINK_H
 
 #include <Arduino.h>
-#include <WString.h>
-
 #include "include/Duck.h"
-#include "include/cdpcfg.h"
 
 class DuckLink : public Duck {
 public:
   using Duck::Duck;
   
-  ~DuckLink() {}
+  ~DuckLink() override {}
 
   /**
    * @brief Provide the DuckLink specific implementation of the base `run()` method.
@@ -33,7 +30,7 @@ public:
    * 
    * @returns DUCK_ERR_NONE if setup is successfull, an error code otherwise.
    */
-  int setupWithDefaults(std::vector<byte> deviceId, String ssid="", String password="");
+  int setupWithDefaults(std::vector<byte> deviceId, std::string ssid="", std::string password="");
 
 
   /**

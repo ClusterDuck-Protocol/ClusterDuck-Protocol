@@ -12,12 +12,15 @@
  */
 #ifndef DUCKDISPLAY_H_
 #define DUCKDISPLAY_H_
+
 #include "include/cdpcfg.h"
 #include <Arduino.h>
 #include <vector>
-#include <WString.h>
+#include <string>
+
 #ifndef CDPCFG_OLED_NONE
 #include <U8g2lib.h>
+
 #endif // CDPCFG_OLED_NONE
 /**
  * @brief Internal OLED Display abstraction.
@@ -40,10 +43,10 @@ public:
   void drawString(uint8_t x, uint8_t y, const char* text) {}
   void drawString(bool cls, uint8_t x, uint8_t y, const char* text) {}
   void setCursor(uint8_t x, uint8_t y) {}
-  void print(String text) {}
+  void print(std::string text) {}
   void clear(void) {}
   void sendBuffer(void){}
-  void log(String text) {}
+  void log(std::string text) {}
   uint8_t getWidth() { return 0; }
   uint8_t getHeight() { return 0; }
   void showDefaultScreen(){};
@@ -88,7 +91,7 @@ public:
    *
    * @param text string to draw
    */
-  void print(String s);
+  void print(std::string s);
   /**
    * @brief Clear the screen.
    * 
@@ -103,7 +106,7 @@ public:
   uint8_t getHeight() {return height;}
   
   //TODO implement this for the U8g2 library
-  void log(String text) {}
+  void log(std::string text) {}
 #endif // CDPCFG_OLED_NONE
 private:
   DuckDisplay();
@@ -113,8 +116,8 @@ private:
 
 #ifndef CDPCFG_OLED_NONE
   int duckType;
-  String duckName;
-  String duckTypeToString(int duckType);
+  std::string duckName;
+  std::string duckTypeToString(int duckType);
   uint8_t width;
   uint8_t height;
 #endif // CDPCFG_OLED_NONE

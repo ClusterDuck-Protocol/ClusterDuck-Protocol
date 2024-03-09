@@ -178,15 +178,15 @@ void DuckDisplay::clearLine(u8g2_uint_t x, u8g2_uint_t y) {
 
 void DuckDisplay::setCursor(u8g2_uint_t x, u8g2_uint_t y) { u8g2.setCursor(x, y); }
 
-void DuckDisplay::print(String s) { u8g2.print(s); }
+void DuckDisplay::print(std::string s) { u8g2.print(s.c_str()); }
 
 void DuckDisplay::clear(void) { u8g2.clear(),u8g2.clearBuffer(); }
 
 void DuckDisplay::sendBuffer(void){  u8g2.sendBuffer();}
 
 #ifndef CDPCFG_OLED_NONE
-String DuckDisplay::duckTypeToString(int duckType) {
-  String duckTypeStr = "";
+std::string DuckDisplay::duckTypeToString(int duckType) {
+  std::string duckTypeStr = "";
   switch (duckType) {
     case DuckType::PAPA:
       duckTypeStr = "Papa";
@@ -231,7 +231,7 @@ void DuckDisplay::showDefaultScreen() {
   setCursor(0, 60);
   print("ID: " + duckName);
   setCursor(0, 70);
-  print("MC: " + duckesp::getDuckMacAddress(false));
+  print(std::string("MC: ") + duckesp::getDuckMacAddress(false));
   u8g2.sendBuffer(); 
 #endif // CDPCFG_OLED_64x32
 }

@@ -7,7 +7,6 @@
 #include "cdpcfg.h"
 #include "bloomfilter.h"
 #include <CRC32.h>
-#include <WString.h>
 #include <vector>
 
 /**
@@ -59,6 +58,12 @@ public:
      */
     void setDeviceId(std::vector<byte> duid) { this->duid = duid; }
 
+    /**
+     * @brief Get device Id.
+     *
+     * @returns a duck device unique id
+     */
+    std::vector<byte> getDeviceId() { return this->duid = duid; }
     /**
      * @brief Build a packet from the given topic and provided byte buffer.
      *
