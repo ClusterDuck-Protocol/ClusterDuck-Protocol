@@ -1,4 +1,7 @@
 var searchData=
 [
-  ['duck_185',['Duck',['../class_duck.html#a65753b7b6eb80c4639f6bf165b8db9a6',1,'Duck::Duck()'],['../class_duck.html#a53c9e7278c98060cc03c7d9efd402df8',1,'Duck::Duck(String id)']]]
+  ['bloom_5fadd_0',['bloom_add',['../class_bloom_filter.html#a9324ec548ffba472c579dc4a0655c4f4',1,'BloomFilter']]],
+  ['bloom_5fcheck_1',['bloom_check',['../class_bloom_filter.html#ae976246f2899c2b10166a25e026c91c5',1,'BloomFilter']]],
+  ['bloomfilter_2',['BloomFilter',['../class_bloom_filter.html#a64e9f133cd9bb65d55a5e31f701bbca0',1,'BloomFilter::BloomFilter()'],['../class_bloom_filter.html#aba4255db5abc946c5d89826e026cc4b8',1,'BloomFilter::BloomFilter(int numSectors, int numHashes, int bitsPerSector, int maxMsgs)']]],
+  ['buildcdppacket_3',['buildCdpPacket',['../class_duck.html#a414ba3fbf13759049154076b934d18e8',1,'Duck']]]
 ];

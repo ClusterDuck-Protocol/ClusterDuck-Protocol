@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['iamhere_5fb_250',['iamhere_B',['../_duck_lora_8h.html#a4fd105dd83fb1983bcf595924355a619',1,'DuckLora.h']]]
+  ['gain_0',['gain',['../struct_lora_config_params.html#ab65e37806c948ca584959d074d69a771',1,'LoraConfigParams']]]
 ];
