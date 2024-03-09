@@ -6,8 +6,8 @@
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = "ClusterDuck Protocol"
 PROJECT_NUMBER         =
-PROJECT_BRIEF          = "Firmware for an ad-hoc mesh network of Internet-of-Things devices based on LoRa (Long Range radio) that can be deployed quickly and cheaply."
-PROJECT_LOGO           =CDP_LOGO_2.png
+PROJECT_BRIEF          = "Firmware for an ad-hoc mesh network of Internet-of-Things devices based on LoRa (Long Range radio) that can be deployed rapidly and cost-effectively."
+PROJECT_LOGO           = assets/images/cdp_logo_transparent_small.png
 OUTPUT_DIRECTORY       = 
 CREATE_SUBDIRS         = NO
 ALLOW_UNICODE_NAMES    = NO
@@ -120,8 +120,8 @@ WARN_LOGFILE           =
 INPUT                  = ../src/Ducks \
                          ../src/Ducks \
                          ../src/include \
-                        main.md \
-                         header.html
+                         ../src/include/boards \
+                        main.md                         
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.c \
                          *.cc \
@@ -211,11 +211,10 @@ IGNORE_PREFIX          =
 GENERATE_HTML          = YES
 HTML_OUTPUT            = html
 HTML_FILE_EXTENSION    = .html
-HTML_HEADER            = 
-HTML_FOOTER            = 
-HTML_STYLESHEET        =
-HTML_EXTRA_STYLESHEET  = custom_dark.css \
-                         custom.css
+HTML_HEADER            = header.html
+HTML_FOOTER            = footer.html
+HTML_STYLESHEET        = 
+HTML_EXTRA_STYLESHEET  = custom_dark.css
 HTML_EXTRA_FILES       =
 HTML_COLORSTYLE_HUE    = 220
 HTML_COLORSTYLE_SAT    = 100

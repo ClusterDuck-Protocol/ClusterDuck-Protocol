@@ -1,4 +1,7 @@
 var searchData=
 [
-  ['variablepacketlengthmode_283',['variablePacketLengthMode',['../class_c_c1101.html#a881122ec3457c5f95760859f8e0297c7',1,'CC1101::variablePacketLengthMode()'],['../class_r_f69.html#af62ebde1ea34a394b9781a21ae348c39',1,'RF69::variablePacketLengthMode()'],['../class_s_x126x.html#aa11ab2c6f4488daf2ece93288e05c504',1,'SX126x::variablePacketLengthMode()'],['../class_s_x127x.html#a9f753c0857e7b8b4b9f7f6e91c77f0fd',1,'SX127x::variablePacketLengthMode()']]]
+  ['_7ebloomfilter_0',['~BloomFilter',['../class_bloom_filter.html#a27358192f6e0d7aba2b24be36c5d3580',1,'BloomFilter']]],
+  ['_7ecircularbuffer_1',['~CircularBuffer',['../class_circular_buffer.html#a916f9506cf86010056d189b51fd72c91',1,'CircularBuffer']]],
+  ['_7educk_2',['~Duck',['../class_duck.html#a702222da0aa85e48b6ef945e9c53e68d',1,'Duck']]],
+  ['_7educkpacket_3',['~DuckPacket',['../class_duck_packet.html#a1a656a9aeb29eda2d42e962fd2d33b6c',1,'DuckPacket']]]
 ];
