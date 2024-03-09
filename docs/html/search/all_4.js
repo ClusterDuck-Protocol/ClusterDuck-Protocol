@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['enableduckinterrupt_68',['enableDuckInterrupt',['../namespaceduckutils.html#ad05a5136ce402f494840e02f0e0816dd',1,'duckutils']]]
+  ['encrypt_0',['encrypt',['../class_duck.html#aaaaaaf1cb10424e8ef7f10f3eab6fb13',1,'Duck']]],
+  ['encryptdata_1',['encryptData',['../namespaceduckcrypto.html#a7c685b6ac22984a00ce51c16f29e3303',1,'duckcrypto']]]
 ];
