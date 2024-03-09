@@ -2,7 +2,7 @@
 
 - [ ] Code update
 - [ ] Documentation update
-- [ ] Both
+- [ ] Infrastructure update
 
 **What does this PR do?**  
 Please provide a brief description of what this PR does.
