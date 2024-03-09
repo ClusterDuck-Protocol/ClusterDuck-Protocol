@@ -77,41 +77,41 @@ public:
                 logwarn_f("Unable to set GPS update rate.\n");
             }
 //
-//            msglen = makeUBXPacket(0x06, 0x01, sizeof(_message_GGL), _message_GGL);
-//            GPSSerial.write(UBXscratch, msglen);
-//            if (getACK(0x06, 0x01, 300) != GNSS_RESPONSE_OK) {
-//                logwarn_f("Unable to disable NMEA GGL.\n");
-//            }
-//
-//            msglen = makeUBXPacket(0x06, 0x01, sizeof(_message_GSA), _message_GSA);
-//            GPSSerial.write(UBXscratch, msglen);
-//            if (getACK(0x06, 0x01, 300) != GNSS_RESPONSE_OK) {
-//                logwarn_f("Unable to Enable NMEA GSA.\n");
-//            }
-//
-//            msglen = makeUBXPacket(0x06, 0x01, sizeof(_message_GSV), _message_GSV);
-//            GPSSerial.write(UBXscratch, msglen);
-//            if (getACK(0x06, 0x01, 300) != GNSS_RESPONSE_OK) {
-//                logwarn_f("Unable to disable NMEA GSV.\n");
-//            }
-//
-//            msglen = makeUBXPacket(0x06, 0x01, sizeof(_message_VTG), _message_VTG);
-//            GPSSerial.write(UBXscratch, msglen);
-//            if (getACK(0x06, 0x01, 300) != GNSS_RESPONSE_OK) {
-//                logwarn_f("Unable to disable NMEA VTG.\n");
-//            }
-//
-//            msglen = makeUBXPacket(0x06, 0x01, sizeof(_message_RMC), _message_RMC);
-//            GPSSerial.write(UBXscratch, msglen);
-//            if (getACK(0x06, 0x01, 300) != GNSS_RESPONSE_OK) {
-//                logwarn_f("Unable to enable NMEA RMC.\n");
-//            }
-//
-//            msglen = makeUBXPacket(0x06, 0x01, sizeof(_message_GGA), _message_GGA);
-//            GPSSerial.write(UBXscratch, msglen);
-//            if (getACK(0x06, 0x01, 300) != GNSS_RESPONSE_OK) {
-//                logwarn_f("Unable to enable NMEA GGA.\n");
-//            }
+            msglen = makeUBXPacket(0x06, 0x01, sizeof(_message_GGL), _message_GGL);
+            GPSSerial.write(UBXscratch, msglen);
+            if (getACK(0x06, 0x01, 300) != GNSS_RESPONSE_OK) {
+                logwarn_f("Unable to disable NMEA GGL.\n");
+            }
+
+            msglen = makeUBXPacket(0x06, 0x01, sizeof(_message_GSA), _message_GSA);
+            GPSSerial.write(UBXscratch, msglen);
+            if (getACK(0x06, 0x01, 300) != GNSS_RESPONSE_OK) {
+                logwarn_f("Unable to Enable NMEA GSA.\n");
+            }
+
+            msglen = makeUBXPacket(0x06, 0x01, sizeof(_message_GSV), _message_GSV);
+            GPSSerial.write(UBXscratch, msglen);
+            if (getACK(0x06, 0x01, 300) != GNSS_RESPONSE_OK) {
+                logwarn_f("Unable to disable NMEA GSV.\n");
+            }
+
+            msglen = makeUBXPacket(0x06, 0x01, sizeof(_message_VTG), _message_VTG);
+            GPSSerial.write(UBXscratch, msglen);
+            if (getACK(0x06, 0x01, 300) != GNSS_RESPONSE_OK) {
+                logwarn_f("Unable to disable NMEA VTG.\n");
+            }
+
+            msglen = makeUBXPacket(0x06, 0x01, sizeof(_message_RMC), _message_RMC);
+            GPSSerial.write(UBXscratch, msglen);
+            if (getACK(0x06, 0x01, 300) != GNSS_RESPONSE_OK) {
+                logwarn_f("Unable to enable NMEA RMC.\n");
+            }
+
+            msglen = makeUBXPacket(0x06, 0x01, sizeof(_message_GGA), _message_GGA);
+            GPSSerial.write(UBXscratch, msglen);
+            if (getACK(0x06, 0x01, 300) != GNSS_RESPONSE_OK) {
+                logwarn_f("Unable to enable NMEA GGA.\n");
+            }
         }
     }
     enum AltitudeUnit{
@@ -217,7 +217,29 @@ private:
         sfe_ublox_packet_validity_e valid;           // Goes from NOT_DEFINED to VALID or NOT_VALID when checksum is checked
         sfe_ublox_packet_validity_e classAndIDmatch; // Goes from NOT_DEFINED to VALID or NOT_VALID when the Class and ID match the requestedClass and requestedID
     };
-    const uint8_t _message_GNSS_7[200] = {
+
+    const uint8_t _message_GPSGLONASSGAL[68] = {// GPS + GALILEO + GLONASS wo / SBAS
+
+            0xB5,0x62,0x06,0x3E, 0x3C, 0x00,
+
+            0x00,0x00,0x20,0x07,
+
+            0x00,0x00,0x10,0x00,0x01,0x00,0x01,0x01,
+
+            0x01,0x00,0x00,0x00,0x00,0x00,0x01,0x01,
+
+            0x02,0x00,0x08,0x00,0x01,0x00,0x01,0x01,
+
+            0x03,0x00,0x00,0x00,0x00,0x00,0x01,0x01,
+
+            0x04,0x00,0x00,0x00,0x00,0x00,0x01,0x01,
+
+            0x05,0x00,0x00,0x00,0x00,0x00,0x01,0x01,
+
+            0x06,0x00,0x10,0x00,0x01,0x00,0x01,0x01,
+
+            0xF5,0x8A};
+    uint8_t _message_GNSS_7[20] = {
             0x00, // msgVer (0 for this version)
             0x00, // numTrkChHw (max number of hardware channels, read only, so it's always 0)
             0xff, // numTrkChUse (max number of channels to use, 0xff = max available)
@@ -226,7 +248,7 @@ private:
             0x00, 0x08, 0x10, 0x00, 0x01, 0x00, 0x00, 0x01, // GPS
             0x01, 0x01, 0x03, 0x00, 0x01, 0x00, 0x00, 0x01  // SBAS
     };
-    const uint8_t _message_GNSS[200] = {
+    uint8_t _message_GNSS[28] = {
             0x00, // msgVer (0 for this version)
             0x00, // numTrkChHw (max number of hardware channels, read only, so it's always 0)
             0xff, // numTrkChUse (max number of channels to use, 0xff = max available)
@@ -236,7 +258,7 @@ private:
             0x01, 0x01, 0x03, 0x00, 0x01, 0x00, 0x01, 0x01, // SBAS
             0x06, 0x08, 0x0e, 0x00, 0x01, 0x00, 0x01, 0x01  // GLONASS
     };
-    const uint8_t _message_JAM[200] = {
+    const uint8_t _message_JAM[8] = {
             // bbThreshold (Broadband jamming detection threshold) is set to 0x3F (63 in decimal)
             // cwThreshold (CW jamming detection threshold) is set to 0x10 (16 in decimal)
             // algorithmBits (Reserved algorithm settings) is set to 0x16B156 as recommended
@@ -249,7 +271,7 @@ private:
             // (enabled)
             0x1E, 0x03, 0x00, 0x01 // config2: Extra settings for jamming/interference monitor
     };
-    const uint8_t _message_NAVX5[200] = {
+    const uint8_t _message_NAVX5[40] = {
             0x00, 0x00, // msgVer (0 for this version)
             // minMax flag = 1: apply min/max SVs settings
             // minCno flag = 1: apply minimum C/N0 setting
@@ -278,42 +300,42 @@ private:
             0x00, 0x00, 0x00,                   // Reserved
             0x01,                               // useAdr (Enable/disable ADR sensor fusion) = 1 (enabled)
     };
-    const uint8_t _message_1HZ[200] = {
+    const uint8_t _message_1HZ[6] = {
             0xE8, 0x03, // Measurement Rate (1000ms for 1Hz)
             0x01, 0x00, // Navigation rate, always 1 in GPS mode
             0x01, 0x00, // Time reference
     };
-    const uint8_t _message_GGL[200] =  {
+    const uint8_t _message_GGL[8] =  {
             0xF0, 0x01,            // NMEA ID for GLL
             0x01,                  // I/O Target 0=I/O, 1=UART1, 2=UART2, 3=USB, 4=SPI
             0x00,                  // Disable
             0x01, 0x01, 0x01, 0x01 // Reserved
     };
-    const uint8_t _message_GSA[200] = {
+    const uint8_t _message_GSA[8] = {
             0xF0, 0x02,            // NMEA ID for GSA
             0x01,                  // I/O Target 0=I/O, 1=UART1, 2=UART2, 3=USB, 4=SPI
             0x01,                  // Enable
             0x01, 0x01, 0x01, 0x01 // Reserved
     };
-    const uint8_t _message_GSV[200] = {
+    const uint8_t _message_GSV[8] = {
         0xF0, 0x03,            // NMEA ID for GSV
                 0x01,                  // I/O Target 0=I/O, 1=UART1, 2=UART2, 3=USB, 4=SPI
                 0x00,                  // Disable
                 0x01, 0x01, 0x01, 0x01 // Reserved
     };
-    const uint8_t _message_VTG[200] = {
+    const uint8_t _message_VTG[8] = {
             0xF0, 0x05,            // NMEA ID for VTG
             0x01,                  // I/O Target 0=I/O, 1=UART1, 2=UART2, 3=USB, 4=SPI
             0x00,                  // Disable
             0x01, 0x01, 0x01, 0x01 // Reserved
     };
-    const uint8_t _message_RMC[200] = {
+    const uint8_t _message_RMC[8] = {
             0xF0, 0x04,            // NMEA ID for RMC
             0x01,                  // I/O Target 0=I/O, 1=UART1, 2=UART2, 3=USB, 4=SPI
             0x01,                  // Enable
             0x01, 0x01, 0x01, 0x01 // Reserved
     };
-    const uint8_t _message_GGA[200] = {
+    const uint8_t _message_GGA[8] = {
             0xF0, 0x00,            // NMEA ID for GGA
             0x01,                  // I/O Target 0=I/O, 1=UART1, 2=UART2, 3=USB, 4=SPI
             0x01,                  // Enable
