@@ -1,39 +1,32 @@
 ![Logo](docs/assets/images/CDP_LOGO_small.png)
 
-[![License](https://img.shields.io/badge/License-Apache2-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![Slack](https://img.shields.io/badge/Join-Slack-blue)](https://www.project-owl.com/slack) [![Wiki](https://img.shields.io/badge/Read-Wiki-blue)](https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki) [![Build Status](https://travis-ci.com/Call-for-Code/ClusterDuck-Protocol.svg?branch=master)](https://app.travis-ci.com/github/Call-for-Code/ClusterDuck-Protocol)
-
-## Why are We Building CDP?
-
-In 2017 a category-5 Atlantic hurricane, Maria, hit Puerto Rico and destroyed most of the island's infrastructure. Cellular and power were disabled for an extended period of time leaving medical and communications problems long after the hurricane passed. If access to a basic communications network was available, the community could have connected with emergency services, local government, or family to mitigate some of the widespread problems resulting from this disaster.
+[![License](https://img.shields.io/badge/License-Apache2-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![Discord](https://img.shields.io/badge/Join-Discord-blue)](https://discord.com/invite/Cbgbzq353z) [![Wiki](https://img.shields.io/badge/Read-Wiki-blue)](https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki) [![Build Status](https://travis-ci.com/Call-for-Code/ClusterDuck-Protocol.svg?branch=master)](https://app.travis-ci.com/github/Call-for-Code/ClusterDuck-Protocol)
 
 ## What is the CDP?
 
-The ClusterDuck Protocol was created by [Project OWL] to be an easy to use mobile ad-hoc mesh network that can be accessed by people without the need to have specific hardware or pre-downloaded software (such as a mobile app). Since its creation, the vision for the [ClusterDuck Protocol] has grown beyond only servicing people in need after a hurricane towards additional use cases around earthquakes, wildfires, cellular congestion (large events), sensor networks, and more. [Project OWL] open-sourced this project so that the [ClusterDuck Protocol] could reach the communities that need it as fast as possible and continue to explore new directions.
+The ClusterDuck Protocol (CDP), an innovative open-source project under the Linux Foundation, represents a significant leap in IoT communications, harnessing the power of low bandwidth and low power such as LoRa technology. Distinct from LoRaWAN, this protocol utilizes LoRa's point-to-multipoint capabilities to facilitate robust communication in diverse environments.
+
+The ClusterDuck Protocol was created by [OWL Integrations] (formerly Project OWL) to provide developers with an advanced library for crafting distributed communication networks, tailored for a variety of IoT applications. Since its creation, the vision for the [ClusterDuck Protocol] has grown beyond servicing natural disasters to large events (cellular congestion), sensor networks, and more. 
 
 ## How does it work?
 
-The network is made up of multiple nodes called **"Ducks"**. There are 3 core roles in a ClusterDuck network: DuckLink, MamaDuck, and PapaDuck. **DuckLinks** serve as edge nodes that only transmit data. These function as remote sensors or as additional access points to a Captive Portal. **MamaDucks** inherit the same functionality of the DuckLinks, but also receive messages. MamaDucks repeat messages from DuckLinks and other MamaDucks until the message reaches a PapaDuck. **PapaDucks** are the endpoint of the network where all of the data is collected and can be stored or pushed up to the cloud. **(free tier cloud DMS platform in BETA! Reach out to us on Slack for more info)**
+The network is made up of multiple nodes called **Ducks**. There are 3 basic types of Ducks in a ClusterDuck Network: DuckLink, MamaDuck, and PapaDuck. **DuckLinks** serve as edge nodes that only transmit data. **MamaDucks** inherit the same functionality of the DuckLinks, but can also receive messages. This allows the MamaDucks to relay messages from DuckLinks and/or other MamaDucks along the network (towards the gateway). **PapaDucks** are the endpoint of the network where all of the data is collected and can be stored or pushed up into the cloud. **(free tier cloud DMS platform in BETA! Reach out to us on Discord for more info)**
 
 ![overview](https://www.project-owl.com/assets/wiki/cdp-explain-gif.gif)
 
 ## Installation
 
-Check out the [Wiki](https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki) to learn how to build your own ClusterDuck Protocol Network. And go to the [ClusterDuck Protocol](https://clusterduckprotocol.org/) website for more information and to learn about projects built upon this codebase. You can reach out directly on our [Slack Workspace] for any questions and work with the community.
+Check out the [Wiki](https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol/wiki) to learn how to build your own ClusterDuck Network. Feel free to visit the  [ClusterDuck Protocol](https://clusterduckprotocol.org/) website for more information on projects that the community is building. You can reach out directly on our [Slack Workspace] for any questions and/or to work with the community.
 
-**To use the ClusterDuck Protocol follow the [Installation Manual](https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki/getting-started).**
+**To use the ClusterDuck Protocol follow the [Installation Manual](https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol/wiki/getting-started).**
 
 ## Testing
 
 Starting with release 4.0.0 we have unit tests available with the PlatformIO test framework `unity`
 
-Tests are located in the `ClusterDuckProtocol/test` folder. These tests are unit tests as
-they validate the CDP publicly accessible APIs. However they must be run on a device.
-This means you have to connect a device to your development machine and build the tests to
-run on the device. Platform IO `test` command will build, deploy and run the tests and
-report back the results on your terminal console.
+Tests are located in the `ClusterDuckProtocol/test` folder. These tests are unit tests as they validate the CDP publicly accessible APIs. However they must be run on a device. This means you have to connect a device to your development machine and build the tests to run on the device. Platform IO `test` command will build, deploy and run the tests and report back the results on your terminal console.
 
-Unit tests are great in detecting problems before they make it to the release, so it is important
-no only to run them to validate your changes, but to continuously update them.
+Unit tests are great in detecting problems before they make it to the release, so it is important no only to run them to validate your changes, but to continuously update them.
 
 ### PlatformIO test environments
 The project `platformio.ini` defines environment configurations for supported boards.
@@ -107,9 +100,7 @@ test/test_DuckUtils/test_DuckUtils.cpp:196: test_DuckUtils_loadWifiSsid         
 
 ## How to Contribute
 
-We host a bi-weekly [CDP Town Hall](meet.google.com/unq-duaq-ygj) on Mondays at 2pm ET. The town hall is the place to get updates on protocol, get your questions about CDP answered, and discuss on-going projects. All the current projects is documented in a public [roadmap in Trello](https://trello.com/b/bU0cZuUJ/cdp-roadmap).
-
-On the other Mondays (when there is no Town Hall), we host a live stream. Visit OWL's [YouTube Channel](https://www.youtube.com/c/OWLIntegrations) for updates.
+We host a bi-weekly [CDP Town Hall](meet.google.com/unq-duaq-ygj) on Mondays at 2pm EST. The town hall is the place to get updates on protocol, get your questions about CDP answered, and discuss on-going projects. All the current projects is documented in a public [roadmap in Github Projects](https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol/projects).
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our Code of Conduct, the process for submitting ClusterDuck Protocol improvements, and how to join our town halls and livestreams.
 
@@ -131,6 +122,6 @@ v4.0.0
 
 See `library.json` (PlatformIO) or `library.properties` (Arduino).
 
-[Project OWL]: <https://www.project-owl.com/>
-[ClusterDuck Protocol]: <https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki>
-[Slack Workspace]: <https://www.project-owl.com/slack>
+[OWL Integrations]: <https://www.owlintegrations.com/>
+[ClusterDuck Protocol]: <https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol/wiki>
+[Discord]: <https://discord.com/invite/Cbgbzq353z>
