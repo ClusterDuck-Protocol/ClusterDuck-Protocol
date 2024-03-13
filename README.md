@@ -84,7 +84,7 @@ For example below is the configuration for tests on the Heltec LoRa v3 Arduino b
 
   ```
   Processing test_DuckUtils in test_heltec_wifi_lora_32_V3 environment
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------
 Building & Uploading...
 Testing...
 If you don't see any output for the first 10 secs, please reset board (press reset button)
@@ -105,7 +105,7 @@ test/test_DuckUtils/test_DuckUtils.cpp:193: test_DuckUtils_toUint32             
 test/test_DuckUtils/test_DuckUtils.cpp:194: test_DuckUtils_saveWifiCredentials                  [PASSED]
 test/test_DuckUtils/test_DuckUtils.cpp:195: test_DuckUtils_saveWifiCredentials_zero_length      [PASSED]
 test/test_DuckUtils/test_DuckUtils.cpp:196: test_DuckUtils_loadWifiSsid                         [PASSED]
-------------------------------------------------------------- test_heltec_wifi_lora_32_V3:test_DuckUtils [PASSED] Took 23.34 seconds -------------------------------------------------------------
+-- test_heltec_wifi_lora_32_V3:test_DuckUtils [PASSED] Took 23.34 seconds -------------------------------------------------------------
 ```
 
 ## How to Contribute
