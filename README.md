@@ -1,7 +1,14 @@
-![Logo](docs/assets/images/cdp_logo_transparent_small.png)
+<p align="center"  style="background-color: black;">
+  <img src="docs/assets/images/cdp_logo_transparent_small.png" alt="Logo">
+</p>
 
-[![License](https://img.shields.io/badge/License-Apache2-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![Discord](https://img.shields.io/badge/Join-Discord-blue)](https://discord.com/invite/Cbgbzq353z) [![Wiki](https://img.shields.io/badge/Read-Wiki-blue)](https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki) ![GitHub Release](https://img.shields.io/github/v/release/ClusterDuck-Protocol/ClusterDuck-Protocol)  ![Build Status](https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol/actions/workflows/arduino_ci.yml/badge.svg)
-
+<p align="center">
+  <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/License-Apache2-blue.svg" alt="License"></a>
+  <a href="https://discord.com/invite/Cbgbzq353z"><img src="https://img.shields.io/badge/Join-Discord-blue" alt="Discord"></a>
+  <a href="https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki"><img src="https://img.shields.io/badge/Read-Wiki-blue" alt="Wiki"></a>
+  <img src="https://img.shields.io/github/v/release/ClusterDuck-Protocol/ClusterDuck-Protocol" alt="GitHub Release">
+  <img src="https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol/actions/workflows/arduino_ci.yml/badge.svg" alt="Build Status">
+</p>
 
 ## What is the CDP?
 
