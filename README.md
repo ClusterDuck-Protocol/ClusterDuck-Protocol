@@ -1,6 +1,7 @@
-![Logo](docs/assets/images/CDP_LOGO_small.png)
+![Logo](docs/assets/images/cdp_logo_transparent_small.png)
 
-[![License](https://img.shields.io/badge/License-Apache2-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![Discord](https://img.shields.io/badge/Join-Discord-blue)](https://discord.com/invite/Cbgbzq353z) [![Wiki](https://img.shields.io/badge/Read-Wiki-blue)](https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki) [![Build Status](https://travis-ci.com/Call-for-Code/ClusterDuck-Protocol.svg?branch=master)](https://app.travis-ci.com/github/Call-for-Code/ClusterDuck-Protocol)
+[![License](https://img.shields.io/badge/License-Apache2-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![Discord](https://img.shields.io/badge/Join-Discord-blue)](https://discord.com/invite/Cbgbzq353z) [![Wiki](https://img.shields.io/badge/Read-Wiki-blue)](https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki) ![GitHub Release](https://img.shields.io/github/v/release/ClusterDuck-Protocol/ClusterDuck-Protocol)  ![Build Status](https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol/actions/workflows/arduino_ci.yml/badge.svg)
+
 
 ## What is the CDP?
 
