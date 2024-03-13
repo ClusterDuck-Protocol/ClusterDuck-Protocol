@@ -2,7 +2,6 @@
   <img src="docs/assets/images/cdp_logo_white_bkg.png" alt="Logo">
 </p>
 
-
 <p align="center">
   <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/License-Apache2-blue.svg" alt="License"></a>
   <a href="https://discord.com/invite/Cbgbzq353z"><img src="https://img.shields.io/badge/Join-Discord-blue" alt="Discord"></a>
@@ -126,12 +125,6 @@ This project is governed by its [Technical Charter](ClusterDuck-Protocol-Technic
 ## License
 
 This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE) file for details.
-
-## Version
-
-v4.0.0
-
-See `library.json` (PlatformIO) or `library.properties` (Arduino).
 
 [OWL Integrations]: <https://www.owlintegrations.com/>
 [ClusterDuck Protocol]: <https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol/wiki>
