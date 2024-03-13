@@ -1,6 +1,7 @@
-<p align="center"  style="background-color: black;">
-  <img src="docs/assets/images/cdp_logo_transparent_small.png" alt="Logo">
+<p align="center">
+  <img src="docs/assets/images/cdp_logo_white_bkg.png" alt="Logo">
 </p>
+
 
 <p align="center">
   <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/License-Apache2-blue.svg" alt="License"></a>
@@ -9,6 +10,8 @@
   <img src="https://img.shields.io/github/v/release/ClusterDuck-Protocol/ClusterDuck-Protocol" alt="GitHub Release">
   <img src="https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol/actions/workflows/arduino_ci.yml/badge.svg" alt="Build Status">
 </p>
+
+
 
 ## What is the CDP?
 
