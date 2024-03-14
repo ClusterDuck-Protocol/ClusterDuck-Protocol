@@ -190,16 +190,14 @@ int quackJson(CdpPacket packet) {
   serializeJson(doc, jsonstat);
 
   //Filter out private chat so it won't get sent to DMS
-  if(cdpTopic == "pchat") {
-    return -1;
-  } else if(client.publish(topic.c_str(), jsonstat.c_str())) {
-      Serial.println("[PAPA] Packet forwarded:");
-      serializeJsonPretty(doc, Serial);
-      Serial.println("");
-      Serial.println("[PAPA] Publish ok");
-      display->drawString(0, 60, "Publish ok");
-      display->sendBuffer();
-      return 0;
+  if(client.publish(topic.c_str(), jsonstat.c_str())) {
+    Serial.println("[PAPA] Packet forwarded:");
+    serializeJsonPretty(doc, Serial);
+    Serial.println("");
+    Serial.println("[PAPA] Publish ok");
+    display->drawString(0, 60, "Publish ok");
+    display->sendBuffer();
+    return 0;
   } else {
     Serial.println("[PAPA] Publish failed");
     display->drawString(0, 60, "Publish failed");

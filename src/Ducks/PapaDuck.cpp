@@ -116,11 +116,7 @@ void PapaDuck::handleReceivedPacket() {
     logdbg_ln("relaying:  %s", duckutils::convertToHex(rxPacket->getBuffer().data(), rxPacket->getBuffer().size()).c_str());
     loginfo_ln("invoking callback in the duck application...");
     
-    if(rxPacket->getTopic() == topics::gchat){
-      duckNet->addToChatBuffer(CdpPacket(rxPacket->getBuffer()));
-    } else{
-      recvDataCallback(rxPacket->getBuffer());
-    }
+    recvDataCallback(rxPacket->getBuffer());
     
     if (acksEnabled) {
       const CdpPacket packet = CdpPacket(rxPacket->getBuffer());
@@ -272,13 +268,6 @@ int PapaDuck::reconnectWifi(std::string ssid, std::string password) {
   return DUCK_ERR_NONE;
 #endif
 }
-
-void PapaDuck::sendMessageBoardMessage(std::vector<byte> dataPayload, std::vector<byte> duid) {
-  int err = txPacket->prepareForSending(&filter, duid, DuckType::PAPA,
-    reservedTopic::mbm, dataPayload);
-  if (err != DUCK_ERR_NONE) {
-    logerr_ln("ERROR handleReceivedPacket. Failed to prepare ack. Error: %d", err);
-  }
 
   err = duckRadio.sendData(txPacket->getBuffer());
 

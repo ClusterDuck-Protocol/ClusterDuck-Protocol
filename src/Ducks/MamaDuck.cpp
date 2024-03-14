@@ -125,23 +125,6 @@ void MamaDuck::handleReceivedPacket() {
             loginfo_ln("handleReceivedPacket: packet RELAY DONE");
           }
         break;
-        case reservedTopic::mbm:
-          packet.timeReceived = millis();
-          duckNet->addToMessageBoardBuffer(packet);
-        break;
-        case topics::gchat:{
-          packet.timeReceived = millis();
-          duckNet->addToChatBuffer(packet);
-
-          std::vector<byte> data;
-          byte numPairs = 1;
-          data.insert(data.end(), numPairs);
-          data.insert(data.end(), packet.muid.begin(), packet.muid.end());
-          if(duckutils::getAckingState()){
-            sendAck(data, BROADCAST_DUID);
-          }
-        }
-        break;
         default:
           err = duckRadio.relayPacket(rxPacket);
           if (err != DUCK_ERR_NONE) {
@@ -190,40 +173,6 @@ void MamaDuck::handleReceivedPacket() {
           sMuid.insert(sMuid.end(), (packet.data.begin() + 1), packet.data.end());
           duckNet->checkForPrivateMessage(sMuid, packet.sduid);
           handleAck(packet);
-        }
-        break;
-        case reservedTopic::mbm:
-          packet.timeReceived = millis();
-          duckNet->addToMessageBoardBuffer(packet);
-        break;
-        case topics::gchat:
-        {
-          packet.timeReceived = millis();
-          duckNet->addToChatBuffer(packet);
-
-          std::vector<byte> data;
-          byte numPairs = 1;
-          data.insert(data.end(), numPairs);
-          data.insert(data.end(), packet.muid.begin(), packet.muid.end());
-
-          if(duckutils::getAckingState()){
-            sendAck(data, BROADCAST_DUID);
-          }
-        } 
-        break;
-        case topics::pchat:{
-          packet.timeReceived = millis();
-          std::string session(packet.sduid.begin(), packet.sduid.end());
-
-          duckNet->createPrivateHistory(session);
-          duckNet->addToPrivateChatBuffer(packet, session);
-          std::vector<byte> data;
-          byte numPairs = 1;
-          data.insert(data.end(), numPairs);
-          data.insert(data.end(), packet.muid.begin(), packet.muid.end());
-          if(duckutils::getAckingState()){
-            sendAck(data, packet.sduid);
-          }
         }
         break;
         default:
