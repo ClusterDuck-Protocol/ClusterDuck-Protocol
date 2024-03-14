@@ -23,7 +23,6 @@ class DuckNet;
 
 #include "Duck.h"
 #include <map>
-#include "circularBuffer.h"
 #include "DuckUtils.h"
 #include "DuckError.h"
 #include <string>
