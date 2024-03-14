@@ -268,14 +268,3 @@ int PapaDuck::reconnectWifi(std::string ssid, std::string password) {
   return DUCK_ERR_NONE;
 #endif
 }
-
-  err = duckRadio.sendData(txPacket->getBuffer());
-
-  if (err == DUCK_ERR_NONE) {
-    CdpPacket packet = CdpPacket(txPacket->getBuffer());
-    filter.bloom_add(packet.muid.data(), MUID_LENGTH);
-  } else {
-    logerr_ln("ERROR handleReceivedPacket. Failed to send ack. Error: ",err);
-  }
-  
-}

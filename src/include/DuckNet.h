@@ -134,34 +134,6 @@ public:
     logwarn_ln("WARNING loadChannel skipped, device has no WiFi.");
   }
 
-  void addToMessageBoardBuffer(CdpPacket message) {
-    logwarn_ln("WARNING addToMessageBoardBuffer skipped, device has no WiFi.");
-  }
-
-  void addToChatBuffer(CdpPacket message) {
-    logwarn_ln("WARNING addToChatBuffer skipped, device has no WiFi.");
-  }
-
-  void addToPrivateChatBuffer(CdpPacket message, std::string chatSession) {
-    logwarn_ln("WARNING addToPrivateChatBuffer skipped, device has no WiFi.");
-  }
-
-  void createPrivateHistory(std::string session) {
-    logwarn_ln("WARNING createPrivateHistory skipped, device has no WiFi.");
-  }
-
-  std::string retrieveMessageHistory(CircularBuffer* buffer) {
-    logwarn_ln("WARNING retrieveMessageHistory skipped, device has no WiFi.");
-    return "";
-  }
-
-  void checkForPrivateMessage(std::vector<byte> muid, std::vector<byte> sduid) {
-    logwarn_ln("WARNING checkForPrivateMessage skipped, device has no WiFi.");
-  }
-
-  void checkForPublicMessage(std::vector<byte> muid) {
-    logwarn_ln("WARNING checkForPublicMessage skipped, device has no WiFi.");
-  }
 #else
   /**
    * @brief Set up the WebServer.
@@ -176,54 +148,6 @@ public:
    * empty
    */
   int setupWebServer(bool createCaptivePortal = false, std::string html = "");
-
-  /**
-   * @brief insert received packet into the message board circular buffer and
-   * send refresh page event to client
-   *
-   * @param message the packet to add to the buffer
-   */
-  void addToMessageBoardBuffer(CdpPacket message);
-
-  /**
-   * @brief insert received packet into the chat circular buffer and
-   * send refresh page event to client
-   *
-   * @param message the packet to add to the buffer
-   */
-  void addToChatBuffer(CdpPacket message);
-
-  /**
-   * @brief insert received packet into the private chat circular buffer and
-   * send refresh page event to client
-   *
-   * @param message the packet to add to the buffer
-   * @param chatSession the session of the chat buffer you want to add to.
-   */
-  void addToPrivateChatBuffer(CdpPacket message, std::string chatSession);
-
-   /**
-   * @brief creates a new private chat history, replacing the oldest history if the limit is reached.
-   *
-   * @param session the destination device to open a chat with
-   */
-  void createPrivateHistory(std::string session);
-
-  /**
-   * @brief retrieve all messages from from message circular buffer
-   *
-   * @returns a json array of messages with a title, body, and messageAge
-   */
-  std::string retrieveMessageHistory(CircularBuffer* buffer);
-
-  /**
- * @brief sets a message's ack value if the packet exists in a private chat buffer
- * @param muid the message uid to check for in the buffer
- * @param sduid the source device that sent the ack
- */
-  void checkForPrivateMessage(std::vector<byte> muid, std::vector<byte> sduid);
-
-  void checkForPublicMessage(std::vector<byte> muid);
 
   /**
    * @brief Set up the WiFi access point.

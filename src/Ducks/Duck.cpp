@@ -432,21 +432,6 @@ int Duck::sendPong() {
   return err;
 }
 
-int Duck::sendAck(std::vector<byte> data, const std::vector<byte> dduid) { 
-  int err = DUCK_ERR_NONE;
-  err = txPacket->prepareForSending(&filter, dduid, this->getType(), reservedTopic::ack, data);
-  if (err != DUCK_ERR_NONE) {
-    logerr_ln("ERROR Oops! failed to build pong packet, err = %d", err);
-    return err;
-  }
-  err = duckRadio.sendData(txPacket->getBuffer());
-  if (err != DUCK_ERR_NONE) {
-    logerr_ln("ERROR Oops! Lora sendData failed, err = %d", err);
-    return err;
-  }
-  return err;
-}
-
 int Duck::sendPing() {
   int err = DUCK_ERR_NONE;
   std::vector<byte> data(1, 0);

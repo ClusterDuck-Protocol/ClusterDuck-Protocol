@@ -101,9 +101,6 @@ void MamaDuck::handleReceivedPacket() {
           return;
         break;
         case reservedTopic::ack:{
-          std::vector<byte> sMuid;
-          sMuid.insert(sMuid.end(), (packet.data.begin() + 1), packet.data.end());
-          duckNet->checkForPublicMessage(sMuid);
           handleAck(packet);
           //relay batch ack 
           err = duckRadio.relayPacket(rxPacket);
@@ -169,9 +166,6 @@ void MamaDuck::handleReceivedPacket() {
 
         break;
         case reservedTopic::ack:{
-          std::vector<byte> sMuid;
-          sMuid.insert(sMuid.end(), (packet.data.begin() + 1), packet.data.end());
-          duckNet->checkForPrivateMessage(sMuid, packet.sduid);
           handleAck(packet);
         }
         break;
