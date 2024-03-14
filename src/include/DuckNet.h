@@ -46,11 +46,6 @@ class DuckNet;
 #include "controlPanel.h"
 #include "cdpHome.h"
 #include "papaHome.h"
-#include "messageBoard.h"
-#include "chatPage.h"
-#include "chatPrompt.h"
-#include "privateChat.h"
-#include "privateChatPrompt.h"
 
 
 #endif

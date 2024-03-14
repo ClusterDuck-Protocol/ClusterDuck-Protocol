@@ -187,22 +187,6 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
     request->send(200, "text/html", portal.c_str());
   });
 
-  webServer.on("/message-board", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    request->send(200, "text/html", message_board);
-  });
-  webServer.on("/join-chat", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    request->send(200, "text/html", chat_prompt);
-  });
-  webServer.on("/chat", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    request->send(200, "text/html", chat_page);
-  });
-  webServer.on("/new-private-chat", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    request->send(200, "text/html", private_chat_prompt);
-  });
-  webServer.on("/private-chat", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    request->send(200, "text/html", private_chat_page);
-  });
-
   webServer.on("/main", HTTP_GET, [&](AsyncWebServerRequest* request) {
     request->send(200, "text/html", MAIN_page);
   });
