@@ -7,17 +7,17 @@ file://<DIRECTORY>/ClusterDuck-Protocol
 
 ## 1. Ducks
 
+#### DuckLink
+The DuckLink is the base unit of the mesh network. It can only send messages into the ClusterDuck network.
+
 #### MamaDuck
-Is the Central Duck of the mesh and can receive and relay messages to other ducks as well send its own payloads.
+The MamaDuck is a critical device in the ClusterDuck Protocol. In addition to sending its own payloads, it can receive messages from other Ducks and relay them along the mesh network.
 
 #### PapaDuck
-The PapaDuck is the final destination of the mesh and is used to collect all messages and push them up to the cloud.
-
-#### DuckLink
-The DuckLink is the base unit of the Mesh and can only send messages into the ClusterDuck network.
+The PapaDuck is the final destination of the mesh network. It acts as a gateway to to collect all messages in the network and push it up to the cloud.
 
 #### DetectorDuck
-The DetectorDuck is used to deploy all the other Ducks, it provides the RSSI value of the closest Duck and can provide feedback on range.
+The DetectorDuck is a tool to help deploy the ClusterDuck Network. Using RSSI, it provides alerts if the user leaves the range of the network.
 
 ## 2. Custom Mama Examples
-The Custom Mama Example is there to show how a mama is build and how to modify it, This example can receive custom Lora settings and has code for a Oles display.
+The Custom Mama Examples are examples where we show you how to use APIs to customize your own ClusterDuck Network. For example, you can adjust, Lora settings, WiFi settings, etc.
