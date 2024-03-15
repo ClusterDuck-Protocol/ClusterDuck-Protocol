@@ -25,6 +25,7 @@ class DuckNet;
 #include <map>
 #include "DuckUtils.h"
 #include "DuckError.h"
+#include "DuckLogger.h"
 #include <string>
 
 #ifdef CDPCFG_WIFI_NONE
