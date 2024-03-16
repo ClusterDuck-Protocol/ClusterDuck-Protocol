@@ -1,46 +1,72 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PapaDuck Message Viewer</title>
+    <style>
+        #messages {
+            max-height: 300px;
+            overflow-y: scroll;
+            border: 1px solid black;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        td, th {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
 <body>
-    <div style="height: 300px; overflow: auto;">
-        <table id="mqttTable" style="border: 1px solid black; border-collapse: collapse;">
-            <tr>
-            <th style="border: 1px solid black; padding: 10px;">Topic</th>
-            <th style="border: 1px solid black; padding: 10px;">Message</th>
-            </tr>
+    <h2>Received Messages</h2>
+    <div id="messages">
+        <table id="messageTable">
+            <thead>
+                <tr>
+                    <th>mqtt topic</th>
+                    <th>from</th>
+                    <th>to</th>
+                    <th>cdp topic</th>
+                    <th>response required</th>
+                    <th>payload</th>
+                    
+                    
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Messages will be inserted here -->
+
+            </tbody>
         </table>
     </div>
 
-  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
-  <script>
-    // Connect to the broker
-    const client = mqtt.connect('wss://test.mosquitto.org:8081', {
-        clientId: 'cdp-mqtt-web-client'
-    })
+    <h2>Send Message</h2>
+    <form id="sendMessageForm">
+        <label for="mqttTopic">MQTT Topic:</label>
+        <input type="text" id="mqttTopic" name="mqttTopic"><br><br>
 
-    client.on('connect', function () {
-        // Subscribe to a topic with QoS level 0 (at most once delivery)
-        client.subscribe('hub/event', { qos: 0 }, function (err) {
-            if (err) {
-            console.error('Failed to subscribe to topic:', err)
-            }
-        })
-    })
+        <label for="duckId">Duck ID:</label>
+        <input type="text" id="duckId" name="duckId"><br><br>
 
-    client.on('message', function (topic, message) {
-      // message is a Buffer, convert it to a string
-      const msg = message.toString()
+        <label for="cdpTopic">CDP Topic:</label>
+        <select id="cdpTopic" name="cdpTopic">
+            <option value="ack">ack</option>
+            <option value="cmd">cmd</option>
+            <option value="response">response</option>
+            <option value="request">request</option>
+            <!-- Add other CDP topics as needed -->
+        </select><br><br>
 
-      // Parse the JSON message
-      const jsonMsg = JSON.parse(msg)
+        <label for="messageBody">Message Body:</label><br>
+        <textarea id="messageBody" name="messageBody" rows="4" cols="50"></textarea><br><br>
 
-      // Add the message to the table
-      const table = document.getElementById('mqttTable')
-      const row = table.insertRow(-1)
-      const cell1 = row.insertCell(0)
-      const cell2 = row.insertCell(1)
-      cell1.textContent = topic
-      cell2.textContent = JSON.stringify(jsonMsg)
-    })
-  </script>
+        <button type="button" onclick="publishMessage()">Send Message</button>
+    </form>
+
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>

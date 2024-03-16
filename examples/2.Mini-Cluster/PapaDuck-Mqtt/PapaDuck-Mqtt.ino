@@ -131,7 +131,7 @@ bool setup_mqtt(void)
     Serial.println("[HUB] MQTT client connected");
 
     // This is an example if you want to subscribe to an incoming topic
-    if (!mqttClient.subscribe("incoming/say_hello",0)) {
+    if (!mqttClient.subscribe(mqttSubTopic.c_str(),0)) {
         Serial.println("[HUB] ERROR - Failed to subscribe to topic");
         return false;
     }
@@ -383,6 +383,6 @@ void loop()
   timer.tick();
 
   // Check for incoming messages from MQTT
-  //mqttClient.loop();
-  //handleIncomingMqttMessages();
+  mqttClient.loop();
+  handleIncomingMqttMessages();
 }
