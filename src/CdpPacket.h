@@ -96,10 +96,6 @@ enum topics {
   health = 0x15,
   // Send duck commands
   dcmd = 0x16,
-  //global chat message
-  gchat = 0x17,
-  //private chat message
-  pchat = 0x18,
   // MQ7 Gas Sensor
   mq7 = 0xEF,
   // GP2Y Dust Sensor
@@ -124,7 +120,6 @@ enum reservedTopic {
   gps = 0x03,
   ack = 0x04,
   cmd = 0x05,
-  mbm = 0x06,
   max_reserved = 0x0F
 };
 
@@ -173,8 +168,6 @@ public:
   std::vector<byte> path;
   //time received
   unsigned long timeReceived;
-  //if the packet has been acked
-  bool acked = false;
 
   CdpPacket() {
     reset();
@@ -234,10 +227,6 @@ public:
         return "health";
       case topics::dcmd:
         return "dcmd";
-      case topics::gchat:
-        return "gchat";
-      case topics::pchat:
-        return "pchat";
       case topics::mq7:
         return "mq7";
       case topics::gp2y:

@@ -101,14 +101,6 @@ public:
    */
   void sendCommand(byte cmd, std::vector<byte> value, std::vector<byte> dduid);
 
-  /**
-   * @brief send message board message to the entire network
-   * 
-   * @param dataPayload the message to send
-   * @param duid optional -- the target device uid. Default is BROADCAST_DUID. 
-   */
-  void sendMessageBoardMessage(std::vector<byte> dataPayload, std::vector<byte> duid = BROADCAST_DUID);
-
 private:
 
   void handleReceivedPacket();
