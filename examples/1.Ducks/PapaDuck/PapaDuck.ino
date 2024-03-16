@@ -48,7 +48,6 @@ char clientId[] = "TestPapa02";
 #define CMD_STATE_WIFI "/wifi/"
 #define CMD_STATE_HEALTH "/health/"
 #define CMD_STATE_CHANNEL "/channel/"
-#define CMD_STATE_MBM "/messageBoard/"
 
 
 // use the '+' wildcard so it subscribes to any command with any message format
@@ -190,16 +189,14 @@ int quackJson(CdpPacket packet) {
   serializeJson(doc, jsonstat);
 
   //Filter out private chat so it won't get sent to DMS
-  if(cdpTopic == "pchat") {
-    return -1;
-  } else if(client.publish(topic.c_str(), jsonstat.c_str())) {
-      Serial.println("[PAPA] Packet forwarded:");
-      serializeJsonPretty(doc, Serial);
-      Serial.println("");
-      Serial.println("[PAPA] Publish ok");
-      display->drawString(0, 60, "Publish ok");
-      display->sendBuffer();
-      return 0;
+  if(client.publish(topic.c_str(), jsonstat.c_str())) {
+    Serial.println("[PAPA] Packet forwarded:");
+    serializeJsonPretty(doc, Serial);
+    Serial.println("");
+    Serial.println("[PAPA] Publish ok");
+    display->drawString(0, 60, "Publish ok");
+    display->sendBuffer();
+    return 0;
   } else {
     Serial.println("[PAPA] Publish failed");
     display->drawString(0, 60, "Publish failed");
@@ -336,15 +333,6 @@ void gotMsg(char* topic, byte* payload, unsigned int payloadLength) {
     } else {
       Serial.println("Payload size too small");
     }
-  } else if (String(topic).indexOf(CMD_STATE_MBM) > 0){
-      std::vector<byte> message;
-      std::string output;
-      for (int i = 0; i<payloadLength; i++) {
-        output = output + (char)payload[i];
-      }
-
-      message.insert(message.end(),output.begin(),output.end());
-      duck.sendMessageBoardMessage(message);
   } else {
     Serial.print("gotMsg: unexpected topic: "); Serial.println(topic);
   }
