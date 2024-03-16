@@ -60,8 +60,7 @@ static const char* mosquitto_ca_cert = \
 // Use pre-built papa duck as our hub device
 PapaDuck hub;
 
-const int bufferSize = 4 * JSON_OBJECT_SIZE(4);
-StaticJsonDocument<bufferSize> doc;
+JsonDocument doc;
 
 bool setupOK = false;
 
@@ -213,17 +212,25 @@ int toJSON(CdpPacket packet)
 }
 
 bool publishToMqttTopic(std::string source, std::string topic, String message) {
+  bool ok = false;
   if (hub.isWifiConnected()) {
-    setup_mqtt();  
+    ok = setup_mqtt();  
+    if (!ok) {
+      Serial.println("[HUB] ERROR - Failed to connect to MQTT broker");
+      return false;
+    }
     if (mqttClient.publish(topic.c_str(), message.c_str(), message.length())) {
+      ok = true;
       Serial.println("[HUB] Publish ok");        
     } else {
+      ok = false;
       Serial.println("[HUB] Publish failed");
     }
-
   } else {
     Serial.println("[HUB] ERROR No WiFi connection!!!");
+    ok = false;
   }  
+  return ok;
 }
 
 
@@ -248,7 +255,7 @@ void handleIncomingMqttMessages(void) {
     auto rawMessage = mqttMessageQueue.front(); 
     mqttMessageQueue.pop();
 
-    StaticJsonDocument<512> doc;
+    JsonDocument doc;
     DeserializationError err = deserializeJson(doc, rawMessage);
     if (err) {
       Serial.print("[HUB] deserializeJson() failed with code: ");
@@ -266,7 +273,7 @@ void handleIncomingMqttMessages(void) {
 
 void processMessageFromDucks(std::vector<byte> packetBuffer) {
 
-    StaticJsonDocument<bufferSize> doc;
+    JsonDocument doc;
     CdpPacket cdp_packet = CdpPacket(packetBuffer);
 
     int messageLength = cdp_packet.data.size();
@@ -276,19 +283,21 @@ void processMessageFromDucks(std::vector<byte> packetBuffer) {
     std::string sduid = toHexString(cdp_packet.sduid);
     std::string dduid = toHexString(cdp_packet.dduid);
     std::string muid(cdp_packet.muid.begin(), cdp_packet.muid.end());
-    std::string deviceTopic = toTopicString(cdp_packet.topic);
+    std::string cdpTopic = toTopicString(cdp_packet.topic);
 
-    Serial.printf("[HUB] got topic: %s from %s\n",deviceTopic.c_str(), sduid.c_str());
+    Serial.printf("[HUB] got topic: %s from %s\n",cdpTopic.c_str(), sduid.c_str());
  
     // Counter Message
     std::string payload(cdp_packet.data.begin(), cdp_packet.data.end());
 
     // Forward the counter message to the MQTT broker
+    // This is a simple example, but you can do anything you want with the message here
+    // This example shows how the message from be transformed into something that matches your application
     uint32_t msgId = esp_random();
     doc["from"] = "hub";
     doc["to"] = "controller";
-    doc["responseExpected"] = false;
-    doc["messageTopic"] = "counterMessage";
+    doc["responseExpected"] = false; // This flag is used to indicate if the controller should respond to this message
+    doc["messageTopic"] = cdpTopic.c_str();
     doc["messageId"].set(msgId);
     
     doc["payload"]["hops"].set(cdp_packet.hopCount);
