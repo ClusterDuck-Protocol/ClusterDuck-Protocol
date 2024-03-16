@@ -749,35 +749,35 @@ int DuckNet::loadWiFiCredentials(){
 }
 
 
-int DuckNet::setupInternet(std::string ssid, std::string password) {
+int DuckNet::setupInternet(std::string ssid, std::string password) 
+{
+  const uint32_t WIFI_CONNECTION_TIMEOUT_MS = 1500;
+
+  int rc = DUCK_ERR_NONE;
   this->ssid = ssid;
   this->password = password;
-
-
-  // // Check if SSID is available
-  // if (!ssidAvailable(ssid)) {
-  //   logerr_ln("ERROR setupInternet: " + ssid + " is not available. Please check the provided ssid and/or passwords");
-  //   return DUCK_INTERNET_ERR_SSID;
-  // }
-
-
-
-  //  Connect to Access Point
-  logdbg_ln("setupInternet: connecting to WiFi access point SSID: %s", ssid);
-  WiFi.begin(ssid.c_str(), password.c_str());
-  // We need to wait here for the connection to estanlish. Otherwise the WiFi.status() may return a false negative
-  // WiFi.waitForConnectResult();
-  delay(100);
-
-  //TODO: Handle bad password better
-  if(WiFi.status() != WL_CONNECTED) {
-    logerr_ln("ERROR setupInternet: failed to connect to %s",ssid);
-    return DUCK_INTERNET_ERR_CONNECT;
+  // Check if SSID is available
+  if (!ssidAvailable(ssid)) {
+    logerr_ln("ERROR setupInternet: %s is not available. Please check the provided ssid and/or passwords", ssid.c_str());
+    return DUCK_INTERNET_ERR_SSID;
   }
 
-  loginfo_ln("Duck connected to internet!");
+  //  Connect to Access Point
+  loginfo_ln("setupInternet: connecting to WiFi access point SSID: %s",ssid.c_str());
+  WiFi.begin(ssid.c_str(), password.c_str());
+  // We need to wait here for the connection to estanlish. Otherwise the WiFi.status() may return a false negative
+  loginfo_ln("setupInternet: Waiting for connect results for ", ssid.c_str());
+  WiFi.waitForConnectResult(WIFI_CONNECTION_TIMEOUT_MS);
 
-  return DUCK_ERR_NONE;
+  if (WiFi.status() == WL_CONNECTED) {
+    loginfo_ln("Duck connected to internet!");
+    rc = DUCK_ERR_NONE;
+  } else {
+    logerr_ln("ERROR setupInternet: failed to connect to %s (status: %d)", ssid.c_str(), WiFi.status());
+    rc = DUCK_INTERNET_ERR_CONNECT;
+  };
+
+  return rc;
 
 }
 
