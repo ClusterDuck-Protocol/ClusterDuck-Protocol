@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <div style="height: 300px; overflow: auto;">
+        <table id="mqttTable" style="border: 1px solid black; border-collapse: collapse;">
+            <tr>
+            <th style="border: 1px solid black; padding: 10px;">Topic</th>
+            <th style="border: 1px solid black; padding: 10px;">Message</th>
+            </tr>
+        </table>
+    </div>
+
+  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+  <script>
+    // Connect to the broker
+    const client = mqtt.connect('wss://test.mosquitto.org:8081', {
+        clientId: 'cdp-mqtt-web-client'
+    })
+
+    client.on('connect', function () {
+        // Subscribe to a topic with QoS level 0 (at most once delivery)
+        client.subscribe('hub/event', { qos: 0 }, function (err) {
+            if (err) {
+            console.error('Failed to subscribe to topic:', err)
+            }
+        })
+    })
+
+    client.on('message', function (topic, message) {
+      // message is a Buffer, convert it to a string
+      const msg = message.toString()
+
+      // Parse the JSON message
+      const jsonMsg = JSON.parse(msg)
+
+      // Add the message to the table
+      const table = document.getElementById('mqttTable')
+      const row = table.insertRow(-1)
+      const cell1 = row.insertCell(0)
+      const cell2 = row.insertCell(1)
+      cell1.textContent = topic
+      cell2.textContent = JSON.stringify(jsonMsg)
+    })
+  </script>
+</body>
+</html>
