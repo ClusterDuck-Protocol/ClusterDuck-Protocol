@@ -76,8 +76,8 @@ std::queue<std::string> mqttMessageQueue;
 std::string mqttPubTopic = "hub/event";           // published by the hub
 std::string mqttSubTopic = "incoming/say_hello";  // subscribed by the hub
 
-const std::string WIFI_SSID="Lojika Systems 2.4G";   // Replace with WiFi SSID
-const std::string WIFI_PASS="7212-Wabash!";     // Replace with WiFi Password
+const std::string WIFI_SSID="WhatTheDuck";   // Replace with WiFi SSID
+const std::string WIFI_PASS="QuackQuack";    // Replace with WiFi Password
 
 std::string toTopicString(byte topic);
 String convertToHex(byte* data, int size);
