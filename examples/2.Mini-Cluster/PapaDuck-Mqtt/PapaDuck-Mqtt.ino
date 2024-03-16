@@ -76,8 +76,8 @@ std::queue<std::string> mqttMessageQueue;
 std::string mqttPubTopic = "hub/event";           // published by the hub
 std::string mqttSubTopic = "incoming/say_hello";  // subscribed by the hub
 
-const std::string WIFI_SSID="WhatTheDuck";   // Replace with WiFi SSID
-const std::string WIFI_PASS="QuackQuack";    // Replace with WiFi Password
+const std::string WIFI_SSID="Lojika Systems 2.4G";   // Replace with WiFi SSID
+const std::string WIFI_PASS="7212-Wabash!";     // Replace with WiFi Password
 
 std::string toTopicString(byte topic);
 String convertToHex(byte* data, int size);
@@ -109,6 +109,7 @@ std::vector<uint8_t> fromHexString(const std::string& hexString) {
     }
     return bytes;
 }
+
 bool setup_mqtt(void) 
 {
     bool connected = mqttClient.connected();
@@ -117,6 +118,10 @@ bool setup_mqtt(void)
     }
     
     Serial.println("[HUB] MQTT client connecting to broker...");
+
+    // Connect to the MQTT broker with the client ID only
+    // If you need to use a username and password, use the connect method with 3 parameters below
+    // boolean mqttClient.connect(const char *id, const char *user, const char *pass) 
     connected = mqttClient.connect(MQTT_CLIENT_ID);
     if (!connected) {
         Serial.println("[HUB] ERROR - Failed to connect to MQTT broker");
