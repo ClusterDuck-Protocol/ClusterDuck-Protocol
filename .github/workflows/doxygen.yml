@@ -7,12 +7,8 @@ on:
     branches: 
       - master
       - 387-doxygen-pipeline-still-failing
-      
-  workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
+  workflow_dispatch:
 
 jobs:
     doxygen:
