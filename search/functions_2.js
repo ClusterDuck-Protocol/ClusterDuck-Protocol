@@ -1,9 +1,8 @@
 var searchData=
 [
-  ['checkforprivatemessage_0',['checkForPrivateMessage',['../class_duck_net.html#a8eb44a03e09d2aa3e02729349a019ac5',1,'DuckNet']]],
-  ['checkforpublicmessage_1',['checkForPublicMessage',['../class_duck_net.html#a232e987b52838846cf163d75d5f1406f',1,'DuckNet']]],
-  ['circularbuffer_2',['CircularBuffer',['../class_circular_buffer.html#a8849e18b35e8d144a59906268812f204',1,'CircularBuffer']]],
-  ['converttohex_3',['convertToHex',['../namespaceduckutils.html#a7af6fab5b312e69d35f62c81150eb752',1,'duckutils']]],
-  ['createprivatehistory_4',['createPrivateHistory',['../class_duck_net.html#a2a35e13452a1eeb0abcd8db2ec6aa3eb',1,'DuckNet']]],
-  ['createuuid_5',['createUuid',['../namespaceduckutils.html#aff2e7f9ce8df861a748df8a3f84be721',1,'duckutils']]]
+  ['decrypt_266',['decrypt',['../class_duck.html#a9980d0144dbcd4698d21c1e87902aa2f',1,'Duck']]],
+  ['decryptdata_267',['decryptData',['../namespaceduckcrypto.html#a4eb30dba2b8da5b5ed71520702e0edb5',1,'duckcrypto']]],
+  ['duck_268',['Duck',['../class_duck.html#aeb0a83da19c0accf415052d9e2626b68',1,'Duck::Duck(std::string name=&quot;&quot;)'],['../class_duck.html#a87b5981a405d694d6796cb56fe52c698',1,'Duck::Duck(Duck const &amp;)=delete']]],
+  ['ducknet_269',['DuckNet',['../class_duck_net.html#aa5096707e76c61542c094a24d69f0849',1,'DuckNet']]],
+  ['duckpacket_270',['DuckPacket',['../class_duck_packet.html#a0d70cc32e12585c7c1ac4da10fec80af',1,'DuckPacket::DuckPacket()'],['../class_duck_packet.html#a8abaa404ab99c4251261feef77a3e02a',1,'DuckPacket::DuckPacket(std::vector&lt; byte &gt; duid)']]]
 ];

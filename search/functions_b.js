@@ -1,7 +1,8 @@
 var searchData=
 [
-  ['prepareforrelaying_0',['prepareForRelaying',['../class_duck_packet.html#a110773934b30d9514e3e1809da50a712',1,'DuckPacket']]],
-  ['prepareforsending_1',['prepareForSending',['../class_duck_packet.html#acdf6f73073e1d095e7f63a692a6b9bbe',1,'DuckPacket']]],
-  ['processportalrequest_2',['processPortalRequest',['../class_duck.html#a8fde44959e2ca108af1799f87f754336',1,'Duck']]],
-  ['push_3',['push',['../class_circular_buffer.html#ab8673160ec372c25ec4c1c0f15e4ca16',1,'CircularBuffer']]]
+  ['reboot_314',['reboot',['../class_duck.html#a64f61f312f2e077477369750188bfccf',1,'Duck']]],
+  ['reconnectwifi_315',['reconnectWifi',['../class_duck.html#a230809997b45df2613791cbeeab19726',1,'Duck']]],
+  ['reset_316',['reset',['../class_duck_packet.html#a9e7b7886b7e7600698df5aec5b064224',1,'DuckPacket']]],
+  ['restartduck_317',['restartDuck',['../namespaceduckesp.html#a1bccb912823b8261c7ef8559efc3d5ec',1,'duckesp']]],
+  ['run_318',['run',['../class_duck.html#ae563c92e38f7f99412eb4445f6429366',1,'Duck']]]
 ];

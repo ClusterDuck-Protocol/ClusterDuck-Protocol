@@ -25,7 +25,11 @@
 var NAVTREE =
 [
   [ "ClusterDuck Protocol", "index.html", [
-    [ "ClusterDuck Protocol Info", "index.html", "index" ],
+    [ "ClusterDuck Protocol Info", "index.html", [
+      [ "About", "index.html#autotoc_md1", null ],
+      [ "What is it?", "index.html#autotoc_md2", null ],
+      [ "How does it work?", "index.html#autotoc_md3", null ]
+    ] ],
     [ "Namespaces", "namespaces.html", [
       [ "Namespace List", "namespaces.html", "namespaces_dup" ],
       [ "Namespace Members", "namespacemembers.html", [
@@ -41,7 +45,7 @@ var NAVTREE =
         [ "All", "functions.html", null ],
         [ "Functions", "functions_func.html", null ],
         [ "Variables", "functions_vars.html", null ],
-        [ "Related Symbols", "functions_rela.html", null ]
+        [ "Related Functions", "functions_rela.html", null ]
       ] ]
     ] ],
     [ "Files", "files.html", [
@@ -60,7 +64,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "_duck_8cpp.html",
-"class_duck_packet.html#ab904bb9fd821f0c524d71d4dfdc1532d"
+"heltec__cubecell__board_8h_source.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

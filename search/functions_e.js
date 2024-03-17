@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['tostring_0',['toString',['../namespaceduckutils.html#a232773eaac919a424cf6c8737c6843f0',1,'duckutils']]],
-  ['touint32_1',['toUint32',['../namespaceduckutils.html#a3dc52038752191518492e540418c195b',1,'duckutils']]],
-  ['touppercase_2',['toUpperCase',['../namespaceduckutils.html#a0a51e5d45425646f2d70f63c3de51faa',1,'duckutils']]]
+  ['updatefirmware_352',['updateFirmware',['../class_duck.html#a75deecd06db3aaccf4c930ca3bcb43f3',1,'Duck']]]
 ];

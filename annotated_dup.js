@@ -1,7 +1,6 @@
 var annotated_dup =
 [
     [ "BloomFilter", "class_bloom_filter.html", "class_bloom_filter" ],
-    [ "CircularBuffer", "class_circular_buffer.html", "class_circular_buffer" ],
     [ "Duck", "class_duck.html", "class_duck" ],
     [ "DuckLed", "class_duck_led.html", "class_duck_led" ],
     [ "DuckNet", "class_duck_net.html", "class_duck_net" ],

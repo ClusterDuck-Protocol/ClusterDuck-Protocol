@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['updatefirmware_0',['updateFirmware',['../class_duck.html#a75deecd06db3aaccf4c930ca3bcb43f3',1,'Duck']]],
-  ['updatemuid_1',['updateMuid',['../class_circular_buffer.html#a918a8cf81b3387df992379d23080680b',1,'CircularBuffer']]]
+  ['_7ebloomfilter_353',['~BloomFilter',['../class_bloom_filter.html#a27358192f6e0d7aba2b24be36c5d3580',1,'BloomFilter']]],
+  ['_7educk_354',['~Duck',['../class_duck.html#a702222da0aa85e48b6ef945e9c53e68d',1,'Duck']]],
+  ['_7educkpacket_355',['~DuckPacket',['../class_duck_packet.html#a1a656a9aeb29eda2d42e962fd2d33b6c',1,'DuckPacket']]]
 ];

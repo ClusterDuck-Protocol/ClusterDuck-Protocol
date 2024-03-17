@@ -27,17 +27,7 @@ var menudata={children:[
 {text:"Namespaces",url:"namespaces.html",children:[
 {text:"Namespace List",url:"namespaces.html"},
 {text:"Namespace Members",url:"namespacemembers.html",children:[
-{text:"All",url:"namespacemembers.html",children:[
-{text:"c",url:"namespacemembers.html#index_c"},
-{text:"d",url:"namespacemembers.html#index_d"},
-{text:"e",url:"namespacemembers.html#index_e"},
-{text:"f",url:"namespacemembers.html#index_f"},
-{text:"g",url:"namespacemembers.html#index_g"},
-{text:"i",url:"namespacemembers.html#index_i"},
-{text:"l",url:"namespacemembers.html#index_l"},
-{text:"r",url:"namespacemembers.html#index_r"},
-{text:"s",url:"namespacemembers.html#index_s"},
-{text:"t",url:"namespacemembers.html#index_t"}]},
+{text:"All",url:"namespacemembers.html"},
 {text:"Functions",url:"namespacemembers_func.html"},
 {text:"Variables",url:"namespacemembers_vars.html"}]}]},
 {text:"Classes",url:"annotated.html",children:[
@@ -45,7 +35,6 @@ var menudata={children:[
 {text:"Class Index",url:"classes.html"},
 {text:"Class Members",url:"functions.html",children:[
 {text:"All",url:"functions.html",children:[
-{text:"a",url:"functions.html#index_a"},
 {text:"b",url:"functions.html#index_b"},
 {text:"c",url:"functions.html#index_c"},
 {text:"d",url:"functions.html#index_d"},
@@ -64,12 +53,9 @@ var menudata={children:[
 {text:"u",url:"functions.html#index_u"},
 {text:"~",url:"functions.html#index__7E"}]},
 {text:"Functions",url:"functions_func.html",children:[
-{text:"a",url:"functions_func.html#index_a"},
 {text:"b",url:"functions_func.html#index_b"},
-{text:"c",url:"functions_func.html#index_c"},
 {text:"d",url:"functions_func.html#index_d"},
 {text:"e",url:"functions_func.html#index_e"},
-{text:"f",url:"functions_func.html#index_f"},
 {text:"g",url:"functions_func.html#index_g"},
 {text:"h",url:"functions_func.html#index_h"},
 {text:"i",url:"functions_func.html#index_i"},
@@ -81,7 +67,7 @@ var menudata={children:[
 {text:"u",url:"functions_func.html#index_u"},
 {text:"~",url:"functions_func.html#index__7E"}]},
 {text:"Variables",url:"functions_vars.html"},
-{text:"Related Symbols",url:"functions_rela.html"}]}]},
+{text:"Related Functions",url:"functions_rela.html"}]}]},
 {text:"Files",url:"files.html",children:[
 {text:"File List",url:"files.html"},
 {text:"File Members",url:"globals.html",children:[

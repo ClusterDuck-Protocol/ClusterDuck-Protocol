@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['ackmessage_0',['ackMessage',['../class_circular_buffer.html#a80934f9ca507572da786399a99f623bc',1,'CircularBuffer']]],
-  ['addtochatbuffer_1',['addToChatBuffer',['../class_duck_net.html#a80ef482317d896718a931e2c85adf8c9',1,'DuckNet']]],
-  ['addtomessageboardbuffer_2',['addToMessageBoardBuffer',['../class_duck_net.html#a1dcaf326d47b3ae670f16dc05ef1be76',1,'DuckNet']]],
-  ['addtoprivatechatbuffer_3',['addToPrivateChatBuffer',['../class_duck_net.html#a48e9fd6b6018697c9c2d1ab5760ab8ad',1,'DuckNet']]]
+  ['bloom_5fadd_260',['bloom_add',['../class_bloom_filter.html#a9324ec548ffba472c579dc4a0655c4f4',1,'BloomFilter']]],
+  ['bloom_5fcheck_261',['bloom_check',['../class_bloom_filter.html#ae976246f2899c2b10166a25e026c91c5',1,'BloomFilter']]],
+  ['bloomfilter_262',['BloomFilter',['../class_bloom_filter.html#a64e9f133cd9bb65d55a5e31f701bbca0',1,'BloomFilter::BloomFilter()'],['../class_bloom_filter.html#aba4255db5abc946c5d89826e026cc4b8',1,'BloomFilter::BloomFilter(int numSectors, int numHashes, int bitsPerSector, int maxMsgs)']]],
+  ['buildcdppacket_263',['buildCdpPacket',['../class_duck.html#a414ba3fbf13759049154076b934d18e8',1,'Duck']]]
 ];
