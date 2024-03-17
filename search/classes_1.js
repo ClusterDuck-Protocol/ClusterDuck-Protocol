@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['loraconfigparams_159',['LoraConfigParams',['../struct_lora_config_params.html',1,'']]]
+  ['circularbuffer_0',['CircularBuffer',['../class_circular_buffer.html',1,'']]]
 ];
