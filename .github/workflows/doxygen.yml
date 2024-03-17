@@ -6,7 +6,8 @@ on:
   push:
     branches: 
       - master
-  
+      - 387-doxygen-pipeline-still-failing
+      
   workflow_dispatch:
 
 permissions:
