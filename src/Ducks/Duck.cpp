@@ -34,36 +34,22 @@ Duck::~Duck() {
   delete duckNet;
 }
 
-void Duck::setEncrypt(bool state) {
-  duckcrypto::setEncrypt(state);
-}
 
-bool Duck::getEncrypt() {
-  return duckcrypto::getState();
-}
-
-bool Duck::getDecrypt() {
-  return duckcrypto::getDecrypt();
-}
-
-void Duck::setDecrypt(bool state) {
-  duckcrypto::setDecrypt(state);
-}
 
 void Duck::setAESKey(uint8_t newKEY[32]) {
-  duckcrypto::setAESKey(newKEY);
+  DuckCrypto::getInstance()->setAESKey(newKEY);
 }
 
 void Duck::setAESIv(uint8_t newIV[16]) {
-  duckcrypto::setAESIV(newIV);
+  DuckCrypto::getInstance()->setAESIV(newIV);
 }
 
 void Duck::encrypt(uint8_t* text, uint8_t* encryptedData, size_t inc) {
-  duckcrypto::encryptData(text, encryptedData, inc);
+  DuckCrypto::getInstance()->encryptData(text, encryptedData, inc);
 }
 
 void Duck::decrypt(uint8_t* encryptedData, uint8_t* text, size_t inc) {
-  duckcrypto::decryptData(encryptedData, text, inc);
+  DuckCrypto::getInstance()->decryptData(encryptedData, text, inc);
 }
 
 void Duck::logIfLowMemory() {

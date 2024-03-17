@@ -4,73 +4,74 @@
 #include "Crypto.h"
 #include "../../Crypto/src/AES.h" // some builds can't find this file so we need explicit path
 #include "CTR.h"
+#include "DuckLogger.h"
 
-namespace duckcrypto {
+// Singleton instance
+DuckCrypto* DuckCrypto::instance = nullptr;
 
-   // Initializing the cipher (CTR with AES256)
-   CTR<AES256> ctraes256;
+// Private constructor
+DuckCrypto::DuckCrypto() {}
 
-   void setEncrypt(bool state) {
-      encryptOn = state;
-   }
+// Get the singleton instance
+DuckCrypto* DuckCrypto::getInstance() {
+    if (!instance) {
+        instance = new DuckCrypto();
+    }
+    return instance;
+}
 
-   bool getState() { return encryptOn; }
+// Initialize the crypto with default key and IV
+void DuckCrypto::init(const uint8_t defaultKey[KEY_SIZE], const uint8_t defaultIV[IV_SIZE]) {
+    setAESKey(defaultKey);
+    setAESIV(defaultIV);
+}
 
-   void setDecrypt(bool state) {
-      decryptOn = state;
-   }
+// Set the encryption key
+void DuckCrypto::setAESKey(const uint8_t newKEY[KEY_SIZE]) {
+    for(int i = 0; i < KEY_SIZE; i++) {
+        KEY[i] = newKEY[i];
+    }
+}
 
-   bool getDecrypt() { return decryptOn; }
+// Set the encryption IV
+void DuckCrypto::setAESIV(const uint8_t newIV[IV_SIZE]) {
+    for(int i = 0; i < IV_SIZE; i++) {
+        IV[i] = newIV[i];
+    }
+}
 
+// Encrypt data
+void DuckCrypto::encryptData(const uint8_t* text, uint8_t* encryptedData, size_t inc) {
+    CTR<AES256> ctraes256;
+    ctraes256.clear();
+    ctraes256.setKey(KEY, KEY_SIZE);
+    ctraes256.setIV(IV, IV_SIZE);
+    ctraes256.setCounterSize(4);
 
-   void encryptData(uint8_t* text, uint8_t* encryptedData, size_t inc)
-   {
-      
-      size_t posn, len;
-      long t1 = millis();
+    size_t posn, len;
+    long t1 = millis();
 
-      ctraes256.clear();
-      ctraes256.setKey(KEY, 32);
-      ctraes256.setIV(IV, 16);
-      ctraes256.setCounterSize(4);
+    for (posn = 0; posn < inc; posn += inc) {
+        len = inc - posn;
+        if (len > inc) len = inc;
+        ctraes256.encrypt(encryptedData + posn, text + posn, len);
+    }
+    loginfo("Encrypt done in : %ld ms\n",(millis() - t1));
+}
 
-      for (posn = 0; posn < inc; posn += inc) {
-         len = inc - posn;
-         if (len > inc) len = inc;
-         ctraes256.encrypt(encryptedData + posn, text + posn, len);
-      }
-      loginfo("Encrypt done in : %ld ms\n",(millis() - t1));
-   }
+// Decrypt data
+void DuckCrypto::decryptData(const uint8_t* encryptedData, uint8_t* text, size_t inc) {
+    CTR<AES256> ctraes256;
+    ctraes256.clear();
+    ctraes256.setKey(KEY, KEY_SIZE);
+    ctraes256.setIV(IV, IV_SIZE);
+    ctraes256.setCounterSize(4);
 
-   void decryptData(uint8_t* encryptedData, uint8_t* text, size_t inc) {
+    size_t posn, len;
 
-      size_t posn, len;
-
-      ctraes256.clear();
-      ctraes256.setKey(KEY, 32);
-      ctraes256.setIV(IV, 16);
-      ctraes256.setCounterSize(4);
-
-      for (posn = 0; posn < inc; posn += inc) {
-         len = inc - posn;
-         if (len > inc) len = inc;
-         ctraes256.encrypt(text + posn, encryptedData + posn, len);
-      }
-   }
-
-   void setAESKey(uint8_t newKEY[32]) {
-      
-      for(int i = 0; i < 32; i++) {
-         KEY[i] = newKEY[i];
-      }
-
-   }
-
-   void setAESIV(uint8_t newIV[16]) {
-      
-      for(int i = 0; i < 16; i++) {
-         IV[i] = newIV[i];
-      }
-      
-   }
+    for (posn = 0; posn < inc; posn += inc) {
+        len = inc - posn;
+        if (len > inc) len = inc;
+        ctraes256.encrypt(text + posn, encryptedData + posn, len);
+    }
 }

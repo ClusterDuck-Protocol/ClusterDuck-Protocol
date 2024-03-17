@@ -70,9 +70,13 @@ def main():
             exit(1)
         
         # Map command from cdp to platformio
-        pio_command = 'run' if args.command == 'build' or 'clean' else 'test'
+        if args.command == 'test':
+            pio_command = 'test'
+        else:
+            pio_command = 'run'
         
-        run_command(pio_command, args.target, 
+        run_command(pio_command, 
+                    args.target, 
                     getattr(args, 'deploy', False), 
                     getattr(args, 'suite', None),
                     getattr(args, 'clean', (args.command == 'clean')))

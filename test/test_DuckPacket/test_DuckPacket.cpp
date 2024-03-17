@@ -1,8 +1,17 @@
 #include <unity.h>
+#include <DuckCrypto.h>
 #include <DuckPacket.h>
 #include <bloomfilter.h>
 
 // Testing public methods only 
+
+const uint8_t key[DuckCrypto::KEY_SIZE] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 
+                                         0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 
+                                         0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 
+                                         0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F};
+
+const uint8_t iv[DuckCrypto::IV_SIZE] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+                                       0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F};
 
 void test_DuckPacket_constructor_default(void) {
     DuckPacket dp;
@@ -162,6 +171,10 @@ void test_prepareForRelaying_returns_false(void) {
 
 
 void test_DuckPacket_getBuffer(void) {
+
+    DuckCrypto* dc = DuckCrypto::getInstance();
+    dc->init(key, iv);
+
     std::vector<byte> duid = {
         0x50, 0x61, 0x70, 0x61,
         0x44, 0x75, 0x63, 0x6B
@@ -173,19 +186,30 @@ void test_DuckPacket_getBuffer(void) {
     };
     byte duckType = DuckType::LINK;
     byte topic = topics::status;
-    std::vector<byte> app_data = {
-        0x01, 0x02, 0x03, 0x04,
-        0x05, 0x06, 0x07, 0x08
-    };
+
+    uint8_t clearData[32] = "This is a test string";
+    uint8_t encryptedData[32] = {0x0E,0x06,0x6D,0x24,0x28,0x92,0x02,0xB6,
+                                       0x91,0x0E,0x21,0x58,0x71,0xB7,0x86,0xE1,
+                                       0x14,0x81,0x79,0xBB,0xA4,0x85,0x58,0x5D,
+                                       0x55,0x16,0xFB,0x51,0x72,0xE5,0x20,0xCF};
+
+    // convert the test string to a vector
+    std::vector<byte> app_data;
+    for (int i = 0; i < 32; i++) {
+        app_data.push_back(clearData[i]);
+    }
     BloomFilter filter;
     int rc = dp.prepareForSending(&filter, targetDevice, duckType, topic, app_data);
     TEST_ASSERT_EQUAL(DUCK_ERR_NONE, rc);
 
+    // get the encrypted buffer that was prepared for sending
     std::vector<byte> buffer = dp.getBuffer();
+    // check that the buffer contains the expected values
+
     TEST_ASSERT_EQUAL(topic, buffer[TOPIC_POS]);
     TEST_ASSERT_EQUAL(duckType, buffer[DUCK_TYPE_POS]);
-    TEST_ASSERT_EQUAL(app_data[0], buffer[DATA_POS]);
-    TEST_ASSERT_EQUAL(app_data[7], buffer[DATA_POS + 7]);
+    TEST_ASSERT_EQUAL(encryptedData[0], buffer[DATA_POS]);
+    TEST_ASSERT_EQUAL(encryptedData[7], buffer[DATA_POS + 7]);
     TEST_ASSERT_EQUAL(0x00, buffer[HOP_COUNT_POS]);
 }
 

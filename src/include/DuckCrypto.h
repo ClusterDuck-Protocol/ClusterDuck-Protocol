@@ -1,107 +1,65 @@
-/**
- * @file DuckCrypto.h
- * @brief This file is internal to CDP and provides the library access to
- * encryption functions. Currently only supports AES-256
- *
- * @version
- * @date 2021-02-10
- *
- * @copyright
- */
+#ifndef DUCK_CRYPTO_H
+#define DUCK_CRYPTO_H
+
+#include <Arduino.h>
 
 
-#include "../DuckLogger.h"
+class DuckCrypto {
+public:
+    static const uint8_t KEY_SIZE = 32;
+    static const uint8_t IV_SIZE = 16;
 
-namespace duckcrypto {
-
-
-   namespace {
-      /**
-       * @brief Enable or disable encryption flag.
-       *
-       */
-      bool encryptOn = false;
-
-      /**
-       * @brief Enable or disable decryption flag.
-       *
-       */
-      bool decryptOn = false;
-
-      /**
-       * @brief Default encryption key, can be set in application layer using `void setAESKey(uint8_t newKEY[32])`.
-       *
-       */
-      uint8_t KEY[32] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-                        0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
-                        0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-                        0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F};
-
-      /**
-       * @brief Default encryption IV, can be set in application layer using `void setAESIV(uint8_t newIV[16])`.
-       *
-       */
-      uint8_t IV[16] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-                        0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
-   }
-
-   /**
-    * @brief Setter for encryption flag.
-    * 
-    * @param state sets `encryptOn` flag. 
+    /*
+     * @brief Get the singleton instance
+     * @return DuckCrypto* The singleton instance
     */
-   void setEncrypt(bool state);
+    static DuckCrypto* getInstance();
 
-   /**
-    * @brief Getter for encryption flag.
-    * 
+    /* 
+     * @brief Initialize the crypto with default key and IV
+     * @param defaultKey The default encryption key
+     * @param defaultIV The default encryption IV 
     */
-   bool getState();
+    void init(const uint8_t defaultKey[KEY_SIZE], const uint8_t defaultIV[IV_SIZE]);
 
-   /**
-    * @brief Setter for decryption flag.
-    * 
-    * @param state sets `decryptOn` flag. 
+    /* 
+     * @brief Set the encryption key
+     * @param newKEY The new encryption key 
     */
-   void setDecrypt(bool state);
+    void setAESKey(const uint8_t newKEY[KEY_SIZE]);
 
-   /**
-    * @brief Getter for decryption flag.
-    * 
+    /*
+     * @brief Set the encryption IV
+     * @param newIV The new encryption IV 
     */
-   bool getDecrypt();
+    void setAESIV(const uint8_t newIV[IV_SIZE]);
 
-   /**
-    * @brief Encrypt data function.
-    * 
-    * @param text pointer for data to be encrypted. 
-    * @param encryptedData pointer for where encrypted data should be stored.
-    * @param inc .
-    */
-   void encryptData(uint8_t* text, uint8_t* encryptedData, size_t inc);
+   /* 
+    * @brief Encrypt data
+    * @param text The data to encrypt
+    * @param encryptedData The encrypted data
+    * @param inc The size of the data
+   */
+    void encryptData(const uint8_t* text, uint8_t* encryptedData, size_t inc);
 
-   /**
-    * @brief Encrypt data function.
-    * 
-    * @param encryptedData pointer for data to be decrypted. 
-    * @param text pointer for where decrypted data should be stored.
-    * @param inc .
-    */
-   void decryptData(uint8_t* encryptedData, uint8_t* text, size_t inc);
+   /* 
+    * @brief Decrypt data
+    * @param encryptedData The encrypted data
+    * @param text The decrypted data
+    * @param inc The size of the data
+   */
+    void decryptData(const uint8_t* encryptedData, uint8_t* text, size_t inc);
 
-   /**
-    * @brief Setter encryption key.
-    * 
-    * @param newKEY sets key to be used for encryption. 
-    */
-   void setAESKey(uint8_t newKEY[32]);
+private:
+    // Singleton instance
+    static DuckCrypto* instance;
 
-   /**
-    * @brief Setter encryption IV.
-    * 
-    * @param newIV sets IV to be used for encryption. 
-    */
-   void setAESIV(uint8_t newIV[16]);
-   
+    // Encryption key and IV
+    uint8_t KEY[KEY_SIZE];
+    uint8_t IV[IV_SIZE];
 
+    // Private constructor to prevent instantiation
+    DuckCrypto();
 };
+
+#endif // DUCK_CRYPTO_H

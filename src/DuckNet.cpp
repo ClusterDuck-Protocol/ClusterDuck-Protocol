@@ -130,21 +130,6 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
     
   });
 
-  webServer.on("/flipDetector", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    //Run flip method
-    duckutils::flipDetectState();
-    request->send(200, "text/plain", "Success");
-  });
-
-  webServer.on("/flipDecrypt", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    //Flip Decrypt State
-    loginfo_ln("Flipping Decrypt");
-
-    duck->setDecrypt(!duck->getDecrypt());
-    loginfo_ln("Decrypt is now: %d", duck->getDecrypt());
-    request->send(200, "text/plain", "Success");
-  });
-
   webServer.on("/setChannel", HTTP_POST, [&](AsyncWebServerRequest* request) {
     AsyncWebParameter* p = request->getParam(0);
     logdbg_ln("%s : %d", p->name(), p->value());

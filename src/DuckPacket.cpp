@@ -66,14 +66,9 @@ int DuckPacket::prepareForSending(BloomFilter *filter,
 
   byte crc_bytes[DATA_CRC_LENGTH];
   uint32_t value;
-  // TODO: update the CRC32 library to return crc as a byte array
-  if(duckcrypto::getState()) {
-    encryptedData.resize(app_data.size());
-    duckcrypto::encryptData(app_data.data(), encryptedData.data(), app_data.size());
-    value = CRC32::calculate(encryptedData.data(), encryptedData.size());
-  } else {
-    value = CRC32::calculate(app_data.data(), app_data.size());
-  }
+  encryptedData.resize(app_data.size());
+  DuckCrypto::getInstance()->encryptData(app_data.data(), encryptedData.data(), app_data.size());
+  value = CRC32::calculate(encryptedData.data(), encryptedData.size());
   
   crc_bytes[0] = (value >> 24) & 0xFF;
   crc_bytes[1] = (value >> 16) & 0xFF;
@@ -110,16 +105,8 @@ int DuckPacket::prepareForSending(BloomFilter *filter,
   logdbg_ln("Data CRC:  %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
 
   // ----- insert data -----
-  if(duckcrypto::getState()) {
-
-    buffer.insert(buffer.end(), encryptedData.begin(), encryptedData.end());
-    logdbg_ln("Encrypted Data:      %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
-
-  } else {
-    buffer.insert(buffer.end(), app_data.begin(), app_data.end());
-    logdbg_ln("Data:      %s",duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
-  }
-  
+  buffer.insert(buffer.end(), encryptedData.begin(), encryptedData.end());
+  logdbg_ln("Encrypted Data:      %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
   logdbg_ln("Built packet: %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
   return DUCK_ERR_NONE;
 }
