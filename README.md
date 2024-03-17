@@ -1,6 +1,17 @@
-![Logo](docs/assets/images/CDP_LOGO_small.png)
+<p align="center">
+  <img src="docs/assets/images/cdp_logo_white_bkg.png" alt="Logo">
+</p>
 
-[![License](https://img.shields.io/badge/License-Apache2-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![Discord](https://img.shields.io/badge/Join-Discord-blue)](https://discord.com/invite/Cbgbzq353z) [![Wiki](https://img.shields.io/badge/Read-Wiki-blue)](https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki) [![Build Status](https://travis-ci.com/Call-for-Code/ClusterDuck-Protocol.svg?branch=master)](https://app.travis-ci.com/github/Call-for-Code/ClusterDuck-Protocol)
+<p align="center">
+  <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/License-Apache2-FFA500.svg" alt="License"></a>
+  <a href="https://discord.com/invite/Cbgbzq353z"><img src="https://img.shields.io/badge/Join-Discord-aa80ff" alt="Discord"></a>
+  <a href="https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki"><img src="https://img.shields.io/badge/Read-Wiki-50dda0" alt="Wiki"></a>
+  <a href="https://clusterduck-protocol.github.io/ClusterDuck-Protocol/html/index.html"><img src="https://img.shields.io/badge/API-Doc-50dda0" alt="Wiki"></a>
+  <img src="https://img.shields.io/github/v/release/ClusterDuck-Protocol/ClusterDuck-Protocol?label=Release&color=10ccff" alt="GitHub Release">
+  <img src="https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol/actions/workflows/arduino_ci.yml/badge.svg" alt="Build Status">
+</p>
+
+
 
 ## What is the CDP?
 
@@ -74,7 +85,7 @@ For example below is the configuration for tests on the Heltec LoRa v3 Arduino b
 
   ```
   Processing test_DuckUtils in test_heltec_wifi_lora_32_V3 environment
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------
 Building & Uploading...
 Testing...
 If you don't see any output for the first 10 secs, please reset board (press reset button)
@@ -95,7 +106,7 @@ test/test_DuckUtils/test_DuckUtils.cpp:193: test_DuckUtils_toUint32             
 test/test_DuckUtils/test_DuckUtils.cpp:194: test_DuckUtils_saveWifiCredentials                  [PASSED]
 test/test_DuckUtils/test_DuckUtils.cpp:195: test_DuckUtils_saveWifiCredentials_zero_length      [PASSED]
 test/test_DuckUtils/test_DuckUtils.cpp:196: test_DuckUtils_loadWifiSsid                         [PASSED]
-------------------------------------------------------------- test_heltec_wifi_lora_32_V3:test_DuckUtils [PASSED] Took 23.34 seconds -------------------------------------------------------------
+-- test_heltec_wifi_lora_32_V3:test_DuckUtils [PASSED] Took 23.34 seconds -------------------------------------------------------------
 ```
 
 ## How to Contribute
@@ -115,12 +126,6 @@ This project is governed by its [Technical Charter](ClusterDuck-Protocol-Technic
 ## License
 
 This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE) file for details.
-
-## Version
-
-v4.0.0
-
-See `library.json` (PlatformIO) or `library.properties` (Arduino).
 
 [OWL Integrations]: <https://www.owlintegrations.com/>
 [ClusterDuck Protocol]: <https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol/wiki>

@@ -10,14 +10,11 @@ const char home_page[] PROGMEM = R"=====(
 <body>
 <div class="main-box">
     <h1>CLUSTERDUCK PROTOCOL</h1>
-    <p>Open one of the menus to send a message or read from the Public or a Private chat.</p>
+    <p>Open one of the menus to send a message or toggle options.</p>
     <br>
 
     <a id="message-button" href="/main">Send A Message &#x1F4E9</a>
     <a href="/controlpanel">Control Panel &#x2699</a>
-    <a href="/message-board">View The Message Board &#x1F4CB</a>
-    <a href="/join-chat">Open Global Chat &#x1F310 &#x1F4AC </a>
-    <a href="/new-private-chat">Start a Private Chat &#x1F512 &#x1F4AC</a>
 </div>
 </body>
 </html>
