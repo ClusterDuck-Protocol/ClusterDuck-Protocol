@@ -4,7 +4,9 @@ name: Documentation
 # events but only for the master branch
 on:
   push:
-    branches: [ master ]
+    branches: 
+      - master
+      - 387-doxygen-pipeline-still-failing
 
 permissions:
   contents: read
