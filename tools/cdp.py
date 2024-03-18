@@ -41,7 +41,7 @@ def run_command(command, target, deploy = False, suite = None, clean = False):
         if clean and command == 'run':
             cmd += ['-t', 'clean']
 
-    print(f"Executing: {' '.join(cmd)}")
+    print(f"\033[1;93m cdp_cli: executing {' '.join(cmd)}\033[0m")
     subprocess.run(cmd)
 
 def main():
