@@ -1,6 +1,8 @@
 # Quick Start Guide for Building CDP Library and Examples
 
-## Prerequisites
+Instructions provided bellow are for Linux and MacOS X
+
+## Prerequisites 
 **Python 3:** Ensure Python 3 is installed on your system.
 
 **PlatformIO CLI:** This tool requires the PlatformIO Command Line Interface. Please install it from PlatformIO's [CLI installation guide](https://docs.platformio.org/en/latest/core/installation/methods/installer-script.html).
@@ -58,7 +60,7 @@ Available target environments:
 
 ### Build the CDP library for a specific target
 ```bash
-./cdp.py build --target <target_env>
+./tools/cdp.py build --target <target_env>
 ```
 
 ```
@@ -75,7 +77,7 @@ heltec_wifi_lora_32_V3  SUCCESS   00:00:32.583
 
 ### Deploy the CDP library for a specific target
 ```bash
-./cdp.py build --target <target_env> --deploy
+./tools/cdp.py build --target <target_env> --deploy
 ```
 ```
 ./tools/cdp.py build -t heltec_wifi_lora_32_V3 --deploy
