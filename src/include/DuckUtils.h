@@ -117,9 +117,7 @@ Timer<> getTimer();
 
 
 bool getDetectState();
-bool getAckingState();
 bool flipDetectState();
-bool flipAckingState();
 
 /**
  * @brief Save / Write Wifi credentials to EEPROM

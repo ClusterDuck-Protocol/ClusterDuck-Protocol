@@ -21,8 +21,8 @@
 
 // version definitions
 #define CDP_VERSION_MAJOR  4
-#define CDP_VERSION_MINOR  0
-#define CDP_VERSION_PATCH  1
+#define CDP_VERSION_MINOR  1
+#define CDP_VERSION_PATCH  0
 
 #define CDP_VERSION ((((CDP_VERSION_MAJOR) << 16) | ((CDP_VERSION_MINOR) << 8) | (CDP_VERSION_PATCH)))
 
