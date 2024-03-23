@@ -54,21 +54,14 @@ typedef struct {
  *
  */
 class DuckRadio {
-  friend class Duck;
-  friend class DuckDetect;
-  friend class DuckLink;
-  friend class MamaDuck;
-  friend class PapaDuck;
-
-private:
-  // Everything is private to force Duck (and Duck descendants) to be the only
-  // way to interact with the radio. There should only be one Duck per sketch
-  // so that arbitrary pieces of code cannot interfere with the radio. Also,
-  // Duck does things like recording the outgoing MUIDs so that it can wait for
-  // acknowledgments to those MUIDs.
-
-  DuckRadio();
-
+ 
+public:
+  
+  static DuckRadio& getInstance() {
+    static DuckRadio instance; 
+    return instance;
+  }
+ 
   /**
    * @brief Initialize the LoRa chip.
    * 
@@ -81,8 +74,9 @@ private:
    * @brief Set sync word used to communicate between radios. 0x12 for private and 0x34 for public channels.
    * 
    * @param syncWord set byte syncWord
+   * @returns DUCK_ERR_NONE if the sync word was set successfully, an error code otherwise.
    */
-  void setSyncWord(byte syncWord);
+  int setSyncWord(byte syncWord);
 
   /**
    * @brief Send packet data out into the LoRa mesh network
@@ -129,8 +123,9 @@ private:
    * @brief change the duck channel.
    * 
    * @param channelNum set the channel number 1-6.
+   * @returns DUCK_ERR_NONE if the channel was set successfully, an error code otherwise.
    */
-  void setChannel(int channelNum);
+  int setChannel(int channelNum);
 
   /**
    * @brief Get the current RSSI value.
@@ -171,36 +166,50 @@ private:
   int readReceivedData(std::vector<byte>* packetBytes);
 
   /**
-   * @brief Process IRQ interrupts for the LoRa Radio.
+   * @brief Get the DuckRadio channel.
    * 
+   * @return int channel number.
    */
-  void processRadioIrq();
-
   int getChannel() { return channel; }
 
-private:
-  static volatile uint16_t interruptFlags;
+  /**
+   * @brief Service the RadioLib SX127x and SX126x interrupt flags.
+   * 
+   */
   void serviceInterruptFlags();
+
+  /*
+   * @brief Interrupt service routine for the LoRa module.
+   *
+  */
   static void onInterrupt();
 
-  static volatile bool receivedFlag;
-  static void setReceiveFlag(bool value) { receivedFlag = value; }
-  static bool getReceiveFlag() { return receivedFlag; }
-  
   /**
-   * Set the Duck to be ready to recieve LoRa packets.
-   *
-   * params:  clearReceiveFlag if true, the receive flag will be cleared
-   * returns: DUCK_ERR_NONE if the call was successful, an error code otherwise.
-  */
-  int goToReceiveMode(bool clearReceiveFlag);
+   * @brief Get the data receive flag.
+   * 
+   * @return true if the flag is set, false otherwise.
+   */
+  static bool getReceiveFlag() { return receivedFlag; }
+ 
 
+private:
+
+  static DuckRadio* instance;
+  int channel;  
+  static volatile uint16_t interruptFlags;
+  static volatile bool receivedFlag;
+  volatile bool isSetup = false;
+
+  static void setReceiveFlag(bool value) { receivedFlag = value; }
+
+  
+  int goToReceiveMode(bool clear);
+  int checkLoRaParameters(LoraConfigParams config);
+
+  DuckRadio() {};
   DuckRadio(DuckRadio const&) = delete;
   DuckRadio& operator=(DuckRadio const&) = delete;
-
-  DuckDisplay* display = DuckDisplay::getInstance();
-  int err;
-  int channel;  
+  
 };
 
 #endif

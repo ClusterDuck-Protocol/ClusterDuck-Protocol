@@ -17,8 +17,9 @@
 const int MEMORY_LOW_THRESHOLD = PACKET_LENGTH + sizeof(CdpPacket);
 
 Duck::Duck(std::string name):
-  duckNet(new DuckNet(this)),
-  filter() // initialized filter with default values
+  
+  filter(), // initialized filter with default values
+  duckNet(new DuckNet(&filter))
 {
   duckName = name;
 }

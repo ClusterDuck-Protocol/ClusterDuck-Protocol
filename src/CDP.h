@@ -18,7 +18,7 @@
 #include "CdpPacket.h"
 #include "DuckError.h"
 #include "DuckLogger.h"
-
+#include "include/DuckNet.h"
 #define CDP_STRINGIFY(x) #x
 #define CDP_VALUE(x) CDP_STRINGIFY(x)
 
