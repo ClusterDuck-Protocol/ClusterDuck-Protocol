@@ -41,7 +41,7 @@ def run_command(command, target, deploy = False, suite = None, clean = False):
         if clean and command == 'run':
             cmd += ['-t', 'clean']
 
-    print(f"Executing: {' '.join(cmd)}")
+    print(f"\033[1;93m cdp_cli: executing {' '.join(cmd)}\033[0m")
     subprocess.run(cmd)
 
 def main():
@@ -70,8 +70,15 @@ def main():
             exit(1)
         
         # Map command from cdp to platformio
-        pio_command = 'run' if args.command == 'build' or 'clean' else 'test'
-        
+
+        # pio_command = 'run' if args.command == 'build' or 'clean' else 'test'
+        if args.command == 'build' or args.command == 'clean':
+            pio_command = 'run'
+        elif args.command == 'test':
+            pio_command = 'test'
+        else:
+            pio_command = args.command
+
         run_command(pio_command, args.target, 
                     getattr(args, 'deploy', False), 
                     getattr(args, 'suite', None),
