@@ -9,7 +9,7 @@ DuckLink duck;
 
 void setup()
 {
-    std::string deviceId("PAPER001");
+    std::string deviceId("LINK0001");
     std::vector<byte> devId;
     int rc;
     devId.insert(devId.end(), deviceId.begin(), deviceId.end());
@@ -22,5 +22,3 @@ void loop()
 {
 
 }
-
-
