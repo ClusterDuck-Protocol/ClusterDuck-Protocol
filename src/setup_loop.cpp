@@ -2,7 +2,6 @@
 * To make the project compatible with PlatformIO, 
 * we need to immplement the arduino setup and loop functions
 */
-/*
 #if defined(ARDUINO) && defined(PLATFORMIO)
 
 #ifndef UNIT_TEST
@@ -17,4 +16,3 @@ void loop() {
 #endif
 
 #endif
- */
