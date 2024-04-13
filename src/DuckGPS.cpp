@@ -165,7 +165,7 @@ if (ack == 3 && b == 0x00) { // UBX-ACK-NAK message
 #ifdef GPS_DEBUG
 LOG_DEBUG("\n");
 #endif
-logwarn_f("Got NAK for class %02X message %02X\n", class_id, msg_id);
+logwarn("Got NAK for class %02X message %02X\n", class_id, msg_id);
 return GNSS_RESPONSE_NAK; // NAK received
 }
 ack = 0; // Reset the acknowledgement counter

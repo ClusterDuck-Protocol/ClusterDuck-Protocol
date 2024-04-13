@@ -17,7 +17,7 @@
 
 // LoRa configuration
 #define CDPCFG_PIN_LORA_CS      18
-#define CDPCFG_PIN_LORA_RST     23 
+#define CDPCFG_PIN_LORA_RST     23
 #define CDPCFG_PIN_LORA_DIO0    26
 #define CDPCFG_PIN_LORA_DIO1    33
 #define CDPCFG_PIN_LORA_BUSY    32

@@ -13,7 +13,7 @@
 class DuckGPS {
 public:
 #if defined(CDPCFG_GPS_RX) && defined(CDPCFG_GPS_TX)
-    DuckGPS() : GPSSerial(1) {
+    DuckGPS() : GPSSerial(1){
         GPSSerial.begin(9600, SERIAL_8N1, CDPCFG_GPS_RX, CDPCFG_GPS_TX);
     };
 #endif
@@ -60,13 +60,13 @@ public:
             msglen = makeUBXPacket(0x06, 0x39, sizeof(_message_JAM), _message_JAM);
             GPSSerial.write(UBXscratch, msglen);
             if (getACK(0x06, 0x39, 300) != GNSS_RESPONSE_OK) {
-                logwarn_f("Unable to enable interference resistance.\n");
+                logwarn("Unable to enable interference resistance.\n");
             }
 
             msglen = makeUBXPacket(0x06, 0x23, sizeof(_message_NAVX5), _message_NAVX5);
             GPSSerial.write(UBXscratch, msglen);
             if (getACK(0x06, 0x23, 300) != GNSS_RESPONSE_OK) {
-                logwarn_f("Unable to configure extra settings.\n");
+                logwarn("Unable to configure extra settings.\n");
             }
 
             // ublox-M10S can be compatible with UBLOX traditional protocol, so the following sentence settings are also valid
@@ -74,43 +74,43 @@ public:
             msglen = makeUBXPacket(0x06, 0x08, sizeof(_message_1HZ), _message_1HZ);
             GPSSerial.write(UBXscratch, msglen);
             if (getACK(0x06, 0x08, 300) != GNSS_RESPONSE_OK) {
-                logwarn_f("Unable to set GPS update rate.\n");
+                logwarn("Unable to set GPS update rate.\n");
             }
 //
             msglen = makeUBXPacket(0x06, 0x01, sizeof(_message_GGL), _message_GGL);
             GPSSerial.write(UBXscratch, msglen);
             if (getACK(0x06, 0x01, 300) != GNSS_RESPONSE_OK) {
-                logwarn_f("Unable to disable NMEA GGL.\n");
+                logwarn("Unable to disable NMEA GGL.\n");
             }
 
             msglen = makeUBXPacket(0x06, 0x01, sizeof(_message_GSA), _message_GSA);
             GPSSerial.write(UBXscratch, msglen);
             if (getACK(0x06, 0x01, 300) != GNSS_RESPONSE_OK) {
-                logwarn_f("Unable to Enable NMEA GSA.\n");
+                logwarn("Unable to Enable NMEA GSA.\n");
             }
 
             msglen = makeUBXPacket(0x06, 0x01, sizeof(_message_GSV), _message_GSV);
             GPSSerial.write(UBXscratch, msglen);
             if (getACK(0x06, 0x01, 300) != GNSS_RESPONSE_OK) {
-                logwarn_f("Unable to disable NMEA GSV.\n");
+                logwarn("Unable to disable NMEA GSV.\n");
             }
 
             msglen = makeUBXPacket(0x06, 0x01, sizeof(_message_VTG), _message_VTG);
             GPSSerial.write(UBXscratch, msglen);
             if (getACK(0x06, 0x01, 300) != GNSS_RESPONSE_OK) {
-                logwarn_f("Unable to disable NMEA VTG.\n");
+                logwarn("Unable to disable NMEA VTG.\n");
             }
 
             msglen = makeUBXPacket(0x06, 0x01, sizeof(_message_RMC), _message_RMC);
             GPSSerial.write(UBXscratch, msglen);
             if (getACK(0x06, 0x01, 300) != GNSS_RESPONSE_OK) {
-                logwarn_f("Unable to enable NMEA RMC.\n");
+                logwarn("Unable to enable NMEA RMC.\n");
             }
 
             msglen = makeUBXPacket(0x06, 0x01, sizeof(_message_GGA), _message_GGA);
             GPSSerial.write(UBXscratch, msglen);
             if (getACK(0x06, 0x01, 300) != GNSS_RESPONSE_OK) {
-                logwarn_f("Unable to enable NMEA GGA.\n");
+                logwarn("Unable to enable NMEA GGA.\n");
             }
         }
     }
