@@ -55,7 +55,7 @@ public:
                 // commands
 
             }
-            delay(850);
+            delay(1000);
 
             msglen = makeUBXPacket(0x06, 0x39, sizeof(_message_JAM), _message_JAM);
             GPSSerial.write(UBXscratch, msglen);
@@ -111,6 +111,14 @@ public:
             GPSSerial.write(UBXscratch, msglen);
             if (getACK(0x06, 0x01, 300) != GNSS_RESPONSE_OK) {
                 logwarn("Unable to enable NMEA GGA.\n");
+            }
+            if (strncmp(info.hwVersion, "00080000", 8) == 0) {
+                msglen = makeUBXPacket(0x06, 0x17, sizeof(_message_NMEA), _message_NMEA);
+                clearBuffer();
+                GPSSerial.write(UBXscratch, msglen);
+                if (getACK(0x06, 0x17, 500) != GNSS_RESPONSE_OK) {
+                    logwarn("Unable to enable NMEA 4.10.\n");
+                }
             }
         }
     }
@@ -248,7 +256,7 @@ private:
             0x00, 0x08, 0x10, 0x00, 0x01, 0x00, 0x00, 0x01, // GPS
             0x01, 0x01, 0x03, 0x00, 0x01, 0x00, 0x00, 0x01  // SBAS
     };
-    const uint8_t _message_GNSS_8[44] = {
+    uint8_t _message_GNSS_8[44] = {
             0x00,                                           // msgVer (0 for this version)
             0x00,                                           // numTrkChHw (max number of hardware channels, read only, so it's always 0)
             0xff,                                           // numTrkChUse (max number of channels to use, 0xff = max available)
@@ -259,6 +267,19 @@ private:
             0x02, 0x04, 0x08, 0x00, 0x01, 0x00, 0x01, 0x01, // Galileo
             0x05, 0x00, 0x03, 0x00, 0x01, 0x00, 0x01, 0x01, // QZSS
             0x06, 0x08, 0x0E, 0x00, 0x01, 0x00, 0x01, 0x01  // GLONASS
+    };
+    uint8_t _message_NMEA[20]{
+            0x00,                              // filter flags
+            0x41,                              // NMEA Version
+            0x00,                              // Max number of SVs to report per TaklerId
+            0x02,                              // flags
+            0x00, 0x00, 0x00, 0x00,            // gnssToFilter
+            0x00,                              // svNumbering
+            0x00,                              // mainTalkerId
+            0x00,                              // gsvTalkerId
+            0x01,                              // Message version
+            0x00, 0x00,                        // bdsTalkerId 2 chars 0=default
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00 // Reserved
     };
     uint8_t _message_GNSS[28] = {
             0x00, // msgVer (0 for this version)

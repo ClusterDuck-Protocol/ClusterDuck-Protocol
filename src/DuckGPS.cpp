@@ -36,15 +36,15 @@ std::time_t DuckGPS::epoch(){
 }
 void DuckGPS::printData(){
     // Printing the GPS data
-    logdbg("--- GPS ---");
-    logdbg(std::string("Latitude  : "+std::to_string(lat())).c_str());
-    logdbg(std::string("Longitude : "+std::to_string(lng())).c_str());
-    logdbg(std::string("Altitude : "+std::to_string(altitude(AltitudeUnit::meter))).append("M").c_str());
-    logdbg(std::string("Satellites : "+std::to_string(satellites())).c_str());
-    logdbg(std::string("Raw Date : "+std::to_string(gps.date.value())).c_str());
-    logdbg(std::string("Epoch : "+std::to_string(epoch())).c_str());
-    logdbg(std::string("Raw Date : "+std::to_string(speed(SpeedUnit::kmph))).append("KPH").c_str());
-    logdbg("**********************");
+    logdbg_ln("--- GPS ---");
+    logdbg_ln(std::string("Latitude  : "+std::to_string(lat())).c_str());
+    logdbg_ln(std::string("Longitude : "+std::to_string(lng())).c_str());
+    logdbg_ln(std::string("Altitude : "+std::to_string(altitude(AltitudeUnit::meter))).append("M").c_str());
+    logdbg_ln(std::string("Satellites : "+std::to_string(satellites())).c_str());
+    logdbg_ln(std::string("Raw Date : "+std::to_string(gps.date.value())).c_str());
+    logdbg_ln(std::string("Epoch : "+std::to_string(epoch())).c_str());
+    logdbg_ln(std::string("Raw Date : "+std::to_string(speed(SpeedUnit::kmph))).append("KPH").c_str());
+    logdbg_ln("**********************");
 }
 
 
