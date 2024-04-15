@@ -38,7 +38,7 @@ public:
                 msglen = makeUBXPacket(0x06, 0x3e, sizeof(_message_GNSS_7), _message_GNSS_7);
                 GPSSerial.write(UBXscratch, msglen);
             } else {
-                msglen = makeUBXPacket(0x06, 0x3e, sizeof(_message_GNSS), _message_GNSS);
+                msglen = makeUBXPacket(0x06, 0x3e, sizeof(_message_GNSS_8), _message_GNSS_8);
                 GPSSerial.write(UBXscratch, msglen);
             }
 
@@ -247,6 +247,18 @@ private:
             // GNSS config format: gnssId, resTrkCh, maxTrkCh, reserved1, flags
             0x00, 0x08, 0x10, 0x00, 0x01, 0x00, 0x00, 0x01, // GPS
             0x01, 0x01, 0x03, 0x00, 0x01, 0x00, 0x00, 0x01  // SBAS
+    };
+    const uint8_t _message_GNSS_8[44] = {
+            0x00,                                           // msgVer (0 for this version)
+            0x00,                                           // numTrkChHw (max number of hardware channels, read only, so it's always 0)
+            0xff,                                           // numTrkChUse (max number of channels to use, 0xff = max available)
+            0x05,                                           // numConfigBlocks (number of GNSS systems)
+            // GNSS config format: gnssId, resTrkCh, maxTrkCh, reserved1, flags
+            0x00, 0x08, 0x10, 0x00, 0x01, 0x00, 0x01, 0x01, // GPS
+            0x01, 0x01, 0x03, 0x00, 0x01, 0x00, 0x01, 0x01, // SBAS
+            0x02, 0x04, 0x08, 0x00, 0x01, 0x00, 0x01, 0x01, // Galileo
+            0x05, 0x00, 0x03, 0x00, 0x01, 0x00, 0x01, 0x01, // QZSS
+            0x06, 0x08, 0x0E, 0x00, 0x01, 0x00, 0x01, 0x01  // GLONASS
     };
     uint8_t _message_GNSS[28] = {
             0x00, // msgVer (0 for this version)
