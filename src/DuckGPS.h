@@ -49,7 +49,7 @@ public:
                 if (strncmp(info.hwVersion, "00070000", 8) == 0) {
                     loginfo("GNSS configured for GPS+SBAS. Pause for 0.75s before sending next command.\n");
                 } else {
-                    loginfo("GNSS configured for GPS+SBAS+GLONASS. Pause for 0.75s before sending next command.\n");
+                    loginfo("GNSS configured for GPS+SBAS+GLONASS+Galileo. Pause for 0.75s before sending next command.\n");
                 }
                 // Documentation say, we need wait atleast 0.5s after reconfiguration of GNSS module, before sending next
                 // commands
