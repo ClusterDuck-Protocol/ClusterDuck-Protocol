@@ -24,7 +24,6 @@ bool flipDetectState() {
 
 }
 
-bool getAckingState() { return ackingState; }
 bool flipAckingState() {
   ackingState = !ackingState;
   return ackingState;
