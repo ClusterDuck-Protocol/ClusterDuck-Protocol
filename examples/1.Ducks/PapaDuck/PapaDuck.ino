@@ -3,13 +3,13 @@
  * @author Timo Wielink
  * @brief Uses built-in PapaDuck from the SDK to create a WiFi enabled Papa Duck
  *
- * This example will configure and run a Papa Duck that connects to the cloud
+ * This example will configure and run a Papa Duck that connects to AWS cloud
  * and forwards all messages (except  pings) to the cloud. When disconnected
  * it will add received packets to a queue. When it reconnects to MQTT it will
  * try to publish all messages in the queue. You can change the size of the queue
  * by changing `QUEUE_SIZE_MAX`.
  *
- * @date 09-07-2023
+ * @date 06-14-2024
  *
  */
 
@@ -33,22 +33,11 @@
 #define SSID "" // Your WiFi SSID (Make sure its a 2.4 Ghz network)
 #define PASSWORD "" // Your WiFi Password
 
-// Leave these empty
-#define ORG         ""
-#define DEVICE_ID   ""
-#define DEVICE_TYPE ""
-#define TOKEN       ""
-
-
-char server[] = ORG ""; // Your AWS IoT Core Endpoint
 char authMethod[] = "use-token-auth";
-char token[] = TOKEN;
-char clientId[] = "TestPapa02";
 
 #define CMD_STATE_WIFI "/wifi/"
 #define CMD_STATE_HEALTH "/health/"
 #define CMD_STATE_CHANNEL "/channel/"
-
 
 // use the '+' wildcard so it subscribes to any command with any message format
 const char commandTopic[] = "iot-2/cmd/+/fmt/+";
@@ -68,7 +57,7 @@ int QUEUE_SIZE_MAX = 5;
 std::queue<std::vector<byte>> packetQueue;
 
 WiFiClientSecure wifiClient;
-PubSubClient client(server, 8883, gotMsg, wifiClient);
+PubSubClient client(AWS_IOT_ENDPOINT, 8883, gotMsg, wifiClient);
 
 // / DMS locator URL requires a topicString, so we need to convert the topic
 // from the packet to a string based on the topics code
@@ -139,14 +128,9 @@ String convertToHex(byte* data, int size) {
 bool retry = true;
 int quackJson(CdpPacket packet) {
 
-  const int bufferSize = 4 * JSON_OBJECT_SIZE(4);
-  StaticJsonDocument<bufferSize> doc;
+  JsonDocument doc;
 
-  // Here we treat the internal payload of the CDP packet as a string
-  // but this is mostly application dependent.
-  // The parsingf here is optional. The Papa duck could simply decide to
-  // forward the CDP packet as a byte array and let the Network Server (or DMS) deal with
-  // the parsing based on some business logic.
+  // Parsing the packet that was received
 
   std::string payload(packet.data.begin(), packet.data.end());
   std::string sduid(packet.sduid.begin(), packet.sduid.end());
@@ -173,17 +157,15 @@ int quackJson(CdpPacket packet) {
   doc["duckType"].set(packet.duckType);
 
   std::string cdpTopic = toTopicString(packet.topic);
+  
+  // display->clear();
+  // display->drawString(0, 10, "New Message");
+  // display->drawString(0, 20, sduid.c_str());
+  // display->drawString(0, 30, muid.c_str());
+  // display->drawString(0, 40, cdpTopic.c_str());
+  // display->sendBuffer();
 
-  display->clear();
-  display->drawString(0, 10, "New Message");
-  display->drawString(0, 20, sduid.c_str());
-  display->drawString(0, 30, muid.c_str());
-  display->drawString(0, 40, cdpTopic.c_str());
-  display->sendBuffer();
-
-  //  std::string topic = "iot-2/evt/" + cdpTopic + "/fmt/json";
-  // std::string topic = "topic_2";
-  std::string topic = "owl/device/" + sduid + "/evt/" + cdpTopic;
+  std::string topic = "owl/device/" + std::string(THINGNAME) + "/evt/" + cdpTopic;
 
   String jsonstat;
   serializeJson(doc, jsonstat);
@@ -229,10 +211,8 @@ void handleDuckData(std::vector<byte> packetBuffer) {
 }
 
 void setup() {
- // We are using a hardcoded device id here, but it should be retrieved or
-  // given during the device provisioning then converted to a byte vector to
-  // setup the duck NOTE: The Device ID must be exactly 8 bytes otherwise it
-  // will get rejected
+  
+  // NOTE: The Device ID must be exactly 8 bytes otherwise it will get rejected
   std::string deviceId("PAPADUCK");
   std::vector<byte> devId;
   devId.insert(devId.end(), deviceId.begin(), deviceId.end());
@@ -240,9 +220,9 @@ void setup() {
   // the default setup is equivalent to the above setup sequence
   duck.setupWithDefaults(devId, SSID, PASSWORD);
 
-  display = DuckDisplay::getInstance();
   // DuckDisplay instance is returned unconditionally, if there is no physical
   // display the functions will not do anything
+  display = DuckDisplay::getInstance();
   display->setupDisplay(duck.getType(), devId);
 
   // register a callback to handle incoming data from duck in the network
@@ -258,40 +238,38 @@ void setup() {
   wifiClient.setInsecure();
   #endif
 
+  duck.enableAcks(true);
 
-  Serial.println("[PAPA] Setup OK! ");
-
-   duck.enableAcks(true);
-  // we are done
   display->showDefaultScreen();
+  
+  Serial.println("[PAPA] Setup OK! ");
 }
 
 void loop() {
+  
+  if (!duck.isWifiConnected() && retry) {
+    std::string ssid = duck.getSsid();
+    std::string password = duck.getPassword();
 
-   if (!duck.isWifiConnected() && retry) {
-      String ssid = duck.getSsid();
-      String password = duck.getPassword();
-
-      Serial.println("[PAPA] WiFi disconnected, reconnecting to local network: " +
-                     ssid);
+    Serial.println((std::string("[PAPA] WiFi disconnected, reconnecting to local network: ") + ssid).c_str());
                      
-      int err = duck.reconnectWifi(ssid, password);
+    int err = duck.reconnectWifi(ssid, password);
 
-      if (err != DUCK_ERR_NONE) {
-         retry = false;
-      }
-      timer.in(5000, enableRetry);
-   }
+    if (err != DUCK_ERR_NONE) {
+      retry = false;
+    }
+    timer.in(5000, enableRetry);
+  }
 
-   if (!client.loop()) {
-     if(duck.isWifiConnected()) {
-        mqttConnect();
-     }
+  if (!client.loop()) {
+    if(duck.isWifiConnected()) {
+      mqttConnect();
+    }
 
-   }
+  }
 
-   duck.run();
-   timer.tick();
+  duck.run();
+  timer.tick();
 
 }
 
@@ -350,8 +328,8 @@ void wifiConnect() {
 
 void mqttConnect() {
    if (!!!client.connected()) {
-      Serial.print("Reconnecting MQTT client to "); Serial.println(server);
-      if(!!!client.connect(clientId) && retry) {
+      Serial.print("Reconnecting MQTT client to "); Serial.println(AWS_IOT_ENDPOINT);
+      if(!!!client.connect(THINGNAME) && retry) {
          Serial.print("Connection failed, retry in 5 seconds");
          retry = false;
          timer.in(5000, enableRetry);
