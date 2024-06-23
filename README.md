@@ -27,7 +27,7 @@ The network is made up of multiple nodes called **Ducks**. There are 3 basic typ
 
 ## Installation
 
-Check out the [Wiki](https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol/wiki) to learn how to build your own ClusterDuck Network. Feel free to visit the  [ClusterDuck Protocol](https://clusterduckprotocol.org/) website for more information on projects that the community is building. You can reach out directly on our [Slack Workspace] for any questions and/or to work with the community.
+Check out the [Wiki](https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol/wiki) to learn how to build your own ClusterDuck Network. Feel free to visit the  [ClusterDuck Protocol](https://clusterduckprotocol.org/) website for more information on projects that the community is building. You can reach out directly on our [Discord Community](https://discord.gg/Cbgbzq353z) for any questions and/or to work with the community.
 
 **To use the ClusterDuck Protocol follow the [Installation Manual](https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol/wiki/getting-started).**
 
