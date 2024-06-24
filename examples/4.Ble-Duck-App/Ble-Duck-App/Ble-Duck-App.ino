@@ -59,7 +59,7 @@ void loop() {
   if (SerialBT.available()) {
     String text = SerialBT.readString();
     Serial.println(text);
-    duck.sendData(topics::status, text);
+    duck.sendData(topics::status, text.c_str());
     delay(10);
   }
 
