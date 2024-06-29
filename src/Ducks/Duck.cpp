@@ -17,7 +17,7 @@
 const int MEMORY_LOW_THRESHOLD = PACKET_LENGTH + sizeof(CdpPacket);
 
 Duck::Duck(std::string name):
-  
+
   filter(), // initialized filter with default values
   duckNet(new DuckNet(&filter))
 {
@@ -80,7 +80,7 @@ int Duck::setDeviceId(std::vector<byte> id) {
     logerr_ln("ERROR  device id too long rc = %d", DUCK_ERR_ID_TOO_LONG);
     return DUCK_ERR_ID_TOO_LONG;
   }
-  
+
   duid.clear();
   duid.assign(id.begin(), id.end());
   loginfo_ln("setupDeviceId rc = %d",DUCK_ERR_NONE);
@@ -519,6 +519,6 @@ std::string Duck::getErrorString(int error) {
     case DUCK_INTERNET_ERR_CONNECT:
       return errorStr + "Internet connection failed";
   }
-  
+
   return "Unknown error";
 }

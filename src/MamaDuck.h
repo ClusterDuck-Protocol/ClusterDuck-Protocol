@@ -14,7 +14,7 @@ public:
   using rxDoneCallback = void (*)(std::vector<byte> data );
   /**
    * @brief Register callback for handling data received from duck devices
-   * 
+   *
    * The callback will be invoked if the packet needs to be relayed (i.e not seen before)
    * @param cb a callback to handle data received by the papa duck
    */
@@ -39,7 +39,7 @@ public:
    * @param ssid wifi access point ssid (defaults to an empty string if not
    * provided)
    * @param password wifi password (defaults to an empty string if not provided)
-   * 
+   *
    * @returns DUCK_ERR_NONE if setup is successfull, an error code otherwise.
    */
    int setupWithDefaults(std::vector<byte> deviceId, std::string ssid = "",
@@ -47,7 +47,7 @@ public:
 
   /**
    * @brief Get the DuckType
-   * 
+   *
    * @returns the duck type defined as DuckType
    */
   int getType() {return DuckType::MAMA;}
@@ -55,7 +55,7 @@ public:
   bool getDetectState();
 
 private :
-  rxDoneCallback recvDataCallback;
+  rxDoneCallback recvDataCallback = nullptr;
   void handleReceivedPacket();
 
   void handleCommand(const CdpPacket & packet);

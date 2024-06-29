@@ -51,7 +51,7 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, std::string ssid, st
       logerr_ln("ERROR setupWithDefaults  rc = %d",err);
       return err;
     }
-  } 
+  }
 
   duckNet->loadChannel();
 
@@ -63,11 +63,11 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, std::string ssid, st
 
     if (err != DUCK_ERR_NONE) {
       logerr_ln("ERROR setupWithDefaults  rc = %d",err);
-     
+
       return err;
     }
-    
-    
+
+
   }
 
 
@@ -114,10 +114,11 @@ void PapaDuck::handleReceivedPacket() {
   bool relay = rxPacket->prepareForRelaying(&filter, data);
   if (relay) {
     logdbg_ln("relaying:  %s", duckutils::convertToHex(rxPacket->getBuffer().data(), rxPacket->getBuffer().size()).c_str());
-    loginfo_ln("invoking callback in the duck application...");
-    
-    recvDataCallback(rxPacket->getBuffer());
-    
+    if (recvDataCallback != nullptr) {
+      loginfo_ln("invoking callback in the duck application...");
+      recvDataCallback(rxPacket->getBuffer());
+    }
+
     if (acksEnabled) {
       const CdpPacket packet = CdpPacket(rxPacket->getBuffer());
       if (needsAck(packet)) {
@@ -183,7 +184,7 @@ void PapaDuck::broadcastAck() {
     logdbg_ln("Storing ack for duid: %s, muid: %s",
       duckutils::convertToHex(duid.data(), DUID_LENGTH).c_str(),
       duckutils::convertToHex(muid.data(), MUID_LENGTH).c_str());
-      
+
     dataPayload.insert(dataPayload.end(), duid.begin(), duid.end());
     dataPayload.insert(dataPayload.end(), muid.begin(), muid.end());
   }
@@ -215,7 +216,7 @@ void PapaDuck::sendCommand(byte cmd, std::vector<byte> value) {
   int err = txPacket->prepareForSending(&filter, BROADCAST_DUID, DuckType::PAPA,
     reservedTopic::cmd, dataPayload);
   if (err != DUCK_ERR_NONE) {
-    
+
     logerr_ln("ERROR handleReceivedPacket. Failed to prepare ack. Error: %d",err);
   }
 
