@@ -14,15 +14,6 @@ DNSServer DuckNet::dnsServer;
 const char* DuckNet::DNS = "duck";
 const byte DuckNet::DNS_PORT = 53;
 
-// Username and password for /update
-const char* update_username = CDPCFG_UPDATE_USERNAME;
-const char* update_password = CDPCFG_UPDATE_PASSWORD;
-
-const char* control_username = CDPCFG_UPDATE_USERNAME;
-const char* control_password = CDPCFG_UPDATE_PASSWORD;
-
-bool restartRequired = false;
-
 void DuckNet::setDeviceId(std::vector<byte> deviceId) {
   this->deviceId.insert(this->deviceId.end(), deviceId.begin(), deviceId.end());
 }
@@ -187,36 +178,6 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
   //     request->send(500, "text/plain", "There was an error");
   //   }
   // });
-
-  // Update Firmware OTA
-  webServer.on("/update", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    if (!request->authenticate(update_username, update_password))
-      return request->requestAuthentication();
-
-    AsyncWebServerResponse* response =
-    request->beginResponse(200, "text/html", update_page);
-
-    request->send(response);
-  });
-  
-  webServer.on(
-    "/update", HTTP_POST,
-    [&](AsyncWebServerRequest* request) {
-      AsyncWebServerResponse* response = request->beginResponse(
-        (Update.hasError()) ? 500 : 200, "text/plain",
-        (Update.hasError()) ? "FAIL" : "OK");
-      response->addHeader("Connection", "close");
-      response->addHeader("Access-Control-Allow-Origin", "*");
-      request->send(response);
-      restartRequired = true;
-    },
-    [&](AsyncWebServerRequest* request, String filename, size_t index,
-      uint8_t* data, size_t len, bool final)
-    {
-      duck->updateFirmware(filename.c_str(), index, data, len, final);
-      // TODO: error/exception handling
-      // TODO: request->send
-    });
 
   webServer.on("/muidStatus.json", HTTP_GET, [&](AsyncWebServerRequest* request) {
     logdbg_ln("muidStatus.json: %s", request->url().c_str());

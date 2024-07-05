@@ -14,7 +14,6 @@
 
 // Device Id is too long
 #define DUCK_ERR_ID_TOO_LONG   -5101
-#define DUCK_ERR_OTA           -5200
 
 /// Lora module initialization error
 #define DUCKLORA_ERR_BEGIN          -1000

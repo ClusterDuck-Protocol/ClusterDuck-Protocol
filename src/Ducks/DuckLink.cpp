@@ -31,12 +31,6 @@ int DuckLink::setupWithDefaults(std::vector<byte> deviceId, std::string ssid,
     logerr_ln("ERROR setupWithDefaults rc = %d",err);
     return err;
   }
-
-  err = setupOTA();
-  if (err != DUCK_ERR_NONE) {
-    logerr_ln("ERROR setupWithDefaults rc = %d",err);
-    return err;
-  }
   
   loginfo_ln("DuckLink setup done");
   return DUCK_ERR_NONE;
@@ -47,6 +41,5 @@ void DuckLink::run() {
 
   duckRadio.serviceInterruptFlags();
 
-  handleOtaUpdate();
   processPortalRequest();
 }
