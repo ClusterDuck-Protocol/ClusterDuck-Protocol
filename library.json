@@ -8,21 +8,21 @@
         "email": "info@owlintegrations.com",
         "url": "https://owlintegrations.com/"
     },
-    "version": "4.0.1",
+    "version": "4.2.0",
     "repository":
     {
         "type": "git",
         "url": "https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol"
     },
     "frameworks": "arduino",
-    "platforms": ["espressif32","heltec-cubecell"], 
+    "platforms": ["espressif32","heltec-cubecell"],
     "license": "Apache-2.0",
     "export": {
         "include": [
             "src/*.cpp",
-            "src/*.h", 
+            "src/*.h",
             "src/Ducks/**",
-            "src/include/**",            
+            "src/include/**",
             "tools/**",
             "examples/1.Ducks/**"
         ]
