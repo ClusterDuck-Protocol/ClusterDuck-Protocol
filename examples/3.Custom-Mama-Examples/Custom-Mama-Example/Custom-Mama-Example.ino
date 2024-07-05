@@ -59,8 +59,6 @@ void setup() {
   duck.setupDns();
   // initialize web server, enabling the captive portal with a custom HTML page
   duck.setupWebServer(true);
-  // initialize Over The Air firmware upgrade
-  duck.setupOTA();
   // This duck has an OLED display and we want to use it. 
   // Get an instance and initialize it, so we can use in our application
   display = DuckDisplay::getInstance();
