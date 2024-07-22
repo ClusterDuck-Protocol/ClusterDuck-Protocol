@@ -8,6 +8,10 @@
  * @version
 */
 
+// if we have an external board definition, include it before anything else
+#ifdef CDP_EXTERNAL_BOARD
+#include "cdp_external_board.h"
+#endif
 
 #include "include/cdpcfg.h"
 #include "DuckDetect.h"
@@ -18,12 +22,12 @@
 #include "CdpPacket.h"
 #include "DuckError.h"
 #include "DuckLogger.h"
-
+#include "include/DuckNet.h"
 #define CDP_STRINGIFY(x) #x
 #define CDP_VALUE(x) CDP_STRINGIFY(x)
 
 #ifndef CDP_BOARD_NAME
-#error "No board definition found! Please provide a board definition in your cdpcfg.h"
+#warning "No board definition found! Please provide a board definition in your cdpcfg.h"
 #else
 #pragma message("\n" \
 "-- CDP Library Info --\n" \

@@ -17,8 +17,8 @@ enum muidStatus {
 #include "../DuckError.h"
 #include "bloomfilter.h"
 #include "cdpcfg.h"
-#include "DuckNet.h"
 #include "DuckPacket.h"
+#include "DuckNet.h"
 #include "DuckRadio.h"
 #include "DuckTypes.h"
 #include "DuckUtils.h"
@@ -303,10 +303,11 @@ protected:
 
   std::string deviceId;
   std::vector<byte> duid;
-  DuckRadio duckRadio;
 
-  DuckNet * const duckNet;// The pointer itself is never modified, though the
-  // duckNet instance itself can be modified.
+  DuckRadio& duckRadio = DuckRadio::getInstance();
+
+
+  DuckNet * const duckNet;
 
   DuckPacket* txPacket = NULL;
   DuckPacket* rxPacket = NULL;
