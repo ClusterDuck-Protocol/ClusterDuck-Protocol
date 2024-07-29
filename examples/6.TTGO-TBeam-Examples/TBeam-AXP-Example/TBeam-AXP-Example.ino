@@ -21,10 +21,12 @@
 
 // AXP setup
 #include <Wire.h>
-#include <axp20x.h>
+#define XPOWERS_CHIP_AXP192
+#include <XPowersLib.h>
 
-AXP20X_Class axp;
+XPowersPMU axp;
 
+bool runSensor(void *);
 const uint8_t i2c_sda = 21;
 const uint8_t i2c_scl = 22;
 
@@ -33,7 +35,6 @@ DuckDisplay* display = NULL;
 
 
 // Set device ID between ""
-String deviceId = "MAMA001";
 MamaDuck duck;
 
 auto timer = timer_create_default();
@@ -60,12 +61,9 @@ void setup() {
 
    Wire.begin(i2c_sda, i2c_scl);
 
-     int ret = axp.begin(Wire, AXP192_SLAVE_ADDRESS);
+     int ret = axp.begin(Wire, AXP192_SLAVE_ADDRESS,i2c_sda,i2c_scl);
 
-     if (ret == AXP_FAIL) {
-        Serial.println("AXP Power begin failed");
-        while (1);
-     }
+     axp.enableIRQ(XPOWERS_AXP192_BAT_CHG_DONE_IRQ | XPOWERS_AXP192_BAT_CHG_START_IRQ);
 }
 
 void loop() {
@@ -81,12 +79,12 @@ void loop() {
 bool runSensor(void *) {
   
   
-float isCharging = axp.isChargeing();
-boolean isFullyCharged = axp.isChargingDoneIRQ();
+float isCharging = axp.isCharging();
+boolean isFullyCharged = axp.isBatChagerDoneIrq();
 float batteryVoltage = axp.getBattVoltage();
 float batteryDischarge = axp.getAcinCurrent();
-float getTemp = axp.getTemp();  
-int battPercentage = axp.getBattPercentage();
+float getTemp = axp.getTemperature();
+int battPercentage = axp.getBatteryPercent();
    
     Serial.println("--- T-BEAM Power Information ---");
     Serial.print("Duck charging (1 = Yes): ");
@@ -101,17 +99,17 @@ int battPercentage = axp.getBattPercentage();
     Serial.println(getTemp);
     Serial.print("battery Percentage: ");
     Serial.println(battPercentage);
-   
 
-  String sensorVal = 
-  "Charging: " + 
-  String(isCharging) ; 
-  " BattFull: " +
-  String(isFullyCharged)+
-  " Voltage " +
-  String(batteryVoltage) ;
-  " Temp: " +
-  String(getTemp);
+
+  std::string sensorVal =
+  "Charging: ";
+  sensorVal.append(isCharging ? "Yes" : "No")
+  .append(" BattFull: ")
+  .append(isFullyCharged ? "Yes" : "No")
+  .append(" Voltage: ")
+  .append(std::to_string(batteryVoltage))
+  .append(" Temp: ")
+  .append(std::to_string(getTemp));
 
   
   duck.sendData(topics::sensor, sensorVal);
