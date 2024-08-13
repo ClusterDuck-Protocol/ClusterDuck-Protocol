@@ -72,7 +72,8 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
   });
 
   webServer.on("/setChannel", HTTP_POST, [&](AsyncWebServerRequest* request) {
-    const AsyncWebParameter* p = request->getParam(0);
+    int paramNum = 0;
+    const AsyncWebParameter* p = request->getParam(paramNum);
     logdbg_ln("%s : %d", p->name(), p->value());
     int val = std::atoi(p->value().c_str());
     //TODO: don't use duck for everything
