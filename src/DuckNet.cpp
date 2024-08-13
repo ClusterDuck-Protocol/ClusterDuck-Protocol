@@ -72,7 +72,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
   });
 
   webServer.on("/setChannel", HTTP_POST, [&](AsyncWebServerRequest* request) {
-    AsyncWebParameter* p = request->getParam(0);
+    const AsyncWebParameter* p = request->getParam(0);
     logdbg_ln("%s : %d", p->name(), p->value());
     int val = std::atoi(p->value().c_str());
     //TODO: don't use duck for everything
@@ -93,7 +93,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
     std::string clientId = "";
 
     for (int i = 0; i < paramsNumber; i++) {
-      AsyncWebParameter* p = request->getParam(i);
+      const AsyncWebParameter* p = request->getParam(i);
       logdbg_ln("%s : %s", p->name(), p->value());
 
       if (p->name() == "clientId") {
@@ -160,7 +160,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
     std::string password = "";
 
     for (int i = 0; i < paramsNumber; i++) {
-      AsyncWebParameter* p = request->getParam(i);
+      const AsyncWebParameter* p = request->getParam(i);
 
       std::string name = p->name().c_str();
       std::string value = p->value().c_str();
