@@ -14,15 +14,6 @@ DNSServer DuckNet::dnsServer;
 const char* DuckNet::DNS = "duck";
 const byte DuckNet::DNS_PORT = 53;
 
-// Username and password for /update
-const char* update_username = CDPCFG_UPDATE_USERNAME;
-const char* update_password = CDPCFG_UPDATE_PASSWORD;
-
-const char* control_username = CDPCFG_UPDATE_USERNAME;
-const char* control_password = CDPCFG_UPDATE_PASSWORD;
-
-bool restartRequired = false;
-
 void DuckNet::setDeviceId(std::vector<byte> deviceId) {
   this->deviceId.insert(this->deviceId.end(), deviceId.begin(), deviceId.end());
 }
@@ -81,7 +72,8 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
   });
 
   webServer.on("/setChannel", HTTP_POST, [&](AsyncWebServerRequest* request) {
-    AsyncWebParameter* p = request->getParam(0);
+    int paramNum = 0;
+    const AsyncWebParameter* p = request->getParam(paramNum);
     logdbg_ln("%s : %d", p->name(), p->value());
     int val = std::atoi(p->value().c_str());
     //TODO: don't use duck for everything
@@ -90,35 +82,6 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
 
     request->send(200, "text/plain", "Success");
   });
-
-  // Update Firmware OTA
-  webServer.on("/update", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    if (!request->authenticate(update_username, update_password))
-      return request->requestAuthentication();
-
-    AsyncWebServerResponse* response =
-    request->beginResponse(200, "text/html", update_page);
-
-    request->send(response);
-  });
-  
-  webServer.on(
-    "/update", HTTP_POST,
-    [&](AsyncWebServerRequest* request) {
-      AsyncWebServerResponse* response = request->beginResponse(
-        (Update.hasError()) ? 500 : 200, "text/plain",
-        (Update.hasError()) ? "FAIL" : "OK");
-      response->addHeader("Connection", "close");
-      response->addHeader("Access-Control-Allow-Origin", "*");
-      request->send(response);
-      restartRequired = true;
-    },
-    [&](AsyncWebServerRequest* request, String filename, size_t index,
-      uint8_t* data, size_t len, bool final)
-    {
-      // TODO: re-implement this with proper FOTA module
-      //duck->updateFirmware(filename.c_str(), index, data, len, final);
-    });
 
   // Captive Portal form submission
   webServer.on("/formSubmit.json", HTTP_POST, [&](AsyncWebServerRequest* request) {
@@ -131,7 +94,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
     std::string clientId = "";
 
     for (int i = 0; i < paramsNumber; i++) {
-      AsyncWebParameter* p = request->getParam(i);
+      const AsyncWebParameter* p = request->getParam(i);
       logdbg_ln("%s : %s", p->name(), p->value());
 
       if (p->name() == "clientId") {
@@ -198,7 +161,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
     std::string password = "";
 
     for (int i = 0; i < paramsNumber; i++) {
-      AsyncWebParameter* p = request->getParam(i);
+      const AsyncWebParameter* p = request->getParam(i);
 
       std::string name = p->name().c_str();
       std::string value = p->value().c_str();

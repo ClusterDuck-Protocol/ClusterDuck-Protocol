@@ -42,7 +42,6 @@
 #include <WiFiClientSecure.h>
 
 #include "DuckEsp.h"
-#include "OTAPage.h"
 #include "index.h"
 #include "wifiCredentials.h"
 #include "controlPanel.h"
@@ -57,7 +56,7 @@
 /**
  * @brief Internal network abstraction.
  *
- * Provides access to Webserver, DNS, WiFi and OTA update functionalities.
+ * Provides access to Webserver, DNS, and WiFi update functionalities.
  */
 class DuckNet {
 public:
