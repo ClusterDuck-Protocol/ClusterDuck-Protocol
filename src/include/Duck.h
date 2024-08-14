@@ -17,8 +17,8 @@ enum muidStatus {
 #include "../DuckError.h"
 #include "bloomfilter.h"
 #include "cdpcfg.h"
-#include "DuckNet.h"
 #include "DuckPacket.h"
+#include "DuckNet.h"
 #include "DuckRadio.h"
 #include "DuckTypes.h"
 #include "DuckUtils.h"
@@ -144,12 +144,6 @@ public:
   int setupInternet(std::string ssid, std::string password);
 
   /**
-   * @brief
-   *
-   */
-  int setupOTA();
-
-  /**
    * @brief Sends data into the mesh network.
    *
    * @param topic the message topic
@@ -200,13 +194,6 @@ public:
    * */
   CdpPacket buildCdpPacket(byte topic, const std::vector<byte> data,
     const std::vector<byte> targetDevice, const std::vector<byte> &muid);
-
-  /**
-   * @brief Updates the firmware on the device
-   *
-   * TODO: Additional documentation
-   */
-  void updateFirmware(const std::string & filename, size_t index, uint8_t* data, size_t len, bool final);
 
   /**
    * @brief Get the status of an MUID
@@ -316,10 +303,11 @@ protected:
 
   std::string deviceId;
   std::vector<byte> duid;
-  DuckRadio duckRadio;
 
-  DuckNet * const duckNet;// The pointer itself is never modified, though the
-  // duckNet instance itself can be modified.
+  DuckRadio& duckRadio = DuckRadio::getInstance();
+
+
+  DuckNet * const duckNet;
 
   DuckPacket* txPacket = NULL;
   DuckPacket* rxPacket = NULL;
@@ -400,12 +388,6 @@ protected:
    *
    */
   void processPortalRequest();
-
-  /**
-   * @brief Handle over the air firmware update.
-   *
-   */
-  void handleOtaUpdate();
 
   /**
    * @brief Log an error message if the system's memory is too low.

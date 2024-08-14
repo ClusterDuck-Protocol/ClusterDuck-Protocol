@@ -38,12 +38,6 @@ int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, std::string ssid, st
     return err;
   }
 
-  err = setupOTA();
-  if (err != DUCK_ERR_NONE) {
-    logerr_ln("ERROR setupWithDefaults  rc = %d",err);
-    return err;
-  }
-
   if (ssid.length() != 0 && password.length() != 0) {
     err = setupInternet(ssid, password);
 
@@ -81,7 +75,6 @@ void PapaDuck::run() {
 
   duckRadio.serviceInterruptFlags();
 
-  handleOtaUpdate();
   if (DuckRadio::getReceiveFlag()) {
     handleReceivedPacket();
     rxPacket->reset(); // TODO(rolsen): Make rxPacket local to handleReceivedPacket

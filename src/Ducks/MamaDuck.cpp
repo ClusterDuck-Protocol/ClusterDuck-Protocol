@@ -36,12 +36,6 @@ int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, std::string ssid, st
     return err;
   }
 
-  err = setupOTA();
-  if (err != DUCK_ERR_NONE) {
-    logerr_ln("ERROR setupWithDefaults rc = %d",err);
-    return err;
-  }
-
   duckutils::getTimer().every(CDPCFG_MILLIS_ALIVE, imAlive);
 
   duckNet->loadChannel();
@@ -54,7 +48,6 @@ void MamaDuck::run() {
 
   duckRadio.serviceInterruptFlags();
 
-  handleOtaUpdate();
   if (DuckRadio::getReceiveFlag()) {
     
     handleReceivedPacket();
