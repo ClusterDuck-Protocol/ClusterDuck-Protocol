@@ -29,8 +29,7 @@ const char controlPanel[] PROGMEM = R"=====(
 </div>
 <a href="/flipDetector"><button id="sendBtn">Flip Detector</button></a>
 <a href="/flipDecrypt"><button id="sendBtn">Flip Decryption</button></a>
-<a href="/flipAcking"><button id="sendBtn">Flip Acking</button></a>
- <a href="/"> <button type="button" id="backBtn">Go Back Home</button> </a>
+<a href="/"> <button type="button" id="backBtn">Go Back Home</button> </a>
 
 
 
@@ -57,21 +56,6 @@ const char controlPanel[] PROGMEM = R"=====(
     #form {
         margin-top: 60px;
     }
-
-    .textbox {
-        border-radius: 4px;
-        border: none;
-        margin: .5em 0;
-        border-radius: 12px;
-        border: 2px solid #2A2C49;
-        padding: 0.5em;
-    }
-
-    .textbox-full {
-        height: 5em;
-        width: 95%;
-    }
-
     #sendBtn {
         width: 100%;
         margin-top: 10px;
@@ -93,16 +77,6 @@ const char controlPanel[] PROGMEM = R"=====(
         position: relative;
         top: 1px;
     }
-
-    .historyBtn {
-        background-color: #ffe421;
-        max-width: 250px;
-        margin: auto;
-        padding: 18px 24px 14px;
-        border-radius: 3px;
-    }
-
-
 
     #backBtn {
         width: 100%;

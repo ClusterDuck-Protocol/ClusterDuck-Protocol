@@ -246,9 +246,7 @@ void quackJson(std::vector<byte> packetBuffer) {
   serializeJson(doc, jsonstat);
 
   //Filter out private chat so it won't get sent to DMS
-  if(cdpTopic == "pchat") {
-    return -1;
-  } else if(client.publish(topic.c_str(), jsonstat.c_str())) {
+  if(client.publish(topic.c_str(), jsonstat.c_str())) {
     Serial.println("[DISH] Packet forwarded:");
     serializeJsonPretty(doc, Serial);
     Serial.println("");

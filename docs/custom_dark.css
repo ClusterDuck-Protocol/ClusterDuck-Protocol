@@ -22,8 +22,27 @@ div.fragment, pre.fragment {
 	background: #32363d;
 }
 
+a img:hover {
+    opacity: 0.7;
+}
+
+
 a, a:link, a:visited {
 	color: #67d8ef !important;
+}
+
+#projectlogo a:link, 
+#projectlogo a:visited, 
+#projectlogo a:hover, 
+#projectlogo a:active {
+	all: initial;
+    text-decoration: none !important;
+}
+
+#projectbrief
+{
+	all: inherit;
+	font-size: 120%;
 }
 
 .highlighted {
@@ -39,7 +58,7 @@ a.highlighted {
 /*********************************************/
 #main-nav {
 	/* display: none; */
-	border-bottom: 1px solid #32363d;
+	border-bottom: 1px solid #2a2a2a;
 }
 
 #main-nav .sm-dox {
