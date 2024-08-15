@@ -27,19 +27,54 @@ CDPCFG_LORA_CLASS lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO0,
 volatile uint16_t DuckRadio::interruptFlags = 0;
 volatile bool DuckRadio::receivedFlag = false;
 
-DuckRadio::DuckRadio() {}
+int DuckRadio::checkLoRaParameters(LoraConfigParams config) {
+    int rc = DUCK_ERR_NONE;
+    if (config.func == NULL) {
+        logerr_ln("ERROR  interrupt function is NULL");
+        return DUCK_ERR_INVALID_ARGUMENT;
+    }
+    if (config.sf < 6 || config.sf > 12) {
+        logerr_ln("ERROR  spreading factor is invalid");
+        return DUCK_ERR_INVALID_ARGUMENT;
+    }
+    if (config.band < 150.0 || config.band > 960.0) {
+        logerr_ln("ERROR  frequency is invalid");
+        return DUCK_ERR_INVALID_ARGUMENT;
+    }
+    if (config.txPower < -9 || config.txPower > 22) {
+        logerr_ln("ERROR  tx power is invalid");
+        return DUCK_ERR_INVALID_ARGUMENT;
+    }
+    if (config.bw < 7.8 || config.bw > 500.0) {
+        logerr_ln("ERROR  bandwidth is invalid");
+        return DUCK_ERR_INVALID_ARGUMENT;
+    }
+    if (config.gain < 0 || config.gain > 3) {
+        logerr_ln("ERROR  gain is invalid");
+        return DUCK_ERR_INVALID_ARGUMENT;
+    }
+    return rc;
+}
 
 int DuckRadio::setupRadio(LoraConfigParams config) {
     loginfo_ln("Setting up RADIOLIB LoRa radio...");
     int rc;
+    rc = checkLoRaParameters(config);
+    if (rc != DUCK_ERR_NONE) {
+        return rc;
+    }
+
+    if (isSetup) {
+        loginfo_ln("LoRa radio already setup");
+        return DUCK_ERR_NONE;
+    }
+
     rc = lora.begin();
     if (rc != RADIOLIB_ERR_NONE) {
         logerr_ln("ERROR  initializing LoRa driver. state = %d", rc);
         return DUCKLORA_ERR_BEGIN;
     }
-    // Lora is started, we need to set all the radio parameters, before it can
-    // start receiving packets
-
+    
     loginfo_ln("Setting up LoRa radio parameters...");
     rc = lora.setFrequency(config.band);
     if (rc == RADIOLIB_ERR_INVALID_FREQUENCY) {
@@ -84,22 +119,7 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
     if (rc != RADIOLIB_ERR_NONE) {
         logerr_ln("ERROR  sync word is invalid");
         return DUCKLORA_ERR_SETUP;
-    }
-/*
-    #ifdef HELTEC_CUBE_CELL
-    rc = lora.setTCXO(1.8, 2000);
-    if (rc == RADIOLIB_ERR_INVALID_TCXO_VOLTAGE) {
-        logerr_ln("ERROR  TCXO failed!");
-        return DUCKLORA_ERR_SETUP;
-    }
-
-    rc = lora.setDio2AsRfSwitch();
-    if (rc != RADIOLIB_ERR_NONE) {
-        logerr_ln("ERROR  setDio2AsRfSwitch failed!");
-        return DUCKLORA_ERR_SETUP;
-    }
-    #endif
- */   
+    }   
 
     rc = lora.startReceive();
 
@@ -107,16 +127,26 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
         logerr_ln("ERROR Failed to start receive");
         return DUCKLORA_ERR_RECEIVE;
     }
+
+    channel = CDPCFG_RADIO_CHANNEL_1; // default channel
+
     loginfo_ln("LoRa radio setup complete");
+    isSetup = true;
     return DUCK_ERR_NONE;
 }
 
-void DuckRadio::setSyncWord(byte syncWord) {
+int DuckRadio::setSyncWord(byte syncWord) {
+    if (!isSetup) {
+        logerr_ln("ERROR  LoRa radio not setup");
+        return DUCKLORA_ERR_NOT_INITIALIZED;
+    }
     int error = lora.setSyncWord(syncWord);
     if (error != RADIOLIB_ERR_NONE) {
         logerr_ln("ERROR  sync word is invalid");
+        return error;
     }
-    lora.startReceive();
+    
+    return lora.startReceive();
 }
 
 int DuckRadio::goToReceiveMode(bool clearReceiveFlag) {
@@ -131,6 +161,12 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
     int packet_length = 0;
     int err = DUCK_ERR_NONE;
     int rxState = DUCK_ERR_NONE;
+
+    if (!isSetup) {
+        logerr_ln("ERROR  LoRa radio not setup");
+        return DUCKLORA_ERR_NOT_INITIALIZED;
+    }
+
     packet_length = lora.getPacketLength();
 
     if (packet_length < MIN_PACKET_LENGTH) {
@@ -174,7 +210,6 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
         logerr_ln("ERROR data crc mismatch: received: 0x%X, calculated: 0x%X",packet_data_crc, computed_data_crc);
         return DUCKLORA_ERR_HANDLE_PACKET;
     }
-    // we have a good packet
 #ifndef CDPCFG_RADIO_SX1262
     loginfo_ln("RX: rssi: %f snr: %f fe: %d size: %d", lora.getRSSI(), lora.getSNR(), lora.getFrequencyError(true), packet_length);
 #else
@@ -189,23 +224,43 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
     return err;
 }
 
-int DuckRadio::sendData(byte* data, int length) {
-    // display->log("sendData...");
+int DuckRadio::sendData(byte* data, int length)
+{
+
+    if (!isSetup) {
+        logerr_ln("ERROR  LoRa radio not setup");
+        return DUCKLORA_ERR_NOT_INITIALIZED;
+    }
     return startTransmitData(data, length);
 }
 
-int DuckRadio::relayPacket(DuckPacket* packet) {
-    // display->log("relayPacket...");
+int DuckRadio::relayPacket(DuckPacket* packet)
+{
+    
+    if(!isSetup) {
+        logerr_ln("ERROR  LoRa radio not setup");
+        return DUCKLORA_ERR_NOT_INITIALIZED;
+    }
+
     return startTransmitData(packet->getBuffer().data(),
                              packet->getBuffer().size());
 }
 
-int DuckRadio::sendData(std::vector<byte> data) {
-    // display->log("sendData...");
+int DuckRadio::sendData(std::vector<byte> data)
+{
+    if (!isSetup) {
+        logerr_ln("ERROR  LoRa radio not setup");
+        return DUCKLORA_ERR_NOT_INITIALIZED;
+    }
     return startTransmitData(data.data(), data.size());
 }
 
-int DuckRadio::startReceive() {
+int DuckRadio::startReceive()
+{
+    if (!isSetup) {
+        logerr_ln("ERROR  LoRa radio not setup");
+        return DUCKLORA_ERR_NOT_INITIALIZED;
+    }
     int state = lora.startReceive();
 
     if (state != RADIOLIB_ERR_NONE) {
@@ -216,56 +271,81 @@ int DuckRadio::startReceive() {
     return DUCK_ERR_NONE;
 }
 
-int DuckRadio::getRSSI() { return lora.getRSSI(); }
+int DuckRadio::getRSSI()
+{ 
+    if (!isSetup) {
+        logerr_ln("ERROR  LoRa radio not setup");
+        return DUCKLORA_ERR_NOT_INITIALIZED;
+    }
+    return lora.getRSSI(); 
+}
 
 // TODO: implement this
 int DuckRadio::ping() { return DUCK_ERR_NOT_SUPPORTED; }
 
-int DuckRadio::standBy() { return lora.standby(); }
-
-int DuckRadio::sleep() { return lora.sleep(); }
-
-void DuckRadio::processRadioIrq() {}
-
-void DuckRadio::setChannel(int channelNum) {
-
-    logdbg_ln("Setting Channel to : %d", channelNum);
-
-    int err;
-    switch(channelNum) {
-        case 2:
-            err = lora.setFrequency(CHANNEL_2);
-            lora.startReceive();
-            break;
-        case 3:
-            err = lora.setFrequency(CHANNEL_3);
-            lora.startReceive();
-            break;
-        case 4:
-            err = lora.setFrequency(CHANNEL_4);
-            lora.startReceive();
-            break;
-        case 5:
-            err = lora.setFrequency(CHANNEL_5);
-            lora.startReceive();
-            break;
-        case 6:
-            err = lora.setFrequency(CHANNEL_6);
-            lora.startReceive();
-            break;
-        case 1:
-        default:
-            err = lora.setFrequency(CHANNEL_1);
-            lora.startReceive();
-            break;
+int DuckRadio::standBy()
+{ 
+    int rc = DUCK_ERR_NONE;
+    if (!isSetup) {
+        logerr_ln("ERROR  LoRa radio not setup");
+        return DUCKLORA_ERR_NOT_INITIALIZED;
     }
+    if (lora.standby() != RADIOLIB_ERR_NONE) {
+        logerr_ln("ERROR  standby failed");
+        rc = DUCKLORA_ERR_STANDBY;
+    }
+    return rc;
+}
+
+int DuckRadio::sleep()
+{ 
+    int rc = DUCK_ERR_NONE;
+
+    if (!isSetup) {
+        logerr_ln("ERROR  LoRa radio not setup");
+        return DUCKLORA_ERR_NOT_INITIALIZED;
+    }    
+    if (lora.sleep() != RADIOLIB_ERR_NONE) {
+        logerr_ln("ERROR  sleep failed");
+        rc = DUCKLORA_ERR_SLEEP;
+    }
+    return rc;
+}
+
+int DuckRadio::setChannel(int channelNum)
+{
+
+    int err = DUCK_ERR_NONE;
+
+    if (!isSetup) {
+        logerr_ln("ERROR  LoRa radio not setup");
+        return DUCKLORA_ERR_NOT_INITIALIZED;
+    }
+
+    loginfo_ln("Setting Channel to : %d", channelNum);
+
+    int rc = DUCK_ERR_NONE;
+
+    if (channel == channelNum) {
+        loginfo_ln("Channel %d already set", channelNum);
+        return DUCK_ERR_NONE;
+    }
+    
+    if (channelNum < 1 || channelNum > 6) {
+        logerr_ln("ERROR Invalid channel number: %d", channelNum);
+        return DUCKLORA_ERR_INVALID_CHANNEL;
+    }
+
+    rc = lora.setFrequency(CDPCFG_RADIO_CHANNEL_1 - (channelNum - 1));
+
     if (err != RADIOLIB_ERR_NONE) {
-        logerr_ln("ERROR Failed to set channel");
+        logerr_ln("ERROR Failed to set channel %d - rc: %d", channelNum, rc);
     } else {
         lora.startReceive();
         channel = channelNum;
-        loginfo_ln("Channel Set");
+        loginfo_ln("Channel %d Set", channelNum);
     }
+    return rc;
 }
 
 void DuckRadio::serviceInterruptFlags() {
@@ -351,12 +431,17 @@ void DuckRadio::onInterrupt(void) {
 int DuckRadio::startTransmitData(byte* data, int length) {
     int err = DUCK_ERR_NONE;
     int tx_err = RADIOLIB_ERR_NONE;
+
+    if (!isSetup) {
+        logerr_ln("ERROR  LoRa radio not setup");
+        return DUCKLORA_ERR_NOT_INITIALIZED;
+    }
+
     loginfo_ln("TX data");
     logdbg_ln(" -> len: %d, %s", length, duckutils::convertToHex(data, length).c_str());
 
     long t1 = millis();
-    // this is going to wait for transmission to complete or to timeout
-    // when transmit is complete, the Di0 interrupt will be triggered
+    // non blocking transmit
     tx_err = lora.startTransmit(data, length);
     switch (tx_err) {
         case RADIOLIB_ERR_NONE:
@@ -371,13 +456,11 @@ int DuckRadio::startTransmitData(byte* data, int length) {
 
         case RADIOLIB_ERR_TX_TIMEOUT:
             logerr_ln("ERROR startTransmitData timeout!");
-            display->log("tx-tmout");
             err = DUCKLORA_ERR_TIMEOUT;
             break;
 
         default:
             logerr_ln("ERROR startTransmitData failed, err: %d", tx_err);
-            display->log("tx-fail");
             err = DUCKLORA_ERR_TRANSMIT;
             break;
     }

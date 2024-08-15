@@ -39,11 +39,6 @@ int DuckDetect::setupWithDefaults(std::vector<byte> deviceId, std::string ssid,
   //   return err;
   // }
 
-  // err = setupOTA();
-  // if (err != DUCK_ERR_NONE) {
-  //   logerr("ERROR setupWithDefaults - setupOTA src = %s\n",err);
-  //   return err;
-  // }
   duckNet->loadChannel();
 
   loginfo("DuckDetect setup done");
@@ -55,7 +50,6 @@ void DuckDetect::run() {
 
   duckRadio.serviceInterruptFlags();
 
-  handleOtaUpdate();
   if (DuckRadio::getReceiveFlag()) {
     handleReceivedPacket();
   }

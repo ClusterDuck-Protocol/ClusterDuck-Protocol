@@ -14,7 +14,6 @@
 
 // Device Id is too long
 #define DUCK_ERR_ID_TOO_LONG   -5101
-#define DUCK_ERR_OTA           -5200
 
 /// Lora module initialization error
 #define DUCKLORA_ERR_BEGIN          -1000
@@ -25,22 +24,30 @@
 #define DUCKLORA_ERR_RECEIVE        -1002
 /// Lora module timeout error
 #define DUCKLORA_ERR_TIMEOUT        -1003
-// Failed to send data
+/// Failed to send data
 #define DUCKLORA_ERR_TRANSMIT       -1004
-// Failed to handle data received from the Lora module
+/// Failed to handle data received from the Lora module
 #define DUCKLORA_ERR_HANDLE_PACKET  -1050
-// Attempted to send a message larger than 256 bytes
+/// Attempted to send a message larger than 256 bytes
 #define DUCKLORA_ERR_MSG_TOO_LARGE  -1051
-// Radio is busy sending data
+/// Radio is busy sending data
 #define DUCKLORA_ERR_TX_BUSY        -1052
+/// Invalid channel
+#define DUCKLORA_ERR_INVALID_CHANNEL -1053
+/// Radio not initialized
+#define DUCKLORA_ERR_NOT_INITIALIZED -1054
 
-// Wifi network is not availble
+#define DUCKLORA_ERR_STANDBY         -1055
+#define DUCKLORA_ERR_SLEEP           -1056
+
+
+/// Wifi network is not availble
 #define DUCKWIFI_ERR_NOT_AVAILABLE  -2000
-// Wifi is disconnected
+/// Wifi is disconnected
 #define DUCKWIFI_ERR_DISCONNECTED   -2001
-// Wifi generic setup error
+/// Wifi generic setup error
 #define DUCKWIFI_ERR_AP_CONFIG      -2002
-// DNS initialization failed
+/// DNS initialization failed
 #define DUCKDNS_ERR_STARTING        -3000
 
 

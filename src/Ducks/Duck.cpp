@@ -1,12 +1,5 @@
 #include "include/Duck.h"
 
-#ifndef CDPCFG_WIFI_NONE
-  #include <ArduinoOTA.h>
-  #include <esp_int_wdt.h>
-  #include <esp_task_wdt.h>
-  #include <Update.h>
-#endif
-
 #include <cassert>
 #include "../CdpPacket.h"
 #include "include/bloomfilter.h"
@@ -17,8 +10,9 @@
 const int MEMORY_LOW_THRESHOLD = PACKET_LENGTH + sizeof(CdpPacket);
 
 Duck::Duck(std::string name):
-  duckNet(new DuckNet(this)),
-  filter() // initialized filter with default values
+  
+  filter(), // initialized filter with default values
+  duckNet(new DuckNet(&filter))
 {
   duckName = name;
 }
@@ -203,62 +197,6 @@ int Duck::setupInternet(std::string ssid, std::string password) {
 }
 
 #ifdef CDPCFG_WIFI_NONE
-int Duck::setupOTA() { return DUCK_ERR_NONE; }
-#else
-int Duck::setupOTA() {
-
-  ArduinoOTA.onStart([]() {
-    std::string type;
-    if (ArduinoOTA.getCommand() == U_FLASH)
-      type = "sketch";
-    else // U_SPIFFS
-      type = "filesystem";
-
-    // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using
-    // SPIFFS.end()
-    loginfo_ln("setupOTA. Start updating %s", type);
-  });
-  ArduinoOTA.onEnd([]() { loginfo_ln("\nEnd"); });
-  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    loginfo_ln("Progress: %u%%\r", (progress / (total / 100)));
-  });
-
-  ArduinoOTA.onError([](ota_error_t error) {
-    loginfo_ln("Error[%u]: ", error);
-    switch (error) {
-      case OTA_AUTH_ERROR:
-        logerr_ln("ERROR setupOTA. Auth Failed");
-        break;
-      case OTA_BEGIN_ERROR:
-        logerr_ln("ERROR setupOTA. Begin Failed");
-        break;
-      case OTA_CONNECT_ERROR:
-        logerr_ln("ERROR setupOTA. Connect Failed");
-        break;
-      case OTA_RECEIVE_ERROR:
-        logerr_ln("ERROR setupOTA. Receive Failed");
-        break;
-      case OTA_END_ERROR:
-        logerr_ln("ERROR setupOTA. End Failed");
-        break;
-      default:
-        logerr_ln("ERROR setupOTA. Unknown Error");
-    }
-  });
-
-  ArduinoOTA.begin();
-  loginfo_ln("setupOTA rc = %d",DUCK_ERR_NONE);
-  return DUCK_ERR_NONE;
-}
-#endif
-
-#ifdef CDPCFG_WIFI_NONE
-void Duck::handleOtaUpdate() {}
-#else
-void Duck::handleOtaUpdate() { ArduinoOTA.handle(); }
-#endif
-
-#ifdef CDPCFG_WIFI_NONE
 void Duck::processPortalRequest() {}
 #else
 void Duck::processPortalRequest() { duckNet->dnsServer.processNextRequest(); }
@@ -323,36 +261,6 @@ int Duck::sendData(byte topic, std::vector<byte> data,
 
   return err;
 }
-
-#ifdef CDPCFG_WIFI_NONE
-void Duck::updateFirmware(const std::string & filename, size_t index, uint8_t* data, size_t len, bool final) {}
-#else
-void Duck::updateFirmware(const std::string & filename, size_t index, uint8_t* data, size_t len, bool final) {
-  if (!index) {
-    loginfo_ln("Pause Radio and starting OTA update");
-    duckRadio.standBy();
-
-    int cmd = (filename.find("spiffs") != std::string::npos) ? U_SPIFFS : U_FLASH;
-    if (!Update.begin(UPDATE_SIZE_UNKNOWN, cmd)) {
-
-      Update.printError(Serial);
-    }
-  }
-
-  if (Update.write(data, len) != len) {
-    Update.printError(Serial);
-    duckRadio.startReceive();
-  }
-
-  if (final) {
-    if (Update.end(true)) {
-      ESP.restart();
-      esp_task_wdt_init(1, true);
-      esp_task_wdt_add(NULL);
-    }
-  }
-}
-#endif
 
 muidStatus Duck::getMuidStatus(const std::vector<byte> & muid) const {
   if (duckutils::isEqual(muid, lastMessageMuid)) {
@@ -477,8 +385,6 @@ std::string Duck::getErrorString(int error) {
       return errorStr + "Setup failure";
     case DUCK_ERR_ID_TOO_LONG:
       return errorStr + "Id length is invalid";
-    case DUCK_ERR_OTA:
-      return errorStr + "OTA update failure";
     case DUCKLORA_ERR_BEGIN:
       return errorStr + "Lora module initialization failed";
     case DUCKLORA_ERR_SETUP:

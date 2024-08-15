@@ -17,16 +17,18 @@
 
 #include "cdpcfg.h"
 
-class DuckNet;
 // Since Duck needs to know about DuckNet and DuckNet needs to know about Duck,
 // this forward declaration allows a DuckNet reference to be declared in Duck.h.
 
-#include "Duck.h"
 #include <map>
 #include "DuckUtils.h"
 #include "DuckError.h"
 #include "DuckLogger.h"
 #include <string>
+
+#include "DuckRadio.h"
+#include "bloomfilter.h"
+#include "DuckPacket.h"
 
 #ifdef CDPCFG_WIFI_NONE
 #pragma info "WARNING: WiFi is disabled. DuckNet will not be available."
@@ -40,7 +42,6 @@ class DuckNet;
 #include <WiFiClientSecure.h>
 
 #include "DuckEsp.h"
-#include "OTAPage.h"
 #include "index.h"
 #include "wifiCredentials.h"
 #include "controlPanel.h"
@@ -55,7 +56,7 @@ class DuckNet;
 /**
  * @brief Internal network abstraction.
  *
- * Provides access to Webserver, DNS, WiFi and OTA update functionalities.
+ * Provides access to Webserver, DNS, and WiFi update functionalities.
  */
 class DuckNet {
 public:
@@ -261,19 +262,20 @@ public:
   static DNSServer dnsServer;
 #endif
 
-  DuckNet(Duck* duck);
+  DuckNet(BloomFilter *bloomFilter);
 
 private:
-
-  std::string getMuidStatusMessage(muidStatus status);
-  std::string getMuidStatusString(muidStatus status);
-  std::string createMuidResponseJson(muidStatus status);
 
   DuckNet(DuckNet const&) = delete;
   DuckNet& operator=(DuckNet const&) = delete;
 
-  Duck* duck;
+  DuckRadio& duckRadio = DuckRadio::getInstance();
+
+  DuckPacket* txPacket = NULL;
+
   std::vector<byte> deviceId;
+
+  BloomFilter *bloomFilter = nullptr;
 
   static const byte DNS_PORT;
   static const char* DNS;
