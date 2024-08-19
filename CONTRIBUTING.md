@@ -3,7 +3,7 @@
 When contributing a major change to this repository, please first discuss the change you wish to make via an [issue](contributing/ISSUES.md) or via
 [Slack](https://www.project-owl.com/slack). Minor issues can simply be addressed by sending a pull request.
 
-> Join our weekly town hall meeting at [2pm ET every Monday](https://meet.google.com/unq-duaq-ygj) and [bookmark our calendar](https://calendar.google.com/calendar/u/0/embed?src=c_725e2ebc8909e726ea797a87da018c8be98bdbb0659d5f636defae2d1b1a07eb@group.calendar.google.com&ctz=America/New_York) to learn about project priorities, milestones, and upcoming events.
+> Join our [Discord Server](https://discord.gg/33gmAXJG) to learn about milestones, upcoming events, and to join our Townhall and Quack-Hour meetings every Monday at 2pm ET.
 
 This project uses the [Developers Certificate of Origin (DCO)](#developer-certificate-of-origin) to validate that you own the rights to the code you want to contribute.
 
