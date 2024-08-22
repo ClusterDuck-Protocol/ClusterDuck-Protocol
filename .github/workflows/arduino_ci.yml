@@ -52,13 +52,13 @@ jobs:
         arduino-cli config set library.enable_unsafe_install true
         # udpate the index to include the Heltec ESP32 and CubeCell boards
         echo "[ARDUINO SETUP] Updating the index to include the Heltec ESP32 and CubeCell boards"
-        arduino-cli core update-index --additional-urls https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series/releases/download/1.0.0/package_heltec_esp32_index.json
+        arduino-cli core update-index --additional-urls https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series/releases/download/3.0.0/package_heltec_esp32_index.json
         arduino-cli core update-index --additional-urls https://github.com/HelTecAutomation/CubeCell-Arduino/releases/download/V1.5.0/package_CubeCell_index.json
         
         # install the Heltec ESP32 and CubeCell boards
         if [[ "${{ matrix.board }}" =~ "esp32:esp32:" ]]; then
           echo "[ARDUINO SETUP] Installing the Heltec ESP32 board"
-          arduino-cli core install esp32:esp32 --additional-urls https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series/releases/download/1.0.0/package_heltec_esp32_index.json
+          arduino-cli core install esp32:esp32 --additional-urls https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series/releases/download/3.0.0/package_heltec_esp32_index.json
         fi
         if [[ "${{ matrix.board }}" =~ "CubeCell:CubeCell:" ]]; then
           echo "[ARDUINO SETUP] Installing the CubeCell board"
