@@ -359,10 +359,6 @@ bool Duck::isWifiConnected() {
   return duckNet->isWifiConnected();
 }
 
-bool Duck::ssidAvailable(std::string ssid) {
-  return duckNet->ssidAvailable(ssid);
-}
-
 std::string Duck::getSsid() {
   return duckNet->getSsid();
 }
