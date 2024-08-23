@@ -256,12 +256,7 @@ int DuckNet::setupInternet(std::string ssid, std::string password)
   int rc = DUCK_ERR_NONE;
   this->ssid = ssid;
   this->password = password;
-  // Check if SSID is available
-  if (!ssidAvailable(ssid)) {
-    logerr_ln("ERROR setupInternet: %s is not available. Please check the provided ssid and/or passwords", ssid.c_str());
-    return DUCK_INTERNET_ERR_SSID;
-  }
-
+  
   //  Connect to Access Point
   loginfo_ln("setupInternet: connecting to WiFi access point SSID: %s",ssid.c_str());
   WiFi.begin(ssid.c_str(), password.c_str());
@@ -279,29 +274,6 @@ int DuckNet::setupInternet(std::string ssid, std::string password)
 
   return rc;
 
-}
-
-bool DuckNet::ssidAvailable(std::string val) {
-  int n = WiFi.scanNetworks();
-  
-  if (n == 0 || ssid == "") {
-    logdbg_ln("Networks found: %d", n);
-  } else {
-    logdbg_ln("Networks found: %d", n);
-    if (val == "") {
-      val = ssid;
-    }
-    for (int i = 0; i < n; ++i) {
-      if (WiFi.SSID(i) == val.c_str()) {
-        logdbg_ln("Given ssid is available!");
-        return true;
-      }
-      delay(AP_SCAN_INTERVAL_MS);
-    }
-  }
-  loginfo_ln("No ssid available");
-
-  return false;
 }
 
 void DuckNet::saveChannel(int val){

@@ -85,11 +85,6 @@ public:
     return DUCK_ERR_NONE;
   }
 
-  bool ssidAvailable(std::string val = "") {
-    logwarn_ln("WARNING ssidAvailable skipped, device has no WiFi.");
-    return false;
-  }
-
   void setSsid(std::string val) {
     logwarn_ln("WARNING setSsid skipped, device has no WiFi.");
   }
@@ -173,15 +168,6 @@ public:
    * @param password    password to join the network
    */
   int setupInternet(std::string ssid, std::string password);
-
-  /**
-   * @brief  Checks if the given ssid is available.
-   *
-   * @param val     ssid to check, default is an empty string and will use the
-   * internal default ssid
-   * @returns true if the ssid is available, false otherwise.
-   */
-  bool ssidAvailable(std::string val = "");
 
   /**
    * @brief Save / Write Wifi credentials to EEPROM

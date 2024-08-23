@@ -206,13 +206,6 @@ public:
    * @returns true if device wifi is connected, false otherwise. 
    */
   bool isWifiConnected();
-  /**
-   * @brief Check if the give access point is available.
-   * 
-   * @param ssid access point to check
-   * @returns true if the access point is available, false otherwise.
-   */
-  bool ssidAvailable(std::string ssid);
 
   /**
    * @brief Get the access point ssid

@@ -249,9 +249,6 @@ int PapaDuck::reconnectWifi(std::string ssid, std::string password) {
   logwarn_ln("WARNING reconnectWifi skipped, device has no WiFi.");
   return DUCK_ERR_NONE;
 #else
-  if (!duckNet->ssidAvailable(ssid)) {
-    return DUCKWIFI_ERR_NOT_AVAILABLE;
-  }
   duckNet->setupInternet(ssid, password);
   duckNet->setupDns();
   if (WiFi.status() != WL_CONNECTED) {
