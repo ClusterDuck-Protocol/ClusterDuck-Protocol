@@ -1,5 +1,7 @@
 var NAVTREEINDEX1 =
 {
+"globals_vars.html":[3,1,1],
+"heltec__cubecell__board_8h.html":[3,0,0,1,0,0],
 "heltec__cubecell__board_8h_source.html":[3,0,0,1,0,0],
 "heltec__cubecell__gps_8h.html":[3,0,0,1,0,1],
 "heltec__cubecell__gps_8h_source.html":[3,0,0,1,0,1],
@@ -58,9 +60,9 @@ var NAVTREEINDEX1 =
 "namespacemembers_vars.html":[1,1,2],
 "namespaces.html":[1,0],
 "pages.html":[],
-"papa_home_8h.html":[3,0,0,1,16],
-"papa_home_8h.html#add7787dc1036a94d02377383c2047e4a":[3,0,0,1,16,0],
-"papa_home_8h_source.html":[3,0,0,1,16],
+"papa_home_8h.html":[3,0,0,1,15],
+"papa_home_8h.html#add7787dc1036a94d02377383c2047e4a":[3,0,0,1,15,0],
+"papa_home_8h_source.html":[3,0,0,1,15],
 "struct_lora_config_params.html":[2,0,6],
 "struct_lora_config_params.html#a0952350e961aa2180b10f7d3bfa9bd0b":[2,0,6,1],
 "struct_lora_config_params.html#a184fcd88957d92fd56bd160fb9770738":[2,0,6,9],
@@ -74,7 +76,7 @@ var NAVTREEINDEX1 =
 "struct_lora_config_params.html#af2ebe2e5a8cec9c8c0644febc2091b08":[2,0,6,4],
 "ttgo__t__beam__v1__sx1276_8h.html":[3,0,0,1,0,5],
 "ttgo__t__beam__v1__sx1276_8h_source.html":[3,0,0,1,0,5],
-"wifi_credentials_8h.html":[3,0,0,1,17],
-"wifi_credentials_8h.html#a46f43114a43a357ea34c4246b06403c5":[3,0,0,1,17,0],
-"wifi_credentials_8h_source.html":[3,0,0,1,17]
+"wifi_credentials_8h.html":[3,0,0,1,16],
+"wifi_credentials_8h.html#a46f43114a43a357ea34c4246b06403c5":[3,0,0,1,16,0],
+"wifi_credentials_8h_source.html":[3,0,0,1,16]
 };

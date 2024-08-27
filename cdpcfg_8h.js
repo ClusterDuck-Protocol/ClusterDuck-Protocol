@@ -23,6 +23,12 @@ var cdpcfg_8h =
     [ "CDPCFG_PIN_RGBLED_B", "cdpcfg_8h.html#ade2b59c9fa435327aac360a92e18c000", null ],
     [ "CDPCFG_PIN_RGBLED_G", "cdpcfg_8h.html#a0b314d2303dd13d30c293e99e44d9889", null ],
     [ "CDPCFG_PIN_RGBLED_R", "cdpcfg_8h.html#ae8bb89e871f63dde4fe6434f420d80e2", null ],
+    [ "CDPCFG_RADIO_CHANNEL_1", "cdpcfg_8h.html#ac997cf8c7a80baf84344780d476b5f26", null ],
+    [ "CDPCFG_RADIO_CHANNEL_2", "cdpcfg_8h.html#ae5b90202a58f5953b9e3ad6a46b14bb3", null ],
+    [ "CDPCFG_RADIO_CHANNEL_3", "cdpcfg_8h.html#aeb07cb92ede85873dc194462a9d1708b", null ],
+    [ "CDPCFG_RADIO_CHANNEL_4", "cdpcfg_8h.html#a30def82b19d48de98bc7009a2c7ed9d9", null ],
+    [ "CDPCFG_RADIO_CHANNEL_5", "cdpcfg_8h.html#aadc152e03a61e8df938e6b90a2702eea", null ],
+    [ "CDPCFG_RADIO_CHANNEL_6", "cdpcfg_8h.html#a76d128470d7fd3c8be2c17db2a9c0b48", null ],
     [ "CDPCFG_RF_LORA_BW", "cdpcfg_8h.html#adc07e97b79250ddfd7c8e2dc119e892f", null ],
     [ "CDPCFG_RF_LORA_FREQ", "cdpcfg_8h.html#a76429eb9d4f8fd3dc8c8fc902e9eb8fd", null ],
     [ "CDPCFG_RF_LORA_FREQ_HZ", "cdpcfg_8h.html#a04e1a63e177c7512f4c5f77d75f1c617", null ],
@@ -33,11 +39,5 @@ var cdpcfg_8h =
     [ "CDPCFG_UPDATE_PASSWORD", "cdpcfg_8h.html#a18efacccf4c956bdcc082d9540e42ca5", null ],
     [ "CDPCFG_UPDATE_USERNAME", "cdpcfg_8h.html#accf2dc3b0d9894db8be9f990a4059f72", null ],
     [ "CDPCFG_UUID_LEN", "cdpcfg_8h.html#ae8f9a966c10a74fe57e8d30290d10227", null ],
-    [ "CDPCFG_WEB_PORT", "cdpcfg_8h.html#a821294e2f6701503091a967cac63d2c9", null ],
-    [ "CHANNEL_1", "cdpcfg_8h.html#a0163025498d90e61500d3aa30b422efa", null ],
-    [ "CHANNEL_2", "cdpcfg_8h.html#aed0f3200ae4286984ee855977dfe55c7", null ],
-    [ "CHANNEL_3", "cdpcfg_8h.html#ab587e7781ee7b458ea7989213e1b7920", null ],
-    [ "CHANNEL_4", "cdpcfg_8h.html#af8d68b8243921dcdcc9cf688cf74ac28", null ],
-    [ "CHANNEL_5", "cdpcfg_8h.html#a948d53cf577f841a3d73b0af44752e9e", null ],
-    [ "CHANNEL_6", "cdpcfg_8h.html#a894971fa0d1b7a4b422e2dd19964d865", null ]
+    [ "CDPCFG_WEB_PORT", "cdpcfg_8h.html#a821294e2f6701503091a967cac63d2c9", null ]
 ];

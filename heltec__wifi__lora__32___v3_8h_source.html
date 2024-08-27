@@ -93,10 +93,10 @@ $(document).ready(function(){initNavTree('heltec__wifi__lora__32___v3_8h_source.
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> */</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment">// This is becoming ridiculous. 3 different build systems, 3 different ways to define the board name.</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment">// Arduino IDE: ARDUINO_WIFI_LORA_32_V3</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment">// Arduino IDE: ARDUINO_HELTEC_WIFI_LORA_32_V3</span></div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment">// PlatformIO: ARDUINO_heltec_wifi_lora_32_V3</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment">// Arduino Cli: ARDUINO_heltec_wifi_32_lora_V3</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#if defined(ARDUINO_WIFI_LORA_32_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3) || defined(ARDUINO_heltec_wifi_32_lora_V3)</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#if defined(ARDUINO_HELTEC_WIFI_LORA_32_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3) || defined(ARDUINO_heltec_wifi_32_lora_V3)</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#define CDP_BOARD_NAME &quot;Heltec WiFi LoRa 32 V3&quot;</span></div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#define CDPCFG_RADIO_SX1262</span></div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
@@ -104,7 +104,7 @@ $(document).ready(function(){initNavTree('heltec__wifi__lora__32___v3_8h_source.
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment">// Uncomment this to enable the OLED display</span></div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#define ENABLE_DISPLAY</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="comment">// Lora configurations </span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="comment">// Lora configurations</span></div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#define CDPCFG_PIN_LORA_CS      8</span></div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#define CDPCFG_PIN_LORA_RST     12</span></div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#define CDPCFG_PIN_LORA_DIO0    13</span></div>

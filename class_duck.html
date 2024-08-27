@@ -139,8 +139,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a97e4e4eac7d09d7b19a6ec32ed6e3316"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a97e4e4eac7d09d7b19a6ec32ed6e3316">setupInternet</a> (std::string ssid, std::string password)</td></tr>
 <tr class="memdesc:a97e4e4eac7d09d7b19a6ec32ed6e3316"><td class="mdescLeft">&#160;</td><td class="mdescRight">Setup internet access.  <a href="class_duck.html#a97e4e4eac7d09d7b19a6ec32ed6e3316">More...</a><br /></td></tr>
 <tr class="separator:a97e4e4eac7d09d7b19a6ec32ed6e3316"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d339c8180e2786f53d66f7b9b91f7d6"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a9d339c8180e2786f53d66f7b9b91f7d6">setupOTA</a> ()</td></tr>
-<tr class="separator:a9d339c8180e2786f53d66f7b9b91f7d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac0fabaca99305598a713a5da05fdc0c8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#ac0fabaca99305598a713a5da05fdc0c8">sendData</a> (byte topic, const std::string data, const std::vector&lt; byte &gt; targetDevice=ZERO_DUID, std::vector&lt; byte &gt; *outgoingMuid=NULL)</td></tr>
 <tr class="memdesc:ac0fabaca99305598a713a5da05fdc0c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends data into the mesh network.  <a href="class_duck.html#ac0fabaca99305598a713a5da05fdc0c8">More...</a><br /></td></tr>
 <tr class="separator:ac0fabaca99305598a713a5da05fdc0c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -153,18 +151,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a414ba3fbf13759049154076b934d18e8"><td class="memItemLeft" align="right" valign="top">CdpPacket&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a414ba3fbf13759049154076b934d18e8">buildCdpPacket</a> (byte topic, const std::vector&lt; byte &gt; data, const std::vector&lt; byte &gt; targetDevice, const std::vector&lt; byte &gt; &amp;muid)</td></tr>
 <tr class="memdesc:a414ba3fbf13759049154076b934d18e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds a CdpPacket with a specified muid.  <a href="class_duck.html#a414ba3fbf13759049154076b934d18e8">More...</a><br /></td></tr>
 <tr class="separator:a414ba3fbf13759049154076b934d18e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a75deecd06db3aaccf4c930ca3bcb43f3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a75deecd06db3aaccf4c930ca3bcb43f3">updateFirmware</a> (const std::string &amp;filename, size_t index, uint8_t *data, size_t len, bool final)</td></tr>
-<tr class="memdesc:a75deecd06db3aaccf4c930ca3bcb43f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Updates the firmware on the device.  <a href="class_duck.html#a75deecd06db3aaccf4c930ca3bcb43f3">More...</a><br /></td></tr>
-<tr class="separator:a75deecd06db3aaccf4c930ca3bcb43f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad2210de36be0eeb98d87e64fabbbaf45"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_duck_8h.html#a5931873aef9ff172ae93e721a3f84aa9">muidStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#ad2210de36be0eeb98d87e64fabbbaf45">getMuidStatus</a> (const std::vector&lt; byte &gt; &amp;muid) const</td></tr>
 <tr class="memdesc:ad2210de36be0eeb98d87e64fabbbaf45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the status of an MUID.  <a href="class_duck.html#ad2210de36be0eeb98d87e64fabbbaf45">More...</a><br /></td></tr>
 <tr class="separator:ad2210de36be0eeb98d87e64fabbbaf45"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a09149de412d44bc20792b6412e296c13"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a09149de412d44bc20792b6412e296c13">isWifiConnected</a> ()</td></tr>
 <tr class="memdesc:a09149de412d44bc20792b6412e296c13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check wifi connection status.  <a href="class_duck.html#a09149de412d44bc20792b6412e296c13">More...</a><br /></td></tr>
 <tr class="separator:a09149de412d44bc20792b6412e296c13"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a69c885ca42021113d9dbfcea5009dd0b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a69c885ca42021113d9dbfcea5009dd0b">ssidAvailable</a> (std::string ssid)</td></tr>
-<tr class="memdesc:a69c885ca42021113d9dbfcea5009dd0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the give access point is available.  <a href="class_duck.html#a69c885ca42021113d9dbfcea5009dd0b">More...</a><br /></td></tr>
-<tr class="separator:a69c885ca42021113d9dbfcea5009dd0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abfceae63bc916c2f878d629613d50c57"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#abfceae63bc916c2f878d629613d50c57">getSsid</a> ()</td></tr>
 <tr class="memdesc:abfceae63bc916c2f878d629613d50c57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the access point ssid.  <a href="class_duck.html#abfceae63bc916c2f878d629613d50c57">More...</a><br /></td></tr>
 <tr class="separator:abfceae63bc916c2f878d629613d50c57"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -229,9 +221,6 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a8fde44959e2ca108af1799f87f754336"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a8fde44959e2ca108af1799f87f754336">processPortalRequest</a> ()</td></tr>
 <tr class="memdesc:a8fde44959e2ca108af1799f87f754336"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handle request from emergency portal.  <a href="class_duck.html#a8fde44959e2ca108af1799f87f754336">More...</a><br /></td></tr>
 <tr class="separator:a8fde44959e2ca108af1799f87f754336"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac9407d040d345391b1aecfb18404542f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#ac9407d040d345391b1aecfb18404542f">handleOtaUpdate</a> ()</td></tr>
-<tr class="memdesc:ac9407d040d345391b1aecfb18404542f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handle over the air firmware update.  <a href="class_duck.html#ac9407d040d345391b1aecfb18404542f">More...</a><br /></td></tr>
-<tr class="separator:ac9407d040d345391b1aecfb18404542f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-methods"></a>
 Static Protected Member Functions</h2></td></tr>
@@ -251,8 +240,8 @@ Protected Attributes</h2></td></tr>
 <tr class="separator:aa94854a4f643efc6212d9e627c7ab44d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aecf698676336de0fff0a80ca7deb3b50"><td class="memItemLeft" align="right" valign="top">std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#aecf698676336de0fff0a80ca7deb3b50">duid</a></td></tr>
 <tr class="separator:aecf698676336de0fff0a80ca7deb3b50"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9ce9a617a7b8293be487fe28774eb9b2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_duck_radio.html">DuckRadio</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a9ce9a617a7b8293be487fe28774eb9b2">duckRadio</a></td></tr>
-<tr class="separator:a9ce9a617a7b8293be487fe28774eb9b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f194cb1575afb927fc5ccd5c76a0f00"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_duck_radio.html">DuckRadio</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a2f194cb1575afb927fc5ccd5c76a0f00">duckRadio</a> = <a class="el" href="class_duck_radio.html#a3d86f64f9817264c9272292acea3cd54">DuckRadio::getInstance</a>()</td></tr>
+<tr class="separator:a2f194cb1575afb927fc5ccd5c76a0f00"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac23aaf80fd98d8d7e890f0619fefa968"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_duck_net.html">DuckNet</a> *const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#ac23aaf80fd98d8d7e890f0619fefa968">duckNet</a></td></tr>
 <tr class="separator:ac23aaf80fd98d8d7e890f0619fefa968"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a401cc1ab76bbea8030d8c48cba084a2c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_duck_packet.html">DuckPacket</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a401cc1ab76bbea8030d8c48cba084a2c">txPacket</a> = NULL</td></tr>
@@ -685,33 +674,6 @@ Protected Attributes</h2></td></tr>
 
 <p>Get the duck type. </p>
 <dl class="section return"><dt>Returns</dt><dd>A value representing a DuckType </dd></dl>
-
-</div>
-</div>
-<a id="ac9407d040d345391b1aecfb18404542f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac9407d040d345391b1aecfb18404542f">&#9670;&nbsp;</a></span>handleOtaUpdate()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Duck::handleOtaUpdate </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Handle over the air firmware update. </p>
 
 </div>
 </div>
@@ -1461,23 +1423,6 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a9d339c8180e2786f53d66f7b9b91f7d6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9d339c8180e2786f53d66f7b9b91f7d6">&#9670;&nbsp;</a></span>setupOTA()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int Duck::setupOTA </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a02e4e6acfc49f20f352623fb1519b991"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a02e4e6acfc49f20f352623fb1519b991">&#9670;&nbsp;</a></span>setupRadio()</h2>
 
@@ -1697,33 +1642,6 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a69c885ca42021113d9dbfcea5009dd0b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a69c885ca42021113d9dbfcea5009dd0b">&#9670;&nbsp;</a></span>ssidAvailable()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool Duck::ssidAvailable </td>
-          <td>(</td>
-          <td class="paramtype">std::string&#160;</td>
-          <td class="paramname"><em>ssid</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Check if the give access point is available. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">ssid</td><td>access point to check </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>true if the access point is available, false otherwise. </dd></dl>
-
-</div>
-</div>
 <a id="a4a6e0d24b829a3b9760d94b1095a4d02"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4a6e0d24b829a3b9760d94b1095a4d02">&#9670;&nbsp;</a></span>startReceive()</h2>
 
@@ -1749,55 +1667,6 @@ Protected Attributes</h2></td></tr>
 
 <p>Tell the duck radio to start receiving packets from the mesh network. </p>
 <dl class="section return"><dt>Returns</dt><dd>DUCK_ERR_NONE if successful, an error code otherwise </dd></dl>
-
-</div>
-</div>
-<a id="a75deecd06db3aaccf4c930ca3bcb43f3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a75deecd06db3aaccf4c930ca3bcb43f3">&#9670;&nbsp;</a></span>updateFirmware()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Duck::updateFirmware </td>
-          <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>filename</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>index</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint8_t *&#160;</td>
-          <td class="paramname"><em>data</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>len</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>final</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Updates the firmware on the device. </p>
-<p>TODO: Additional documentation </p>
 
 </div>
 </div>
@@ -1868,8 +1737,8 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a9ce9a617a7b8293be487fe28774eb9b2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9ce9a617a7b8293be487fe28774eb9b2">&#9670;&nbsp;</a></span>duckRadio</h2>
+<a id="a2f194cb1575afb927fc5ccd5c76a0f00"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f194cb1575afb927fc5ccd5c76a0f00">&#9670;&nbsp;</a></span>duckRadio</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1878,7 +1747,7 @@ Protected Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_duck_radio.html">DuckRadio</a> Duck::duckRadio</td>
+          <td class="memname"><a class="el" href="class_duck_radio.html">DuckRadio</a>&amp; Duck::duckRadio = <a class="el" href="class_duck_radio.html#a3d86f64f9817264c9272292acea3cd54">DuckRadio::getInstance</a>()</td>
         </tr>
       </table>
   </td>

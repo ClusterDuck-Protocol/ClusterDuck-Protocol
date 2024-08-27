@@ -20,7 +20,6 @@ var dir_b0856f6b0d80ccb263b2f415c91f9e17 =
     [ "DuckTypes.h", "_duck_types_8h.html", "_duck_types_8h" ],
     [ "DuckUtils.h", "_duck_utils_8h.html", "_duck_utils_8h" ],
     [ "index.h", "index_8h.html", "index_8h" ],
-    [ "OTAPage.h", "_o_t_a_page_8h.html", "_o_t_a_page_8h" ],
     [ "papaHome.h", "papa_home_8h.html", "papa_home_8h" ],
     [ "wifiCredentials.h", "wifi_credentials_8h.html", "wifi_credentials_8h" ]
 ];

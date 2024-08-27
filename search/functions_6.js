@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['handleotaupdate_301',['handleOtaUpdate',['../class_duck.html#ac9407d040d345391b1aecfb18404542f',1,'Duck']]]
+  ['imalive_304',['imAlive',['../class_duck.html#a9b5501043f7804263b391555f33aa986',1,'Duck']]],
+  ['isequal_305',['isEqual',['../namespaceduckutils.html#a73122238e9e6161a781b25f4a74cca44',1,'duckutils']]],
+  ['iswificonnected_306',['isWifiConnected',['../class_duck.html#a09149de412d44bc20792b6412e296c13',1,'Duck::isWifiConnected()'],['../class_duck_net.html#a393440e488e564a2269bdec8a218f1a2',1,'DuckNet::isWifiConnected()']]]
 ];

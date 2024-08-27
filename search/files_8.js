@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['papaduck_2ecpp_256',['PapaDuck.cpp',['../_papa_duck_8cpp.html',1,'']]],
-  ['papahome_2eh_257',['papaHome.h',['../papa_home_8h.html',1,'']]]
+  ['ttgo_5ft_5fbeam_5fv1_5fsx1276_2eh_259',['ttgo_t_beam_v1_sx1276.h',['../ttgo__t__beam__v1__sx1276_8h.html',1,'']]]
 ];

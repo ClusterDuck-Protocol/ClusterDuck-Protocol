@@ -92,198 +92,192 @@ $(document).ready(function(){initNavTree('_duck_net_8h_source.html',''); initRes
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="cdpcfg_8h.html">cdpcfg.h</a>&quot;</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">class </span><a class="code" href="class_duck_net.html">DuckNet</a>;</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="comment">// Since Duck needs to know about DuckNet and DuckNet needs to know about Duck,</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="comment">// this forward declaration allows a DuckNet reference to be declared in Duck.h.</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_duck_8h.html">Duck.h</a>&quot;</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &lt;map&gt;</span></div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_duck_utils_8h.html">DuckUtils.h</a>&quot;</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#include &quot;DuckError.h&quot;</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#include &quot;DuckLogger.h&quot;</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#ifdef CDPCFG_WIFI_NONE</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">#pragma info &quot;WARNING: WiFi is disabled. DuckNet will not be available.&quot;</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">#include &lt;Update.h&gt;</span></div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="preprocessor">#include &lt;DNSServer.h&gt;</span></div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">#include &lt;ESPAsyncWebServer.h&gt;</span></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="preprocessor">#include &lt;ESPmDNS.h&gt;</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="preprocessor">#include &lt;WiFi.h&gt;</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="preprocessor">#include &lt;WiFiClientSecure.h&gt;</span></div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_duck_esp_8h.html">DuckEsp.h</a>&quot;</span></div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_o_t_a_page_8h.html">OTAPage.h</a>&quot;</span></div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="index_8h.html">index.h</a>&quot;</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="wifi_credentials_8h.html">wifiCredentials.h</a>&quot;</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="control_panel_8h.html">controlPanel.h</a>&quot;</span></div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="cdp_home_8h.html">cdpHome.h</a>&quot;</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="papa_home_8h.html">papaHome.h</a>&quot;</span></div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="comment">// Since Duck needs to know about DuckNet and DuckNet needs to know about Duck,</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="comment">// this forward declaration allows a DuckNet reference to be declared in Duck.h.</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &lt;map&gt;</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_duck_utils_8h.html">DuckUtils.h</a>&quot;</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &quot;DuckError.h&quot;</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &quot;DuckLogger.h&quot;</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_duck_radio_8h.html">DuckRadio.h</a>&quot;</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="bloomfilter_8h.html">bloomfilter.h</a>&quot;</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_duck_packet_8h.html">DuckPacket.h</a>&quot;</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#ifdef CDPCFG_WIFI_NONE</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">#pragma info &quot;WARNING: WiFi is disabled. DuckNet will not be available.&quot;</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">#include &lt;Update.h&gt;</span></div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="preprocessor">#include &lt;DNSServer.h&gt;</span></div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="preprocessor">#include &lt;ESPAsyncWebServer.h&gt;</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="preprocessor">#include &lt;ESPmDNS.h&gt;</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">#include &lt;WiFi.h&gt;</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor">#include &lt;WiFiClientSecure.h&gt;</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_duck_esp_8h.html">DuckEsp.h</a>&quot;</span></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="index_8h.html">index.h</a>&quot;</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="wifi_credentials_8h.html">wifiCredentials.h</a>&quot;</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="control_panel_8h.html">controlPanel.h</a>&quot;</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="cdp_home_8h.html">cdpHome.h</a>&quot;</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="papa_home_8h.html">papaHome.h</a>&quot;</span></div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
-<div class="line"><a name="l00053"></a><span class="lineno"><a class="line" href="_duck_net_8h.html#aba4a92db4249aded425b58254e5dbbae">   53</a></span>&#160;<span class="preprocessor">#define AP_SCAN_INTERVAL_MS 10</span></div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
-<div class="line"><a name="l00060"></a><span class="lineno"><a class="line" href="class_duck_net.html">   60</a></span>&#160;<span class="keyword">class </span><a class="code" href="class_duck_net.html">DuckNet</a> {</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
-<div class="line"><a name="l00063"></a><span class="lineno"><a class="line" href="class_duck_net.html#ad757b9cd43b62d0d1cf2608625f7b690">   63</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#ad757b9cd43b62d0d1cf2608625f7b690">channel</a>;</div>
-<div class="line"><a name="l00064"></a><span class="lineno"><a class="line" href="class_duck_net.html#a3fd723d211e67416f9c01a3263ff368e">   64</a></span>&#160;  std::string <a class="code" href="class_duck_net.html#a3fd723d211e67416f9c01a3263ff368e">duckSession</a>;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="preprocessor">#ifdef CDPCFG_WIFI_NONE</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#af03e8abe9a6cef40de6eb68c4978440f">setupWebServer</a>(<span class="keywordtype">bool</span> createCaptivePortal = <span class="keyword">false</span>, std::string html = <span class="stringliteral">&quot;&quot;</span>) {</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING setupWebServer skipped, device has no WiFi.&quot;</span>);</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keywordflow">return</span> DUCK_ERR_NONE;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  }</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#adc99c966344f8ca8fe0c92b7ac74b498">setupWifiAp</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* accessPoint = <span class="stringliteral">&quot;DuckLink&quot;</span>) {</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING setupWifiAp skipped, device has no WiFi.&quot;</span>);</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="keywordflow">return</span> DUCK_ERR_NONE;</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  }</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#adf1b556e746790e133583abb73329cb0">setupDns</a>() {</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING setupDns skipped, device has no WiFi.&quot;</span>);</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="keywordflow">return</span> DUCK_ERR_NONE;</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  }</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160; </div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#a24ad57e3d50ac2f17b44099f501809e4">setupInternet</a>(std::string ssid, std::string password) {</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING setupInternet skipped, device has no WiFi.&quot;</span>);</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keywordflow">return</span> DUCK_ERR_NONE;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  }</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="class_duck_net.html#a4eecc153ba912effdaf7b69d83485b6c">ssidAvailable</a>(std::string val = <span class="stringliteral">&quot;&quot;</span>) {</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING ssidAvailable skipped, device has no WiFi.&quot;</span>);</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
+<div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="_duck_net_8h.html#aba4a92db4249aded425b58254e5dbbae">   54</a></span>&#160;<span class="preprocessor">#define AP_SCAN_INTERVAL_MS 10</span></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
+<div class="line"><a name="l00061"></a><span class="lineno"><a class="line" href="class_duck_net.html">   61</a></span>&#160;<span class="keyword">class </span><a class="code" href="class_duck_net.html">DuckNet</a> {</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160; </div>
+<div class="line"><a name="l00064"></a><span class="lineno"><a class="line" href="class_duck_net.html#ad757b9cd43b62d0d1cf2608625f7b690">   64</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#ad757b9cd43b62d0d1cf2608625f7b690">channel</a>;</div>
+<div class="line"><a name="l00065"></a><span class="lineno"><a class="line" href="class_duck_net.html#a3fd723d211e67416f9c01a3263ff368e">   65</a></span>&#160;  std::string <a class="code" href="class_duck_net.html#a3fd723d211e67416f9c01a3263ff368e">duckSession</a>;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">#ifdef CDPCFG_WIFI_NONE</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#af03e8abe9a6cef40de6eb68c4978440f">setupWebServer</a>(<span class="keywordtype">bool</span> createCaptivePortal = <span class="keyword">false</span>, std::string html = <span class="stringliteral">&quot;&quot;</span>) {</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING setupWebServer skipped, device has no WiFi.&quot;</span>);</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <span class="keywordflow">return</span> DUCK_ERR_NONE;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  }</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#adc99c966344f8ca8fe0c92b7ac74b498">setupWifiAp</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* accessPoint = <span class="stringliteral">&quot;DuckLink&quot;</span>) {</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING setupWifiAp skipped, device has no WiFi.&quot;</span>);</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <span class="keywordflow">return</span> DUCK_ERR_NONE;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  }</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#adf1b556e746790e133583abb73329cb0">setupDns</a>() {</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING setupDns skipped, device has no WiFi.&quot;</span>);</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keywordflow">return</span> DUCK_ERR_NONE;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  }</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160; </div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#a24ad57e3d50ac2f17b44099f501809e4">setupInternet</a>(std::string ssid, std::string password) {</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING setupInternet skipped, device has no WiFi.&quot;</span>);</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="keywordflow">return</span> DUCK_ERR_NONE;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  }</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160; </div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_duck_net.html#a628d4040b156cd7ecd585d019f5ef8c8">setSsid</a>(std::string val) {</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING setSsid skipped, device has no WiFi.&quot;</span>);</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  }</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_duck_net.html#a628d4040b156cd7ecd585d019f5ef8c8">setSsid</a>(std::string val) {</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING setSsid skipped, device has no WiFi.&quot;</span>);</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_duck_net.html#ae2da5685c74057f46210a5b008b49753">setPassword</a>(std::string val) {</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING setPassword skipped, device has no WiFi.&quot;</span>);</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  }</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160; </div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_duck_net.html#ae2da5685c74057f46210a5b008b49753">setPassword</a>(std::string val) {</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING setPassword skipped, device has no WiFi.&quot;</span>);</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  }</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160; </div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  std::string <a class="code" href="class_duck_net.html#a4bac22808e4120262d1538e9be816698">getSsid</a>() {</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING getSsid skipped, device has no WiFi.&quot;</span>);</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <span class="keywordflow">return</span> std::string(<span class="stringliteral">&quot;&quot;</span>);</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  }</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  std::string <a class="code" href="class_duck_net.html#afcac65512ef0a9b74f6f0826300612e8">getPassword</a>() {</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING getPassword skipped, device has no WiFi.&quot;</span>);</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <span class="keywordflow">return</span> std::string(<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  std::string <a class="code" href="class_duck_net.html#a4bac22808e4120262d1538e9be816698">getSsid</a>() {</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING getSsid skipped, device has no WiFi.&quot;</span>);</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="keywordflow">return</span> std::string(<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  }</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160; </div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;  std::string <a class="code" href="class_duck_net.html#afcac65512ef0a9b74f6f0826300612e8">getPassword</a>() {</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING getPassword skipped, device has no WiFi.&quot;</span>);</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <span class="keywordflow">return</span> std::string(<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  }</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160; </div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_duck_net.html#ae6aedb1e4656307a39c370bb42e9f98a">setDeviceId</a>(std::vector&lt;byte&gt; deviceId) {</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING setDeviceId skipped, device has no WiFi.&quot;</span>);</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  }</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160; </div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_duck_net.html#ae6aedb1e4656307a39c370bb42e9f98a">setDeviceId</a>(std::vector&lt;byte&gt; deviceId) {</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING setDeviceId skipped, device has no WiFi.&quot;</span>);</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  }</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="class_duck_net.html#a393440e488e564a2269bdec8a218f1a2">isWifiConnected</a>() {</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING isWifiConnected skipped, device has no WiFi.&quot;</span>);</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  }</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#a98508f1de7a2bf259d91d770b358f6ae">loadWiFiCredentials</a>() {</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING loadWiFiCredentials skipped, device has no WiFi.&quot;</span>);</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="keywordflow">return</span> DUCK_ERR_NONE;</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="class_duck_net.html#a393440e488e564a2269bdec8a218f1a2">isWifiConnected</a>() {</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING isWifiConnected skipped, device has no WiFi.&quot;</span>);</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  }</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160; </div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#a98508f1de7a2bf259d91d770b358f6ae">loadWiFiCredentials</a>() {</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING loadWiFiCredentials skipped, device has no WiFi.&quot;</span>);</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="keywordflow">return</span> DUCK_ERR_NONE;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  }</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160; </div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_duck_net.html#a2b229176ee12d9438983347adf0c3137">saveChannel</a>(<span class="keywordtype">int</span> val) {</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING saveChannel skipped, device has no WiFi.&quot;</span>);</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  }</div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160; </div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_duck_net.html#a2b229176ee12d9438983347adf0c3137">saveChannel</a>(<span class="keywordtype">int</span> val) {</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING saveChannel skipped, device has no WiFi.&quot;</span>);</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;  }</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160; </div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#a46aee82eff4b1b77df321b0250fa046a">getChannel</a>() {</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING getChannel skipped, device has no WiFi.&quot;</span>);</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#a46aee82eff4b1b77df321b0250fa046a">getChannel</a>() {</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING getChannel skipped, device has no WiFi.&quot;</span>);</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;  }</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160; </div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_duck_net.html#ae67d21661ff5a48777d902e1abf9f9f4">loadChannel</a>() {</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING loadChannel skipped, device has no WiFi.&quot;</span>);</div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  }</div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160; </div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_duck_net.html#ae67d21661ff5a48777d902e1abf9f9f4">loadChannel</a>() {</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    logwarn_ln(<span class="stringliteral">&quot;WARNING loadChannel skipped, device has no WiFi.&quot;</span>);</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;  }</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160; </div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00150"></a><span class="lineno"><a class="line" href="class_duck_net.html#af03e8abe9a6cef40de6eb68c4978440f">  150</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#af03e8abe9a6cef40de6eb68c4978440f">setupWebServer</a>(<span class="keywordtype">bool</span> createCaptivePortal = <span class="keyword">false</span>, std::string html = <span class="stringliteral">&quot;&quot;</span>);</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160; </div>
-<div class="line"><a name="l00159"></a><span class="lineno"><a class="line" href="class_duck_net.html#adc99c966344f8ca8fe0c92b7ac74b498">  159</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#adc99c966344f8ca8fe0c92b7ac74b498">setupWifiAp</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* accessPoint = <span class="stringliteral">&quot;DuckLink&quot;</span>);</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160; </div>
-<div class="line"><a name="l00166"></a><span class="lineno"><a class="line" href="class_duck_net.html#adf1b556e746790e133583abb73329cb0">  166</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#adf1b556e746790e133583abb73329cb0">setupDns</a>();</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160; </div>
-<div class="line"><a name="l00174"></a><span class="lineno"><a class="line" href="class_duck_net.html#a24ad57e3d50ac2f17b44099f501809e4">  174</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#a24ad57e3d50ac2f17b44099f501809e4">setupInternet</a>(std::string ssid, std::string password);</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160; </div>
-<div class="line"><a name="l00183"></a><span class="lineno"><a class="line" href="class_duck_net.html#a4eecc153ba912effdaf7b69d83485b6c">  183</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="class_duck_net.html#a4eecc153ba912effdaf7b69d83485b6c">ssidAvailable</a>(std::string val = <span class="stringliteral">&quot;&quot;</span>);</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160; </div>
-<div class="line"><a name="l00192"></a><span class="lineno"><a class="line" href="class_duck_net.html#aee618ca707c409dfef470a352a92c4eb">  192</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#aee618ca707c409dfef470a352a92c4eb">saveWifiCredentials</a>(std::string ssid, std::string password);</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160; </div>
-<div class="line"><a name="l00199"></a><span class="lineno"><a class="line" href="class_duck_net.html#a2b229176ee12d9438983347adf0c3137">  199</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_duck_net.html#a2b229176ee12d9438983347adf0c3137">saveChannel</a>(<span class="keywordtype">int</span> val);</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160; </div>
-<div class="line"><a name="l00204"></a><span class="lineno"><a class="line" href="class_duck_net.html#ae67d21661ff5a48777d902e1abf9f9f4">  204</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_duck_net.html#ae67d21661ff5a48777d902e1abf9f9f4">loadChannel</a>();</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00146"></a><span class="lineno"><a class="line" href="class_duck_net.html#af03e8abe9a6cef40de6eb68c4978440f">  146</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#af03e8abe9a6cef40de6eb68c4978440f">setupWebServer</a>(<span class="keywordtype">bool</span> createCaptivePortal = <span class="keyword">false</span>, std::string html = <span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160; </div>
+<div class="line"><a name="l00155"></a><span class="lineno"><a class="line" href="class_duck_net.html#adc99c966344f8ca8fe0c92b7ac74b498">  155</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#adc99c966344f8ca8fe0c92b7ac74b498">setupWifiAp</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* accessPoint = <span class="stringliteral">&quot;DuckLink&quot;</span>);</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160; </div>
+<div class="line"><a name="l00162"></a><span class="lineno"><a class="line" href="class_duck_net.html#adf1b556e746790e133583abb73329cb0">  162</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#adf1b556e746790e133583abb73329cb0">setupDns</a>();</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160; </div>
+<div class="line"><a name="l00170"></a><span class="lineno"><a class="line" href="class_duck_net.html#a24ad57e3d50ac2f17b44099f501809e4">  170</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#a24ad57e3d50ac2f17b44099f501809e4">setupInternet</a>(std::string ssid, std::string password);</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160; </div>
+<div class="line"><a name="l00179"></a><span class="lineno"><a class="line" href="class_duck_net.html#aee618ca707c409dfef470a352a92c4eb">  179</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#aee618ca707c409dfef470a352a92c4eb">saveWifiCredentials</a>(std::string ssid, std::string password);</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160; </div>
+<div class="line"><a name="l00186"></a><span class="lineno"><a class="line" href="class_duck_net.html#a2b229176ee12d9438983347adf0c3137">  186</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_duck_net.html#a2b229176ee12d9438983347adf0c3137">saveChannel</a>(<span class="keywordtype">int</span> val);</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160; </div>
+<div class="line"><a name="l00191"></a><span class="lineno"><a class="line" href="class_duck_net.html#ae67d21661ff5a48777d902e1abf9f9f4">  191</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_duck_net.html#ae67d21661ff5a48777d902e1abf9f9f4">loadChannel</a>();</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160; </div>
+<div class="line"><a name="l00197"></a><span class="lineno"><a class="line" href="class_duck_net.html#a98508f1de7a2bf259d91d770b358f6ae">  197</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#a98508f1de7a2bf259d91d770b358f6ae">loadWiFiCredentials</a>();</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160; </div>
+<div class="line"><a name="l00204"></a><span class="lineno"><a class="line" href="class_duck_net.html#a628d4040b156cd7ecd585d019f5ef8c8">  204</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_duck_net.html#a628d4040b156cd7ecd585d019f5ef8c8">setSsid</a>(std::string val);</div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160; </div>
-<div class="line"><a name="l00210"></a><span class="lineno"><a class="line" href="class_duck_net.html#a98508f1de7a2bf259d91d770b358f6ae">  210</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#a98508f1de7a2bf259d91d770b358f6ae">loadWiFiCredentials</a>();</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160; </div>
-<div class="line"><a name="l00217"></a><span class="lineno"><a class="line" href="class_duck_net.html#a628d4040b156cd7ecd585d019f5ef8c8">  217</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_duck_net.html#a628d4040b156cd7ecd585d019f5ef8c8">setSsid</a>(std::string val);</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160; </div>
-<div class="line"><a name="l00224"></a><span class="lineno"><a class="line" href="class_duck_net.html#ae2da5685c74057f46210a5b008b49753">  224</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_duck_net.html#ae2da5685c74057f46210a5b008b49753">setPassword</a>(std::string val);</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160; </div>
-<div class="line"><a name="l00231"></a><span class="lineno"><a class="line" href="class_duck_net.html#a4bac22808e4120262d1538e9be816698">  231</a></span>&#160;  std::string <a class="code" href="class_duck_net.html#a4bac22808e4120262d1538e9be816698">getSsid</a>();</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160; </div>
-<div class="line"><a name="l00238"></a><span class="lineno"><a class="line" href="class_duck_net.html#afcac65512ef0a9b74f6f0826300612e8">  238</a></span>&#160;  std::string <a class="code" href="class_duck_net.html#afcac65512ef0a9b74f6f0826300612e8">getPassword</a>();</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160; </div>
-<div class="line"><a name="l00245"></a><span class="lineno"><a class="line" href="class_duck_net.html#a46aee82eff4b1b77df321b0250fa046a">  245</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#a46aee82eff4b1b77df321b0250fa046a">getChannel</a>();</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160; </div>
-<div class="line"><a name="l00252"></a><span class="lineno"><a class="line" href="class_duck_net.html#ae6aedb1e4656307a39c370bb42e9f98a">  252</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_duck_net.html#ae6aedb1e4656307a39c370bb42e9f98a">setDeviceId</a>(std::vector&lt;byte&gt; deviceId);</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160; </div>
-<div class="line"><a name="l00259"></a><span class="lineno"><a class="line" href="class_duck_net.html#a393440e488e564a2269bdec8a218f1a2">  259</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="class_duck_net.html#a393440e488e564a2269bdec8a218f1a2">isWifiConnected</a>() { <span class="keywordflow">return</span> (WiFi.status() == WL_CONNECTED); }</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160; </div>
-<div class="line"><a name="l00261"></a><span class="lineno"><a class="line" href="class_duck_net.html#ab3c9f38500b2f4f242a4c40d2b889463">  261</a></span>&#160;  <span class="keyword">static</span> DNSServer <a class="code" href="class_duck_net.html#ab3c9f38500b2f4f242a4c40d2b889463">dnsServer</a>;</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00211"></a><span class="lineno"><a class="line" href="class_duck_net.html#ae2da5685c74057f46210a5b008b49753">  211</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_duck_net.html#ae2da5685c74057f46210a5b008b49753">setPassword</a>(std::string val);</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160; </div>
+<div class="line"><a name="l00218"></a><span class="lineno"><a class="line" href="class_duck_net.html#a4bac22808e4120262d1538e9be816698">  218</a></span>&#160;  std::string <a class="code" href="class_duck_net.html#a4bac22808e4120262d1538e9be816698">getSsid</a>();</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160; </div>
+<div class="line"><a name="l00225"></a><span class="lineno"><a class="line" href="class_duck_net.html#afcac65512ef0a9b74f6f0826300612e8">  225</a></span>&#160;  std::string <a class="code" href="class_duck_net.html#afcac65512ef0a9b74f6f0826300612e8">getPassword</a>();</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160; </div>
+<div class="line"><a name="l00232"></a><span class="lineno"><a class="line" href="class_duck_net.html#a46aee82eff4b1b77df321b0250fa046a">  232</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="class_duck_net.html#a46aee82eff4b1b77df321b0250fa046a">getChannel</a>();</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160; </div>
+<div class="line"><a name="l00239"></a><span class="lineno"><a class="line" href="class_duck_net.html#ae6aedb1e4656307a39c370bb42e9f98a">  239</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_duck_net.html#ae6aedb1e4656307a39c370bb42e9f98a">setDeviceId</a>(std::vector&lt;byte&gt; deviceId);</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160; </div>
+<div class="line"><a name="l00246"></a><span class="lineno"><a class="line" href="class_duck_net.html#a393440e488e564a2269bdec8a218f1a2">  246</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="class_duck_net.html#a393440e488e564a2269bdec8a218f1a2">isWifiConnected</a>() { <span class="keywordflow">return</span> (WiFi.status() == WL_CONNECTED); }</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160; </div>
+<div class="line"><a name="l00248"></a><span class="lineno"><a class="line" href="class_duck_net.html#ab3c9f38500b2f4f242a4c40d2b889463">  248</a></span>&#160;  <span class="keyword">static</span> DNSServer <a class="code" href="class_duck_net.html#ab3c9f38500b2f4f242a4c40d2b889463">dnsServer</a>;</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160; </div>
+<div class="line"><a name="l00251"></a><span class="lineno"><a class="line" href="class_duck_net.html#a732adcbd8649a905be85b406d441bc3e">  251</a></span>&#160;  <a class="code" href="class_duck_net.html#a732adcbd8649a905be85b406d441bc3e">DuckNet</a>(<a class="code" href="class_bloom_filter.html">BloomFilter</a> *bloomFilter);</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160; </div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160; </div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;  <a class="code" href="class_duck_net.html#a732adcbd8649a905be85b406d441bc3e">DuckNet</a>(<a class="code" href="class_duck_net.html">DuckNet</a> <span class="keyword">const</span>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;  <a class="code" href="class_duck_net.html">DuckNet</a>&amp; operator=(<a class="code" href="class_duck_net.html">DuckNet</a> <span class="keyword">const</span>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160; </div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;  <a class="code" href="class_duck_radio.html">DuckRadio</a>&amp; duckRadio = <a class="code" href="class_duck_radio.html#a3d86f64f9817264c9272292acea3cd54">DuckRadio::getInstance</a>();</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160; </div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;  <a class="code" href="class_duck_packet.html">DuckPacket</a>* txPacket = NULL;</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160; </div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;  std::vector&lt;byte&gt; deviceId;</div>
 <div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160; </div>
-<div class="line"><a name="l00264"></a><span class="lineno"><a class="line" href="class_duck_net.html#aa5096707e76c61542c094a24d69f0849">  264</a></span>&#160;  <a class="code" href="class_duck_net.html#aa5096707e76c61542c094a24d69f0849">DuckNet</a>(<a class="code" href="class_duck.html">Duck</a>* duck);</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;  <a class="code" href="class_bloom_filter.html">BloomFilter</a> *bloomFilter = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160; </div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160; </div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;  std::string getMuidStatusMessage(<a class="code" href="_duck_8h.html#a5931873aef9ff172ae93e721a3f84aa9">muidStatus</a> status);</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;  std::string getMuidStatusString(<a class="code" href="_duck_8h.html#a5931873aef9ff172ae93e721a3f84aa9">muidStatus</a> status);</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;  std::string createMuidResponseJson(<a class="code" href="_duck_8h.html#a5931873aef9ff172ae93e721a3f84aa9">muidStatus</a> status);</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160; </div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;  <a class="code" href="class_duck_net.html#aa5096707e76c61542c094a24d69f0849">DuckNet</a>(<a class="code" href="class_duck_net.html">DuckNet</a> <span class="keyword">const</span>&amp;) = <span class="keyword">delete</span>;</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;  <a class="code" href="class_duck_net.html">DuckNet</a>&amp; operator=(<a class="code" href="class_duck_net.html">DuckNet</a> <span class="keyword">const</span>&amp;) = <span class="keyword">delete</span>;</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160; </div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;  <a class="code" href="class_duck.html">Duck</a>* duck;</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;  std::vector&lt;byte&gt; deviceId;</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160; </div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">byte</span> DNS_PORT;</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span>* DNS;</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span>* AP;</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;  std::string portal = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;  std::string ssid = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;  std::string password = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;  <span class="comment">// char* controlSsid = &quot;&quot;;</span></div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;  <span class="comment">// char* controlPassword = &quot;&quot;;</span></div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;};</div>
-<div class="ttc" id="a_duck_8h_html"><div class="ttname"><a href="_duck_8h.html">Duck.h</a></div></div>
-<div class="ttc" id="a_duck_8h_html_a5931873aef9ff172ae93e721a3f84aa9"><div class="ttname"><a href="_duck_8h.html#a5931873aef9ff172ae93e721a3f84aa9">muidStatus</a></div><div class="ttdeci">muidStatus</div><div class="ttdef"><b>Definition:</b> Duck.h:10</div></div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">byte</span> DNS_PORT;</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span>* DNS;</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span>* AP;</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;  std::string portal = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;  std::string ssid = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;  std::string password = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;  <span class="comment">// char* controlSsid = &quot;&quot;;</span></div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;  <span class="comment">// char* controlPassword = &quot;&quot;;</span></div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;};</div>
 <div class="ttc" id="a_duck_esp_8h_html"><div class="ttname"><a href="_duck_esp_8h.html">DuckEsp.h</a></div><div class="ttdoc">This file is internal to CDP and provides ESP32 specific implementations.</div></div>
+<div class="ttc" id="a_duck_packet_8h_html"><div class="ttname"><a href="_duck_packet_8h.html">DuckPacket.h</a></div></div>
+<div class="ttc" id="a_duck_radio_8h_html"><div class="ttname"><a href="_duck_radio_8h.html">DuckRadio.h</a></div><div class="ttdoc">This file is internal to CDP and provides the library access to onboard LoRa module functions as well...</div></div>
 <div class="ttc" id="a_duck_utils_8h_html"><div class="ttname"><a href="_duck_utils_8h.html">DuckUtils.h</a></div><div class="ttdoc">This file is internal to CDP and provides some common utility methods.</div></div>
-<div class="ttc" id="a_o_t_a_page_8h_html"><div class="ttname"><a href="_o_t_a_page_8h.html">OTAPage.h</a></div></div>
+<div class="ttc" id="abloomfilter_8h_html"><div class="ttname"><a href="bloomfilter_8h.html">bloomfilter.h</a></div></div>
 <div class="ttc" id="acdp_home_8h_html"><div class="ttname"><a href="cdp_home_8h.html">cdpHome.h</a></div></div>
 <div class="ttc" id="acdpcfg_8h_html"><div class="ttname"><a href="cdpcfg_8h.html">cdpcfg.h</a></div><div class="ttdoc">CDP central compile-time configuration file.</div></div>
-<div class="ttc" id="aclass_duck_html"><div class="ttname"><a href="class_duck.html">Duck</a></div><div class="ttdef"><b>Definition:</b> Duck.h:26</div></div>
-<div class="ttc" id="aclass_duck_net_html"><div class="ttname"><a href="class_duck_net.html">DuckNet</a></div><div class="ttdoc">Internal network abstraction.</div><div class="ttdef"><b>Definition:</b> DuckNet.h:60</div></div>
+<div class="ttc" id="aclass_bloom_filter_html"><div class="ttname"><a href="class_bloom_filter.html">BloomFilter</a></div><div class="ttdef"><b>Definition:</b> bloomfilter.h:18</div></div>
+<div class="ttc" id="aclass_duck_net_html"><div class="ttname"><a href="class_duck_net.html">DuckNet</a></div><div class="ttdoc">Internal network abstraction.</div><div class="ttdef"><b>Definition:</b> DuckNet.h:61</div></div>
 <div class="ttc" id="aclass_duck_net_html_a24ad57e3d50ac2f17b44099f501809e4"><div class="ttname"><a href="class_duck_net.html#a24ad57e3d50ac2f17b44099f501809e4">DuckNet::setupInternet</a></div><div class="ttdeci">int setupInternet(std::string ssid, std::string password)</div><div class="ttdoc">Set up internet access.</div></div>
 <div class="ttc" id="aclass_duck_net_html_a2b229176ee12d9438983347adf0c3137"><div class="ttname"><a href="class_duck_net.html#a2b229176ee12d9438983347adf0c3137">DuckNet::saveChannel</a></div><div class="ttdeci">void saveChannel(int val)</div><div class="ttdoc">save set radio channel</div></div>
-<div class="ttc" id="aclass_duck_net_html_a393440e488e564a2269bdec8a218f1a2"><div class="ttname"><a href="class_duck_net.html#a393440e488e564a2269bdec8a218f1a2">DuckNet::isWifiConnected</a></div><div class="ttdeci">bool isWifiConnected()</div><div class="ttdoc">Provide Wifi connection status.</div><div class="ttdef"><b>Definition:</b> DuckNet.h:259</div></div>
-<div class="ttc" id="aclass_duck_net_html_a3fd723d211e67416f9c01a3263ff368e"><div class="ttname"><a href="class_duck_net.html#a3fd723d211e67416f9c01a3263ff368e">DuckNet::duckSession</a></div><div class="ttdeci">std::string duckSession</div><div class="ttdef"><b>Definition:</b> DuckNet.h:64</div></div>
+<div class="ttc" id="aclass_duck_net_html_a393440e488e564a2269bdec8a218f1a2"><div class="ttname"><a href="class_duck_net.html#a393440e488e564a2269bdec8a218f1a2">DuckNet::isWifiConnected</a></div><div class="ttdeci">bool isWifiConnected()</div><div class="ttdoc">Provide Wifi connection status.</div><div class="ttdef"><b>Definition:</b> DuckNet.h:246</div></div>
+<div class="ttc" id="aclass_duck_net_html_a3fd723d211e67416f9c01a3263ff368e"><div class="ttname"><a href="class_duck_net.html#a3fd723d211e67416f9c01a3263ff368e">DuckNet::duckSession</a></div><div class="ttdeci">std::string duckSession</div><div class="ttdef"><b>Definition:</b> DuckNet.h:65</div></div>
 <div class="ttc" id="aclass_duck_net_html_a46aee82eff4b1b77df321b0250fa046a"><div class="ttname"><a href="class_duck_net.html#a46aee82eff4b1b77df321b0250fa046a">DuckNet::getChannel</a></div><div class="ttdeci">int getChannel()</div><div class="ttdoc">Get the current channel.</div></div>
 <div class="ttc" id="aclass_duck_net_html_a4bac22808e4120262d1538e9be816698"><div class="ttname"><a href="class_duck_net.html#a4bac22808e4120262d1538e9be816698">DuckNet::getSsid</a></div><div class="ttdeci">std::string getSsid()</div><div class="ttdoc">Get the WiFi network ssid.</div></div>
-<div class="ttc" id="aclass_duck_net_html_a4eecc153ba912effdaf7b69d83485b6c"><div class="ttname"><a href="class_duck_net.html#a4eecc153ba912effdaf7b69d83485b6c">DuckNet::ssidAvailable</a></div><div class="ttdeci">bool ssidAvailable(std::string val=&quot;&quot;)</div><div class="ttdoc">Checks if the given ssid is available.</div></div>
 <div class="ttc" id="aclass_duck_net_html_a628d4040b156cd7ecd585d019f5ef8c8"><div class="ttname"><a href="class_duck_net.html#a628d4040b156cd7ecd585d019f5ef8c8">DuckNet::setSsid</a></div><div class="ttdeci">void setSsid(std::string val)</div><div class="ttdoc">Set the WiFi network ssid.</div></div>
+<div class="ttc" id="aclass_duck_net_html_a732adcbd8649a905be85b406d441bc3e"><div class="ttname"><a href="class_duck_net.html#a732adcbd8649a905be85b406d441bc3e">DuckNet::DuckNet</a></div><div class="ttdeci">DuckNet(BloomFilter *bloomFilter)</div></div>
 <div class="ttc" id="aclass_duck_net_html_a98508f1de7a2bf259d91d770b358f6ae"><div class="ttname"><a href="class_duck_net.html#a98508f1de7a2bf259d91d770b358f6ae">DuckNet::loadWiFiCredentials</a></div><div class="ttdeci">int loadWiFiCredentials()</div><div class="ttdoc">Load Wifi credentials from EEPROM.</div></div>
-<div class="ttc" id="aclass_duck_net_html_aa5096707e76c61542c094a24d69f0849"><div class="ttname"><a href="class_duck_net.html#aa5096707e76c61542c094a24d69f0849">DuckNet::DuckNet</a></div><div class="ttdeci">DuckNet(Duck *duck)</div></div>
-<div class="ttc" id="aclass_duck_net_html_ab3c9f38500b2f4f242a4c40d2b889463"><div class="ttname"><a href="class_duck_net.html#ab3c9f38500b2f4f242a4c40d2b889463">DuckNet::dnsServer</a></div><div class="ttdeci">static DNSServer dnsServer</div><div class="ttdef"><b>Definition:</b> DuckNet.h:261</div></div>
-<div class="ttc" id="aclass_duck_net_html_ad757b9cd43b62d0d1cf2608625f7b690"><div class="ttname"><a href="class_duck_net.html#ad757b9cd43b62d0d1cf2608625f7b690">DuckNet::channel</a></div><div class="ttdeci">int channel</div><div class="ttdef"><b>Definition:</b> DuckNet.h:63</div></div>
+<div class="ttc" id="aclass_duck_net_html_ab3c9f38500b2f4f242a4c40d2b889463"><div class="ttname"><a href="class_duck_net.html#ab3c9f38500b2f4f242a4c40d2b889463">DuckNet::dnsServer</a></div><div class="ttdeci">static DNSServer dnsServer</div><div class="ttdef"><b>Definition:</b> DuckNet.h:248</div></div>
+<div class="ttc" id="aclass_duck_net_html_ad757b9cd43b62d0d1cf2608625f7b690"><div class="ttname"><a href="class_duck_net.html#ad757b9cd43b62d0d1cf2608625f7b690">DuckNet::channel</a></div><div class="ttdeci">int channel</div><div class="ttdef"><b>Definition:</b> DuckNet.h:64</div></div>
 <div class="ttc" id="aclass_duck_net_html_adc99c966344f8ca8fe0c92b7ac74b498"><div class="ttname"><a href="class_duck_net.html#adc99c966344f8ca8fe0c92b7ac74b498">DuckNet::setupWifiAp</a></div><div class="ttdeci">int setupWifiAp(const char *accessPoint=&quot;DuckLink&quot;)</div><div class="ttdoc">Set up the WiFi access point.</div></div>
 <div class="ttc" id="aclass_duck_net_html_adf1b556e746790e133583abb73329cb0"><div class="ttname"><a href="class_duck_net.html#adf1b556e746790e133583abb73329cb0">DuckNet::setupDns</a></div><div class="ttdeci">int setupDns()</div><div class="ttdoc">Set up DNS.</div></div>
 <div class="ttc" id="aclass_duck_net_html_ae2da5685c74057f46210a5b008b49753"><div class="ttname"><a href="class_duck_net.html#ae2da5685c74057f46210a5b008b49753">DuckNet::setPassword</a></div><div class="ttdeci">void setPassword(std::string val)</div><div class="ttdoc">Set the WiFi password.</div></div>
@@ -292,6 +286,9 @@ $(document).ready(function(){initNavTree('_duck_net_8h_source.html',''); initRes
 <div class="ttc" id="aclass_duck_net_html_aee618ca707c409dfef470a352a92c4eb"><div class="ttname"><a href="class_duck_net.html#aee618ca707c409dfef470a352a92c4eb">DuckNet::saveWifiCredentials</a></div><div class="ttdeci">int saveWifiCredentials(std::string ssid, std::string password)</div><div class="ttdoc">Save / Write Wifi credentials to EEPROM.</div></div>
 <div class="ttc" id="aclass_duck_net_html_af03e8abe9a6cef40de6eb68c4978440f"><div class="ttname"><a href="class_duck_net.html#af03e8abe9a6cef40de6eb68c4978440f">DuckNet::setupWebServer</a></div><div class="ttdeci">int setupWebServer(bool createCaptivePortal=false, std::string html=&quot;&quot;)</div><div class="ttdoc">Set up the WebServer.</div></div>
 <div class="ttc" id="aclass_duck_net_html_afcac65512ef0a9b74f6f0826300612e8"><div class="ttname"><a href="class_duck_net.html#afcac65512ef0a9b74f6f0826300612e8">DuckNet::getPassword</a></div><div class="ttdeci">std::string getPassword()</div><div class="ttdoc">Get the WiFi password ssid.</div></div>
+<div class="ttc" id="aclass_duck_packet_html"><div class="ttname"><a href="class_duck_packet.html">DuckPacket</a></div><div class="ttdoc">Encapsulate the protocol packet attributes and operations.</div><div class="ttdef"><b>Definition:</b> DuckPacket.h:37</div></div>
+<div class="ttc" id="aclass_duck_radio_html"><div class="ttname"><a href="class_duck_radio.html">DuckRadio</a></div><div class="ttdoc">Internal Radio chip abstraction.</div><div class="ttdef"><b>Definition:</b> DuckRadio.h:56</div></div>
+<div class="ttc" id="aclass_duck_radio_html_a3d86f64f9817264c9272292acea3cd54"><div class="ttname"><a href="class_duck_radio.html#a3d86f64f9817264c9272292acea3cd54">DuckRadio::getInstance</a></div><div class="ttdeci">static DuckRadio &amp; getInstance()</div><div class="ttdef"><b>Definition:</b> DuckRadio.h:60</div></div>
 <div class="ttc" id="acontrol_panel_8h_html"><div class="ttname"><a href="control_panel_8h.html">controlPanel.h</a></div></div>
 <div class="ttc" id="aindex_8h_html"><div class="ttname"><a href="index_8h.html">index.h</a></div></div>
 <div class="ttc" id="apapa_home_8h_html"><div class="ttname"><a href="papa_home_8h.html">papaHome.h</a></div></div>

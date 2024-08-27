@@ -1,6 +1,6 @@
 var class_duck_net =
 [
-    [ "DuckNet", "class_duck_net.html#aa5096707e76c61542c094a24d69f0849", null ],
+    [ "DuckNet", "class_duck_net.html#a732adcbd8649a905be85b406d441bc3e", null ],
     [ "getChannel", "class_duck_net.html#a46aee82eff4b1b77df321b0250fa046a", null ],
     [ "getPassword", "class_duck_net.html#afcac65512ef0a9b74f6f0826300612e8", null ],
     [ "getSsid", "class_duck_net.html#a4bac22808e4120262d1538e9be816698", null ],
@@ -16,7 +16,6 @@ var class_duck_net =
     [ "setupInternet", "class_duck_net.html#a24ad57e3d50ac2f17b44099f501809e4", null ],
     [ "setupWebServer", "class_duck_net.html#af03e8abe9a6cef40de6eb68c4978440f", null ],
     [ "setupWifiAp", "class_duck_net.html#adc99c966344f8ca8fe0c92b7ac74b498", null ],
-    [ "ssidAvailable", "class_duck_net.html#a4eecc153ba912effdaf7b69d83485b6c", null ],
     [ "channel", "class_duck_net.html#ad757b9cd43b62d0d1cf2608625f7b690", null ],
     [ "duckSession", "class_duck_net.html#a3fd723d211e67416f9c01a3263ff368e", null ]
 ];

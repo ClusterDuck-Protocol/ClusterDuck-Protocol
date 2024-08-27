@@ -110,9 +110,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a24ad57e3d50ac2f17b44099f501809e4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck_net.html#a24ad57e3d50ac2f17b44099f501809e4">setupInternet</a> (std::string ssid, std::string password)</td></tr>
 <tr class="memdesc:a24ad57e3d50ac2f17b44099f501809e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up internet access.  <a href="class_duck_net.html#a24ad57e3d50ac2f17b44099f501809e4">More...</a><br /></td></tr>
 <tr class="separator:a24ad57e3d50ac2f17b44099f501809e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4eecc153ba912effdaf7b69d83485b6c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck_net.html#a4eecc153ba912effdaf7b69d83485b6c">ssidAvailable</a> (std::string val=&quot;&quot;)</td></tr>
-<tr class="memdesc:a4eecc153ba912effdaf7b69d83485b6c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the given ssid is available.  <a href="class_duck_net.html#a4eecc153ba912effdaf7b69d83485b6c">More...</a><br /></td></tr>
-<tr class="separator:a4eecc153ba912effdaf7b69d83485b6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aee618ca707c409dfef470a352a92c4eb"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck_net.html#aee618ca707c409dfef470a352a92c4eb">saveWifiCredentials</a> (std::string ssid, std::string password)</td></tr>
 <tr class="memdesc:aee618ca707c409dfef470a352a92c4eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save / Write Wifi credentials to EEPROM.  <a href="class_duck_net.html#aee618ca707c409dfef470a352a92c4eb">More...</a><br /></td></tr>
 <tr class="separator:aee618ca707c409dfef470a352a92c4eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -146,8 +143,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a393440e488e564a2269bdec8a218f1a2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck_net.html#a393440e488e564a2269bdec8a218f1a2">isWifiConnected</a> ()</td></tr>
 <tr class="memdesc:a393440e488e564a2269bdec8a218f1a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provide Wifi connection status.  <a href="class_duck_net.html#a393440e488e564a2269bdec8a218f1a2">More...</a><br /></td></tr>
 <tr class="separator:a393440e488e564a2269bdec8a218f1a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa5096707e76c61542c094a24d69f0849"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck_net.html#aa5096707e76c61542c094a24d69f0849">DuckNet</a> (<a class="el" href="class_duck.html">Duck</a> *duck)</td></tr>
-<tr class="separator:aa5096707e76c61542c094a24d69f0849"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a732adcbd8649a905be85b406d441bc3e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck_net.html#a732adcbd8649a905be85b406d441bc3e">DuckNet</a> (<a class="el" href="class_bloom_filter.html">BloomFilter</a> *bloomFilter)</td></tr>
+<tr class="separator:a732adcbd8649a905be85b406d441bc3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -163,10 +160,10 @@ Static Public Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Internal network abstraction. </p>
-<p>Provides access to Webserver, DNS, WiFi and OTA update functionalities. </p>
+<p>Provides access to Webserver, DNS, and WiFi update functionalities. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="aa5096707e76c61542c094a24d69f0849"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa5096707e76c61542c094a24d69f0849">&#9670;&nbsp;</a></span>DuckNet()</h2>
+<a id="a732adcbd8649a905be85b406d441bc3e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a732adcbd8649a905be85b406d441bc3e">&#9670;&nbsp;</a></span>DuckNet()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -174,8 +171,8 @@ Static Public Attributes</h2></td></tr>
         <tr>
           <td class="memname">DuckNet::DuckNet </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_duck.html">Duck</a> *&#160;</td>
-          <td class="paramname"><em>duck</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="class_bloom_filter.html">BloomFilter</a> *&#160;</td>
+          <td class="paramname"><em>bloomFilter</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -572,33 +569,6 @@ Static Public Attributes</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>DUCK_ERR_NONE if successful, an error code otherwise. </dd></dl>
-
-</div>
-</div>
-<a id="a4eecc153ba912effdaf7b69d83485b6c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4eecc153ba912effdaf7b69d83485b6c">&#9670;&nbsp;</a></span>ssidAvailable()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool DuckNet::ssidAvailable </td>
-          <td>(</td>
-          <td class="paramtype">std::string&#160;</td>
-          <td class="paramname"><em>val</em> = <code>&quot;&quot;</code></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Checks if the given ssid is available. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">val</td><td>ssid to check, default is an empty string and will use the internal default ssid </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>true if the ssid is available, false otherwise. </dd></dl>
 
 </div>
 </div>
