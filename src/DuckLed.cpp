@@ -20,6 +20,10 @@ void DuckLed::setupLED(int redPin, int greenPin, int bluePin) {
   ledcSetup(1, 12000, 8); // 12 kHz PWM, 8-bit resolution
   ledcSetup(2, 12000, 8);
   ledcSetup(3, 12000, 8);
+
+  // ledcAttachChannel(redPin, 12000, 8, 1);
+  // ledcAttachChannel(greenPin, 12000, 8, 2);
+  // ledcAttachChannel(bluePin, 12000, 8, 3);
 #endif
 }
 
