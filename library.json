@@ -39,6 +39,7 @@
         "operatorfoundation/Crypto": "^0.4.0",
         "me-no-dev/AsyncTCP": "^1.1.1",
         "mathieucarbou/ESP Async WebServer": "^2.7.0",
-        "knolleary/pubsubclient":"^2.8.0"
+        "knolleary/pubsubclient":"^2.8.0",
+        "mikalhart/TinyGPSPlus": "~1.0.2"
     }
 }
