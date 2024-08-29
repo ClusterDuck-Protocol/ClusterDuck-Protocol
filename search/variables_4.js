@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['gain_383',['gain',['../struct_lora_config_params.html#ab65e37806c948ca584959d074d69a771',1,'LoraConfigParams']]]
+  ['gain_398',['gain',['../struct_lora_config_params.html#ab65e37806c948ca584959d074d69a771',1,'LoraConfigParams']]]
 ];
