@@ -12,16 +12,20 @@
 #ifndef CDPCFG_H
 #define CDPCFG_H
 
+#ifdef CDP_EXTERNAL_BOARD
+#include "cdp_external_board.h"
+#else
 #include "boards/heltec_wifi_lora_32_V3.h"
 #include "boards/heltec_wifi_lora_32_V2.h"
 #include "boards/lilygo_t_beam_sx1262.h"
 #include "boards/ttgo_t_beam_v1_sx1276.h"
 #include "boards/heltec_cubecell_board.h"
 #include "boards/heltec_cubecell_gps.h"
+#endif
 
 // version definitions
 #define CDP_VERSION_MAJOR  4
-#define CDP_VERSION_MINOR  1
+#define CDP_VERSION_MINOR  2
 #define CDP_VERSION_PATCH  0
 
 #define CDP_VERSION ((((CDP_VERSION_MAJOR) << 16) | ((CDP_VERSION_MINOR) << 8) | (CDP_VERSION_PATCH)))
@@ -93,12 +97,12 @@
 #define CDPCFG_PIN_RGBLED_B 2
 
 /// CDP Channel Frequencies
-#define CHANNEL_1 915.0
-#define CHANNEL_2 914.0
-#define CHANNEL_3 913.0
-#define CHANNEL_4 912.0
-#define CHANNEL_5 911.0
-#define CHANNEL_6 910.0
+#define CDPCFG_RADIO_CHANNEL_1 CDPCFG_RF_LORA_FREQ
+#define CDPCFG_RADIO_CHANNEL_2 914.0
+#define CDPCFG_RADIO_CHANNEL_3 913.0
+#define CDPCFG_RADIO_CHANNEL_4 912.0
+#define CDPCFG_RADIO_CHANNEL_5 911.0
+#define CDPCFG_RADIO_CHANNEL_6 910.0
 
 #ifndef CDPCFG_OLED_CLASS
 #if defined(CDPCFG_OLED_NONE)

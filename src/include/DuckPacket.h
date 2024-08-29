@@ -43,12 +43,15 @@ public:
      * 
      */
     DuckPacket() {}
+
     /**
      * @brief Construct a new Duck Packet object.
      * 
      * @param duid a duck device unique id
+     * @param filter a bloom filter
      */
-    DuckPacket(std::vector<byte> duid) { this->duid = duid; }
+        DuckPacket(std::vector<byte> duid) 
+        : duid(duid) { }
 
     ~DuckPacket() {}
     /**
@@ -102,11 +105,9 @@ public:
 
     byte getTopic() { return buffer[TOPIC_POS]; }
 
-
   private: 
     std::vector<byte> duid;
     std::vector<byte> buffer;
-
     static void getUniqueMessageId(BloomFilter * filter, byte message_id[MUID_LENGTH]);
 
 };
