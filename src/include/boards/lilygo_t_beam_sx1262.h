@@ -15,6 +15,10 @@
 #define CDPCFG_BAT_MULDIV 200 / 100 
 #define CDPCFG_PIN_LED1 25
 
+//GPS configuration
+#define CDPCFG_GPS_RX 34
+#define CDPCFG_GPS_TX 12
+
 // LoRa configuration
 #define CDPCFG_PIN_LORA_CS      18
 #define CDPCFG_PIN_LORA_RST     23
