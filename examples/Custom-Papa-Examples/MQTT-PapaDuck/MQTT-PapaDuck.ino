@@ -17,8 +17,6 @@
 #include <string>
 
 #include <queue>
-#include <iomanip>
-#include <sstream>
 
 
 #define MQTT_RETRY_DELAY_MS 500
@@ -60,8 +58,6 @@ static const char* mosquitto_ca_cert = \
 // Use pre-built papa duck as our hub device
 PapaDuck hub;
 
-JsonDocument doc;
-
 bool setupOK = false;
 
 auto timer = timer_create_default();
@@ -75,25 +71,20 @@ std::queue<std::string> mqttMessageQueue;
 std::string mqttPubTopic = "hub/event";           // published by the hub
 std::string mqttSubTopic = "incoming/say_hello";  // subscribed by the hub
 
-const std::string WIFI_SSID="Lojika Systems 2.4G";   // Replace with WiFi SSID
-const std::string WIFI_PASS="7212-Wabash!";     // Replace with WiFi Password
+const std::string WIFI_SSID="ENTER SSID";   // Replace with WiFi SSID
+const std::string WIFI_PASS="ENTER PASSWORD";     // Replace with WiFi Password
 
 std::string toTopicString(byte topic);
-String convertToHex(byte* data, int size);
-int toJSON(CdpPacket packet);
+String arduinoStringFromHex(byte* data, int size);
 bool setup_mqtt(void);
 void handleIncomingMqttMessages(void);
-std::string toHexString(const std::vector<uint8_t>& data);
+// std::string toHexString(std::vector<byte>& data);
 std::vector<uint8_t> fromHexString(const std::string& hexString);
 
-std::string toHexString(const std::vector<uint8_t>& data) {
-    std::stringstream ss;
-    ss << std::hex << std::setfill('0');
-    for (uint8_t byte : data) {
-        ss << std::setw(2) << static_cast<unsigned int>(byte);
-    }
-    return ss.str();
-}
+// std::string toHexString(std::vector<byte>& data) {
+//   String str = arduinoStringFromHex(data.data(), data.size());
+//   return str.c_str();
+// }
 
 std::vector<uint8_t> fromHexString(const std::string& hexString) {
     if (hexString.length() % 2 != 0) {
@@ -156,7 +147,7 @@ std::string toTopicString(byte topic)
   return topicString;
 }
 
-String convertToHex(byte* data, int size) 
+String arduinoStringFromHex(byte* data, int size) 
 {
   String buf = "";
   buf.reserve(size * 2); // 2 digit hex
@@ -167,48 +158,6 @@ String convertToHex(byte* data, int size)
     buf += cs[val & 0x0F];
   }
   return buf;
-}
-
-int toJSON(CdpPacket packet) 
-{
-  
-  std::stringstream ss;
-
-  // convert the dduid to a string. We should probably do this for all fields
-  // using stringstream because print will interpret 00 as a null terminator
-  for (auto &c : packet.dduid) {
-    ss << std::hex << std::setw(2) << std::setfill('0') << (int)c;
-  }
-  
-  std::string payload(packet.data.begin(), packet.data.end());
-  std::string sduid(packet.sduid.begin(), packet.sduid.end());
-  std::string dduid = ss.str();
-  std::string muid(packet.muid.begin(), packet.muid.end());
-
-  Serial.println("[PAPA] topic:   " + String(toTopicString(packet.topic).c_str()));
-  
-  Serial.println("[PAPA] sduid:   " + String(sduid.c_str()));
-  Serial.println("[PAPA] dduid:   " + String(dduid.c_str()));
-
-  Serial.println("[PAPA] muid:    " + String(muid.c_str()));
-  Serial.println("[PAPA] data:    " + String(payload.c_str()));
-  Serial.println("[PAPA] hops:    " + String(packet.hopCount));
-  Serial.println("[PAPA] duck:    " + String(packet.duckType));
-
-  doc["DeviceId"] = sduid;
-  doc["topic"].set(toTopicString(packet.topic));
-  doc["MessageId"] = muid;
-  doc["Payload"].set(payload);
-  doc["hops"].set(packet.hopCount);
-  doc["duckType"].set(packet.duckType);
-
-  String jsonstat;
-  serializeJson(doc, jsonstat);
-  serializeJsonPretty(doc, Serial);
-  Serial.print("\n[PAPA] --------------------------------------------------------------------------------------\n\n");
-
-  
-  return doc.size();
 }
 
 bool publishToMqttTopic(std::string source, std::string topic, String message) {
@@ -280,9 +229,8 @@ void processMessageFromDucks(std::vector<byte> packetBuffer) {
 
     Serial.printf("Packet data size=%d\n", messageLength);
 
-    std::string sduid = toHexString(cdp_packet.sduid);
-    std::string dduid = toHexString(cdp_packet.dduid);
     std::string muid(cdp_packet.muid.begin(), cdp_packet.muid.end());
+    std::string sduid(cdp_packet.sduid.begin(), cdp_packet.sduid.end());
     std::string cdpTopic = toTopicString(cdp_packet.topic);
 
     Serial.printf("[HUB] got topic: %s from %s\n",cdpTopic.c_str(), sduid.c_str());
@@ -293,18 +241,18 @@ void processMessageFromDucks(std::vector<byte> packetBuffer) {
     // Forward the counter message to the MQTT broker
     // This is a simple example, but you can do anything you want with the message here
     // This example shows how the message from be transformed into something that matches your application
-    uint32_t msgId = esp_random();
+    // uint32_t msgId = esp_random();
     doc["from"] = "hub";
     doc["to"] = "controller";
-    doc["responseExpected"] = false; // This flag is used to indicate if the controller should respond to this message
-    doc["messageTopic"] = cdpTopic.c_str();
-    doc["messageId"].set(msgId);
+    doc["RE"] = false; // This flag is used to indicate if the controller should respond to this message
+    doc["eventType"] = cdpTopic.c_str();
+    doc["MessageID"].set(muid);
     
     doc["payload"]["hops"].set(cdp_packet.hopCount);
-    doc["payload"]["deviceType"].set(cdp_packet.duckType);
-    doc["payload"]["deviceId"] = sduid.c_str();
+    doc["payload"]["duckType"].set(cdp_packet.duckType);
+    doc["payload"]["DeviceID"] = sduid.c_str();
 
-    doc["payload"]["counterMessage"] = payload.c_str();  
+    doc["payload"]["Message"] = payload.c_str();  
        
     String jsonstat;
     serializeJson(doc, jsonstat);
@@ -330,7 +278,7 @@ void processMessageFromDucks(std::vector<byte> packetBuffer) {
 // The callback method simply takes the incoming packet and
 // converts it to a JSON string, before sending it out over MQTT
 void handleDuckData(std::vector<byte> packetBuffer) {
-  Serial.println("[HUB] got packet: " + convertToHex(packetBuffer.data(), packetBuffer.size()));
+  Serial.println("[HUB] got packet: " + arduinoStringFromHex(packetBuffer.data(), packetBuffer.size()));
   processMessageFromDucks(packetBuffer);
 }
 

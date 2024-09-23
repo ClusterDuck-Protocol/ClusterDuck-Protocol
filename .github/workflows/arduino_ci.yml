@@ -116,8 +116,8 @@ jobs:
           arduino-cli compile -v -t -b ${{ matrix.board }} $PWD/examples/$1/$2/$2.ino > ${BOARD##*:}-$2-build.log 2>&1; 
           echo "Build complete."
         } 
-        buildExampleSketch 1.Ducks DuckLink
-        buildExampleSketch 1.Ducks MamaDuck
+        buildExampleSketch Basic-Ducks DuckLink
+        buildExampleSketch Basic-Ducks MamaDuck
     - name: Upload build log
       uses: actions/upload-artifact@v3
       if: always()
