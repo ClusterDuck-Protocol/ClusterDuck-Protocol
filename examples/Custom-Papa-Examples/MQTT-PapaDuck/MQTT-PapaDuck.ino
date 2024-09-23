@@ -71,14 +71,20 @@ std::queue<std::string> mqttMessageQueue;
 std::string mqttPubTopic = "hub/event";           // published by the hub
 std::string mqttSubTopic = "incoming/say_hello";  // subscribed by the hub
 
-const std::string WIFI_SSID="WiFi SSID";   // Replace with WiFi SSID
-const std::string WIFI_PASS="Password";     // Replace with WiFi Password
+const std::string WIFI_SSID="ENTER SSID";   // Replace with WiFi SSID
+const std::string WIFI_PASS="ENTER PASSWORD";     // Replace with WiFi Password
 
 std::string toTopicString(byte topic);
 String arduinoStringFromHex(byte* data, int size);
 bool setup_mqtt(void);
 void handleIncomingMqttMessages(void);
+// std::string toHexString(std::vector<byte>& data);
 std::vector<uint8_t> fromHexString(const std::string& hexString);
+
+// std::string toHexString(std::vector<byte>& data) {
+//   String str = arduinoStringFromHex(data.data(), data.size());
+//   return str.c_str();
+// }
 
 std::vector<uint8_t> fromHexString(const std::string& hexString) {
     if (hexString.length() % 2 != 0) {
@@ -224,9 +230,10 @@ void processMessageFromDucks(std::vector<byte> packetBuffer) {
     Serial.printf("Packet data size=%d\n", messageLength);
 
     std::string muid(cdp_packet.muid.begin(), cdp_packet.muid.end());
+    std::string sduid(cdp_packet.sduid.begin(), cdp_packet.sduid.end());
     std::string cdpTopic = toTopicString(cdp_packet.topic);
 
-    Serial.printf("[HUB] got topic: %s from %s\n",cdpTopic.c_str(), cdp_packet.sduid.c_str());
+    Serial.printf("[HUB] got topic: %s from %s\n",cdpTopic.c_str(), sduid.c_str());
  
     // Counter Message
     std::string payload(cdp_packet.data.begin(), cdp_packet.data.end());
@@ -234,18 +241,18 @@ void processMessageFromDucks(std::vector<byte> packetBuffer) {
     // Forward the counter message to the MQTT broker
     // This is a simple example, but you can do anything you want with the message here
     // This example shows how the message from be transformed into something that matches your application
-    uint32_t msgId = esp_random();
+    // uint32_t msgId = esp_random();
     doc["from"] = "hub";
     doc["to"] = "controller";
-    doc["responseExpected"] = false; // This flag is used to indicate if the controller should respond to this message
-    doc["messageTopic"] = cdpTopic.c_str();
-    doc["messageId"].set(msgId);
+    doc["RE"] = false; // This flag is used to indicate if the controller should respond to this message
+    doc["eventType"] = cdpTopic.c_str();
+    doc["MessageID"].set(muid);
     
     doc["payload"]["hops"].set(cdp_packet.hopCount);
-    doc["payload"]["deviceType"].set(cdp_packet.duckType);
-    doc["payload"]["deviceId"] = sduid.c_str();
+    doc["payload"]["duckType"].set(cdp_packet.duckType);
+    doc["payload"]["DeviceID"] = sduid.c_str();
 
-    doc["payload"]["counterMessage"] = payload.c_str();  
+    doc["payload"]["Message"] = payload.c_str();  
        
     String jsonstat;
     serializeJson(doc, jsonstat);
