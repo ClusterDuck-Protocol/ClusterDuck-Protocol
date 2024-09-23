@@ -78,13 +78,7 @@ std::string toTopicString(byte topic);
 String arduinoStringFromHex(byte* data, int size);
 bool setup_mqtt(void);
 void handleIncomingMqttMessages(void);
-std::string toHexString(std::vector<byte>& data);
 std::vector<uint8_t> fromHexString(const std::string& hexString);
-
-std::string toHexString(std::vector<byte>& data) {
-  String str = arduinoStringFromHex(data.data(), data.size());
-  return str.c_str();
-}
 
 std::vector<uint8_t> fromHexString(const std::string& hexString) {
     if (hexString.length() % 2 != 0) {
@@ -229,12 +223,10 @@ void processMessageFromDucks(std::vector<byte> packetBuffer) {
 
     Serial.printf("Packet data size=%d\n", messageLength);
 
-    std::string sduid = toHexString(cdp_packet.sduid);
-    std::string dduid = toHexString(cdp_packet.dduid);
     std::string muid(cdp_packet.muid.begin(), cdp_packet.muid.end());
     std::string cdpTopic = toTopicString(cdp_packet.topic);
 
-    Serial.printf("[HUB] got topic: %s from %s\n",cdpTopic.c_str(), sduid.c_str());
+    Serial.printf("[HUB] got topic: %s from %s\n",cdpTopic.c_str(), cdp_packet.sduid.c_str());
  
     // Counter Message
     std::string payload(cdp_packet.data.begin(), cdp_packet.data.end());
