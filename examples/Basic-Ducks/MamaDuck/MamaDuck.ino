@@ -4,6 +4,7 @@
  */
 
 #include <string>
+#include <vector>
 #include <arduino-timer.h>
 #include <CDP.h>
 
@@ -47,7 +48,7 @@ void setup() {
 
 }
 
-std::vector<byte> stringToByteVector(const String& str) {
+std::vector<byte> stringToByteVector(const std::string& str) {
     std::vector<byte> byteVec;
     byteVec.reserve(str.length());
 
@@ -72,9 +73,9 @@ void loop() {
 bool runSensor(void *) {
   bool result;
   
-  String message = String("Counter:") + String(counter)+ " " +String("Free Memory:") + String(freeMemory());
+  std::string message = std::string("Counter:") + std::to_string(counter) + " " + std::string("Free Memory:") + std::to_string(freeMemory());
   Serial.print("[MAMA] sensor data: ");
-  Serial.println(message);
+  Serial.println(message.c_str());
 
   result = sendData(stringToByteVector(message));
   if (result) {
@@ -94,7 +95,7 @@ bool sendData(std::vector<byte> message) {
      sentOk = true;
   }
   if (!sentOk) {
-    Serial.println("[MAMA] Failed to send data. error = " + String(err));
+    Serial.println("[MAMA] Failed to send data. error = " + std::to_string(err));
   }
   return sentOk;
 }

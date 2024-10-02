@@ -90,7 +90,7 @@ bool runSensor(void *) {
   bool result;
   const byte* buffer;
   
-  String message = String("Counter:") + String(counter);
+  std::string message = std::string("Counter:") + std::string(counter);
   int length = message.length();
   Serial.print("[MAMA] sensor data: ");
   Serial.println(message);
@@ -115,7 +115,7 @@ bool sendData(const byte* buffer, int length) {
      sentOk = true;
   }
   if (!sentOk) {
-    Serial.println("[MAMA] Failed to send data. error = " + String(err));
+    Serial.println("[MAMA] Failed to send data. error = " + std::string(err));
   }
   return sentOk;
 }

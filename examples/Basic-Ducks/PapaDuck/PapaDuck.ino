@@ -22,7 +22,7 @@
 
 
 std::string toTopicString(byte topic);
-String convertToHex(byte* data, int size);
+std::string convertToHex(byte* data, int size);
 int toJSON(CdpPacket packet);
 
 
@@ -89,9 +89,9 @@ std::string toTopicString(byte topic)
   return topicString;
 }
 
-String convertToHex(byte* data, int size) 
+std::string convertToHex(byte* data, int size) 
 {
-  String buf = "";
+  std::string buf = "";
   buf.reserve(size * 2); // 2 digit hex
   const char* cs = "0123456789ABCDEF";
   for (int i = 0; i < size; i++) {
@@ -118,15 +118,15 @@ int toJSON(CdpPacket packet)
   std::string dduid = ss.str();
   std::string muid(packet.muid.begin(), packet.muid.end());
 
-  Serial.println("[PAPA] topic:   " + String(toTopicString(packet.topic).c_str()));
+  Serial.println("[PAPA] topic:   " + std::string(toTopicString(packet.topic).c_str()));
   
-  Serial.println("[PAPA] sduid:   " + String(sduid.c_str()));
-  Serial.println("[PAPA] dduid:   " + String(dduid.c_str()));
+  Serial.println("[PAPA] sduid:   " + std::string(sduid.c_str()));
+  Serial.println("[PAPA] dduid:   " + std::string(dduid.c_str()));
 
-  Serial.println("[PAPA] muid:    " + String(muid.c_str()));
-  Serial.println("[PAPA] data:    " + String(payload.c_str()));
-  Serial.println("[PAPA] hops:    " + String(packet.hopCount));
-  Serial.println("[PAPA] duck:    " + String(packet.duckType));
+  Serial.println("[PAPA] muid:    " + std::string(muid.c_str()));
+  Serial.println("[PAPA] data:    " + std::string(payload.c_str()));
+  Serial.println("[PAPA] hops:    " + std::string(packet.hopCount));
+  Serial.println("[PAPA] duck:    " + std::string(packet.duckType));
 
   doc["DeviceId"] = sduid;
   doc["topic"].set(toTopicString(packet.topic));
@@ -135,7 +135,7 @@ int toJSON(CdpPacket packet)
   doc["hops"].set(packet.hopCount);
   doc["duckType"].set(packet.duckType);
 
-  String jsonstat;
+  std::string jsonstat;
   serializeJson(doc, jsonstat);
   serializeJsonPretty(doc, Serial);
   Serial.print("\n[PAPA] --------------------------------------------------------------------------------------\n\n");

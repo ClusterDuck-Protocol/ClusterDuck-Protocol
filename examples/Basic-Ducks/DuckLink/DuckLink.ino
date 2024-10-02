@@ -64,7 +64,7 @@ void loop() {
   duck.run();
 }
 
-std::vector<byte> stringToByteVector(const String& str) {
+std::vector<byte> stringToByteVector(const std::string& str) {
     std::vector<byte> byteVec;
     byteVec.reserve(str.length());
 
@@ -79,16 +79,16 @@ bool sendSensorData() {
   bool result = false;
   const byte* buffer;
   
-  String message = String("Counter:") + String(counter);
+  std::string message = std::string("Counter:") + std::to_string(counter);
   Serial.print("[LINK] sensor data: ");
-  Serial.println(message);
+  Serial.println(message.c_str());
   
   int err = duck.sendData(topics::status, stringToByteVector(message));
   if (err == DUCK_ERR_NONE) {
      result = true;
      counter++;
   } else {
-    Serial.println("[LINK] Failed to send data. error = " + String(err));
+    Serial.println("[LINK] Failed to send data. error = " + std::to_string(err));
     return false;
   }
   return result;
