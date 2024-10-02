@@ -95,7 +95,8 @@ bool sendData(std::vector<byte> message) {
      sentOk = true;
   }
   if (!sentOk) {
-    Serial.println("[MAMA] Failed to send data. error = " + std::to_string(err));
+    std::string errMessage = "[MAMA] Failed to send data. error = " + std::to_string(err);
+    Serial.println(errMessage.c_str());
   }
   return sentOk;
 }
