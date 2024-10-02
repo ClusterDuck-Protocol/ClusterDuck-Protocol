@@ -96,86 +96,82 @@ $(document).ready(function(){initNavTree('cdpcfg_8h_source.html',''); initResiza
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="heltec__wifi__lora__32___v2_8h.html">boards/heltec_wifi_lora_32_V2.h</a>&quot;</span></div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="lilygo__t__beam__sx1262_8h.html">boards/lilygo_t_beam_sx1262.h</a>&quot;</span></div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="ttgo__t__beam__v1__sx1276_8h.html">boards/ttgo_t_beam_v1_sx1276.h</a>&quot;</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="heltec__cubecell__board_8h.html">boards/heltec_cubecell_board.h</a>&quot;</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="heltec__cubecell__gps_8h.html">boards/heltec_cubecell_gps.h</a>&quot;</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="comment">// version definitions</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#abe9ef4acde2667cf722332061b91d743">   27</a></span>&#160;<span class="preprocessor">#define CDP_VERSION_MAJOR  4</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a6890433d16edee7bae8733cd3ed77bf2">   28</a></span>&#160;<span class="preprocessor">#define CDP_VERSION_MINOR  2</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a05c6607626bcbfb754b3b857f4b744fc">   29</a></span>&#160;<span class="preprocessor">#define CDP_VERSION_PATCH  0</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="comment">// version definitions</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#abe9ef4acde2667cf722332061b91d743">   25</a></span>&#160;<span class="preprocessor">#define CDP_VERSION_MAJOR  4</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a6890433d16edee7bae8733cd3ed77bf2">   26</a></span>&#160;<span class="preprocessor">#define CDP_VERSION_MINOR  2</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a05c6607626bcbfb754b3b857f4b744fc">   27</a></span>&#160;<span class="preprocessor">#define CDP_VERSION_PATCH  0</span></div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
+<div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ae099256b32778fd4a7a51cc15399dca3">   29</a></span>&#160;<span class="preprocessor">#define CDP_VERSION ((((CDP_VERSION_MAJOR) &lt;&lt; 16) | ((CDP_VERSION_MINOR) &lt;&lt; 8) | (CDP_VERSION_PATCH)))</span></div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ae099256b32778fd4a7a51cc15399dca3">   31</a></span>&#160;<span class="preprocessor">#define CDP_VERSION ((((CDP_VERSION_MAJOR) &lt;&lt; 16) | ((CDP_VERSION_MINOR) &lt;&lt; 8) | (CDP_VERSION_PATCH)))</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#ifdef CDPCFG_RADIO_SX1262</span></div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">  #define CDPCFG_LORA_CLASS SX1262</span></div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a23598e98b6c02c580eb8c6a1437ce918">   36</a></span>&#160;<span class="preprocessor">  #define CDPCFG_LORA_CLASS SX1276</span></div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="comment">//Default Username and Password</span></div>
-<div class="line"><a name="l00044"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#accf2dc3b0d9894db8be9f990a4059f72">   44</a></span>&#160;<span class="preprocessor">#define CDPCFG_UPDATE_USERNAME &quot;user&quot;</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a18efacccf4c956bdcc082d9540e42ca5">   45</a></span>&#160;<span class="preprocessor">#define CDPCFG_UPDATE_PASSWORD &quot;pass&quot;</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
-<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ac1682927a6f4f86f210eb5a7f398d472">   47</a></span>&#160;<span class="preprocessor">#define CDPCFG_EEPROM_CRED_MAX 32</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ab1a13bbc999ebc074ef1c81329cc33b0">   48</a></span>&#160;<span class="preprocessor">#define CDPCFG_EEPROM_WIFI_USERNAME 0</span></div>
-<div class="line"><a name="l00049"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a813f271b48f1644ee32a572a827869e9">   49</a></span>&#160;<span class="preprocessor">#define CDPCFG_EEPROM_WIFI_PASSWORD 32</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a8f4a12f6e06935b201ab1d0ed5e3927e">   50</a></span>&#160;<span class="preprocessor">#define CDPCFG_EEPROM_CONTROL_USERNAME 64</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a83003fb6a8533565b9c21bbc7e870670">   51</a></span>&#160;<span class="preprocessor">#define CDPCFG_EEPROM_CONTROL_PASSWORD 96</span></div>
-<div class="line"><a name="l00052"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a8ee57145ec8cbe56a08506aae22c0eab">   52</a></span>&#160;<span class="preprocessor">#define CDPCFG_EEPROM_CHANNEL_VALUE 128</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
-<div class="line"><a name="l00055"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#acf3f6af4dab13f4cf4776dfd148191c0">   55</a></span>&#160;<span class="preprocessor">#define CDPCFG_SERIAL_BAUD 115200</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#ifdef CDPCFG_RADIO_SX1262</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">  #define CDPCFG_LORA_CLASS SX1262</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a23598e98b6c02c580eb8c6a1437ce918">   34</a></span>&#160;<span class="preprocessor">  #define CDPCFG_LORA_CLASS SX1276</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="comment">//Default Username and Password</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#accf2dc3b0d9894db8be9f990a4059f72">   42</a></span>&#160;<span class="preprocessor">#define CDPCFG_UPDATE_USERNAME &quot;user&quot;</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a18efacccf4c956bdcc082d9540e42ca5">   43</a></span>&#160;<span class="preprocessor">#define CDPCFG_UPDATE_PASSWORD &quot;pass&quot;</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
+<div class="line"><a name="l00045"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ac1682927a6f4f86f210eb5a7f398d472">   45</a></span>&#160;<span class="preprocessor">#define CDPCFG_EEPROM_CRED_MAX 32</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ab1a13bbc999ebc074ef1c81329cc33b0">   46</a></span>&#160;<span class="preprocessor">#define CDPCFG_EEPROM_WIFI_USERNAME 0</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a813f271b48f1644ee32a572a827869e9">   47</a></span>&#160;<span class="preprocessor">#define CDPCFG_EEPROM_WIFI_PASSWORD 32</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a8f4a12f6e06935b201ab1d0ed5e3927e">   48</a></span>&#160;<span class="preprocessor">#define CDPCFG_EEPROM_CONTROL_USERNAME 64</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a83003fb6a8533565b9c21bbc7e870670">   49</a></span>&#160;<span class="preprocessor">#define CDPCFG_EEPROM_CONTROL_PASSWORD 96</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a8ee57145ec8cbe56a08506aae22c0eab">   50</a></span>&#160;<span class="preprocessor">#define CDPCFG_EEPROM_CHANNEL_VALUE 128</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
+<div class="line"><a name="l00053"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#acf3f6af4dab13f4cf4776dfd148191c0">   53</a></span>&#160;<span class="preprocessor">#define CDPCFG_SERIAL_BAUD 115200</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="comment">// Access point IP adress</span></div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="comment">// Access point IP adress</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
-<div class="line"><a name="l00059"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a7e386e3bb480dc7bca8e522bc51c925f">   59</a></span>&#160;<span class="preprocessor">#define CDPCFG_AP_IP1 192</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a57b49b4e9fd9654386ac443aec0be35b">   60</a></span>&#160;<span class="preprocessor">#define CDPCFG_AP_IP2 168</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ac317ad457bfd590e7cb852da0b9e6100">   61</a></span>&#160;<span class="preprocessor">#define CDPCFG_AP_IP3 1</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ac065e069e2fe32a521a71bd4584ff24a">   62</a></span>&#160;<span class="preprocessor">#define CDPCFG_AP_IP4 1</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160; </div>
-<div class="line"><a name="l00065"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a821294e2f6701503091a967cac63d2c9">   65</a></span>&#160;<span class="preprocessor">#define CDPCFG_WEB_PORT 80</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
-<div class="line"><a name="l00068"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a76429eb9d4f8fd3dc8c8fc902e9eb8fd">   68</a></span>&#160;<span class="preprocessor">#define CDPCFG_RF_LORA_FREQ 915.0</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a04e1a63e177c7512f4c5f77d75f1c617">   69</a></span>&#160;<span class="preprocessor">#define CDPCFG_RF_LORA_FREQ_HZ 915000000</span></div>
-<div class="line"><a name="l00071"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#adc07e97b79250ddfd7c8e2dc119e892f">   71</a></span>&#160;<span class="preprocessor">#define CDPCFG_RF_LORA_BW 125.0</span></div>
-<div class="line"><a name="l00073"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#aa533f097df8cb6cd2b29e1c6f9f056cd">   73</a></span>&#160;<span class="preprocessor">#define CDPCFG_RF_LORA_SF 7</span></div>
-<div class="line"><a name="l00075"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#afca851cc09f5d10dc4879edaff55b5f6">   75</a></span>&#160;<span class="preprocessor">#define CDPCFG_RF_LORA_TXPOW 20</span></div>
-<div class="line"><a name="l00077"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ac48828218af573b698154ab3300d5714">   77</a></span>&#160;<span class="preprocessor">#define CDPCFG_RF_LORA_GAIN 0</span></div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
-<div class="line"><a name="l00080"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a6dee0e0904b3ac55bac351fe949d2f30">   80</a></span>&#160;<span class="preprocessor">#define CDPCFG_CDP_BUFSIZE 256</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ae8f9a966c10a74fe57e8d30290d10227">   82</a></span>&#160;<span class="preprocessor">#define CDPCFG_UUID_LEN 8</span></div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
-<div class="line"><a name="l00085"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a74933c89a7aff4d8f36044402b28bee2">   85</a></span>&#160;<span class="preprocessor">#define CDPCFG_CDP_CHATBUF_SIZE 15</span></div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
-<div class="line"><a name="l00088"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a6e7a6e2f49cc23ed20b1b7411f8d28be">   88</a></span>&#160;<span class="preprocessor">#define CDPCFG_MILLIS_ALIVE 1800000</span></div>
-<div class="line"><a name="l00090"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ae06ad58f39d92cac806ec42808aada49">   90</a></span>&#160;<span class="preprocessor">#define CDPCFG_MILLIS_REBOOT 43200000</span></div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
-<div class="line"><a name="l00093"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ae8bb89e871f63dde4fe6434f420d80e2">   93</a></span>&#160;<span class="preprocessor">#define CDPCFG_PIN_RGBLED_R 25</span></div>
-<div class="line"><a name="l00095"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a0b314d2303dd13d30c293e99e44d9889">   95</a></span>&#160;<span class="preprocessor">#define CDPCFG_PIN_RGBLED_G 4</span></div>
-<div class="line"><a name="l00097"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ade2b59c9fa435327aac360a92e18c000">   97</a></span>&#160;<span class="preprocessor">#define CDPCFG_PIN_RGBLED_B 2</span></div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
-<div class="line"><a name="l00100"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ac997cf8c7a80baf84344780d476b5f26">  100</a></span>&#160;<span class="preprocessor">#define CDPCFG_RADIO_CHANNEL_1 CDPCFG_RF_LORA_FREQ</span></div>
-<div class="line"><a name="l00101"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ae5b90202a58f5953b9e3ad6a46b14bb3">  101</a></span>&#160;<span class="preprocessor">#define CDPCFG_RADIO_CHANNEL_2 914.0</span></div>
-<div class="line"><a name="l00102"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#aeb07cb92ede85873dc194462a9d1708b">  102</a></span>&#160;<span class="preprocessor">#define CDPCFG_RADIO_CHANNEL_3 913.0</span></div>
-<div class="line"><a name="l00103"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a30def82b19d48de98bc7009a2c7ed9d9">  103</a></span>&#160;<span class="preprocessor">#define CDPCFG_RADIO_CHANNEL_4 912.0</span></div>
-<div class="line"><a name="l00104"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#aadc152e03a61e8df938e6b90a2702eea">  104</a></span>&#160;<span class="preprocessor">#define CDPCFG_RADIO_CHANNEL_5 911.0</span></div>
-<div class="line"><a name="l00105"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a76d128470d7fd3c8be2c17db2a9c0b48">  105</a></span>&#160;<span class="preprocessor">#define CDPCFG_RADIO_CHANNEL_6 910.0</span></div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160; </div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="preprocessor">#ifndef CDPCFG_OLED_CLASS</span></div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="preprocessor">#if defined(CDPCFG_OLED_NONE)</span></div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<span class="comment">// do nothing</span></div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="preprocessor">#elif defined(CDPCFG_OLED_64x32)</span></div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="comment">// smaller displays</span></div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="preprocessor">#define CDPCFG_OLED_CLASS U8G2_SSD1306_64X32_NONAME_F_SW_I2C</span></div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="comment">// classic default</span></div>
-<div class="line"><a name="l00115"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#acef35f728d68db44426088bbc112128b">  115</a></span>&#160;<span class="preprocessor">#define CDPCFG_OLED_CLASS U8G2_SSD1306_128X64_NONAME_F_SW_I2C</span></div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CDPCFG_OLED_NONE</span></div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CDPCFG_OLED_CLASS</span></div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CDPCFG_H</span></div>
-<div class="ttc" id="aheltec__cubecell__board_8h_html"><div class="ttname"><a href="heltec__cubecell__board_8h.html">heltec_cubecell_board.h</a></div></div>
-<div class="ttc" id="aheltec__cubecell__gps_8h_html"><div class="ttname"><a href="heltec__cubecell__gps_8h.html">heltec_cubecell_gps.h</a></div></div>
+<div class="line"><a name="l00057"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a7e386e3bb480dc7bca8e522bc51c925f">   57</a></span>&#160;<span class="preprocessor">#define CDPCFG_AP_IP1 192</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a57b49b4e9fd9654386ac443aec0be35b">   58</a></span>&#160;<span class="preprocessor">#define CDPCFG_AP_IP2 168</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ac317ad457bfd590e7cb852da0b9e6100">   59</a></span>&#160;<span class="preprocessor">#define CDPCFG_AP_IP3 1</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ac065e069e2fe32a521a71bd4584ff24a">   60</a></span>&#160;<span class="preprocessor">#define CDPCFG_AP_IP4 1</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
+<div class="line"><a name="l00063"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a821294e2f6701503091a967cac63d2c9">   63</a></span>&#160;<span class="preprocessor">#define CDPCFG_WEB_PORT 80</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
+<div class="line"><a name="l00066"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a76429eb9d4f8fd3dc8c8fc902e9eb8fd">   66</a></span>&#160;<span class="preprocessor">#define CDPCFG_RF_LORA_FREQ 915.0</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a04e1a63e177c7512f4c5f77d75f1c617">   67</a></span>&#160;<span class="preprocessor">#define CDPCFG_RF_LORA_FREQ_HZ 915000000</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#adc07e97b79250ddfd7c8e2dc119e892f">   69</a></span>&#160;<span class="preprocessor">#define CDPCFG_RF_LORA_BW 125.0</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#aa533f097df8cb6cd2b29e1c6f9f056cd">   71</a></span>&#160;<span class="preprocessor">#define CDPCFG_RF_LORA_SF 7</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#afca851cc09f5d10dc4879edaff55b5f6">   73</a></span>&#160;<span class="preprocessor">#define CDPCFG_RF_LORA_TXPOW 20</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ac48828218af573b698154ab3300d5714">   75</a></span>&#160;<span class="preprocessor">#define CDPCFG_RF_LORA_GAIN 0</span></div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
+<div class="line"><a name="l00078"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a6dee0e0904b3ac55bac351fe949d2f30">   78</a></span>&#160;<span class="preprocessor">#define CDPCFG_CDP_BUFSIZE 256</span></div>
+<div class="line"><a name="l00080"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ae8f9a966c10a74fe57e8d30290d10227">   80</a></span>&#160;<span class="preprocessor">#define CDPCFG_UUID_LEN 8</span></div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160; </div>
+<div class="line"><a name="l00083"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a74933c89a7aff4d8f36044402b28bee2">   83</a></span>&#160;<span class="preprocessor">#define CDPCFG_CDP_CHATBUF_SIZE 15</span></div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160; </div>
+<div class="line"><a name="l00086"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a6e7a6e2f49cc23ed20b1b7411f8d28be">   86</a></span>&#160;<span class="preprocessor">#define CDPCFG_MILLIS_ALIVE 1800000</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ae06ad58f39d92cac806ec42808aada49">   88</a></span>&#160;<span class="preprocessor">#define CDPCFG_MILLIS_REBOOT 43200000</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160; </div>
+<div class="line"><a name="l00091"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ae8bb89e871f63dde4fe6434f420d80e2">   91</a></span>&#160;<span class="preprocessor">#define CDPCFG_PIN_RGBLED_R 25</span></div>
+<div class="line"><a name="l00093"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a0b314d2303dd13d30c293e99e44d9889">   93</a></span>&#160;<span class="preprocessor">#define CDPCFG_PIN_RGBLED_G 4</span></div>
+<div class="line"><a name="l00095"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ade2b59c9fa435327aac360a92e18c000">   95</a></span>&#160;<span class="preprocessor">#define CDPCFG_PIN_RGBLED_B 2</span></div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160; </div>
+<div class="line"><a name="l00098"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ac997cf8c7a80baf84344780d476b5f26">   98</a></span>&#160;<span class="preprocessor">#define CDPCFG_RADIO_CHANNEL_1 CDPCFG_RF_LORA_FREQ</span></div>
+<div class="line"><a name="l00099"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ae5b90202a58f5953b9e3ad6a46b14bb3">   99</a></span>&#160;<span class="preprocessor">#define CDPCFG_RADIO_CHANNEL_2 914.0</span></div>
+<div class="line"><a name="l00100"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#aeb07cb92ede85873dc194462a9d1708b">  100</a></span>&#160;<span class="preprocessor">#define CDPCFG_RADIO_CHANNEL_3 913.0</span></div>
+<div class="line"><a name="l00101"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a30def82b19d48de98bc7009a2c7ed9d9">  101</a></span>&#160;<span class="preprocessor">#define CDPCFG_RADIO_CHANNEL_4 912.0</span></div>
+<div class="line"><a name="l00102"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#aadc152e03a61e8df938e6b90a2702eea">  102</a></span>&#160;<span class="preprocessor">#define CDPCFG_RADIO_CHANNEL_5 911.0</span></div>
+<div class="line"><a name="l00103"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a76d128470d7fd3c8be2c17db2a9c0b48">  103</a></span>&#160;<span class="preprocessor">#define CDPCFG_RADIO_CHANNEL_6 910.0</span></div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="preprocessor">#ifndef CDPCFG_OLED_CLASS</span></div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;<span class="preprocessor">#if defined(CDPCFG_OLED_NONE)</span></div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="comment">// do nothing</span></div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="preprocessor">#elif defined(CDPCFG_OLED_64x32)</span></div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<span class="comment">// smaller displays</span></div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="preprocessor">#define CDPCFG_OLED_CLASS U8G2_SSD1306_64X32_NONAME_F_SW_I2C</span></div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="comment">// classic default</span></div>
+<div class="line"><a name="l00113"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#acef35f728d68db44426088bbc112128b">  113</a></span>&#160;<span class="preprocessor">#define CDPCFG_OLED_CLASS U8G2_SSD1306_128X64_NONAME_F_SW_I2C</span></div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CDPCFG_OLED_NONE</span></div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CDPCFG_OLED_CLASS</span></div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160; </div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CDPCFG_H</span></div>
 <div class="ttc" id="aheltec__wifi__lora__32___v2_8h_html"><div class="ttname"><a href="heltec__wifi__lora__32___v2_8h.html">heltec_wifi_lora_32_V2.h</a></div></div>
 <div class="ttc" id="aheltec__wifi__lora__32___v3_8h_html"><div class="ttname"><a href="heltec__wifi__lora__32___v3_8h.html">heltec_wifi_lora_32_V3.h</a></div></div>
 <div class="ttc" id="alilygo__t__beam__sx1262_8h_html"><div class="ttname"><a href="lilygo__t__beam__sx1262_8h.html">lilygo_t_beam_sx1262.h</a></div></div>

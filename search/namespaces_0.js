@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['duckcrypto_244',['duckcrypto',['../namespaceduckcrypto.html',1,'']]],
-  ['duckesp_245',['duckesp',['../namespaceduckesp.html',1,'']]],
-  ['duckutils_246',['duckutils',['../namespaceduckutils.html',1,'']]]
+  ['duckcrypto_242',['duckcrypto',['../namespaceduckcrypto.html',1,'']]],
+  ['duckesp_243',['duckesp',['../namespaceduckesp.html',1,'']]],
+  ['duckutils_244',['duckutils',['../namespaceduckutils.html',1,'']]]
 ];
