@@ -9,6 +9,7 @@
 
 #include <arduino-timer.h>
 #include <string>
+#include <vector>
 #include <CDP.h>
 
 
@@ -39,7 +40,8 @@ void setup() {
   devId.insert(devId.end(), deviceId.begin(), deviceId.end());
   rc = duck.setupWithDefaults(devId);
   if (rc != DUCK_ERR_NONE) {
-    Serial.print("[LINK] Failed to setup ducklink: rc = ");Serial .println(rc);
+    Serial.print("[LINK] Failed to setup ducklink: rc = ");
+    Serial.println(rc);
     return;
   }
 
@@ -64,7 +66,7 @@ void loop() {
   duck.run();
 }
 
-std::vector<byte> stringToByteVector(const String& str) {
+std::vector<byte> stringToByteVector(const std::string& str) {
     std::vector<byte> byteVec;
     byteVec.reserve(str.length());
 
@@ -79,16 +81,17 @@ bool sendSensorData() {
   bool result = false;
   const byte* buffer;
   
-  String message = String("Counter:") + String(counter);
+  std::string message = std::string("Counter:") + std::to_string(counter);
   Serial.print("[LINK] sensor data: ");
-  Serial.println(message);
+  Serial.println(message.c_str());
   
   int err = duck.sendData(topics::status, stringToByteVector(message));
   if (err == DUCK_ERR_NONE) {
      result = true;
      counter++;
   } else {
-    Serial.println("[LINK] Failed to send data. error = " + String(err));
+    std::string errMessage = "[LINK] Failed to send data. error = " + std::to_string(err);
+    Serial.println(errMessage.c_str());
     return false;
   }
   return result;

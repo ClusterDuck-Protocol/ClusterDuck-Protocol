@@ -112,8 +112,8 @@ std::string toTopicString(byte topic) {
   return topicString;
 }
 
-String convertToHex(byte* data, int size) {
-  String buf = "";
+std::string convertToHex(byte* data, int size) {
+  std::string buf = "";
   buf.reserve(size * 2); // 2 digit hex
   const char* cs = "0123456789ABCDEF";
   for (int i = 0; i < size; i++) {
@@ -140,14 +140,14 @@ int quackJson(CdpPacket packet) {
   std::string path(packet.path.begin(), packet.path.end());
 
   Serial.println("[PAPA] Packet Received:");
-  Serial.println("[PAPA] sduid:   " + String(sduid.c_str()));
-  Serial.println("[PAPA] dduid:   " + String(dduid.c_str()));
+  Serial.println("[PAPA] sduid:   " + std::string(sduid.c_str()));
+  Serial.println("[PAPA] dduid:   " + std::string(dduid.c_str()));
 
-  Serial.println("[PAPA] muid:    " + String(muid.c_str()));
-  Serial.println("[PAPA] path:    " + String(path.c_str()));
-  Serial.println("[PAPA] data:    " + String(payload.c_str()));
-  Serial.println("[PAPA] hops:    " + String(packet.hopCount));
-  Serial.println("[PAPA] duck:    " + String(packet.duckType));
+  Serial.println("[PAPA] muid:    " + std::string(muid.c_str()));
+  Serial.println("[PAPA] path:    " + std::string(path.c_str()));
+  Serial.println("[PAPA] data:    " + std::string(payload.c_str()));
+  Serial.println("[PAPA] hops:    " + std::string(packet.hopCount));
+  Serial.println("[PAPA] duck:    " + std::string(packet.duckType));
 
   doc["DeviceID"] = sduid;
   doc["MessageID"] = muid;
@@ -167,7 +167,7 @@ int quackJson(CdpPacket packet) {
 
   std::string topic = "owl/device/" + std::string(THINGNAME) + "/evt/" + cdpTopic;
 
-  String jsonstat;
+  std::string jsonstat;
   serializeJson(doc, jsonstat);
 
   //Filter out private chat so it won't get sent to DMS
@@ -276,7 +276,7 @@ void loop() {
 void gotMsg(char* topic, byte* payload, unsigned int payloadLength) {
   Serial.print("gotMsg: invoked for topic: "); Serial.println(topic);
 
-  if (String(topic).indexOf(CMD_STATE_WIFI) > 0) {
+  if (std::string(topic).indexOf(CMD_STATE_WIFI) > 0) {
     Serial.println("Start WiFi Command");
     byte sCmd = 1;
     std::vector<byte> sValue = {payload[0]};
@@ -294,7 +294,7 @@ void gotMsg(char* topic, byte* payload, unsigned int payloadLength) {
     } else {
       duck.sendCommand(sCmd, sValue);
     }
-  } else if (String(topic).indexOf(CMD_STATE_HEALTH) > 0) {
+  } else if (std::string(topic).indexOf(CMD_STATE_HEALTH) > 0) {
     byte sCmd = 0;
     std::vector<byte> sValue = {payload[0]};
     if(payloadLength >= 8) {

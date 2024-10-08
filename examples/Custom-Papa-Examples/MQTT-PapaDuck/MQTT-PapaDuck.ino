@@ -75,14 +75,14 @@ const std::string WIFI_SSID="ENTER SSID";   // Replace with WiFi SSID
 const std::string WIFI_PASS="ENTER PASSWORD";     // Replace with WiFi Password
 
 std::string toTopicString(byte topic);
-String arduinoStringFromHex(byte* data, int size);
+std::string arduinoStringFromHex(byte* data, int size);
 bool setup_mqtt(void);
 void handleIncomingMqttMessages(void);
 // std::string toHexString(std::vector<byte>& data);
 std::vector<uint8_t> fromHexString(const std::string& hexString);
 
 // std::string toHexString(std::vector<byte>& data) {
-//   String str = arduinoStringFromHex(data.data(), data.size());
+//   std::string str = arduinoStringFromHex(data.data(), data.size());
 //   return str.c_str();
 // }
 
@@ -147,9 +147,9 @@ std::string toTopicString(byte topic)
   return topicString;
 }
 
-String arduinoStringFromHex(byte* data, int size) 
+std::string arduinoStringFromHex(byte* data, int size) 
 {
-  String buf = "";
+  std::string buf = "";
   buf.reserve(size * 2); // 2 digit hex
   const char* cs = "0123456789ABCDEF";
   for (int i = 0; i < size; i++) {
@@ -160,7 +160,7 @@ String arduinoStringFromHex(byte* data, int size)
   return buf;
 }
 
-bool publishToMqttTopic(std::string source, std::string topic, String message) {
+bool publishToMqttTopic(std::string source, std::string topic, std::string message) {
   bool ok = false;
   if (hub.isWifiConnected()) {
     ok = setup_mqtt();  
@@ -211,7 +211,7 @@ void handleIncomingMqttMessages(void) {
       Serial.println(err.c_str());
       continue;
     }
-    String jsonstat;
+    std::string jsonstat;
     serializeJson(doc, jsonstat);
     serializeJsonPretty(doc, Serial);
 
@@ -254,7 +254,7 @@ void processMessageFromDucks(std::vector<byte> packetBuffer) {
 
     doc["payload"]["Message"] = payload.c_str();  
        
-    String jsonstat;
+    std::string jsonstat;
     serializeJson(doc, jsonstat);
     Serial.printf("%s\n",jsonstat.c_str());
 
