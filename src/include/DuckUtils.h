@@ -100,6 +100,14 @@ bool isEqual(const std::vector<T> & a, const std::vector<T> & b) {
   return std::equal(a.begin(), a.end(), b.begin());
 }
 
+    template<typename T>
+    bool isEqual(const std::array<T,8> & a, const std::array<T,8> & b) {
+        if (a.size() != b.size()) {
+            return false;
+        }
+        return std::equal(a.begin(), a.end(), b.begin());
+    }
+
 /**
  * @brief Convert a byte array to unsigned 32 bit integer.
  * 

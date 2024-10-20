@@ -203,7 +203,7 @@ void Duck::processPortalRequest() { duckNet->dnsServer.processNextRequest(); }
 #endif
 
 int Duck::sendData(byte topic, const std::string data,
-  const std::vector<byte> targetDevice, std::vector<byte> * outgoingMuid)
+  const std::array<byte,8> targetDevice, std::array<byte,8> * outgoingMuid)
 {
   std::vector<byte> app_data;
   app_data.insert(app_data.end(), data.begin(), data.end());
@@ -212,16 +212,16 @@ int Duck::sendData(byte topic, const std::string data,
 }
 
 int Duck::sendData(byte topic, const byte* data, int length,
-  const std::vector<byte> targetDevice, std::vector<byte> * outgoingMuid)
+  const std::array<byte,8> targetDevice, std::array<byte,8> * outgoingMuid)
 {
-  std::vector<byte> app_data;
+  std::vector<byte> app_data(length);
   app_data.insert(app_data.end(), &data[0], &data[length]);
   int err = sendData(topic, app_data, targetDevice, outgoingMuid);
   return err;
 }
 
 int Duck::sendData(byte topic, std::vector<byte> data,
-  const std::vector<byte> targetDevice, std::vector<byte> * outgoingMuid)
+  const std::array<byte,8> targetDevice, std::array<byte,8> * outgoingMuid)
 {
   // if (topic < reservedTopic::max_reserved) {
   //   logerr_ln("ERROR send data failed, topic is reserved.");
@@ -236,7 +236,7 @@ int Duck::sendData(byte topic, std::vector<byte> data,
   if (err != DUCK_ERR_NONE) {
     return err;
   }
-
+    std::vector<byte> vBuffer(txPacket->getBuffer().size());
   err = duckRadio.sendData(txPacket->getBuffer());
 
   CdpPacket packet = CdpPacket(txPacket->getBuffer());
@@ -277,7 +277,7 @@ muidStatus Duck::getMuidStatus(const std::vector<byte> & muid) const {
 }
 
 CdpPacket Duck::buildCdpPacket(byte topic, const std::vector<byte> data,
-    const std::vector<byte> targetDevice, const std::vector<byte> &muid)
+    const std::array<byte,8> targetDevice, const std::array<byte,8> &muid)
 {
   if (data.size() > MAX_DATA_LENGTH) {
     logerr_ln("ERROR send data failed, message too large: %d bytes", data.size());

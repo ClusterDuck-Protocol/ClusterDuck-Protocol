@@ -14,7 +14,7 @@ DNSServer DuckNet::dnsServer;
 const char* DuckNet::DNS = "duck";
 const byte DuckNet::DNS_PORT = 53;
 
-void DuckNet::setDeviceId(std::vector<byte> deviceId) {
+void DuckNet::setDeviceId(std::array<byte,8> deviceId) {
   this->deviceId.insert(this->deviceId.end(), deviceId.begin(), deviceId.end());
 }
 

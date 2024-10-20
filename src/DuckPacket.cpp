@@ -28,7 +28,7 @@ bool DuckPacket::prepareForRelaying(BloomFilter *filter, std::vector<byte> dataB
   }
 
   // update the rx packet internal byte buffer
-  buffer.assign(dataBuffer.begin(), dataBuffer.end());
+  buffer = dataBuffer;
   int hops = buffer[HOP_COUNT_POS]++;
   loginfo_ln("prepareForRelaying: hops count: %d", hops);
   return true;
@@ -47,10 +47,10 @@ void DuckPacket::getUniqueMessageId(BloomFilter * filter, byte message_id[MUID_L
 }
 
 int DuckPacket::prepareForSending(BloomFilter *filter,
-                                  std::vector<byte> targetDevice, byte duckType,
+                                  std::array<byte,8> targetDevice, byte duckType,
                                   byte topic, std::vector<byte> app_data) {
 
-  std::vector<uint8_t> encryptedData;
+  std::vector<byte> encryptedData;
   uint8_t app_data_length = app_data.size();
 
   this->reset();
@@ -68,7 +68,6 @@ int DuckPacket::prepareForSending(BloomFilter *filter,
   uint32_t value;
   // TODO: update the CRC32 library to return crc as a byte array
   if(duckcrypto::getState()) {
-    encryptedData.resize(app_data.size());
     duckcrypto::encryptData(app_data.data(), encryptedData.data(), app_data.size());
     value = CRC32::calculate(encryptedData.data(), encryptedData.size());
   } else {
@@ -82,41 +81,53 @@ int DuckPacket::prepareForSending(BloomFilter *filter,
 
   // ----- insert packet header  -----
   // source device uid
-  buffer.insert(buffer.end(), duid.begin(), duid.end());
-  logdbg_ln("SDuid:     %s",duckutils::convertToHex(duid.data(), duid.size()).c_str());
 
+  for(int i = 0; i < DUID_LENGTH; i++) {
+    buffer[SDUID_POS + i] = duid[i];
+  }
+  logdbg_ln("SDuid:     %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
   // destination device uid
-  buffer.insert(buffer.end(), targetDevice.begin(), targetDevice.end());
+  for(int i = 0; i < DUID_LENGTH; i++) {
+    buffer[DDUID_POS + i] = targetDevice[i];
+  }
   logdbg_ln("DDuid:     %s", duckutils::convertToHex(targetDevice.data(), targetDevice.size()).c_str());
 
   // message uid
-  buffer.insert(buffer.end(), &message_id[0], &message_id[MUID_LENGTH]);
+  for(int i = 0; i < MUID_LENGTH; i++) {
+    buffer[MUID_POS + i] = message_id[i];
+  }
   logdbg_ln("Muid:      %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
 
   // topic
-  buffer.insert(buffer.end(), topic);
+  buffer[TOPIC_POS] = topic;
   logdbg_ln("Topic:     %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
 
   // duckType
-  buffer.insert(buffer.end(), duckType);
+    buffer[DUCK_TYPE_POS] = duckType;
   logdbg_ln("duck type: %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
 
   // hop count
-  buffer.insert(buffer.end(), 0x00);
+  buffer[HOP_COUNT_POS] = 0x00;
   logdbg_ln("hop count: %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
 
   // data crc
-  buffer.insert(buffer.end(), &crc_bytes[0], &crc_bytes[DATA_CRC_LENGTH]);
+  for(int i = 0; i < DATA_CRC_LENGTH; i++) {
+    buffer[DATA_CRC_POS + i] = crc_bytes[i];
+  }
   logdbg_ln("Data CRC:  %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
 
   // ----- insert data -----
   if(duckcrypto::getState()) {
 
-    buffer.insert(buffer.end(), encryptedData.begin(), encryptedData.end());
+   for(int i = 0; i < MAX_DATA_LENGTH; i++) {
+       buffer[DATA_POS + i] = encryptedData[i];
+   }
     logdbg_ln("Encrypted Data:      %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
 
   } else {
-    buffer.insert(buffer.end(), app_data.begin(), app_data.end());
+    for(int i = 0; i < app_data.size(); i++) {
+      buffer[DATA_POS + i] = app_data[i];
+    }
     logdbg_ln("Data:      %s",duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
   }
   

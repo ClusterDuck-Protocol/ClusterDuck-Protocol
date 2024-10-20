@@ -153,7 +153,7 @@ public:
    * @return DUCK_ERR_NONE if the data was send successfully, an error code otherwise. 
    */
   int sendData(byte topic, const std::string data,
-    const std::vector<byte> targetDevice = ZERO_DUID, std::vector<byte> * outgoingMuid = NULL);
+    const std::array<byte,8> targetDevice = ZERO_DUID, std::array<byte,8> * outgoingMuid = NULL);
 
   /**
    * @brief Sends data into the mesh network.
@@ -166,7 +166,7 @@ public:
    otherwise.
    */
   int sendData(byte topic, std::vector<byte> bytes,
-    const std::vector<byte> targetDevice = ZERO_DUID, std::vector<byte> * outgoingMuid = NULL);
+    const std::array<byte,8> targetDevice = ZERO_DUID, std::array<byte,8> * outgoingMuid = NULL);
     
   /**
    * @brief Sends data into the mesh network.
@@ -180,7 +180,7 @@ public:
    * otherwise.
    */
   int sendData(byte topic, const byte* data, int length,
-    const std::vector<byte> targetDevice = ZERO_DUID, std::vector<byte> * outgoingMuid = NULL);
+    const std::array<byte,8> targetDevice = ZERO_DUID, std::array<byte,8> * outgoingMuid = NULL);
 
   /**
    * @brief Builds a CdpPacket with a specified muid.
@@ -193,7 +193,7 @@ public:
    * @return a new CdpPacket
    * */
   CdpPacket buildCdpPacket(byte topic, const std::vector<byte> data,
-    const std::vector<byte> targetDevice, const std::vector<byte> &muid);
+    const std::array<byte,8> targetDevice, const std::array<byte,8> &muid);
 
   /**
    * @brief Get the status of an MUID
@@ -295,7 +295,7 @@ protected:
   std::string duckName="";
 
   std::string deviceId;
-  std::vector<byte> duid;
+  std::array<byte,8> duid;
 
   DuckRadio& duckRadio = DuckRadio::getInstance();
 
@@ -346,12 +346,12 @@ protected:
    * The default implementation simply initializes the serial interface.
    * It can be overriden by each concrete Duck class implementation.
    */
-  virtual int setupWithDefaults(std::vector<byte> deviceId, std::string ssid, std::string password) {
+  virtual int setupWithDefaults(std::array<byte,8> deviceId, std::string ssid, std::string password) {
     int err = setupSerial();
     if (err != DUCK_ERR_NONE) {
       return err;
     }
-    err = setDeviceId(deviceId);
+    err = setDeviceId(deviceId.data());
     if (err != DUCK_ERR_NONE) {
       return err;
     }

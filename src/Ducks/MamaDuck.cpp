@@ -2,7 +2,7 @@
 #include "../MemoryFree.h"
 
 
-int MamaDuck::setupWithDefaults(std::vector<byte> deviceId, std::string ssid, std::string password) {
+int MamaDuck::setupWithDefaults(std::array<byte,8> deviceId, std::string ssid, std::string password) {
   
   int err = Duck::setupWithDefaults(deviceId, ssid, password);
   if (err != DUCK_ERR_NONE) {
