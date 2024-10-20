@@ -42,7 +42,7 @@ public:
      * @brief Construct a new Duck Packet object.
      * 
      */
-    DuckPacket() {}
+    DuckPacket() {buffer.reserve(229);}
 
     /**
      * @brief Construct a new Duck Packet object.
@@ -51,7 +51,7 @@ public:
      * @param filter a bloom filter
      */
         DuckPacket(std::array<byte,8> duid)
-        : duid(duid) { }
+        : duid(duid) { buffer.reserve(229);}
 
     ~DuckPacket() {}
     /**
