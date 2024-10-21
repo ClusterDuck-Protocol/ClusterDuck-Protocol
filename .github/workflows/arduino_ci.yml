@@ -24,11 +24,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        board: ["esp32:esp32:heltec_wifi_lora_32_V3", "CubeCell:CubeCell:CubeCell-Board-V2"]
+        board: ["esp32:esp32:heltec_wifi_lora_32_V3"]
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: System setup
       run: |
@@ -42,7 +42,7 @@ jobs:
     - name: Run cppcheck
       run: |
         cppcheck --version
-        cppcheck --error-exitcode=1 --std=c++11 --force src
+        cppcheck --error-exitcode=1 --std=c++20 --force src
 
     - name: Arduino setup
       run: |
@@ -50,21 +50,13 @@ jobs:
         set -x
         arduino-cli config init
         arduino-cli config set library.enable_unsafe_install true
-        # udpate the index to include the Heltec ESP32 and CubeCell boards
-        echo "[ARDUINO SETUP] Updating the index to include the Heltec ESP32 and CubeCell boards"
+        echo "[ARDUINO SETUP] Updating the index to include the Heltec ESP32 boards"
         arduino-cli core update-index --additional-urls https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series/releases/download/3.0.0/package_heltec_esp32_index.json
-        arduino-cli core update-index --additional-urls https://github.com/HelTecAutomation/CubeCell-Arduino/releases/download/V1.5.0/package_CubeCell_index.json
         
-        # install the Heltec ESP32 and CubeCell boards
+        # install the Heltec ESP32 boards
         if [[ "${{ matrix.board }}" =~ "esp32:esp32:" ]]; then
           echo "[ARDUINO SETUP] Installing the Heltec ESP32 board"
           arduino-cli core install esp32:esp32@2.0.17 --additional-urls https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series/releases/download/3.0.0/package_heltec_esp32_index.json
-        fi
-        if [[ "${{ matrix.board }}" =~ "CubeCell:CubeCell:" ]]; then
-          echo "[ARDUINO SETUP] Installing the CubeCell board"
-          arduino-cli core install CubeCell:CubeCell --additional-urls https://github.com/HelTecAutomation/CubeCell-Arduino/releases/download/V1.5.0/package_CubeCell_index.json
-          echo "[ARDUINO  SETUP] Patching the CubeCell Arduino.h file."
-          cp ./arduino_patches/CubeCell_Arduino.h /home/runner/.arduino15/packages/CubeCell/hardware/CubeCell/1.5.0/cores/asr650x/Arduino.h
         fi
 
     - name: Install CDP
@@ -116,11 +108,12 @@ jobs:
           arduino-cli compile -v -t -b ${{ matrix.board }} $PWD/examples/$1/$2/$2.ino > ${BOARD##*:}-$2-build.log 2>&1; 
           echo "Build complete."
         } 
-        buildExampleSketch 1.Ducks DuckLink
-        buildExampleSketch 1.Ducks MamaDuck
+        buildExampleSketch Basic-Ducks DuckLink
+        buildExampleSketch Basic-Ducks MamaDuck
     - name: Upload build log
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       if: always()
       with:
         name: build-log
         path: '*.log'      
+    

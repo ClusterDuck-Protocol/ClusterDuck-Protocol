@@ -38,7 +38,7 @@ void test_DuckUtils_toUpperCase(void) {
 }
 
 void test_DuckUtils_stringToByteVector(void) {
-    String str = "hello";
+    std::string str = "hello";
     std::vector<byte> bytes = duckutils::stringToByteVector(str);
     TEST_ASSERT_EQUAL(5, bytes.size());
     TEST_ASSERT_EQUAL('h', bytes[0]);

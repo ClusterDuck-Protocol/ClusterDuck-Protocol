@@ -15,7 +15,7 @@
         "url": "https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol"
     },
     "frameworks": "arduino",
-    "platforms": ["espressif32","heltec-cubecell"], 
+    "platforms": ["espressif32"], 
     "license": "Apache-2.0",
     "export": {
         "include": [
@@ -35,7 +35,7 @@
         "olikraus/U8g2": "^2.35.9",
         "bblanchon/ArduinoJson": "^7.0.3",
         "bakercp/CRC32": "2.0.0",
-        "jgromes/RadioLib": "^6.4.2",
+        "jgromes/RadioLib": "^6.6.0",
         "operatorfoundation/Crypto": "^0.4.0",
         "me-no-dev/AsyncTCP": "^1.1.1",
         "mathieucarbou/ESP Async WebServer": "^2.7.0",

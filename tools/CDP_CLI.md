@@ -49,13 +49,9 @@ Available target environments:
   - lilygo_t_beam_sx1262
   - heltec_wifi_lora_32_V2
   - ttgo_lora32_v1
-  - cubecell_gps
-  - cubecell_board_v2
   - test_heltec_wifi_lora_32_V2
   - test_heltec_wifi_lora_32_V3
   - test_lilygo_t_beam_sx1262
-  - test_cubecell_board_v2
-  - test_cubecell_gps
 ```
 
 ### Build the CDP library for a specific target
