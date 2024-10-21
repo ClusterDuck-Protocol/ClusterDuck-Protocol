@@ -86,6 +86,25 @@ std::string toString(const std::vector<T>& vec) {
 }
 
 /**
+ * @brief Convert a array into an ASCII string.
+ *
+ * @param arr A vector to convert
+ * @returns A std::string representing the byte array in ASCII.
+ *
+ */
+    template<typename T>
+    std::string toString(const std::array<T,8>& arr) {
+        std::string result;
+        for (const auto& element : arr) {
+            if (!std::isprint(element)) {
+                return "ERROR: Non-printable character";
+            }
+            result += static_cast<char>(element);
+        }
+        return result;
+    }
+
+/**
  * @brief Compare two vectors with regard to both size and contents.
  * 
  * @param a The first vector

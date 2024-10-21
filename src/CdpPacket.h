@@ -211,7 +211,7 @@ public:
     std::array<byte,8>().swap(sduid);
     std::array<byte,8>().swap(muid);
     //std::array<byte,8>().swap(path);
-    std::array<byte,229>().swap(data);
+    data.clear();
     duckType = DuckType::UNKNOWN;
     hopCount = 0;
     topic = 0;

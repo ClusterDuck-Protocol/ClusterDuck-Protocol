@@ -68,14 +68,12 @@ void Duck::logIfLowMemory() {
   }
 }
 
-int Duck::setDeviceId(std::vector<byte> id) {
+int Duck::setDeviceId(std::array<byte,8> id) {
   if (id.size() != DUID_LENGTH) {
     logerr_ln("ERROR  device id too long rc = %d", DUCK_ERR_ID_TOO_LONG);
     return DUCK_ERR_ID_TOO_LONG;
   }
-  
-  duid.clear();
-  duid.assign(id.begin(), id.end());
+    std::copy(id.begin(), id.end(),duid.begin());
   loginfo_ln("setupDeviceId rc = %d",DUCK_ERR_NONE);
   return DUCK_ERR_NONE;
 }
@@ -251,10 +249,10 @@ int Duck::sendData(byte topic, std::vector<byte> data,
   }
 
   lastMessageAck = false;
-  lastMessageMuid.assign(packet.muid.begin(), packet.muid.end());
+    std::copy(packet.muid.begin(),packet.muid.end(),lastMessageMuid.begin());
   assert(lastMessageMuid.size() == MUID_LENGTH);
   if (outgoingMuid != NULL) {
-    outgoingMuid->assign(packet.muid.begin(), packet.muid.end());
+      std::copy(packet.muid.cbegin(),packet.muid.cend(),outgoingMuid->begin());
     assert(outgoingMuid->size() == MUID_LENGTH);
   }
   txPacket->reset();
@@ -262,7 +260,7 @@ int Duck::sendData(byte topic, std::vector<byte> data,
   return err;
 }
 
-muidStatus Duck::getMuidStatus(const std::vector<byte> & muid) const {
+muidStatus Duck::getMuidStatus(const std::array<byte,8> & muid) const {
   if (duckutils::isEqual(muid, lastMessageMuid)) {
     if (lastMessageAck) {
       return muidStatus::acked;

@@ -50,7 +50,7 @@ int DuckPacket::prepareForSending(BloomFilter *filter,
                                   std::array<byte,8> targetDevice, byte duckType,
                                   byte topic, std::vector<byte> app_data) {
 
-  std::vector<byte> encryptedData;
+  std::vector<uint8_t> encryptedData;
   uint8_t app_data_length = app_data.size();
 
   this->reset();
