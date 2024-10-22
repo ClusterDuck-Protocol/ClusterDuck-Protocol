@@ -55,7 +55,7 @@ public:
    * @param an 8 byte unique id 
    * @return DUCK_ERR_NONE if successful, an error code otherwise 
    */
-  int setDeviceId(std::array<byte,8> id);
+  int setDeviceId(std::array<byte,8>& id);
 
   /**
    * @brief setup the duck unique ID
@@ -63,8 +63,9 @@ public:
    * @param an 8 byte unique id
    * @return DUCK_ERR_NONE if successful, an error code otherwise
    */
-  int setDeviceId(byte* id);
+  int setDeviceId(std::string& id);
 
+  int Duck::setDeviceId(byte* id);
   /**
    * @brief Setup serial connection.
    *

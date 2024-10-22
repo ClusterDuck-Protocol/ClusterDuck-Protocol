@@ -68,37 +68,41 @@ void Duck::logIfLowMemory() {
   }
 }
 
-int Duck::setDeviceId(std::array<byte,8> id) {
-  if (id.size() != DUID_LENGTH) {
-    logerr_ln("ERROR  device id too long rc = %d", DUCK_ERR_ID_TOO_LONG);
-    return DUCK_ERR_ID_TOO_LONG;
-  }
+int Duck::setDeviceId(std::array<byte,8>& id) {
     std::copy(id.begin(), id.end(),duid.begin());
   loginfo_ln("setupDeviceId rc = %d",DUCK_ERR_NONE);
   return DUCK_ERR_NONE;
 }
 
+[[deprecated("use setDeviceId(std::array<byte,8>& id) instead")]]
 int Duck::setDeviceId(byte* id) {
-  if (id == NULL) {
-    logerr_ln("ERROR  device id too long rc = %d", DUCK_ERR_SETUP);
+    if (id == NULL) {
+        logerr_ln("ERROR  device id too long rc = %d", DUCK_ERR_SETUP);
+        return DUCK_ERR_SETUP;
+    }
+    int len = *(&id + 1) - id;
+    if (len > DUID_LENGTH) {
+        logerr_ln("ERROR  device id too long rc = %d", DUCK_ERR_ID_TOO_LONG);
+        return DUCK_ERR_ID_TOO_LONG;
+    }
+    std::copy(id, id + len, duid.begin());
+    loginfo_ln("setupDeviceId rc = %d",DUCK_ERR_NONE);
+    return DUCK_ERR_NONE;
+}
 
-    return DUCK_ERR_SETUP;
-  }
-  int len = *(&id + 1) - id;
-  if (len > DUID_LENGTH) {
-    logerr_ln("ERROR  device id too long rc = %d", DUCK_ERR_ID_TOO_LONG);
-    return DUCK_ERR_ID_TOO_LONG;
-  }
-  duid.assign(id, id + len);
-  loginfo_ln("setupDeviceId rc = %d",DUCK_ERR_NONE);
-
-  return DUCK_ERR_NONE;
+int Duck::setDeviceId(std::string& id) {
+    if (id.size() != DUID_LENGTH) {
+        logerr_ln("ERROR  device id too long rc = %d", DUCK_ERR_ID_TOO_LONG);
+        return DUCK_ERR_ID_TOO_LONG;
+    }
+    std::copy(id.begin(), id.end(),duid.begin());
+    loginfo_ln("setupDeviceId rc = %d", DUCK_ERR_NONE);
+    return DUCK_ERR_NONE;
 }
 
 int Duck::setupSerial(int baudRate) {
   // This gives us 10 seconds to do a hard reset if the board is in a bad state after power cycle
-  while (!Serial && millis() < 10000)
-    ;
+  while (!Serial && millis() < 10000);
 
   Serial.begin(baudRate);
   loginfo_ln("setupSerial rc = %d",DUCK_ERR_NONE);
