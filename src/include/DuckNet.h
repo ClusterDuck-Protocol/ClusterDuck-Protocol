@@ -259,7 +259,7 @@ private:
 
   DuckPacket* txPacket = NULL;
 
-  std::vector<byte> deviceId;
+  std::array<byte,8> deviceId;
 
   BloomFilter *bloomFilter = nullptr;
 

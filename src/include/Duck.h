@@ -52,7 +52,7 @@ public:
   /**
    * @brief setup the duck unique ID
    * 
-   * @param an 8 byte unique id 
+   * @param an 8 byte array
    * @return DUCK_ERR_NONE if successful, an error code otherwise 
    */
   int setDeviceId(std::array<byte,8>& id);
@@ -65,7 +65,13 @@ public:
    */
   int setDeviceId(std::string& id);
 
-  int Duck::setDeviceId(byte* id);
+    /**
+     * @brief setup the duck unique ID
+     *
+     * @param an 8 byte unique id
+     * @return DUCK_ERR_NONE if successful, an error code otherwise
+     */
+  int setDeviceId(byte* id);
   /**
    * @brief Setup serial connection.
    *
@@ -166,7 +172,7 @@ public:
    * @return DUCK_ERR_NONE if the data was send successfully, an error code
    otherwise.
    */
-  int sendData(byte topic, std::vector<byte> bytes,
+  int sendData(byte topic, std::vector<byte>& bytes,
     const std::array<byte,8> targetDevice = ZERO_DUID, std::array<byte,8> * outgoingMuid = NULL);
     
   /**
@@ -199,7 +205,7 @@ public:
   /**
    * @brief Get the status of an MUID
    */
-  muidStatus getMuidStatus(const std::array<byte,8> & muid) const;
+  muidStatus getMuidStatus(const std::array<byte,4> & muid) const;
 
   /**
    * @brief Check wifi connection status
@@ -305,7 +311,7 @@ protected:
 
   DuckPacket* txPacket = NULL;
   DuckPacket* rxPacket = NULL;
-  std::array<byte,8> lastMessageMuid;
+  std::array<byte,4> lastMessageMuid;
 
   bool lastMessageAck = true;
   // Since this may be used to throttle outgoing packets, start out in a state

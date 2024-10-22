@@ -173,31 +173,23 @@ public:
     reset();
   }
   CdpPacket(const std::vector<byte> & buffer) {
-    int buffer_length = buffer.size();
-    // sduid
-    for(int i = 0; i < DUID_LENGTH; i++) {
-      sduid[i] = buffer[SDUID_POS + i];
-    }
-    // dduid
-    for(int i = 0; i < DUID_LENGTH; i++) {
-      dduid[i] = buffer[DDUID_POS + i];
-    }
-    // muid
-    for(int i = 0; i < MUID_LENGTH; i++) {
-      muid[i] = buffer[MUID_POS + i];
-    }
-    // topic
-    topic = buffer[TOPIC_POS];
-    // duckType
-    duckType = buffer[DUCK_TYPE_POS];
-    // hop count
-    hopCount = buffer[HOP_COUNT_POS];
-    // data crc
-    dcrc = duckutils::toUint32(&buffer[DATA_CRC_POS]);
-    // data section
-    for(int i = 0; i < buffer_length; i++) {
-      data[i] = buffer[DATA_POS + i];
-    }
+      int buffer_length = buffer.size();
+      // sduid
+      std::copy(&buffer[SDUID_POS], &buffer[DDUID_POS], sduid.begin());
+      // dduid
+      std::copy(&buffer[DDUID_POS], &buffer[MUID_POS], dduid.begin());
+      // muid
+      std::copy(&buffer[MUID_POS], &buffer[TOPIC_POS], muid.begin());
+      // topic
+      topic = buffer[TOPIC_POS];
+      // duckType
+      duckType = buffer[DUCK_TYPE_POS];
+      // hop count
+      hopCount = buffer[HOP_COUNT_POS];
+      // data crc
+      dcrc = duckutils::toUint32(&buffer[DATA_CRC_POS]);
+      // data section
+      data.assign(&buffer[DATA_POS], &buffer[buffer_length]);
 
   }
 

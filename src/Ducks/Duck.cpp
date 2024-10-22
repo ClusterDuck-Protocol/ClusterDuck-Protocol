@@ -222,13 +222,13 @@ int Duck::sendData(byte topic, const byte* data, int length,
   return err;
 }
 
-int Duck::sendData(byte topic, std::vector<byte> data,
+int Duck::sendData(byte topic, std::vector<byte>& data,
   const std::array<byte,8> targetDevice, std::array<byte,8> * outgoingMuid)
 {
-  // if (topic < reservedTopic::max_reserved) {
-  //   logerr_ln("ERROR send data failed, topic is reserved.");
-  //   return DUCKPACKET_ERR_TOPIC_INVALID;
-  // }
+   if (topic < reservedTopic::max_reserved) {
+     logerr_ln("ERROR send data failed, topic is reserved.");
+     return DUCKPACKET_ERR_TOPIC_INVALID;
+   }
   if (data.size() > MAX_DATA_LENGTH) {
     logerr_ln("ERROR send data failed, message too large: %d bytes",data.size());
     return DUCKPACKET_ERR_SIZE_INVALID;
@@ -238,7 +238,7 @@ int Duck::sendData(byte topic, std::vector<byte> data,
   if (err != DUCK_ERR_NONE) {
     return err;
   }
-    std::vector<byte> vBuffer(txPacket->getBuffer().size());
+
   err = duckRadio.sendData(txPacket->getBuffer());
 
   CdpPacket packet = CdpPacket(txPacket->getBuffer());
@@ -264,7 +264,7 @@ int Duck::sendData(byte topic, std::vector<byte> data,
   return err;
 }
 
-muidStatus Duck::getMuidStatus(const std::array<byte,8> & muid) const {
+muidStatus Duck::getMuidStatus(const std::array<byte,4> & muid) const {
   if (duckutils::isEqual(muid, lastMessageMuid)) {
     if (lastMessageAck) {
       return muidStatus::acked;

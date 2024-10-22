@@ -42,7 +42,9 @@ public:
      * @brief Construct a new Duck Packet object.
      * 
      */
-    DuckPacket() {buffer.reserve(229);}
+    DuckPacket() {
+        //buffer.reserve(229);
+    }
 
     /**
      * @brief Construct a new Duck Packet object.
@@ -51,7 +53,8 @@ public:
      * @param filter a bloom filter
      */
         DuckPacket(std::array<byte,8> duid)
-        : duid(duid) { buffer.reserve(229);}
+        : duid(duid) { //buffer.reserve(229);
+            }
 
     ~DuckPacket() {}
     /**
@@ -100,7 +103,7 @@ public:
      *
      */
     void reset() {
-      std::vector<byte>().swap(buffer);
+      buffer.clear();
     }
 
     byte getTopic() { return buffer[TOPIC_POS]; }

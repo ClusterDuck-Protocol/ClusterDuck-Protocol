@@ -42,7 +42,7 @@ public:
    * @param password wifi password (defaults to an empty string if not provided)
    * @returns DUCK_ERR_NONE if setup is successfull, an error code otherwise.
    */
-   int setupWithDefaults(std::vector<byte> deviceId, std::string ssid = "",
+   int setupWithDefaults(std::array<byte,8> deviceId, std::string ssid = "",
                             std::string password = "");
 
   /**
@@ -99,7 +99,7 @@ public:
    * @param value contextual data to be used in executed command.
    * @param dduid destination duck ID for command to be executed.
    */
-  void sendCommand(byte cmd, std::vector<byte> value, std::vector<byte> dduid);
+  void sendCommand(byte cmd, std::vector<byte> value, std::array<byte,8> dduid);
 
 private:
 

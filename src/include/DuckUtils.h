@@ -92,8 +92,8 @@ std::string toString(const std::vector<T>& vec) {
  * @returns A std::string representing the byte array in ASCII.
  *
  */
-    template<typename T>
-    std::string toString(const std::array<T,8>& arr) {
+    template<typename T,size_t S>
+    std::string toString(const std::array<T,S>& arr) {
         std::string result;
         for (const auto& element : arr) {
             if (!std::isprint(element)) {
@@ -119,8 +119,8 @@ bool isEqual(const std::vector<T> & a, const std::vector<T> & b) {
   return std::equal(a.begin(), a.end(), b.begin());
 }
 
-    template<typename T>
-    bool isEqual(const std::array<T,8> & a, const std::array<T,8> & b) {
+    template<typename T,size_t S>
+    bool isEqual(const std::array<T,S> & a, const std::array<T,S> & b) {
         if (a.size() != b.size()) {
             return false;
         }

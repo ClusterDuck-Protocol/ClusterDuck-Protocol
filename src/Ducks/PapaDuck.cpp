@@ -1,6 +1,6 @@
 #include "../PapaDuck.h"
 #include <cassert>
-int PapaDuck::setupWithDefaults(std::vector<byte> deviceId, std::string ssid, std::string password) {
+int PapaDuck::setupWithDefaults(std::array<byte,8> deviceId, std::string ssid, std::string password) {
   loginfo_ln("setupWithDefaults...");
 
   int err = Duck::setupWithDefaults(deviceId, ssid, password);
@@ -222,7 +222,7 @@ void PapaDuck::sendCommand(byte cmd, std::vector<byte> value) {
   }
 }
 
-void PapaDuck::sendCommand(byte cmd, std::vector<byte> value, std::vector<byte> dduid) {
+void PapaDuck::sendCommand(byte cmd, std::vector<byte> value, std::array<byte,8> dduid) {
   loginfo_ln("Initiate sending command");
   std::vector<byte> dataPayload;
   dataPayload.push_back(cmd);
