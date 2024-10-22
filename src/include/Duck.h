@@ -71,6 +71,7 @@ public:
      * @param an 8 byte unique id
      * @return DUCK_ERR_NONE if successful, an error code otherwise
      */
+  [[deprecated("use setDeviceId(std::array<byte,8>& id) instead")]]
   int setDeviceId(byte* id);
   /**
    * @brief Setup serial connection.

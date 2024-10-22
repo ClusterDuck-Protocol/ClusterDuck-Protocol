@@ -74,10 +74,10 @@ int Duck::setDeviceId(std::array<byte,8>& id) {
   return DUCK_ERR_NONE;
 }
 
-[[deprecated("use setDeviceId(std::array<byte,8>& id) instead")]]
+
 int Duck::setDeviceId(byte* id) {
-    if (id == NULL) {
-        logerr_ln("ERROR  device id too long rc = %d", DUCK_ERR_SETUP);
+    if (id == nullptr) {
+        logerr_ln("ERROR  device id empty or address invalid = %d", DUCK_ERR_SETUP);
         return DUCK_ERR_SETUP;
     }
     int len = *(&id + 1) - id;
