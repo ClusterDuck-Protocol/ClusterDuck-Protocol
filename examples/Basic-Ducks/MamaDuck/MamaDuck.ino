@@ -32,8 +32,8 @@ void setup() {
   // setup the duck NOTE: The Device ID must be exactly 8 bytes otherwise it
   // will get rejected
   std::string deviceId("MAMA0001");
-  std::vector<byte> devId;
-  devId.insert(devId.end(), deviceId.begin(), deviceId.end());
+  std::array<byte,8> devId;
+  std::copy(deviceId.begin(), deviceId.end(), devId.begin());
   if (duck.setupWithDefaults(devId) != DUCK_ERR_NONE) {
     Serial.println("[MAMA] Failed to setup MamaDuck");
     return;
