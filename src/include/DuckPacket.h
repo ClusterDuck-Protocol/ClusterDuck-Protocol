@@ -43,7 +43,7 @@ public:
      * 
      */
     DuckPacket() {
-        //buffer.reserve(229);
+        buffer.reserve(256);
     }
 
     /**
@@ -53,7 +53,8 @@ public:
      * @param filter a bloom filter
      */
         DuckPacket(std::array<byte,8> duid)
-        : duid(duid) { //buffer.reserve(229);
+        : duid(duid) {
+            buffer.reserve(256);
             }
 
     ~DuckPacket() {}
