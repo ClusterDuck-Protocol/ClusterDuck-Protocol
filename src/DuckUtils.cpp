@@ -56,7 +56,7 @@ std::string createUuid(int length) {
 }
 
 // Note: This function is not thread safe
-std::string convertToHex(byte* data, int size) {
+std::string convertToHex( byte* data, int size) {
   std::string buf = ""; // static to avoid memory leak
   buf.clear();
   buf.reserve(size * 2); // 2 digit hex

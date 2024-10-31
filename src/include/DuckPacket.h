@@ -7,27 +7,27 @@
 #include "cdpcfg.h"
 #include "bloomfilter.h"
 #include <CRC32.h>
-#include <vector>
+#include <array>
 
 /**
  * @brief Use this DUID to send to all PapaDucks
  * 
  */
-static std::vector<byte> ZERO_DUID = {0x00, 0x00, 0x00, 0x00,
+static std::array<byte,8> ZERO_DUID = {0x00, 0x00, 0x00, 0x00,
                                       0x00, 0x00, 0x00, 0x00};
 
 /**
  * @brief Use this DUID to be received by every duck in the network
  * 
  */
-static std::vector<byte> BROADCAST_DUID = {0xFF, 0xFF, 0xFF, 0xFF,
+static std::array<byte,8> BROADCAST_DUID = {0xFF, 0xFF, 0xFF, 0xFF,
                                            0xFF, 0xFF, 0xFF, 0xFF};
 
 /**
  * @brief Use this DUID to be received by every duck in the network
  * 
  */
-static std::vector<byte> PAPADUCK_DUID = {0x50, 0x61, 0x70, 0x61,
+static std::array<byte,8> PAPADUCK_DUID = {0x50, 0x61, 0x70, 0x61,
                                            0x44, 0x75, 0x63, 0x6B};
 
 /**
@@ -42,7 +42,9 @@ public:
      * @brief Construct a new Duck Packet object.
      * 
      */
-    DuckPacket() {}
+    DuckPacket() {
+        buffer.reserve(256);
+    }
 
     /**
      * @brief Construct a new Duck Packet object.
@@ -50,8 +52,10 @@ public:
      * @param duid a duck device unique id
      * @param filter a bloom filter
      */
-        DuckPacket(std::vector<byte> duid) 
-        : duid(duid) { }
+        DuckPacket(std::array<byte,8> duid)
+        : duid(duid) {
+            buffer.reserve(256);
+            }
 
     ~DuckPacket() {}
     /**
@@ -59,14 +63,14 @@ public:
      *
      * @param duid a duck device unique id
      */
-    void setDeviceId(std::vector<byte> duid) { this->duid = duid; }
+    void setDeviceId(std::array<byte,8> duid) { this->duid = duid; }
 
     /**
      * @brief Get device Id.
      *
      * @returns a duck device unique id
      */
-    std::vector<byte> getDeviceId() { return this->duid = duid; }
+    std::array<byte,8> getDeviceId() { return this->duid = duid; }
     /**
      * @brief Build a packet from the given topic and provided byte buffer.
      *
@@ -75,7 +79,7 @@ public:
      * @param app_data a byte buffer that contains the packet data section
      * @returns DUCK_ERR_NONE if the operation was successful, otherwise an error code.
      */
-    int prepareForSending(BloomFilter *filter, const std::vector<byte> targetDevice,
+    int prepareForSending(BloomFilter *filter, const std::array<byte,8> targetDevice,
                           byte duckType, byte topic, std::vector<byte> app_data);
 
     /**
@@ -89,9 +93,9 @@ public:
     bool prepareForRelaying(BloomFilter *filter, std::vector<byte> dataBuffer);
     
     /**
-     * @brief Get the Cdp Packet byte vector.
+     * @brief Get the Cdp Packet byte array.
      * 
-     * @returns a vector of bytes representing the cdp packet 
+     * @returns a array of bytes representing the cdp packet
      */
     std::vector<byte> getBuffer() { return buffer;}
 
@@ -100,13 +104,13 @@ public:
      *
      */
     void reset() {
-      std::vector<byte>().swap(buffer);
+      buffer.clear();
     }
 
     byte getTopic() { return buffer[TOPIC_POS]; }
 
   private: 
-    std::vector<byte> duid;
+    std::array<byte,8> duid;
     std::vector<byte> buffer;
     static void getUniqueMessageId(BloomFilter * filter, byte message_id[MUID_LENGTH]);
 
