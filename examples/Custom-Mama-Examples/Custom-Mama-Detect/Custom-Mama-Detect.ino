@@ -21,7 +21,7 @@
 // create a built-in mama duck
 MamaDuck duck;
 DuckDetect detect;
-
+bool runSensor(void *);
 bool detectOn = false;
 
 // create a timer with default settings
@@ -86,14 +86,29 @@ void handleDuckData(std::vector<byte> packetBuffer) {
 
 }
 
+bool sendData(const byte* buffer, int length) {
+    bool sentOk = false;
+
+    // Send Data can either take a byte buffer (unsigned char) or a vector
+    int err = duck.sendData(topics::status, buffer, length);
+    if (err == DUCK_ERR_NONE) {
+        counter++;
+        sentOk = true;
+    }
+    if (!sentOk) {
+        Serial.printf("[MAMA] Failed to send data. error = %i\n", err);
+    }
+    return sentOk;
+}
+
 bool runSensor(void *) {
   bool result;
   const byte* buffer;
   
-  std::string message = std::string("Counter:") + std::string(counter);
+  std::string message = std::string("Counter:").append(std::to_string(counter));
   int length = message.length();
   Serial.print("[MAMA] sensor data: ");
-  Serial.println(message);
+  Serial.println(message.c_str());
   buffer = (byte*) message.c_str(); 
 
   result = sendData(buffer, length);
@@ -105,21 +120,23 @@ bool runSensor(void *) {
   return result;
 }
 
-bool sendData(const byte* buffer, int length) {
-  bool sentOk = false;
-  
-  // Send Data can either take a byte buffer (unsigned char) or a vector
-  int err = duck.sendData(topics::status, buffer, length);
-  if (err == DUCK_ERR_NONE) {
-     counter++;
-     sentOk = true;
-  }
-  if (!sentOk) {
-    Serial.println("[MAMA] Failed to send data. error = " + std::string(err));
-  }
-  return sentOk;
-}
+// This uses the serial console to output the RSSI quality
+// But you can use a display, sound or LEDs
+void showSignalQuality(int incoming) {
+    int rssi = incoming;
+    Serial.print("[DETECTOR] Rssi value: ");
+    Serial.print(rssi);
 
+    if (rssi > -95) {
+        Serial.println(" - GOOD");
+    }
+    else if (rssi <= -95 && rssi > -108) {
+        Serial.println(" - OKAY");
+    }
+    else if (rssi <= -108) {
+        Serial.println(" - BAD");
+    }
+}
 //If in DetectorDuck mode show RSSI
 void handleReceiveRssi(const int rssi) {
   if(detectOn) { showSignalQuality(rssi); }
@@ -131,22 +148,4 @@ bool pingHandler(void *) {
   detect.sendPing(true);
 
   return true;
-}
-
-// This uses the serial console to output the RSSI quality
-// But you can use a display, sound or LEDs
-void showSignalQuality(int incoming) {
-  int rssi = incoming;
-  Serial.print("[DETECTOR] Rssi value: ");
-  Serial.print(rssi);
-
-  if (rssi > -95) {
-    Serial.println(" - GOOD");
-  }
-  else if (rssi <= -95 && rssi > -108) {
-    Serial.println(" - OKAY");
-  }
-  else if (rssi <= -108) {
-    Serial.println(" - BAD");
-  }
 }
