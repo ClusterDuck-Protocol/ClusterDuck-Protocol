@@ -359,7 +359,7 @@ protected:
     if (err != DUCK_ERR_NONE) {
       return err;
     }
-    err = setDeviceId(deviceId.data());
+    err = setDeviceId(deviceId);
     if (err != DUCK_ERR_NONE) {
       return err;
     }
