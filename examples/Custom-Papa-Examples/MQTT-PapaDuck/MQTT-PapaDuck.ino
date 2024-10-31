@@ -278,7 +278,7 @@ void processMessageFromDucks(std::vector<byte> packetBuffer) {
 // The callback method simply takes the incoming packet and
 // converts it to a JSON string, before sending it out over MQTT
 void handleDuckData(std::vector<byte> packetBuffer) {
-  Serial.println("[HUB] got packet: " + arduinoStringFromHex(packetBuffer.data(), packetBuffer.size()));
+  Serial.printf("[HUB] got packet: %s\n", arduinoStringFromHex(packetBuffer.data(), packetBuffer.size()).c_str());
   processMessageFromDucks(packetBuffer);
 }
 

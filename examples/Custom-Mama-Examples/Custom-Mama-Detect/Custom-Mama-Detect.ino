@@ -37,10 +37,10 @@ void setup() {
   // setup the duck NOTE: The Device ID must be exactly 8 bytes otherwise it
   // will get rejected
   std::string deviceId("MAMA0001");
-  std::vector<byte> devId;
-  devId.insert(devId.end(), deviceId.begin(), deviceId.end());
+  std::array<byte,8> devId;
+  std::copy(deviceId.begin(), deviceId.end(), devId.begin());
   duck.setupWithDefaults(devId);
-  detect.setDeviceId(devId);
+  detect.setDeviceId(deviceId);
   
   // Load DetectorDuck profile
   detect.setupRadio();
