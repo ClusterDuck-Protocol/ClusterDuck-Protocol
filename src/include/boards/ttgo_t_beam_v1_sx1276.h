@@ -21,8 +21,6 @@
 #define CDPCFG_PIN_LORA_DIO1 -1
 #define CDPCFG_PIN_LORA_RST 14
 
-#define CDPCFG_GPS_RX 34
-#define CDPCFG_GPS_TX 12
 // OLED display settings for TTGO LoRa32 V1.3
 //#define CDPCFG_PIN_OLED_ROTATION U8G2_R0
 #ifdef TTGO_1_3
