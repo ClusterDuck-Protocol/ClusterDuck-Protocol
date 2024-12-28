@@ -18,7 +18,7 @@ public:
    * @param startReceive `true` if the device must to be ready to receive a response immediately,
    * `false` if response needs to be deffered. 
    */
-  void sendPing(bool startReceive);
+  void sendPing();
 
   /**
    * @brief Provide the DuckDetect specific implementation of the base `run()`

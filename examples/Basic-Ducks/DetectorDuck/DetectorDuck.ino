@@ -15,6 +15,16 @@
 #include <arduino-timer.h>
 #include <string>
 #include <DuckDetect.h>
+#include "FastLED.h"
+
+// Setup for W2812 (LED)
+#define LED_TYPE WS2812
+#define DATA_PIN 4
+#define NUM_LEDS 1
+#define COLOR_ORDER GRB
+#define BRIGHTNESS  128
+#include <pixeltypes.h>
+CRGB leds[NUM_LEDS]; 
 
 // Needed if using a board with built-in USB, such as Arduiono Zero
 #ifdef SERIAL_PORT_USBVIRTUAL
@@ -45,10 +55,17 @@ void setup() {
   // Initialize the timer. The timer thread runs separately from the main loop
   // and will trigger sending a counter message.
   timer.every(INTERVAL_MS, pingHandler);
+
+  FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalSMD5050 );
+  FastLED.setBrightness(  BRIGHTNESS );
+  leds[0] = CRGB::Gold;
+  FastLED.show();
+
   Serial.println("[DETECTOR] Setup OK!");
 }
 
 void handleReceiveRssi(const int rssi) {
+  Serial.print("rssi callback called");
   showSignalQuality(rssi);
 }
 
@@ -59,8 +76,7 @@ void loop() {
 
 // Periodically sends a ping message
 bool pingHandler(void *) {
-  Serial.println("[DETECTOR] Says ping!");
-  duck.sendPing(true);
+  duck.sendPing();
 
   return true;
 }
@@ -74,11 +90,22 @@ void showSignalQuality(int incoming) {
 
   if (rssi > -95) {
     Serial.println(" - GOOD");
+    leds[0] = CRGB::Green;
+    FastLED.show();
   }
   else if (rssi <= -95 && rssi > -108) {
     Serial.println(" - OKAY");
+    leds[0] = CRGB::Yellow;
+    FastLED.show();
   }
   else if (rssi <= -108) {
     Serial.println(" - BAD");
+    Serial.println(" - BAD");
+    leds[0] = CRGB::Orange;
+    FastLED.show();
+  }
+  else {
+    leds[0] = CRGB::Red;
+    FastLED.show();
   }
 }

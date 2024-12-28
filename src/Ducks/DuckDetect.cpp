@@ -73,19 +73,14 @@ void DuckDetect::handleReceivedPacket() {
   }
 }
 
-void DuckDetect::sendPing(bool startReceive) {
+void DuckDetect::sendPing() {
+  Serial.println(String("send ping actually called from detector"));
   int err = DUCK_ERR_NONE;
   std::vector<byte> data(1, 0);
   err = txPacket->prepareForSending(&filter, BROADCAST_DUID, DuckType::DETECTOR, reservedTopic::ping, data);
 
   if (err == DUCK_ERR_NONE) {
     err = duckRadio.sendData(txPacket->getBuffer());
-    if (startReceive) {
-      duckRadio.startReceive();
-    }
-    if (err != DUCK_ERR_NONE) {
-      logerr("ERROR Failed to ping, err = %s\n",err);
-    }
   } else {
     logerr("ERROR Failed to build packet, err = %s\n",err);
   }
