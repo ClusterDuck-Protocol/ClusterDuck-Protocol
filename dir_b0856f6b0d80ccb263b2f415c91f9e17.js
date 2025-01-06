@@ -8,15 +8,10 @@ var dir_b0856f6b0d80ccb263b2f415c91f9e17 =
     [ "Duck.h", "_duck_8h.html", "_duck_8h" ],
     [ "DuckCrypto.h", "_duck_crypto_8h.html", "_duck_crypto_8h" ],
     [ "DuckEsp.h", "_duck_esp_8h.html", "_duck_esp_8h" ],
-    [ "DuckLed.h", "_duck_led_8h.html", [
-      [ "DuckLed", "class_duck_led.html", "class_duck_led" ]
-    ] ],
+    [ "DuckLed.h", "_duck_led_8h.html", "_duck_led_8h" ],
     [ "DuckNet.h", "_duck_net_8h.html", "_duck_net_8h" ],
     [ "DuckPacket.h", "_duck_packet_8h.html", "_duck_packet_8h" ],
-    [ "DuckRadio.h", "_duck_radio_8h.html", [
-      [ "LoraConfigParams", "struct_lora_config_params.html", "struct_lora_config_params" ],
-      [ "DuckRadio", "class_duck_radio.html", "class_duck_radio" ]
-    ] ],
+    [ "DuckRadio.h", "_duck_radio_8h.html", "_duck_radio_8h" ],
     [ "DuckTypes.h", "_duck_types_8h.html", "_duck_types_8h" ],
     [ "DuckUtils.h", "_duck_utils_8h.html", "_duck_utils_8h" ],
     [ "index.h", "index_8h.html", "index_8h" ],

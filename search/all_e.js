@@ -1,12 +1,12 @@
 var searchData=
 [
-  ['readreceiveddata_179',['readReceivedData',['../class_duck_radio.html#ad2e398fdfbccae3b7e07abad41fb13fa',1,'DuckRadio']]],
-  ['reboot_180',['reboot',['../class_duck.html#a64f61f312f2e077477369750188bfccf',1,'Duck']]],
-  ['reconnectwifi_181',['reconnectWifi',['../class_duck.html#a230809997b45df2613791cbeeab19726',1,'Duck']]],
-  ['relaypacket_182',['relayPacket',['../class_duck_radio.html#adf58a5b83c5632d37c5c05aa37f53035',1,'DuckRadio']]],
-  ['reset_183',['reset',['../class_duck_packet.html#a9e7b7886b7e7600698df5aec5b064224',1,'DuckPacket']]],
-  ['restartduck_184',['restartDuck',['../namespaceduckesp.html#a1bccb912823b8261c7ef8559efc3d5ec',1,'duckesp']]],
-  ['rst_185',['rst',['../struct_lora_config_params.html#aa5beddcb6adbe7a6b4bfcc8c2c0ad58f',1,'LoraConfigParams']]],
-  ['run_186',['run',['../class_duck.html#ae563c92e38f7f99412eb4445f6429366',1,'Duck']]],
-  ['rxpacket_187',['rxPacket',['../class_duck.html#ae5a77bb03f168ea6181ad426d3c49d84',1,'Duck']]]
+  ['papa_0',['PAPA',['../_duck_types_8h.html#ae840cd9270fc5804ad85c80de1686d4aae3eec4dfdc41211205c40372d228ed25',1,'DuckTypes.h']]],
+  ['papaduck_2ecpp_1',['PapaDuck.cpp',['../_papa_duck_8cpp.html',1,'']]],
+  ['papahome_2eh_2',['papaHome.h',['../papa_home_8h.html',1,'']]],
+  ['ping_3',['ping',['../class_duck_radio.html#a74cf885807a8045710d2080f88a01549',1,'DuckRadio']]],
+  ['prepareforrelaying_4',['prepareForRelaying',['../class_duck_packet.html#a110773934b30d9514e3e1809da50a712',1,'DuckPacket']]],
+  ['prepareforsending_5',['prepareForSending',['../class_duck_packet.html#acdf6f73073e1d095e7f63a692a6b9bbe',1,'DuckPacket']]],
+  ['processportalrequest_6',['processPortalRequest',['../class_duck.html#a8fde44959e2ca108af1799f87f754336',1,'Duck']]],
+  ['progmem_7',['progmem',['../cdp_home_8h.html#aca917910df2c6da98ffc4b6fb0c80210',1,'PROGMEM:&#160;cdpHome.h'],['../control_panel_8h.html#a3745f8a1917b8d171123031a412bc79c',1,'PROGMEM:&#160;controlPanel.h'],['../index_8h.html#a63045e444911fecb9430625b3cd36d36',1,'PROGMEM:&#160;index.h'],['../papa_home_8h.html#add7787dc1036a94d02377383c2047e4a',1,'PROGMEM:&#160;papaHome.h'],['../wifi_credentials_8h.html#a46f43114a43a357ea34c4246b06403c5',1,'PROGMEM:&#160;wifiCredentials.h']]],
+  ['protocol_20info_8',['ClusterDuck Protocol Info',['../index.html',1,'']]]
 ];

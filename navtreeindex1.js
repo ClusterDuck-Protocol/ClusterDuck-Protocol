@@ -48,7 +48,7 @@ var NAVTREEINDEX1 =
 "namespaceduckutils.html#a73122238e9e6161a781b25f4a74cca44":[1,0,2,7],
 "namespaceduckutils.html#a7af6fab5b312e69d35f62c81150eb752":[1,0,2,0],
 "namespaceduckutils.html#a9a259c88457e4fac2bdc6042aa229dec":[1,0,2,5],
-"namespaceduckutils.html#af5ed0d1c0cfb70a3c647bef2d0d60cac":[1,0,2,11],
+"namespaceduckutils.html#aca7b40acfbb2b68b7155571fe11fd98f":[1,0,2,11],
 "namespaceduckutils.html#afdb0bf8814af2145ed0d183ad5523157":[1,0,2,6],
 "namespaceduckutils.html#aff2e7f9ce8df861a748df8a3f84be721":[1,0,2,1],
 "namespacemembers.html":[1,1,0],

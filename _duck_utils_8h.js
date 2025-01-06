@@ -11,7 +11,7 @@ var _duck_utils_8h =
     [ "loadWifiPassword", "_duck_utils_8h.html#a56ea08fb08a402d391f3582a309d8899", null ],
     [ "loadWifiSsid", "_duck_utils_8h.html#a0a14835a59650aef58f9ffbd107586fe", null ],
     [ "saveWifiCredentials", "_duck_utils_8h.html#a37eec93ee812bf6f0c50eb00928605ad", null ],
-    [ "stringToByteVector", "_duck_utils_8h.html#af5ed0d1c0cfb70a3c647bef2d0d60cac", null ],
+    [ "stringToByteVector", "_duck_utils_8h.html#aca7b40acfbb2b68b7155571fe11fd98f", null ],
     [ "toString", "_duck_utils_8h.html#a232773eaac919a424cf6c8737c6843f0", null ],
     [ "toUint32", "_duck_utils_8h.html#a3dc52038752191518492e540418c195b", null ],
     [ "toUpperCase", "_duck_utils_8h.html#a0a51e5d45425646f2d70f63c3de51faa", null ],

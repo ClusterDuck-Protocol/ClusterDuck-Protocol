@@ -25,14 +25,7 @@
 var NAVTREE =
 [
   [ "ClusterDuck Protocol", "index.html", [
-    [ "ClusterDuck Protocol Info", "index.html", [
-      [ "About", "index.html#autotoc_md1", null ],
-      [ "Origin Story", "index.html#autotoc_md2", null ],
-      [ "How It Works", "index.html#autotoc_md3", null ],
-      [ "Getting Started", "index.html#autotoc_md4", null ],
-      [ "How to Contribute", "index.html#autotoc_md5", null ],
-      [ "Join the Conversation", "index.html#autotoc_md6", null ]
-    ] ],
+    [ "ClusterDuck Protocol Info", "index.html", "index" ],
     [ "Namespaces", "namespaces.html", [
       [ "Namespace List", "namespaces.html", "namespaces_dup" ],
       [ "Namespace Members", "namespacemembers.html", [
@@ -48,7 +41,7 @@ var NAVTREE =
         [ "All", "functions.html", null ],
         [ "Functions", "functions_func.html", null ],
         [ "Variables", "functions_vars.html", null ],
-        [ "Related Functions", "functions_rela.html", null ]
+        [ "Related Symbols", "functions_rela.html", null ]
       ] ]
     ] ],
     [ "Files", "files.html", [

@@ -16,7 +16,7 @@ var class_duck =
     [ "getSsid", "class_duck.html#abfceae63bc916c2f878d629613d50c57", null ],
     [ "getType", "class_duck.html#a3d0b92824388146c6e4e7d15d5f3c449", null ],
     [ "isWifiConnected", "class_duck.html#a09149de412d44bc20792b6412e296c13", null ],
-    [ "operator=", "class_duck.html#aaa676acc8bd171a20c18d74aaa5fd111", null ],
+    [ "operator=", "class_duck.html#a6b7113b2cf0dc5c9ea53b3ccc9f2707c", null ],
     [ "processPortalRequest", "class_duck.html#a8fde44959e2ca108af1799f87f754336", null ],
     [ "reconnectWifi", "class_duck.html#a230809997b45df2613791cbeeab19726", null ],
     [ "run", "class_duck.html#ae563c92e38f7f99412eb4445f6429366", null ],

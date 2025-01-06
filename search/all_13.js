@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['_7ebloomfilter_232',['~BloomFilter',['../class_bloom_filter.html#a27358192f6e0d7aba2b24be36c5d3580',1,'BloomFilter']]],
-  ['_7educk_233',['~Duck',['../class_duck.html#a702222da0aa85e48b6ef945e9c53e68d',1,'Duck']]],
-  ['_7educkpacket_234',['~DuckPacket',['../class_duck_packet.html#a1a656a9aeb29eda2d42e962fd2d33b6c',1,'DuckPacket']]]
+  ['wificredentials_2eh_0',['wifiCredentials.h',['../wifi_credentials_8h.html',1,'']]],
+  ['works_1',['How It Works',['../index.html#autotoc_md3',1,'']]]
 ];

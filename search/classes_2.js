@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['loraconfigparams_241',['LoraConfigParams',['../struct_lora_config_params.html',1,'']]]
+  ['loraconfigparams_0',['LoraConfigParams',['../struct_lora_config_params.html',1,'']]]
 ];

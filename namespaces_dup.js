@@ -29,7 +29,7 @@ var namespaces_dup =
       [ "loadWifiPassword", "namespaceduckutils.html#a56ea08fb08a402d391f3582a309d8899", null ],
       [ "loadWifiSsid", "namespaceduckutils.html#a0a14835a59650aef58f9ffbd107586fe", null ],
       [ "saveWifiCredentials", "namespaceduckutils.html#a37eec93ee812bf6f0c50eb00928605ad", null ],
-      [ "stringToByteVector", "namespaceduckutils.html#af5ed0d1c0cfb70a3c647bef2d0d60cac", null ],
+      [ "stringToByteVector", "namespaceduckutils.html#aca7b40acfbb2b68b7155571fe11fd98f", null ],
       [ "toString", "namespaceduckutils.html#a232773eaac919a424cf6c8737c6843f0", null ],
       [ "toUint32", "namespaceduckutils.html#a3dc52038752191518492e540418c195b", null ],
       [ "toUpperCase", "namespaceduckutils.html#a0a51e5d45425646f2d70f63c3de51faa", null ],
