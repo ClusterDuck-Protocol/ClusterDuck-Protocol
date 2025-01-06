@@ -100,8 +100,10 @@ void PapaDuck::handleReceivedPacket() {
   }
   // ignore pings
   if (data[TOPIC_POS] == reservedTopic::ping) {
-    rxPacket->reset();
-    return;
+    err = sendPong();
+    if (err != DUCK_ERR_NONE) {
+      logerr_ln("ERROR failed to send pong message. rc = %d",err);
+    }
   }
   // build our RX DuckPacket which holds the updated path in case the packet is relayed
   bool relay = rxPacket->prepareForRelaying(&filter, data);
