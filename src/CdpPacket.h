@@ -239,6 +239,8 @@ public:
         return "pir";
       case topics::bmp180:
         return "bmp180";
+      case reservedTopic::ping:
+        return "ping";
       default:
         return "unknown";
     }
