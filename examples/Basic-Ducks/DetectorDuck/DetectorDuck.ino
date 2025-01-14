@@ -37,14 +37,11 @@ DuckDetect duck;
 // Create a timer with default settings
 auto timer = timer_create_default();
 
-const int INTERVAL_MS = 3000;
+const int INTERVAL_MS = 5000;
 
 void setup() {
-  // We are using a hardcoded device id here, but it should be retrieved or
-  // given during the device provisioning then converted to a byte vector to
-  // setup the duck NOTE: The Device ID must be exactly 8 bytes otherwise it
-  // will get rejected
-  std::string deviceId("DETECTOR");
+
+  std::string deviceId("DETECTOR"); // NOTE: The Device ID must be exactly 8 bytes
   std::vector<byte> devId;
   devId.insert(devId.end(), deviceId.begin(), deviceId.end());
   duck.setupWithDefaults(devId);
@@ -56,6 +53,7 @@ void setup() {
   // and will trigger sending a counter message.
   timer.every(INTERVAL_MS, pingHandler);
 
+  // Setup the LED
   FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalSMD5050 );
   FastLED.setBrightness(  BRIGHTNESS );
   leds[0] = CRGB::Gold;
@@ -65,7 +63,7 @@ void setup() {
 }
 
 void handleReceiveRssi(const int rssi) {
-  Serial.print("rssi callback called");
+  Serial.print("[DETECTOR] RSSI callback called");
   showSignalQuality(rssi);
 }
 
@@ -85,26 +83,26 @@ bool pingHandler(void *) {
 // But you can use a display, sound or LEDs
 void showSignalQuality(int incoming) {
   int rssi = incoming;
-  Serial.print("[DETECTOR] Rssi value: ");
+  Serial.print("[DETECTOR] RSSI value: ");
   Serial.print(rssi);
 
   if (rssi > -95) {
-    Serial.println(" - GOOD");
+    Serial.println(" - GOOD SIGNAL");
     leds[0] = CRGB::Green;
     FastLED.show();
   }
   else if (rssi <= -95 && rssi > -108) {
-    Serial.println(" - OKAY");
-    leds[0] = CRGB::Yellow;
+    Serial.println(" - OKAY SIGNAL");
+    leds[0] = CRGB::Blue;
     FastLED.show();
   }
-  else if (rssi <= -108) {
-    Serial.println(" - BAD");
-    Serial.println(" - BAD");
-    leds[0] = CRGB::Orange;
+  else if (rssi <= -108 <= -118) {
+    Serial.println(" - LOW SIGNAL");
+    leds[0] = CRGB::Purple;
     FastLED.show();
   }
   else {
+    Serial.println(" - NO SIGNAL");
     leds[0] = CRGB::Red;
     FastLED.show();
   }
