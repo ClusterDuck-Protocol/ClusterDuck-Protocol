@@ -21,7 +21,7 @@ The ClusterDuck Protocol was created by [OWL Integrations] (formerly Project OWL
 
 ## How does it work?
 
-The network is made up of multiple nodes called **Ducks**. There are 3 basic types of Ducks in a ClusterDuck Network: DuckLink, MamaDuck, and PapaDuck. **DuckLinks** serve as edge nodes that only transmit data. **MamaDucks** inherit the same functionality of the DuckLinks, but can also receive messages. This allows the MamaDucks to relay messages from DuckLinks and/or other MamaDucks along the network (towards the gateway). **PapaDucks** are the endpoint of the network where all of the data is collected and can be stored or pushed up into the cloud. **(free tier cloud DMS platform in BETA! Reach out to us on Discord for more info)**
+The network is made up of multiple nodes called **Ducks**. There are 3 basic types of Ducks in a ClusterDuck Network: DuckLink, MamaDuck, and PapaDuck. **DuckLinks** serve as edge nodes that only transmit data. **MamaDucks** inherit the same functionality of the DuckLinks but can also receive messages. This allows the MamaDucks to relay messages from DuckLinks and/or other MamaDucks along the network (towards the gateway). **PapaDucks** are the endpoint of the network where all of the data is collected and can be stored or pushed up into the cloud. **(free tier cloud DMS platform in BETA! Reach out to us on Discord for more info)**
 
 ![overview](https://www.project-owl.com/assets/wiki/cdp-explain-gif.gif)
 
@@ -35,9 +35,9 @@ Check out the [Wiki](https://github.com/ClusterDuck-Protocol/ClusterDuck-Protoco
 
 Starting with release 4.0.0 we have unit tests available with the PlatformIO test framework `unity`
 
-Tests are located in the `ClusterDuckProtocol/test` folder. These tests are unit tests as they validate the CDP publicly accessible APIs. However they must be run on a device. This means you have to connect a device to your development machine and build the tests to run on the device. Platform IO `test` command will build, deploy and run the tests and report back the results on your terminal console.
+Tests are located in the `ClusterDuckProtocol/test` folder. These tests are unit tests as they validate the CDP publicly accessible APIs. However, they must be run on a device. This means you have to connect a device to your development machine and build the tests to run on the device. Platform IO `test` command will build, deploy and run the tests and report back the results on your terminal console.
 
-Unit tests are great in detecting problems before they make it to the release, so it is important no only to run them to validate your changes, but to continuously update them.
+Unit tests are great in detecting problems before they make it to the release, so it is important not only to run them to validate your changes, but to continuously update them.
 
 ### PlatformIO test environments
 The project `platformio.ini` defines environment configurations for supported boards.
@@ -111,7 +111,7 @@ test/test_DuckUtils/test_DuckUtils.cpp:196: test_DuckUtils_loadWifiSsid         
 
 ## How to Contribute
 
-We host a bi-weekly [CDP Town Hall](meet.google.com/unq-duaq-ygj) on Mondays at 2pm EST. The town hall is the place to get updates on protocol, get your questions about CDP answered, and discuss on-going projects. All the current projects is documented in a public [roadmap in Github Projects](https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol/projects).
+We host a bi-weekly [CDP Town Hall](meet.google.com/unq-duaq-ygj) on Mondays at 2pm EST. The town hall is the place to get updates on protocol, get your questions about CDP answered, and discuss on-going projects. All the current projects are documented in a public [roadmap in Github Projects](https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol/projects).
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our Code of Conduct, the process for submitting ClusterDuck Protocol improvements, and how to join our town halls and livestreams.
 
