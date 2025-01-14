@@ -118,15 +118,15 @@ int toJSON(CdpPacket packet)
   std::string dduid = ss.str();
   std::string muid(packet.muid.begin(), packet.muid.end());
 
-  Serial.println("[PAPA] topic:   " + std::string(toTopicString(packet.topic).c_str()));
+  loginfo_ln("[PAPA] topic:   %s", toTopicString(packet.topic).c_str());
   
-  Serial.println("[PAPA] sduid:   " + std::string(sduid.c_str()));
-  Serial.println("[PAPA] dduid:   " + std::string(dduid.c_str()));
+  loginfo_ln("[PAPA] sduid:   %s", sduid.c_str());
+  loginfo_ln("[PAPA] dduid:   %s", dduid.c_str());
 
-  Serial.println("[PAPA] muid:    " + std::string(muid.c_str()));
-  Serial.println("[PAPA] data:    " + std::string(payload.c_str()));
-  Serial.println("[PAPA] hops:    " + std::string(packet.hopCount));
-  Serial.println("[PAPA] duck:    " + std::string(packet.duckType));
+  loginfo_ln("[PAPA] muid:    %s", muid.c_str());
+  loginfo_ln("[PAPA] data:    %s", payload.c_str());
+  loginfo_ln("[PAPA] hops:    %s",  packet.hopCount);
+  loginfo_ln("[PAPA] duck:    %s", packet.duckType);
 
   doc["DeviceId"] = sduid;
   doc["topic"].set(toTopicString(packet.topic));
@@ -149,7 +149,7 @@ int toJSON(CdpPacket packet)
 void handleDuckData(std::vector<byte> packetBuffer)
 {
   Serial.print("\n[PAPA] --------------------------------------------------------------------------------------\n");
-  Serial.println("[PAPA] got packet: " + convertToHex(packetBuffer.data(), packetBuffer.size()));
+  loginfo_ln("[PAPA] got packet: %s", convertToHex(packetBuffer.data(), packetBuffer.size()).c_str());
 
   CdpPacket packet = CdpPacket(packetBuffer);
   toJSON(packet);
@@ -158,8 +158,8 @@ void handleDuckData(std::vector<byte> packetBuffer)
 void setup() 
 {
   std::string deviceId("PAPADUCK");
-  std::vector<byte> devId;
-  devId.insert(devId.end(), deviceId.begin(), deviceId.end());
+  std::array<byte,8> devId;
+  std::copy(deviceId.begin(), deviceId.end(), devId.begin());
   if (duck.setupWithDefaults(devId) != DUCK_ERR_NONE) {
     Serial.println("[PAPA] Failed to setup MamaDuck");
     setupOK = false;

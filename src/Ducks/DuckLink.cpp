@@ -1,6 +1,6 @@
 #include "../DuckLink.h"
 
-int DuckLink::setupWithDefaults(std::vector<byte> deviceId, std::string ssid,
+int DuckLink::setupWithDefaults(std::array<byte,8> deviceId, std::string ssid,
                                 std::string password) {
   int err = Duck::setupWithDefaults(deviceId, ssid, password);
   if (err != DUCK_ERR_NONE) {

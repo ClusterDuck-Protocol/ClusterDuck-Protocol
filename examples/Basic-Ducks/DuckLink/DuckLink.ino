@@ -19,7 +19,8 @@
 
 // create a built-in duck link
 DuckLink duck;
-
+bool sendSensorData();
+bool runSensor(void *);
 // create a timer with default settings
 auto timer = timer_create_default();
 
@@ -35,9 +36,9 @@ void setup() {
   // setup the duck NOTE: The Device ID must be exactly 8 bytes otherwise it
   // will get rejected
   std::string deviceId("DUCK0001");
-  std::vector<byte> devId;
+  std::array<byte,8> devId;
   int rc;
-  devId.insert(devId.end(), deviceId.begin(), deviceId.end());
+  std::copy(deviceId.begin(), deviceId.end(), devId.begin());
   rc = duck.setupWithDefaults(devId);
   if (rc != DUCK_ERR_NONE) {
     Serial.print("[LINK] Failed to setup ducklink: rc = ");
@@ -80,12 +81,12 @@ std::vector<byte> stringToByteVector(const std::string& str) {
 bool sendSensorData() {
   bool result = false;
   const byte* buffer;
-  
+
   std::string message = std::string("Counter:") + std::to_string(counter);
   Serial.print("[LINK] sensor data: ");
   Serial.println(message.c_str());
-  
-  int err = duck.sendData(topics::status, stringToByteVector(message));
+  std::vector<byte> data = stringToByteVector(message);
+  int err = duck.sendData(topics::status, data.data(),data.size());
   if (err == DUCK_ERR_NONE) {
      result = true;
      counter++;
