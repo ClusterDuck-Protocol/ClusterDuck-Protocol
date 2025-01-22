@@ -19,7 +19,7 @@ CDP is a project under the Linux Foundation created by [OWL Integrations] (forme
 
 ## How does it work?
 
-The network is made up of multiple nodes called **Ducks**. There are 3 basic types of Ducks in a ClusterDuck Network: DuckLink, MamaDuck, and PapaDuck. **DuckLinks** serve as leaf nodes that only transmit data. **MamaDucks** are relays and transmission nodes, creating the core mesh functionality. **PapaDucks** are sink nodes that can also serve as gateways, so you can either gather data locally or publish over wifi to cloud solutions. **(free tier cloud DMS platform in BETA! Reach out to us on Discord for more info)**
+The network is made up of multiple nodes called **Ducks**. There are 3 basic types of Ducks in a ClusterDuck Network: DuckLink, MamaDuck, and PapaDuck. **DuckLinks** serve as leaf nodes that only transmit data. **MamaDucks** are relay and transmission nodes, creating the core mesh functionality. **PapaDucks** are sink nodes that can also serve as gateways, so you can either gather data locally or publish over wifi to cloud solutions. **(free tier cloud DMS platform in BETA! Reach out to us on Discord for more info)**
 
 ![overview](https://www.project-owl.com/assets/wiki/cdp-explain-gif.gif)
 
@@ -32,7 +32,7 @@ Check out the [Wiki](https://github.com/ClusterDuck-Protocol/ClusterDuck-Protoco
 
 ## How to Contribute
 
-We host a weekly [Quack Hour](meet.google.com/unq-duaq-ygj) on Wednesdays at 6pm EST. Quack Hour is the place to get updates on the protocol's development, get your questions about CDP answered, and discuss on-going projects. Development tasks are tracked publicly on our [Trello](https://trello.com/b/bU0cZuUJ/cdp-roadmap)
+We host a weekly [Quack Hour](https://discord.gg/Cbgbzq353z) on Wednesdays at 6pm EST. Quack Hour is the place to get updates on the protocol's development, get your questions about CDP answered, and discuss on-going projects. Development tasks are tracked publicly on our [Trello](https://trello.com/b/bU0cZuUJ/cdp-roadmap)
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our Code of Conduct and the process for submitting ClusterDuck Protocol improvements.
 
