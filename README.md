@@ -21,7 +21,7 @@ CDP is a project under the Linux Foundation created by [OWL Integrations] (forme
 
 The network is made up of multiple nodes called **Ducks**. There are 3 basic types of Ducks in a ClusterDuck Network: DuckLink, MamaDuck, and PapaDuck. **DuckLinks** serve as leaf nodes that only transmit data. **MamaDucks** are relay and transmission nodes, creating the core mesh functionality. **PapaDucks** are sink nodes that can also serve as gateways, so you can either gather data locally or publish over wifi to cloud solutions. **(free tier cloud DMS platform in BETA! Reach out to us on Discord for more info)**
 
-![overview](https://www.project-owl.com/assets/wiki/cdp-explain-gif.gif)
+![overview](https://i.imgur.com/oNp7JFn.png)
 
 ## Getting Started
 
