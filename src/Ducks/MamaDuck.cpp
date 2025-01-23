@@ -95,7 +95,6 @@ void MamaDuck::handleReceivedPacket() {
         break;
         case reservedTopic::pong:
           loginfo_ln("PONG received. Ignoring!");
-          return;
         break;
         case reservedTopic::ack:{
           handleAck(packet);

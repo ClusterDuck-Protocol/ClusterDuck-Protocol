@@ -74,7 +74,7 @@ void DuckDetect::handleReceivedPacket() {
 }
 
 void DuckDetect::sendPing() {
-  Serial.println(String("send ping actually called from detector"));
+  loginfo("Sending PING...");
   int err = DUCK_ERR_NONE;
   std::vector<byte> data(1, 0);
   err = txPacket->prepareForSending(&filter, BROADCAST_DUID, DuckType::DETECTOR, reservedTopic::ping, data);

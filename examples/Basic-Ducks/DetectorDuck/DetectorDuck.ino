@@ -38,6 +38,8 @@ DuckDetect duck;
 auto timer = timer_create_default();
 
 const int INTERVAL_MS = 5000;
+const unsigned long SIGNAL_TIMEOUT_MS = INTERVAL_MS + 1000; // 5 seconds timeout
+unsigned long lastSignalTime = 0;
 
 void setup() {
 
@@ -63,13 +65,23 @@ void setup() {
 }
 
 void handleReceiveRssi(const int rssi) {
-  Serial.print("[DETECTOR] RSSI callback called");
+  Serial.println("[DETECTOR] RSSI callback called");
   showSignalQuality(rssi);
+  Serial.println("[DETECTOR] Reseting signal timeout");
+  lastSignalTime = millis();
 }
 
 void loop() {
   timer.tick();
   duck.run(); // use internal duck detect behavior
+  
+  // Check if signal timeout occurred
+  if (millis() - lastSignalTime > SIGNAL_TIMEOUT_MS) {
+    Serial.println("[DETECTOR] No signal");
+    leds[0] = CRGB::Red;
+    FastLED.show();
+    lastSignalTime = millis(); // Reset to prevent continuous messages
+  }
 }
 
 // Periodically sends a ping message
