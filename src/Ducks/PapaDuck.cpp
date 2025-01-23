@@ -98,13 +98,21 @@ void PapaDuck::handleReceivedPacket() {
     logerr_ln("ERROR handleReceivedPacket. Failed to get data. rc = %d",err);
     return;
   }
-  // ignore pings
+  
   if (data[TOPIC_POS] == reservedTopic::ping) {
+    logdbg_ln("PING received. Sending PONG!");
     err = sendPong();
     if (err != DUCK_ERR_NONE) {
       logerr_ln("ERROR failed to send pong message. rc = %d",err);
     }
+    return;
   }
+  
+  if (data[TOPIC_POS] == reservedTopic::pong) {
+    logdbg_ln("PONG received. Ignoring!");
+    return;
+  }
+  
   // build our RX DuckPacket which holds the updated path in case the packet is relayed
   bool relay = rxPacket->prepareForRelaying(&filter, data);
   if (relay) {
