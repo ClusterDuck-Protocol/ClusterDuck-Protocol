@@ -100,7 +100,7 @@ void PapaDuck::handleReceivedPacket() {
   }
   
   if (data[TOPIC_POS] == reservedTopic::ping) {
-    logdbg_ln("PING received. Sending PONG!");
+    loginfo_ln("PING received. Sending PONG!");
     err = sendPong();
     if (err != DUCK_ERR_NONE) {
       logerr_ln("ERROR failed to send pong message. rc = %d",err);
@@ -109,7 +109,7 @@ void PapaDuck::handleReceivedPacket() {
   }
   
   if (data[TOPIC_POS] == reservedTopic::pong) {
-    logdbg_ln("PONG received. Ignoring!");
+    loginfo_ln("PONG received. Ignoring!");
     return;
   }
   
