@@ -98,30 +98,34 @@ void PapaDuck::handleReceivedPacket() {
     logerr_ln("ERROR handleReceivedPacket. Failed to get data. rc = %d",err);
     return;
   }
-  // ignore pings
+  
   if (data[TOPIC_POS] == reservedTopic::ping) {
+    loginfo_ln("PING received. Sending PONG!");
     err = sendPong();
     if (err != DUCK_ERR_NONE) {
       logerr_ln("ERROR failed to send pong message. rc = %d",err);
     }
-  }
-  // build our RX DuckPacket which holds the updated path in case the packet is relayed
-  bool relay = rxPacket->prepareForRelaying(&filter, data);
-  if (relay) {
-    logdbg_ln("relaying:  %s", duckutils::convertToHex(rxPacket->getBuffer().data(), rxPacket->getBuffer().size()).c_str());
-    loginfo_ln("invoking callback in the duck application...");
-    
-    recvDataCallback(rxPacket->getBuffer());
-    
-    if (acksEnabled) {
-      const CdpPacket packet = CdpPacket(rxPacket->getBuffer());
-      if (needsAck(packet)) {
-        handleAck(packet);
+  } else if (data[TOPIC_POS] == reservedTopic::pong) {
+    loginfo_ln("PONG received. Ignoring!");
+  } else {
+    // build our RX DuckPacket which holds the updated path in case the packet is relayed
+    bool relay = rxPacket->prepareForRelaying(&filter, data);
+    if (relay) {
+      logdbg_ln("relaying:  %s", duckutils::convertToHex(rxPacket->getBuffer().data(), rxPacket->getBuffer().size()).c_str());
+      loginfo_ln("invoking callback in the duck application...");
+      
+      recvDataCallback(rxPacket->getBuffer());
+      
+      if (acksEnabled) {
+        const CdpPacket packet = CdpPacket(rxPacket->getBuffer());
+        if (needsAck(packet)) {
+          handleAck(packet);
+        }
       }
     }
-
-    loginfo_ln("handleReceivedPacket() DONE");
   }
+
+  loginfo_ln("handleReceivedPacket() DONE");
 }
 
 void PapaDuck::handleAck(const CdpPacket & packet) {

@@ -86,12 +86,15 @@ void MamaDuck::handleReceivedPacket() {
     if (duckutils::isEqual(BROADCAST_DUID, packet.dduid)) {
       switch(packet.topic) {
         case reservedTopic::ping:
-          loginfo_ln("ping received");
+          loginfo_ln("PING received. Sending PONG!");
           err = sendPong();
           if (err != DUCK_ERR_NONE) {
             logerr_ln("ERROR failed to send pong message. rc = %d",err);
           }
           return;
+        break;
+        case reservedTopic::pong:
+          loginfo_ln("PONG received. Ignoring!");
         break;
         case reservedTopic::ack:{
           handleAck(packet);
