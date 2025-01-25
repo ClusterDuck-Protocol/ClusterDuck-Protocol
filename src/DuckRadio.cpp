@@ -421,11 +421,7 @@ void DuckRadio::serviceInterruptFlags() {
 
 // IMPORTANT: this function MUST be 'void' type and MUST NOT have any arguments!
 void DuckRadio::onInterrupt(void) {
-#ifdef CDPCFG_RADIO_SX1262
-    interruptFlags = lora.getIrqStatus();
-#else
-    interruptFlags = lora.getIRQFlags();
-#endif
+    interruptFlags = lora.getIrqFlags();
 }
 
 int DuckRadio::startTransmitData(byte* data, int length) {
