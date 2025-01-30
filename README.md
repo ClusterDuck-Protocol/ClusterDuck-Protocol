@@ -32,9 +32,7 @@ Check out the [Wiki](https://github.com/ClusterDuck-Protocol/ClusterDuck-Protoco
 
 ## How to Contribute
 
-We host a weekly [Quack Hour](https://discord.gg/Cbgbzq353z) on Wednesdays at 6pm EST. Quack Hour is the place to get updates on the protocol's development, get your questions about CDP answered, and discuss on-going projects. Development tasks are tracked publicly on our [Trello](https://trello.com/b/bU0cZuUJ/cdp-roadmap)
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our Code of Conduct and the process for submitting ClusterDuck Protocol improvements.
+Development tasks are tracked publicly on our [Trello](https://trello.com/b/bU0cZuUJ/cdp-roadmap). Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our Code of Conduct and the process for submitting ClusterDuck Protocol improvements.
 
 This project is governed by its [Technical Charter](ClusterDuck-Protocol-Technical-Charter.pdf) and led by its [Technical Steering Committee](https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki/technical-steering-committee).
 
