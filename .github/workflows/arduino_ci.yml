@@ -129,10 +129,10 @@ jobs:
         buildExampleSketch Custom-Mama-Examples Custom-Mama-Example
     - name: Arduino Registry Lint
       if: startsWith(github.ref, 'refs/heads/release')
-      run: |
-        echo "Running Arduino Lint..."
-        arduino-lint --library-manager update --compliance strict
-        arduino/arduino-lint-action@v2
+      uses: arduino/arduino-lint-action@v2
+      with:
+        library-manager: update
+        compliance: strict
     - name: Upload build log
       uses: actions/upload-artifact@v4
       if: always()
