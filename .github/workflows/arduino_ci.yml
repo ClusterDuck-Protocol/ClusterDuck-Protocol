@@ -102,7 +102,6 @@ jobs:
     #     python -m pip install platformio
     #     platformio run --target upload --environment test_heltec_wifi_lora_32_V3
     - name: Build
-      # needs: Unit Tests
       run: |
         echo "List of installed Arduino Cores:"
         arduino-cli core list
@@ -115,9 +114,7 @@ jobs:
         buildExampleSketch Basic-Ducks DuckLink
         buildExampleSketch Basic-Ducks MamaDuck
     - name: Release Build
-      rules:
-        - if: startsWith(github.ref, 'refs/heads/release')
-      needs: Arduino Registry Lint
+      if: startsWith(github.ref, 'refs/heads/release')
       run: |
         buildExampleSketch() { 
           BOARD=${{ matrix.board }}
@@ -130,19 +127,11 @@ jobs:
         buildExampleSketch Custom-Mama-Examples Custom-Mama-Detect
         buildExampleSketch Custom-Mama-Examples Custom-Mama-Example
     - name: Arduino Registry Lint
-      rules:
-        - if: startsWith(github.ref, 'refs/heads/release')
-      needs: Release Build
-      - uses: arduino/arduino-lint-action@v2
-        with:
-          library-manager: update
-          compliance: strict
-      steps:
-        - uses: arduino/arduino-lint-action@v2
-          with:
-            library-manager: update
-            compliance: strict
-        
+      if: startsWith(github.ref, 'refs/heads/release')
+      run: |
+        echo "Running Arduino Lint..."
+        arduino-lint --library-manager update --compliance strict
+        arduino/arduino-lint-action@v2
     - name: Upload build log
       uses: actions/upload-artifact@v4
       if: always()
