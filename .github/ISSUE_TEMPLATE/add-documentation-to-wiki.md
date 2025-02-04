@@ -7,10 +7,7 @@ assignees: ''
 
 ---
 
-To which page do you want to add to the wiki?
-- 
-
-What do you want to change/add?
+Brief explanation of changes or pages affected:
 
 
-Is your documentation related to a recent pull request or issue?
+Related issues:
