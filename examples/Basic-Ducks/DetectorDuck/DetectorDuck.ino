@@ -91,8 +91,6 @@ bool pingHandler(void *) {
   return true;
 }
 
-// This uses the serial console to output the RSSI quality
-// But you can use a display, sound or LEDs
 void showSignalQuality(int incoming) {
   int rssi = incoming;
   Serial.print("[DETECTOR] RSSI value: ");

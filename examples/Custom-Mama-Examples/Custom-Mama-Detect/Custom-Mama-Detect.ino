@@ -13,6 +13,16 @@
 #include <arduino-timer.h>
 #include <MamaDuck.h>
 #include <DuckDetect.h>
+#include "FastLED.h"
+
+// Setup for W2812 (LED)
+#define LED_TYPE WS2812
+#define DATA_PIN 4
+#define NUM_LEDS 1
+#define COLOR_ORDER GRB
+#define BRIGHTNESS  128
+#include <pixeltypes.h>
+CRGB leds[NUM_LEDS]; 
 
 #ifdef SERIAL_PORT_USBVIRTUAL
 #define Serial SERIAL_PORT_USBVIRTUAL
@@ -21,14 +31,14 @@
 // create a built-in mama duck
 MamaDuck duck;
 DuckDetect detect;
-bool runSensor(void *);
-bool detectOn = false;
 
 // create a timer with default settings
 auto timer = timer_create_default();
 
 // for sending the counter message
 const int INTERVAL_MS = 5000;
+const unsigned long SIGNAL_TIMEOUT_MS = INTERVAL_MS + 1000;
+unsigned long lastSignalTime = 0;
 int counter = 1;
 
 void setup() {
@@ -45,45 +55,75 @@ void setup() {
   // Load DetectorDuck profile
   detect.setupRadio();
   detect.onReceiveRssi(handleReceiveRssi);
+  timer.every(INTERVAL_MS, pingHandler);
 
-  // Initialize the timer. The timer thread runs separately from the main loop
-  // and will trigger sending a counter message.
-  timer.every(INTERVAL_MS, runSensor);
-  duck.onReceiveDuckData(handleDuckData);
+   // Setup the LED
+  FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalSMD5050 );
+  FastLED.setBrightness(  BRIGHTNESS );
+  leds[0] = CRGB::Gold;
+  FastLED.show();
+
   Serial.println("[MAMA] Setup OK!");
 
 }
 
+//If in DetectorDuck mode show RSSI
+void handleReceiveRssi(const int rssi) {
+  if(duck.getDetectState()) { showSignalQuality(rssi); }
+  lastSignalTime = millis();
+}
+
 void loop() {
   timer.tick();
+  duck.run();
+
   // Here we check the state of our Detect flag that is adjustable using the /controlpanel
   // Changing the state will determine the Duck's behavior
-  // This strategy can be used with other ducks to morph a duck quickly into other behaviors
-  
-  if(duck.getDetectState()) {
-    if(!detectOn) {
-      detectOn = true;
-      // Remove MamaDuck timer
-      timer.cancel();
-      detect.run();
-      timer.every(3000, pingHandler);
-    }
+  if ((millis() - lastSignalTime > SIGNAL_TIMEOUT_MS) && duck.getDetectState()) {
+    Serial.println("[DETECTOR] No signal");
+    leds[0] = CRGB::Red;
+    FastLED.show();
+    lastSignalTime = millis(); // Reset to prevent continuous messages
     detect.run();
-  } else {
-    if(detectOn) {
-      detectOn = false;
-      // Remove Detector timer
-      timer.cancel();
-      duck.run();
-      timer.every(INTERVAL_MS, runSensor);
-    }
-    duck.run();
+  }
+  if(!duck.getDetectState()){
+    leds[0] = CRGB::Gold;
+    FastLED.show();
   }
   
 }
 
-void handleDuckData(std::vector<byte> packetBuffer) {
+bool pingHandler(void *) {
+  detect.sendPing();
 
+  return true;
+}
+
+void showSignalQuality(int incoming) {
+  int rssi = incoming;
+  Serial.print("[DETECTOR] RSSI value: ");
+  Serial.print(rssi);
+
+  if (rssi > -95) {
+    Serial.println(" - GOOD SIGNAL");
+    leds[0] = CRGB::Green;
+    FastLED.show();
+  }
+  else if (rssi <= -95 && rssi > -108) {
+    Serial.println(" - OKAY SIGNAL");
+    leds[0] = CRGB::Blue;
+    FastLED.show();
+  }
+  else if (rssi <= -108 <= -118) {
+    Serial.println(" - LOW SIGNAL");
+    leds[0] = CRGB::Purple;
+    FastLED.show();
+  }
+  else {
+    Serial.println(" - NO SIGNAL");
+    leds[0] = CRGB::Red;
+    FastLED.show();
+  }
 }
 
 bool sendData(const byte* buffer, int length) {
@@ -99,53 +139,4 @@ bool sendData(const byte* buffer, int length) {
         Serial.printf("[MAMA] Failed to send data. error = %i\n", err);
     }
     return sentOk;
-}
-
-bool runSensor(void *) {
-  bool result;
-  const byte* buffer;
-  
-  std::string message = std::string("Counter:").append(std::to_string(counter));
-  int length = message.length();
-  Serial.print("[MAMA] sensor data: ");
-  Serial.println(message.c_str());
-  buffer = (byte*) message.c_str(); 
-
-  result = sendData(buffer, length);
-  if (result) {
-     Serial.println("[MAMA] runSensor ok.");
-  } else {
-     Serial.println("[MAMA] runSensor failed.");
-  }
-  return result;
-}
-
-// This uses the serial console to output the RSSI quality
-// But you can use a display, sound or LEDs
-void showSignalQuality(int incoming) {
-    int rssi = incoming;
-    Serial.print("[DETECTOR] Rssi value: ");
-    Serial.print(rssi);
-
-    if (rssi > -95) {
-        Serial.println(" - GOOD");
-    }
-    else if (rssi <= -95 && rssi > -108) {
-        Serial.println(" - OKAY");
-    }
-    else if (rssi <= -108) {
-        Serial.println(" - BAD");
-    }
-}
-//If in DetectorDuck mode show RSSI
-void handleReceiveRssi(const int rssi) {
-  if(detectOn) { showSignalQuality(rssi); }
-}
-
-// Periodically sends a ping message in DetectorDuck mode
-bool pingHandler(void *) {
-  Serial.println("[DETECTOR] Says ping!");
-  detect.sendPing(true);
-
-  return true;
 }
