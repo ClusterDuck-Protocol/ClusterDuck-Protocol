@@ -123,6 +123,7 @@ jobs:
           echo "Build complete."
         } 
         buildExampleSketch Basic-Ducks PapaDuck
+        arduino-cli lib install --git-url "https://github.com/FastLED/FastLED"
         buildExampleSketch Basic-Ducks DetectorDuck
         buildExampleSketch Custom-Mama-Examples Custom-Mama-Detect
         buildExampleSketch Custom-Mama-Examples Custom-Mama-Example
