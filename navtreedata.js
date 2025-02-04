@@ -60,7 +60,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "_duck_8cpp.html",
-"globals_vars.html"
+"globals_defs.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

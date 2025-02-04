@@ -9,7 +9,7 @@ var class_duck_net =
     [ "loadWiFiCredentials", "class_duck_net.html#a98508f1de7a2bf259d91d770b358f6ae", null ],
     [ "saveChannel", "class_duck_net.html#a2b229176ee12d9438983347adf0c3137", null ],
     [ "saveWifiCredentials", "class_duck_net.html#aee618ca707c409dfef470a352a92c4eb", null ],
-    [ "setDeviceId", "class_duck_net.html#ae6aedb1e4656307a39c370bb42e9f98a", null ],
+    [ "setDeviceId", "class_duck_net.html#a4763786d357e5f836b805823f516c487", null ],
     [ "setPassword", "class_duck_net.html#ae2da5685c74057f46210a5b008b49753", null ],
     [ "setSsid", "class_duck_net.html#a628d4040b156cd7ecd585d019f5ef8c8", null ],
     [ "setupDns", "class_duck_net.html#adf1b556e746790e133583abb73329cb0", null ],

@@ -26,7 +26,7 @@ var searchData=
   ['duckname_23',['duckName',['../class_duck.html#afd50e4275853e0e4751953d2c929296f',1,'Duck']]],
   ['ducknet_24',['ducknet',['../class_duck_net.html#a732adcbd8649a905be85b406d441bc3e',1,'DuckNet::DuckNet()'],['../class_duck.html#ac23aaf80fd98d8d7e890f0619fefa968',1,'Duck::duckNet'],['../class_duck_net.html',1,'DuckNet']]],
   ['ducknet_2eh_25',['DuckNet.h',['../_duck_net_8h.html',1,'']]],
-  ['duckpacket_26',['duckpacket',['../class_duck_packet.html',1,'DuckPacket'],['../class_duck_packet.html#a0d70cc32e12585c7c1ac4da10fec80af',1,'DuckPacket::DuckPacket()'],['../class_duck_packet.html#a8abaa404ab99c4251261feef77a3e02a',1,'DuckPacket::DuckPacket(std::vector&lt; byte &gt; duid)']]],
+  ['duckpacket_26',['duckpacket',['../class_duck_packet.html',1,'DuckPacket'],['../class_duck_packet.html#a0d70cc32e12585c7c1ac4da10fec80af',1,'DuckPacket::DuckPacket()'],['../class_duck_packet.html#a2353be5e63d55a5d7f2193c02b76c640',1,'DuckPacket::DuckPacket(std::array&lt; byte, 8 &gt; duid)']]],
   ['duckpacket_2eh_27',['DuckPacket.h',['../_duck_packet_8h.html',1,'']]],
   ['duckradio_28',['duckradio',['../class_duck_radio.html',1,'DuckRadio'],['../class_duck.html#a2f194cb1575afb927fc5ccd5c76a0f00',1,'Duck::duckRadio']]],
   ['duckradio_2eh_29',['DuckRadio.h',['../_duck_radio_8h.html',1,'']]],
@@ -36,5 +36,5 @@ var searchData=
   ['ducktypes_2eh_33',['DuckTypes.h',['../_duck_types_8h.html',1,'']]],
   ['duckutils_34',['duckutils',['../namespaceduckutils.html',1,'']]],
   ['duckutils_2eh_35',['DuckUtils.h',['../_duck_utils_8h.html',1,'']]],
-  ['duid_36',['duid',['../class_duck.html#aecf698676336de0fff0a80ca7deb3b50',1,'Duck']]]
+  ['duid_36',['duid',['../class_duck.html#afef06937de521be2c40b4884cc796fdd',1,'Duck']]]
 ];

@@ -14,5 +14,5 @@ var searchData=
   ['duckradio_11',['duckRadio',['../class_duck.html#a2f194cb1575afb927fc5ccd5c76a0f00',1,'Duck']]],
   ['ducksession_12',['duckSession',['../class_duck_net.html#a3fd723d211e67416f9c01a3263ff368e',1,'DuckNet']]],
   ['ducktimer_13',['duckTimer',['../namespaceduckutils.html#a6a89c26b27f49a64aa4ad62479da0327',1,'duckutils']]],
-  ['duid_14',['duid',['../class_duck.html#aecf698676336de0fff0a80ca7deb3b50',1,'Duck']]]
+  ['duid_14',['duid',['../class_duck.html#afef06937de521be2c40b4884cc796fdd',1,'Duck']]]
 ];

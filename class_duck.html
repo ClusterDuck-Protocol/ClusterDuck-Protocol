@@ -116,9 +116,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aae3a4cc926fb9bc26c03409dc8a8ba12" id="r_aae3a4cc926fb9bc26c03409dc8a8ba12"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#aae3a4cc926fb9bc26c03409dc8a8ba12">getName</a> ()</td></tr>
 <tr class="memdesc:aae3a4cc926fb9bc26c03409dc8a8ba12"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the duck's name.  <br /></td></tr>
 <tr class="separator:aae3a4cc926fb9bc26c03409dc8a8ba12"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a97e4092d7719c1f2d4edf16b7c4429f9" id="r_a97e4092d7719c1f2d4edf16b7c4429f9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a97e4092d7719c1f2d4edf16b7c4429f9">setDeviceId</a> (std::vector&lt; byte &gt; id)</td></tr>
-<tr class="memdesc:a97e4092d7719c1f2d4edf16b7c4429f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">setup the duck unique ID  <br /></td></tr>
-<tr class="separator:a97e4092d7719c1f2d4edf16b7c4429f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99145d165cca9e9dda90ef5d6e3cb519" id="r_a99145d165cca9e9dda90ef5d6e3cb519"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a99145d165cca9e9dda90ef5d6e3cb519">setDeviceId</a> (std::array&lt; byte, 8 &gt; &amp;id)</td></tr>
+<tr class="memdesc:a99145d165cca9e9dda90ef5d6e3cb519"><td class="mdescLeft">&#160;</td><td class="mdescRight">setup the duck unique ID  <br /></td></tr>
+<tr class="separator:a99145d165cca9e9dda90ef5d6e3cb519"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7461090320fd73be0abd9081034208d8" id="r_a7461090320fd73be0abd9081034208d8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a7461090320fd73be0abd9081034208d8">setDeviceId</a> (std::string &amp;id)</td></tr>
+<tr class="memdesc:a7461090320fd73be0abd9081034208d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">setup the duck unique ID  <br /></td></tr>
+<tr class="separator:a7461090320fd73be0abd9081034208d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e0a150fe39b00e050d750de099fd032" id="r_a9e0a150fe39b00e050d750de099fd032"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a9e0a150fe39b00e050d750de099fd032">setDeviceId</a> (byte *id)</td></tr>
 <tr class="memdesc:a9e0a150fe39b00e050d750de099fd032"><td class="mdescLeft">&#160;</td><td class="mdescRight">setup the duck unique ID  <br /></td></tr>
 <tr class="separator:a9e0a150fe39b00e050d750de099fd032"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -146,21 +149,21 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a97e4e4eac7d09d7b19a6ec32ed6e3316" id="r_a97e4e4eac7d09d7b19a6ec32ed6e3316"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a97e4e4eac7d09d7b19a6ec32ed6e3316">setupInternet</a> (std::string ssid, std::string password)</td></tr>
 <tr class="memdesc:a97e4e4eac7d09d7b19a6ec32ed6e3316"><td class="mdescLeft">&#160;</td><td class="mdescRight">Setup internet access.  <br /></td></tr>
 <tr class="separator:a97e4e4eac7d09d7b19a6ec32ed6e3316"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac0fabaca99305598a713a5da05fdc0c8" id="r_ac0fabaca99305598a713a5da05fdc0c8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#ac0fabaca99305598a713a5da05fdc0c8">sendData</a> (byte topic, const std::string data, const std::vector&lt; byte &gt; targetDevice=ZERO_DUID, std::vector&lt; byte &gt; *outgoingMuid=NULL)</td></tr>
-<tr class="memdesc:ac0fabaca99305598a713a5da05fdc0c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends data into the mesh network.  <br /></td></tr>
-<tr class="separator:ac0fabaca99305598a713a5da05fdc0c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4c7f8a504dc53ab81372d2483d32afdf" id="r_a4c7f8a504dc53ab81372d2483d32afdf"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a4c7f8a504dc53ab81372d2483d32afdf">sendData</a> (byte topic, std::vector&lt; byte &gt; bytes, const std::vector&lt; byte &gt; targetDevice=ZERO_DUID, std::vector&lt; byte &gt; *outgoingMuid=NULL)</td></tr>
-<tr class="memdesc:a4c7f8a504dc53ab81372d2483d32afdf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends data into the mesh network.  <br /></td></tr>
-<tr class="separator:a4c7f8a504dc53ab81372d2483d32afdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a36a971cdb34ea453bd6b70b198821b30" id="r_a36a971cdb34ea453bd6b70b198821b30"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a36a971cdb34ea453bd6b70b198821b30">sendData</a> (byte topic, const byte *data, int length, const std::vector&lt; byte &gt; targetDevice=ZERO_DUID, std::vector&lt; byte &gt; *outgoingMuid=NULL)</td></tr>
-<tr class="memdesc:a36a971cdb34ea453bd6b70b198821b30"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends data into the mesh network.  <br /></td></tr>
-<tr class="separator:a36a971cdb34ea453bd6b70b198821b30"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a414ba3fbf13759049154076b934d18e8" id="r_a414ba3fbf13759049154076b934d18e8"><td class="memItemLeft" align="right" valign="top">CdpPacket&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a414ba3fbf13759049154076b934d18e8">buildCdpPacket</a> (byte topic, const std::vector&lt; byte &gt; data, const std::vector&lt; byte &gt; targetDevice, const std::vector&lt; byte &gt; &amp;muid)</td></tr>
-<tr class="memdesc:a414ba3fbf13759049154076b934d18e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds a CdpPacket with a specified muid.  <br /></td></tr>
-<tr class="separator:a414ba3fbf13759049154076b934d18e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad2210de36be0eeb98d87e64fabbbaf45" id="r_ad2210de36be0eeb98d87e64fabbbaf45"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_duck_8h.html#a5931873aef9ff172ae93e721a3f84aa9">muidStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#ad2210de36be0eeb98d87e64fabbbaf45">getMuidStatus</a> (const std::vector&lt; byte &gt; &amp;muid) const</td></tr>
-<tr class="memdesc:ad2210de36be0eeb98d87e64fabbbaf45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the status of an MUID.  <br /></td></tr>
-<tr class="separator:ad2210de36be0eeb98d87e64fabbbaf45"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a42d190997b13ab6f4b4e40e77afe7447" id="r_a42d190997b13ab6f4b4e40e77afe7447"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a42d190997b13ab6f4b4e40e77afe7447">sendData</a> (byte topic, const std::string data, const std::array&lt; byte, 8 &gt; targetDevice=ZERO_DUID, std::array&lt; byte, 8 &gt; *outgoingMuid=NULL)</td></tr>
+<tr class="memdesc:a42d190997b13ab6f4b4e40e77afe7447"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends data into the mesh network.  <br /></td></tr>
+<tr class="separator:a42d190997b13ab6f4b4e40e77afe7447"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acbe287c969fe7b31f7d717f597f12bb1" id="r_acbe287c969fe7b31f7d717f597f12bb1"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#acbe287c969fe7b31f7d717f597f12bb1">sendData</a> (byte topic, std::vector&lt; byte &gt; &amp;bytes, const std::array&lt; byte, 8 &gt; targetDevice=ZERO_DUID, std::array&lt; byte, 8 &gt; *outgoingMuid=NULL)</td></tr>
+<tr class="memdesc:acbe287c969fe7b31f7d717f597f12bb1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends data into the mesh network.  <br /></td></tr>
+<tr class="separator:acbe287c969fe7b31f7d717f597f12bb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae70987a057395c986938bd74846d24ca" id="r_ae70987a057395c986938bd74846d24ca"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#ae70987a057395c986938bd74846d24ca">sendData</a> (byte topic, const byte *data, int length, const std::array&lt; byte, 8 &gt; targetDevice=ZERO_DUID, std::array&lt; byte, 8 &gt; *outgoingMuid=NULL)</td></tr>
+<tr class="memdesc:ae70987a057395c986938bd74846d24ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends data into the mesh network.  <br /></td></tr>
+<tr class="separator:ae70987a057395c986938bd74846d24ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c555b6f4794eb1b489932bc3ba2b8a5" id="r_a7c555b6f4794eb1b489932bc3ba2b8a5"><td class="memItemLeft" align="right" valign="top">CdpPacket&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a7c555b6f4794eb1b489932bc3ba2b8a5">buildCdpPacket</a> (byte topic, const std::vector&lt; byte &gt; data, const std::array&lt; byte, 8 &gt; targetDevice, const std::array&lt; byte, 8 &gt; &amp;muid)</td></tr>
+<tr class="memdesc:a7c555b6f4794eb1b489932bc3ba2b8a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds a CdpPacket with a specified muid.  <br /></td></tr>
+<tr class="separator:a7c555b6f4794eb1b489932bc3ba2b8a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a7c531a827cc9d21a0df5ee23ed06e0" id="r_a3a7c531a827cc9d21a0df5ee23ed06e0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_duck_8h.html#a5931873aef9ff172ae93e721a3f84aa9">muidStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a3a7c531a827cc9d21a0df5ee23ed06e0">getMuidStatus</a> (const std::array&lt; byte, 4 &gt; &amp;muid) const</td></tr>
+<tr class="memdesc:a3a7c531a827cc9d21a0df5ee23ed06e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the status of an MUID.  <br /></td></tr>
+<tr class="separator:a3a7c531a827cc9d21a0df5ee23ed06e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a09149de412d44bc20792b6412e296c13" id="r_a09149de412d44bc20792b6412e296c13"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a09149de412d44bc20792b6412e296c13">isWifiConnected</a> ()</td></tr>
 <tr class="memdesc:a09149de412d44bc20792b6412e296c13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check wifi connection status.  <br /></td></tr>
 <tr class="separator:a09149de412d44bc20792b6412e296c13"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -216,9 +219,9 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:ae563c92e38f7f99412eb4445f6429366" id="r_ae563c92e38f7f99412eb4445f6429366"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#ae563c92e38f7f99412eb4445f6429366">run</a> ()=0</td></tr>
 <tr class="memdesc:ae563c92e38f7f99412eb4445f6429366"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implement the duck's specific behavior.  <br /></td></tr>
 <tr class="separator:ae563c92e38f7f99412eb4445f6429366"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ace2be0f5ed1f9fe3958540e5a0ba728e" id="r_ace2be0f5ed1f9fe3958540e5a0ba728e"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#ace2be0f5ed1f9fe3958540e5a0ba728e">setupWithDefaults</a> (std::vector&lt; byte &gt; <a class="el" href="class_duck.html#aa94854a4f643efc6212d9e627c7ab44d">deviceId</a>, std::string ssid, std::string password)</td></tr>
-<tr class="memdesc:ace2be0f5ed1f9fe3958540e5a0ba728e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Setup a duck with default settings.  <br /></td></tr>
-<tr class="separator:ace2be0f5ed1f9fe3958540e5a0ba728e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc45fdcef6c968345c4ce13e580bf8da" id="r_afc45fdcef6c968345c4ce13e580bf8da"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#afc45fdcef6c968345c4ce13e580bf8da">setupWithDefaults</a> (std::array&lt; byte, 8 &gt; <a class="el" href="class_duck.html#aa94854a4f643efc6212d9e627c7ab44d">deviceId</a>, std::string ssid, std::string password)</td></tr>
+<tr class="memdesc:afc45fdcef6c968345c4ce13e580bf8da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Setup a duck with default settings.  <br /></td></tr>
+<tr class="separator:afc45fdcef6c968345c4ce13e580bf8da"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3d0b92824388146c6e4e7d15d5f3c449" id="r_a3d0b92824388146c6e4e7d15d5f3c449"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a3d0b92824388146c6e4e7d15d5f3c449">getType</a> ()=0</td></tr>
 <tr class="memdesc:a3d0b92824388146c6e4e7d15d5f3c449"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the duck type.  <br /></td></tr>
 <tr class="separator:a3d0b92824388146c6e4e7d15d5f3c449"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -245,8 +248,8 @@ Protected Attributes</h2></td></tr>
 <tr class="separator:afd50e4275853e0e4751953d2c929296f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa94854a4f643efc6212d9e627c7ab44d" id="r_aa94854a4f643efc6212d9e627c7ab44d"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#aa94854a4f643efc6212d9e627c7ab44d">deviceId</a></td></tr>
 <tr class="separator:aa94854a4f643efc6212d9e627c7ab44d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aecf698676336de0fff0a80ca7deb3b50" id="r_aecf698676336de0fff0a80ca7deb3b50"><td class="memItemLeft" align="right" valign="top">std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#aecf698676336de0fff0a80ca7deb3b50">duid</a></td></tr>
-<tr class="separator:aecf698676336de0fff0a80ca7deb3b50"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afef06937de521be2c40b4884cc796fdd" id="r_afef06937de521be2c40b4884cc796fdd"><td class="memItemLeft" align="right" valign="top">std::array&lt; byte, 8 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#afef06937de521be2c40b4884cc796fdd">duid</a></td></tr>
+<tr class="separator:afef06937de521be2c40b4884cc796fdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2f194cb1575afb927fc5ccd5c76a0f00" id="r_a2f194cb1575afb927fc5ccd5c76a0f00"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_duck_radio.html">DuckRadio</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a2f194cb1575afb927fc5ccd5c76a0f00">duckRadio</a> = <a class="el" href="class_duck_radio.html#a44a79333509f33d1a89d30c637170a22">DuckRadio::getInstance</a>()</td></tr>
 <tr class="separator:a2f194cb1575afb927fc5ccd5c76a0f00"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac23aaf80fd98d8d7e890f0619fefa968" id="r_ac23aaf80fd98d8d7e890f0619fefa968"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_duck_net.html">DuckNet</a> *const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#ac23aaf80fd98d8d7e890f0619fefa968">duckNet</a></td></tr>
@@ -255,8 +258,8 @@ Protected Attributes</h2></td></tr>
 <tr class="separator:a401cc1ab76bbea8030d8c48cba084a2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae5a77bb03f168ea6181ad426d3c49d84" id="r_ae5a77bb03f168ea6181ad426d3c49d84"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_duck_packet.html">DuckPacket</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#ae5a77bb03f168ea6181ad426d3c49d84">rxPacket</a> = NULL</td></tr>
 <tr class="separator:ae5a77bb03f168ea6181ad426d3c49d84"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a71b85c77dcab2e749388182fabd92e6c" id="r_a71b85c77dcab2e749388182fabd92e6c"><td class="memItemLeft" align="right" valign="top">std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a71b85c77dcab2e749388182fabd92e6c">lastMessageMuid</a></td></tr>
-<tr class="separator:a71b85c77dcab2e749388182fabd92e6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc15ce7c15e57083bcd6dafdd58ebfeb" id="r_abc15ce7c15e57083bcd6dafdd58ebfeb"><td class="memItemLeft" align="right" valign="top">std::array&lt; byte, 4 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#abc15ce7c15e57083bcd6dafdd58ebfeb">lastMessageMuid</a></td></tr>
+<tr class="separator:abc15ce7c15e57083bcd6dafdd58ebfeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adab8d421f12c56e1bbd0d20c7579dbac" id="r_adab8d421f12c56e1bbd0d20c7579dbac"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#adab8d421f12c56e1bbd0d20c7579dbac">lastMessageAck</a> = true</td></tr>
 <tr class="separator:adab8d421f12c56e1bbd0d20c7579dbac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a626ccc31b3598053dfc09c863243547a" id="r_a626ccc31b3598053dfc09c863243547a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_bloom_filter.html">BloomFilter</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a626ccc31b3598053dfc09c863243547a">filter</a></td></tr>
@@ -335,8 +338,8 @@ Protected Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a414ba3fbf13759049154076b934d18e8" name="a414ba3fbf13759049154076b934d18e8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a414ba3fbf13759049154076b934d18e8">&#9670;&#160;</a></span>buildCdpPacket()</h2>
+<a id="a7c555b6f4794eb1b489932bc3ba2b8a5" name="a7c555b6f4794eb1b489932bc3ba2b8a5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c555b6f4794eb1b489932bc3ba2b8a5">&#9670;&#160;</a></span>buildCdpPacket()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -356,13 +359,13 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::vector&lt; byte &gt;&#160;</td>
+          <td class="paramtype">const std::array&lt; byte, 8 &gt;&#160;</td>
           <td class="paramname"><em>targetDevice</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramtype">const std::array&lt; byte, 8 &gt; &amp;&#160;</td>
           <td class="paramname"><em>muid</em>&#160;</td>
         </tr>
         <tr>
@@ -568,8 +571,8 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ad2210de36be0eeb98d87e64fabbbaf45" name="ad2210de36be0eeb98d87e64fabbbaf45"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad2210de36be0eeb98d87e64fabbbaf45">&#9670;&#160;</a></span>getMuidStatus()</h2>
+<a id="a3a7c531a827cc9d21a0df5ee23ed06e0" name="a3a7c531a827cc9d21a0df5ee23ed06e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a7c531a827cc9d21a0df5ee23ed06e0">&#9670;&#160;</a></span>getMuidStatus()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -577,7 +580,7 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="_duck_8h.html#a5931873aef9ff172ae93e721a3f84aa9">muidStatus</a> Duck::getMuidStatus </td>
           <td>(</td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramtype">const std::array&lt; byte, 4 &gt; &amp;&#160;</td>
           <td class="paramname"><em>muid</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -910,8 +913,8 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a36a971cdb34ea453bd6b70b198821b30" name="a36a971cdb34ea453bd6b70b198821b30"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a36a971cdb34ea453bd6b70b198821b30">&#9670;&#160;</a></span>sendData() <span class="overload">[1/3]</span></h2>
+<a id="ae70987a057395c986938bd74846d24ca" name="ae70987a057395c986938bd74846d24ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae70987a057395c986938bd74846d24ca">&#9670;&#160;</a></span>sendData() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -937,13 +940,13 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::vector&lt; byte &gt;&#160;</td>
+          <td class="paramtype">const std::array&lt; byte, 8 &gt;&#160;</td>
           <td class="paramname"><em>targetDevice</em> = <code>ZERO_DUID</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::vector&lt; byte &gt; *&#160;</td>
+          <td class="paramtype">std::array&lt; byte, 8 &gt; *&#160;</td>
           <td class="paramname"><em>outgoingMuid</em> = <code>NULL</code>&#160;</td>
         </tr>
         <tr>
@@ -969,8 +972,8 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ac0fabaca99305598a713a5da05fdc0c8" name="ac0fabaca99305598a713a5da05fdc0c8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac0fabaca99305598a713a5da05fdc0c8">&#9670;&#160;</a></span>sendData() <span class="overload">[2/3]</span></h2>
+<a id="a42d190997b13ab6f4b4e40e77afe7447" name="a42d190997b13ab6f4b4e40e77afe7447"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a42d190997b13ab6f4b4e40e77afe7447">&#9670;&#160;</a></span>sendData() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -990,13 +993,13 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::vector&lt; byte &gt;&#160;</td>
+          <td class="paramtype">const std::array&lt; byte, 8 &gt;&#160;</td>
           <td class="paramname"><em>targetDevice</em> = <code>ZERO_DUID</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::vector&lt; byte &gt; *&#160;</td>
+          <td class="paramtype">std::array&lt; byte, 8 &gt; *&#160;</td>
           <td class="paramname"><em>outgoingMuid</em> = <code>NULL</code>&#160;</td>
         </tr>
         <tr>
@@ -1021,8 +1024,8 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a4c7f8a504dc53ab81372d2483d32afdf" name="a4c7f8a504dc53ab81372d2483d32afdf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4c7f8a504dc53ab81372d2483d32afdf">&#9670;&#160;</a></span>sendData() <span class="overload">[3/3]</span></h2>
+<a id="acbe287c969fe7b31f7d717f597f12bb1" name="acbe287c969fe7b31f7d717f597f12bb1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acbe287c969fe7b31f7d717f597f12bb1">&#9670;&#160;</a></span>sendData() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1036,19 +1039,19 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::vector&lt; byte &gt;&#160;</td>
+          <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>bytes</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::vector&lt; byte &gt;&#160;</td>
+          <td class="paramtype">const std::array&lt; byte, 8 &gt;&#160;</td>
           <td class="paramname"><em>targetDevice</em> = <code>ZERO_DUID</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::vector&lt; byte &gt; *&#160;</td>
+          <td class="paramtype">std::array&lt; byte, 8 &gt; *&#160;</td>
           <td class="paramname"><em>outgoingMuid</em> = <code>NULL</code>&#160;</td>
         </tr>
         <tr>
@@ -1234,7 +1237,7 @@ Protected Attributes</h2></td></tr>
 </div>
 </div>
 <a id="a9e0a150fe39b00e050d750de099fd032" name="a9e0a150fe39b00e050d750de099fd032"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9e0a150fe39b00e050d750de099fd032">&#9670;&#160;</a></span>setDeviceId() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a9e0a150fe39b00e050d750de099fd032">&#9670;&#160;</a></span>setDeviceId() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1260,8 +1263,8 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a97e4092d7719c1f2d4edf16b7c4429f9" name="a97e4092d7719c1f2d4edf16b7c4429f9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a97e4092d7719c1f2d4edf16b7c4429f9">&#9670;&#160;</a></span>setDeviceId() <span class="overload">[2/2]</span></h2>
+<a id="a99145d165cca9e9dda90ef5d6e3cb519" name="a99145d165cca9e9dda90ef5d6e3cb519"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a99145d165cca9e9dda90ef5d6e3cb519">&#9670;&#160;</a></span>setDeviceId() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1269,7 +1272,34 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="memname">int Duck::setDeviceId </td>
           <td>(</td>
-          <td class="paramtype">std::vector&lt; byte &gt;&#160;</td>
+          <td class="paramtype">std::array&lt; byte, 8 &gt; &amp;&#160;</td>
+          <td class="paramname"><em>id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>setup the duck unique ID </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">an</td><td>8 byte array </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>DUCK_ERR_NONE if successful, an error code otherwise </dd></dl>
+
+</div>
+</div>
+<a id="a7461090320fd73be0abd9081034208d8" name="a7461090320fd73be0abd9081034208d8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7461090320fd73be0abd9081034208d8">&#9670;&#160;</a></span>setDeviceId() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int Duck::setDeviceId </td>
+          <td>(</td>
+          <td class="paramtype">std::string &amp;&#160;</td>
           <td class="paramname"><em>id</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1604,8 +1634,8 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ace2be0f5ed1f9fe3958540e5a0ba728e" name="ace2be0f5ed1f9fe3958540e5a0ba728e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ace2be0f5ed1f9fe3958540e5a0ba728e">&#9670;&#160;</a></span>setupWithDefaults()</h2>
+<a id="afc45fdcef6c968345c4ce13e580bf8da" name="afc45fdcef6c968345c4ce13e580bf8da"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afc45fdcef6c968345c4ce13e580bf8da">&#9670;&#160;</a></span>setupWithDefaults()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1616,7 +1646,7 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="memname">virtual int Duck::setupWithDefaults </td>
           <td>(</td>
-          <td class="paramtype">std::vector&lt; byte &gt;&#160;</td>
+          <td class="paramtype">std::array&lt; byte, 8 &gt;&#160;</td>
           <td class="paramname"><em>deviceId</em>, </td>
         </tr>
         <tr>
@@ -1766,8 +1796,8 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="aecf698676336de0fff0a80ca7deb3b50" name="aecf698676336de0fff0a80ca7deb3b50"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aecf698676336de0fff0a80ca7deb3b50">&#9670;&#160;</a></span>duid</h2>
+<a id="afef06937de521be2c40b4884cc796fdd" name="afef06937de521be2c40b4884cc796fdd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afef06937de521be2c40b4884cc796fdd">&#9670;&#160;</a></span>duid</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1776,7 +1806,7 @@ Protected Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt;byte&gt; Duck::duid</td>
+          <td class="memname">std::array&lt;byte,8&gt; Duck::duid</td>
         </tr>
       </table>
   </td>
@@ -1832,8 +1862,8 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a71b85c77dcab2e749388182fabd92e6c" name="a71b85c77dcab2e749388182fabd92e6c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a71b85c77dcab2e749388182fabd92e6c">&#9670;&#160;</a></span>lastMessageMuid</h2>
+<a id="abc15ce7c15e57083bcd6dafdd58ebfeb" name="abc15ce7c15e57083bcd6dafdd58ebfeb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc15ce7c15e57083bcd6dafdd58ebfeb">&#9670;&#160;</a></span>lastMessageMuid</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1842,7 +1872,7 @@ Protected Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt;byte&gt; Duck::lastMessageMuid</td>
+          <td class="memname">std::array&lt;byte,4&gt; Duck::lastMessageMuid</td>
         </tr>
       </table>
   </td>

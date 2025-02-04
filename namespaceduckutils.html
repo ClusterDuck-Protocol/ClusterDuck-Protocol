@@ -119,10 +119,17 @@ Functions</h2></td></tr>
 <tr class="memitem:a232773eaac919a424cf6c8737c6843f0"><td class="memTemplItemLeft" align="right" valign="top">std::string&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceduckutils.html#a232773eaac919a424cf6c8737c6843f0">toString</a> (const std::vector&lt; T &gt; &amp;vec)</td></tr>
 <tr class="memdesc:a232773eaac919a424cf6c8737c6843f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a vector into an ASCII string.  <br /></td></tr>
 <tr class="separator:a232773eaac919a424cf6c8737c6843f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acda8fcf6c67d4a8c3e675a9c22288dcf" id="r_acda8fcf6c67d4a8c3e675a9c22288dcf"><td class="memTemplParams" colspan="2">template&lt;typename T , size_t S&gt; </td></tr>
+<tr class="memitem:acda8fcf6c67d4a8c3e675a9c22288dcf"><td class="memTemplItemLeft" align="right" valign="top">std::string&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceduckutils.html#acda8fcf6c67d4a8c3e675a9c22288dcf">toString</a> (const std::array&lt; T, S &gt; &amp;arr)</td></tr>
+<tr class="memdesc:acda8fcf6c67d4a8c3e675a9c22288dcf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a array into an ASCII string.  <br /></td></tr>
+<tr class="separator:acda8fcf6c67d4a8c3e675a9c22288dcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a73122238e9e6161a781b25f4a74cca44" id="r_a73122238e9e6161a781b25f4a74cca44"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a73122238e9e6161a781b25f4a74cca44"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceduckutils.html#a73122238e9e6161a781b25f4a74cca44">isEqual</a> (const std::vector&lt; T &gt; &amp;a, const std::vector&lt; T &gt; &amp;b)</td></tr>
 <tr class="memdesc:a73122238e9e6161a781b25f4a74cca44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare two vectors with regard to both size and contents.  <br /></td></tr>
 <tr class="separator:a73122238e9e6161a781b25f4a74cca44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a97f2ca60c96157b104216f166439f78b" id="r_a97f2ca60c96157b104216f166439f78b"><td class="memTemplParams" colspan="2">template&lt;typename T , size_t S&gt; </td></tr>
+<tr class="memitem:a97f2ca60c96157b104216f166439f78b"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceduckutils.html#a97f2ca60c96157b104216f166439f78b">isEqual</a> (const std::array&lt; T, S &gt; &amp;a, const std::array&lt; T, S &gt; &amp;b)</td></tr>
+<tr class="separator:a97f2ca60c96157b104216f166439f78b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3dc52038752191518492e540418c195b" id="r_a3dc52038752191518492e540418c195b"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceduckutils.html#a3dc52038752191518492e540418c195b">toUint32</a> (const byte *data)</td></tr>
 <tr class="memdesc:a3dc52038752191518492e540418c195b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a byte array to unsigned 32 bit integer.  <br /></td></tr>
 <tr class="separator:a3dc52038752191518492e540418c195b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -324,8 +331,38 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="a97f2ca60c96157b104216f166439f78b" name="a97f2ca60c96157b104216f166439f78b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a97f2ca60c96157b104216f166439f78b">&#9670;&#160;</a></span>isEqual() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T , size_t S&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">bool duckutils::isEqual </td>
+          <td>(</td>
+          <td class="paramtype">const std::array&lt; T, S &gt; &amp;&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::array&lt; T, S &gt; &amp;&#160;</td>
+          <td class="paramname"><em>b</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a73122238e9e6161a781b25f4a74cca44" name="a73122238e9e6161a781b25f4a74cca44"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a73122238e9e6161a781b25f4a74cca44">&#9670;&#160;</a></span>isEqual()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a73122238e9e6161a781b25f4a74cca44">&#9670;&#160;</a></span>isEqual() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -469,8 +506,37 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
+<a id="acda8fcf6c67d4a8c3e675a9c22288dcf" name="acda8fcf6c67d4a8c3e675a9c22288dcf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acda8fcf6c67d4a8c3e675a9c22288dcf">&#9670;&#160;</a></span>toString() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T , size_t S&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string duckutils::toString </td>
+          <td>(</td>
+          <td class="paramtype">const std::array&lt; T, S &gt; &amp;&#160;</td>
+          <td class="paramname"><em>arr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Convert a array into an ASCII string. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">arr</td><td>A vector to convert </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A std::string representing the byte array in ASCII. </dd></dl>
+
+</div>
+</div>
 <a id="a232773eaac919a424cf6c8737c6843f0" name="a232773eaac919a424cf6c8737c6843f0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a232773eaac919a424cf6c8737c6843f0">&#9670;&#160;</a></span>toString()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a232773eaac919a424cf6c8737c6843f0">&#9670;&#160;</a></span>toString() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
