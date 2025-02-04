@@ -44,8 +44,8 @@ unsigned long lastSignalTime = 0;
 void setup() {
 
   std::string deviceId("DETECTOR"); // NOTE: The Device ID must be exactly 8 bytes
-  std::vector<byte> devId;
-  devId.insert(devId.end(), deviceId.begin(), deviceId.end());
+  std::array<byte,8> devId;
+  std::copy(deviceId.begin(), deviceId.end(), devId.begin());
   duck.setupWithDefaults(devId);
 
   // Register  a callback that provides RSSI value
