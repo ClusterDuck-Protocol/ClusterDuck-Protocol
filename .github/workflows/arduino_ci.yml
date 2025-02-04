@@ -97,8 +97,12 @@ jobs:
         echo "Dependencies installed successfully!"
         echo
         arduino-cli lib list
-
+    # - name: Unit Tests
+    #   run: |
+    #     python -m pip install platformio
+    #     platformio run --target upload --environment test_heltec_wifi_lora_32_V3
     - name: Build
+      # needs: Unit Tests
       run: |
         echo "List of installed Arduino Cores:"
         arduino-cli core list
@@ -110,8 +114,37 @@ jobs:
         } 
         buildExampleSketch Basic-Ducks DuckLink
         buildExampleSketch Basic-Ducks MamaDuck
+    - name: Release Build
+      rules:
+        - if: startsWith(github.ref, 'refs/heads/release')
+      needs: Arduino Registry Lint
+      run: |
+        buildExampleSketch() { 
+          BOARD=${{ matrix.board }}
+          echo "Building $1/$2/$2.ino..."
+          arduino-cli compile -v -t -b ${{ matrix.board }} $PWD/examples/$1/$2/$2.ino > ${BOARD##*:}-$2-build.log 2>&1; 
+          echo "Build complete."
+        } 
+        buildExampleSketch Basic-Ducks PapaDuck
+        buildExampleSketch Basic-Ducks DetectorDuck
+        buildExampleSketch Custom-Mama-Examples Custom-Mama-Detect
+        buildExampleSketch Custom-Mama-Examples Custom-Mama-Example
+    - name: Arduino Registry Lint
+      rules:
+        - if: startsWith(github.ref, 'refs/heads/release')
+      needs: Release Build
+      - uses: arduino/arduino-lint-action@v2
+        with:
+          library-manager: update
+          compliance: strict
+      steps:
+        - uses: arduino/arduino-lint-action@v2
+          with:
+            library-manager: update
+            compliance: strict
+        
     - name: Upload build log
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: build-log
