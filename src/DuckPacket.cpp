@@ -28,7 +28,7 @@ bool DuckPacket::prepareForRelaying(BloomFilter *filter, std::vector<byte> dataB
   }
 
   // update the rx packet internal byte buffer
-  buffer.assign(dataBuffer.begin(), dataBuffer.end());
+  buffer = dataBuffer;
   int hops = buffer[HOP_COUNT_POS]++;
   loginfo_ln("prepareForRelaying: hops count: %d", hops);
   return true;
@@ -47,7 +47,7 @@ void DuckPacket::getUniqueMessageId(BloomFilter * filter, byte message_id[MUID_L
 }
 
 int DuckPacket::prepareForSending(BloomFilter *filter,
-                                  std::vector<byte> targetDevice, byte duckType,
+                                  std::array<byte,8> targetDevice, byte duckType,
                                   byte topic, std::vector<byte> app_data) {
 
   std::vector<uint8_t> encryptedData;
@@ -68,7 +68,6 @@ int DuckPacket::prepareForSending(BloomFilter *filter,
   uint32_t value;
   // TODO: update the CRC32 library to return crc as a byte array
   if(duckcrypto::getState()) {
-    encryptedData.resize(app_data.size());
     duckcrypto::encryptData(app_data.data(), encryptedData.data(), app_data.size());
     value = CRC32::calculate(encryptedData.data(), encryptedData.size());
   } else {
@@ -82,45 +81,46 @@ int DuckPacket::prepareForSending(BloomFilter *filter,
 
   // ----- insert packet header  -----
   // source device uid
-  buffer.insert(buffer.end(), duid.begin(), duid.end());
-  logdbg_ln("SDuid:     %s",duckutils::convertToHex(duid.data(), duid.size()).c_str());
+    buffer.insert(buffer.end(), duid.begin(), duid.end());
+    logdbg_ln("SDuid:     %s",duckutils::convertToHex(duid.data(), duid.size()).c_str());
 
-  // destination device uid
-  buffer.insert(buffer.end(), targetDevice.begin(), targetDevice.end());
-  logdbg_ln("DDuid:     %s", duckutils::convertToHex(targetDevice.data(), targetDevice.size()).c_str());
+    // destination device uid
+    buffer.insert(buffer.end(), targetDevice.begin(), targetDevice.end());
+    logdbg_ln("DDuid:     %s", duckutils::convertToHex(targetDevice.data(), targetDevice.size()).c_str());
 
-  // message uid
-  buffer.insert(buffer.end(), &message_id[0], &message_id[MUID_LENGTH]);
-  logdbg_ln("Muid:      %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
+    // message uid
+    buffer.insert(buffer.end(), &message_id[0], &message_id[MUID_LENGTH]);
+    logdbg_ln("Muid:      %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
 
-  // topic
-  buffer.insert(buffer.end(), topic);
-  logdbg_ln("Topic:     %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
+    // topic
+    buffer.insert(buffer.end(), topic);
+    logdbg_ln("Topic:     %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
 
-  // duckType
-  buffer.insert(buffer.end(), duckType);
-  logdbg_ln("duck type: %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
+    // duckType
+    buffer.insert(buffer.end(), duckType);
+    logdbg_ln("duck type: %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
 
-  // hop count
-  buffer.insert(buffer.end(), 0x00);
-  logdbg_ln("hop count: %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
+    // hop count
+    buffer.insert(buffer.end(), 0x00);
+    logdbg_ln("hop count: %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
 
-  // data crc
-  buffer.insert(buffer.end(), &crc_bytes[0], &crc_bytes[DATA_CRC_LENGTH]);
-  logdbg_ln("Data CRC:  %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
+    // data crc
+    buffer.insert(buffer.end(), &crc_bytes[0], &crc_bytes[DATA_CRC_LENGTH]);
+    logdbg_ln("Data CRC:  %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
 
-  // ----- insert data -----
-  if(duckcrypto::getState()) {
+    // ----- insert data -----
+    if(duckcrypto::getState()) {
 
-    buffer.insert(buffer.end(), encryptedData.begin(), encryptedData.end());
-    logdbg_ln("Encrypted Data:      %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
+        buffer.insert(buffer.end(), encryptedData.begin(), encryptedData.end());
+        logdbg_ln("Encrypted Data:      %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
 
-  } else {
-    buffer.insert(buffer.end(), app_data.begin(), app_data.end());
-    logdbg_ln("Data:      %s",duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
-  }
-  
-  logdbg_ln("Built packet: %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
+    } else {
+        buffer.insert(buffer.end(), app_data.begin(), app_data.end());
+        logdbg_ln("Data:      %s",duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
+    }
+
+    logdbg_ln("Built packet: %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
+    getBuffer().shrink_to_fit();
   return DUCK_ERR_NONE;
 }
 

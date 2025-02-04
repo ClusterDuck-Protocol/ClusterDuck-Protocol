@@ -14,8 +14,8 @@ DNSServer DuckNet::dnsServer;
 const char* DuckNet::DNS = "duck";
 const byte DuckNet::DNS_PORT = 53;
 
-void DuckNet::setDeviceId(std::vector<byte> deviceId) {
-  this->deviceId.insert(this->deviceId.end(), deviceId.begin(), deviceId.end());
+void DuckNet::setDeviceId(std::array<byte,8> devId) {
+    std::copy(devId.begin(), devId.end(), deviceId.begin());
 }
 
 int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
@@ -95,7 +95,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
 
     for (int i = 0; i < paramsNumber; i++) {
       const AsyncWebParameter* p = request->getParam(i);
-      logdbg_ln("%s : %s", p->name(), p->value());
+      logdbg_ln("%s : %s", p->name().c_str(), p->value().c_str());
 
       if (p->name() == "clientId") {
         clientId = p->value().c_str();
@@ -118,7 +118,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
       {
         std::string response = "{\"muid\":\"" + duckutils::toString(muid) + "\"}";
         request->send(200, "text/html", response.c_str());
-        logdbg_ln("Sent 200 response: %s",response);
+        logdbg_ln("Sent 200 response: %s",response.c_str());
       }
       break;
       case DUCKLORA_ERR_MSG_TOO_LARGE:

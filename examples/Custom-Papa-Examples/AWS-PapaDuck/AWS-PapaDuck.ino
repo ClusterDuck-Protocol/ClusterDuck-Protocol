@@ -58,7 +58,7 @@ std::queue<std::vector<byte>> packetQueue;
 
 WiFiClientSecure wifiClient;
 PubSubClient client(AWS_IOT_ENDPOINT, 8883, gotMsg, wifiClient);
-
+void subscribeTo(const char* topic);
 // / DMS locator URL requires a topicString, so we need to convert the topic
 // from the packet to a string based on the topics code
 std::string toTopicString(byte topic) {
@@ -137,22 +137,19 @@ int quackJson(CdpPacket packet) {
   std::string dduid(packet.dduid.begin(), packet.dduid.end());
 
   std::string muid(packet.muid.begin(), packet.muid.end());
-  std::string path(packet.path.begin(), packet.path.end());
 
   Serial.println("[PAPA] Packet Received:");
-  Serial.println("[PAPA] sduid:   " + std::string(sduid.c_str()));
-  Serial.println("[PAPA] dduid:   " + std::string(dduid.c_str()));
+  Serial.printf("[PAPA] sduid:   %s\n" , sduid.c_str());
+  Serial.printf("[PAPA] dduid:   %s\n" , dduid.c_str());
 
-  Serial.println("[PAPA] muid:    " + std::string(muid.c_str()));
-  Serial.println("[PAPA] path:    " + std::string(path.c_str()));
-  Serial.println("[PAPA] data:    " + std::string(payload.c_str()));
-  Serial.println("[PAPA] hops:    " + std::string(packet.hopCount));
-  Serial.println("[PAPA] duck:    " + std::string(packet.duckType));
+  Serial.printf("[PAPA] muid:    %s\n" , muid.c_str());
+  Serial.printf("[PAPA] data:    %s\n" , payload.c_str());
+  Serial.printf("[PAPA] hops:    %s\n", packet.hopCount);
+  Serial.printf("[PAPA] duck:    %s\n" , packet.duckType);
 
   doc["DeviceID"] = sduid;
   doc["MessageID"] = muid;
   doc["Payload"].set(payload);
-  doc["path"].set(path);
   doc["hops"].set(packet.hopCount);
   doc["duckType"].set(packet.duckType);
 
@@ -190,8 +187,8 @@ int quackJson(CdpPacket packet) {
 // The callback method simply takes the incoming packet and
 // converts it to a JSON string, before sending it out over WiFi
 void handleDuckData(std::vector<byte> packetBuffer) {
-  Serial.println("[PAPA] got packet: " +
-                 convertToHex(packetBuffer.data(), packetBuffer.size()));
+  Serial.printf("[PAPA] got packet: %s\n" ,
+                 convertToHex(packetBuffer.data(), packetBuffer.size()).c_str());
 
   CdpPacket packet = CdpPacket(packetBuffer);
   if(packet.topic != reservedTopic::ack) {
@@ -287,14 +284,14 @@ void gotMsg(char* topic, byte* payload, unsigned int payloadLength) {
         destination += (char)payload[i];
       }
 
-      std::vector<byte> dDevId;
-      dDevId.insert(dDevId.end(),destination.begin(),destination.end());
+        std::array<byte,8> dDevId;
+        std::copy(destination.begin(), destination.end(), dDevId.begin());
 
       duck.sendCommand(sCmd, sValue, dDevId);
     } else {
       duck.sendCommand(sCmd, sValue);
     }
-  } else if (std::string(topic).indexOf(CMD_STATE_HEALTH) > 0) {
+  } else if (std::string(topic).find(CMD_STATE_HEALTH) > 0) {
     byte sCmd = 0;
     std::vector<byte> sValue = {payload[0]};
     if(payloadLength >= 8) {
@@ -303,8 +300,8 @@ void gotMsg(char* topic, byte* payload, unsigned int payloadLength) {
         destination += (char)payload[i];
       }
 
-      std::vector<byte> dDevId;
-      dDevId.insert(dDevId.end(),destination.begin(),destination.end());
+      std::array<byte,8> dDevId;
+      std::copy(destination.begin(), destination.end(), dDevId.begin());
 
       duck.sendCommand(sCmd, sValue, dDevId);
 

@@ -236,7 +236,7 @@ public:
    *
    * @param deviceId Duck's device ID string to set
    */
-  void setDeviceId(std::vector<byte> deviceId);
+  void setDeviceId(std::array<byte,8> deviceId);
 
   /**
    * @brief Provide Wifi connection status.
@@ -259,7 +259,7 @@ private:
 
   DuckPacket* txPacket = NULL;
 
-  std::vector<byte> deviceId;
+  std::array<byte,8> deviceId;
 
   BloomFilter *bloomFilter = nullptr;
 

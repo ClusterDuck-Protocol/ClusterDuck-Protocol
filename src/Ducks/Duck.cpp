@@ -68,39 +68,41 @@ void Duck::logIfLowMemory() {
   }
 }
 
-int Duck::setDeviceId(std::vector<byte> id) {
-  if (id.size() != DUID_LENGTH) {
-    logerr_ln("ERROR  device id too long rc = %d", DUCK_ERR_ID_TOO_LONG);
-    return DUCK_ERR_ID_TOO_LONG;
-  }
-  
-  duid.clear();
-  duid.assign(id.begin(), id.end());
+int Duck::setDeviceId(std::array<byte,8>& id) {
+    std::copy(id.begin(), id.end(),duid.begin());
   loginfo_ln("setupDeviceId rc = %d",DUCK_ERR_NONE);
   return DUCK_ERR_NONE;
 }
 
+
 int Duck::setDeviceId(byte* id) {
-  if (id == NULL) {
-    logerr_ln("ERROR  device id too long rc = %d", DUCK_ERR_SETUP);
+    if (id == nullptr) {
+        logerr_ln("ERROR  device id empty or address invalid = %d", DUCK_ERR_SETUP);
+        return DUCK_ERR_SETUP;
+    }
+    int len = *(&id + 1) - id;
+    if (len > DUID_LENGTH) {
+        logerr_ln("ERROR  device id too long rc = %d", DUCK_ERR_ID_TOO_LONG);
+        return DUCK_ERR_ID_TOO_LONG;
+    }
+    std::copy(id, id + len, duid.begin());
+    loginfo_ln("setupDeviceId rc = %d",DUCK_ERR_NONE);
+    return DUCK_ERR_NONE;
+}
 
-    return DUCK_ERR_SETUP;
-  }
-  int len = *(&id + 1) - id;
-  if (len > DUID_LENGTH) {
-    logerr_ln("ERROR  device id too long rc = %d", DUCK_ERR_ID_TOO_LONG);
-    return DUCK_ERR_ID_TOO_LONG;
-  }
-  duid.assign(id, id + len);
-  loginfo_ln("setupDeviceId rc = %d",DUCK_ERR_NONE);
-
-  return DUCK_ERR_NONE;
+int Duck::setDeviceId(std::string& id) {
+    if (id.size() != DUID_LENGTH) {
+        logerr_ln("ERROR  device id too long rc = %d", DUCK_ERR_ID_TOO_LONG);
+        return DUCK_ERR_ID_TOO_LONG;
+    }
+    std::copy(id.begin(), id.end(),duid.begin());
+    loginfo_ln("setupDeviceId rc = %d", DUCK_ERR_NONE);
+    return DUCK_ERR_NONE;
 }
 
 int Duck::setupSerial(int baudRate) {
   // This gives us 10 seconds to do a hard reset if the board is in a bad state after power cycle
-  while (!Serial && millis() < 10000)
-    ;
+  while (!Serial && millis() < 10000);
 
   Serial.begin(baudRate);
   loginfo_ln("setupSerial rc = %d",DUCK_ERR_NONE);
@@ -203,7 +205,7 @@ void Duck::processPortalRequest() { duckNet->dnsServer.processNextRequest(); }
 #endif
 
 int Duck::sendData(byte topic, const std::string data,
-  const std::vector<byte> targetDevice, std::vector<byte> * outgoingMuid)
+  const std::array<byte,8> targetDevice, std::array<byte,8> * outgoingMuid)
 {
   std::vector<byte> app_data;
   app_data.insert(app_data.end(), data.begin(), data.end());
@@ -212,21 +214,21 @@ int Duck::sendData(byte topic, const std::string data,
 }
 
 int Duck::sendData(byte topic, const byte* data, int length,
-  const std::vector<byte> targetDevice, std::vector<byte> * outgoingMuid)
+  const std::array<byte,8> targetDevice, std::array<byte,8> * outgoingMuid)
 {
-  std::vector<byte> app_data;
+  std::vector<byte> app_data(length);
   app_data.insert(app_data.end(), &data[0], &data[length]);
   int err = sendData(topic, app_data, targetDevice, outgoingMuid);
   return err;
 }
 
-int Duck::sendData(byte topic, std::vector<byte> data,
-  const std::vector<byte> targetDevice, std::vector<byte> * outgoingMuid)
+int Duck::sendData(byte topic, std::vector<byte>& data,
+  const std::array<byte,8> targetDevice, std::array<byte,8> * outgoingMuid)
 {
-  // if (topic < reservedTopic::max_reserved) {
-  //   logerr_ln("ERROR send data failed, topic is reserved.");
-  //   return DUCKPACKET_ERR_TOPIC_INVALID;
-  // }
+   if (topic < reservedTopic::max_reserved) {
+     logerr_ln("ERROR send data failed, topic is reserved.");
+     return DUCKPACKET_ERR_TOPIC_INVALID;
+   }
   if (data.size() > MAX_DATA_LENGTH) {
     logerr_ln("ERROR send data failed, message too large: %d bytes",data.size());
     return DUCKPACKET_ERR_SIZE_INVALID;
@@ -251,10 +253,10 @@ int Duck::sendData(byte topic, std::vector<byte> data,
   }
 
   lastMessageAck = false;
-  lastMessageMuid.assign(packet.muid.begin(), packet.muid.end());
+    std::copy(packet.muid.begin(),packet.muid.end(),lastMessageMuid.begin());
   assert(lastMessageMuid.size() == MUID_LENGTH);
   if (outgoingMuid != NULL) {
-    outgoingMuid->assign(packet.muid.begin(), packet.muid.end());
+      std::copy(packet.muid.cbegin(),packet.muid.cend(),outgoingMuid->begin());
     assert(outgoingMuid->size() == MUID_LENGTH);
   }
   txPacket->reset();
@@ -262,7 +264,7 @@ int Duck::sendData(byte topic, std::vector<byte> data,
   return err;
 }
 
-muidStatus Duck::getMuidStatus(const std::vector<byte> & muid) const {
+muidStatus Duck::getMuidStatus(const std::array<byte,4> & muid) const {
   if (duckutils::isEqual(muid, lastMessageMuid)) {
     if (lastMessageAck) {
       return muidStatus::acked;
@@ -277,7 +279,7 @@ muidStatus Duck::getMuidStatus(const std::vector<byte> & muid) const {
 }
 
 CdpPacket Duck::buildCdpPacket(byte topic, const std::vector<byte> data,
-    const std::vector<byte> targetDevice, const std::vector<byte> &muid)
+    const std::array<byte,8> targetDevice, const std::array<byte,8> &muid)
 {
   if (data.size() > MAX_DATA_LENGTH) {
     logerr_ln("ERROR send data failed, message too large: %d bytes", data.size());

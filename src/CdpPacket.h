@@ -6,7 +6,7 @@
 #include "DuckLogger.h"
 #include "include/DuckTypes.h"
 #include <string>
-#include <vector>
+#include <array>
 
 #define MAX_HOPS 6
 
@@ -141,17 +141,17 @@ DCRC:      04  byte value          - Data section CRC
 DATA:      229 byte array          - Data payload (e.g sensor read, text,...)
 */
 
-typedef std::vector<byte> Duid;
-typedef std::vector<byte> Muid;
+typedef std::array<byte,8> Duid;
+typedef std::array<byte,8> Muid;
 
 class CdpPacket {
 public:
   /// Source Device UID (8 bytes)
-  std::vector<byte> sduid;
+  std::array<byte,8> sduid;
   /// Destination Device UID (8 bytes)
-  std::vector<byte> dduid;
+  std::array<byte,8> dduid;
   /// Message UID (4 bytes)
-  std::vector<byte> muid;
+  std::array<byte,8> muid;
   /// Message topic (1 byte)
   byte topic;
   /// Offset to the Path section (1 byte)
@@ -165,7 +165,7 @@ public:
   /// Data section
   std::vector<byte> data;
   /// Path section (48 bytes max)
-  std::vector<byte> path;
+  //std::array<byte,48> path;
   //time received
   unsigned long timeReceived;
 
@@ -173,23 +173,23 @@ public:
     reset();
   }
   CdpPacket(const std::vector<byte> & buffer) {
-    int buffer_length = buffer.size();
-    // sduid
-    sduid.assign(&buffer[SDUID_POS], &buffer[DDUID_POS]);
-    // dduid
-    dduid.assign(&buffer[DDUID_POS], &buffer[MUID_POS]);
-    // muid
-    muid.assign(&buffer[MUID_POS], &buffer[TOPIC_POS]);
-    // topic
-    topic = buffer[TOPIC_POS];
-    // duckType
-    duckType = buffer[DUCK_TYPE_POS];
-    // hop count
-    hopCount = buffer[HOP_COUNT_POS];
-    // data crc
-    dcrc = duckutils::toUint32(&buffer[DATA_CRC_POS]);
-    // data section
-    data.assign(&buffer[DATA_POS], &buffer[buffer_length]);
+      int buffer_length = buffer.size();
+      // sduid
+      std::copy(&buffer[SDUID_POS], &buffer[DDUID_POS], sduid.begin());
+      // dduid
+      std::copy(&buffer[DDUID_POS], &buffer[MUID_POS], dduid.begin());
+      // muid
+      std::copy(&buffer[MUID_POS], &buffer[TOPIC_POS], muid.begin());
+      // topic
+      topic = buffer[TOPIC_POS];
+      // duckType
+      duckType = buffer[DUCK_TYPE_POS];
+      // hop count
+      hopCount = buffer[HOP_COUNT_POS];
+      // data crc
+      dcrc = duckutils::toUint32(&buffer[DATA_CRC_POS]);
+      // data section
+      data.assign(&buffer[DATA_POS], &buffer[buffer_length]);
 
   }
 
@@ -200,10 +200,10 @@ public:
    *
    */
   void reset() {
-    std::vector<byte>().swap(sduid);
-    std::vector<byte>().swap(muid);
-    std::vector<byte>().swap(path);
-    std::vector<byte>().swap(data);
+    std::array<byte,8>().swap(sduid);
+    std::array<byte,8>().swap(muid);
+    //std::array<byte,8>().swap(path);
+    data.clear();
     duckType = DuckType::UNKNOWN;
     hopCount = 0;
     topic = 0;

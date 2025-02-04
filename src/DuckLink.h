@@ -30,7 +30,7 @@ public:
    * 
    * @returns DUCK_ERR_NONE if setup is successfull, an error code otherwise.
    */
-  int setupWithDefaults(std::vector<byte> deviceId, std::string ssid="", std::string password="");
+  int setupWithDefaults(std::array<byte,8> deviceId, std::string ssid="", std::string password="");
 
 
   /**
