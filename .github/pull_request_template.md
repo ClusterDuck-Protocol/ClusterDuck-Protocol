@@ -1,42 +1,25 @@
-**What is is PR for?**
+**Affected Areas:**
 
-- [ ] Code update
-- [ ] Documentation update
-- [ ] Infrastructure update
+- [ ] Code
+- [ ] Documentation
+- [ ] Infrastructure
 
-**What does this PR do?**  
-Please provide a brief description of what this PR does.
+**Description:**  
+A brief description of changes made in this PR.
+Note things to look for when testing, if these changes target any specific hardware, and any other considerations.
 
-**Is this related to an open issue?**  
-Please provide the link.
-
-**Testing methodology**  
-How can someone test your pull request?
-
-**Additional context**  
-Add any other technical detail or considerations here.
+**Related Issues:**  
 
 **Checklist**
-Before you submit this pull request, please make sure you have done the following:
+Before you contribute, please make sure you have read the [Contribution Guidelines](https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol/blob/master/CONTRIBUTING.md) and [Code of Conduct](https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol/blob/master/CODE_OF_CONDUCT.md)
 
-_General_  
-
-- [ ] Contribution Guidelines: Have you read the contribution guidelines?
-- [ ] Code of Conduct: Have you read the code of conduct?
-- [ ] Documentation: If applicable, have you added or updated all relevant documentation?
-
-_For Code Updates_  
-
-- [ ] Hardware Validation: If relevant, have you validated your changes on actual supported Duck hardware?
-- [ ] Unit Tests: Have you run the unit tests on the device?
-- [ ] Network Testing: If applicable, have you tested your changes on a Duck network?
-- [ ] Licensing: Have you added a copyright and license header to each new file?
+- [ ] Updated relevant documentation
+- [ ] Validated changes by uploading to hardware
 
 _Tested Targets (Please check all that apply)_
 
-- [ ] All
 - [ ] Heltec LoRa v3
 - [ ] Heltec LoRa v2
-- [ ] Heltec CubeCell Series
-- [ ] TTGO T-Beam (SX1262)
-- [ ] Others
+- [ ] T-Beam SoftRF sX1262
+- [ ] T-Beam SoftRF SX1276
+- [ ] Other (Please list in PR description)

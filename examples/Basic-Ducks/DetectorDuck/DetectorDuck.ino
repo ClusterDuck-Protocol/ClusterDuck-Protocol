@@ -44,8 +44,8 @@ unsigned long lastSignalTime = 0;
 void setup() {
 
   std::string deviceId("DETECTOR"); // NOTE: The Device ID must be exactly 8 bytes
-  std::vector<byte> devId;
-  devId.insert(devId.end(), deviceId.begin(), deviceId.end());
+  std::array<byte,8> devId;
+  std::copy(deviceId.begin(), deviceId.end(), devId.begin());
   duck.setupWithDefaults(devId);
 
   // Register  a callback that provides RSSI value
@@ -91,8 +91,6 @@ bool pingHandler(void *) {
   return true;
 }
 
-// This uses the serial console to output the RSSI quality
-// But you can use a display, sound or LEDs
 void showSignalQuality(int incoming) {
   int rssi = incoming;
   Serial.print("[DETECTOR] RSSI value: ");
