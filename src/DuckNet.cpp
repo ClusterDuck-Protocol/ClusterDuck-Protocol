@@ -154,6 +154,11 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
    
  });
 
+ webServer.on("/controlpanel", HTTP_GET, [&](AsyncWebServerRequest* request) {
+   request->send(200, "text/html", controlPanel);
+   
+ });
+
   webServer.on("/changeSSID", HTTP_POST, [&](AsyncWebServerRequest* request) {
     int paramsNumber = request->params();
     std::string val = "";

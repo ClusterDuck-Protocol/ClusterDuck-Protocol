@@ -14,7 +14,9 @@ const char home_page[] PROGMEM = R"=====(
     <br>
 
     <a id="message-button" href="/main">Send A Message &#x1F4E9</a>
-    <a href="/controlpanel">Control Panel &#x2699</a>
+    <a href="/restart">Reboot your Duck &#x1F504</a>
+    <a href="/mac">See Mac Address &#x1F5A5</a>
+    <a href="/controlpanel">Control Panel</a>
 </div>
 </body>
 </html>
