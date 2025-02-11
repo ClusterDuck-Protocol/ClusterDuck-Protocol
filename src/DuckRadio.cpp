@@ -193,7 +193,6 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
     }
 
     loginfo_ln("Rx packet: %s", duckutils::convertToHex(packetBytes->data(), packetBytes->size()).c_str());
-    loginfo_ln("Rx packet: %s", duckutils::toString(*packetBytes).c_str());
 
     loginfo_ln("readReceivedData: checking path offset integrity");
 
