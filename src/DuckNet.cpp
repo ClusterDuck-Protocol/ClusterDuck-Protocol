@@ -116,12 +116,12 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
     //TODO: send the correct ducktype. Probably need the ducktype when DuckNet is created or setup
     txPacket->prepareForSending(bloomFilter, ZERO_DUID, DuckType::UNKNOWN, topics::cpm, data );
     err = duckRadio.sendData(txPacket->getBuffer());
-    
+
     CdpPacket muidPacket = CdpPacket(txPacket->getBuffer());
-    std::array<byte, 8> arrMuid = muidPacket.muid;
+    std::array<byte, 4> arrMuid = muidPacket.muid;
 
     String muidStr = "";
-    for (size_t i = 0; i < 4; ++i) {
+    for (size_t i = 0; i < MUID_LENGTH; ++i) {
         muidStr += String(muidPacket.muid[i], HEX); 
     }
     Serial.println("{\"muid\":\"" + muidStr + "\"}");

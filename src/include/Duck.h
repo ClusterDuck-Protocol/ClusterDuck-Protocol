@@ -194,7 +194,7 @@ public:
    * @return a new CdpPacket
    * */
   CdpPacket buildCdpPacket(byte topic, const std::vector<byte> data,
-    const std::array<byte,8> targetDevice, const std::array<byte,8> &muid);
+    const std::array<byte,8> targetDevice, const std::array<byte,4> &muid);
 
   /**
    * @brief Check wifi connection status

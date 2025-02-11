@@ -258,7 +258,7 @@ int Duck::sendData(byte topic, std::vector<byte>& data,
 }
 
 CdpPacket Duck::buildCdpPacket(byte topic, const std::vector<byte> data,
-    const std::array<byte,8> targetDevice, const std::array<byte,8> &muid)
+    const std::array<byte,8> targetDevice, const std::array<byte,4> &muid)
 {
   if (data.size() > MAX_DATA_LENGTH) {
     logerr_ln("ERROR send data failed, message too large: %d bytes", data.size());

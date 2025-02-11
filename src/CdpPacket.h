@@ -142,7 +142,7 @@ DATA:      229 byte array          - Data payload (e.g sensor read, text,...)
 */
 
 typedef std::array<byte,8> Duid;
-typedef std::array<byte,8> Muid;
+typedef std::array<byte,4> Muid;
 
 class CdpPacket {
 public:
@@ -151,7 +151,7 @@ public:
   /// Destination Device UID (8 bytes)
   std::array<byte,8> dduid;
   /// Message UID (4 bytes)
-  std::array<byte,8> muid;
+  std::array<byte,4> muid;
   /// Message topic (1 byte)
   byte topic;
   /// Offset to the Path section (1 byte)
@@ -201,7 +201,7 @@ public:
    */
   void reset() {
     std::array<byte,8>().swap(sduid);
-    std::array<byte,8>().swap(muid);
+    std::array<byte,4>().swap(muid);
     //std::array<byte,8>().swap(path);
     data.clear();
     duckType = DuckType::UNKNOWN;
