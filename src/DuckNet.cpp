@@ -120,11 +120,9 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
     CdpPacket muidPacket = CdpPacket(txPacket->getBuffer());
     std::array<byte, 4> arrMuid = muidPacket.muid;
 
-    String muidStr = "";
-    for (size_t i = 0; i < MUID_LENGTH; ++i) {
-        muidStr += String(muidPacket.muid[i], HEX); 
-    }
-    Serial.println("{\"muid\":\"" + muidStr + "\"}");
+    std::string muidStr = duckutils::arrayToHexString(arrMuid);
+
+    Serial.println("{\"muid\":\"" + String(muidStr.c_str()) + "\"}");
     muidStr = "{\"muid\":\"" + muidStr + "\"}";
 
     switch (err) {
