@@ -6,13 +6,6 @@
 class Duck;
 // Since Duck needs to know about DuckNet and DuckNet needs to know about Duck,
 // this forward declaration allows a Duck pointer to be declared in DuckNet.h.
-// Similarly, muidStatus needs to be declared before DuckNet.h is included.
-enum muidStatus {
-  invalid, // The MUID was not given in the correct format.
-  unrecognized, // The MUID was not recognized. The Duck may have forgotten it.
-  not_acked, // The MUID was recognized but not yet ack'd.
-  acked // The MUID was recognized and has been ack'd.
-};
 
 #include "../DuckError.h"
 #include "bloomfilter.h"
@@ -204,11 +197,6 @@ public:
     const std::array<byte,8> targetDevice, const std::array<byte,8> &muid);
 
   /**
-   * @brief Get the status of an MUID
-   */
-  muidStatus getMuidStatus(const std::array<byte,4> & muid) const;
-
-  /**
    * @brief Check wifi connection status
    * 
    * @returns true if device wifi is connected, false otherwise. 
@@ -313,10 +301,6 @@ protected:
   DuckPacket* txPacket = NULL;
   DuckPacket* rxPacket = NULL;
   std::array<byte,4> lastMessageMuid;
-
-  bool lastMessageAck = true;
-  // Since this may be used to throttle outgoing packets, start out in a state
-  // that indicates we're not waiting for a ack
 
   BloomFilter filter;
 

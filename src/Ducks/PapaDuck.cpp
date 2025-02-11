@@ -85,7 +85,6 @@ void PapaDuck::run() {
   // is a shared resource, we should synchronize everything in ackTimer.tick()
   // so the thread in AsyncWebServer cannot modify duckRadio while broadcastAck
   // is also modifying duckRadio.
-  ackTimer.tick();
 }
 
 void PapaDuck::handleReceivedPacket() {
@@ -115,94 +114,10 @@ void PapaDuck::handleReceivedPacket() {
       loginfo_ln("invoking callback in the duck application...");
       
       recvDataCallback(rxPacket->getBuffer());
-      
-      if (acksEnabled) {
-        const CdpPacket packet = CdpPacket(rxPacket->getBuffer());
-        if (needsAck(packet)) {
-          handleAck(packet);
-        }
-      }
     }
   }
 
   loginfo_ln("handleReceivedPacket() DONE");
-}
-
-void PapaDuck::handleAck(const CdpPacket & packet) {
-  if (ackTimer.empty()) {
-    logdbg_ln("Starting new ack broadcast timer with a delay of %d ms", timerDelay);
-    ackTimer.in(timerDelay, ackHandler, this);
-  }
-
-  storeForAck(packet);
-
-  if (ackBufferIsFull()) {
-    logdbg_ln("Ack buffer is full. Sending broadcast ack immediately.");
-    ackTimer.cancel();
-    broadcastAck();
-  }
-}
-
-void PapaDuck::enableAcks(bool enable) {
-  acksEnabled = enable;
-}
-
-bool PapaDuck::ackHandler(PapaDuck * duck)
-{
-  duck->broadcastAck();
-  return false;
-}
-
-void PapaDuck::storeForAck(const CdpPacket & packet) {
-  ackStore.push_back(std::pair<Duid, Muid>(packet.sduid, packet.muid));
-}
-
-bool PapaDuck::ackBufferIsFull() {
-  return (ackStore.size() >= MAX_MUID_PER_ACK);
-}
-
-bool PapaDuck::needsAck(const CdpPacket & packet) {
-  if (packet.topic == reservedTopic::ack) {
-    return false;
-  } else {
-    return true;
-  }
-}
-
-void PapaDuck::broadcastAck() {
-  assert(ackStore.size() <= MAX_MUID_PER_ACK);
-
-  const byte num = static_cast<byte>(ackStore.size());
-
-  std::vector<byte> dataPayload;
-  dataPayload.push_back(num);
-  for (int i = 0; i < num; i++) {
-    Duid duid = ackStore[i].first;
-    Muid muid = ackStore[i].second;
-    logdbg_ln("Storing ack for duid: %s, muid: %s",
-      duckutils::convertToHex(duid.data(), DUID_LENGTH).c_str(),
-      duckutils::convertToHex(muid.data(), MUID_LENGTH).c_str());
-      
-    dataPayload.insert(dataPayload.end(), duid.begin(), duid.end());
-    dataPayload.insert(dataPayload.end(), muid.begin(), muid.end());
-  }
-
-  int err = txPacket->prepareForSending(&filter, BROADCAST_DUID, DuckType::PAPA,
-    reservedTopic::ack, dataPayload);
-  if (err != DUCK_ERR_NONE) {
-    logerr_ln("ERROR handleReceivedPacket. Failed to prepare ack. Error: %d",err);
-  }
-
-  err = duckRadio.sendData(txPacket->getBuffer());
-
-  if (err == DUCK_ERR_NONE) {
-    CdpPacket packet = CdpPacket(txPacket->getBuffer());
-    filter.bloom_add(packet.muid.data(), MUID_LENGTH);
-  } else {
-    logerr_ln("ERROR handleReceivedPacket. Failed to send ack. Error: %d",err);
-  }
-
-  ackStore.clear();
 }
 
 void PapaDuck::sendCommand(byte cmd, std::vector<byte> value) {

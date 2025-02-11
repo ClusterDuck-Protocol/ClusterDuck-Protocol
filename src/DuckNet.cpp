@@ -83,6 +83,11 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
     request->send(200, "text/plain", "Success");
   });
 
+  webServer.on("/success.txt", HTTP_GET, [&](AsyncWebServerRequest* request) {
+    loginfo_ln("client connected to DuckNet");
+    request->send(200, "text/plain", "Success");
+  });
+
   // Captive Portal form submission
   webServer.on("/formSubmit.json", HTTP_POST, [&](AsyncWebServerRequest* request) {
     loginfo_ln("Submitting Form to /formSubmit.json");
@@ -105,19 +110,28 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
     }
     clientId = duckutils::toUpperCase(clientId); 
     val = "[" + clientId + "]" + val;
-    std::vector<byte> muid;
 
     std::vector<byte> data;
     data.insert(data.end(), val.begin(), val.end());
     //TODO: send the correct ducktype. Probably need the ducktype when DuckNet is created or setup
     txPacket->prepareForSending(bloomFilter, ZERO_DUID, DuckType::UNKNOWN, topics::cpm, data );
     err = duckRadio.sendData(txPacket->getBuffer());
+    
+    CdpPacket muidPacket = CdpPacket(txPacket->getBuffer());
+    std::array<byte, 8> arrMuid = muidPacket.muid;
+
+    String muidStr = "";
+    for (size_t i = 0; i < 4; ++i) {
+        muidStr += String(muidPacket.muid[i], HEX); 
+    }
+    Serial.println("{\"muid\":\"" + muidStr + "\"}");
+    muidStr = "{\"muid\":\"" + muidStr + "\"}";
 
     switch (err) {
       case DUCK_ERR_NONE:
       {
-        std::string response = "{\"muid\":\"" + duckutils::toString(muid) + "\"}";
-        request->send(200, "text/html", response.c_str());
+        std::string response = muidStr.c_str();
+        request->send(200, "application/json", response.c_str());
         logdbg_ln("Sent 200 response: %s",response.c_str());
       }
       break;

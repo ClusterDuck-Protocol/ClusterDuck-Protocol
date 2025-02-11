@@ -96,17 +96,6 @@ void MamaDuck::handleReceivedPacket() {
         case reservedTopic::pong:
           loginfo_ln("PONG received. Ignoring!");
         break;
-        case reservedTopic::ack:{
-          handleAck(packet);
-          //relay batch ack 
-          err = duckRadio.relayPacket(rxPacket);
-          if (err != DUCK_ERR_NONE) {
-            logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
-          } else {
-            loginfo_ln("handleReceivedPacket: packet RELAY DONE");
-          }
-        }
-        break;
         case reservedTopic::cmd:
           loginfo_ln("Command received");
           handleCommand(packet);
@@ -138,32 +127,9 @@ void MamaDuck::handleReceivedPacket() {
         case reservedTopic::cmd:
           loginfo_ln("Command received");
           
-          //Start send ack that command was received
-          dataPayload.push_back(num);
-
-          dataPayload.insert(dataPayload.end(), packet.sduid.begin(), packet.sduid.end());
-          dataPayload.insert(dataPayload.end(), packet.muid.begin(), packet.muid.end());
-
-          err = txPacket->prepareForSending(&filter, PAPADUCK_DUID, 
-            DuckType::MAMA, reservedTopic::ack, dataPayload);
-          if (err != DUCK_ERR_NONE) {
-          logerr_ln("ERROR handleReceivedPacket. Failed to prepare ack. Error: %d",err);
-          }
-
-          err = duckRadio.sendData(txPacket->getBuffer());
-          if (err == DUCK_ERR_NONE) {
-            filter.bloom_add(packet.muid.data(), MUID_LENGTH);
-          } else {
-            logerr_ln("ERROR handleReceivedPacket. Failed to send ack. Error: %d", err);
-          }
-          
           //Handle Command
           handleCommand(packet);
 
-        break;
-        case reservedTopic::ack:{
-          handleAck(packet);
-        }
         break;
         default:
           err = duckRadio.relayPacket(rxPacket);
@@ -234,32 +200,6 @@ void MamaDuck::handleCommand(const CdpPacket & packet) {
 
 void MamaDuck::handleDuckCommand(const CdpPacket & packet) {
   loginfo_ln("Doesn't do anything yet. But Duck Command was received.");
-}
-
-void MamaDuck::handleAck(const CdpPacket & packet) {
-  
-  if (lastMessageMuid.size() == MUID_LENGTH) {
-    const byte numPairs = packet.data[0];
-    static const int NUM_PAIRS_LENGTH = 1;
-    static const int PAIR_LENGTH = DUID_LENGTH + MUID_LENGTH;
-    for (int i = 0; i < numPairs; i++) {
-      int pairOffset = NUM_PAIRS_LENGTH + i*PAIR_LENGTH;
-      std::vector<byte>::const_iterator duidOffset = packet.data.begin() + pairOffset;
-      std::vector<byte>::const_iterator muidOffset = packet.data.begin() + pairOffset + DUID_LENGTH;
-      if (std::equal(duid.begin(), duid.end(), duidOffset)
-        && std::equal(lastMessageMuid.begin(), lastMessageMuid.end(), muidOffset)
-      ) {
-        loginfo_ln("handleReceivedPacket: matched ack-MUID %s", duckutils::toString(lastMessageMuid).c_str());
-        lastMessageAck = true;
-        break;
-      }
-    }
-    
-
-    // TODO[Rory Olsen: 2021-06-23]: The application may need to know about
-    //   acks. I recommend a callback specifically for acks, or
-    //   similar.
-  }
 }
 
 bool MamaDuck::getDetectState() { return duckutils::getDetectState(); }

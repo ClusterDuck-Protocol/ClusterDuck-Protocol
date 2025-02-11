@@ -9,7 +9,6 @@ namespace duckutils {
 
 Timer<> duckTimer = timer_create_default();
 bool detectState = false;
-bool ackingState = true;
 
 std::string getCDPVersion() {
   return std::to_string(CDP_VERSION_MAJOR) + "." + std::to_string(CDP_VERSION_MINOR) + "." + std::to_string(CDP_VERSION_PATCH);
@@ -21,12 +20,6 @@ bool getDetectState() { return detectState; }
 bool flipDetectState() {
   detectState = !detectState;
   return detectState;
-
-}
-
-bool flipAckingState() {
-  ackingState = !ackingState;
-  return ackingState;
 
 }
 
