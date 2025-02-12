@@ -1,5 +1,6 @@
 var _duck_utils_8h =
 [
+    [ "arrayToHexString", "_duck_utils_8h.html#ac1e7d2b9804f5f2e9d5d3f44ae11d875", null ],
     [ "convertToHex", "_duck_utils_8h.html#a7af6fab5b312e69d35f62c81150eb752", null ],
     [ "createUuid", "_duck_utils_8h.html#aff2e7f9ce8df861a748df8a3f84be721", null ],
     [ "flipDetectState", "_duck_utils_8h.html#a687a9ca39ed93decec5870a794acbbff", null ],

@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['_7ebloomfilter_0',['~BloomFilter',['../class_bloom_filter.html#a27358192f6e0d7aba2b24be36c5d3580',1,'BloomFilter']]],
-  ['_7educk_1',['~Duck',['../class_duck.html#a702222da0aa85e48b6ef945e9c53e68d',1,'Duck']]],
-  ['_7educkpacket_2',['~DuckPacket',['../class_duck_packet.html#a1a656a9aeb29eda2d42e962fd2d33b6c',1,'DuckPacket']]]
+  ['tostring_0',['tostring',['../namespaceduckutils.html#a232773eaac919a424cf6c8737c6843f0',1,'duckutils::toString(const std::vector&lt; T &gt; &amp;vec)'],['../namespaceduckutils.html#acda8fcf6c67d4a8c3e675a9c22288dcf',1,'duckutils::toString(const std::array&lt; T, S &gt; &amp;arr)']]],
+  ['touint32_1',['toUint32',['../namespaceduckutils.html#a3dc52038752191518492e540418c195b',1,'duckutils']]],
+  ['touppercase_2',['toUpperCase',['../namespaceduckutils.html#a0a51e5d45425646f2d70f63c3de51faa',1,'duckutils']]]
 ];

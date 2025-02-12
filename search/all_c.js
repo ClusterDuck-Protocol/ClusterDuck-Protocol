@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['not_5facked_0',['not_acked',['../_duck_8h.html#a5931873aef9ff172ae93e721a3f84aa9aea982f6099ea8391466714b613ea006d',1,'Duck.h']]]
+  ['oninterrupt_0',['onInterrupt',['../class_duck_radio.html#abba2a46b2ec298d1fe8136ccbf33baf7',1,'DuckRadio']]],
+  ['operator_3d_1',['operator=',['../class_duck.html#a6b7113b2cf0dc5c9ea53b3ccc9f2707c',1,'Duck']]],
+  ['origin_20story_2',['Origin Story',['../index.html#autotoc_md2',1,'']]]
 ];

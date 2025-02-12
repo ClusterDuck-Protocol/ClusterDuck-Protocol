@@ -158,12 +158,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae70987a057395c986938bd74846d24ca" id="r_ae70987a057395c986938bd74846d24ca"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#ae70987a057395c986938bd74846d24ca">sendData</a> (byte topic, const byte *data, int length, const std::array&lt; byte, 8 &gt; targetDevice=ZERO_DUID, std::array&lt; byte, 8 &gt; *outgoingMuid=NULL)</td></tr>
 <tr class="memdesc:ae70987a057395c986938bd74846d24ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends data into the mesh network.  <br /></td></tr>
 <tr class="separator:ae70987a057395c986938bd74846d24ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7c555b6f4794eb1b489932bc3ba2b8a5" id="r_a7c555b6f4794eb1b489932bc3ba2b8a5"><td class="memItemLeft" align="right" valign="top">CdpPacket&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a7c555b6f4794eb1b489932bc3ba2b8a5">buildCdpPacket</a> (byte topic, const std::vector&lt; byte &gt; data, const std::array&lt; byte, 8 &gt; targetDevice, const std::array&lt; byte, 8 &gt; &amp;muid)</td></tr>
-<tr class="memdesc:a7c555b6f4794eb1b489932bc3ba2b8a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds a CdpPacket with a specified muid.  <br /></td></tr>
-<tr class="separator:a7c555b6f4794eb1b489932bc3ba2b8a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3a7c531a827cc9d21a0df5ee23ed06e0" id="r_a3a7c531a827cc9d21a0df5ee23ed06e0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_duck_8h.html#a5931873aef9ff172ae93e721a3f84aa9">muidStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a3a7c531a827cc9d21a0df5ee23ed06e0">getMuidStatus</a> (const std::array&lt; byte, 4 &gt; &amp;muid) const</td></tr>
-<tr class="memdesc:a3a7c531a827cc9d21a0df5ee23ed06e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the status of an MUID.  <br /></td></tr>
-<tr class="separator:a3a7c531a827cc9d21a0df5ee23ed06e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8fc876e4009cb4fadde1dfd540e90f78" id="r_a8fc876e4009cb4fadde1dfd540e90f78"><td class="memItemLeft" align="right" valign="top">CdpPacket&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a8fc876e4009cb4fadde1dfd540e90f78">buildCdpPacket</a> (byte topic, const std::vector&lt; byte &gt; data, const std::array&lt; byte, 8 &gt; targetDevice, const std::array&lt; byte, 4 &gt; &amp;muid)</td></tr>
+<tr class="memdesc:a8fc876e4009cb4fadde1dfd540e90f78"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds a CdpPacket with a specified muid.  <br /></td></tr>
+<tr class="separator:a8fc876e4009cb4fadde1dfd540e90f78"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a09149de412d44bc20792b6412e296c13" id="r_a09149de412d44bc20792b6412e296c13"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a09149de412d44bc20792b6412e296c13">isWifiConnected</a> ()</td></tr>
 <tr class="memdesc:a09149de412d44bc20792b6412e296c13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check wifi connection status.  <br /></td></tr>
 <tr class="separator:a09149de412d44bc20792b6412e296c13"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -260,8 +257,6 @@ Protected Attributes</h2></td></tr>
 <tr class="separator:ae5a77bb03f168ea6181ad426d3c49d84"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abc15ce7c15e57083bcd6dafdd58ebfeb" id="r_abc15ce7c15e57083bcd6dafdd58ebfeb"><td class="memItemLeft" align="right" valign="top">std::array&lt; byte, 4 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#abc15ce7c15e57083bcd6dafdd58ebfeb">lastMessageMuid</a></td></tr>
 <tr class="separator:abc15ce7c15e57083bcd6dafdd58ebfeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adab8d421f12c56e1bbd0d20c7579dbac" id="r_adab8d421f12c56e1bbd0d20c7579dbac"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#adab8d421f12c56e1bbd0d20c7579dbac">lastMessageAck</a> = true</td></tr>
-<tr class="separator:adab8d421f12c56e1bbd0d20c7579dbac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a626ccc31b3598053dfc09c863243547a" id="r_a626ccc31b3598053dfc09c863243547a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_bloom_filter.html">BloomFilter</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck.html#a626ccc31b3598053dfc09c863243547a">filter</a></td></tr>
 <tr class="separator:a626ccc31b3598053dfc09c863243547a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -338,8 +333,8 @@ Protected Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a7c555b6f4794eb1b489932bc3ba2b8a5" name="a7c555b6f4794eb1b489932bc3ba2b8a5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7c555b6f4794eb1b489932bc3ba2b8a5">&#9670;&#160;</a></span>buildCdpPacket()</h2>
+<a id="a8fc876e4009cb4fadde1dfd540e90f78" name="a8fc876e4009cb4fadde1dfd540e90f78"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8fc876e4009cb4fadde1dfd540e90f78">&#9670;&#160;</a></span>buildCdpPacket()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -365,7 +360,7 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::array&lt; byte, 8 &gt; &amp;&#160;</td>
+          <td class="paramtype">const std::array&lt; byte, 4 &gt; &amp;&#160;</td>
           <td class="paramname"><em>muid</em>&#160;</td>
         </tr>
         <tr>
@@ -568,26 +563,6 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a string describing the error. </dd></dl>
-
-</div>
-</div>
-<a id="a3a7c531a827cc9d21a0df5ee23ed06e0" name="a3a7c531a827cc9d21a0df5ee23ed06e0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3a7c531a827cc9d21a0df5ee23ed06e0">&#9670;&#160;</a></span>getMuidStatus()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_duck_8h.html#a5931873aef9ff172ae93e721a3f84aa9">muidStatus</a> Duck::getMuidStatus </td>
-          <td>(</td>
-          <td class="paramtype">const std::array&lt; byte, 4 &gt; &amp;&#160;</td>
-          <td class="paramname"><em>muid</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Get the status of an MUID. </p>
 
 </div>
 </div>
@@ -1829,28 +1804,6 @@ Protected Attributes</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="class_bloom_filter.html">BloomFilter</a> Duck::filter</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="adab8d421f12c56e1bbd0d20c7579dbac" name="adab8d421f12c56e1bbd0d20c7579dbac"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adab8d421f12c56e1bbd0d20c7579dbac">&#9670;&#160;</a></span>lastMessageAck</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool Duck::lastMessageAck = true</td>
         </tr>
       </table>
   </td>

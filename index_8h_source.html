@@ -331,10 +331,10 @@ $(document).ready(function(){initNavTree('index_8h_source.html',''); initResizab
 <div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span><span class="stringliteral">                        &lt;dd id=&quot;lastMessageField&quot;&gt;&lt;/dd&gt;</span></div>
 <div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span><span class="stringliteral">                        &lt;dt&gt;Last message ID:&lt;/dt&gt;</span></div>
 <div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span><span class="stringliteral">                        &lt;dd id=&quot;lastMessageMuid&quot;&gt;&lt;/dd&gt;</span></div>
-<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span><span class="stringliteral">                        &lt;dt&gt;Status:&lt;/dt&gt;</span></div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span><span class="stringliteral">                       &lt;!-- &lt;dt&gt;Status:&lt;/dt&gt;</span></div>
 <div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span><span class="stringliteral">                        &lt;dd id=&quot;muidStatus&quot;&gt;&lt;/dd&gt;</span></div>
 <div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span><span class="stringliteral">                        &lt;dt&gt;Status Message:&lt;/dt&gt;</span></div>
-<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span><span class="stringliteral">                        &lt;dd id=&quot;muidStatusMessage&quot;&gt;&lt;/dd&gt;</span></div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span><span class="stringliteral">                        &lt;dd id=&quot;muidStatusMessage&quot;&gt;&lt;/dd&gt; --!&gt;</span></div>
 <div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span><span class="stringliteral">                    &lt;/dl&gt;</span></div>
 <div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span><span class="stringliteral">                &lt;/div&gt;</span></div>
 <div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span><span class="stringliteral"></span> </div>
@@ -348,164 +348,119 @@ $(document).ready(function(){initNavTree('index_8h_source.html',''); initResizab
 <div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span><span class="stringliteral"></span> </div>
 <div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span><span class="stringliteral">    &lt;!-- Run javascript actions here --&gt;</span></div>
 <div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span><span class="stringliteral">    &lt;script type=&quot;text/javascript&quot;&gt;</span></div>
-<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span><span class="stringliteral">        const MUID_URL = &#39;/muidStatus.json&#39;;</span></div>
-<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span><span class="stringliteral">        const MUID_PARAM_NAME = &#39;muid&#39;;</span></div>
-<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span><span class="stringliteral">        const CLIENT_ID_LENGTH = 4;</span></div>
-<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span><span class="stringliteral">        const CLIENT_ID_KEY = &#39;CLIENT_ID&#39;;</span></div>
-<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span><span class="stringliteral">        const NOT_ACKED_MSG = &quot;The message may have been received, but we&#39;re still waiting for confirmation.&quot;</span></div>
-<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span><span class="stringliteral">        var messageController;</span></div>
-<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span><span class="stringliteral">        var muidRequest;</span></div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span><span class="stringliteral">        const MUID_PARAM_NAME = &#39;muid&#39;;</span></div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span><span class="stringliteral">        const CLIENT_ID_LENGTH = 4;</span></div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span><span class="stringliteral">        const CLIENT_ID_KEY = &#39;CLIENT_ID&#39;;</span></div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span><span class="stringliteral">        const NOT_ACKED_MSG = &quot;The message may have been received, but we&#39;re still waiting for confirmation.&quot;</span></div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span><span class="stringliteral">        var messageController;</span></div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span><span class="stringliteral">        var muidRequest;</span></div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span><span class="stringliteral"></span> </div>
 <div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span><span class="stringliteral"></span> </div>
-<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span><span class="stringliteral">        function CreateMuidRequest(muid) {</span></div>
-<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span><span class="stringliteral">            return MuidRequest(</span></div>
-<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span><span class="stringliteral">                muid,</span></div>
-<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span><span class="stringliteral">                document.getElementById(&#39;muidStatus&#39;),</span></div>
-<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span><span class="stringliteral">                document.getElementById(&#39;muidStatusMessage&#39;)</span></div>
-<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span><span class="stringliteral">            );</span></div>
-<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span><span class="stringliteral">        }</span></div>
-<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span><span class="stringliteral"></span> </div>
-<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span><span class="stringliteral">        var MessageController = function () {</span></div>
-<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span><span class="stringliteral">            var loadListener = function () {</span></div>
-<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span><span class="stringliteral">                // this.responseText should be something like: {&quot;muid&quot;:&quot;ABCD&quot;}</span></div>
-<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span><span class="stringliteral">                var res = JSON.parse(this.responseText);</span></div>
-<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span><span class="stringliteral">                messageController.saveLastMuid(res.muid);</span></div>
-<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span><span class="stringliteral">                var errEl = document.getElementById(&#39;makeshiftErrorOutput&#39;);</span></div>
-<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span><span class="stringliteral">                if (!errEl.classList.toString().includes(&quot;hidden&quot;)) {</span></div>
-<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span><span class="stringliteral">                    errEl.innerHTML = &#39;&#39;;</span></div>
-<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span><span class="stringliteral">                    errEl.classList.add(&quot;hidden&quot;);</span></div>
-<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span><span class="stringliteral">                }</span></div>
-<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span><span class="stringliteral">            };</span></div>
-<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span><span class="stringliteral">            var errorListener = function () {</span></div>
-<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span><span class="stringliteral">                var errorMessage = &#39;There was an error sending the message. Please try again.&#39;;</span></div>
-<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span><span class="stringliteral">                console.log(errorMessage);</span></div>
-<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span><span class="stringliteral">                var errEl = document.getElementById(&#39;makeshiftErrorOutput&#39;);</span></div>
-<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span><span class="stringliteral">                errEl.innerHTML = errorMessage;</span></div>
-<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span><span class="stringliteral">                errEl.classList.remove(&quot;hidden&quot;);</span></div>
-<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span><span class="stringliteral">            };</span></div>
-<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span><span class="stringliteral">            var showSentMessage = function (commentsInput) {</span></div>
-<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span><span class="stringliteral">                var lastMessageField = document.getElementById(&#39;lastMessageField&#39;);</span></div>
-<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span><span class="stringliteral">                lastMessageField.innerHTML = commentsInput.value;</span></div>
-<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span><span class="stringliteral">                // TODO: Create a new DOM view so multiple messages can be shown</span></div>
-<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span><span class="stringliteral">                var msgSection = document.getElementById(&#39;lastMessageSection&#39;);</span></div>
-<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span><span class="stringliteral">                msgSection.classList.remove(&quot;hidden&quot;);</span></div>
-<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span><span class="stringliteral">            };</span></div>
-<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span><span class="stringliteral">            return {</span></div>
-<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span><span class="stringliteral">                sendMessage: function () {</span></div>
-<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span><span class="stringliteral">                    var clientIdInput = document.getElementById(&#39;clientId&#39;);</span></div>
-<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span><span class="stringliteral">                    var commentsInput = document.getElementById(&#39;commentsInput&#39;);</span></div>
-<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span><span class="stringliteral">                    var params = new URLSearchParams(&quot;&quot;);</span></div>
-<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span><span class="stringliteral">                    params.append(clientIdInput.name, clientIdInput.value);</span></div>
-<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span><span class="stringliteral">                    params.append(commentsInput.name, commentsInput.value);</span></div>
-<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span><span class="stringliteral">                    var req = new XMLHttpRequest();</span></div>
-<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span><span class="stringliteral">                    req.addEventListener(&quot;load&quot;, loadListener);</span></div>
-<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span><span class="stringliteral">                    req.addEventListener(&quot;error&quot;, errorListener);</span></div>
-<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span><span class="stringliteral">                    req.open(&quot;POST&quot;, &quot;/formSubmit.json?&quot; + params.toString());</span></div>
-<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span><span class="stringliteral">                    req.send();</span></div>
-<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span><span class="stringliteral">                    showSentMessage(commentsInput);</span></div>
-<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span><span class="stringliteral">                },</span></div>
-<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span><span class="stringliteral">                saveLastMuid: function (muid) { &lt;!-- for checking if message was acked on duk, needs fixed --&gt;</span></div>
-<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span><span class="stringliteral">                    document.getElementById(&#39;lastMessageMuid&#39;).innerHTML = muid;</span></div>
-<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span><span class="stringliteral">                    muidRequest = CreateMuidRequest(muid);</span></div>
-<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span><span class="stringliteral">                    muidRequest.requestMuidStatus();</span></div>
-<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span><span class="stringliteral">                },</span></div>
-<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span><span class="stringliteral">            };</span></div>
-<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span><span class="stringliteral">        };</span></div>
-<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span><span class="stringliteral">        var MuidRequest = function (muid, statusEl, messageEl) {</span></div>
-<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span><span class="stringliteral">            var showStatus = function (status, message) {</span></div>
-<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span><span class="stringliteral">                statusEl.innerHTML = status;</span></div>
-<div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span><span class="stringliteral">                messageEl.innerHTML = message;</span></div>
-<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span><span class="stringliteral">            };</span></div>
-<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span><span class="stringliteral">            var loadListener = function () {</span></div>
-<div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span><span class="stringliteral">                var res = JSON.parse(this.responseText);</span></div>
-<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span><span class="stringliteral">                showStatus(res.status, res.message);</span></div>
-<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span><span class="stringliteral">                if (res.status === &#39;not_acked&#39;) {</span></div>
-<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span><span class="stringliteral">                    showStatus(&#39;not_acked&#39;, NOT_ACKED_MSG)</span></div>
-<div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span><span class="stringliteral">                    setTimeout(requestMuidStatus, 1000);</span></div>
-<div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span><span class="stringliteral">                }</span></div>
-<div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span><span class="stringliteral">            };</span></div>
-<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span><span class="stringliteral">            var errorListener = function () {</span></div>
-<div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span><span class="stringliteral">                showStatus(&#39;error&#39;, &#39;There was an unknown error&#39;);</span></div>
-<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span><span class="stringliteral">                setTimeout(requestMuidStatus, 1000);</span></div>
-<div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span><span class="stringliteral">            };</span></div>
-<div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span><span class="stringliteral">            var requestMuidStatus = function () {</span></div>
-<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span><span class="stringliteral">                var req = new XMLHttpRequest();</span></div>
-<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span><span class="stringliteral">                req.addEventListener(&quot;load&quot;, loadListener);</span></div>
-<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span><span class="stringliteral">                req.addEventListener(&quot;error&quot;, errorListener);</span></div>
-<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span><span class="stringliteral">                var url = MUID_URL;</span></div>
-<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span><span class="stringliteral">                var params = new URLSearchParams(&quot;&quot;);</span></div>
-<div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span><span class="stringliteral">                params.append(MUID_PARAM_NAME, muid);</span></div>
-<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span><span class="stringliteral">                url += &quot;?&quot; + params.toString();</span></div>
-<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span><span class="stringliteral">                req.open(&quot;GET&quot;, makeUrlUnique(url));</span></div>
-<div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span><span class="stringliteral">                req.send();</span></div>
-<div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span><span class="stringliteral">            };</span></div>
-<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span><span class="stringliteral">            return {</span></div>
-<div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span><span class="stringliteral">                requestMuidStatus: requestMuidStatus,</span></div>
-<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span><span class="stringliteral">            };</span></div>
-<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span><span class="stringliteral">        };</span></div>
-<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span><span class="stringliteral"></span> </div>
-<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span><span class="stringliteral">        function makeUrlUnique(url) {</span></div>
-<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span><span class="stringliteral">            // Makes the URL bypass the browser&#39;s cache.</span></div>
-<div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span><span class="stringliteral">            // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest#bypassing_the_cache</span></div>
-<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span><span class="stringliteral">            return url + ((/\?/).test(url) ? &quot;&amp;&quot; : &quot;?&quot;) + (new Date()).getTime();</span></div>
-<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span><span class="stringliteral">        }</span></div>
-<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span><span class="stringliteral"></span> </div>
-<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span><span class="stringliteral">        function storageAvailable(type) {</span></div>
-<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span><span class="stringliteral">            var storage;</span></div>
-<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span><span class="stringliteral">            try {</span></div>
-<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span><span class="stringliteral">                storage = window[type];</span></div>
-<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span><span class="stringliteral">                var x = &#39;__storage_test__&#39;;</span></div>
-<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span><span class="stringliteral">                storage.setItem(x, x);</span></div>
-<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span><span class="stringliteral">                storage.removeItem(x);</span></div>
-<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span><span class="stringliteral">                return true;</span></div>
-<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span><span class="stringliteral">            } catch (e) {</span></div>
-<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span><span class="stringliteral">                return e instanceof DOMException &amp;&amp; (</span></div>
-<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span><span class="stringliteral">                        // everything except Firefox</span></div>
-<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span><span class="stringliteral">                        e.code === 22 ||</span></div>
-<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span><span class="stringliteral">                        // Firefox</span></div>
-<div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span><span class="stringliteral">                        e.code === 1014 ||</span></div>
-<div class="line"><a id="l00367" name="l00367"></a><span class="lineno">  367</span><span class="stringliteral">                        // test name field too, because code might not be present</span></div>
-<div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span><span class="stringliteral">                        // everything except Firefox</span></div>
-<div class="line"><a id="l00369" name="l00369"></a><span class="lineno">  369</span><span class="stringliteral">                        e.name === &#39;QuotaExceededError&#39; ||</span></div>
-<div class="line"><a id="l00370" name="l00370"></a><span class="lineno">  370</span><span class="stringliteral">                        // Firefox</span></div>
-<div class="line"><a id="l00371" name="l00371"></a><span class="lineno">  371</span><span class="stringliteral">                        e.name === &#39;NS_ERROR_DOM_QUOTA_REACHED&#39;) &amp;&amp;</span></div>
-<div class="line"><a id="l00372" name="l00372"></a><span class="lineno">  372</span><span class="stringliteral">                    // acknowledge QuotaExceededError only if there&#39;s something already stored</span></div>
-<div class="line"><a id="l00373" name="l00373"></a><span class="lineno">  373</span><span class="stringliteral">                    (storage &amp;&amp; storage.length !== 0);</span></div>
-<div class="line"><a id="l00374" name="l00374"></a><span class="lineno">  374</span><span class="stringliteral">            }</span></div>
-<div class="line"><a id="l00375" name="l00375"></a><span class="lineno">  375</span><span class="stringliteral">        }</span></div>
-<div class="line"><a id="l00376" name="l00376"></a><span class="lineno">  376</span><span class="stringliteral"></span> </div>
-<div class="line"><a id="l00377" name="l00377"></a><span class="lineno">  377</span><span class="stringliteral">        function generateClientId() {</span></div>
-<div class="line"><a id="l00378" name="l00378"></a><span class="lineno">  378</span><span class="stringliteral">            var result = &#39;&#39;;</span></div>
-<div class="line"><a id="l00379" name="l00379"></a><span class="lineno">  379</span><span class="stringliteral">            var characters = &#39;ABCDEFGHIJKLMNPQRSTUVWXYZ123456789&#39;;</span></div>
-<div class="line"><a id="l00380" name="l00380"></a><span class="lineno">  380</span><span class="stringliteral">            for (var i = 0; i &lt; CLIENT_ID_LENGTH; i++) {</span></div>
-<div class="line"><a id="l00381" name="l00381"></a><span class="lineno">  381</span><span class="stringliteral">                var randomIndex = Math.floor(Math.random() * characters.length);</span></div>
-<div class="line"><a id="l00382" name="l00382"></a><span class="lineno">  382</span><span class="stringliteral">                result += characters.charAt(randomIndex);</span></div>
-<div class="line"><a id="l00383" name="l00383"></a><span class="lineno">  383</span><span class="stringliteral">            }</span></div>
-<div class="line"><a id="l00384" name="l00384"></a><span class="lineno">  384</span><span class="stringliteral">            return result;</span></div>
-<div class="line"><a id="l00385" name="l00385"></a><span class="lineno">  385</span><span class="stringliteral">        }</span></div>
-<div class="line"><a id="l00386" name="l00386"></a><span class="lineno">  386</span><span class="stringliteral"></span> </div>
-<div class="line"><a id="l00387" name="l00387"></a><span class="lineno">  387</span><span class="stringliteral">        function initialize() {</span></div>
-<div class="line"><a id="l00388" name="l00388"></a><span class="lineno">  388</span><span class="stringliteral">            var clientId;</span></div>
-<div class="line"><a id="l00389" name="l00389"></a><span class="lineno">  389</span><span class="stringliteral">            if (storageAvailable(&#39;localStorage&#39;)) {</span></div>
-<div class="line"><a id="l00390" name="l00390"></a><span class="lineno">  390</span><span class="stringliteral">                if (window.localStorage.getItem(CLIENT_ID_KEY)) {</span></div>
-<div class="line"><a id="l00391" name="l00391"></a><span class="lineno">  391</span><span class="stringliteral">                    clientId = window.localStorage.getItem(CLIENT_ID_KEY);</span></div>
-<div class="line"><a id="l00392" name="l00392"></a><span class="lineno">  392</span><span class="stringliteral">                } else {</span></div>
-<div class="line"><a id="l00393" name="l00393"></a><span class="lineno">  393</span><span class="stringliteral">                    clientId = generateClientId();</span></div>
-<div class="line"><a id="l00394" name="l00394"></a><span class="lineno">  394</span><span class="stringliteral">                    window.localStorage.setItem(CLIENT_ID_KEY, clientId);</span></div>
-<div class="line"><a id="l00395" name="l00395"></a><span class="lineno">  395</span><span class="stringliteral">                }</span></div>
-<div class="line"><a id="l00396" name="l00396"></a><span class="lineno">  396</span><span class="stringliteral">                document.getElementById(&#39;clientId&#39;).value = clientId;</span></div>
-<div class="line"><a id="l00397" name="l00397"></a><span class="lineno">  397</span><span class="stringliteral">            } else {</span></div>
-<div class="line"><a id="l00398" name="l00398"></a><span class="lineno">  398</span><span class="stringliteral">                document.getElementById(&#39;clientId&#39;).value = &#39;&#39;;</span></div>
-<div class="line"><a id="l00399" name="l00399"></a><span class="lineno">  399</span><span class="stringliteral">            }</span></div>
-<div class="line"><a id="l00400" name="l00400"></a><span class="lineno">  400</span><span class="stringliteral">            messageController = MessageController();</span></div>
-<div class="line"><a id="l00401" name="l00401"></a><span class="lineno">  401</span><span class="stringliteral">            document.getElementById(&#39;sendBtn&#39;).addEventListener(&#39;click&#39;, messageController.sendMessage);</span></div>
-<div class="line"><a id="l00402" name="l00402"></a><span class="lineno">  402</span><span class="stringliteral">        }</span></div>
-<div class="line"><a id="l00403" name="l00403"></a><span class="lineno">  403</span><span class="stringliteral"></span> </div>
-<div class="line"><a id="l00404" name="l00404"></a><span class="lineno">  404</span><span class="stringliteral">        initialize();</span></div>
-<div class="line"><a id="l00405" name="l00405"></a><span class="lineno">  405</span><span class="stringliteral">    &lt;/script&gt;</span></div>
-<div class="line"><a id="l00406" name="l00406"></a><span class="lineno">  406</span><span class="stringliteral">&lt;/body&gt;</span></div>
-<div class="line"><a id="l00407" name="l00407"></a><span class="lineno">  407</span><span class="stringliteral">&lt;/html&gt;</span></div>
-<div class="line"><a id="l00408" name="l00408"></a><span class="lineno">  408</span><span class="stringliteral">)=====&quot;;</span></div>
-<div class="line"><a id="l00409" name="l00409"></a><span class="lineno">  409</span><span class="stringliteral"></span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span><span class="stringliteral">        var MessageController = function () {</span></div>
+<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span><span class="stringliteral">            var loadListener = function (req) {</span></div>
+<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span><span class="stringliteral">                var errEl = document.getElementById(&#39;makeshiftErrorOutput&#39;);</span></div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span><span class="stringliteral">                if (!errEl.classList.toString().includes(&quot;hidden&quot;)) {</span></div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span><span class="stringliteral">                    errEl.innerHTML = &#39;&#39;;</span></div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span><span class="stringliteral">                    errEl.classList.add(&quot;hidden&quot;);</span></div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span><span class="stringliteral">                }</span></div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span><span class="stringliteral">                var res = JSON.parse(req.responseText);</span></div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span><span class="stringliteral">                let muidStatus = document.getElementById(&#39;lastMessageMuid&#39;);</span></div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span><span class="stringliteral">                muidStatus.innerHTML = res.muid;</span></div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span><span class="stringliteral">            };</span></div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span><span class="stringliteral">            var errorListener = function () {</span></div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span><span class="stringliteral">                var errorMessage = &#39;There was an error sending the message. Please try again.&#39;;</span></div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span><span class="stringliteral">                console.log(errorMessage);</span></div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span><span class="stringliteral">                var errEl = document.getElementById(&#39;makeshiftErrorOutput&#39;);</span></div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span><span class="stringliteral">                errEl.innerHTML = errorMessage;</span></div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span><span class="stringliteral">                errEl.classList.remove(&quot;hidden&quot;);</span></div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span><span class="stringliteral">            };</span></div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span><span class="stringliteral">            var showSentMessage = function (commentsInput) {</span></div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span><span class="stringliteral">                var lastMessageField = document.getElementById(&#39;lastMessageField&#39;);</span></div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span><span class="stringliteral">                lastMessageField.innerHTML = commentsInput.value;</span></div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span><span class="stringliteral">                // TODO: Create a new DOM view so multiple messages can be shown</span></div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span><span class="stringliteral">                var msgSection = document.getElementById(&#39;lastMessageSection&#39;);</span></div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span><span class="stringliteral">                msgSection.classList.remove(&quot;hidden&quot;);</span></div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span><span class="stringliteral">            };</span></div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span><span class="stringliteral">            return {</span></div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span><span class="stringliteral">                sendMessage: function () {</span></div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span><span class="stringliteral">                    var clientIdInput = document.getElementById(&#39;clientId&#39;);</span></div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span><span class="stringliteral">                    var commentsInput = document.getElementById(&#39;commentsInput&#39;);</span></div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span><span class="stringliteral">                    var params = new URLSearchParams(&quot;&quot;);</span></div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span><span class="stringliteral">                    params.append(clientIdInput.name, clientIdInput.value);</span></div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span><span class="stringliteral">                    params.append(commentsInput.name, commentsInput.value);</span></div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span><span class="stringliteral">                    var req = new XMLHttpRequest();</span></div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span><span class="stringliteral">                    req.addEventListener(&quot;load&quot;, function() { loadListener(req); });</span></div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span><span class="stringliteral">                    req.addEventListener(&quot;error&quot;, errorListener);</span></div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span><span class="stringliteral">                    req.open(&quot;POST&quot;, &quot;/formSubmit.json?&quot; + params.toString());</span></div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span><span class="stringliteral">                    req.send();</span></div>
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span><span class="stringliteral">                    showSentMessage(commentsInput);</span></div>
+<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span><span class="stringliteral">                }</span></div>
+<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span><span class="stringliteral">            };</span></div>
+<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span><span class="stringliteral">        };</span></div>
+<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span><span class="stringliteral"></span> </div>
+<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span><span class="stringliteral">        function makeUrlUnique(url) {</span></div>
+<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span><span class="stringliteral">            // Makes the URL bypass the browser&#39;s cache.</span></div>
+<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span><span class="stringliteral">            // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest#bypassing_the_cache</span></div>
+<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span><span class="stringliteral">            return url + ((/\?/).test(url) ? &quot;&amp;&quot; : &quot;?&quot;) + (new Date()).getTime();</span></div>
+<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span><span class="stringliteral">        }</span></div>
+<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span><span class="stringliteral"></span> </div>
+<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span><span class="stringliteral">        function storageAvailable(type) {</span></div>
+<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span><span class="stringliteral">            var storage;</span></div>
+<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span><span class="stringliteral">            try {</span></div>
+<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span><span class="stringliteral">                storage = window[type];</span></div>
+<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span><span class="stringliteral">                var x = &#39;__storage_test__&#39;;</span></div>
+<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span><span class="stringliteral">                storage.setItem(x, x);</span></div>
+<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span><span class="stringliteral">                storage.removeItem(x);</span></div>
+<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span><span class="stringliteral">                return true;</span></div>
+<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span><span class="stringliteral">            } catch (e) {</span></div>
+<div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span><span class="stringliteral">                return e instanceof DOMException &amp;&amp; (</span></div>
+<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span><span class="stringliteral">                        // everything except Firefox</span></div>
+<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span><span class="stringliteral">                        e.code === 22 ||</span></div>
+<div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span><span class="stringliteral">                        // Firefox</span></div>
+<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span><span class="stringliteral">                        e.code === 1014 ||</span></div>
+<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span><span class="stringliteral">                        // test name field too, because code might not be present</span></div>
+<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span><span class="stringliteral">                        // everything except Firefox</span></div>
+<div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span><span class="stringliteral">                        e.name === &#39;QuotaExceededError&#39; ||</span></div>
+<div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span><span class="stringliteral">                        // Firefox</span></div>
+<div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span><span class="stringliteral">                        e.name === &#39;NS_ERROR_DOM_QUOTA_REACHED&#39;) &amp;&amp;</span></div>
+<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span><span class="stringliteral">                    // acknowledge QuotaExceededError only if there&#39;s something already stored</span></div>
+<div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span><span class="stringliteral">                    (storage &amp;&amp; storage.length !== 0);</span></div>
+<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span><span class="stringliteral">            }</span></div>
+<div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span><span class="stringliteral">        }</span></div>
+<div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span><span class="stringliteral"></span> </div>
+<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span><span class="stringliteral">        function generateClientId() {</span></div>
+<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span><span class="stringliteral">            var result = &#39;&#39;;</span></div>
+<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span><span class="stringliteral">            var characters = &#39;ABCDEFGHIJKLMNPQRSTUVWXYZ123456789&#39;;</span></div>
+<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span><span class="stringliteral">            for (var i = 0; i &lt; CLIENT_ID_LENGTH; i++) {</span></div>
+<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span><span class="stringliteral">                var randomIndex = Math.floor(Math.random() * characters.length);</span></div>
+<div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span><span class="stringliteral">                result += characters.charAt(randomIndex);</span></div>
+<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span><span class="stringliteral">            }</span></div>
+<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span><span class="stringliteral">            return result;</span></div>
+<div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span><span class="stringliteral">        }</span></div>
+<div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span><span class="stringliteral"></span> </div>
+<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span><span class="stringliteral">        function initialize() {</span></div>
+<div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span><span class="stringliteral">            var clientId;</span></div>
+<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span><span class="stringliteral">            if (storageAvailable(&#39;localStorage&#39;)) {</span></div>
+<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span><span class="stringliteral">                if (window.localStorage.getItem(CLIENT_ID_KEY)) {</span></div>
+<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span><span class="stringliteral">                    clientId = window.localStorage.getItem(CLIENT_ID_KEY);</span></div>
+<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span><span class="stringliteral">                } else {</span></div>
+<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span><span class="stringliteral">                    clientId = generateClientId();</span></div>
+<div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span><span class="stringliteral">                    window.localStorage.setItem(CLIENT_ID_KEY, clientId);</span></div>
+<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span><span class="stringliteral">                }</span></div>
+<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span><span class="stringliteral">                document.getElementById(&#39;clientId&#39;).value = clientId;</span></div>
+<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span><span class="stringliteral">            } else {</span></div>
+<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span><span class="stringliteral">                document.getElementById(&#39;clientId&#39;).value = &#39;&#39;;</span></div>
+<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span><span class="stringliteral">            }</span></div>
+<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span><span class="stringliteral">            messageController = MessageController();</span></div>
+<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span><span class="stringliteral">            document.getElementById(&#39;sendBtn&#39;).addEventListener(&#39;click&#39;, messageController.sendMessage);</span></div>
+<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span><span class="stringliteral">        }</span></div>
+<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span><span class="stringliteral"></span> </div>
+<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span><span class="stringliteral">        initialize();</span></div>
+<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span><span class="stringliteral">    &lt;/script&gt;</span></div>
+<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span><span class="stringliteral">&lt;/body&gt;</span></div>
+<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span><span class="stringliteral">&lt;/html&gt;</span></div>
+<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span><span class="stringliteral">)=====&quot;;</span></div>
+<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span><span class="stringliteral"></span><span class="preprocessor">#endif</span></div>
 <div class="ttc" id="aindex_8h_html_a63045e444911fecb9430625b3cd36d36"><div class="ttname"><a href="index_8h.html#a63045e444911fecb9430625b3cd36d36">PROGMEM</a></div><div class="ttdeci">const char MAIN_page[] PROGMEM</div><div class="ttdef"><b>Definition</b> index.h:3</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

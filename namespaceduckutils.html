@@ -121,8 +121,12 @@ Functions</h2></td></tr>
 <tr class="separator:a232773eaac919a424cf6c8737c6843f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acda8fcf6c67d4a8c3e675a9c22288dcf" id="r_acda8fcf6c67d4a8c3e675a9c22288dcf"><td class="memTemplParams" colspan="2">template&lt;typename T , size_t S&gt; </td></tr>
 <tr class="memitem:acda8fcf6c67d4a8c3e675a9c22288dcf"><td class="memTemplItemLeft" align="right" valign="top">std::string&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceduckutils.html#acda8fcf6c67d4a8c3e675a9c22288dcf">toString</a> (const std::array&lt; T, S &gt; &amp;arr)</td></tr>
-<tr class="memdesc:acda8fcf6c67d4a8c3e675a9c22288dcf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a array into an ASCII string.  <br /></td></tr>
+<tr class="memdesc:acda8fcf6c67d4a8c3e675a9c22288dcf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a vector into an ASCII string.  <br /></td></tr>
 <tr class="separator:acda8fcf6c67d4a8c3e675a9c22288dcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac1e7d2b9804f5f2e9d5d3f44ae11d875" id="r_ac1e7d2b9804f5f2e9d5d3f44ae11d875"><td class="memTemplParams" colspan="2">template&lt;typename T , size_t S&gt; </td></tr>
+<tr class="memitem:ac1e7d2b9804f5f2e9d5d3f44ae11d875"><td class="memTemplItemLeft" align="right" valign="top">std::string&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceduckutils.html#ac1e7d2b9804f5f2e9d5d3f44ae11d875">arrayToHexString</a> (const std::array&lt; T, S &gt; &amp;arr)</td></tr>
+<tr class="memdesc:ac1e7d2b9804f5f2e9d5d3f44ae11d875"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert an array into hex for sending over http or display.  <br /></td></tr>
+<tr class="separator:ac1e7d2b9804f5f2e9d5d3f44ae11d875"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a73122238e9e6161a781b25f4a74cca44" id="r_a73122238e9e6161a781b25f4a74cca44"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a73122238e9e6161a781b25f4a74cca44"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceduckutils.html#a73122238e9e6161a781b25f4a74cca44">isEqual</a> (const std::vector&lt; T &gt; &amp;a, const std::vector&lt; T &gt; &amp;b)</td></tr>
 <tr class="memdesc:a73122238e9e6161a781b25f4a74cca44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare two vectors with regard to both size and contents.  <br /></td></tr>
@@ -158,6 +162,35 @@ Variables</h2></td></tr>
 <tr class="separator:a0f01261a6300cd0d8079981838ede1c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="ac1e7d2b9804f5f2e9d5d3f44ae11d875" name="ac1e7d2b9804f5f2e9d5d3f44ae11d875"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac1e7d2b9804f5f2e9d5d3f44ae11d875">&#9670;&#160;</a></span>arrayToHexString()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T , size_t S&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string duckutils::arrayToHexString </td>
+          <td>(</td>
+          <td class="paramtype">const std::array&lt; T, S &gt; &amp;&#160;</td>
+          <td class="paramname"><em>arr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Convert an array into hex for sending over http or display. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">arr</td><td>an array to convert </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A std::string representing the byte array in ASCII. </dd></dl>
+
+</div>
+</div>
 <a id="a7af6fab5b312e69d35f62c81150eb752" name="a7af6fab5b312e69d35f62c81150eb752"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7af6fab5b312e69d35f62c81150eb752">&#9670;&#160;</a></span>convertToHex()</h2>
 
@@ -524,7 +557,7 @@ template&lt;typename T , size_t S&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Convert a array into an ASCII string. </p>
+<p>Convert a vector into an ASCII string. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">arr</td><td>A vector to convert </td></tr>

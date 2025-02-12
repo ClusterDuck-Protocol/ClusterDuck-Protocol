@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['acked_0',['acked',['../_duck_8h.html#a5931873aef9ff172ae93e721a3f84aa9abc470a20333570c3a666a7ed8b7fbceb',1,'Duck.h']]]
+  ['detector_0',['DETECTOR',['../_duck_types_8h.html#ae840cd9270fc5804ad85c80de1686d4aabbc3cf4a9cbee11e6dc95c58594dc677',1,'DuckTypes.h']]]
 ];

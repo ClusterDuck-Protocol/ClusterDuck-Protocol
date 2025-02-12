@@ -18,6 +18,7 @@ var namespaces_dup =
       [ "restartDuck", "namespaceduckesp.html#a1bccb912823b8261c7ef8559efc3d5ec", null ]
     ] ],
     [ "duckutils", "namespaceduckutils.html", [
+      [ "arrayToHexString", "namespaceduckutils.html#ac1e7d2b9804f5f2e9d5d3f44ae11d875", null ],
       [ "convertToHex", "namespaceduckutils.html#a7af6fab5b312e69d35f62c81150eb752", null ],
       [ "createUuid", "namespaceduckutils.html#aff2e7f9ce8df861a748df8a3f84be721", null ],
       [ "flipDetectState", "namespaceduckutils.html#a687a9ca39ed93decec5870a794acbbff", null ],

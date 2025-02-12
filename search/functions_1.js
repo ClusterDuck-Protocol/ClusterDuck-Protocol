@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['converttohex_0',['convertToHex',['../namespaceduckutils.html#a7af6fab5b312e69d35f62c81150eb752',1,'duckutils']]],
-  ['createuuid_1',['createUuid',['../namespaceduckutils.html#aff2e7f9ce8df861a748df8a3f84be721',1,'duckutils']]]
+  ['bloom_5fadd_0',['bloom_add',['../class_bloom_filter.html#a9324ec548ffba472c579dc4a0655c4f4',1,'BloomFilter']]],
+  ['bloom_5fcheck_1',['bloom_check',['../class_bloom_filter.html#ae976246f2899c2b10166a25e026c91c5',1,'BloomFilter']]],
+  ['bloomfilter_2',['bloomfilter',['../class_bloom_filter.html#a64e9f133cd9bb65d55a5e31f701bbca0',1,'BloomFilter::BloomFilter()'],['../class_bloom_filter.html#aba4255db5abc946c5d89826e026cc4b8',1,'BloomFilter::BloomFilter(int numSectors, int numHashes, int bitsPerSector, int maxMsgs)']]],
+  ['buildcdppacket_3',['buildCdpPacket',['../class_duck.html#a8fc876e4009cb4fadde1dfd540e90f78',1,'Duck']]]
 ];

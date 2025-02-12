@@ -1,5 +1,8 @@
 var searchData=
 [
-  ['oninterrupt_0',['onInterrupt',['../class_duck_radio.html#abba2a46b2ec298d1fe8136ccbf33baf7',1,'DuckRadio']]],
-  ['operator_3d_1',['operator=',['../class_duck.html#a6b7113b2cf0dc5c9ea53b3ccc9f2707c',1,'Duck']]]
+  ['loadchannel_0',['loadChannel',['../class_duck_net.html#ae67d21661ff5a48777d902e1abf9f9f4',1,'DuckNet']]],
+  ['loadwificredentials_1',['loadWiFiCredentials',['../class_duck_net.html#a98508f1de7a2bf259d91d770b358f6ae',1,'DuckNet']]],
+  ['loadwifipassword_2',['loadWifiPassword',['../namespaceduckutils.html#a56ea08fb08a402d391f3582a309d8899',1,'duckutils']]],
+  ['loadwifissid_3',['loadWifiSsid',['../namespaceduckutils.html#a0a14835a59650aef58f9ffbd107586fe',1,'duckutils']]],
+  ['logiflowmemory_4',['logIfLowMemory',['../class_duck.html#a76ad584ab3b1eee157b9c2bbda491248',1,'Duck']]]
 ];

@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['invalid_0',['invalid',['../_duck_8h.html#a5931873aef9ff172ae93e721a3f84aa9aaf3d1efdf1095604d189748d8b46fc56',1,'Duck.h']]]
+  ['mama_0',['MAMA',['../_duck_types_8h.html#ae840cd9270fc5804ad85c80de1686d4aa324f3d8a8abafdef821a168b2c2e3a3e',1,'DuckTypes.h']]],
+  ['max_5ftype_1',['MAX_TYPE',['../_duck_types_8h.html#ae840cd9270fc5804ad85c80de1686d4aacde90f0aafc1967e6a602267a564a0cc',1,'DuckTypes.h']]]
 ];

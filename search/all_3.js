@@ -24,7 +24,7 @@ var searchData=
   ['duckled_2eh_21',['DuckLed.h',['../_duck_led_8h.html',1,'']]],
   ['ducklink_2ecpp_22',['DuckLink.cpp',['../_duck_link_8cpp.html',1,'']]],
   ['duckname_23',['duckName',['../class_duck.html#afd50e4275853e0e4751953d2c929296f',1,'Duck']]],
-  ['ducknet_24',['ducknet',['../class_duck_net.html#a732adcbd8649a905be85b406d441bc3e',1,'DuckNet::DuckNet()'],['../class_duck.html#ac23aaf80fd98d8d7e890f0619fefa968',1,'Duck::duckNet'],['../class_duck_net.html',1,'DuckNet']]],
+  ['ducknet_24',['ducknet',['../class_duck.html#ac23aaf80fd98d8d7e890f0619fefa968',1,'Duck::duckNet'],['../class_duck_net.html#a732adcbd8649a905be85b406d441bc3e',1,'DuckNet::DuckNet()'],['../class_duck_net.html',1,'DuckNet']]],
   ['ducknet_2eh_25',['DuckNet.h',['../_duck_net_8h.html',1,'']]],
   ['duckpacket_26',['duckpacket',['../class_duck_packet.html',1,'DuckPacket'],['../class_duck_packet.html#a0d70cc32e12585c7c1ac4da10fec80af',1,'DuckPacket::DuckPacket()'],['../class_duck_packet.html#a2353be5e63d55a5d7f2193c02b76c640',1,'DuckPacket::DuckPacket(std::array&lt; byte, 8 &gt; duid)']]],
   ['duckpacket_2eh_27',['DuckPacket.h',['../_duck_packet_8h.html',1,'']]],

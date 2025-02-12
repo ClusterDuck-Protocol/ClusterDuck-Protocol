@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['flipdetectstate_0',['flipDetectState',['../namespaceduckutils.html#a687a9ca39ed93decec5870a794acbbff',1,'duckutils']]],
-  ['freeheapmemory_1',['freeHeapMemory',['../namespaceduckesp.html#ae50a3039b7243bdf5d1d094cb8b59182',1,'duckesp']]]
+  ['encrypt_0',['encrypt',['../class_duck.html#aaaaaaf1cb10424e8ef7f10f3eab6fb13',1,'Duck']]],
+  ['encryptdata_1',['encryptData',['../namespaceduckcrypto.html#a7c685b6ac22984a00ce51c16f29e3303',1,'duckcrypto']]]
 ];
