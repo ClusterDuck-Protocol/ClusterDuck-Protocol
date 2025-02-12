@@ -232,10 +232,10 @@ const char MAIN_page[] PROGMEM = R"=====(
                         <dd id="lastMessageField"></dd>
                         <dt>Last message ID:</dt>
                         <dd id="lastMessageMuid"></dd>
-                        <dt>Status:</dt>
+                       <!-- <dt>Status:</dt>
                         <dd id="muidStatus"></dd>
                         <dt>Status Message:</dt>
-                        <dd id="muidStatusMessage"></dd>
+                        <dd id="muidStatusMessage"></dd> --!>
                     </dl>
                 </div>
 
@@ -249,7 +249,6 @@ const char MAIN_page[] PROGMEM = R"=====(
 
     <!-- Run javascript actions here -->
     <script type="text/javascript">
-        const MUID_URL = '/muidStatus.json';
         const MUID_PARAM_NAME = 'muid';
         const CLIENT_ID_LENGTH = 4;
         const CLIENT_ID_KEY = 'CLIENT_ID';
@@ -257,24 +256,17 @@ const char MAIN_page[] PROGMEM = R"=====(
         var messageController;
         var muidRequest;
 
-        function CreateMuidRequest(muid) {
-            return MuidRequest(
-                muid,
-                document.getElementById('muidStatus'),
-                document.getElementById('muidStatusMessage')
-            );
-        }
 
         var MessageController = function () {
-            var loadListener = function () {
-                // this.responseText should be something like: {"muid":"ABCD"}
-                var res = JSON.parse(this.responseText);
-                messageController.saveLastMuid(res.muid);
+            var loadListener = function (req) {
                 var errEl = document.getElementById('makeshiftErrorOutput');
                 if (!errEl.classList.toString().includes("hidden")) {
                     errEl.innerHTML = '';
                     errEl.classList.add("hidden");
                 }
+                var res = JSON.parse(req.responseText);
+                let muidStatus = document.getElementById('lastMessageMuid');
+                muidStatus.innerHTML = res.muid;
             };
             var errorListener = function () {
                 var errorMessage = 'There was an error sending the message. Please try again.';
@@ -298,49 +290,12 @@ const char MAIN_page[] PROGMEM = R"=====(
                     params.append(clientIdInput.name, clientIdInput.value);
                     params.append(commentsInput.name, commentsInput.value);
                     var req = new XMLHttpRequest();
-                    req.addEventListener("load", loadListener);
+                    req.addEventListener("load", function() { loadListener(req); });
                     req.addEventListener("error", errorListener);
                     req.open("POST", "/formSubmit.json?" + params.toString());
                     req.send();
                     showSentMessage(commentsInput);
-                },
-                saveLastMuid: function (muid) { <!-- for checking if message was acked on duk, needs fixed -->
-                    document.getElementById('lastMessageMuid').innerHTML = muid;
-                    muidRequest = CreateMuidRequest(muid);
-                    muidRequest.requestMuidStatus();
-                },
-            };
-        };
-        var MuidRequest = function (muid, statusEl, messageEl) {
-            var showStatus = function (status, message) {
-                statusEl.innerHTML = status;
-                messageEl.innerHTML = message;
-            };
-            var loadListener = function () {
-                var res = JSON.parse(this.responseText);
-                showStatus(res.status, res.message);
-                if (res.status === 'not_acked') {
-                    showStatus('not_acked', NOT_ACKED_MSG)
-                    setTimeout(requestMuidStatus, 1000);
                 }
-            };
-            var errorListener = function () {
-                showStatus('error', 'There was an unknown error');
-                setTimeout(requestMuidStatus, 1000);
-            };
-            var requestMuidStatus = function () {
-                var req = new XMLHttpRequest();
-                req.addEventListener("load", loadListener);
-                req.addEventListener("error", errorListener);
-                var url = MUID_URL;
-                var params = new URLSearchParams("");
-                params.append(MUID_PARAM_NAME, muid);
-                url += "?" + params.toString();
-                req.open("GET", makeUrlUnique(url));
-                req.send();
-            };
-            return {
-                requestMuidStatus: requestMuidStatus,
             };
         };
 

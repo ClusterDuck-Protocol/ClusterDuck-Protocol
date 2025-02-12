@@ -60,13 +60,6 @@ private :
 
   void handleCommand(const CdpPacket & packet);
   void handleDuckCommand(const CdpPacket & packet);
-
-  /**
-   * @brief Handles if there were any acks addressed to this duck.
-   *
-   * @param packet The a broadcast ack, which has topic type reservedTopic::ack
-   */
-  void handleAck(const CdpPacket & packet);
 };
 
 #endif

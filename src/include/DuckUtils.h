@@ -86,23 +86,46 @@ std::string toString(const std::vector<T>& vec) {
 }
 
 /**
- * @brief Convert a array into an ASCII string.
+ * @brief Convert a vector into an ASCII string.
  *
  * @param arr A vector to convert
  * @returns A std::string representing the byte array in ASCII.
  *
  */
-    template<typename T,size_t S>
-    std::string toString(const std::array<T,S>& arr) {
-        std::string result;
-        for (const auto& element : arr) {
-            if (!std::isprint(element)) {
-                return "ERROR: Non-printable character";
-            }
-            result += static_cast<char>(element);
+template<typename T,size_t S>
+std::string toString(const std::array<T,S>& arr) {
+    std::string result;
+    for (const auto& element : arr) {
+        if (!std::isprint(element)) {
+            return "ERROR: Non-printable character";
         }
-        return result;
+        result += static_cast<char>(element);
     }
+    return result;
+}
+
+/**
+ * @brief Convert an array into hex for sending over http or display.
+ *
+ * @param arr an array to convert
+ * @returns A std::string representing the byte array in ASCII.
+ *
+ */
+template<typename T,size_t S>
+std::string arrayToHexString(const std::array<T,S>& arr) {
+    std::string buf = ""; // static to avoid memory leak
+    buf.clear();
+    buf.reserve(S * 2); // 2 digit hex
+    const char* cs = "0123456789ABCDEF";
+    for (int i = 0; i < S; i++) {
+        byte val = arr[i];
+        buf += cs[(val >> 4) & 0x0F];
+        buf += cs[val & 0x0F];
+    }
+    return buf;
+}
+
+
 
 /**
  * @brief Compare two vectors with regard to both size and contents.

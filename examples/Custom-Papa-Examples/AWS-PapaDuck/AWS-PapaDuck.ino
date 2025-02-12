@@ -235,8 +235,6 @@ void setup() {
   wifiClient.setInsecure();
   #endif
 
-  duck.enableAcks(true);
-
   display->showDefaultScreen();
   
   Serial.println("[PAPA] Setup OK! ");

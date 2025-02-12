@@ -246,13 +246,6 @@ int Duck::sendData(byte topic, std::vector<byte>& data,
   if (err == DUCK_ERR_NONE) {
     filter.bloom_add(packet.muid.data(), MUID_LENGTH);
   }
-
-  if (!lastMessageAck) {
-    loginfo_ln("Previous `lastMessageMuid` %s not acked",duckutils::toString(lastMessageMuid).c_str());
-    loginfo_ln("Overwriting with: ",duckutils::toString(packet.muid).c_str());
-  }
-
-  lastMessageAck = false;
     std::copy(packet.muid.begin(),packet.muid.end(),lastMessageMuid.begin());
   assert(lastMessageMuid.size() == MUID_LENGTH);
   if (outgoingMuid != NULL) {
@@ -264,22 +257,8 @@ int Duck::sendData(byte topic, std::vector<byte>& data,
   return err;
 }
 
-muidStatus Duck::getMuidStatus(const std::array<byte,4> & muid) const {
-  if (duckutils::isEqual(muid, lastMessageMuid)) {
-    if (lastMessageAck) {
-      return muidStatus::acked;
-    } else {
-      return muidStatus::not_acked;
-    }
-  } else if (muid.size() != MUID_LENGTH) {
-    return muidStatus::invalid;
-  } else {
-    return muidStatus::unrecognized;
-  }
-}
-
 CdpPacket Duck::buildCdpPacket(byte topic, const std::vector<byte> data,
-    const std::array<byte,8> targetDevice, const std::array<byte,8> &muid)
+    const std::array<byte,8> targetDevice, const std::array<byte,4> &muid)
 {
   if (data.size() > MAX_DATA_LENGTH) {
     logerr_ln("ERROR send data failed, message too large: %d bytes", data.size());

@@ -171,7 +171,6 @@ void setup()
 
   Serial.println("[PAPA] Setup OK! ");
 
-  duck.enableAcks(false);
 }
 
 void loop() 
