@@ -59,7 +59,7 @@ The GPS, Battery and OLED pins are optional, but if you are using them, you will
 The pins for each board are in a pinout diagram made by the manufacturer. The pin numbers you're looking for are the GPIO
 numbers, not the physical pin numbers. For example, the TTGO T-Beam has the following pinout diagram:
 
-![TTGO T-Beam Pinout](https://www.passion-radio.fr/img/cms/v1-2_1.png)
+![TTGO T-Beam Example Pinout](https://www.passion-radio.fr/img/cms/v1-2_1.png)
 **NOTE: The manufurers may change the pinout diagram or have the wrong pins labeled, so cross reference with other sources
 or verify the pins with the manufacturer.**
 
