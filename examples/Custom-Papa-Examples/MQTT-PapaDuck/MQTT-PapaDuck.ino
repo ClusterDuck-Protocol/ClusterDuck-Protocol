@@ -285,8 +285,8 @@ void handleDuckData(std::vector<byte> packetBuffer) {
 
 void setup() {
   std::string deviceId("PAPA0001");
-  std::vector<byte> devId;
-  devId.insert(devId.end(), deviceId.begin(), deviceId.end());
+  std::array<byte,8> devId;
+  std::copy(deviceId.begin(), deviceId.end(), devId.begin());
   
   // Set the CA cert for the WiFi client
   wifiClient.setCACert(mosquitto_ca_cert);
