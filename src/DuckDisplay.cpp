@@ -102,7 +102,7 @@ DuckDisplay* DuckDisplay::getInstance() {
 
 #ifndef CDPCFG_OLED_NONE
 
-void DuckDisplay::setupDisplay(int duckType, std::vector<byte> name) {
+void DuckDisplay::setupDisplay(int duckType, std::array<byte,8> name) {
   u8g2.begin();        // clear the internal memory
   u8g2.setFont(u8g2_font_synchronizer_nbp_tf); // choose a suitable font
   u8g2.clearBuffer();  

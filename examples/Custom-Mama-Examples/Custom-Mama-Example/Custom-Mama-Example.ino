@@ -43,8 +43,8 @@ void setup() {
   // The Device ID must be unique and 8 bytes long. Typically the ID is stored
   // in a secure nvram, or provided to the duck during provisioning/registration
   std::string deviceId("MAMA0001");
-  std::vector<byte> devId;
-  devId.insert(devId.end(), deviceId.begin(), deviceId.end()); 
+  std::array<byte,8> devId;
+  std::copy(deviceId.begin(), deviceId.end(), devId.begin());
 
 
   //Set the Device ID

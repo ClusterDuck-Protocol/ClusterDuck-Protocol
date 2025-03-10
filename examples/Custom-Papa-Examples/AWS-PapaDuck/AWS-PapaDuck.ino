@@ -211,8 +211,8 @@ void setup() {
   
   // NOTE: The Device ID must be exactly 8 bytes otherwise it will get rejected
   std::string deviceId("PAPADUCK");
-  std::vector<byte> devId;
-  devId.insert(devId.end(), deviceId.begin(), deviceId.end());
+  std::array<byte,8> devId;
+  std::copy(deviceId.begin(), deviceId.end(), devId.begin());
 
   // the default setup is equivalent to the above setup sequence
   duck.setupWithDefaults(devId, SSID, PASSWORD);
@@ -271,7 +271,7 @@ void loop() {
 void gotMsg(char* topic, byte* payload, unsigned int payloadLength) {
   Serial.print("gotMsg: invoked for topic: "); Serial.println(topic);
 
-  if (std::string(topic).indexOf(CMD_STATE_WIFI) > 0) {
+  if (std::string(topic).find(CMD_STATE_WIFI) > 0) {
     Serial.println("Start WiFi Command");
     byte sCmd = 1;
     std::vector<byte> sValue = {payload[0]};
