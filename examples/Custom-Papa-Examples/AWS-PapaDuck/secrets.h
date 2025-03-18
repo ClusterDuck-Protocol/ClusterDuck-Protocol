@@ -22,7 +22,9 @@ const char AWS_IOT_ENDPOINT[] = ""; // Your AWS IoT Core Endpoint
 
 // Amazon Root CA 1
 static const char AWS_CERT_CA[] PROGMEM = R"EOF(
-
+-----BEGIN CERTIFICATE-----
+... your AWS root CA certificate ...
+-----END CERTIFICATE-----
 )EOF";
 
 // Device Certificate
