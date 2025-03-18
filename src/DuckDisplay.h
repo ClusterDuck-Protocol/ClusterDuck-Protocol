@@ -38,7 +38,7 @@ public:
    */
   static DuckDisplay* getInstance();
 #ifdef CDPCFG_OLED_NONE
-  void setupDisplay(int duckType, std::vector<byte> name) {}
+  void setupDisplay(int duckType, std::array<byte,8> name) {}
   void powerSave(bool save) {}
   void drawString(uint8_t x, uint8_t y, const char* text) {}
   void drawString(bool cls, uint8_t x, uint8_t y, const char* text) {}
@@ -55,7 +55,7 @@ public:
    * @brief Initialize the display component.
    * 
    */
-  void setupDisplay(int duckType, std::vector<byte> name);
+  void setupDisplay(int duckType, std::array<byte,8> name);
   /**
    * @brief Toggle the display in or out of power saving mode.
    * 

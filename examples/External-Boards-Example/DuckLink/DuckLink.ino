@@ -10,9 +10,9 @@ DuckLink duck;
 void setup()
 {
     std::string deviceId("LINK0001");
-    std::vector<byte> devId;
+    std::array<byte,8> devId;
+    std::copy(deviceId.begin(), deviceId.end(), devId.begin());
     int rc;
-    devId.insert(devId.end(), deviceId.begin(), deviceId.end());
     rc = duck.setupWithDefaults(devId);
 
     loginfo_ln("Hello, World!");
