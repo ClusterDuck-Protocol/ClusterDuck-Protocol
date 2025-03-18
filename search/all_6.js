@@ -26,7 +26,7 @@ var searchData=
   ['getssid_23',['getssid',['../class_duck_net.html#a4bac22808e4120262d1538e9be816698',1,'DuckNet::getSsid()'],['../class_duck.html#abfceae63bc916c2f878d629613d50c57',1,'Duck::getSsid()']]],
   ['getstate_24',['getState',['../namespaceduckcrypto.html#a54b3103192a6ab83dbee1883246b485e',1,'duckcrypto']]],
   ['gettimer_25',['getTimer',['../namespaceduckutils.html#afdb0bf8814af2145ed0d183ad5523157',1,'duckutils']]],
-  ['getting_20started_26',['Getting Started',['../index.html#autotoc_md4',1,'']]],
+  ['getting_20started_26',['Getting Started',['../index.html#autotoc_md8',1,'']]],
   ['gettopic_27',['getTopic',['../class_duck_packet.html#a81d0ea3aaeac549e206b5fded15987ec',1,'DuckPacket']]],
   ['gettype_28',['getType',['../class_duck.html#a3d0b92824388146c6e4e7d15d5f3c449',1,'Duck']]]
 ];

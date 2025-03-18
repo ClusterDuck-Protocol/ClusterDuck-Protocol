@@ -30,9 +30,9 @@ var searchData=
   ['sleep_27',['sleep',['../class_duck_radio.html#afe2c2822e1e8e77294d0557ed8c4574f',1,'DuckRadio']]],
   ['ss_28',['ss',['../struct_lora_config_params.html#ae97055396dcf7dc6e39d5c2fbe627572',1,'LoraConfigParams']]],
   ['standby_29',['standBy',['../class_duck_radio.html#afadf1046aed311eadf83a65f76c081e2',1,'DuckRadio']]],
-  ['started_30',['Getting Started',['../index.html#autotoc_md4',1,'']]],
+  ['started_30',['Getting Started',['../index.html#autotoc_md8',1,'']]],
   ['startreceive_31',['startreceive',['../class_duck_radio.html#ad3f1c11f52067155223f6b199b0155dd',1,'DuckRadio::startReceive()'],['../class_duck.html#a4a6e0d24b829a3b9760d94b1095a4d02',1,'Duck::startReceive()']]],
   ['starttransmitdata_32',['startTransmitData',['../class_duck_radio.html#ae2ca2b8c1b02151c116a8e1d5c0bb34f',1,'DuckRadio']]],
-  ['story_33',['Origin Story',['../index.html#autotoc_md2',1,'']]],
+  ['story_33',['Origin Story',['../index.html#autotoc_md6',1,'']]],
   ['stringtobytevector_34',['stringToByteVector',['../namespaceduckutils.html#aca7b40acfbb2b68b7155571fe11fd98f',1,'duckutils']]]
 ];

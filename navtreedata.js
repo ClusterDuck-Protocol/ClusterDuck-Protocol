@@ -26,6 +26,11 @@ var NAVTREE =
 [
   [ "ClusterDuck Protocol", "index.html", [
     [ "ClusterDuck Protocol Info", "index.html", "index" ],
+    [ "Adding Your Own Board", "md__2home_2runner_2work_2_cluster_duck-_protocol_2_cluster_duck-_protocol_2src_2include_2boards_2_r_e_a_d_m_e.html", [
+      [ "Board Format", "md__2home_2runner_2work_2_cluster_duck-_protocol_2_cluster_duck-_protocol_2src_2include_2boards_2_r_e_a_d_m_e.html#autotoc_md1", null ],
+      [ "Defining the Pins", "md__2home_2runner_2work_2_cluster_duck-_protocol_2_cluster_duck-_protocol_2src_2include_2boards_2_r_e_a_d_m_e.html#autotoc_md2", null ],
+      [ "Adding the Board Header", "md__2home_2runner_2work_2_cluster_duck-_protocol_2_cluster_duck-_protocol_2src_2include_2boards_2_r_e_a_d_m_e.html#autotoc_md3", null ]
+    ] ],
     [ "Namespaces", "namespaces.html", [
       [ "Namespace List", "namespaces.html", "namespaces_dup" ],
       [ "Namespace Members", "namespacemembers.html", [
