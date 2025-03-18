@@ -215,7 +215,7 @@ void setup() {
   std::copy(deviceId.begin(), deviceId.end(), devId.begin());
   
   // Setup the duck link with default settings and connect to WiFi
-  uint32_t err = duck.setupWithDefaults(devId, SSID, PASSWORD);
+ duck.setupWithDefaults(devId, SSID, PASSWORD);
   
   // DuckDisplay instance is returned unconditionally, if there is no physical
   // display the functions will not do anything
