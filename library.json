@@ -1,5 +1,5 @@
 {
-    "name": "ClusterDuck Protocol",
+    "name": "clusterduck-protocol",
     "keywords": "lora, mesh, emergency-network, ducks, owl, iot",
     "description": "An open source firmware for a mesh network of Internet-of-Things devices based on LoRa (Long Range radio)",
     "authors":
@@ -15,7 +15,7 @@
         "url": "https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol"
     },
     "frameworks": "arduino",
-    "platforms": ["espressif32@3.6.1"], 
+    "platforms": ["espressif32"], 
     "license": "Apache-2.0",
     "export": {
         "include": [
@@ -28,7 +28,7 @@
         ]
     },
     "examples": [
-        "[Ee]xamples/*/*.ino"
+        "examples/*/*.ino"
     ],
     "dependencies": {
         "contrem/arduino-timer": "^3.0.1",
