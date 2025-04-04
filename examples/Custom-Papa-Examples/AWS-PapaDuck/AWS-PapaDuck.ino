@@ -144,8 +144,8 @@ int quackJson(CdpPacket packet) {
 
   Serial.printf("[PAPA] muid:    %s\n" , muid.c_str());
   Serial.printf("[PAPA] data:    %s\n" , payload.c_str());
-  Serial.printf("[PAPA] hops:    %s\n", std::to_string(packet.hopCount));
-  Serial.printf("[PAPA] duck:    %s\n" , std::to_string(packet.duckType));
+  Serial.printf("[PAPA] hops:    %s\n", std::to_string(packet.hopCount).c_str());
+  Serial.printf("[PAPA] duck:    %s\n" , std::to_string(packet.duckType).c_str());
 
   doc["DeviceID"] = sduid;
   doc["MessageID"] = muid;
