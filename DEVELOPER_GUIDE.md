@@ -33,12 +33,12 @@ This guide will help you set up the CDP on your development machine and build th
 
        default_envs = local_heltec_wifi_lora_32_V3
     ;   default_envs = local_heltec_wifi_lora_32_V2
-    ;   default_envs = local_ttgo_lora32_v1
+    ;   default_envs = local_lilygo_t_beam_sx1276
     ;   default_envs = local_lilygo_t_beam_sx1262
 
     ;   default_envs = prod_heltec_wifi_lora_32_V3
     ;   default_envs = prod_heltec_wifi_lora_32_V2
-    ;   default_envs = prod_ttgo_lora32_v1
+    ;   default_envs = prod_lilygo_t_beam_sx1276
     ;   default_envs = prod_lilygo_t_beam_sx1262
 
     ;  default_envs = test_heltec_wifi_lora_32_V3
@@ -93,13 +93,13 @@ Here are the steps to run the examples (on Linux or Mac OS). This assumes you ha
 
 3. Run the examples for the Heltec LoRa v3 Arduino board using your local CDP library, supplying the relative path to the example folder you want to use. If no EXAMPLE_DIR is supplied, it defaults to Basic-Ducks/MamaDuck
     ```bash
-    EXAMPLE_DIR=Basic-Ducks/DuckLink platformio run -e local_ttgo_lora32_v1 -t upload
+    EXAMPLE_DIR=Basic-Ducks/DuckLink platformio run -e local_lilygo_t_beam_sx1276 -t upload
     ```
 
 4. Run the examples for the Heltec LoRa v3 Arduino board using the CDP library from the PlatformIO library registry
     ```bash
     cd examples/1.Ducks/DuckLink
-    EXAMPLE_DIR=Basic-Ducks/DuckLink platformio run -e prod_ttgo_lora32_v1 -t upload
+    EXAMPLE_DIR=Basic-Ducks/DuckLink platformio run -e prod_lilygo_t_beam_sx1276 -t upload
     ```
 
 
