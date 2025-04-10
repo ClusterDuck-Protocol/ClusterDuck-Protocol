@@ -14,6 +14,8 @@
 
 #include "include/DuckUtils.h"
 #include <RadioLib.h>
+#include <random>
+#include <memory>
 
 #if defined(CDPCFG_RADIO_SX1262)
 CDPCFG_LORA_CLASS lora =
@@ -240,6 +242,10 @@ int DuckRadio::relayPacket(DuckPacket* packet)
         logerr_ln("ERROR  LoRa radio not setup");
         return DUCKLORA_ERR_NOT_INITIALIZED;
     }
+    if(getRSSI()){
+        std::mt19937 gen(millis());
+        std::uniform_int_distribution<> distrib(0, 5000);
+    }
 
     return startTransmitData(packet->getBuffer().data(),
                              packet->getBuffer().size());
@@ -252,6 +258,19 @@ int DuckRadio::sendData(std::vector<byte> data)
         return DUCKLORA_ERR_NOT_INITIALIZED;
     }
     return startTransmitData(data.data(), data.size());
+}
+
+void DuckRadio::getSignalScore()
+{
+
+    if (!isSetup) {
+        logerr_ln("ERROR  LoRa radio not setup");
+        return;
+    }
+    //Normalize the values to 0-10 range
+    signalInfo.rssi = (getRSSI() - 0.0f)/(10.0f-0.0f);
+    signalInfo.snr = abs(getSNR() - 0.0f)/(10.0f-0.0f);
+    signalInfo.signalScore = (signalInfo.rssi + signalInfo.snr) / 2.0f;
 }
 
 int DuckRadio::startReceive()
@@ -270,13 +289,22 @@ int DuckRadio::startReceive()
     return DUCK_ERR_NONE;
 }
 
-int DuckRadio::getRSSI()
+float DuckRadio::getRSSI()
 { 
     if (!isSetup) {
         logerr_ln("ERROR  LoRa radio not setup");
         return DUCKLORA_ERR_NOT_INITIALIZED;
     }
     return lora.getRSSI(); 
+}
+
+float DuckRadio::getSNR()
+{
+    if (!isSetup) {
+        logerr_ln("ERROR  LoRa radio not setup");
+        return DUCKLORA_ERR_NOT_INITIALIZED;
+    }
+    return lora.getSNR();
 }
 
 // TODO: implement this

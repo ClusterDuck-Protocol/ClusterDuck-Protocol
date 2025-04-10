@@ -130,9 +130,16 @@ public:
   /**
    * @brief Get the current RSSI value.
    *
-   * @returns An integer representing the rssi value.
+   * @returns A float representing the rssi value.
    */
-  int getRSSI();
+
+  float getRSSI();
+  /**
+   * @brief Get the current SNR value.
+   *
+   * @returns A float representing the snr value.
+   */
+  float getSNR();
 
   /**
    * @brief Transmit a ping message.
@@ -209,7 +216,14 @@ private:
   DuckRadio() {};
   DuckRadio(DuckRadio const&) = delete;
   DuckRadio& operator=(DuckRadio const&) = delete;
-  
+
+  void getSignalScore();
+
+  static struct SignalInfo {
+      float rssi;
+      float snr;
+      float signalScore;
+  } signalInfo;
 };
 
 #endif
