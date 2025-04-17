@@ -91,16 +91,12 @@ Here are the steps to run the examples (on Linux or Mac OS). This assumes you ha
     cd ClusterDuckProtocol
     ```
 
-3. Run the examples for the Heltec LoRa v3 Arduino board using your local CDP library, supplying the relative path to the example folder you want to use. If no EXAMPLE_DIR is supplied, it defaults to Basic-Ducks/MamaDuck
+3. Run the examples for the Lilygo Tbeam (with SX1276 LoRa chip) using your local CDP library (indicated by the `local_` prefix of board environment), supplying the relative path to the example folder you want to use. If no EXAMPLE_DIR is supplied, it defaults to Basic-Ducks/MamaDuck
     ```bash
     EXAMPLE_DIR=Basic-Ducks/DuckLink platformio run -e local_lilygo_t_beam_sx1276 -t upload
     ```
 
-4. Run the examples for the Heltec LoRa v3 Arduino board using the CDP library from the PlatformIO library registry
+4. Run the examples for the Lilygo Tbeam (with SX1276 LoRa chip) using the CDP library from the PlatformIO library registry (indicated by the `prod_` prefix of board environment).
     ```bash
-    cd examples/1.Ducks/DuckLink
     EXAMPLE_DIR=Basic-Ducks/DuckLink platformio run -e prod_lilygo_t_beam_sx1276 -t upload
     ```
-
-
-
