@@ -206,6 +206,7 @@ private:
   static volatile uint16_t interruptFlags;
   static volatile bool receivedFlag;
   volatile bool isSetup = false;
+  unsigned long lastReceiveTime = 0L;
 
   static void setReceiveFlag(bool value) { receivedFlag = value; }
 

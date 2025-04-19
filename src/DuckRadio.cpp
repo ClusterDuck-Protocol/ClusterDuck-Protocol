@@ -16,6 +16,7 @@
 #include <RadioLib.h>
 #include <random>
 #include <memory>
+#include <chrono>
 
 #if defined(CDPCFG_RADIO_SX1262)
 CDPCFG_LORA_CLASS lora =
@@ -208,6 +209,7 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
     uint32_t computed_data_crc =
             CRC32::calculate(data_section.data(), data_section.size());
     if (computed_data_crc != packet_data_crc) {
+        lastReceiveTime = millis(); //even if the packet is invalid, we need to know when we last received
         logerr_ln("ERROR data crc mismatch: received: 0x%X, calculated: 0x%X",packet_data_crc, computed_data_crc);
         return DUCKLORA_ERR_HANDLE_PACKET;
     }
@@ -219,9 +221,10 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
 
 
     if (rxState != RADIOLIB_ERR_NONE) {
+        lastReceiveTime = millis(); //even if rxState is bad, we need to know when we last received
         return rxState;
     }
-
+    lastReceiveTime = millis(); // always update the last receive time
     return err;
 }
 
@@ -237,14 +240,18 @@ int DuckRadio::sendData(byte* data, int length)
 
 int DuckRadio::relayPacket(DuckPacket* packet)
 {
-    
     if(!isSetup) {
         logerr_ln("ERROR  LoRa radio not setup");
         return DUCKLORA_ERR_NOT_INITIALIZED;
     }
-    if(getRSSI()){
+    //Delay the transmission if we have received within the last 5 seconds
+    if( (millis() - lastReceiveTime) < 5000L) {
         std::mt19937 gen(millis());
-        std::uniform_int_distribution<> distrib(0, 5000);
+        std::uniform_int_distribution<> distrib(0, 3000L);
+        std::chrono::milliseconds txdelay(distrib(gen));
+        //Random delay between 0 and 3 seconds
+        std::chrono::duration<long, std::milli> txdelay_ms(txdelay.count());
+        delay(txdelay_ms.count());
     }
 
     return startTransmitData(packet->getBuffer().data(),
@@ -257,6 +264,7 @@ int DuckRadio::sendData(std::vector<byte> data)
         logerr_ln("ERROR  LoRa radio not setup");
         return DUCKLORA_ERR_NOT_INITIALIZED;
     }
+
     return startTransmitData(data.data(), data.size());
 }
 
