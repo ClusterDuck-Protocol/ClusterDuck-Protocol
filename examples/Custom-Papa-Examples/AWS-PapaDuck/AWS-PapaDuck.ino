@@ -9,7 +9,7 @@
  * try to publish all messages in the queue. You can change the size of the queue
  * by changing `QUEUE_SIZE_MAX`.
  *
- * @date 06-14-2024
+ * @date 04-04-2025
  *
  */
 
@@ -144,8 +144,8 @@ int quackJson(CdpPacket packet) {
 
   Serial.printf("[PAPA] muid:    %s\n" , muid.c_str());
   Serial.printf("[PAPA] data:    %s\n" , payload.c_str());
-  Serial.printf("[PAPA] hops:    %s\n", String(packet.hopCount));
-  Serial.printf("[PAPA] duck:    %s\n" , String(packet.duckType));
+  Serial.printf("[PAPA] hops:    %s\n", std::to_string(packet.hopCount).c_str());
+  Serial.printf("[PAPA] duck:    %s\n" , std::to_string(packet.duckType).c_str());
 
   doc["DeviceID"] = sduid;
   doc["MessageID"] = muid;
@@ -154,13 +154,6 @@ int quackJson(CdpPacket packet) {
   doc["duckType"].set(packet.duckType);
 
   std::string cdpTopic = toTopicString(packet.topic);
-  
-  // display->clear();
-  // display->drawString(0, 10, "New Message");
-  // display->drawString(0, 20, sduid.c_str());
-  // display->drawString(0, 30, muid.c_str());
-  // display->drawString(0, 40, cdpTopic.c_str());
-  // display->sendBuffer();
 
   std::string topic = "owl/device/" + std::string(THINGNAME) + "/evt/" + cdpTopic;
 
