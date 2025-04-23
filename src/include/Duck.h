@@ -293,8 +293,31 @@ protected:
   std::string deviceId;
   std::array<byte,8> duid;
 
-  DuckRadio& duckRadio = DuckRadio::getInstance();
+  class DuckRecord {
+    public:
+      DuckRecord() : routingScore(0), lastSeen(0), snr(0), rssi(0) {}
+      DuckRecord(std::string deviceId, long routingScore, long lastSeen, long snr, long rssi) :
+        DeviceId(deviceId), routingScore(routingScore), lastSeen(lastSeen), snr(snr), rssi(rssi) {}
 
+      std::string getDeviceId() { return DeviceId; }
+      long getRoutingScore() const { return routingScore; }
+      long getLastSeen() { return lastSeen; }
+      long getSnr() { return snr; }
+      long getRssi() { return rssi; }
+  private:
+      std::string DeviceId;
+      long routingScore, lastSeen;
+      float snr, rssi;
+  };
+
+  struct customGreater {
+    bool operator()(const DuckRecord& lhs, const DuckRecord& rhs) const {
+      return lhs.getRoutingScore() > rhs.getRoutingScore();
+    }
+  };
+
+  DuckRadio& duckRadio = DuckRadio::getInstance();
+  std::list<DuckRecord> routingTable;
 
   DuckNet * const duckNet;
 
@@ -303,6 +326,12 @@ protected:
   std::array<byte,4> lastMessageMuid;
 
   BloomFilter filter;
+  /**
+   * @brief Sort the routing table using the customGreater comparator
+   */
+  void sortRoutingTable() {
+    routingTable.sort(customGreater());
+  }
 
   /**
    * @brief sends a pong message
