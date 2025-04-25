@@ -295,9 +295,9 @@ protected:
 
   class DuckRecord {
     public:
-      DuckRecord() : routingScore(0), lastSeen(0), snr(0), rssi(0) {}
-      DuckRecord(std::string deviceId, long routingScore, long lastSeen, long snr, long rssi) :
-        DeviceId(deviceId), routingScore(routingScore), lastSeen(lastSeen), snr(snr), rssi(rssi) {}
+      //DuckRecord() : routingScore(0), lastSeen(0), snr(0), rssi(0) {}
+      DuckRecord(std::string devId, long routingScore, long lastSeen, long snr, long rssi) :
+        DeviceId(std::move(devId)), routingScore(routingScore), lastSeen(lastSeen), snr(snr), rssi(rssi) {}
 
       std::string getDeviceId() { return DeviceId; }
       long getRoutingScore() const { return routingScore; }
@@ -310,14 +310,14 @@ protected:
       float snr, rssi;
   };
 
-  struct customGreater {
-    bool operator()(const DuckRecord& lhs, const DuckRecord& rhs) const {
-      return lhs.getRoutingScore() > rhs.getRoutingScore();
-    }
-  };
+//  struct customGreater {
+//    bool operator()(const DuckRecord& lhs, const DuckRecord& rhs) const {
+//      return lhs.getRoutingScore() > rhs.getRoutingScore();
+//    }
+//  };
 
   DuckRadio& duckRadio = DuckRadio::getInstance();
-  std::list<DuckRecord> routingTable;
+  std::multimap<long,DuckRecord,std::greater<long>> routingTable;
 
   DuckNet * const duckNet;
 
@@ -329,8 +329,21 @@ protected:
   /**
    * @brief Sort the routing table using the customGreater comparator
    */
-  void sortRoutingTable() {
-    routingTable.sort(customGreater());
+//  void sortRoutingTable() {
+//    routingTable.sort(customGreater());
+//  }
+    /**
+     * @brief Insert a new record into the routing table
+     *
+     * @param deviceID the device ID
+     * @param routingScore the routing score
+     * @param lastSeen the last seen timestamp
+     * @param snr the signal to noise ratio
+     * @param rssi the received signal strength indicator
+     */
+  void insertIntoRoutingTable(std::string deviceID, long routingScore, long lastSeen, long snr, long rssi) {
+    DuckRecord record(std::move(deviceID), routingScore, lastSeen, snr, rssi);
+    routingTable.insert(std::make_pair(routingScore, record));
   }
 
   /**
