@@ -73,7 +73,7 @@ bool runSensor(void *) {
   
   bool result = false;
 
-  std::string message = "C:" + std::to_string(counter) + "/" + "FM:" + std::to_string(freeMemory());
+  std::string message = "C:" + std::to_string(counter) + "|" + "FM:" + std::to_string(freeMemory());
   Serial.print("[LINK] sensor data: ");
   Serial.println(message.c_str());
   
