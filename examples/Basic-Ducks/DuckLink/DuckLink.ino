@@ -1,17 +1,17 @@
-
 /**
  * @file DuckLink.ino
  * @author
- * @brief This example creates a duck link that sends a counter message periodically.
- *
- * It's using a pre-built DuckLink available from the ClusterDuck SDK
+ * @brief This example creates a DuckLink that sends a health message periodically.
+ * @details The health message is sent every 10 seconds (can be set by INTERVAL_MS) 
+ * using the runSensor() function. The message is a string that contains the counter 
+ * value ("C") and the free memory ("FM") available on the Duck. The message is sent 
+ * using the sendData function.
  */
 
 #include <arduino-timer.h>
 #include <string>
 #include <vector>
 #include <CDP.h>
-
 
 #ifdef SERIAL_PORT_USBVIRTUAL
 #define Serial SERIAL_PORT_USBVIRTUAL
@@ -32,11 +32,8 @@ int counter = 1;
 bool setupOK = false;
 
 void setup() {
-  // We are using a hardcoded device id here, but it should be retrieved or
-  // given during the device provisioning then converted to a byte vector to
-  // setup the duck NOTE: The Device ID must be exactly 8 bytes otherwise it
-  // will get rejected
-  std::string deviceId("DUCK0001");
+
+  std::string deviceId("DUCK0001"); //deviceId MUST be 8 bytes
   std::array<byte,8> devId;
   std::copy(deviceId.begin(), deviceId.end(), devId.begin());
   if (duck.setupWithDefaults(devId) != DUCK_ERR_NONE) {
@@ -45,8 +42,10 @@ void setup() {
   }
 
   setupOK = true;
-  // Initialize the timer. The timer thread runs separately from the main loop
-  // and will trigger sending a counter message.
+  
+  // The timer triggers runSensor every INTERVAL_MS.
+  timer.every(INTERVAL_MS, runSensor);
+  
   Serial.println("[LINK] Setup OK!");
 }
 
