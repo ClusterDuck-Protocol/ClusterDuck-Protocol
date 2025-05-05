@@ -310,12 +310,6 @@ protected:
       float snr, rssi;
   };
 
-//  struct customGreater {
-//    bool operator()(const DuckRecord& lhs, const DuckRecord& rhs) const {
-//      return lhs.getRoutingScore() > rhs.getRoutingScore();
-//    }
-//  };
-
   DuckRadio& duckRadio = DuckRadio::getInstance();
   std::multimap<long,DuckRecord,std::greater<long>> routingTable;
 
@@ -329,8 +323,17 @@ protected:
   /**
    * @brief Sort the routing table using the customGreater comparator
    */
+   std::list <DuckRecord> getRoutingTable() {
+    std::list<DuckRecord> sortedList;
+    for (const auto& pair : routingTable) {
+      sortedList.push_back(pair.second);
+    }
+    return sortedList;
+    }
 //  void sortRoutingTable() {
-//    routingTable.sort(customGreater());
+//    getRoutingTable().sort([](const DuckRecord& lhs, const DuckRecord& rhs){
+//        return lhs.getRoutingScore() > rhs.getRoutingScore();
+//    });
 //  }
     /**
      * @brief Insert a new record into the routing table
