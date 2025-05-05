@@ -69,7 +69,7 @@ void Duck::logIfLowMemory() {
 }
 
 int Duck::setDeviceId(std::array<byte,8>& id) {
-    std::copy(id.begin(), id.end(),duid.begin());
+  std::copy(id.begin(), id.end(),duid.begin());
   loginfo_ln("setupDeviceId rc = %d",DUCK_ERR_NONE);
   return DUCK_ERR_NONE;
 }

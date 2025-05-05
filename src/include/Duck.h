@@ -42,6 +42,7 @@ public:
    * @returns A string representing the duck's name
    */
   std::string getName() {return duckName;}
+
   /**
    * @brief setup the duck unique ID
    * 
@@ -49,6 +50,13 @@ public:
    * @return DUCK_ERR_NONE if successful, an error code otherwise 
    */
   int setDeviceId(std::array<byte,8>& id);
+
+  /**
+   * @brief Get the duck's unique ID.
+   * 
+   * @returns A std::string representing the duck's unique ID
+   */ 
+  std::string getDuckId() {return std::string(duid.begin(), duid.end());}
 
   /**
    * @brief setup the duck unique ID
