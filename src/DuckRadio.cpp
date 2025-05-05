@@ -27,6 +27,11 @@ CDPCFG_LORA_CLASS lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO0,
                   CDPCFG_PIN_LORA_RST, CDPCFG_PIN_LORA_DIO1);
 #endif
 
+#define RSSI_MAX (-20.0f)
+#define RSSI_MIN (-131.0f)
+#define SNR_MAX 11.5f
+#define SNR_MIN (-11.5f)
+
 volatile uint16_t DuckRadio::interruptFlags = 0;
 volatile bool DuckRadio::receivedFlag = false;
 
@@ -276,8 +281,8 @@ void DuckRadio::getSignalScore()
         return;
     }
     //Normalize the values to 0-10 range
-    signalInfo.rssi = (getRSSI() - 0.0f)/(10.0f-0.0f);
-    signalInfo.snr = abs(getSNR() - 0.0f)/(10.0f-0.0f);
+    signalInfo.rssi = (getRSSI() - RSSI_MIN)/(RSSI_MAX-RSSI_MIN);
+    signalInfo.snr = (getSNR() - SNR_MIN)/(SNR_MAX-SNR_MIN);
     signalInfo.signalScore = (signalInfo.rssi + signalInfo.snr) / 2.0f;
 }
 
