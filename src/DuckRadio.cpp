@@ -14,6 +14,9 @@
 
 #include "include/DuckUtils.h"
 #include <RadioLib.h>
+#include <random>
+#include <memory>
+#include <chrono>
 
 #if defined(CDPCFG_RADIO_SX1262)
 CDPCFG_LORA_CLASS lora =
@@ -23,6 +26,11 @@ CDPCFG_LORA_CLASS lora =
 CDPCFG_LORA_CLASS lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO0,
                   CDPCFG_PIN_LORA_RST, CDPCFG_PIN_LORA_DIO1);
 #endif
+
+#define RSSI_MAX (-20.0f)
+#define RSSI_MIN (-131.0f)
+#define SNR_MAX 11.5f
+#define SNR_MIN (-11.5f)
 
 volatile uint16_t DuckRadio::interruptFlags = 0;
 volatile bool DuckRadio::receivedFlag = false;
@@ -206,6 +214,7 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
     uint32_t computed_data_crc =
             CRC32::calculate(data_section.data(), data_section.size());
     if (computed_data_crc != packet_data_crc) {
+        lastReceiveTime = millis(); //even if the packet is invalid, we need to know when we last received
         logerr_ln("ERROR data crc mismatch: received: 0x%X, calculated: 0x%X",packet_data_crc, computed_data_crc);
         return DUCKLORA_ERR_HANDLE_PACKET;
     }
@@ -217,9 +226,10 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
 
 
     if (rxState != RADIOLIB_ERR_NONE) {
+        lastReceiveTime = millis(); //even if rxState is bad, we need to know when we last received
         return rxState;
     }
-
+    lastReceiveTime = millis(); // always update the last receive time
     return err;
 }
 
@@ -235,10 +245,18 @@ int DuckRadio::sendData(byte* data, int length)
 
 int DuckRadio::relayPacket(DuckPacket* packet)
 {
-    
     if(!isSetup) {
         logerr_ln("ERROR  LoRa radio not setup");
         return DUCKLORA_ERR_NOT_INITIALIZED;
+    }
+    //Delay the transmission if we have received within the last 5 seconds
+    if( (millis() - lastReceiveTime) < 5000L) {
+        std::mt19937 gen(millis());
+        std::uniform_int_distribution<> distrib(0, 3000L);
+        std::chrono::milliseconds txdelay(distrib(gen));
+        //Random delay between 0 and 3 seconds
+        std::chrono::duration<long, std::milli> txdelay_ms(txdelay.count());
+        delay(txdelay_ms.count());
     }
 
     return startTransmitData(packet->getBuffer().data(),
@@ -251,7 +269,21 @@ int DuckRadio::sendData(std::vector<byte> data)
         logerr_ln("ERROR  LoRa radio not setup");
         return DUCKLORA_ERR_NOT_INITIALIZED;
     }
+
     return startTransmitData(data.data(), data.size());
+}
+
+void DuckRadio::getSignalScore()
+{
+
+    if (!isSetup) {
+        logerr_ln("ERROR  LoRa radio not setup");
+        return;
+    }
+    //Normalize the values to 0-10 range
+    signalInfo.rssi = (getRSSI() - RSSI_MIN)/(RSSI_MAX-RSSI_MIN);
+    signalInfo.snr = (getSNR() - SNR_MIN)/(SNR_MAX-SNR_MIN);
+    signalInfo.signalScore = (signalInfo.rssi + signalInfo.snr) / 2.0f;
 }
 
 int DuckRadio::startReceive()
@@ -270,13 +302,22 @@ int DuckRadio::startReceive()
     return DUCK_ERR_NONE;
 }
 
-int DuckRadio::getRSSI()
+float DuckRadio::getRSSI()
 { 
     if (!isSetup) {
         logerr_ln("ERROR  LoRa radio not setup");
         return DUCKLORA_ERR_NOT_INITIALIZED;
     }
     return lora.getRSSI(); 
+}
+
+float DuckRadio::getSNR()
+{
+    if (!isSetup) {
+        logerr_ln("ERROR  LoRa radio not setup");
+        return DUCKLORA_ERR_NOT_INITIALIZED;
+    }
+    return lora.getSNR();
 }
 
 // TODO: implement this
