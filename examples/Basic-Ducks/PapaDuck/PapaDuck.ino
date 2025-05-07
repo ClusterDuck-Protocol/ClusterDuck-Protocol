@@ -141,6 +141,9 @@ std::string toTopicString(byte topic)
     case topics::sensor:
       topicString = "sensor";
       break;
+    case topics::health:
+      topicString = "health";
+      break;
     default:
       topicString = "status";
   }

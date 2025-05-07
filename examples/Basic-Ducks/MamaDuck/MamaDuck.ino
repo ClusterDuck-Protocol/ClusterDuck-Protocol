@@ -73,7 +73,7 @@ void loop() {
 bool runSensor(void *) {
   bool result;
   
-  std::string message = std::string("Counter:") + std::to_string(counter) + " " + std::string("Free Memory:") + std::to_string(freeMemory());
+  std::string message = "C:" + std::to_string(counter) + "|" + "FM:" + std::to_string(freeMemory());
   Serial.print("[MAMA] sensor data: ");
   Serial.println(message.c_str());
 
@@ -100,3 +100,5 @@ bool sendData(std::vector<byte> message) {
   }
   return sentOk;
 }
+
+

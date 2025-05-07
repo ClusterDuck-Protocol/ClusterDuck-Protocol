@@ -47,23 +47,21 @@ void setup() {
   std::copy(deviceId.begin(), deviceId.end(), devId.begin());
 
 
-  //Set the Device ID
+  // Set the Device ID
   duck.setDeviceId(deviceId);
-  // initialize the serial component with the hardware supported baudrate
+  // Initialize the serial component with the hardware supported baudrate
   duck.setupSerial(115200);
-  // initialize the LoRa radio with specific settings. This will overwrites settings defined in the CDP config file cdpcfg.h
+  // Initialize the LoRa radio with specific settings. This will overwrites settings defined in the CDP config file cdpcfg.h
   duck.setupRadio(LORA_FREQ, LORA_CS_PIN, LORA_RST_PIN, LORA_DIO0_PIN, LORA_DIO1_PIN, LORA_TXPOWER);
-  // initialize the wifi access point with a custom AP name
+  // Initialize the wifi access point with a custom AP name
   duck.setupWifi();
-  // initialize DNS
+  // Initialize DNS
   duck.setupDns();
-  // initialize web server, enabling the captive portal with a custom HTML page
+  // Initialize web server, enabling the captive portal with a custom HTML page
   duck.setupWebServer(true);
-  // This duck has an OLED display and we want to use it. 
-  // Get an instance and initialize it, so we can use in our application
+  // Get a display instance and initialize it, so we can use in our application
   display = DuckDisplay::getInstance();
   display->setupDisplay(duck.getType(), devId);
-  // we are done
   display->showDefaultScreen();
 
   // Initialize the timer. The timer thread runs separately from the main loop
@@ -82,36 +80,32 @@ void loop() {
 }
 
 bool runSensor(void *) {
-  bool result;
-  const byte* buffer;
   
-  String message = String("Counter:") + String(counter);
-  int length = message.length();
+  bool result;
+  
+  std::string message = "C:" + std::to_string(counter) + "|" + "FM:" + std::to_string(freeMemory());
   Serial.print("[MAMA] sensor data: ");
-  Serial.println(message);
-  buffer = (byte*) message.c_str(); 
+  Serial.println(message.c_str());
 
-  result = sendData(buffer, length);
+  result = sendData(stringToByteVector(message));
   if (result) {
-    Serial.println("[MAMA] runSensor ok.");
+     Serial.println("[MAMA] runSensor ok.");
   } else {
-    Serial.println("[MAMA] runSensor failed.");
+     Serial.println("[MAMA] runSensor failed.");
   }
   return result;
 }
 
-bool sendData(const byte* buffer, int length) {
+bool sendData(std::vector<byte> message) {
   bool sentOk = false;
   
-  // Send Data can either take a byte buffer (unsigned char) or a vector
-  int err = duck.sendData(topics::status, buffer, length);
+  int err = duck.sendData(topics::status, message);
   if (err == DUCK_ERR_NONE) {
-    counter++;
-    sentOk = true;
+     counter++;
+     sentOk = true;
   }
   if (!sentOk) {
-    Serial.println("[MAMA] Failed to send data. error = " + String(err));
+    Serial.println(("[MAMA] Failed to send data. error = " + std::to_string(err)).c_str());
   }
   return sentOk;
 }
-
