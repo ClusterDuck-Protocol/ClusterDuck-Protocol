@@ -1,11 +1,11 @@
 /**
  * @file DuckLink.ino
- * @author
- * @brief This example creates a DuckLink that sends a health message periodically.
- * @details The health message is sent every 10 seconds (can be set by INTERVAL_MS) 
- * using the runSensor() function. The message is a string that contains the counter 
- * value ("C") and the free memory ("FM") available on the Duck. The message is sent 
- * using the sendData function.
+ * @brief Implements a DuckLink using the ClusterDuck Protocol (CDP).
+ * 
+ * This example firmware periodically sends sensor health data (counter and free memory) 
+ * through a CDP mesh network.
+ * 
+ * @date 2025-05-07
  */
 
 #include <arduino-timer.h>
@@ -17,38 +17,46 @@
 #define Serial SERIAL_PORT_USBVIRTUAL
 #endif
 
-// create a built-in duck link
-DuckLink duck;
+// --- Function Declarations ---
 bool runSensor(void *);
 bool sendData(std::vector<byte> message);
+std::vector<byte> stringToByteVector(const std::string& str);
 
-// create a timer with default settings
-auto timer = timer_create_default();
+// --- Global Variables ---
+DuckLink duck;                            ///< CDP DuckLink instance
+auto timer = timer_create_default();      ///< Creating a timer with default settings
+const int INTERVAL_MS = 10000;            ///< Interval in milliseconds between each call of runSensor
+int counter = 1;                          ///< Message counter to track transmissions
+bool setupOK = false;                     ///< Flag indicating setup completion status
 
-// for sending the counter message
-const int INTERVAL_MS = 10000;
-int counter = 1;
-
-bool setupOK = false;
-
+/**
+ * @brief Setup function initializing the DuckLink.
+ *
+ * - Sets up the Duck ID (exactly 8 bytes).
+ * - Initializes DuckLink using default configuration.
+ * - Sets up periodic execution of sensor data transmissions.
+ */
 void setup() {
 
-  std::string deviceId("DUCK0001"); //deviceId MUST be 8 bytes
+  std::string deviceId("DUCK0001");    ///< MUST be 8 bytes and unique from other ducks
   std::array<byte,8> devId;
   std::copy(deviceId.begin(), deviceId.end(), devId.begin());
   if (duck.setupWithDefaults(devId) != DUCK_ERR_NONE) {
-    Serial.println("[LINK] Failed to setup MamaDuck");
+    Serial.println("[LINK] Failed to setup DuckLink");
     return;
   }
-
-  setupOK = true;
   
-  // The timer triggers runSensor every INTERVAL_MS.
-  timer.every(INTERVAL_MS, runSensor);
+  timer.every(INTERVAL_MS, runSensor);     ///< Triggers runSensor every INTERVAL_MS
   
   Serial.println("[LINK] Setup OK!");
+  setupOK = true;
 }
 
+/**
+ * @brief Main loop runs continuously.
+ *
+ * Executes scheduled tasks and maintains Duck operation.
+ */
 void loop() {
   if (!setupOK) {
     return; 
@@ -58,6 +66,12 @@ void loop() {
   duck.run();
 }
 
+/**
+ * @brief Utility function to convert a std::string to a byte vector.
+ *
+ * @param str The input string to convert
+ * @return Byte vector representation of the input string
+ */
 std::vector<byte> stringToByteVector(const std::string& str) {
     std::vector<byte> byteVec;
     byteVec.reserve(str.length());
@@ -69,6 +83,14 @@ std::vector<byte> stringToByteVector(const std::string& str) {
     return byteVec;
 }
 
+/**
+ * @brief Function to run the sensor and send data.
+ *
+ * This function is called periodically to send sensor health data.
+ *
+ * @param unused Pointer to unused parameter (not used in this implementation)
+ * @return true if data was sent successfully, false otherwise
+ */
 bool runSensor(void *) {
   
   bool result = false;
@@ -87,16 +109,24 @@ bool runSensor(void *) {
 
 }
 
-bool sendData(std::vector<byte> message) {
+/**
+ * @brief Function to send data through the DuckLink.
+ *
+ * This function sends a message to the specified topic.
+ *
+ * @param message The message to send
+ * @param topic The topic to send the message to (default is status)
+ * @return true if data was sent successfully, false otherwise
+ */
+bool sendData(std::vector<byte> message, byte topic=topics::status) {
   bool sentOk = false;
   
-  int err = duck.sendData(topics::status, message);
+  int err = duck.sendData(topic, message);
   if (err == DUCK_ERR_NONE) {
-     counter++;
-     sentOk = true;
+    sentOk = true;
   }
   if (!sentOk) {
-    std::string errMessage = "[LINK] Failed to send data. error = " + std::to_string(err);
+    std::string errMessage = "[Link] Failed to send data. error = " + std::to_string(err);
     Serial.println(errMessage.c_str());
   }
   return sentOk;
