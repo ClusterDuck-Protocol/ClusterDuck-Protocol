@@ -23,11 +23,11 @@ bool sendData(std::vector<byte> message);
 std::vector<byte> stringToByteVector(const std::string& str);
 
 // --- Global Variables ---
-DuckLink duck;                            ///< CDP DuckLink instance
-auto timer = timer_create_default();      ///< Creating a timer with default settings
-const int INTERVAL_MS = 10000;            ///< Interval in milliseconds between each call of runSensor
-int counter = 1;                          ///< Message counter to track transmissions
-bool setupOK = false;                     ///< Flag indicating setup completion status
+DuckLink duck;                            // CDP DuckLink instance
+auto timer = timer_create_default();      // Creating a timer with default settings
+const int INTERVAL_MS = 10000;            // Interval in milliseconds between each call of runSensor
+int counter = 1;                          // Message counter to track transmissions
+bool setupOK = false;                     // Flag indicating setup completion status
 
 /**
  * @brief Setup function initializing the DuckLink.
@@ -38,7 +38,7 @@ bool setupOK = false;                     ///< Flag indicating setup completion 
  */
 void setup() {
 
-  std::string deviceId("DUCK0001");    ///< MUST be 8 bytes and unique from other ducks
+  std::string deviceId("DUCK0001");    // MUST be 8 bytes and unique from other ducks
   std::array<byte,8> devId;
   std::copy(deviceId.begin(), deviceId.end(), devId.begin());
   if (duck.setupWithDefaults(devId) != DUCK_ERR_NONE) {
@@ -46,7 +46,7 @@ void setup() {
     return;
   }
   
-  timer.every(INTERVAL_MS, runSensor);     ///< Triggers runSensor every INTERVAL_MS
+  timer.every(INTERVAL_MS, runSensor);     // Triggers runSensor every INTERVAL_MS
   
   Serial.println("[LINK] Setup OK!");
   setupOK = true;

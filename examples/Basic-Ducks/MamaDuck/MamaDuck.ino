@@ -24,11 +24,11 @@ bool sendData(std::vector<byte> message, byte topic=topics::status);
 bool runSensor(void *);
 
 // --- Global Variables ---
-MamaDuck duck;                        ///< CDP MamaDuck instance
-auto timer = timer_create_default();  ///< Creating a timer with default settings
-const int INTERVAL_MS = 10000;        ///< Interval in milliseconds between runSensor call
-int counter = 1;                      ///< Counter for the sensor data  
-bool setupOK = false;                 ///< Flag to check if setup is complete
+MamaDuck duck;                        // CDP MamaDuck instance
+auto timer = timer_create_default();  // Creating a timer with default settings
+const int INTERVAL_MS = 10000;        // Interval in milliseconds between runSensor call
+int counter = 1;                      // Counter for the sensor data  
+bool setupOK = false;                 // Flag to check if setup is complete
 
 /**
  * @brief Setup function to initialize the MamaDuck
@@ -39,7 +39,7 @@ bool setupOK = false;                 ///< Flag to check if setup is complete
  */
 void setup() {
 
-  std::string deviceId("MAMA0001"); ///< MUST be 8 bytes and unique from other ducks
+  std::string deviceId("MAMA0001"); // MUST be 8 bytes and unique from other ducks
   std::array<byte,8> devId;
   std::copy(deviceId.begin(), deviceId.end(), devId.begin());
   if (duck.setupWithDefaults(devId) != DUCK_ERR_NONE) {
@@ -47,7 +47,7 @@ void setup() {
     return;
   }
 
-  timer.every(INTERVAL_MS, runSensor); ///< Triggers runSensor every INTERVAL_MS
+  timer.every(INTERVAL_MS, runSensor); // Triggers runSensor every INTERVAL_MS
   
   setupOK = true;
   Serial.println("[MAMA] Setup OK!");
@@ -71,7 +71,7 @@ std::vector<byte> stringToByteVector(const std::string& str) {
 }
 
 /**
- * @brief Main Arduino loop runs continuously.
+ * @brief Main loop runs continuously.
  *
  * Executes scheduled tasks and maintains Duck operation.
  */

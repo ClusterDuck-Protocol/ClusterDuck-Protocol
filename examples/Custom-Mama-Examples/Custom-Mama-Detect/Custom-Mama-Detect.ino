@@ -2,7 +2,7 @@
  * @file Custom-Mama-Detect.ino
  * @brief Uses the built in Mama Duck and DuckDetector.
  * 
- * This example is a DubleDuck. It has the ability to easily change from a MamaDuck
+ * This example is a DoubleDuck. It has the ability to easily change from a MamaDuck
  * to a DuckDetector. This can be controlled by going to 192.168.1.1/controlpanel
  * after connecting to the Duck's wifi AP. In this example the duck starts as a 
  * MamaDuck by default. 
