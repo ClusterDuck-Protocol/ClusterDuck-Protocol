@@ -176,7 +176,6 @@ bool publishToMqttTopic(std::string source, std::string topic, std::string messa
   return ok;
 }
 
-
 // Incoming MQTT messages from the controller
 // This needs to be fast, so we simply queue the raw message
 // And we can process them in the main loop
@@ -212,7 +211,6 @@ void handleIncomingMqttMessages(void) {
     // Process the topic and message here
   }
 }
-
 
 void processMessageFromDucks(std::vector<byte> packetBuffer) {
 

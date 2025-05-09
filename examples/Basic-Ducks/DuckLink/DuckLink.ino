@@ -19,8 +19,7 @@
 
 // --- Function Declarations ---
 bool runSensor(void *);
-bool sendData(std::vector<byte> message);
-std::vector<byte> stringToByteVector(const std::string& str);
+bool sendData(std::string message, byte topic=topics::status);
 
 // --- Global Variables ---
 DuckLink duck;                            // CDP DuckLink instance
@@ -67,23 +66,6 @@ void loop() {
 }
 
 /**
- * @brief Utility function to convert a std::string to a byte vector.
- *
- * @param str The input string to convert
- * @return Byte vector representation of the input string
- */
-std::vector<byte> stringToByteVector(const std::string& str) {
-    std::vector<byte> byteVec;
-    byteVec.reserve(str.length());
-
-    for (unsigned int i = 0; i < str.length(); ++i) {
-        byteVec.push_back(static_cast<byte>(str[i]));
-    }
-
-    return byteVec;
-}
-
-/**
  * @brief Function to run the sensor and send data.
  *
  * This function is called periodically to send sensor health data.
@@ -99,7 +81,7 @@ bool runSensor(void *) {
   Serial.print("[LINK] sensor data: ");
   Serial.println(message.c_str());
   
-  result = sendData(stringToByteVector(message));
+  result = sendData(message, topics::health);
   if (result) {
      Serial.println("[LINK] runSensor ok.");
   } else {
@@ -112,13 +94,14 @@ bool runSensor(void *) {
 /**
  * @brief Function to send data through the DuckLink.
  *
- * This function sends a message to the specified topic.
+ * Encapsulates the message within a CDP topic and handles errors in transmission. CDP topics can be found 
+ * in CdpPacket.h
  *
  * @param message The message to send
  * @param topic The topic to send the message to (default is status)
  * @return true if data was sent successfully, false otherwise
  */
-bool sendData(std::vector<byte> message, byte topic=topics::status) {
+bool sendData(std::string message, byte topic) {
   bool sentOk = false;
   
   int err = duck.sendData(topic, message);
