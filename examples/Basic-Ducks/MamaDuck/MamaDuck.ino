@@ -95,11 +95,10 @@ bool runSensor(void *) {
 /**
  * @brief Sends the provided message as CDP packet to the mesh network.
  *
- * Encapsulates the message within a CDP topic and handles errors in transmission. CDP topics can be found 
- * in CdpPacket.h
+ * Encapsulates the message within a CDP topic and handles errors in transmission. 
  *
- * @param message The payload data to send as a byte vector
- * @param topic CDP topic (default: status)
+ * @param message The payload data to send as a std::string
+ * @param topic CDP topic. CDP topics can be found in CdpPacket.h (default: status)
  * @return true if data sent successfully, false otherwise
  */
 bool sendData(std::string message, byte topic) {

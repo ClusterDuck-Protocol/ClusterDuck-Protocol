@@ -92,14 +92,13 @@ bool runSensor(void *) {
 }
 
 /**
- * @brief Function to send data through the DuckLink.
+ * @brief Sends the provided message as CDP packet to the mesh network.
  *
- * Encapsulates the message within a CDP topic and handles errors in transmission. CDP topics can be found 
- * in CdpPacket.h
+ * Encapsulates the message within a CDP topic and handles errors in transmission. 
  *
- * @param message The message to send
- * @param topic The topic to send the message to (default is status)
- * @return true if data was sent successfully, false otherwise
+ * @param message The payload data to send as a std::string
+ * @param topic CDP topic. CDP topics can be found in CdpPacket.h (default: status)
+ * @return true if data sent successfully, false otherwise
  */
 bool sendData(std::string message, byte topic) {
   bool sentOk = false;
