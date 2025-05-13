@@ -30,25 +30,19 @@ public:
   std::string getCDPVersion() { return duckutils::getCDPVersion(); }
 
   /**
-   * @brief Set the Device Name object
-   * 
-   * @param name 
-   */
-  void setName(std::string name) { this->duckName = name; }
-  
-  /**
-   * @brief Get the duck's name.
-   * 
-   * @returns A string representing the duck's name
-   */
-  std::string getName() {return duckName;}
-  /**
    * @brief setup the duck unique ID
    * 
    * @param an 8 byte array
    * @return DUCK_ERR_NONE if successful, an error code otherwise 
    */
   int setDeviceId(std::array<byte,8>& id);
+
+  /**
+   * @brief Get the duck's unique ID.
+   * 
+   * @returns A std::string representing the duck's unique ID
+   */ 
+  std::string getDuckId() {return std::string(duid.begin(), duid.end());}
 
   /**
    * @brief setup the duck unique ID
@@ -287,8 +281,6 @@ public:
 protected:
   Duck(Duck const&) = delete;
   Duck& operator=(Duck const&) = delete;
-
-  std::string duckName="";
 
   std::string deviceId;
   std::array<byte,8> duid;
