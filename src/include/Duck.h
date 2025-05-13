@@ -29,20 +29,6 @@ public:
 
   std::string getCDPVersion() { return duckutils::getCDPVersion(); }
 
-  // /**
-  //  * @brief Set the Device Name object
-  //  * 
-  //  * @param name 
-  //  */
-  // void setName(std::string name) { this->duckName = name; }
-  
-  // /**
-  //  * @brief Get the duck's name.
-  //  * 
-  //  * @returns A string representing the duck's name
-  //  */
-  // std::string getName() {return duckName;}
-
   /**
    * @brief setup the duck unique ID
    * 
@@ -295,8 +281,6 @@ public:
 protected:
   Duck(Duck const&) = delete;
   Duck& operator=(Duck const&) = delete;
-
-  // std::string duckName="";
 
   std::string deviceId;
   std::array<byte,8> duid;

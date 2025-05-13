@@ -14,7 +14,7 @@ Duck::Duck(std::string name):
   filter(), // initialized filter with default values
   duckNet(new DuckNet(&filter))
 {
-  // duckName = name;
+  
 }
 
 Duck::~Duck() {
