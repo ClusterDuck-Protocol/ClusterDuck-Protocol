@@ -250,13 +250,20 @@ int DuckRadio::relayPacket(DuckPacket* packet)
         return DUCKLORA_ERR_NOT_INITIALIZED;
     }
     //Delay the transmission if we have received within the last 5 seconds
+
     if( (millis() - lastReceiveTime) < 5000L) {
         std::mt19937 gen(millis());
         std::uniform_int_distribution<> distrib(0, 3000L);
         std::chrono::milliseconds txdelay(distrib(gen));
         //Random delay between 0 and 3 seconds
         std::chrono::duration<long, std::milli> txdelay_ms(txdelay.count());
-        delay(txdelay_ms.count());
+
+        unsigned long current_time = millis();
+        unsigned long previousMillis = 0;
+        while(previousMillis - current_time <= txdelay_ms.count()) {
+            previousMillis = millis();
+            loginfo_ln("Delaying transmission for %ld ms", txdelay_ms.count());
+        }
     }
 
     return startTransmitData(packet->getBuffer().data(),
