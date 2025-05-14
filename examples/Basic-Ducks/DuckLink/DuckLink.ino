@@ -10,7 +10,6 @@
 
 #include <arduino-timer.h>
 #include <string>
-#include <vector>
 #include <CDP.h>
 
 #ifdef SERIAL_PORT_USBVIRTUAL

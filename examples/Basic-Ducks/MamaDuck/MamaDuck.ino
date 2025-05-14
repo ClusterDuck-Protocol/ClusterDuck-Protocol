@@ -10,7 +10,6 @@
  */
 
 #include <string>
-#include <vector>
 #include <arduino-timer.h>
 #include <CDP.h>
 
