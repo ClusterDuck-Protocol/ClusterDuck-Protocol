@@ -109,8 +109,7 @@ bool sendData(std::string message, byte topic) {
     sentOk = true;
   }
   if (!sentOk) {
-    std::string errMessage = "[MAMA] Failed to send data. error = " + std::to_string(err);
-    Serial.println(errMessage.c_str());
+    Serial.println(("[Link] Failed to send data. error = " + std::to_string(err)).c_str());
   }
   return sentOk;
 }
