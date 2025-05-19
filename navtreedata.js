@@ -65,7 +65,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "_duck_8cpp.html",
-"heltec__wifi__lora__32___v3_8h.html"
+"index.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

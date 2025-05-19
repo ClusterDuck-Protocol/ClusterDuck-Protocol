@@ -1,9 +1,7 @@
 var NAVTREEINDEX1 =
 {
-"heltec__wifi__lora__32___v3_8h.html":[4,0,0,1,0,1],
-"heltec__wifi__lora__32___v3_8h_source.html":[4,0,0,1,0,1],
-"index.html":[0],
 "index.html":[],
+"index.html":[0],
 "index.html#autotoc_md10":[0,5],
 "index.html#autotoc_md5":[0,0],
 "index.html#autotoc_md6":[0,1],
