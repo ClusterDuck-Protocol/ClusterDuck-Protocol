@@ -1,32 +1,31 @@
-
 /**
  * @file PapaDuck-Mqtt.ino
- * @author
- * @brief This example creates a PapaDuck that receives messages from other ducks and sends them to the test Mosquitto MQTT broker.
+ * @brief Implements a PapaDuck hub that receives CDP messages and forwards them to an MQTT broker.
  *
- * It's using a pre-built PapaDuck available from the ClusterDuck SDK but configured to send messages to an MQTT broker.
+ * The PapaDuck is a Wi-Fi enabled device that acts as a bridge between the CDP and the cloud (MQTT).
+ * It parses incoming CDP packets, serializes them to JSON, and sends them securely to an MQTT broker.
+ *
+ * @date 2025-05-07
  */
 
 #include <CDP.h>
-
 #include <PubSubClient.h>
 #include <WiFiClientSecure.h>
-
 #include <ArduinoJson.h>
 #include <arduino-timer.h>
 #include <string>
-
 #include <queue>
 
-
-#define MQTT_RETRY_DELAY_MS 500
+// --- WIFI Configuration ---
+const std::string WIFI_SSID="ENTER SSID";         // Replace with WiFi SSID
+const std::string WIFI_PASS="ENTER PASSWORD";     // Replace with WiFi Password
 #define WIFI_RETRY_DELAY_MS 5000
 
+// --- MQTT Configuration ---
+#define MQTT_RETRY_DELAY_MS 500
 #define MQTT_SERVER     "test.mosquitto.org" 
 #define PORT            8883
 #define MQTT_CLIENT_ID  "papa-duck-mqtt-1"  // This must be unique
-
-
 // from https://test.mosquitto.org/
 static const char* mosquitto_ca_cert = \
 "-----BEGIN CERTIFICATE-----\n" \
@@ -54,38 +53,29 @@ static const char* mosquitto_ca_cert = \
 "m/XriWr/Cq4h/JfB7NTsezVslgkBaoU=\n" \
 "-----END CERTIFICATE-----\n";
 
+// --- Global Objects ---
+PapaDuck hub;                                     // PapaDuck instance
+WiFiClientSecure wifiClient;                      // Secure WiFi client
+PubSubClient mqttClient(wifiClient);              // MQTT client
+std::queue<std::string> mqttMessageQueue;         // Incoming mqtt messages
+std::string mqttPubTopic = "hub/event";           // Published by the hub
+std::string mqttSubTopic = "incoming/say_hello";  // Subscribed by the hub
+bool setupOK = false;                             // Flag to check if setup is complete
+auto timer = timer_create_default();              // Timer instance
+bool wifiConnected = false;                       // Flag to check if WiFi is connected
 
-// Use pre-built papa duck as our hub device
-PapaDuck hub;
-
-bool setupOK = false;
-
-auto timer = timer_create_default();
-WiFiClientSecure wifiClient;
-PubSubClient mqttClient(wifiClient);
-bool wifiConnected = false;
-
-// hub incoming mqtt messages
-std::queue<std::string> mqttMessageQueue;
-
-std::string mqttPubTopic = "hub/event";           // published by the hub
-std::string mqttSubTopic = "incoming/say_hello";  // subscribed by the hub
-
-const std::string WIFI_SSID="ENTER SSID";   // Replace with WiFi SSID
-const std::string WIFI_PASS="ENTER PASSWORD";     // Replace with WiFi Password
-
-std::string toTopicString(byte topic);
-std::string arduinoStringFromHex(byte* data, int size);
-bool setup_mqtt(void);
-void handleIncomingMqttMessages(void);
-// std::string toHexString(std::vector<byte>& data);
+// --- Function Declarations ---
 std::vector<uint8_t> fromHexString(const std::string& hexString);
+std::string toTopicString(byte topic);
+bool setup_mqtt(void);
+std::string arduinoStringFromHex(byte* data, int size);
+bool publishToMqttTopic(std::string source, std::string topic, std::string message);
+void mqtt_callback(char* topic, byte* message, unsigned int length);
+void handleIncomingMqttMessages(void);
+void processMessageFromDucks(std::vector<byte> packetBuffer);
+void handleDuckData(std::vector<byte> packetBuffer);
 
-// std::string toHexString(std::vector<byte>& data) {
-//   std::string str = arduinoStringFromHex(data.data(), data.size());
-//   return str.c_str();
-// }
-
+// --- Convert Packet to Hex String ---
 std::vector<uint8_t> fromHexString(const std::string& hexString) {
     if (hexString.length() % 2 != 0) {
         throw std::invalid_argument("Hex string must have an even length");
@@ -141,12 +131,16 @@ std::string toTopicString(byte topic)
     case topics::sensor:
       topicString = "sensor";
       break;
+    case topics::health:
+      topicString = "health";
+      break;
     default:
       topicString = "status";
   }
   return topicString;
 }
 
+// --- Convert Packet to Hex String ---
 std::string arduinoStringFromHex(byte* data, int size) 
 {
   std::string buf = "";
@@ -181,7 +175,6 @@ bool publishToMqttTopic(std::string source, std::string topic, std::string messa
   }  
   return ok;
 }
-
 
 // Incoming MQTT messages from the controller
 // This needs to be fast, so we simply queue the raw message
@@ -218,7 +211,6 @@ void handleIncomingMqttMessages(void) {
     // Process the topic and message here
   }
 }
-
 
 void processMessageFromDucks(std::vector<byte> packetBuffer) {
 
@@ -282,7 +274,14 @@ void handleDuckData(std::vector<byte> packetBuffer) {
   processMessageFromDucks(packetBuffer);
 }
 
-
+/**
+ * @brief Setup function to initialize the PapaDuck
+ *
+ * - Sets up the Duck device ID (exactly 8 bytes).
+ * - Initializes PapaDuck using default configuration.
+ * - Sets up connection to WIFI.
+ * - Sets up MQTT client.
+ */
 void setup() {
   std::string deviceId("PAPA0001");
   std::array<byte,8> devId;
@@ -331,6 +330,11 @@ void setup() {
   Serial.printf("[HUB] Ready!\n");
 }
 
+/**
+ * @brief Main loop runs continuously.
+ *
+ * Executes scheduled tasks and maintains Duck operation.
+ */
 void loop() 
 {
   if (!setupOK) {
