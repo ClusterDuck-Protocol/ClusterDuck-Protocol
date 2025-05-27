@@ -18,6 +18,7 @@
 #include "../DuckLogger.h"
 #include "cdpcfg.h"
 #include "DuckPacket.h"
+#include <random>
 
 /**
  * @brief Internal structure to hold the LoRa module configuration
@@ -214,12 +215,16 @@ private:
   int goToReceiveMode(bool clear);
   int checkLoRaParameters(LoraConfigParams config);
 
-  DuckRadio() {};
+  DuckRadio() {
+      // Initialize the random number generator with a seed based on the current time in a non-arduino way
+      gen.seed(time(nullptr));
+  };
   DuckRadio(DuckRadio const&) = delete;
   DuckRadio& operator=(DuckRadio const&) = delete;
 
   void getSignalScore();
-
+  void delay();
+  std::mt19937 gen;
   static struct SignalInfo {
       float rssi;
       float snr;

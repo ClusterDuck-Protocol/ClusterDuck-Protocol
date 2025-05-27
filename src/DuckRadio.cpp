@@ -14,7 +14,6 @@
 
 #include "include/DuckUtils.h"
 #include <RadioLib.h>
-#include <random>
 #include <memory>
 #include <chrono>
 
@@ -249,10 +248,15 @@ int DuckRadio::relayPacket(DuckPacket* packet)
         logerr_ln("ERROR  LoRa radio not setup");
         return DUCKLORA_ERR_NOT_INITIALIZED;
     }
-    //Delay the transmission if we have received within the last 5 seconds
+    delay();
 
-    if( (millis() - lastReceiveTime) < 5000L) {
-        std::mt19937 gen(millis());
+    return startTransmitData(packet->getBuffer().data(),
+                             packet->getBuffer().size());
+}
+
+void DuckRadio::delay() {
+    //Delay the transmission if we have received within the last 5 seconds
+    if((millis() - this->lastReceiveTime) < 5000L) {
         std::uniform_int_distribution<> distrib(0, 3000L);
         std::chrono::milliseconds txdelay(distrib(gen));
         //Random delay between 0 and 3 seconds
@@ -265,9 +269,6 @@ int DuckRadio::relayPacket(DuckPacket* packet)
             loginfo_ln("Delaying transmission for %ld ms", txdelay_ms.count());
         }
     }
-
-    return startTransmitData(packet->getBuffer().data(),
-                             packet->getBuffer().size());
 }
 
 int DuckRadio::sendData(std::vector<byte> data)
@@ -276,10 +277,11 @@ int DuckRadio::sendData(std::vector<byte> data)
         logerr_ln("ERROR  LoRa radio not setup");
         return DUCKLORA_ERR_NOT_INITIALIZED;
     }
-
+    delay();
     return startTransmitData(data.data(), data.size());
 }
 
+//internal convenience method for now, may use in the routing branch later
 void DuckRadio::getSignalScore()
 {
 
