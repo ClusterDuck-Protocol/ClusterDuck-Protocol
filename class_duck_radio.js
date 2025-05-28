@@ -1,7 +1,8 @@
 var class_duck_radio =
 [
     [ "getChannel", "class_duck_radio.html#ade2da34b1dadc3aadf165d9ffe0b86bd", null ],
-    [ "getRSSI", "class_duck_radio.html#a0851b73a9a482eb4c79f5088c29f8cee", null ],
+    [ "getRSSI", "class_duck_radio.html#adf8d6541b860531b030fc8b169c21687", null ],
+    [ "getSNR", "class_duck_radio.html#a9dfe6c07410f19412bf3bf73bb73b500", null ],
     [ "ping", "class_duck_radio.html#a74cf885807a8045710d2080f88a01549", null ],
     [ "readReceivedData", "class_duck_radio.html#ad2e398fdfbccae3b7e07abad41fb13fa", null ],
     [ "relayPacket", "class_duck_radio.html#adf58a5b83c5632d37c5c05aa37f53035", null ],

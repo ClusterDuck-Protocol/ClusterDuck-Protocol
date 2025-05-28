@@ -19,14 +19,15 @@ var searchData=
   ['getinstance_16',['getinstance',['../class_duck_led.html#aeba6efc2fd6b67fd353300a46154b17e',1,'DuckLed::getInstance()'],['../class_duck_radio.html#a44a79333509f33d1a89d30c637170a22',1,'DuckRadio::getInstance()']]],
   ['getmaxallocheap_17',['getMaxAllocHeap',['../namespaceduckesp.html#aed41c96f426661ae0c3eaef453dd5f89',1,'duckesp']]],
   ['getminfreeheap_18',['getMinFreeHeap',['../namespaceduckesp.html#a5338d6f79be1fb629ffc5f1d1b4495a6',1,'duckesp']]],
-  ['getpassword_19',['getpassword',['../class_duck.html#a041a7773e559efb4bf8e0e20c493ceff',1,'Duck::getPassword()'],['../class_duck_net.html#afcac65512ef0a9b74f6f0826300612e8',1,'DuckNet::getPassword()']]],
+  ['getpassword_19',['getpassword',['../class_duck_net.html#afcac65512ef0a9b74f6f0826300612e8',1,'DuckNet::getPassword()'],['../class_duck.html#a041a7773e559efb4bf8e0e20c493ceff',1,'Duck::getPassword()']]],
   ['getrandombytes_20',['getRandomBytes',['../namespaceduckutils.html#a9a259c88457e4fac2bdc6042aa229dec',1,'duckutils']]],
   ['getreceiveflag_21',['getReceiveFlag',['../class_duck_radio.html#ad02e74c1329e584c9d461e247173a2e5',1,'DuckRadio']]],
-  ['getrssi_22',['getRSSI',['../class_duck_radio.html#a0851b73a9a482eb4c79f5088c29f8cee',1,'DuckRadio']]],
-  ['getssid_23',['getssid',['../class_duck_net.html#a4bac22808e4120262d1538e9be816698',1,'DuckNet::getSsid()'],['../class_duck.html#abfceae63bc916c2f878d629613d50c57',1,'Duck::getSsid()']]],
-  ['getstate_24',['getState',['../namespaceduckcrypto.html#a54b3103192a6ab83dbee1883246b485e',1,'duckcrypto']]],
-  ['gettimer_25',['getTimer',['../namespaceduckutils.html#afdb0bf8814af2145ed0d183ad5523157',1,'duckutils']]],
-  ['getting_20started_26',['Getting Started',['../index.html#autotoc_md8',1,'']]],
-  ['gettopic_27',['getTopic',['../class_duck_packet.html#a81d0ea3aaeac549e206b5fded15987ec',1,'DuckPacket']]],
-  ['gettype_28',['getType',['../class_duck.html#a3d0b92824388146c6e4e7d15d5f3c449',1,'Duck']]]
+  ['getrssi_22',['getRSSI',['../class_duck_radio.html#adf8d6541b860531b030fc8b169c21687',1,'DuckRadio']]],
+  ['getsnr_23',['getSNR',['../class_duck_radio.html#a9dfe6c07410f19412bf3bf73bb73b500',1,'DuckRadio']]],
+  ['getssid_24',['getssid',['../class_duck_net.html#a4bac22808e4120262d1538e9be816698',1,'DuckNet::getSsid()'],['../class_duck.html#abfceae63bc916c2f878d629613d50c57',1,'Duck::getSsid()']]],
+  ['getstate_25',['getState',['../namespaceduckcrypto.html#a54b3103192a6ab83dbee1883246b485e',1,'duckcrypto']]],
+  ['gettimer_26',['getTimer',['../namespaceduckutils.html#afdb0bf8814af2145ed0d183ad5523157',1,'duckutils']]],
+  ['getting_20started_27',['Getting Started',['../index.html#autotoc_md8',1,'']]],
+  ['gettopic_28',['getTopic',['../class_duck_packet.html#a81d0ea3aaeac549e206b5fded15987ec',1,'DuckPacket']]],
+  ['gettype_29',['getType',['../class_duck.html#a3d0b92824388146c6e4e7d15d5f3c449',1,'Duck']]]
 ];

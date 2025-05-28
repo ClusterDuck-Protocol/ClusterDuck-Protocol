@@ -90,6 +90,7 @@ $(document).ready(function(){initNavTree('class_duck_radio.html',''); initResiza
 
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="class_duck_radio-members.html">List of all members</a>  </div>
@@ -128,9 +129,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a35843d3c8856d01fa8046c6a267a0904" id="r_a35843d3c8856d01fa8046c6a267a0904"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck_radio.html#a35843d3c8856d01fa8046c6a267a0904">setChannel</a> (int channelNum)</td></tr>
 <tr class="memdesc:a35843d3c8856d01fa8046c6a267a0904"><td class="mdescLeft">&#160;</td><td class="mdescRight">change the duck channel.  <br /></td></tr>
 <tr class="separator:a35843d3c8856d01fa8046c6a267a0904"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0851b73a9a482eb4c79f5088c29f8cee" id="r_a0851b73a9a482eb4c79f5088c29f8cee"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck_radio.html#a0851b73a9a482eb4c79f5088c29f8cee">getRSSI</a> ()</td></tr>
-<tr class="memdesc:a0851b73a9a482eb4c79f5088c29f8cee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current RSSI value.  <br /></td></tr>
-<tr class="separator:a0851b73a9a482eb4c79f5088c29f8cee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf8d6541b860531b030fc8b169c21687" id="r_adf8d6541b860531b030fc8b169c21687"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck_radio.html#adf8d6541b860531b030fc8b169c21687">getRSSI</a> ()</td></tr>
+<tr class="memdesc:adf8d6541b860531b030fc8b169c21687"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current RSSI value.  <br /></td></tr>
+<tr class="separator:adf8d6541b860531b030fc8b169c21687"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9dfe6c07410f19412bf3bf73bb73b500" id="r_a9dfe6c07410f19412bf3bf73bb73b500"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck_radio.html#a9dfe6c07410f19412bf3bf73bb73b500">getSNR</a> ()</td></tr>
+<tr class="memdesc:a9dfe6c07410f19412bf3bf73bb73b500"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current SNR value.  <br /></td></tr>
+<tr class="separator:a9dfe6c07410f19412bf3bf73bb73b500"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a74cf885807a8045710d2080f88a01549" id="r_a74cf885807a8045710d2080f88a01549"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_duck_radio.html#a74cf885807a8045710d2080f88a01549">ping</a> ()</td></tr>
 <tr class="memdesc:a74cf885807a8045710d2080f88a01549"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a ping message.  <br /></td></tr>
 <tr class="separator:a74cf885807a8045710d2080f88a01549"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -245,14 +249,14 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a0851b73a9a482eb4c79f5088c29f8cee" name="a0851b73a9a482eb4c79f5088c29f8cee"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0851b73a9a482eb4c79f5088c29f8cee">&#9670;&#160;</a></span>getRSSI()</h2>
+<a id="adf8d6541b860531b030fc8b169c21687" name="adf8d6541b860531b030fc8b169c21687"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adf8d6541b860531b030fc8b169c21687">&#9670;&#160;</a></span>getRSSI()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int DuckRadio::getRSSI </td>
+          <td class="memname">float DuckRadio::getRSSI </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -261,7 +265,27 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Get the current RSSI value. </p>
-<dl class="section return"><dt>Returns</dt><dd>An integer representing the rssi value. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A float representing the rssi value. </dd></dl>
+
+</div>
+</div>
+<a id="a9dfe6c07410f19412bf3bf73bb73b500" name="a9dfe6c07410f19412bf3bf73bb73b500"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9dfe6c07410f19412bf3bf73bb73b500">&#9670;&#160;</a></span>getSNR()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float DuckRadio::getSNR </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the current SNR value. </p>
+<dl class="section return"><dt>Returns</dt><dd>A float representing the snr value. </dd></dl>
 
 </div>
 </div>
