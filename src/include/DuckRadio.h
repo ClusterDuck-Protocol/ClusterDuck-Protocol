@@ -18,6 +18,7 @@
 #include "../DuckLogger.h"
 #include "cdpcfg.h"
 #include "DuckPacket.h"
+#include <random>
 
 /**
  * @brief Internal structure to hold the LoRa module configuration
@@ -130,9 +131,16 @@ public:
   /**
    * @brief Get the current RSSI value.
    *
-   * @returns An integer representing the rssi value.
+   * @returns A float representing the rssi value.
    */
-  int getRSSI();
+
+  float getRSSI();
+  /**
+   * @brief Get the current SNR value.
+   *
+   * @returns A float representing the snr value.
+   */
+  float getSNR();
 
   /**
    * @brief Transmit a ping message.
@@ -199,6 +207,7 @@ private:
   static volatile uint16_t interruptFlags;
   static volatile bool receivedFlag;
   volatile bool isSetup = false;
+  unsigned long lastReceiveTime = 0L;
 
   static void setReceiveFlag(bool value) { receivedFlag = value; }
 
@@ -206,10 +215,21 @@ private:
   int goToReceiveMode(bool clear);
   int checkLoRaParameters(LoraConfigParams config);
 
-  DuckRadio() {};
+  DuckRadio() {
+      // Initialize the random number generator with a seed based on the current time in a non-arduino way
+      gen.seed(time(nullptr));
+  };
   DuckRadio(DuckRadio const&) = delete;
   DuckRadio& operator=(DuckRadio const&) = delete;
-  
+
+  void getSignalScore();
+  void delay();
+  std::mt19937 gen;
+  static struct SignalInfo {
+      float rssi;
+      float snr;
+      float signalScore;
+  } signalInfo;
 };
 
 #endif
