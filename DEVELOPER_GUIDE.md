@@ -31,13 +31,20 @@ This guide will help you set up the CDP on your development machine and build th
     ```ini
     [platformio]
 
-    default_envs = heltec_wifi_lora_32_V3
-    ;  default_envs = ttgo_t_beam
-    ;  default_envs = zeroUSB
-    ;  default_envs = cubecell_gps
-    ;  default_envs = cubecell_board_v2
+       default_envs = local_heltec_wifi_lora_32_V3
+    ;   default_envs = local_heltec_wifi_lora_32_V2
+    ;   default_envs = local_lilygo_t_beam_sx1276
+    ;   default_envs = local_lilygo_t_beam_sx1262
+
+    ;   default_envs = prod_heltec_wifi_lora_32_V3
+    ;   default_envs = prod_heltec_wifi_lora_32_V2
+    ;   default_envs = prod_lilygo_t_beam_sx1276
+    ;   default_envs = prod_lilygo_t_beam_sx1262
+
     ;  default_envs = test_heltec_wifi_lora_32_V3
-    ;  default_envs = test_cubecell_board_v2
+    ;  default_envs = test_lilygo_t_beam_sx1262
+    ;  default_envs = test_ttgo_lora32_v1
+
     ```
 This will set the environment for the Heltec LoRa v3 Arduino board. You can select the environment for your development board by uncommenting the corresponding line.
 
@@ -84,17 +91,12 @@ Here are the steps to run the examples (on Linux or Mac OS). This assumes you ha
     cd ClusterDuckProtocol
     ```
 
-3. Run the examples for the Heltec LoRa v3 Arduino board using your local CDP library
+3. Run the examples for the Lilygo Tbeam (with SX1276 LoRa chip) using your local CDP library (indicated by the `local_` prefix of board environment), supplying the relative path to the example folder you want to use. If no EXAMPLE_DIR is supplied, it defaults to Basic-Ducks/MamaDuck
     ```bash
-    cd examples/1.Ducks/DuckLink
-    platformio run -e local_heltec_wifi_lora_32_V3 -t upload
+    EXAMPLE_DIR=Basic-Ducks/DuckLink platformio run -e local_lilygo_t_beam_sx1276 -t upload
     ```
 
-4. Run the examples for the Heltec LoRa v3 Arduino board using the CDP library from the PlatformIO library registry
+4. Run the examples for the Lilygo Tbeam (with SX1276 LoRa chip) using the CDP library from the PlatformIO library registry (indicated by the `prod_` prefix of board environment).
     ```bash
-    cd examples/1.Ducks/DuckLink
-    platformio run -e prod_heltec_wifi_lora_32_V3 -t upload
+    EXAMPLE_DIR=Basic-Ducks/DuckLink platformio run -e prod_lilygo_t_beam_sx1276 -t upload
     ```
-
-
-
