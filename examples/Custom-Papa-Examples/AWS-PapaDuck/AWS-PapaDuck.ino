@@ -40,14 +40,12 @@
 // --- Global Objects ---
 PapaDuck duck;
 int QUEUE_SIZE_MAX = 5;
-std::queue<std::vector<byte>> packetQueue;
 auto timer = timer_create_default();
 bool retry = true; 
-WiFiClientSecure wifiClient;
-PubSubClient client(AWS_IOT_ENDPOINT, 8883, gotMsg, wifiClient);
 const char commandTopic[] = "iot-2/cmd/+/fmt/+";
 
 // --- Function Declarations ---
+std::queue<std::vector<byte>> packetQueue;
 std::string toTopicString(byte topic);
 std::string convertToHex(byte* data, int size);
 int quackJson(CdpPacket packet);
@@ -58,6 +56,10 @@ void mqttConnect();
 void subscribeTo(const char* topic);
 bool enableRetry(void*);
 void publishQueue();
+
+// --- WIFI Setup Function ---
+WiFiClientSecure wifiClient;
+PubSubClient client(AWS_IOT_ENDPOINT, 8883, gotMsg, wifiClient);
 
 /**
  * @brief Converts a CDP topic byte value into a string.
