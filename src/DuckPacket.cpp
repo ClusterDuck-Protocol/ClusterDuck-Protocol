@@ -91,7 +91,7 @@ int DuckPacket::prepareForSending(BloomFilter *filter,
     printStr.assign(targetDevice.begin(), targetDevice.end());
     logdbg_ln("DDuid:     %s", printStr.c_str());
     // message uid
-    buffer.insert(buffer.end(), &message_id[0], &message_id[MUID_LENGTH]);
+    buffer.insert(buffer.end(), &message_id[0], &message_id[MUID_LENGTH - 1]);
     printStr.assign(message_id.begin(), message_id.end());
     logdbg_ln("Muid:      %s", printStr.c_str());
 
@@ -108,8 +108,8 @@ int DuckPacket::prepareForSending(BloomFilter *filter,
     logdbg_ln("hop count: %s", std::to_string(getBuffer().at(HOP_COUNT_POS)).c_str());
 
     // data crc
-    buffer.insert(buffer.end(), &crc_bytes[0], &crc_bytes[DATA_CRC_LENGTH]);
-    logdbg_ln("Data CRC:  %s", duckutils::convertToHex(crc_bytes.data(), DATA_CRC_LENGTH).c_str());
+    buffer.insert(buffer.end(), &crc_bytes[0], &crc_bytes[DATA_CRC_LENGTH - 1]);
+    logdbg_ln("Data CRC:  %s", duckutils::convertToHex(crc_bytes.data(), DATA_CRC_LENGTH - 1).c_str());
 
     // ----- insert data -----
     if(duckcrypto::getState()) {
