@@ -64,7 +64,7 @@ int DuckPacket::prepareForSending(BloomFilter *filter,
   std::array<uint8_t,MUID_LENGTH> message_id;
   getUniqueMessageId(filter, message_id);
 
-  byte crc_bytes[DATA_CRC_LENGTH];
+  std::array<uint8_t,DATA_CRC_LENGTH> crc_bytes;
   uint32_t value;
   // TODO: update the CRC32 library to return crc as a byte array
   if(duckcrypto::getState()) {
@@ -109,7 +109,7 @@ int DuckPacket::prepareForSending(BloomFilter *filter,
 
     // data crc
     buffer.insert(buffer.end(), &crc_bytes[0], &crc_bytes[DATA_CRC_LENGTH]);
-    logdbg_ln("Data CRC:  %s", printStr.assign(crc_bytes, crc_bytes + DATA_CRC_LENGTH).c_str());
+    logdbg_ln("Data CRC:  %s", duckutils::convertToHex(crc_bytes.data(), DATA_CRC_LENGTH).c_str());
 
     // ----- insert data -----
     if(duckcrypto::getState()) {
