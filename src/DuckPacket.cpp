@@ -108,12 +108,12 @@ int DuckPacket::prepareForSending(BloomFilter *filter,
 
     // duckType
     buffer.insert(buffer.end(), duckType);
-    byte deviceType = buffer[DUCK_TYPE_POS];
+    byte deviceType = buffer[DUCK_TYPE_POS - 1];
     logdbg_ln("duck type: %s", std::to_string(deviceType).c_str());
 
     // hop count
     buffer.insert(buffer.end(), 0x00);
-    byte hopCount = buffer[HOP_COUNT_POS];
+    byte hopCount = buffer[HOP_COUNT_POS - 1];
     logdbg_ln("hop count: %s", std::to_string(hopCount).c_str());
 
     // data crc
