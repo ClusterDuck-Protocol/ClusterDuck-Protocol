@@ -112,7 +112,7 @@ public:
   private: 
     std::array<byte,8> duid;
     std::vector<byte> buffer;
-    static void getUniqueMessageId(BloomFilter * filter, byte message_id[MUID_LENGTH]);
+    static void getUniqueMessageId(BloomFilter * filter, std::array<uint8_t,MUID_LENGTH> &message_id);
 
 };
 
