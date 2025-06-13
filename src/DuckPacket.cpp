@@ -84,12 +84,19 @@ int DuckPacket::prepareForSending(BloomFilter *filter,
     std::string printStr;
   // source device uid
     buffer.insert(buffer.end(), duid.begin(), duid.end());
-    logdbg_ln("SDuid:     %s",duckutils::convertToHex(duid.data(), duid.size()).c_str());
 
-    // destination device uid
-    buffer.insert(buffer.end(), targetDevice.begin(), targetDevice.end());
-    printStr.assign(targetDevice.begin(), targetDevice.end());
-    logdbg_ln("DDuid:     %s", printStr.c_str());
+    std::string strDuid(duid.begin(), duid.end());
+    logdbg_ln("SDuid:      %s", strDuid.c_str());
+
+
+  // destination device uid  
+    if (targetDevice == BROADCAST_DUID){
+      logdbg_ln("DDuid:     broadcast");
+    } else{
+      buffer.insert(buffer.end(), targetDevice.begin(), targetDevice.end());
+      logdbg_ln("DDuid: %s", std::string(targetDevice.begin(), targetDevice.end()).c_str());
+    }
+    
     // message uid
     buffer.insert(buffer.end(), &message_id[0], &message_id[MUID_LENGTH - 1]);
     printStr.assign(message_id.begin(), message_id.end());
@@ -101,11 +108,13 @@ int DuckPacket::prepareForSending(BloomFilter *filter,
 
     // duckType
     buffer.insert(buffer.end(), duckType);
-    logdbg_ln("duck type: %s", std::to_string(getBuffer().at(DUCK_TYPE_POS)).c_str());
+    byte deviceType = buffer[DUCK_TYPE_POS];
+    logdbg_ln("duck type: %s", std::to_string(deviceType).c_str());
 
     // hop count
     buffer.insert(buffer.end(), 0x00);
-    logdbg_ln("hop count: %s", std::to_string(getBuffer().at(HOP_COUNT_POS)).c_str());
+    byte hopCount = buffer[HOP_COUNT_POS];
+    logdbg_ln("hop count: %s", std::to_string(hopCount).c_str());
 
     // data crc
     buffer.insert(buffer.end(), &crc_bytes[0], &crc_bytes[DATA_CRC_LENGTH - 1]);
