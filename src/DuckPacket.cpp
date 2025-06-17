@@ -98,7 +98,7 @@ int DuckPacket::prepareForSending(BloomFilter *filter,
     }
     
     // message uid
-    buffer.insert(buffer.end(), &message_id[0], &message_id[MUID_LENGTH - 1]);
+    buffer.insert(buffer.end(), message_id.begin(), message_id.end());
     printStr.assign(message_id.begin(), message_id.end());
     logdbg_ln("Muid:      %s", printStr.c_str());
 
@@ -108,16 +108,16 @@ int DuckPacket::prepareForSending(BloomFilter *filter,
 
     // duckType
     buffer.insert(buffer.end(), duckType);
-    byte deviceType = buffer[DUCK_TYPE_POS - 1];
+    byte deviceType = buffer[DUCK_TYPE_POS];
     logdbg_ln("duck type: %s", std::to_string(deviceType).c_str());
 
     // hop count
     buffer.insert(buffer.end(), 0x00);
-    byte hopCount = buffer[HOP_COUNT_POS - 1];
+    byte hopCount = buffer[HOP_COUNT_POS];
     logdbg_ln("hop count: %s", std::to_string(hopCount).c_str());
 
     // data crc
-    buffer.insert(buffer.end(), &crc_bytes[0], &crc_bytes[DATA_CRC_LENGTH - 1]);
+    buffer.insert(buffer.end(), crc_bytes.begin(), crc_bytes.end());
     logdbg_ln("Data CRC:  %s", duckutils::convertToHex(crc_bytes.data(), DATA_CRC_LENGTH - 1).c_str());
 
     // ----- insert data -----
