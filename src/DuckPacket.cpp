@@ -118,7 +118,7 @@ int DuckPacket::prepareForSending(BloomFilter *filter,
 
     // data crc
     buffer.insert(buffer.end(), crc_bytes.begin(), crc_bytes.end());
-    logdbg_ln("Data CRC:  %s", duckutils::convertToHex(crc_bytes.data(), DATA_CRC_LENGTH - 1).c_str());
+    logdbg_ln("Data CRC:  %s", duckutils::arrayToHexString(crc_bytes).c_str());
 
     // ----- insert data -----
     if(duckcrypto::getState()) {
