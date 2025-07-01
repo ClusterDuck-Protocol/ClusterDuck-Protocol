@@ -283,7 +283,7 @@ protected:
   Duck& operator=(Duck const&) = delete;
 
   std::string deviceId;
-  std::array<byte,8> duid;
+  std::array<uint8_t,8> duid;
 
   class DuckRecord {
     public:
@@ -309,7 +309,7 @@ protected:
 
   DuckPacket* txPacket = NULL;
   DuckPacket* rxPacket = NULL;
-  std::array<byte,4> lastMessageMuid;
+  std::array<uint8_t,4> lastMessageMuid;
 
   BloomFilter filter;
   /**
