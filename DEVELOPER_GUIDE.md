@@ -100,3 +100,8 @@ Here are the steps to run the examples (on Linux or Mac OS). This assumes you ha
     ```bash
     EXAMPLE_DIR=Basic-Ducks/DuckLink platformio run -e prod_lilygo_t_beam_sx1276 -t upload
     ```
+   If you are flashing from **Windows**, you may need to run the commands separately as below instead:
+   ```
+   $env:EXAMPLE_DIR=Basic-Ducks/DuckLink
+   platformio run -e prod_lilygo_t_beam_sx1276 -t upload
+   ```
