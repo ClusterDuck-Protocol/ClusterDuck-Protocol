@@ -120,6 +120,8 @@ enum reservedTopic {
   gps = 0x03,
   ack = 0x04,
   cmd = 0x05,
+  rreq = 0x06,
+  rrep = 0x07,
   max_reserved = 0x0F
 };
 

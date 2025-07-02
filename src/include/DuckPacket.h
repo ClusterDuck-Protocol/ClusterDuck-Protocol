@@ -6,6 +6,7 @@
 #include "DuckUtils.h"
 #include "cdpcfg.h"
 #include "bloomfilter.h"
+#include "ArduinoJson.h"
 #include <CRC32.h>
 #include <array>
 
@@ -112,8 +113,32 @@ public:
   private: 
     std::array<byte,8> duid;
     std::vector<byte> buffer;
-    static void getUniqueMessageId(BloomFilter * filter, std::array<uint8_t,MUID_LENGTH> &message_id);
 
+    static void getUniqueMessageId(BloomFilter * filter, std::array<uint8_t,MUID_LENGTH> &message_id);
+    /**
+ * @brief Build a RREQ packet.
+ *
+ * @param targetDevice the target device DUID to receive the message
+ * @param sourceDevice the source device DUID to send the message
+ * @returns a JSON Document representing the RREQ packet
+ */
+    ArduinoJson::JsonDocument RREQ(std::array<byte, 8> targetDevice, std::array<byte, 8> sourceDevice);
+
+/**
+ * @brief Update a RREQ packet with the target device.
+ *
+ * @param rreq the RREQ packet to update
+ * @param targetDevice the target device DUID to receive the message
+ * @returns a JSON Document representing the updated RREQ packet
+ */
+    ArduinoJson::JsonDocument UpdateRREQ(ArduinoJson::JsonDocument rreq, std::array<byte, 8> targetDevice);
+
+    /**
+     * @brief Get the data section of the packet.
+     *
+     * @returns a vector of bytes representing the data section
+     */
+    std::vector<byte> getDataSection() { return std::vector<byte>(buffer.begin() + DATA_POS, buffer.end()); }
 };
 
 #endif

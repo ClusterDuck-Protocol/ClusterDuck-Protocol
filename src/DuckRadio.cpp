@@ -271,7 +271,7 @@ void DuckRadio::delay() {
     }
 }
 
-int DuckRadio::sendData(std::vector<byte> data)
+int DuckRadio::sendData(std::vector<uint8_t> data)
 {
     if (!isSetup) {
         logerr_ln("ERROR  LoRa radio not setup");
