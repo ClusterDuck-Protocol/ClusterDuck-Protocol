@@ -58,7 +58,7 @@ void MamaDuck::run() {
 
 void MamaDuck::handleReceivedPacket() {
 
-  std::vector<byte> data;
+  std::vector<uint8_t> data;
   bool relay = false;
   
   loginfo_ln("====> handleReceivedPacket: START");
@@ -116,7 +116,7 @@ void MamaDuck::handleReceivedPacket() {
           }
       }
     } else if(duckutils::isEqual(duid, packet.dduid)) { //Target device check
-        std::vector<byte> dataPayload;
+        std::vector<uint8_t> dataPayload;
         byte num = 1;
       
       switch(packet.topic) {
@@ -154,8 +154,8 @@ void MamaDuck::handleReceivedPacket() {
 
 void MamaDuck::handleCommand(const CdpPacket & packet) {
   int err;
-  std::vector<byte> dataPayload;
-  std::vector<byte> alive {'I','m',' ','a','l','i','v','e'};
+  std::vector<uint8_t> dataPayload;
+  std::vector<uint8_t> alive {'I','m',' ','a','l','i','v','e'};
 
   switch(packet.data[0]) {
     case 0:

@@ -122,7 +122,7 @@ void PapaDuck::handleReceivedPacket() {
 
 void PapaDuck::sendCommand(uint8_t cmd, std::vector<uint8_t> value) {
   loginfo_ln("Initiate sending command");
-  std::vector<byte> dataPayload;
+  std::vector<uint8_t> dataPayload;
   dataPayload.push_back(cmd);
   dataPayload.insert(dataPayload.end(), value.begin(), value.end());
 
@@ -143,7 +143,7 @@ void PapaDuck::sendCommand(uint8_t cmd, std::vector<uint8_t> value) {
   }
 }
 
-void PapaDuck::sendCommand(byte cmd, std::vector<uint8_t> value, std::array<uint8_t,8> dduid) {
+void PapaDuck::sendCommand(uint8_t cmd, std::vector<uint8_t> value, std::array<uint8_t,8> dduid) {
   loginfo_ln("Initiate sending command");
   std::vector<byte> dataPayload;
   dataPayload.push_back(cmd);

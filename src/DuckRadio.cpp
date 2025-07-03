@@ -142,7 +142,7 @@ int DuckRadio::setupRadio(LoraConfigParams config) {
     return DUCK_ERR_NONE;
 }
 
-int DuckRadio::setSyncWord(byte syncWord) {
+int DuckRadio::setSyncWord(uint8_t syncWord) {
     if (!isSetup) {
         logerr_ln("ERROR  LoRa radio not setup");
         return DUCKLORA_ERR_NOT_INITIALIZED;
@@ -163,7 +163,7 @@ int DuckRadio::goToReceiveMode(bool clearReceiveFlag) {
     return startReceive();
 }
 
-int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
+int DuckRadio::readReceivedData(std::vector<uint8_t>* packetBytes) {
 
     int packet_length = 0;
     int err = DUCK_ERR_NONE;
@@ -232,7 +232,7 @@ int DuckRadio::readReceivedData(std::vector<byte>* packetBytes) {
     return err;
 }
 
-int DuckRadio::sendData(byte* data, int length)
+int DuckRadio::sendData(uint8_t* data, int length)
 {
 
     if (!isSetup) {
@@ -473,7 +473,7 @@ void DuckRadio::onInterrupt(void) {
     interruptFlags = lora.getIrqFlags();
 }
 
-int DuckRadio::startTransmitData(byte* data, int length) {
+int DuckRadio::startTransmitData(uint8_t* data, int length) {
     int err = DUCK_ERR_NONE;
     int tx_err = RADIOLIB_ERR_NONE;
 
