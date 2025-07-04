@@ -14,21 +14,21 @@
  * @brief Use this DUID to send to all PapaDucks
  * 
  */
-static std::array<byte,8> ZERO_DUID = {0x00, 0x00, 0x00, 0x00,
+static std::array<uint8_t,8> ZERO_DUID = {0x00, 0x00, 0x00, 0x00,
                                       0x00, 0x00, 0x00, 0x00};
 
 /**
  * @brief Use this DUID to be received by every duck in the network
  * 
  */
-static std::array<byte,8> BROADCAST_DUID = {0xFF, 0xFF, 0xFF, 0xFF,
+static std::array<uint8_t,8> BROADCAST_DUID = {0xFF, 0xFF, 0xFF, 0xFF,
                                            0xFF, 0xFF, 0xFF, 0xFF};
 
 /**
  * @brief Use this DUID to be received by every duck in the network
  * 
  */
-static std::array<byte,8> PAPADUCK_DUID = {0x50, 0x61, 0x70, 0x61,
+static std::array<uint8_t,8> PAPADUCK_DUID = {0x50, 0x61, 0x70, 0x61,
                                            0x44, 0x75, 0x63, 0x6B};
 
 /**
@@ -53,7 +53,7 @@ public:
      * @param duid a duck device unique id
      * @param filter a bloom filter
      */
-        DuckPacket(std::array<byte,8> duid)
+        DuckPacket(std::array<uint8_t,8> duid)
         : duid(duid) {
             buffer.reserve(256);
             }
@@ -64,14 +64,14 @@ public:
      *
      * @param duid a duck device unique id
      */
-    void setDeviceId(std::array<byte,8> duid) { this->duid = duid; }
+    void setDeviceId(std::array<uint8_t,8> duid) { this->duid = duid; }
 
     /**
      * @brief Get device Id.
      *
      * @returns a duck device unique id
      */
-    std::array<byte,8> getDeviceId() { return this->duid = duid; }
+    std::array<uint8_t,8> getDeviceId() { return this->duid; }
     /**
      * @brief Build a packet from the given topic and provided byte buffer.
      *
@@ -80,8 +80,8 @@ public:
      * @param app_data a byte buffer that contains the packet data section
      * @returns DUCK_ERR_NONE if the operation was successful, otherwise an error code.
      */
-    int prepareForSending(BloomFilter *filter, const std::array<byte,8> targetDevice,
-                          byte duckType, byte topic, std::vector<byte> app_data);
+    int prepareForSending(BloomFilter *filter, const std::array<uint8_t,8> targetDevice,
+                          uint8_t duckType, uint8_t topic, std::vector<uint8_t> app_data);
 
     /**
      * @brief Update a received packet if it needs to be relayed in the mesh.
@@ -91,7 +91,7 @@ public:
      * @returns true if the packet needs to be relayed
      * @returns false if the packet does not need to be replayed
      */
-    bool prepareForRelaying(BloomFilter *filter, std::vector<byte> dataBuffer);
+    bool prepareForRelaying(BloomFilter *filter, std::vector<uint8_t> dataBuffer);
     
     /**
      * @brief Get the Cdp Packet byte array.
@@ -108,37 +108,38 @@ public:
       buffer.clear();
     }
 
-    byte getTopic() { return buffer[TOPIC_POS]; }
-
-  private: 
-    std::array<byte,8> duid;
-    std::vector<byte> buffer;
-
-    static void getUniqueMessageId(BloomFilter * filter, std::array<uint8_t,MUID_LENGTH> &message_id);
-    /**
- * @brief Build a RREQ packet.
- *
- * @param targetDevice the target device DUID to receive the message
- * @param sourceDevice the source device DUID to send the message
- * @returns a JSON Document representing the RREQ packet
- */
-    ArduinoJson::JsonDocument RREQ(std::array<byte, 8> targetDevice, std::array<byte, 8> sourceDevice);
+    uint8_t getTopic() { return buffer[TOPIC_POS]; }
 
 /**
- * @brief Update a RREQ packet with the target device.
+* @brief Build a RREQ packet.
+*
+*
+* @param sourceDevice the source device DUID to send the message
+* @returns a JSON Document representing the RREQ packet
+*/
+   static ArduinoJson::JsonDocument RREQ(std::array<uint8_t,8> targetDevice, std::array<uint8_t, 8> sourceDevice);
+
+/**
+ * @brief Update a RREQ packet with the current node's DUID.
  *
  * @param rreq the RREQ packet to update
- * @param targetDevice the target device DUID to receive the message
+ * @param currentDevice the device DUID to of the current node
  * @returns a JSON Document representing the updated RREQ packet
  */
-    ArduinoJson::JsonDocument UpdateRREQ(ArduinoJson::JsonDocument rreq, std::array<byte, 8> targetDevice);
+   static void UpdateRREQ(ArduinoJson::JsonDocument& rreq, std::array<uint8_t, 8> currentDevice);
+
+  private: 
+    std::array<uint8_t,8> duid;
+    std::vector<uint8_t> buffer;
+
+    static void getUniqueMessageId(BloomFilter * filter, std::array<uint8_t,MUID_LENGTH> &message_id);
 
     /**
      * @brief Get the data section of the packet.
      *
      * @returns a vector of bytes representing the data section
      */
-    std::vector<byte> getDataSection() { return std::vector<byte>(buffer.begin() + DATA_POS, buffer.end()); }
+    std::vector<uint8_t> getDataSection() { return std::vector<uint8_t>(buffer.begin() + DATA_POS, buffer.end()); }
 };
 
 #endif

@@ -39,7 +39,7 @@ std::string toUpperCase(std::string str);
  * @param str the string to convert
  * @returns A vector of bytes.
  */
-std::vector<byte> stringToByteVector(const String& str);
+std::vector<uint8_t> stringToByteVector(const std::string& str);
 
 /**
  * @brief Creates a byte array with random alpha numerical values.

@@ -143,29 +143,29 @@ DCRC:      04  byte value          - Data section CRC
 DATA:      229 byte array          - Data payload (e.g sensor read, text,...)
 */
 
-typedef std::array<byte,8> Duid;
-typedef std::array<byte,4> Muid;
+typedef std::array<uint8_t,8> Duid;
+typedef std::array<uint8_t,4> Muid;
 
 class CdpPacket {
 public:
   /// Source Device UID (8 bytes)
-  std::array<byte,8> sduid;
+  std::array<uint8_t,8> sduid;
   /// Destination Device UID (8 bytes)
-  std::array<byte,8> dduid;
+  std::array<uint8_t,8> dduid;
   /// Message UID (4 bytes)
-  std::array<byte,4> muid;
+  std::array<uint8_t,4> muid;
   /// Message topic (1 byte)
-  byte topic;
+  uint8_t topic;
   /// Offset to the Path section (1 byte)
-  byte path_offset;
+  uint8_t path_offset;
   /// Type of ducks as define in DuckTypes.h
-  byte duckType;
+  uint8_t duckType;
   /// Number of times a packet was relayed in the mesh
-  byte hopCount;
+  uint8_t hopCount;
   /// crc32 for the data section
   uint32_t dcrc;
   /// Data section
-  std::vector<byte> data;
+  std::vector<uint8_t> data;
   /// Path section (48 bytes max)
   //std::array<byte,48> path;
   //time received
@@ -174,7 +174,7 @@ public:
   CdpPacket() {
     reset();
   }
-  CdpPacket(const std::vector<byte> & buffer) {
+  CdpPacket(const std::vector<uint8_t> & buffer) {
       int buffer_length = buffer.size();
       // sduid
       std::copy(&buffer[SDUID_POS], &buffer[DDUID_POS], sduid.begin());
@@ -202,8 +202,8 @@ public:
    *
    */
   void reset() {
-    std::array<byte,8>().swap(sduid);
-    std::array<byte,4>().swap(muid);
+    std::array<uint8_t,8>().swap(sduid);
+    std::array<uint8_t,4>().swap(muid);
     //std::array<byte,8>().swap(path);
     data.clear();
     duckType = DuckType::UNKNOWN;

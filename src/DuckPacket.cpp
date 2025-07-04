@@ -48,8 +48,9 @@ void DuckPacket::getUniqueMessageId(BloomFilter * filter, std::array<uint8_t,MUI
 
 ArduinoJson::JsonDocument DuckPacket::RREQ(std::array<uint8_t,8> targetDevice, std::array<uint8_t,8> sourceDevice) {
     ArduinoJson::JsonObject rreq = ArduinoJson::JsonObject();
-    rreq["origin"] = duckutils::convertToHex(sourceDevice.data(), sourceDevice.size());
-    rreq["path"] = ArduinoJson::JsonArray();
+    rreq["origin"] = duckutils::arrayToHexString(sourceDevice);
+    rreq["destination"] = targetDevice.data();
+    rreq["path"].as<ArduinoJson::JsonArray>();
 #ifdef CDP_LOG_DEBUG
     std::string log;
     serializeJson(rreq, log);
@@ -58,16 +59,15 @@ ArduinoJson::JsonDocument DuckPacket::RREQ(std::array<uint8_t,8> targetDevice, s
   return rreq;
 }
 
-ArduinoJson::JsonDocument DuckPacket::UpdateRREQ(ArduinoJson::JsonDocument rreq, std::array<uint8_t ,8> targetDevice) {
+void DuckPacket::UpdateRREQ(ArduinoJson::JsonDocument& rreq, std::array<uint8_t,8> currentDevice) {
     ArduinoJson::JsonArray path = rreq["path"].to<ArduinoJson::JsonArray>();
-    path.add(duckutils::convertToHex(targetDevice.data(), targetDevice.size()));
+    path.add(currentDevice.data());
     rreq["path"] = path;
 #ifdef CDP_LOG_DEBUG
     std::string log;
     serializeJson(rreq, log);
     logdbg_ln("RREQ: %s", log.c_str());
 #endif
-    return rreq;
 }
 
 int DuckPacket::prepareForSending(BloomFilter *filter,
