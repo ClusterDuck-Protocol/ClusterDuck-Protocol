@@ -59,7 +59,7 @@ ArduinoJson::JsonDocument DuckPacket::RREQ(std::array<uint8_t,8> targetDevice, s
   return rreq;
 }
 
-ArduinoJson::JsonDocument DuckPacket::UpdateRREQ(ArduinoJson::JsonDocument rreq, std::array<uint8_t ,8> currentDevice) {
+void DuckPacket::UpdateRREQ(ArduinoJson::JsonDocument& rreq, std::array<uint8_t ,8> currentDevice) {
     ArduinoJson::JsonArray path = rreq["path"].to<ArduinoJson::JsonArray>();
     path.add(duckutils::arrayToHexString(currentDevice));
     rreq["path"] = path;
@@ -68,7 +68,6 @@ ArduinoJson::JsonDocument DuckPacket::UpdateRREQ(ArduinoJson::JsonDocument rreq,
     serializeJson(rreq, log);
     logdbg_ln("RREQ: %s", log.c_str());
 #endif
-    return rreq;
 }
 
 int DuckPacket::prepareForSending(BloomFilter *filter,

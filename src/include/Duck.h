@@ -288,7 +288,7 @@ protected:
   class DuckRecord {
     public:
       //DuckRecord() : routingScore(0), lastSeen(0), snr(0), rssi(0) {}
-      DuckRecord(std::string devId, long routingScore, long lastSeen, long snr, long rssi) :
+      DuckRecord(std::string devId, long routingScore, long lastSeen, float snr, float rssi) :
         DeviceId(std::move(devId)), routingScore(routingScore), lastSeen(lastSeen), snr(snr), rssi(rssi) {}
 
       std::string getDeviceId() { return DeviceId; }
@@ -375,7 +375,7 @@ protected:
    * The default implementation simply initializes the serial interface.
    * It can be overriden by each concrete Duck class implementation.
    */
-  virtual int setupWithDefaults(std::array<byte,8> deviceId, std::string ssid, std::string password) {
+  virtual int setupWithDefaults(std::array<uint8_t,8> deviceId, std::string ssid, std::string password) {
     int err = setupSerial();
     if (err != DUCK_ERR_NONE) {
       return err;

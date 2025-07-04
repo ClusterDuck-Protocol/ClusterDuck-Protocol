@@ -85,6 +85,24 @@ void MamaDuck::handleReceivedPacket() {
     //Check if Duck is desitination for this packet before relaying
     if (duckutils::isEqual(BROADCAST_DUID, packet.dduid)) {
       switch(packet.topic) {
+        case reservedTopic::rreq: {
+            loginfo_ln("RREQ received. Updating RREQ!");
+            ArduinoJson::JsonDocument rreqDoc;
+            deserializeJson(rreqDoc, packet.data);
+            DuckPacket::UpdateRREQ(rreqDoc, this->duid);
+            loginfo_ln("handleReceivedPacket: RREQ updated with current DUID: %s", this->duid);
+            //Serialize the updated RREQ packet
+            std::string strRREQ;
+            serializeJson(rreqDoc, strRREQ);
+            rxPacket->getBuffer() = duckutils::stringToByteVector(strRREQ);
+            err = duckRadio.relayPacket(rxPacket);
+            if (err != DUCK_ERR_NONE) {
+                logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d", err);
+            } else {
+                loginfo_ln("handleReceivedPacket: RREQ packet RELAY DONE");
+            }
+            return;
+        }
         case reservedTopic::ping:
           loginfo_ln("PING received. Sending PONG!");
           err = sendPong();
