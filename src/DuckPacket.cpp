@@ -50,7 +50,7 @@ ArduinoJson::JsonDocument DuckPacket::RREQ(std::array<uint8_t,8> targetDevice, s
     ArduinoJson::JsonObject rreq = ArduinoJson::JsonObject();
     rreq["origin"] = duckutils::arrayToHexString(sourceDevice);
     rreq["destination"] = targetDevice.data();
-    rreq["path"] = ArduinoJson::JsonArray();
+    rreq["path"].as<ArduinoJson::JsonArray>();
 #ifdef CDP_LOG_DEBUG
     std::string log;
     serializeJson(rreq, log);
