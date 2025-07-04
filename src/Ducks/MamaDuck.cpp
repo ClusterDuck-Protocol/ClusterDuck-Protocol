@@ -92,7 +92,6 @@ void MamaDuck::handleReceivedPacket() {
             logerr_ln("ERROR failed to send pong message. rc = %d",err);
           }
           return;
-        break;
         case reservedTopic::pong:
           loginfo_ln("PONG received. Ignoring!");
         break;

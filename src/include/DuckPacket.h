@@ -53,7 +53,7 @@ public:
      * @param duid a duck device unique id
      * @param filter a bloom filter
      */
-        DuckPacket(std::array<byte,8> duid)
+        DuckPacket(std::array<uint8_t,8> duid)
         : duid(duid) {
             buffer.reserve(256);
             }
@@ -64,7 +64,7 @@ public:
      *
      * @param duid a duck device unique id
      */
-    void setDeviceId(std::array<byte,8> duid) { this->duid = duid; }
+    void setDeviceId(std::array<uint8_t,8> duid) { this->duid = duid; }
 
     /**
      * @brief Get device Id.
@@ -80,7 +80,7 @@ public:
      * @param app_data a byte buffer that contains the packet data section
      * @returns DUCK_ERR_NONE if the operation was successful, otherwise an error code.
      */
-    int prepareForSending(BloomFilter *filter, const std::array<byte,8> targetDevice,
+    int prepareForSending(BloomFilter *filter, const std::array<uint8_t,8> targetDevice,
                           byte duckType, byte topic, std::vector<byte> app_data);
 
     /**
@@ -91,7 +91,7 @@ public:
      * @returns true if the packet needs to be relayed
      * @returns false if the packet does not need to be replayed
      */
-    bool prepareForRelaying(BloomFilter *filter, std::vector<byte> dataBuffer);
+    bool prepareForRelaying(BloomFilter *filter, std::vector<uint8_t> dataBuffer);
     
     /**
      * @brief Get the Cdp Packet byte array.
@@ -118,27 +118,27 @@ public:
     /**
  * @brief Build a RREQ packet.
  *
- * @param targetDevice the target device DUID to receive the message
+ *
  * @param sourceDevice the source device DUID to send the message
  * @returns a JSON Document representing the RREQ packet
  */
-    ArduinoJson::JsonDocument RREQ(std::array<byte, 8> targetDevice, std::array<byte, 8> sourceDevice);
+    ArduinoJson::JsonDocument RREQ(std::array<uint8_t,8> targetDevice, std::array<uint8_t, 8> sourceDevice);
 
 /**
- * @brief Update a RREQ packet with the target device.
+ * @brief Update a RREQ packet with the current node's DUID.
  *
  * @param rreq the RREQ packet to update
- * @param targetDevice the target device DUID to receive the message
+ * @param currentDevice the device DUID to of the current node
  * @returns a JSON Document representing the updated RREQ packet
  */
-    ArduinoJson::JsonDocument UpdateRREQ(ArduinoJson::JsonDocument rreq, std::array<byte, 8> targetDevice);
+    ArduinoJson::JsonDocument UpdateRREQ(ArduinoJson::JsonDocument rreq, std::array<uint8_t, 8> currentDevice);
 
     /**
      * @brief Get the data section of the packet.
      *
      * @returns a vector of bytes representing the data section
      */
-    std::vector<byte> getDataSection() { return std::vector<byte>(buffer.begin() + DATA_POS, buffer.end()); }
+    std::vector<uint8_t> getDataSection() { return std::vector<uint8_t>(buffer.begin() + DATA_POS, buffer.end()); }
 };
 
 #endif
