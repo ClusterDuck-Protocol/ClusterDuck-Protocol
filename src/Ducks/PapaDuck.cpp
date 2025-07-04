@@ -1,6 +1,6 @@
 #include "../PapaDuck.h"
 #include <cassert>
-int PapaDuck::setupWithDefaults(std::array<byte,8> deviceId, std::string ssid, std::string password) {
+int PapaDuck::setupWithDefaults(std::array<uint8_t,8> deviceId, std::string ssid, std::string password) {
   loginfo_ln("setupWithDefaults...");
 
   int err = Duck::setupWithDefaults(deviceId, ssid, password);
@@ -90,7 +90,7 @@ void PapaDuck::run() {
 void PapaDuck::handleReceivedPacket() {
 
   loginfo_ln("handleReceivedPacket() START");
-  std::vector<byte> data;
+  std::vector<uint8_t> data;
   int err = duckRadio.readReceivedData(&data);
 
   if (err != DUCK_ERR_NONE) {
@@ -120,9 +120,9 @@ void PapaDuck::handleReceivedPacket() {
   loginfo_ln("handleReceivedPacket() DONE");
 }
 
-void PapaDuck::sendCommand(byte cmd, std::vector<byte> value) {
+void PapaDuck::sendCommand(uint8_t cmd, std::vector<uint8_t> value) {
   loginfo_ln("Initiate sending command");
-  std::vector<byte> dataPayload;
+  std::vector<uint8_t> dataPayload;
   dataPayload.push_back(cmd);
   dataPayload.insert(dataPayload.end(), value.begin(), value.end());
 
@@ -143,7 +143,7 @@ void PapaDuck::sendCommand(byte cmd, std::vector<byte> value) {
   }
 }
 
-void PapaDuck::sendCommand(byte cmd, std::vector<byte> value, std::array<byte,8> dduid) {
+void PapaDuck::sendCommand(uint8_t cmd, std::vector<uint8_t> value, std::array<uint8_t,8> dduid) {
   loginfo_ln("Initiate sending command");
   std::vector<byte> dataPayload;
   dataPayload.push_back(cmd);

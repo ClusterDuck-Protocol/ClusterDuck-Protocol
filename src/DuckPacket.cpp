@@ -9,7 +9,7 @@
 #include <string>
 
 
-bool DuckPacket::prepareForRelaying(BloomFilter *filter, std::vector<byte> dataBuffer) {
+bool DuckPacket::prepareForRelaying(BloomFilter *filter, std::vector<uint8_t> dataBuffer) {
 
 
   this->reset();
@@ -46,7 +46,7 @@ void DuckPacket::getUniqueMessageId(BloomFilter * filter, std::array<uint8_t,MUI
   }
 }
 
-ArduinoJson::JsonDocument DuckPacket::RREQ(std::array<byte,8> targetDevice, std::array<uint8_t,8> sourceDevice) {
+ArduinoJson::JsonDocument DuckPacket::RREQ(std::array<uint8_t,8> targetDevice, std::array<uint8_t,8> sourceDevice) {
     ArduinoJson::JsonObject rreq = ArduinoJson::JsonObject();
     rreq["origin"] = duckutils::convertToHex(sourceDevice.data(), sourceDevice.size());
     rreq["path"] = ArduinoJson::JsonArray();
@@ -71,8 +71,8 @@ ArduinoJson::JsonDocument DuckPacket::UpdateRREQ(ArduinoJson::JsonDocument rreq,
 }
 
 int DuckPacket::prepareForSending(BloomFilter *filter,
-                                  std::array<byte,8> targetDevice, byte duckType,
-                                  byte topic, std::vector<uint8_t> app_data) {
+                                  std::array<uint8_t ,8> targetDevice, uint8_t duckType,
+                                  uint8_t topic, std::vector<uint8_t> app_data) {
 
   std::vector<uint8_t> encryptedData;
   uint8_t app_data_length = app_data.size();

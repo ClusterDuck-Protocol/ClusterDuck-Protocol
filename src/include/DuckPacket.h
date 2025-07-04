@@ -98,7 +98,7 @@ public:
      * 
      * @returns a array of bytes representing the cdp packet
      */
-    std::vector<byte> getBuffer() { return buffer;}
+    std::vector<uint8_t> getBuffer() { return buffer;}
 
     /**
      * @brief Resets the packet byte buffer.
