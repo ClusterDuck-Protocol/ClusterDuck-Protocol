@@ -2,7 +2,7 @@
 #define DUCKLINK_H
 
 #include <Arduino.h>
-#include "include/Duck.h"
+#include "Duck.h"
 
 class DuckLink : public Duck {
 public:

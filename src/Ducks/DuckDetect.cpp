@@ -1,4 +1,4 @@
-#include "../DuckDetect.h"
+#include "DuckDetect.h"
 
 int DuckDetect::setupWithDefaults(std::array<byte,8> deviceId, std::string ssid,
                                   std::string password) {

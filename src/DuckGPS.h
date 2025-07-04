@@ -4,7 +4,7 @@
 
 #ifndef CLUSTERDUCK_PROTOCOL_DUCKGPS_H
 #define CLUSTERDUCK_PROTOCOL_DUCKGPS_H
-#include "DuckLogger.h"
+#include "utils/DuckLogger.h"
 #include <include/cdpcfg.h>
 #include <TinyGPS++.h>
 #include <ctime>

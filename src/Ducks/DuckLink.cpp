@@ -1,4 +1,4 @@
-#include "../DuckLink.h"
+#include "DuckLink.h"
 
 int DuckLink::setupWithDefaults(std::array<byte,8> deviceId, std::string ssid,
                                 std::string password) {

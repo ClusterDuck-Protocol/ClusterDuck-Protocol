@@ -3,8 +3,8 @@
 
 #include <Arduino.h>
 
-#include "include/Duck.h"
-#include "include/cdpcfg.h"
+#include "Duck.h"
+#include "../include/cdpcfg.h"
 
 class DuckDetect : public Duck {
 public:

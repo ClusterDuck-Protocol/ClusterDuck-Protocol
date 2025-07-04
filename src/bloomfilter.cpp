@@ -1,5 +1,5 @@
-#include "include/bloomfilter.h"
-#include "DuckLogger.h"
+#include "bloomfilter.h"
+#include "utils/DuckLogger.h"
 
 
 BloomFilter::BloomFilter(int numSectors, int numHashes, int bitsPerSector, int maxMsgs) {

@@ -11,7 +11,7 @@
 #ifndef DUCKESP_H_
 #define DUCKESP_H_
 
-#include "cdpcfg.h"
+#include "include/cdpcfg.h"
 #include <Arduino.h>
 #include <string>
 

@@ -10,7 +10,7 @@
 #ifndef DUCKLED_H_
 #define DUCKLED_H_
 
-#include "cdpcfg.h"
+#include "include/cdpcfg.h"
 #include <Arduino.h>
 
 /**

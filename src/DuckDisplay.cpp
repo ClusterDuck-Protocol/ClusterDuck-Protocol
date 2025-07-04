@@ -1,9 +1,9 @@
 #include "DuckDisplay.h"
 
 #ifdef CDPCFG_OLED_CLASS
-#include "include/DuckTypes.h"
-#include "include/DuckEsp.h"
-#include "include/DuckUtils.h"
+#include "Ducks/DuckTypes.h"
+#include "DuckEsp.h"
+#include "utils/DuckUtils.h"
 #endif
 
 #include <vector>

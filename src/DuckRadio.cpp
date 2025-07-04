@@ -1,4 +1,4 @@
-#include "include/DuckRadio.h"
+#include "DuckRadio.h"
 #ifdef CDPCFG_RADIO_SX1262
 #define DUCK_RADIO_IRQ_TIMEOUT RADIOLIB_SX126X_IRQ_TIMEOUT
 #define DUCK_RADIO_IRQ_TX_DONE RADIOLIB_SX126X_IRQ_TX_DONE
@@ -12,7 +12,7 @@
 #define DUCK_RADIO_IRQ_CRC_ERROR RADIOLIB_SX127X_CLEAR_IRQ_FLAG_PAYLOAD_CRC_ERROR
 #endif
 
-#include "include/DuckUtils.h"
+#include "utils/DuckUtils.h"
 #include <RadioLib.h>
 #include <memory>
 #include <chrono>

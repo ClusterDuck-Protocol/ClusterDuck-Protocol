@@ -21,14 +21,14 @@
 // this forward declaration allows a DuckNet reference to be declared in Duck.h.
 
 #include <map>
-#include "DuckUtils.h"
-#include "DuckError.h"
-#include "DuckLogger.h"
+#include "../utils/DuckUtils.h"
+#include "../utils/DuckError.h"
+#include "../utils/DuckLogger.h"
 #include <string>
 
-#include "DuckRadio.h"
-#include "bloomfilter.h"
-#include "DuckPacket.h"
+#include "../DuckRadio.h"
+#include "../bloomfilter.h"
+#include "../DuckPacket.h"
 
 #ifdef CDPCFG_WIFI_NONE
 #pragma info "WARNING: WiFi is disabled. DuckNet will not be available."
@@ -41,12 +41,12 @@
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 
-#include "DuckEsp.h"
-#include "index.h"
-#include "wifiCredentials.h"
-#include "controlPanel.h"
-#include "cdpHome.h"
-#include "papaHome.h"
+#include "../DuckEsp.h"
+#include "portalPages/index.h"
+#include "portalPages/wifiCredentials.h"
+#include "portalPages/controlPanel.h"
+#include "portalPages/cdpHome.h"
+#include "portalPages/papaHome.h"
 
 
 #endif

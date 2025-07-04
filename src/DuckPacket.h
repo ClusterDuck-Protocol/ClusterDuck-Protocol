@@ -1,10 +1,10 @@
 #ifndef DUCKPACKET_H_
 #define DUCKPACKET_H_
 
-#include "../CdpPacket.h"
+#include "CdpPacket.h"
 #include "Arduino.h"
-#include "DuckUtils.h"
-#include "cdpcfg.h"
+#include "utils/DuckUtils.h"
+#include "include/cdpcfg.h"
 #include "bloomfilter.h"
 #include "ArduinoJson.h"
 #include <CRC32.h>

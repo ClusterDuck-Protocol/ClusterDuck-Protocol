@@ -1,11 +1,11 @@
 #include "Arduino.h"
-#include "include/DuckPacket.h"
-#include "DuckError.h"
-#include "DuckLogger.h"
-#include "MemoryFree.h"
-#include "include/DuckUtils.h"
-#include "include/DuckCrypto.h"
-#include "include/bloomfilter.h"
+#include "DuckPacket.h"
+#include "utils/DuckError.h"
+#include "utils/DuckLogger.h"
+#include "utils/MemoryFree.h"
+#include "utils/DuckUtils.h"
+#include "DuckCrypto.h"
+#include "bloomfilter.h"
 #include <string>
 
 

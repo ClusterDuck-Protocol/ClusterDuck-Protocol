@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <arduino-timer.h>
-#include "include/Duck.h"
+#include "Duck.h"
 
 class PapaDuck : public Duck {
 public:

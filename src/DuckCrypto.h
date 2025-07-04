@@ -10,7 +10,7 @@
  */
 
 
-#include "../DuckLogger.h"
+#include "utils/DuckLogger.h"
 
 namespace duckcrypto {
 

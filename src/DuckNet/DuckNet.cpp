@@ -1,4 +1,4 @@
-#include "include/DuckNet.h"
+#include "DuckNet.h"
 
 DuckNet::DuckNet(BloomFilter *filter): bloomFilter(filter) {
 }

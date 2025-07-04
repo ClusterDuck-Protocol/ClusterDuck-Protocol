@@ -1,11 +1,11 @@
-#include "include/Duck.h"
+#include "Duck.h"
 
 #include <cassert>
 #include "../CdpPacket.h"
-#include "include/bloomfilter.h"
-#include "include/DuckCrypto.h"
-#include "include/DuckEsp.h"
-#include "include/DuckNet.h"
+#include "../bloomfilter.h"
+#include "../DuckCrypto.h"
+#include "../DuckEsp.h"
+#include "../DuckNet/DuckNet.h"
 
 const int MEMORY_LOW_THRESHOLD = PACKET_LENGTH + sizeof(CdpPacket);
 

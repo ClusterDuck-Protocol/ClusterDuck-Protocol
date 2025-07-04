@@ -1,4 +1,4 @@
-#include "../PapaDuck.h"
+#include "PapaDuck.h"
 #include <cassert>
 int PapaDuck::setupWithDefaults(std::array<uint8_t,8> deviceId, std::string ssid, std::string password) {
   loginfo_ln("setupWithDefaults...");

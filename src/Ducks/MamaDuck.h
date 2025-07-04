@@ -2,8 +2,8 @@
 #define MAMADUCK_H
 
 #include <Arduino.h>
-#include "include/Duck.h"
-#include "include/DuckUtils.h"
+#include "Duck.h"
+#include "../utils/DuckUtils.h"
 
 class MamaDuck : public Duck {
 public:

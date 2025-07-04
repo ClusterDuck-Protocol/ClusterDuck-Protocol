@@ -13,10 +13,10 @@
 
 #include <Arduino.h>
 
-#include "../DuckDisplay.h"
-#include "../DuckError.h"
-#include "../DuckLogger.h"
-#include "cdpcfg.h"
+#include "DuckDisplay.h"
+#include "utils/DuckError.h"
+#include "utils/DuckLogger.h"
+#include "include/cdpcfg.h"
 #include "DuckPacket.h"
 #include <random>
 

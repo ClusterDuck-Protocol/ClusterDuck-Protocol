@@ -2,9 +2,9 @@
 #define CDPPACKET_H_
 
 #include "Arduino.h"
-#include "include/DuckUtils.h"
-#include "DuckLogger.h"
-#include "include/DuckTypes.h"
+#include "utils/DuckUtils.h"
+#include "utils/DuckLogger.h"
+#include "Ducks/DuckTypes.h"
 #include <string>
 #include <array>
 

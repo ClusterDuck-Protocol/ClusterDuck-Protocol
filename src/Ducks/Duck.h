@@ -7,14 +7,14 @@ class Duck;
 // Since Duck needs to know about DuckNet and DuckNet needs to know about Duck,
 // this forward declaration allows a Duck pointer to be declared in DuckNet.h.
 
-#include "../DuckError.h"
-#include "bloomfilter.h"
-#include "cdpcfg.h"
-#include "DuckPacket.h"
-#include "DuckNet.h"
-#include "DuckRadio.h"
+#include "../utils/DuckError.h"
+#include "../bloomfilter.h"
+#include "../include/cdpcfg.h"
+#include "../DuckPacket.h"
+#include "../DuckNet/DuckNet.h"
+#include "../DuckRadio.h"
 #include "DuckTypes.h"
-#include "DuckUtils.h"
+#include "../utils/DuckUtils.h"
 
 class Duck {
 

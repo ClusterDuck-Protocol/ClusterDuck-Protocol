@@ -10,13 +10,13 @@
 #ifndef DUCKUTILS_H_
 #define DUCKUTILS_H_
 
-#include "cdpcfg.h"
+#include "../cdpcfg.h"
 #include "arduino-timer.h"
 #include <Arduino.h>
 #include <EEPROM.h>
 #include <string>
 #include <vector>
-#include "../DuckError.h"
+#include "DuckError.h"
 
 namespace duckutils {
 

@@ -6,7 +6,7 @@ extern char* __brkval;
 #endif // __arm__
 
 #ifdef ESP32
-#include "include/DuckEsp.h"
+#include "../DuckEsp.h"
 int freeMemory() {
   return duckesp::freeHeapMemory();
 }
