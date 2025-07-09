@@ -164,26 +164,30 @@ void Duck::attemptNetworkJoin(){
     networkTransition(networkState, NetworkState::PUBLIC);
   } else{
     //this needs to update some sort of timer registry
-    sendData(reservedTopic::rreq, getDuckId());
+    sendRouteData(reservedTopic::rreq, getDuckId(), BROADCAST_DUID);
   }
 }
 
 std::optional<CdpPacket> Duck::checkForNetworks(){ 
+  std::optional<CdpPacket> result;
+
   if (DuckRadio::getReceiveFlag()){
     std::vector<uint8_t> data;
     int err = duckRadio.readReceivedData(&data);
     if (err != DUCK_ERR_NONE) {
       logerr_ln("ERROR failed to get data from DuckRadio. rc = %d",err);
-      return;
+      result = std::nullopt;
     }
     logdbg_ln("Got data from radio, prepare for relay. size: %d",data.size());
 
     CdpPacket packet = CdpPacket(rxPacket->getBuffer());
-    std::optional<CdpPacket> result = (packet.topic == reservedTopic::rrep) ? std::optional<CdpPacket>{packet} : std::nullopt;
+    result = (packet.topic == reservedTopic::rrep) ? std::optional<CdpPacket>{packet} : std::nullopt;
 
     rxPacket->reset();
-    return result;
+  } else {
+    result = std::nullopt;
   }
+  return result;
 } 
 
 // //put this on Router
@@ -289,6 +293,17 @@ int Duck::sendData(byte topic, std::vector<byte>& data,
   }
   txPacket->reset();
 
+  return err;
+}
+
+
+//private sendData for reserved topic broadcast
+int Duck::sendRouteData(reservedTopic topic, std::string data, Duid targetDevice){
+  std::vector<byte> app_data;
+  app_data.insert(app_data.end(), data.begin(), data.end());
+  // int err = sendData(topic, app_data, targetDevice);
+  txPacket->prepareForSending(&filter, BROADCAST_DUID, DuckType::UNKNOWN, topic, app_data );
+  int err = duckRadio.sendData(txPacket->getBuffer());
   return err;
 }
 

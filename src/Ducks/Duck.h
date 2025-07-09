@@ -280,12 +280,34 @@ public:
    */
   void decrypt(uint8_t* encryptedData, uint8_t* text, size_t inc);
 
+  virtual void handleReceivedPacket() = 0;
+    /**
+   * @brief Run sketch-loop specific code
+   * 
+   * This method must be implemented by the Duck's concrete classes such as DuckLink, MamaDuck,...
+   */
+  void run(){
+    Duck::logIfLowMemory();
+
+    duckRadio.serviceInterruptFlags();
+  
+    if(networkState == NetworkState::PUBLIC) {
+      handleReceivedPacket();
+      processPortalRequest();
+    } else {
+      attemptNetworkJoin();
+      rxPacket->reset();
+    }
+  }
+
 private: 
   NetworkState networkState = NetworkState::SEARCHING;
   void setNetworkState(NetworkState newState);
   void networkTransition(NetworkState oldState, NetworkState newState);
   std::optional<CdpPacket> checkForNetworks();
   void attemptNetworkJoin();
+
+  int sendRouteData(reservedTopic topic, std::string data, Duid targetDevice);
 
 protected:
   Duck(Duck const&) = delete;
@@ -370,28 +392,6 @@ protected:
    * @return DUCK_ERR_NONE if successful, an error code otherwise
    */
   int startReceive();
-
-  virtual void handleReceivedPacket();
-
-  /**
-   * @brief Implement the duck's specific behavior.
-   * 
-   * This method must be implemented by the Duck's concrete classes such as DuckLink, MamaDuck,...
-   */
-  void run(){
-    Duck::logIfLowMemory();
-
-    duckRadio.serviceInterruptFlags();
-  
-    if(networkState == NetworkState::PUBLIC) {
-      handleReceivedPacket();
-      processPortalRequest();
-    } else {
-      attemptNetworkJoin();
-      rxPacket->reset();
-    }
-  }
-  
 
   /**
    * @brief Setup a duck with default settings

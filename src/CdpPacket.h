@@ -243,6 +243,10 @@ public:
         return "bmp180";
       case reservedTopic::ping:
         return "ping";
+      case reservedTopic::rreq:
+      return "rreq";
+      case reservedTopic::rrep:
+      return "rrep";
       default:
         return "unknown";
     }
