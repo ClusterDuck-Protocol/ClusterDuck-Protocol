@@ -357,7 +357,7 @@ int Duck::startReceive() {
 int Duck::sendPong() {
   int err = DUCK_ERR_NONE;
   std::vector<byte> data(1, 0);
-  err = txPacket->prepareForSending(&filter, ZERO_DUID, this->getType(), reservedTopic::pong, data);
+  err = txPacket->prepareForSending(&filter, PAPADUCK_DUID, this->getType(), reservedTopic::pong, data);
   if (err != DUCK_ERR_NONE) {
     logerr_ln("ERROR Oops! failed to build pong packet, err = %d", err);
     return err;
@@ -373,7 +373,7 @@ int Duck::sendPong() {
 int Duck::sendPing() {
   int err = DUCK_ERR_NONE;
   std::vector<byte> data(1, 0);
-  err = txPacket->prepareForSending(&filter, ZERO_DUID, this->getType(), reservedTopic::ping, data);
+  err = txPacket->prepareForSending(&filter, PAPADUCK_DUID, this->getType(), reservedTopic::ping, data);
   if (err != DUCK_ERR_NONE) {
     logerr_ln("ERROR Failed to build ping packet, err = " + err);
     return err;

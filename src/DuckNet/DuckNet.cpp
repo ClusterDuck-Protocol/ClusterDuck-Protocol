@@ -114,7 +114,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
     std::vector<uint8_t> data;
     data.insert(data.end(), val.begin(), val.end());
     //TODO: send the correct ducktype. Probably need the ducktype when DuckNet is created or setup
-    txPacket->prepareForSending(bloomFilter, ZERO_DUID, DuckType::UNKNOWN, topics::cpm, data );
+    txPacket->prepareForSending(bloomFilter, PAPADUCK_DUID, DuckType::UNKNOWN, topics::cpm, data );
     err = duckRadio.sendData(txPacket->getBuffer());
 
     CdpPacket muidPacket = CdpPacket(txPacket->getBuffer());

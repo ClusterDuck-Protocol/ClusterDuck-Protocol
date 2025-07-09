@@ -150,7 +150,7 @@ public:
    * @return DUCK_ERR_NONE if the data was send successfully, an error code otherwise. 
    */
   int sendData(byte topic, const std::string data,
-    const std::array<byte,8> targetDevice = ZERO_DUID, std::array<byte,8> * outgoingMuid = NULL);
+    const std::array<byte,8> targetDevice = PAPADUCK_DUID, std::array<byte,8> * outgoingMuid = NULL);
 
   /**
    * @brief Sends data into the mesh network.
@@ -163,7 +163,7 @@ public:
    otherwise.
    */
   int sendData(byte topic, std::vector<byte>& bytes,
-    const std::array<byte,8> targetDevice = ZERO_DUID, std::array<byte,8> * outgoingMuid = NULL);
+    const std::array<byte,8> targetDevice = PAPADUCK_DUID, std::array<byte,8> * outgoingMuid = NULL);
     
   /**
    * @brief Sends data into the mesh network.
@@ -177,7 +177,7 @@ public:
    * otherwise.
    */
   int sendData(byte topic, const byte* data, int length,
-    const std::array<byte,8> targetDevice = ZERO_DUID, std::array<byte,8> * outgoingMuid = NULL);
+    const std::array<byte,8> targetDevice = PAPADUCK_DUID, std::array<byte,8> * outgoingMuid = NULL);
 
   /**
    * @brief Builds a CdpPacket with a specified muid.
