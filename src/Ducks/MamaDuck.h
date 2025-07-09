@@ -21,13 +21,6 @@ public:
   void onReceiveDuckData(rxDoneCallback cb) { this->recvDataCallback = cb; }
 
   /**
-   * @brief Provide the DuckLink specific implementation of the base `run()`
-   * method.
-   *
-   */
-  void run();
-
-  /**
    * @brief Override the default setup method to match MamaDuck specific
    * defaults.
    *

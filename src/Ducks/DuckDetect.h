@@ -19,13 +19,6 @@ public:
    * `false` if response needs to be deffered. 
    */
   void sendPing();
-
-  /**
-   * @brief Provide the DuckDetect specific implementation of the base `run()`
-   * method.
-   *
-   */
-  void run();
   
   /**
    * @brief Override the default setup method to match DuckDetect specific

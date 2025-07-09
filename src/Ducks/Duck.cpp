@@ -156,6 +156,41 @@ void Duck::setChannel(int channelNum) {
   duckRadio.setChannel(channelNum);
 }
 
+void Duck::attemptNetworkJoin(){
+  std::optional<CdpPacket> cdpNode = checkForNetworks();
+
+  if(cdpNode.has_value()){
+    // updateRoutingTable(cdpNode);
+    networkTransition(networkState, NetworkState::PUBLIC);
+  } else{
+    //this needs to update some sort of timer registry
+    sendData(reservedTopic::rreq, getDuckId());
+  }
+}
+
+std::optional<CdpPacket> Duck::checkForNetworks(){ 
+  if (DuckRadio::getReceiveFlag()){
+    std::vector<uint8_t> data;
+    int err = duckRadio.readReceivedData(&data);
+    if (err != DUCK_ERR_NONE) {
+      logerr_ln("ERROR failed to get data from DuckRadio. rc = %d",err);
+      return;
+    }
+    logdbg_ln("Got data from radio, prepare for relay. size: %d",data.size());
+
+    CdpPacket packet = CdpPacket(rxPacket->getBuffer());
+    std::optional<CdpPacket> result = (packet.topic == reservedTopic::rrep) ? std::optional<CdpPacket>{packet} : std::nullopt;
+
+    rxPacket->reset();
+    return result;
+  }
+} 
+
+// //put this on Router
+// void updateRoutingTable(){
+//   Serial.println("routing table creation")
+// }
+
 int Duck::setupWebServer(bool createCaptivePortal, std::string html) {
   int err = DUCK_ERR_NONE;
   duckNet->setDeviceId(duid);
@@ -294,6 +329,20 @@ bool Duck::imAlive(void*) {
   DuckRadio::getInstance()->sendPayloadStandard(alive, "health");
   */
   return true;
+}
+
+void Duck::setNetworkState(NetworkState newState) {
+  if (networkState != newState) {
+      NetworkState oldState = networkState;
+      networkState = newState;
+      networkTransition(oldState, newState);
+  }
+}
+
+void Duck::networkTransition(NetworkState oldState, NetworkState newState) {
+  if (oldState == NetworkState::SEARCHING && newState == NetworkState::PUBLIC) {
+      Serial.println("public network joined");
+  }
 }
 
 int Duck::startReceive() {

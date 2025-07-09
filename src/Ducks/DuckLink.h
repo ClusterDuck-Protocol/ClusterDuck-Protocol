@@ -9,12 +9,6 @@ public:
   using Duck::Duck;
   
   ~DuckLink() override {}
-
-  /**
-   * @brief Provide the DuckLink specific implementation of the base `run()` method.
-   * 
-   */
-  void run();
   
   /**
    * @brief Override the default setup method to match DuckLink specific

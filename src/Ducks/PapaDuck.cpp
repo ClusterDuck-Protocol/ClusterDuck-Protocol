@@ -70,23 +70,6 @@ int PapaDuck::setupWithDefaults(std::array<uint8_t,8> deviceId, std::string ssid
   return DUCK_ERR_NONE;
 }
 
-void PapaDuck::run() {
-  Duck::logIfLowMemory();
-
-  duckRadio.serviceInterruptFlags();
-
-  if (DuckRadio::getReceiveFlag()) {
-    handleReceivedPacket();
-    rxPacket->reset(); // TODO(rolsen): Make rxPacket local to handleReceivedPacket
-  }
-
-  // TODO(rolsen): Enforce mutually exclusive access to duckRadio.
-  // ackTimer.tick() calls broadcastAck, which calls duckRadio. Since duckRadio
-  // is a shared resource, we should synchronize everything in ackTimer.tick()
-  // so the thread in AsyncWebServer cannot modify duckRadio while broadcastAck
-  // is also modifying duckRadio.
-}
-
 void PapaDuck::handleReceivedPacket() {
 
   loginfo_ln("handleReceivedPacket() START");

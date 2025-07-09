@@ -45,16 +45,6 @@ int DuckDetect::setupWithDefaults(std::array<byte,8> deviceId, std::string ssid,
   return DUCK_ERR_NONE;
 }
 
-void DuckDetect::run() {
-  Duck::logIfLowMemory();
-
-  duckRadio.serviceInterruptFlags();
-
-  if (DuckRadio::getReceiveFlag()) {
-    handleReceivedPacket();
-  }
-}
-
 void DuckDetect::handleReceivedPacket() {
 
   loginfo("handleReceivedPacket()...");

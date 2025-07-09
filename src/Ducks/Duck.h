@@ -16,6 +16,8 @@ class Duck;
 #include "DuckTypes.h"
 #include "../utils/DuckUtils.h"
 
+enum class NetworkState {SEARCHING, PUBLIC};
+
 class Duck {
 
 public:
@@ -278,6 +280,13 @@ public:
    */
   void decrypt(uint8_t* encryptedData, uint8_t* text, size_t inc);
 
+private: 
+  NetworkState networkState = NetworkState::SEARCHING;
+  void setNetworkState(NetworkState newState);
+  void networkTransition(NetworkState oldState, NetworkState newState);
+  std::optional<CdpPacket> checkForNetworks();
+  void attemptNetworkJoin();
+
 protected:
   Duck(Duck const&) = delete;
   Duck& operator=(Duck const&) = delete;
@@ -362,12 +371,27 @@ protected:
    */
   int startReceive();
 
+  virtual void handleReceivedPacket();
+
   /**
    * @brief Implement the duck's specific behavior.
    * 
    * This method must be implemented by the Duck's concrete classes such as DuckLink, MamaDuck,...
    */
-  virtual void run() = 0;
+  void run(){
+    Duck::logIfLowMemory();
+
+    duckRadio.serviceInterruptFlags();
+  
+    if(networkState == NetworkState::PUBLIC) {
+      handleReceivedPacket();
+      processPortalRequest();
+    } else {
+      attemptNetworkJoin();
+      rxPacket->reset();
+    }
+  }
+  
 
   /**
    * @brief Setup a duck with default settings

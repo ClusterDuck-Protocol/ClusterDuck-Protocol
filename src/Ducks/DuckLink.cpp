@@ -35,11 +35,3 @@ int DuckLink::setupWithDefaults(std::array<byte,8> deviceId, std::string ssid,
   loginfo_ln("DuckLink setup done");
   return DUCK_ERR_NONE;
 }
-
-void DuckLink::run() {
-  Duck::logIfLowMemory();
-
-  duckRadio.serviceInterruptFlags();
-
-  processPortalRequest();
-}

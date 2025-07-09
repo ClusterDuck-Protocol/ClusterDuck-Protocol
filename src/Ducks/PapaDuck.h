@@ -23,13 +23,6 @@ public:
   void onReceiveDuckData(rxDoneCallback cb) { this->recvDataCallback = cb; }
 
   /**
-   * @brief Provide the PapaDuck specific implementation of the base `run()`
-   * method.
-   *
-   */
-  void run();
-
-  /**
    * @brief Override the default setup method to match the Duck specific
    * defaults.
    *
