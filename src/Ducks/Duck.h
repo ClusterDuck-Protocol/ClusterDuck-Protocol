@@ -307,6 +307,7 @@ private:
   std::optional<CdpPacket> checkForNetworks();
   void attemptNetworkJoin();
 
+  unsigned long lastRreqTime = 0L;
   int sendRouteData(reservedTopic topic, std::string data, Duid targetDevice);
 
 protected:
