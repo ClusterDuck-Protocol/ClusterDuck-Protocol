@@ -1,9 +1,7 @@
 #ifndef MAMADUCK_H
 #define MAMADUCK_H
 
-#include <Arduino.h>
 #include "Duck.h"
-#include "../utils/DuckUtils.h"
 
 class MamaDuck : public Duck {
 public:

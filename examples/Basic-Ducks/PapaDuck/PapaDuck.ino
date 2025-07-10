@@ -11,9 +11,6 @@
 #include <CDP.h>
 #include <PubSubClient.h>
 #include <WiFiClientSecure.h>
-#include <ArduinoJson.h>
-#include <arduino-timer.h>
-#include <string>
 #include <queue>
 
 // --- WIFI Configuration ---

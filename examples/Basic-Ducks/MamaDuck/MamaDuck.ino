@@ -9,8 +9,6 @@
  * @date 2025-05-07
  */
 
-#include <string>
-#include <arduino-timer.h>
 #include <CDP.h>
 
 #ifdef SERIAL_PORT_USBVIRTUAL

@@ -12,9 +12,7 @@
    @copyright
 */
 
-#include <arduino-timer.h>
-#include <string>
-#include <DuckDetect.h>
+#include <CDP.h>
 #include "FastLED.h"
 
 // Setup for W2812 (LED)

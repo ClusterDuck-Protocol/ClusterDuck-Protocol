@@ -1,8 +1,6 @@
 #ifndef PAPADUCK_H
 #define PAPADUCK_H
 
-#include <Arduino.h>
-#include <arduino-timer.h>
 #include "Duck.h"
 
 class PapaDuck : public Duck {

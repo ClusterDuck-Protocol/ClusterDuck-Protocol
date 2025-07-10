@@ -1,10 +1,7 @@
 #ifndef DUCKDETECT_H
 #define DUCKDETECT_H
 
-#include <Arduino.h>
-
 #include "Duck.h"
-#include "../include/cdpcfg.h"
 
 class DuckDetect : public Duck {
 public:

@@ -1,7 +1,6 @@
 #ifndef DUCKLINK_H
 #define DUCKLINK_H
 
-#include <Arduino.h>
 #include "Duck.h"
 
 class DuckLink : public Duck {
