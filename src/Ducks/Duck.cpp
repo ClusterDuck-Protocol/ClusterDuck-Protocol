@@ -162,9 +162,11 @@ void Duck::attemptNetworkJoin(){
   if(cdpNode.has_value()){
     // updateRoutingTable(cdpNode);
     networkTransition(networkState, NetworkState::PUBLIC);
-  } else{
-    //this needs to update some sort of timer registry
-    sendRouteData(reservedTopic::rreq, getDuckId(), BROADCAST_DUID);
+  } else {
+    if((millis() - this->lastRreqTime) > 5000L){
+      sendRouteData(reservedTopic::rreq, getDuckId(), BROADCAST_DUID);
+      lastRreqTime = millis();
+    }
   }
 }
 
