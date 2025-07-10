@@ -73,7 +73,8 @@ void MamaDuck::handleReceivedPacket() {
       if (duckutils::isEqual(BROADCAST_DUID, packet.dduid)) {
         switch(packet.topic) {
           case reservedTopic::rreq: {
-              loginfo_ln("RREQ received. Updating RREQ!");
+              loginfo_ln("RREQ received from %s. Updating RREQ!",
+                         packet.sduid.data());
               ArduinoJson::JsonDocument rreqDoc;
               deserializeJson(rreqDoc, packet.data);
               DuckPacket::UpdateRREQ(rreqDoc, this->duid);
@@ -128,18 +129,21 @@ void MamaDuck::handleReceivedPacket() {
                 loginfo_ln("RREQ received. Updating RREQ!");
                 ArduinoJson::JsonDocument rreqDoc;
                 deserializeJson(rreqDoc, packet.data);
-                DuckPacket::UpdateRREQ(rreqDoc, this->duid);
-                loginfo_ln("handleReceivedPacket: RREQ updated with current DUID: %s", this->duid);
+                loginfo_ln("handleReceivedPacket: Sending RREP");
                 //Serialize the updated RREQ packet
-                std::string strRREQ;
-                serializeJson(rreqDoc, strRREQ);
-                rxPacket->getBuffer() = duckutils::stringToByteVector(strRREQ);
+                std::string strRREP;
+                serializeJson(rreqDoc, strRREP);
+                rxPacket->getBuffer() = duckutils::stringToByteVector(strRREP);
                 err = duckRadio.relayPacket(rxPacket);
                 if (err != DUCK_ERR_NONE) {
                     logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d", err);
                 } else {
                     loginfo_ln("handleReceivedPacket: RREQ packet RELAY DONE");
                 }
+
+                err = txPacket->prepareForSending(&filter, PAPADUCK_DUID,
+                  DuckType::MAMA, reservedTopic::rreq, dataPayload);
+
                 return;
             }
           case topics::dcmd:

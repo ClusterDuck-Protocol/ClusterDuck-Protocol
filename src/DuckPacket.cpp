@@ -46,10 +46,10 @@ void DuckPacket::getUniqueMessageId(BloomFilter * filter, std::array<uint8_t,MUI
   }
 }
 
-ArduinoJson::JsonDocument DuckPacket::RREQ(std::array<uint8_t,8> targetDevice, std::array<uint8_t,8> sourceDevice) {
+ArduinoJson::JsonDocument DuckPacket::RREQ(std::array<uint8_t,8>& targetDevice, std::array<uint8_t,8>& sourceDevice) {
     ArduinoJson::JsonObject rreq = ArduinoJson::JsonObject();
-    rreq["origin"] = duckutils::arrayToHexString(sourceDevice);
-    rreq["destination"] = targetDevice.data();
+    rreq["origin"] = duckutils::toString(sourceDevice);
+    rreq["destination"] = duckutils::toString(targetDevice);
     rreq["path"].as<ArduinoJson::JsonArray>();
 #ifdef CDP_LOG_DEBUG
     std::string log;
@@ -61,11 +61,37 @@ ArduinoJson::JsonDocument DuckPacket::RREQ(std::array<uint8_t,8> targetDevice, s
 
 void DuckPacket::UpdateRREQ(ArduinoJson::JsonDocument& rreq, std::array<uint8_t,8> currentDevice) {
     ArduinoJson::JsonArray path = rreq["path"].to<ArduinoJson::JsonArray>();
-    path.add(currentDevice.data());
+    path.add(duckutils::toString(currentDevice));
     rreq["path"] = path;
 #ifdef CDP_LOG_DEBUG
     std::string log;
     serializeJson(rreq, log);
+    logdbg_ln("RREQ: %s", log.c_str());
+#endif
+}
+
+ArduinoJson::JsonDocument DuckPacket::RREP(std::array<uint8_t,8>& targetDevice, std::array<uint8_t,8>& sourceDevice,
+                                      std::array<uint8_t,8>& originDevice) {
+    ArduinoJson::JsonObject rrep = ArduinoJson::JsonObject();
+    rrep["origin"] = duckutils::toString(originDevice);
+    rrep["destination"] = duckutils::toString(targetDevice);
+    rrep["source"] = duckutils::toString(sourceDevice);
+    rrep["path"].as<ArduinoJson::JsonArray>();
+#ifdef CDP_LOG_DEBUG
+    std::string log;
+    serializeJson(rrep, log);
+    logdbg_ln("RREP: %s", log.c_str());
+#endif
+    return rrep;
+}
+
+void DuckPacket::UpdateRREP(ArduinoJson::JsonDocument& rrep, std::array<uint8_t,8> currentDevice) {
+    ArduinoJson::JsonArray path = rrep["path"].to<ArduinoJson::JsonArray>();
+    path.add(duckutils::toString(currentDevice));
+    rrep["path"] = path;
+#ifdef CDP_LOG_DEBUG
+    std::string log;
+    serializeJson(rrep, log);
     logdbg_ln("RREQ: %s", log.c_str());
 #endif
 }
