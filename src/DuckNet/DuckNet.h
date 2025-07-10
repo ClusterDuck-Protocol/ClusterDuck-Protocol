@@ -15,7 +15,7 @@
 
 #include <WString.h>
 
-#include "cdpcfg.h"
+#include "../include/cdpcfg.h"
 
 // Since Duck needs to know about DuckNet and DuckNet needs to know about Duck,
 // this forward declaration allows a DuckNet reference to be declared in Duck.h.
