@@ -14,23 +14,11 @@
 #include "../CdpPacket.h"
 #include "../DuckCrypto.h"
 #include "../DuckEsp.h"
-#include <concepts>
 
 enum class NetworkState {SEARCHING, PUBLIC};
 
-//concept definition to make sure that any Radio fulfills the Duck's needs
-template<typename T>
-concept DuckRadio = requires(T radio, const LoRaConfigParams& config, std::vector<byte> data) {
-    { radio.setupRadio(config) } -> std::same_as<int>;
-    { radio.sendData(data) } -> std::same_as<int>;
-    { radio.startReceive() } -> std::same_as<int>;
-    { radio.serviceInterruptFlags() } -> std::same_as<void>;
-    { radio.getReceiveFlag() } -> std::same_as<bool>;
-    { radio.readReceivedData((std::vector<byte>*)nullptr) } -> std::same_as<int>;
-};
-
-//templated class to require some radio capability, constrained to the DuckRadio concept
-template <DuckRadio RadioType = DuckLoRa>
+//templated class to require some radio capability
+template <typename RadioType = DuckLoRa>
 class Duck {
 
 public:
