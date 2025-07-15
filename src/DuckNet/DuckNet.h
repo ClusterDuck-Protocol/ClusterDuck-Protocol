@@ -26,7 +26,7 @@
 #include "../utils/DuckLogger.h"
 #include <string>
 
-#include "../DuckRadio.h"
+#include "../Radio/DuckLoRa.h"
 #include "../bloomfilter.h"
 #include "../DuckPacket.h"
 
@@ -254,8 +254,6 @@ private:
 
   DuckNet(DuckNet const&) = delete;
   DuckNet& operator=(DuckNet const&) = delete;
-
-  DuckRadio& duckRadio = DuckRadio::getInstance();
 
   DuckPacket* txPacket = NULL;
 
