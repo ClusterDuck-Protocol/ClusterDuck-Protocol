@@ -103,6 +103,24 @@ std::string toString(const std::array<T,S>& arr) {
     }
     return result;
 }
+/**
+ * @brief Convert a string into an array of bytes.
+ *
+ * @param str the string to convert
+ * @returns A std::array of bytes representing the string.
+ * @throws std::out_of_range if the string size exceeds the array size.
+ */
+template<typename T,size_t S>
+std::array<T,S> stringToArray(const std::string& str) {
+    std::array<T,S> arr;
+    if (str.size() > S) {
+        throw std::out_of_range("String size exceeds array size");
+    }
+    for (size_t i = 0; i < str.size(); ++i) {
+        arr[i] = static_cast<T>(str[i]);
+    }
+    return arr;
+}
 
 /**
  * @brief Convert an array into hex for sending over http or display.

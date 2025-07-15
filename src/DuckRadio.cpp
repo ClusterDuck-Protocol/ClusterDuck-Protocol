@@ -207,7 +207,7 @@ int DuckRadio::readReceivedData(std::vector<uint8_t>* packetBytes) {
 
     loginfo_ln("readReceivedData: checking data section CRC");
 
-    std::vector<byte> data_section;
+    std::vector<uint8_t> data_section;
     data_section.insert(data_section.end(), &data[DATA_POS], &data[packet_length]);
     uint32_t packet_data_crc = duckutils::toUint32(&data[DATA_CRC_POS]);
     uint32_t computed_data_crc =

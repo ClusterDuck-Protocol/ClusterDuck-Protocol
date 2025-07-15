@@ -110,7 +110,7 @@ public:
 * @param sourceDevice the source device DUID to send the message
 * @returns a JSON Document representing the RREQ packet
 */
-   static ArduinoJson::JsonDocument RREQ(std::array<uint8_t,8>& targetDevice, std::array<uint8_t, 8>& sourceDevice);
+   static ArduinoJson::JsonDocument RREQ(std::string& targetDevice, std::string& sourceDevice);
 
 /**
  * @brief Update a RREQ packet's path with the current node's DUID.
@@ -119,7 +119,7 @@ public:
  * @param currentDevice the device DUID to of the current node
  * @returns a JSON Document representing the updated RREQ packet
  */
-   static void UpdateRREQ(ArduinoJson::JsonDocument& rreq, std::array<uint8_t, 8> currentDevice);
+   static void UpdateRREQ(ArduinoJson::JsonDocument& rreq, std::string currentDevice);
 
 /**
  * @brief Build a RREP packet.
@@ -128,8 +128,8 @@ public:
  * @param originDevice
  * @return
  */
-   static ArduinoJson::JsonDocument RREP(std::array<uint8_t, 8> &targetDevice, std::array<uint8_t, 8> &sourceDevice,
-                            std::array<uint8_t, 8> &originDevice);
+   static ArduinoJson::JsonDocument RREP(std::string &targetDevice, std::string &sourceDevice,
+                            std::string &originDevice);
     /**
      * @brief Update a RREP packet's path with the current node's DUID.
      * @param rrep
