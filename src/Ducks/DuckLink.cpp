@@ -63,27 +63,14 @@ void DuckLink::handleReceivedPacket() {
                          duckutils::toString(packet.data).c_str(), packet.hopCount);
               return;
             } else {
-                loginfo_ln("RREQ received from %s. Sending RREP!",
-                             packet.sduid.data());
-                //Update the RREQ with the current DUID
-                ArduinoJson::JsonDocument rreqDoc, rrepDoc;
-                deserializeJson(rreqDoc, packet.data);
-                auto destination = rreqDoc["origin"].as<std::string>();
-                //not sure if RREP's origin and source should be the same
-                DuckPacket::RREP(destination,this->deviceId,this->deviceId);
-                loginfo_ln("handleReceivedPacket: Sending RREP");
-                //Serialize the updated RREQ packet
-                std::string strRREP;
-                serializeJson(rrepDoc, strRREP);
-                //Prepare the RREP packet for sending
-                txPacket->prepareForSending(&filter,duckutils::stringToArray<uint8_t,8>(this->deviceId),
+                txPacket->prepareForSending(&filter, duckutils::stringToArray<uint8_t,8>(deviceId),
                                             DuckType::LINK, reservedTopic::rrep,
-                                            duckutils::stringToByteVector(strRREP));
-                err = duckRadio.sendData(this->txPacket->getBuffer());
+                                            duckutils::stringToByteVector(DuckPacket::prepareRREP(this->deviceId, packet)));
+                err = duckRadio.sendData(txPacket->getBuffer());
                 if (err != DUCK_ERR_NONE) {
-                    logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d", err);
+                    logerr_ln("====> ERROR handleReceivedPacket failed to send. rc = %d", err);
                 } else {
-                    loginfo_ln("handleReceivedPacket: RREQ packet RELAY DONE");
+                    loginfo_ln("handleReceivedPacket: RREP packet SEND DONE");
                 }
             }
           break;
@@ -104,15 +91,15 @@ void DuckLink::handleReceivedPacket() {
         case reservedTopic::rreq: {
             // send RREP unconditionally
 
-          loginfo_ln("RREQ received. Updating RREQ!");
-          ArduinoJson::JsonDocument rreqDoc;
-          deserializeJson(rreqDoc, packet.data);
-          DuckPacket::UpdateRREQ(rreqDoc, this->duid);
-          loginfo_ln("handleReceivedPacket: RREQ updated with current DUID: %s", this->duid);
-          //Serialize the updated RREQ packet
-          // std::string strRREQ;
-          // serializeJson(rreqDoc, strRREQ);
-          // rxPacket->getBuffer() = duckutils::stringToByteVector(strRREQ);
+            txPacket->prepareForSending(&filter, duckutils::stringToArray<uint8_t,8>(deviceId),
+                                        DuckType::LINK, reservedTopic::rrep,
+                                        duckutils::stringToByteVector(DuckPacket::prepareRREP(this->deviceId, packet)));
+            err = duckRadio.sendData(txPacket->getBuffer());
+            if (err != DUCK_ERR_NONE) {
+                logerr_ln("====> ERROR handleReceivedPacket failed to send. rc = %d", err);
+            } else {
+                loginfo_ln("handleReceivedPacket: RREP packet SEND DONE");
+            }
         break;
       }
         case reservedTopic::rrep: {
