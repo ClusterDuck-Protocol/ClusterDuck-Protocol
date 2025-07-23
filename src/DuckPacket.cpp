@@ -100,6 +100,23 @@ void DuckPacket::UpdateRREP(ArduinoJson::JsonDocument& rrep, std::array<uint8_t,
 #endif
 }
 
+std::string DuckPacket::prepareRREP(std::array<uint8_t,8> &deviceId,CdpPacket &packet) {
+  loginfo_ln("RREQ received from %s. Sending RREP!",
+             packet.sduid.data());
+  //Update the RREQ with the current DUID
+  JsonDocument rreqDoc, rrepDoc;
+  deserializeJson(rreqDoc, packet.data);
+  auto destination = rreqDoc["origin"].as<std::string>();
+  //not sure if RREP's origin and source should be the same
+  std::string deviceIdStr = duckutils::toString(deviceId);
+  DuckPacket::RREP(destination, deviceIdStr, deviceIdStr);
+  loginfo_ln("handleReceivedPacket: Sending RREP");
+  //Serialize the updated RREQ packet
+  std::string strRREP;
+  serializeJson(rrepDoc, strRREP);
+  return strRREP;
+}
+
 int DuckPacket::prepareForSending(BloomFilter *filter,
                                   std::array<uint8_t ,8> targetDevice, uint8_t duckType,
                                   uint8_t topic, std::vector<uint8_t> app_data) {

@@ -333,7 +333,7 @@ protected:
      * @param snr the signal to noise ratio
      * @param rssi the received signal strength indicator
      */
-  void insertIntoRoutingTable(std::string deviceID, long routingScore, long lastSeen, long snr, long rssi) {
+  void insertIntoRoutingTable(std::string deviceID, long routingScore, long lastSeen, float snr, float rssi) {
     DuckRecord record(std::move(deviceID), routingScore, lastSeen, snr, rssi);
     routingTable.insert(std::make_pair(routingScore, record));
   }

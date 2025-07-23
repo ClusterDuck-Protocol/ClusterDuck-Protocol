@@ -137,6 +137,8 @@ public:
      */
    static void UpdateRREP(JsonDocument &rrep, std::array<uint8_t, 8> currentDevice);
 
+   static std::string prepareRREP(std::array<uint8_t,8> &deviceId,CdpPacket &packet);
+
   private: 
     std::array<uint8_t,8> duid;
     std::vector<uint8_t> buffer;
