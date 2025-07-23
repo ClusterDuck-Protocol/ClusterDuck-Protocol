@@ -14,6 +14,8 @@
 #include "../CdpPacket.h"
 #include "../DuckCrypto.h"
 #include "../DuckEsp.h"
+#include <map>
+#include <list>
 
 enum class NetworkState {SEARCHING, PUBLIC};
 
@@ -26,25 +28,107 @@ public:
    * @brief Construct a new Duck object.
    *
    */
-  Duck(std::string name){
+  Duck() : Duck() {}
+  Duck(std::string name){ //check this for correct length
     std::copy(name.begin(), name.end(),duid.begin());
   }
 
-  virtual ~Duck();
+  virtual ~Duck(){
+    delete txPacket;
+    delete rxPacket;
+  };
 
   std::string getCDPVersion() { return duckutils::getCDPVersion(); }
 
-private:
-  const int MEMORY_LOW_THRESHOLD = PACKET_LENGTH + sizeof(CdpPacket);
+    /**
+   * @brief Sends data into the mesh network.
+   *
+   * @param topic the message topic
+   * @param data a string representing the data
+   * @param targetDevice the device UID to receive the message (default is no target device)
+   * @param outgoingMuid Output parameter that returns the MUID of the sent packet. NULL is ignored.
+   * @return DUCK_ERR_NONE if the data was send successfully, an error code otherwise. 
+   */
+  int sendData(byte topic, const std::string data, const std::array<byte,8> targetDevice = PAPADUCK_DUID, std::array<byte,8> * outgoingMuid = NULL) {
+    std::vector<byte> app_data;
+    app_data.insert(app_data.end(), data.begin(), data.end());
+    int err = sendData(topic, app_data, targetDevice, outgoingMuid);
+    return err;
+  }
+  /**
+   * @brief Sends data into the mesh network.
+   *
+   * @param topic the message topic
+   * @param data a vector of bytes representing the data to send
+   * @param targetDevice the device UID to receive the message (default is no target device)
+   * @param outgoingMuid Output parameter that returns the MUID of the sent packet. NULL is ignored.
+   * @return DUCK_ERR_NONE if the data was send successfully, an error code
+   otherwise.
+   */
+  int sendData(byte topic, const byte* data, int length, const std::array<byte,8> targetDevice = PAPADUCK_DUID, std::array<byte,8> * outgoingMuid = NULL) {
+    std::vector<byte> app_data(length);
+    app_data.insert(app_data.end(), &data[0], &data[length]);
+    int err = sendData(topic, app_data, targetDevice, outgoingMuid);
+    return err;
+  }
+    
+  /**
+   * @brief Sends data into the mesh network.
+   *
+   * @param topic the message topic
+   * @param data a byte buffer representing the data to send
+   * @param length the length of the byte buffer
+   * @param targetDevice the device UID to receive the message (default is no target device)
+   * @param outgoingMuid Output parameter that returns the MUID of the sent packet. NULL is ignored.
+   * @return DUCK_ERR_NONE if the data was send successfully, an error code
+   * otherwise.
+   */
+  int sendData(byte topic, std::vector<byte>& data, const std::array<byte,8> targetDevice = PAPADUCK_DUID, std::array<byte,8> * outgoingMuid = NULL) {
+    if (topic < reservedTopic::max_reserved) {
+      logerr_ln("ERROR send data failed, topic is reserved.");
+      return DUCKPACKET_ERR_TOPIC_INVALID;
+    }
+   if (data.size() > MAX_DATA_LENGTH) {
+     logerr_ln("ERROR send data failed, message too large: %d bytes",data.size());
+     return DUCKPACKET_ERR_SIZE_INVALID;
+   }
+   int err = txPacket->prepareForSending(&filter, targetDevice, this->getType(), topic, data);
+ 
+   if (err != DUCK_ERR_NONE) {
+     return err;
+   }
+ 
+   err = duckRadio.sendData(txPacket->getBuffer());
+ 
+   CdpPacket packet = CdpPacket(txPacket->getBuffer());
+ 
+   if (err == DUCK_ERR_NONE) {
+     filter.bloom_add(packet.muid.data(), MUID_LENGTH);
+   }
+     std::copy(packet.muid.begin(),packet.muid.end(),lastMessageMuid.begin());
+   assert(lastMessageMuid.size() == MUID_LENGTH);
+   if (outgoingMuid != NULL) {
+       std::copy(packet.muid.cbegin(),packet.muid.cend(),outgoingMuid->begin());
+     assert(outgoingMuid->size() == MUID_LENGTH);
+   }
+   txPacket->reset();
+ 
+   return err;
+ }
+
+
+protected:
+  static constexpr int MEMORY_LOW_THRESHOLD = PACKET_LENGTH + sizeof(CdpPacket);
   /**
    * @brief Get the duck's unique ID.
    * 
    * @returns A std::string representing the duck's unique ID
    */ 
   std::string getDuckId() {return std::string(duid.begin(), duid.end());}
+  unsigned long lastRreqTime = 0L;
 
 
-  int setupLoRaRadio(const LoRaConfigParams& config){
+  int setupLoRaRadio(const LoRaConfigParams& config = RadioType::defaultRadioParams){
     int err = duckRadio.setupRadio(config);
 
     if (err == DUCKLORA_ERR_BEGIN) {
@@ -66,211 +150,6 @@ private:
   
     return DUCK_ERR_NONE;
   }
-
-  /**
-   * @brief Setup WiFi access point.
-   *
-   * @param accessPoint a string representing the access point. Default to
-   * "🆘 DUCK EMERGENCY PORTAL"
-   *
-   * @returns DUCK_ERROR_NONE if successful, an error code otherwise.
-   */
-  int setupWifi(const char* ap = "🆘 DUCK EMERGENCY PORTAL"){
-    int err = duckNet->setupWifiAp(ap);
-    if (err != DUCK_ERR_NONE) {
-      logerr_ln("ERROR setupWifi rc = %d",DUCK_ERR_NONE);
-    } else {
-      loginfo_ln("setupWifi OK");
-    }
-    return err;
-  }; //this should be a separate module too
-
-  /**
-   * @brief Setup DNS.
-   *
-   * @returns DUCK_ERROR_NONE if successful, an error code otherwise.
-   */
-  int setupDns(){
-    int err = duckNet->setupDns();
-    if (err != DUCK_ERR_NONE) {
-      logerr_ln("ERROR setupDns rc = %d",DUCK_ERR_NONE);
-    } else {
-      loginfo_ln("setupDns OK");
-    }
-    return err;
-  };
-
-  /**
-   * @brief Setup web server.
-   *
-   * The WebServer is used to communicate with the Duck over ad-hoc WiFi
-   * connection.
-   *
-   * @param createCaptivePortal set to true if Captive WiFi connection is
-   * needed. Defaults to false
-   * @param html A string representing custom HTML code used for the portal.
-   * Default is an empty string Default portal web page is used if the string is
-   * empty
-   */
-  int setupWebServer(bool createCaptivePortal = false, std::string html = ""){
-    int err = DUCK_ERR_NONE;
-    duckNet->setDeviceId(duid);
-    err = duckNet->setupWebServer(createCaptivePortal, html);
-    if (err != DUCK_ERR_NONE) {
-      logerr_ln("ERROR setupWebServer %d",err);
-    } else {
-      loginfo_ln("setupWebServer OK");
-    }
-    return err;
-  }
-
-  /**
-   * @brief Setup internet access.
-   *
-   * @param ssid        the ssid of the WiFi network
-   * @param password    password to join the network
-   */
-  int setupInternet(std::string ssid, std::string password){
-    int err = duckNet->setupInternet(ssid, password);
-    if (err != DUCK_ERR_NONE) {
-      logerr_ln("ERROR setupInternet rc = %d",DUCK_ERR_NONE);
-    } else {
-      loginfo_ln("setupInternet OK");
-    }
-    return err;
-  };
-
-  #ifdef CDPCFG_WIFI_NONE //move to wifi module
-  void Duck::processPortalRequest() {}
-  #else
-  void Duck::processPortalRequest() { duckNet->dnsServer.processNextRequest(); }
-  #endif
-
-  /**
-   * @brief Sends data into the mesh network.
-   *
-   * @param topic the message topic
-   * @param data a string representing the data
-   * @param targetDevice the device UID to receive the message (default is no target device)
-   * @param outgoingMuid Output parameter that returns the MUID of the sent packet. NULL is ignored.
-   * @return DUCK_ERR_NONE if the data was send successfully, an error code otherwise. 
-   */
-  int sendData(byte topic, const std::string data,
-    const std::array<byte,8> targetDevice = PAPADUCK_DUID, std::array<byte,8> * outgoingMuid = NULL){
-      std::vector<byte> app_data;
-      app_data.insert(app_data.end(), data.begin(), data.end());
-      int err = sendData(topic, app_data, targetDevice, outgoingMuid);
-      return err;
-  }
-  /**
-   * @brief Sends data into the mesh network.
-   *
-   * @param topic the message topic
-   * @param data a vector of bytes representing the data to send
-   * @param targetDevice the device UID to receive the message (default is no target device)
-   * @param outgoingMuid Output parameter that returns the MUID of the sent packet. NULL is ignored.
-   * @return DUCK_ERR_NONE if the data was send successfully, an error code
-   otherwise.
-   */
-  int sendData(byte topic, std::vector<byte>& bytes,
-    const std::array<byte,8> targetDevice = PAPADUCK_DUID, std::array<byte,8> * outgoingMuid = NULL){
-      std::vector<byte> app_data(length);
-      app_data.insert(app_data.end(), &data[0], &data[length]);
-      int err = sendData(topic, app_data, targetDevice, outgoingMuid);
-      return err;
-  }
-    
-  /**
-   * @brief Sends data into the mesh network.
-   *
-   * @param topic the message topic
-   * @param data a byte buffer representing the data to send
-   * @param length the length of the byte buffer
-   * @param targetDevice the device UID to receive the message (default is no target device)
-   * @param outgoingMuid Output parameter that returns the MUID of the sent packet. NULL is ignored.
-   * @return DUCK_ERR_NONE if the data was send successfully, an error code
-   * otherwise.
-   */
-  int sendData(byte topic, const byte* data, int length,
-    const std::array<byte,8> targetDevice = PAPADUCK_DUID, std::array<byte,8> * outgoingMuid = NULL){
-      if (topic < reservedTopic::max_reserved) {
-        logerr_ln("ERROR send data failed, topic is reserved.");
-        return DUCKPACKET_ERR_TOPIC_INVALID;
-      }
-     if (data.size() > MAX_DATA_LENGTH) {
-       logerr_ln("ERROR send data failed, message too large: %d bytes",data.size());
-       return DUCKPACKET_ERR_SIZE_INVALID;
-     }
-     int err = txPacket->prepareForSending(&filter, targetDevice, this->getType(), topic, data);
-   
-     if (err != DUCK_ERR_NONE) {
-       return err;
-     }
-   
-     err = duckRadio.sendData(txPacket->getBuffer());
-   
-     CdpPacket packet = CdpPacket(txPacket->getBuffer());
-   
-     if (err == DUCK_ERR_NONE) {
-       filter.bloom_add(packet.muid.data(), MUID_LENGTH);
-     }
-       std::copy(packet.muid.begin(),packet.muid.end(),lastMessageMuid.begin());
-     assert(lastMessageMuid.size() == MUID_LENGTH);
-     if (outgoingMuid != NULL) {
-         std::copy(packet.muid.cbegin(),packet.muid.cend(),outgoingMuid->begin());
-       assert(outgoingMuid->size() == MUID_LENGTH);
-     }
-     txPacket->reset();
-   
-     return err;
-   }
-
-  /**
-   * @brief Builds a CdpPacket with a specified muid.
-   *
-   * @param topic the message topic
-   * @param data a byte buffer representing the data to send
-   * @param length the length of the byte buffer
-   * @param targetDevice the device UID to receive the message
-   * @param muid the muid that should be associated with this packet
-   * @return a new CdpPacket
-   * */
-  CdpPacket buildCdpPacket(byte topic, const std::vector<byte> data,
-    const std::array<byte,8> targetDevice, const std::array<byte,4> &muid){
-      if (data.size() > MAX_DATA_LENGTH) {
-        logerr_ln("ERROR send data failed, message too large: %d bytes", data.size());
-      }
-      int err = txPacket->prepareForSending(&filter, targetDevice, this->getType(), topic, data);
-      //txPacket unintended side effects?
-      if (err != DUCK_ERR_NONE) {
-        logerr_ln("prepare for sending failed. " + err);
-      }
-      //todo error not handled properly
-      CdpPacket packet = CdpPacket(txPacket->getBuffer());
-      packet.muid = muid;
-    
-      return packet;
-  } //this doesn't even belong in this class
-
-  // /**
-  //  * @brief Check wifi connection status
-  //  * 
-  //  * @returns true if device wifi is connected, false otherwise. 
-  //  */
-  // bool isWifiConnected();
-
-  // /**
-  //  * @brief Get the access point ssid
-  //  * 
-  //  * @returns the wifi access point as a string
-  //  */
-  // std::string getSsid();
-  // /**
-  //  * @brief Get the wifi access point password.
-  //  * 
-  //  * @returns the wifi access point password as a string. 
-  //  */
-  // std::string getPassword();
 
   /**
    * @brief Get an error code description.
@@ -333,87 +212,6 @@ private:
     return "Unknown error";
   }
 
-  /**
-   * @brief Turn on or off encryption.
-   * 
-   * @param state true for on, false for off
-   */
-  void setEncrypt(bool state); //why
-
-  /**
-   * @brief get encryption state.
-   * 
-   * @return true for on, false for off
-   */
-  bool getEncrypt();
-
-  /**
-   * @brief Turn on or off decryption. Used with MamaDuck
-   * 
-   * @param state true for on, false for off
-   */
-  void setDecrypt(bool state);
-
-  /**
-   * @brief get decryption state.
-   * 
-   * @return true for on, false for off
-   */
-  bool getDecrypt();
-
-  /**
-   * @brief Set new AES key for encryption.
-   * 
-   * @param newKEY byte array, must be 32 bytes
-   */
-  void setAESKey(uint8_t newKEY[32]); //different module
-
-  /**
-   * @brief Set new AES initialization vector.
-   * 
-   * @param newIV byte array, must be 16 bytes
-   */
-  void setAESIv(uint8_t newIV[16]);
-
-  /**
-   * @brief Encrypt data using AES-256 CTR.
-   * 
-   * @param text pointer to byte array of plaintext
-   * @param encryptedData pointer to byte array to store encrypted message
-   * @param inc size of text to be encrypted
-   */
-  void encrypt(uint8_t* text, uint8_t* encryptedData, size_t inc);
-
-  /**
-   * @brief Decrypt data using AES-256 CTR.
-   * 
-   * @param encryptedData pointer to byte array to be decrypted
-   * @param text pointer to byte array to store decrypted plaintext
-   * @param inc size of text to be decrypted
-   */
-  void decrypt(uint8_t* encryptedData, uint8_t* text, size_t inc);
-
-  virtual void handleReceivedPacket() = 0;
-    /**
-   * @brief Run sketch-loop specific code
-   * 
-   * This method must be implemented by the Duck's concrete classes such as DuckLink, MamaDuck,...
-   */
-  void run(){
-    Duck::logIfLowMemory();
-
-    duckRadio.serviceInterruptFlags();
-  
-    if(networkState == NetworkState::PUBLIC) {
-      handleReceivedPacket();
-      processPortalRequest();
-    } else {
-      attemptNetworkJoin();
-      rxPacket->reset();
-    }
-  }
-
-private: 
   RadioType duckRadio;
   NetworkState networkState = NetworkState::SEARCHING;
   void setNetworkState(NetworkState newState){
@@ -432,7 +230,7 @@ private:
   std::optional<CdpPacket> checkForNetworks(){ 
   std::optional<CdpPacket> result;
 
-  if (duckRadio::getReceiveFlag()){
+  if (duckRadio.getReceiveFlag()){
     std::vector<uint8_t> data;
     int err = duckRadio.readReceivedData(&data);
     if (err != DUCK_ERR_NONE) {
@@ -472,7 +270,7 @@ private:
   }
 };
 
-  unsigned long lastRreqTime = 0L;
+  
   int sendRouteData(reservedTopic topic, std::string data, Duid targetDevice){
     std::vector<byte> app_data;
     app_data.insert(app_data.end(), data.begin(), data.end());
@@ -482,10 +280,9 @@ private:
     return err;
   }
   
-
-protected:
-  Duck(Duck const&) = delete;
-  Duck& operator=(Duck const&) = delete;
+  DuckPacket* txPacket = NULL;
+  DuckPacket* rxPacket = NULL;
+  std::array<uint8_t,4> lastMessageMuid;
 
   std::string deviceId; //just make this a print function
   std::array<uint8_t,8> duid;
@@ -511,11 +308,7 @@ protected:
 
   // DuckNet * const duckNet;
 
-  DuckPacket* txPacket = NULL;
-  DuckPacket* rxPacket = NULL;
-  std::array<uint8_t,4> lastMessageMuid;
-
-  BloomFilter filter;
+  BloomFilter filter; //inject this?
   /**
    * @brief Sort the routing table using the customGreater comparator
    */
@@ -550,7 +343,7 @@ protected:
    * 
    * @return DUCK_ERR_NONE if successfull. An error code otherwise 
    */
-  int sendPong(){ //these should not be special
+  int sendPong(){
     int err = DUCK_ERR_NONE;
     std::vector<byte> data(1, 0);
     err = txPacket->prepareForSending(&filter, PAPADUCK_DUID, this->getType(), reservedTopic::pong, data);
@@ -602,24 +395,6 @@ protected:
   };
 
   /**
-   * @brief Setup a duck with default settings
-   *
-   * The default implementation simply initializes the serial interface.
-   * It can be overriden by each concrete Duck class implementation.
-   */
-  virtual int setupWithDefaults(std::array<uint8_t,8> deviceId, std::string ssid, std::string password) {
-    int err = setupSerial();
-    if (err != DUCK_ERR_NONE) {
-      return err;
-    }
-    err = setDeviceId(deviceId);
-    if (err != DUCK_ERR_NONE) {
-      return err;
-    }
-    return DUCK_ERR_NONE;
-  }
-
-  /**
    * @brief Get the duck type.
    * 
    * @returns A value representing a DuckType
@@ -654,6 +429,9 @@ protected:
     }
   }
 
+  private:
+  Duck(Duck const&) = delete;
+  Duck& operator=(Duck const&) = delete;
 };
 
 #endif

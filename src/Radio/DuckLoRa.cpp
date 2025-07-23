@@ -29,12 +29,12 @@ CDPCFG_LORA_CLASS lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO0,
 volatile uint16_t DuckLoRa::interruptFlags = 0;
 volatile bool DuckLoRa::receivedFlag = false;
 
-const LoRaConfigParams defaultLoraParams = {
-    /* band     = */ CDPCFG_RF_LORA_FREQ,
-    /* txPower  = */ CDPCFG_RF_LORA_TXPOW,
-    /* bw       = */ CDPCFG_RF_LORA_BW,
-    /* sf       = */ CDPCFG_RF_LORA_SF,
-    /* gain     = */ CDPCFG_RF_LORA_GAIN,
+const LoRaConfigParams DuckLoRa::defaultRadioParams = {
+    /* band     = */ 915.0f,
+    /* txPower  = */ 14,
+    /* bw       = */ 125.0f,
+    /* sf       = */ 7,
+    /* gain     = */ 0,
     /* func     = */ nullptr
 };
 
@@ -67,7 +67,7 @@ int DuckLoRa::checkLoRaParameters(LoRaConfigParams config) { //this can be impro
     return rc;
 }
 
-int DuckLoRa::setupRadio(LoRaConfigParams config) {
+int DuckLoRa::setupRadio(const LoRaConfigParams &config) {
     loginfo_ln("Setting up RADIOLIB LoRa radio...");
     int rc;
     rc = checkLoRaParameters(config);

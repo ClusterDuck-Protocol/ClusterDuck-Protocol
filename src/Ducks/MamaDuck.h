@@ -2,12 +2,16 @@
 #define MAMADUCK_H
 
 #include "Duck.h"
+#include "../utils/MemoryFree.h"
 
-class MamaDuck : public Duck {
+template <typename RadioType = DuckLoRa>
+class MamaDuck : public Duck<RadioType> {
 public:
-  using Duck::Duck;
+  using Duck<RadioType>::Duck;
 
-  ~MamaDuck() {}
+  MamaDuck(std::string name = "MAMA0001") : Duck<RadioType>(std::move(name)) {}
+
+  ~MamaDuck() {};
 
   using rxDoneCallback = void (*)(std::vector<byte> data );
   /**
@@ -33,8 +37,15 @@ public:
    * 
    * @returns DUCK_ERR_NONE if setup is successfull, an error code otherwise.
    */
-   int setupWithDefaults(std::array<byte,8> deviceId, std::string ssid = "",
-                            std::string password = "");
+   int setupWithDefaults(std::array<byte,8> deviceId, std::string ssid = "", std::string password = "") {
+  
+    int err = this->setupLoRaRadio();
+    if (err != DUCK_ERR_NONE) {
+      logerr_ln("ERROR setupWithDefaults rc = %d",err);
+      return err;
+    }
+    return DUCK_ERR_NONE;
+  }
 
   /**
    * @brief Get the DuckType
@@ -43,14 +54,134 @@ public:
    */
   int getType() {return DuckType::MAMA;}
 
-  bool getDetectState();
-
 private :
   rxDoneCallback recvDataCallback;
-  void handleReceivedPacket();
+  void handleReceivedPacket(){
+    if (this->duckRadio.getReceiveFlag()){
+      std::vector<uint8_t> data;
+      bool relay = false;
+      
+      loginfo_ln("====> handleReceivedPacket: START");
+  
+      int err = this->duckRadio.readReceivedData(&data);
+      if (err != DUCK_ERR_NONE) {
+        logerr_ln("ERROR failed to get data from DuckRadio. rc = %d",err);
+        return;
+      }
+      logdbg_ln("Got data from radio, prepare for relay. size: %d",data.size());
+  
+      relay = this->rxPacket->prepareForRelaying(&this->filter, data);
+      if (relay) {
+        //TODO: this callback is causing an issue, needs to be fixed for mamaduck to get packet data
+        //recvDataCallback(this->rxPacket->getBuffer());
+        loginfo_ln("handleReceivedPacket: packet RELAY START");
+        // NOTE:
+        // Ducks will only handle received message one at a time, so there is a chance the
+        // packet being sent below will never be received, especially if the cluster is small
+        // there are not many alternative paths to reach other mama ducks that could relay the packet.
+        
+        CdpPacket packet = CdpPacket(this->rxPacket->getBuffer());
+  
+        //Check if Duck is desitination for this packet before relaying
+        if (duckutils::isEqual(BROADCAST_DUID, packet.dduid)) {
+          switch(packet.topic) {
+            case reservedTopic::rreq: {
+                loginfo_ln("RREQ received from %s. Updating RREQ!",
+                           packet.sduid.data());
+                ArduinoJson::JsonDocument rreqDoc;
+                deserializeJson(rreqDoc, packet.data);
+                DuckPacket::UpdateRREQ(rreqDoc, this->duid);
+                loginfo_ln("handleReceivedPacket: RREQ updated with current DUID: %s", this->duid);
+                //Serialize the updated RREQ packet
+                std::string strRREQ;
+                serializeJson(rreqDoc, strRREQ);
+                this->rxPacket->getBuffer() = duckutils::stringToByteVector(strRREQ);
+                err = this->duckRadio.relayPacket(this->rxPacket);
+                if (err != DUCK_ERR_NONE) {
+                    logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d", err);
+                } else {
+                    loginfo_ln("handleReceivedPacket: RREQ packet RELAY DONE");
+                }
+                return;
+            }
+            case reservedTopic::ping:
+              loginfo_ln("PING received. Sending PONG!");
+              err = this->sendPong();
+              if (err != DUCK_ERR_NONE) {
+                logerr_ln("ERROR failed to send pong message. rc = %d",err);
+              }
+              return;
+            case reservedTopic::pong:
+              loginfo_ln("PONG received. Ignoring!");
+            break;
+            case reservedTopic::cmd:
+              loginfo_ln("Command received");
+  
+              err = this->duckRadio.relayPacket(this->rxPacket);
+              if (err != DUCK_ERR_NONE) {
+                logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
+              } else {
+                loginfo_ln("handleReceivedPacket: packet RELAY DONE");
+              }
+            break;
+            default:
+              err = this->duckRadio.relayPacket(this->rxPacket);
+              if (err != DUCK_ERR_NONE) {
+                logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
+              } else {
+                loginfo_ln("handleReceivedPacket: packet RELAY DONE");
+              }
+          }
+        } else if(duckutils::isEqual(this->duid, packet.dduid)) { //Target device check
+            std::vector<uint8_t> dataPayload;
+            uint8_t num = 1;
+          
+          switch(packet.topic) {
+              case reservedTopic::rreq: {
+                  loginfo_ln("RREQ received. Updating RREQ!");
+                  ArduinoJson::JsonDocument rreqDoc;
+                  deserializeJson(rreqDoc, packet.data);
+                  loginfo_ln("handleReceivedPacket: Sending RREP");
+                  //Serialize the updated RREQ packet
+                  std::string strRREP;
+                  serializeJson(rreqDoc, strRREP);
+                  this->rxPacket->getBuffer() = duckutils::stringToByteVector(strRREP);
+                  err = this->duckRadio.relayPacket(this->rxPacket);
+                  if (err != DUCK_ERR_NONE) {
+                      logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d", err);
+                  } else {
+                      loginfo_ln("handleReceivedPacket: RREQ packet RELAY DONE");
+                  }
+  
+                  err = this->txPacket->prepareForSending(&this->filter, PAPADUCK_DUID,
+                    DuckType::MAMA, reservedTopic::rreq, dataPayload);
+  
+                  return;
+              }
+            break;
+            default:
+              err = this->duckRadio.relayPacket(this->rxPacket);
+              if (err != DUCK_ERR_NONE) {
+                logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
+              } else {
+                loginfo_ln("handleReceivedPacket: packet RELAY DONE");
+              }
+          }
+  
+        } else {
+          err = this->duckRadio.relayPacket(this->rxPacket);
+          if (err != DUCK_ERR_NONE) {
+            logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
+          } else {
+            loginfo_ln("handleReceivedPacket: packet RELAY DONE");
+          }
+        }
+  
+      }
+    }
+    this->rxPacket->reset();
+  }
 
-  void handleCommand(const CdpPacket & packet);
-  void handleDuckCommand(const CdpPacket & packet);
 };
 
 #endif
