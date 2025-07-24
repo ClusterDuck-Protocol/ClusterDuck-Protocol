@@ -4,6 +4,8 @@
 #include "include/DuckTypes.h"
 #include "include/DuckEsp.h"
 #include "include/DuckUtils.h"
+#include "DuckLogger.h"  // Required for logging functions
+#include <Wire.h>  // Required for I2C initialization
 #endif
 
 #include <vector>
@@ -12,10 +14,9 @@
 
 #define CDPCFG_PIN_OLED_ROTATION U8G2_R0
 
-CDPCFG_OLED_CLASS u8g2( CDPCFG_PIN_OLED_ROTATION,
-                        /* clock=*/CDPCFG_PIN_OLED_CLOCK,
-                       /* data=*/CDPCFG_PIN_OLED_DATA,
-                       /* reset=*/CDPCFG_PIN_OLED_RESET);
+// For software I2C displays like SH1106, provide individual pin parameters
+// Software I2C is more reliable for boards with complex power management
+CDPCFG_OLED_CLASS u8g2(CDPCFG_PIN_OLED_ROTATION, CDPCFG_PIN_OLED_CLOCK, CDPCFG_PIN_OLED_DATA, CDPCFG_PIN_OLED_RESET);
 
 static const unsigned char u8g_logo_bits[] U8X8_PROGMEM = {
 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
@@ -103,9 +104,35 @@ DuckDisplay* DuckDisplay::getInstance() {
 #ifndef CDPCFG_OLED_NONE
 
 void DuckDisplay::setupDisplay(int duckType, std::array<byte,8> name) {
-  u8g2.begin();        // clear the internal memory
+  loginfo_ln("=== Display Setup Debug ===");
+  loginfo_ln("Board: %s", CDP_BOARD_NAME);
+  loginfo_ln("Using Software I2C: SCL=%d, SDA=%d", CDPCFG_PIN_OLED_CLOCK, CDPCFG_PIN_OLED_DATA);
+  
+  // Software I2C handles pins directly, no Wire library initialization needed
+  delay(100); // Allow board to stabilize
+  
+  loginfo_ln("Initializing U8G2 display...");
+  if (!u8g2.begin()) {
+    logerr_ln("U8G2 initialization failed!");
+    return;
+  }
+  
+  loginfo_ln("U8G2 initialized successfully");
+  loginfo_ln("Display size: %d x %d", u8g2.getDisplayWidth(), u8g2.getDisplayHeight());
+  
   u8g2.setFont(u8g2_font_synchronizer_nbp_tf); // choose a suitable font
   u8g2.clearBuffer();  
+  
+  // Test basic drawing
+  loginfo_ln("Drawing test pattern...");
+  u8g2.drawStr(0, 15, "CDP Test");
+  u8g2.drawStr(0, 30, "T-Beam Supreme");
+  u8g2.sendBuffer();
+  delay(2000);
+  
+  // Draw logo
+  loginfo_ln("Drawing CDP logo...");
+  u8g2.clearBuffer();
   u8g2.drawXBM( 0, 0, u8g_logo_width, u8g_logo_height, u8g_logo_bits);
   u8g2.sendBuffer(); 
   delay(1000);
@@ -114,9 +141,7 @@ void DuckDisplay::setupDisplay(int duckType, std::array<byte,8> name) {
   width = u8g2.getCols();
   height = u8g2.getRows();
 
-
   std::string id(name.begin(), name.end());
-
 
   if (duckType >= DuckType::MAX_TYPE) {
     this->duckType = DuckType::UNKNOWN;
@@ -124,6 +149,8 @@ void DuckDisplay::setupDisplay(int duckType, std::array<byte,8> name) {
     this->duckType = duckType;
   }
   this->duckName = id.c_str();
+  
+  loginfo_ln("=== Display Setup Complete ===");
 }
 
 
