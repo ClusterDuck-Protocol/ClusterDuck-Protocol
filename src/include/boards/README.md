@@ -1,6 +1,16 @@
 # Adding Your Own Board
 This directory contains board-specific files for the various boards that are supported by the CDP firmware.
 
+## Supported Boards
+
+The ClusterDuck Protocol currently supports the following boards out of the box:
+
+- **Heltec WiFi LoRa 32 V2** - `src/include/boards/heltec_wifi_lora_32_V2.h`
+- **Heltec WiFi LoRa 32 V3** - `src/include/boards/heltec_wifi_lora_32_V3.h`
+- **LilyGO T-Beam SX1262** - `src/include/boards/lilygo_t_beam_sx1262.h`
+- **LilyGO T-Beam Supreme ESP32-S3 SX1262** - `src/include/boards/lilygo_t_beam_supreme_sx1262.h`
+- **TTGO T-Beam V1 SX1276** - `src/include/boards/ttgo_t_beam_v1_sx1276.h`
+
 ## Board Format
 Some boards will differ in capability, so not all pins will need to be defined. All pins starting 
 Here is what a board file should look like to start:
