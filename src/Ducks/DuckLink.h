@@ -3,12 +3,12 @@
 
 #include "Duck.h"
 
-template <typename RadioType = DuckLoRa>
-class DuckLink : public Duck<RadioType> {
+template <typename WifiCapability, typename RadioType = DuckLoRa>
+class DuckLink : public Duck<WifiCapability, RadioType> {
 public:
-using Duck<RadioType>::Duck;
+using Duck<WifiCapability, RadioType>::Duck;
   
-  DuckLink(std::string name = "LINK0001") : Duck<RadioType>(std::move(name)) {}
+  DuckLink(std::string name = "LINK0001") : Duck<WifiCapability, RadioType>(std::move(name)) {}
   ~DuckLink() override {}
   
   /**
@@ -26,7 +26,7 @@ using Duck<RadioType>::Duck;
    * @returns DUCK_ERR_NONE if setup is successfull, an error code otherwise.
    */
   int setupWithDefaults(std::array<byte,8> deviceId, std::string ssid="", std::string password="") {
-    int err = Duck<RadioType>::setupWithDefaults(deviceId, ssid, password);
+    int err = Duck<WifiCapability, RadioType>::setupWithDefaults(deviceId, ssid, password);
     if (err != DUCK_ERR_NONE) {
       logerr_ln("ERROR setupWithDefaults rc = %d",err);
       return err;

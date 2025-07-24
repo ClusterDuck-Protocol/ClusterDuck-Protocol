@@ -3,12 +3,12 @@
 
 #include "Duck.h"
 
-template <typename RadioType = DuckLoRa>
-class PapaDuck : public Duck<RadioType> {
+template <typename WifiCapability, typename RadioType = DuckLoRa>
+class PapaDuck : public Duck<WifiCapability, RadioType> {
 public:
-  using Duck<RadioType>::Duck;
+  using Duck<WifiCapability, RadioType>::Duck;
   
-  PapaDuck(std::string name = "PAPADUCK") : Duck<RadioType>(std::move(name)) {}
+  PapaDuck(std::string name = "PAPADUCK") : Duck<WifiCapability, RadioType>(std::move(name)) {}
   ~PapaDuck() {}
 
   /// Papa Duck callback functions signature.
@@ -38,7 +38,7 @@ public:
    int setupWithDefaults(std::array<byte,8> deviceId, std::string ssid = "", std::string password = "") {
     loginfo_ln("setupWithDefaults...");
   
-    int err = Duck<RadioType>::setupWithDefaults(deviceId, ssid, password);
+    int err = Duck<WifiCapability, RadioType>::setupWithDefaults(deviceId, ssid, password);
   
     if (err != DUCK_ERR_NONE) {
       logerr_ln("ERROR setupWithDefaults rc = %s",err);

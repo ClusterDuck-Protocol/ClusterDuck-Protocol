@@ -4,12 +4,12 @@
 #include "Duck.h"
 #include "../utils/MemoryFree.h"
 
-template <typename RadioType = DuckLoRa>
-class MamaDuck : public Duck<RadioType> {
+template <typename WifiCapability, typename RadioType = DuckLoRa>
+class MamaDuck : public Duck<WifiCapability, RadioType> {
 public:
-  using Duck<RadioType>::Duck;
+  using Duck<WifiCapability, RadioType>::Duck;
 
-  MamaDuck(std::string name = "MAMA0001") : Duck<RadioType>(std::move(name)) {}
+  MamaDuck(std::string name = "MAMA0001") : Duck<WifiCapability, RadioType>(std::move(name)) {}
 
   ~MamaDuck() {};
 
@@ -44,6 +44,11 @@ public:
       logerr_ln("ERROR setupWithDefaults rc = %d",err);
       return err;
     }
+    err = this->duckWifi->setupAccessPoint();
+    if (err != DUCK_ERR_NONE) {
+      logerr_ln("ERROR setupWithDefaults rc = %d",err);
+      return err;
+    }
     return DUCK_ERR_NONE;
   }
 
@@ -55,7 +60,9 @@ public:
   int getType() {return DuckType::MAMA;}
 
 private :
+  WifiCapability duckWifi;
   rxDoneCallback recvDataCallback;
+
   void handleReceivedPacket(){
     if (this->duckRadio.getReceiveFlag()){
       std::vector<uint8_t> data;

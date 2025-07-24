@@ -13,22 +13,15 @@
 #include "../CdpPacket.h"
 #include "../DuckCrypto.h"
 #include "../DuckEsp.h"
+#include "../wifi/DuckWifiNone.h"
 
 enum class NetworkState {SEARCHING, PUBLIC};
 
 //templated class to require some radio capability
-template <typename RadioType = DuckLoRa>
+template <typename WifiCapability = DuckWifiNone, typename RadioType = DuckLoRa>
 class Duck {
 
 public:
-  /**
-   * @brief Construct a new Duck object.
-   *
-   */
-  Duck(std::string name){ //check this for correct length
-    std::copy(name.begin(), name.end(),duid.begin());
-  }
-
   virtual ~Duck(){
     delete txPacket;
     delete rxPacket;
@@ -114,6 +107,14 @@ public:
 
 
 protected:
+  /**
+   * @brief Construct a new Duck object.
+   *
+   */
+  Duck(std::string name){ //check this for correct length
+    std::copy(name.begin(), name.end(),duid.begin());
+  }
+
   RadioType duckRadio;
   NetworkState networkState = NetworkState::SEARCHING;
   static constexpr int MEMORY_LOW_THRESHOLD = PACKET_LENGTH + sizeof(CdpPacket);
@@ -250,16 +251,6 @@ protected:
    */
   virtual int getType() = 0;
 
-  // /**
-  //  * @brief reconnect the duck to the given wifi access point
-  //  * 
-  //  * @param ssid the access point ssid to connect to 
-  //  * @param password the access point password
-  //  * @return DUCK_ERR_NONE if the duck reconnected to the AP sucessfully. An error code otherwise. 
-  //  */
-  // virtual int reconnectWifi(std::string ssid, std::string password) {
-  //   return DUCK_ERR_NONE;
-  // }
 
   // /**
   //  * @brief Handle request from emergency portal.
