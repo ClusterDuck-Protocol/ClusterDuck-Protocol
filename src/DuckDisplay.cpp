@@ -123,13 +123,6 @@ void DuckDisplay::setupDisplay(int duckType, std::array<byte,8> name) {
   u8g2.setFont(u8g2_font_synchronizer_nbp_tf); // choose a suitable font
   u8g2.clearBuffer();  
   
-  // Test basic drawing
-  loginfo_ln("Drawing test pattern...");
-  u8g2.drawStr(0, 15, "CDP Test");
-  u8g2.drawStr(0, 30, "T-Beam Supreme");
-  u8g2.sendBuffer();
-  delay(2000);
-  
   // Draw logo
   loginfo_ln("Drawing CDP logo...");
   u8g2.clearBuffer();
