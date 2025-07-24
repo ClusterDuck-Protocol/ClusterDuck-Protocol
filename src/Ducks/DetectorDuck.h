@@ -1,14 +1,15 @@
-#ifndef DUCKDETECT_H
-#define DUCKDETECT_H
+#ifndef DETECTORDUCK_H
+#define DETECTORDUCK_H
 
 #include "Duck.h"
 
 template <typename RadioType = DuckLoRa>
-class DuckDetect : public Duck<RadioType> {
+class DetectorDuck : public Duck<RadioType> {
 public:
   using Duck<RadioType>::Duck;
 
-  ~DuckDetect() {}
+  DetectorDuck(std::string name = "DETECTOR") : Duck<RadioType>(std::move(name)) {}
+  ~DetectorDuck() {}
   
   /**
    * @brief Send a ping message to devices in the mesh network.
@@ -62,7 +63,7 @@ private:
       return err;
     }
   
-    loginfo("DuckDetect setup done");
+    loginfo("DetectorDuck setup done");
     return DUCK_ERR_NONE;
   }
   

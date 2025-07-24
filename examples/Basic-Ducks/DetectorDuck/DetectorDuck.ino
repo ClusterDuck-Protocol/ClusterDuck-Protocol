@@ -3,7 +3,7 @@
    @author
    @brief Builds a Duck to get RSSI signal strength value.
 
-   This example builds a duck using the preset DuckDetect to periodically send a ping message
+   This example builds a duck using the preset DetectorDuck to periodically send a ping message
    then provide the RSSI value of the response.
 
    @version
@@ -30,7 +30,7 @@ CRGB leds[NUM_LEDS];
 #endif
 
 // create an instance of a built-in Duck Detector
-DuckDetect duck;
+DetectorDuck duck;
 
 // Create a timer with default settings
 auto timer = timer_create_default();

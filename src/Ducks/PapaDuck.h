@@ -8,6 +8,7 @@ class PapaDuck : public Duck<RadioType> {
 public:
   using Duck<RadioType>::Duck;
   
+  PapaDuck(std::string name = "PAPADUCK") : Duck<RadioType>(std::move(name)) {}
   ~PapaDuck() {}
 
   /// Papa Duck callback functions signature.

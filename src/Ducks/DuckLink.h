@@ -8,6 +8,7 @@ class DuckLink : public Duck<RadioType> {
 public:
 using Duck<RadioType>::Duck;
   
+  DuckLink(std::string name = "LINK0001") : Duck<RadioType>(std::move(name)) {}
   ~DuckLink() override {}
   
   /**

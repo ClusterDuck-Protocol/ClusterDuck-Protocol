@@ -70,7 +70,7 @@ private :
       }
       logdbg_ln("Got data from radio, prepare for relay. size: %d",data.size());
   
-      relay = this->rxPacket->prepareForRelaying(&this->filter, data);
+      relay = this->rxPacket->prepareForRelaying(&this->filter, data); //change to call a function on router that filters for you, filter is private
       if (relay) {
         //TODO: this callback is causing an issue, needs to be fixed for mamaduck to get packet data
         //recvDataCallback(this->rxPacket->getBuffer());

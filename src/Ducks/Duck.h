@@ -4,7 +4,6 @@
 #include <Arduino.h>
 
 #include "../utils/DuckError.h"
-#include "../bloomfilter.h"
 #include "../include/cdpcfg.h"
 #include "../DuckPacket.h"
 #include "../Radio/DuckLoRa.h"
@@ -14,8 +13,6 @@
 #include "../CdpPacket.h"
 #include "../DuckCrypto.h"
 #include "../DuckEsp.h"
-#include <map>
-#include <list>
 
 enum class NetworkState {SEARCHING, PUBLIC};
 
@@ -28,7 +25,6 @@ public:
    * @brief Construct a new Duck object.
    *
    */
-  Duck() : Duck() {}
   Duck(std::string name){ //check this for correct length
     std::copy(name.begin(), name.end(),duid.begin());
   }
@@ -118,7 +114,15 @@ public:
 
 
 protected:
+  RadioType duckRadio;
+  NetworkState networkState = NetworkState::SEARCHING;
   static constexpr int MEMORY_LOW_THRESHOLD = PACKET_LENGTH + sizeof(CdpPacket);
+  DuckPacket* txPacket = NULL;
+  DuckPacket* rxPacket = NULL;
+  std::array<uint8_t,4> lastMessageMuid;
+  std::string deviceId; //just make this a print function
+  std::array<uint8_t,8> duid;
+
   /**
    * @brief Get the duck's unique ID.
    * 
@@ -151,69 +155,6 @@ protected:
     return DUCK_ERR_NONE;
   }
 
-  /**
-   * @brief Get an error code description.
-   * 
-   * @param error an error code
-   * @returns a string describing the error. 
-   */
-  std::string getErrorString(int error) {//seems more like a duck logger or utils type of thing
-    std::string errorStr = std::to_string(error) + ": ";
-  
-    switch (error) {
-      case DUCK_ERR_NONE:
-        return errorStr + "No error";
-      case DUCK_ERR_NOT_SUPPORTED:
-        return errorStr + "Feature not supported";
-      case DUCK_ERR_SETUP:
-        return errorStr + "Setup failure";
-      case DUCK_ERR_ID_TOO_LONG:
-        return errorStr + "Id length is invalid";
-      case DUCKLORA_ERR_BEGIN:
-        return errorStr + "Lora module initialization failed";
-      case DUCKLORA_ERR_SETUP:
-        return errorStr + "Lora module configuration failed";
-      case DUCKLORA_ERR_RECEIVE:
-        return errorStr + "Lora module failed to read data";
-      case DUCKLORA_ERR_TIMEOUT:
-        return errorStr + "Lora module timed out";
-      case DUCKLORA_ERR_TRANSMIT:
-        return errorStr + "Lora moduled failed to send data";
-      case DUCKLORA_ERR_HANDLE_PACKET:
-        return errorStr + "Lora moduled failed to handle RX data";
-      case DUCKLORA_ERR_MSG_TOO_LARGE:
-        return errorStr + "Attempted to send a message larger than 256 bytes";
-  
-      case DUCKWIFI_ERR_NOT_AVAILABLE:
-        return errorStr + "Wifi network is not availble";
-      case DUCKWIFI_ERR_DISCONNECTED:
-        return errorStr + "Wifi is disconnected";
-      case DUCKWIFI_ERR_AP_CONFIG:
-        return errorStr + "Wifi configuration failed";
-  
-      case DUCKDNS_ERR_STARTING:
-        return errorStr + "DNS initialization failed";
-  
-      case DUCKPACKET_ERR_SIZE_INVALID:
-        return errorStr + "Duck packet size is invalid";
-      case DUCKPACKET_ERR_TOPIC_INVALID:
-        return errorStr + "Duck packet topic field is invalid";
-      case DUCKPACKET_ERR_MAX_HOPS:
-        return errorStr + "Duck packet reached maximum allowed hops";
-  
-      case DUCK_INTERNET_ERR_SETUP:
-        return errorStr + "Internet setup failed";
-      case DUCK_INTERNET_ERR_SSID:
-        return errorStr + "Internet SSID is not valid";
-      case DUCK_INTERNET_ERR_CONNECT:
-        return errorStr + "Internet connection failed";
-    }
-    
-    return "Unknown error";
-  }
-
-  RadioType duckRadio;
-  NetworkState networkState = NetworkState::SEARCHING;
   void setNetworkState(NetworkState newState){
     if (networkState != newState) {
         NetworkState oldState = networkState;
@@ -221,54 +162,20 @@ protected:
         networkTransition(oldState, newState);
     }
   }
-  void networkTransition(NetworkState oldState, NetworkState newState){
-    if (oldState == NetworkState::SEARCHING && newState == NetworkState::PUBLIC) {
-      logdbg_ln("public network joined");
-    }
-  }
-
-  std::optional<CdpPacket> checkForNetworks(){ 
-  std::optional<CdpPacket> result;
-
-  if (duckRadio.getReceiveFlag()){
-    std::vector<uint8_t> data;
-    int err = duckRadio.readReceivedData(&data);
-    if (err != DUCK_ERR_NONE) {
-      logerr_ln("ERROR failed to get data from DuckRadio. rc = %d",err);
-      result = std::nullopt;
-    }
-    logdbg_ln("Got data from radio, prepare for relay. size: %d",data.size());
-
-    CdpPacket packet = CdpPacket(rxPacket->getBuffer());
-    result = (packet.topic == reservedTopic::rrep) ? std::optional<CdpPacket>{packet} : std::nullopt;
-
-    rxPacket->reset();
-  } else {
-    result = std::nullopt;
-  }
-  return result;
-} ;
-
-
-// //put this on Router
-// void updateRoutingTable(){
-//   Serial.println("routing table creation")
-// }
-
 
   void attemptNetworkJoin(){
-  std::optional<CdpPacket> cdpNode = checkForNetworks();
+    std::optional<CdpPacket> cdpNode = checkForNetworks();
 
-  if(cdpNode.has_value()){
-    // updateRoutingTable(cdpNode);
-    networkTransition(networkState, NetworkState::PUBLIC);
-  } else {
-    if((millis() - this->lastRreqTime) > 5000L){
-      sendRouteData(reservedTopic::rreq, getDuckId(), BROADCAST_DUID);
-      lastRreqTime = millis();
+    if(cdpNode.has_value()){
+      // updateRoutingTable(cdpNode);
+      networkTransition(networkState, NetworkState::PUBLIC);
+    } else {
+      if((millis() - this->lastRreqTime) > 5000L){
+        sendRouteData(reservedTopic::rreq, getDuckId(), BROADCAST_DUID);
+        lastRreqTime = millis();
+      }
     }
-  }
-};
+  };
 
   
   int sendRouteData(reservedTopic topic, std::string data, Duid targetDevice){
@@ -278,64 +185,6 @@ protected:
     txPacket->prepareForSending(&filter, BROADCAST_DUID, DuckType::UNKNOWN, topic, app_data );
     int err = duckRadio.sendData(txPacket->getBuffer());
     return err;
-  }
-  
-  DuckPacket* txPacket = NULL;
-  DuckPacket* rxPacket = NULL;
-  std::array<uint8_t,4> lastMessageMuid;
-
-  std::string deviceId; //just make this a print function
-  std::array<uint8_t,8> duid;
-
-  class DuckRecord {
-    public:
-      //DuckRecord() : routingScore(0), lastSeen(0), snr(0), rssi(0) {}
-      DuckRecord(std::string devId, long routingScore, long lastSeen, float snr, float rssi) :
-        DeviceId(std::move(devId)), routingScore(routingScore), lastSeen(lastSeen), snr(snr), rssi(rssi) {}
-
-      std::string getDeviceId() { return DeviceId; }
-      long getRoutingScore() const { return routingScore; }
-      long getLastSeen() { return lastSeen; }
-      long getSnr() { return snr; }
-      long getRssi() { return rssi; }
-  private:
-      std::string DeviceId;
-      long routingScore, lastSeen;
-      float snr, rssi;
-  };
-  
-  std::multimap<long,DuckRecord,std::greater<long>> routingTable;
-
-  // DuckNet * const duckNet;
-
-  BloomFilter filter; //inject this?
-  /**
-   * @brief Sort the routing table using the customGreater comparator
-   */
-   std::list <DuckRecord> getRoutingTable() {
-    std::list<DuckRecord> sortedList;
-    for (const auto& pair : routingTable) {
-      sortedList.push_back(pair.second);
-    }
-    return sortedList;
-    }
-//  void sortRoutingTable() {
-//    getRoutingTable().sort([](const DuckRecord& lhs, const DuckRecord& rhs){
-//        return lhs.getRoutingScore() > rhs.getRoutingScore();
-//    });
-//  }
-    /**
-     * @brief Insert a new record into the routing table
-     *
-     * @param deviceID the device ID
-     * @param routingScore the routing score
-     * @param lastSeen the last seen timestamp
-     * @param snr the signal to noise ratio
-     * @param rssi the received signal strength indicator
-     */
-  void insertIntoRoutingTable(std::string deviceID, long routingScore, long lastSeen, float snr, float rssi) {
-    DuckRecord record(std::move(deviceID), routingScore, lastSeen, snr, rssi);
-    routingTable.insert(std::make_pair(routingScore, record));
   }
 
   /**
@@ -401,22 +250,22 @@ protected:
    */
   virtual int getType() = 0;
 
-  /**
-   * @brief reconnect the duck to the given wifi access point
-   * 
-   * @param ssid the access point ssid to connect to 
-   * @param password the access point password
-   * @return DUCK_ERR_NONE if the duck reconnected to the AP sucessfully. An error code otherwise. 
-   */
-  virtual int reconnectWifi(std::string ssid, std::string password) {
-    return DUCK_ERR_NONE;
-  }
+  // /**
+  //  * @brief reconnect the duck to the given wifi access point
+  //  * 
+  //  * @param ssid the access point ssid to connect to 
+  //  * @param password the access point password
+  //  * @return DUCK_ERR_NONE if the duck reconnected to the AP sucessfully. An error code otherwise. 
+  //  */
+  // virtual int reconnectWifi(std::string ssid, std::string password) {
+  //   return DUCK_ERR_NONE;
+  // }
 
-  /**
-   * @brief Handle request from emergency portal.
-   *
-   */
-  void processPortalRequest();
+  // /**
+  //  * @brief Handle request from emergency portal.
+  //  *
+  //  */
+  // void processPortalRequest();
 
   /**
    * @brief Log an error message if the system's memory is too low.
@@ -432,6 +281,34 @@ protected:
   private:
   Duck(Duck const&) = delete;
   Duck& operator=(Duck const&) = delete;
+
+  void networkTransition(NetworkState oldState, NetworkState newState){
+    if (oldState == NetworkState::SEARCHING && newState == NetworkState::PUBLIC) {
+      logdbg_ln("public network joined");
+    }
+  }
+
+  std::optional<CdpPacket> checkForNetworks(){ 
+    std::optional<CdpPacket> result;
+
+    if (duckRadio.getReceiveFlag()){
+      std::vector<uint8_t> data;
+      int err = duckRadio.readReceivedData(&data);
+      if (err != DUCK_ERR_NONE) {
+        logerr_ln("ERROR failed to get data from DuckRadio. rc = %d",err);
+        result = std::nullopt;
+      }
+      logdbg_ln("Got data from radio, prepare for relay. size: %d",data.size());
+
+      CdpPacket packet = CdpPacket(rxPacket->getBuffer());
+      result = (packet.topic == reservedTopic::rrep) ? std::optional<CdpPacket>{packet} : std::nullopt;
+
+      rxPacket->reset();
+      } else {
+        result = std::nullopt;
+      }
+      return result;
+  }
 };
 
 #endif
