@@ -39,15 +39,6 @@ struct LoRaConfigParams {
     void (*func)(void); 
 };
 
-extern const LoRaConfigParams defaultLoraParams = {
-    /* band     = */ 915.0f,
-    /* txPower  = */ 14,
-    /* bw       = */ 125.0f,
-    /* sf       = */ 7,
-    /* gain     = */ 0,
-    /* func     = */ nullptr
-};
-
 // const struct LoRaPins {
 //     const int ss;
 //     /// chip reset pin
@@ -69,6 +60,33 @@ class DuckLoRa {
         };
         DuckLoRa(DuckLoRa const&) = delete;
         DuckLoRa& operator=(DuckLoRa const&) = delete;
+
+        static const LoRaConfigParams defaultRadioParams;
+
+                /**
+         * @brief Initialize the LoRa chip.
+         * 
+         * @param config    lora configurstion parameters
+         * @returns 0 if initialization was successful, an error code otherwise. 
+         */
+        int setupRadio(const LoRaConfigParams& config = defaultRadioParams);
+
+                /**
+         * @brief Send packet data out into the LoRa mesh network
+         *
+         * @param data byte buffer to send
+         * @param length length of the byte buffer
+         * @return int
+         */
+        int sendData(uint8_t* data, int length);
+
+        /**
+         * @brief Send packet data out into the mesh network
+         *
+         * @param data byte vector to send
+         * @returns DUCK_ERR_NONE if the message was sent successfully, an error code otherwise.
+         */
+        int sendData(std::vector<uint8_t> data);
     private:
         static volatile uint16_t interruptFlags;
         static volatile bool receivedFlag;
@@ -88,32 +106,6 @@ class DuckLoRa {
             float snr;
             float signalScore;
         } signalInfo;
-            
-        /**
-         * @brief Initialize the LoRa chip.
-         * 
-         * @param config    lora configurstion parameters
-         * @returns 0 if initialization was successful, an error code otherwise. 
-         */
-        int setupRadio(LoRaConfigParams config = defaultLoraParams);
-
-
-        /**
-         * @brief Send packet data out into the LoRa mesh network
-         *
-         * @param data byte buffer to send
-         * @param length length of the byte buffer
-         * @return int
-         */
-        int sendData(uint8_t* data, int length);
-
-        /**
-         * @brief Send packet data out into the mesh network
-         *
-         * @param data byte vector to send
-         * @returns DUCK_ERR_NONE if the message was sent successfully, an error code otherwise.
-         */
-        int sendData(std::vector<uint8_t> data);
 
         /**
          * @brief Set the Duck to be ready to recieve LoRa packets.

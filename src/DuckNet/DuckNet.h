@@ -27,7 +27,7 @@
 #include <string>
 
 #include "../Radio/DuckLoRa.h"
-#include "../bloomfilter.h"
+#include "../routing/bloomfilter.h"
 #include "../DuckPacket.h"
 
 #ifdef CDPCFG_WIFI_NONE

@@ -14,7 +14,7 @@
 #endif
 
 #include "cdpcfg.h"
-#include "../Ducks/DuckDetect.h"
+#include "../Ducks/DetectorDuck.h"
 #include "../Ducks/DuckLink.h"
 #include "../Ducks/MamaDuck.h"
 #include "../Ducks/PapaDuck.h"

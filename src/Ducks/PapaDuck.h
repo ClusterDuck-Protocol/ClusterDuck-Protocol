@@ -3,10 +3,12 @@
 
 #include "Duck.h"
 
-class PapaDuck : public Duck {
+template <typename WifiCapability, typename RadioType = DuckLoRa>
+class PapaDuck : public Duck<WifiCapability, RadioType> {
 public:
-  using Duck::Duck;
+  using Duck<WifiCapability, RadioType>::Duck;
   
+  PapaDuck(std::string name = "PAPADUCK") : Duck<WifiCapability, RadioType>(std::move(name)) {}
   ~PapaDuck() {}
 
   /// Papa Duck callback functions signature.
@@ -33,21 +35,37 @@ public:
    * @param password wifi password (defaults to an empty string if not provided)
    * @returns DUCK_ERR_NONE if setup is successfull, an error code otherwise.
    */
-   int setupWithDefaults(std::array<byte,8> deviceId, std::string ssid = "",
-                            std::string password = "");
+   int setupWithDefaults(std::array<byte,8> deviceId, std::string ssid = "", std::string password = "") {
+    loginfo_ln("setupWithDefaults...");
+  
+    int err = Duck<WifiCapability, RadioType>::setupWithDefaults(deviceId, ssid, password);
+  
+    if (err != DUCK_ERR_NONE) {
+      logerr_ln("ERROR setupWithDefaults rc = %s",err);
+      return err;
+    }
+  
+    err = this->setupRadio();
+    if (err != DUCK_ERR_NONE) {
+      logerr_ln("ERROR setupWithDefaults  rc = %d",err);
+      return err;
+    }
+  
+    std::string name(deviceId.begin(),deviceId.end());
 
-  /**
-   * @brief Reconnect the device's WiFi access point.
-   *
-   * Allows a Wifi capable device to reconnect the wifi access point if it is
-   * lost.
-   *
-   * @param ssid
-   * @param password
-   * @returns DUCK_ERR_NONE if the reconnection is successful, an error code
-   * otherwise.
-   */
-  int reconnectWifi(std::string ssid, std::string password);
+      if (err != DUCK_ERR_NONE) {
+        logerr_ln("ERROR setupWithDefaults  rc = %d",err);
+        return err;
+      }
+      if (err != DUCK_ERR_NONE) {
+        logerr_ln("ERROR setupWithDefaults  rc = %d",err);
+       
+        return err;
+      }  
+  
+    loginfo_ln("setupWithDefaults done");
+    return DUCK_ERR_NONE;
+  };
 
   /**
    * @brief Get the DuckType
@@ -67,7 +85,27 @@ public:
    * @param cmd byte enum for command to be executed.
    * @param value contextual data to be used in executed command.
    */
-  void sendCommand(byte cmd, std::vector<byte> value);
+  void sendCommand(byte cmd, std::vector<byte> value) {
+    loginfo_ln("Initiate sending command");
+    std::vector<byte> dataPayload;
+    dataPayload.push_back(cmd);
+    dataPayload.insert(dataPayload.end(), value.begin(), value.end());
+  
+    int err = this->txPacket->prepareForSending(&this->filter, this->dduid, DuckType::PAPA,
+      reservedTopic::cmd, dataPayload);
+    if (err != DUCK_ERR_NONE) {
+      logerr_ln("ERROR handleReceivedPacket. Failed to prepare cmd. Error: %d",err);
+    }
+  
+    err = this->duckRadio->sendData(this->txPacket->getBuffer());
+  
+    if (err == DUCK_ERR_NONE) {
+      CdpPacket packet = CdpPacket(this->txPacket->getBuffer());
+      this->filter.bloom_add(packet.muid.data(), MUID_LENGTH);
+    } else {
+      logerr_ln("ERROR handleReceivedPacket. Failed to send cmd. Error: %d",err);
+    }
+  };
 
   /**
    * @brief Send duck command to specific duck
@@ -84,9 +122,40 @@ public:
 
 private:
 
-  void handleReceivedPacket();
+  void handleReceivedPacket() {
 
-  rxDoneCallback recvDataCallback;
+    loginfo_ln("handleReceivedPacket() START");
+    std::vector<uint8_t> data;
+    int err = this->duckRadio->readReceivedData(&data);
+  
+    if (err != DUCK_ERR_NONE) {
+      logerr_ln("ERROR handleReceivedPacket. Failed to get data. rc = %d",err);
+      return;
+    }
+    
+    if (data[TOPIC_POS] == reservedTopic::ping) {
+      loginfo_ln("PING received. Sending PONG!");
+      err = this->sendPong();
+      if (err != DUCK_ERR_NONE) {
+        logerr_ln("ERROR failed to send pong message. rc = %d",err);
+      }
+    } else if (data[TOPIC_POS] == reservedTopic::pong) {
+      loginfo_ln("PONG received. Ignoring!");
+    } else {
+      // build our RX DuckPacket which holds the updated path in case the packet is relayed
+      bool relay = this->rxPacket->prepareForRelaying(&this->filter, data);
+      if (relay) {
+        logdbg_ln("relaying:  %s", duckutils::convertToHex(this->rxPacket->getBuffer().data(), this->rxPacket->getBuffer().size()).c_str());
+        loginfo_ln("invoking callback in the duck application...");
+        
+        this->recvDataCallback(this->rxPacket->getBuffer());
+      }
+          loginfo_ln("handleReceivedPacket() DONE");
+          rxDoneCallback recvDataCallback;
+    }
+  
+
+  }
 };
 
 #endif

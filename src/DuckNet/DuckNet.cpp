@@ -1,6 +1,6 @@
 #include "DuckNet.h"
 
-DuckNet::DuckNet(BloomFilter *filter): bloomFilter(filter) {
+DuckNet::DuckNet(BloomFilter *filter): bloomFilter(filter) { //remove dependence on filter
 }
 
 #ifndef CDPCFG_WIFI_NONE
