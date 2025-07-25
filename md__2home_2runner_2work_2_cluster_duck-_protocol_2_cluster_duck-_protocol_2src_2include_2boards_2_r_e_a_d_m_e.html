@@ -94,6 +94,16 @@ $(document).ready(function(){initNavTree('md__2home_2runner_2work_2_cluster_duck
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="autotoc_md0"></a>This directory contains board-specific files for the various boards that are supported by the CDP firmware.</p>
 <h1><a class="anchor" id="autotoc_md1"></a>
+Supported Boards</h1>
+<p>The ClusterDuck Protocol currently supports the following boards out of the box:</p>
+<ul>
+<li><b>Heltec WiFi LoRa 32 V2</b> - <code><a class="el" href="heltec__wifi__lora__32___v2_8h.html">src/include/boards/heltec_wifi_lora_32_V2.h</a></code></li>
+<li><b>Heltec WiFi LoRa 32 V3</b> - <code><a class="el" href="heltec__wifi__lora__32___v3_8h.html">src/include/boards/heltec_wifi_lora_32_V3.h</a></code></li>
+<li><b>LilyGO T-Beam SX1262</b> - <code><a class="el" href="lilygo__t__beam__sx1262_8h.html">src/include/boards/lilygo_t_beam_sx1262.h</a></code></li>
+<li><b>LilyGO T-Beam Supreme ESP32-S3 SX1262</b> - <code><a class="el" href="lilygo__t__beam__supreme__sx1262_8h.html">src/include/boards/lilygo_t_beam_supreme_sx1262.h</a></code></li>
+<li><b>TTGO T-Beam V1 SX1276</b> - <code><a class="el" href="ttgo__t__beam__v1__sx1276_8h.html">src/include/boards/ttgo_t_beam_v1_sx1276.h</a></code></li>
+</ul>
+<h1><a class="anchor" id="autotoc_md2"></a>
 Board Format</h1>
 <p>Some boards will differ in capability, so not all pins will need to be defined. All pins starting Here is what a board file should look like to start:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define CDPCFG_PIN_BAT </span></div>
@@ -130,7 +140,7 @@ Board Format</h1>
 </div><!-- fragment --><p> If you are using a board with a <b>battery</b> module such as the TTGO T-Beam, you will also need to define the following pins: </p><div class="fragment"><div class="line">CDPCFG_PIN_BAT </div>
 <div class="line">CDPCFG_BAT_MULDIV </div>
 </div><!-- fragment --><p> The GPS, Battery and OLED pins are optional, but if you are using them, you will need to define them in your board file.</p>
-<h1><a class="anchor" id="autotoc_md2"></a>
+<h1><a class="anchor" id="autotoc_md3"></a>
 Defining the Pins</h1>
 <p>The pins for each board are in a pinout diagram made by the manufacturer. The pin numbers you're looking for are the GPIO numbers, not the physical pin numbers. For example, the TTGO T-Beam has the following pinout diagram:</p>
 <p><img src="https://www.passion-radio.fr/img/cms/v1-2_1.png" alt="TTGO T-Beam Example Pinout" class="inline"/> <b>NOTE: The manufurers may change the pinout diagram or have the wrong pins labeled, so cross reference with other sources or verify the pins with the manufacturer.</b></p>
@@ -154,7 +164,7 @@ Defining the Pins</h1>
 <div class="line"><span class="preprocessor">#define CDPCFG_PIN_OLED_DATA 21</span></div>
 <div class="line"><span class="preprocessor">#define CDPCFG_PIN_OLED_RESET 16</span></div>
 <div class="line"><span class="preprocessor">#define CDPCFG_PIN_OLED_ROTATION U8G2_R0</span></div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md4"></a>
 Adding the Board Header</h1>
 <p>After you've defined your header file as shown above, you have the option of putting it in the <code>src/include/boards</code> directory as <code>cdp_external_board.h</code> or somewhere else more convenient with whatever filename you choose. If you place it outside that standard directory, you will need to include it in the <code><a class="el" href="cdpcfg_8h.html" title="CDP central compile-time configuration file.">src/include/cdpcfg.h</a></code> file where the other board headers are included: </p><div class="fragment"><div class="line">...</div>
 <div class="line"> </div>

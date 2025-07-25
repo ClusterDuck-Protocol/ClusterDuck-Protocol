@@ -7,8 +7,9 @@ var searchData=
   ['bloomfilter_2eh_4',['bloomfilter.h',['../bloomfilter_8h.html',1,'']]],
   ['bloomfiltertester_5',['BloomFilterTester',['../class_bloom_filter.html#a37d4fd86dd5e960d606f6abfda4f3ce3',1,'BloomFilter']]],
   ['board_6',['Adding Your Own Board',['../md__2home_2runner_2work_2_cluster_duck-_protocol_2_cluster_duck-_protocol_2src_2include_2boards_2_r_e_a_d_m_e.html',1,'']]],
-  ['board_20format_7',['Board Format',['../md__2home_2runner_2work_2_cluster_duck-_protocol_2_cluster_duck-_protocol_2src_2include_2boards_2_r_e_a_d_m_e.html#autotoc_md1',1,'']]],
-  ['board_20header_8',['Adding the Board Header',['../md__2home_2runner_2work_2_cluster_duck-_protocol_2_cluster_duck-_protocol_2src_2include_2boards_2_r_e_a_d_m_e.html#autotoc_md3',1,'']]],
-  ['buildcdppacket_9',['buildCdpPacket',['../class_duck.html#a8fc876e4009cb4fadde1dfd540e90f78',1,'Duck']]],
-  ['bw_10',['bw',['../struct_lora_config_params.html#a0952350e961aa2180b10f7d3bfa9bd0b',1,'LoraConfigParams']]]
+  ['board_20format_7',['Board Format',['../md__2home_2runner_2work_2_cluster_duck-_protocol_2_cluster_duck-_protocol_2src_2include_2boards_2_r_e_a_d_m_e.html#autotoc_md2',1,'']]],
+  ['board_20header_8',['Adding the Board Header',['../md__2home_2runner_2work_2_cluster_duck-_protocol_2_cluster_duck-_protocol_2src_2include_2boards_2_r_e_a_d_m_e.html#autotoc_md4',1,'']]],
+  ['boards_9',['Supported Boards',['../md__2home_2runner_2work_2_cluster_duck-_protocol_2_cluster_duck-_protocol_2src_2include_2boards_2_r_e_a_d_m_e.html#autotoc_md1',1,'']]],
+  ['buildcdppacket_10',['buildCdpPacket',['../class_duck.html#a8fc876e4009cb4fadde1dfd540e90f78',1,'Duck']]],
+  ['bw_11',['bw',['../struct_lora_config_params.html#a0952350e961aa2180b10f7d3bfa9bd0b',1,'LoraConfigParams']]]
 ];
