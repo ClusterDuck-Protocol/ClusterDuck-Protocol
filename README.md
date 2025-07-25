@@ -8,8 +8,9 @@
   <a href="https://github.com/Call-for-Code/ClusterDuck-Protocol/wiki"><img src="https://img.shields.io/badge/Read-Wiki-50dda0" alt="Wiki"></a>
   <img src="https://img.shields.io/github/v/release/ClusterDuck-Protocol/ClusterDuck-Protocol?label=Release&color=10ccff" alt="GitHub Release">
   <img src="https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol/actions/workflows/arduino_ci.yml/badge.svg" alt="Build Status">
+  <a href="https://insights.linuxfoundation.org/project/ClusterDuck"><img src="https://insights.linuxfoundation.org/api/badge/health-score?project=ClusterDuck" alt="LFX Health Score"></a>
+  <a href="https://insights.linuxfoundation.org/project/ClusterDuck"><img src="https://insights.linuxfoundation.org/api/badge/contributors?project=ClusterDuck" alt="LFX Contributors"></a>
 </p>
-
 
 
 ## A Flexible Wireless Mesh Protocol for Connecting IoT Devices
