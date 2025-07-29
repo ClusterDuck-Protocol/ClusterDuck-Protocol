@@ -46,7 +46,7 @@ class DuckWifi {
         // int setupDns();
 
         // /**
-        //  * @brief Setup web server.
+        //  * @brief Setup web server for Captive Portal.
         //  *
         //  * The WebServer is used to communicate with the Duck over ad-hoc WiFi
         //  * connection.
