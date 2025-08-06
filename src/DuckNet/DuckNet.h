@@ -26,7 +26,7 @@
 #include "../utils/DuckLogger.h"
 #include <string>
 
-#include "../Radio/DuckLoRa.h"
+#include "../radio/DuckLoRa.h"
 #include "../routing/bloomfilter.h"
 #include "../DuckPacket.h"
 

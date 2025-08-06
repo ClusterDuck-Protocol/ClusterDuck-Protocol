@@ -87,6 +87,46 @@ class DuckLoRa {
          * @returns DUCK_ERR_NONE if the message was sent successfully, an error code otherwise.
          */
         int sendData(std::vector<uint8_t> data);
+
+        /**
+         * @brief Send packet data out into the mesh network
+         *
+         * @param packet Duckpacket object that contains the data to send
+         * @return DUCK_ERR_NONE if the message was sent successfully, an error code otherwise.
+         */
+        int relayPacket(DuckPacket* packet)
+        {
+            if(!isSetup) {
+                logerr_ln("ERROR  LoRa radio not setup");
+                return DUCKLORA_ERR_NOT_INITIALIZED;
+            }
+            delay();
+
+            return startTransmitData(packet->getBuffer().data(),
+                                    packet->getBuffer().size());
+        }
+
+
+        /**
+         * @brief Get the data received from the radio
+         * 
+         * @param  packetBytes byte buffer to contain the data 
+         * @return DUCK_ERR_NONE if the chip is sucessfuly set in standby mode, an error code otherwise. 
+         */
+        int readReceivedData(std::vector<uint8_t>* packetBytes_ts);
+
+        /**
+         * @brief Service the RadioLib SX127x and SX126x interrupt flags.
+         * 
+         */
+        void serviceInterruptFlags();
+
+        /**
+         * @brief Get the data receive flag.
+         * 
+         * @return true if the flag is set, false otherwise.
+         */
+        static bool getReceiveFlag() { return receivedFlag; }
     private:
         static volatile uint16_t interruptFlags;
         static volatile bool receivedFlag;
@@ -139,32 +179,11 @@ class DuckLoRa {
          */
         int sleep();
 
-        /**
-         * @brief Get the data received from the radio
-         * 
-         * @param  packetBytes byte buffer to contain the data 
-         * @return DUCK_ERR_NONE if the chip is sucessfuly set in standby mode, an error code otherwise. 
-         */
-        int readReceivedData(std::vector<uint8_t>* packetBytes_ts);
-
-        /**
-         * @brief Service the RadioLib SX127x and SX126x interrupt flags.
-         * 
-         */
-        void serviceInterruptFlags();
-
         /*
         * @brief Interrupt service routine for the LoRa module.
         *
         */
         static void onInterrupt();
-
-        /**
-         * @brief Get the data receive flag.
-         * 
-         * @return true if the flag is set, false otherwise.
-         */
-        static bool getReceiveFlag() { return receivedFlag; }
 
         /**
          * @brief Get the current RSSI value.

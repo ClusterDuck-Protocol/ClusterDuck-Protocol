@@ -6,7 +6,7 @@
 #include "../utils/DuckError.h"
 #include "../include/cdpcfg.h"
 #include "../DuckPacket.h"
-#include "../Radio/DuckLoRa.h"
+#include "../radio/DuckLoRa.h"
 #include "DuckTypes.h"
 #include "../utils/DuckUtils.h"
 #include <cassert>
@@ -14,6 +14,7 @@
 #include "../DuckCrypto.h"
 #include "../DuckEsp.h"
 #include "../wifi/DuckWifiNone.h"
+#include "../routing/DuckRouter.h"
 
 enum class NetworkState {SEARCHING, PUBLIC};
 
@@ -28,6 +29,18 @@ public:
   };
 
   std::string getCDPVersion() { return duckutils::getCDPVersion(); }
+
+  void run(){
+    Duck::logIfLowMemory();
+    duckRadio.serviceInterruptFlags();
+    if(networkState == NetworkState::PUBLIC) {
+      handleReceivedPacket();
+      // processPortalRequest();
+    } else {
+      attemptNetworkJoin();
+      rxPacket->reset();
+    }
+  }
 
     /**
    * @brief Sends data into the mesh network.
@@ -81,7 +94,7 @@ public:
      logerr_ln("ERROR send data failed, message too large: %d bytes",data.size());
      return DUCKPACKET_ERR_SIZE_INVALID;
    }
-   int err = txPacket->prepareForSending(&filter, targetDevice, this->getType(), topic, data);
+   int err = txPacket->prepareForSending(&router.getFilter(), targetDevice, this->getType(), topic, data);
  
    if (err != DUCK_ERR_NONE) {
      return err;
@@ -92,7 +105,7 @@ public:
    CdpPacket packet = CdpPacket(txPacket->getBuffer());
  
    if (err == DUCK_ERR_NONE) {
-     filter.bloom_add(packet.muid.data(), MUID_LENGTH);
+     router.getFilter().bloom_add(packet.muid.data(), MUID_LENGTH);
    }
      std::copy(packet.muid.begin(),packet.muid.end(),lastMessageMuid.begin());
    assert(lastMessageMuid.size() == MUID_LENGTH);
@@ -123,7 +136,8 @@ protected:
   std::array<uint8_t,4> lastMessageMuid;
   std::string deviceId; //just make this a print function
   std::array<uint8_t,8> duid;
-
+  DuckRouter router;
+  virtual void handleReceivedPacket() = 0;
   /**
    * @brief Get the duck's unique ID.
    * 
@@ -183,7 +197,7 @@ protected:
     std::vector<byte> app_data;
     app_data.insert(app_data.end(), data.begin(), data.end());
     // int err = sendData(topic, app_data, targetDevice);
-    txPacket->prepareForSending(&filter, BROADCAST_DUID, DuckType::UNKNOWN, topic, app_data );
+    txPacket->prepareForSending(&router.getFilter(), BROADCAST_DUID, DuckType::UNKNOWN, topic, app_data );
     int err = duckRadio.sendData(txPacket->getBuffer());
     return err;
   }
@@ -196,7 +210,7 @@ protected:
   int sendPong(){
     int err = DUCK_ERR_NONE;
     std::vector<byte> data(1, 0);
-    err = txPacket->prepareForSending(&filter, PAPADUCK_DUID, this->getType(), reservedTopic::pong, data);
+    err = txPacket->prepareForSending(&router.getFilter(), PAPADUCK_DUID, this->getType(), reservedTopic::pong, data);
     if (err != DUCK_ERR_NONE) {
       logerr_ln("ERROR Oops! failed to build pong packet, err = %d", err);
       return err;
@@ -217,7 +231,7 @@ protected:
   int sendPing(){
     int err = DUCK_ERR_NONE;
     std::vector<byte> data(1, 0);
-    err = txPacket->prepareForSending(&filter, PAPADUCK_DUID, this->getType(), reservedTopic::ping, data);
+    err = txPacket->prepareForSending(&router.getFilter(), PAPADUCK_DUID, this->getType(), reservedTopic::ping, data);
     if (err != DUCK_ERR_NONE) {
       logerr_ln("ERROR Failed to build ping packet, err = " + err);
       return err;

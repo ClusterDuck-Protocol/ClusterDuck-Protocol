@@ -4,7 +4,7 @@ int DuckWifi::reconnect(std::string ssid, std::string password) {
     return DUCK_ERR_NONE;
 }
 
-int DuckWifi::setupAccessPoint(const char* ap = "🆘 DUCK EMERGENCY PORTAL") {
+int DuckWifi::setupAccessPoint(const char* ap) {
     bool success;
 
     success = WiFi.mode(WIFI_AP);

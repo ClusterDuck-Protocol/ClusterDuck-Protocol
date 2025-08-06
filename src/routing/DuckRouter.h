@@ -13,29 +13,13 @@
 #include <map>
 #include <list>
 #include "bloomfilter.h"
-
-class DuckRecord {
-    public:
-      //DuckRecord() : routingScore(0), lastSeen(0), snr(0), rssi(0) {}
-      DuckRecord(std::string devId, long routingScore, long lastSeen, float snr, float rssi) :
-        DeviceId(std::move(devId)), routingScore(routingScore), lastSeen(lastSeen), snr(snr), rssi(rssi) {}
-  
-      std::string getDeviceId() { return DeviceId; }
-      long getRoutingScore() const { return routingScore; }
-      long getLastSeen() { return lastSeen; }
-      long getSnr() { return snr; }
-      long getRssi() { return rssi; }
-  private:
-      std::string DeviceId;
-      long routingScore, lastSeen;
-      float snr, rssi;
-      BloomFilter filter = BloomFilter();
-  };
+#include "DuckRecord.h"
 
 class DuckRouter {
     public:
-        DuckRouter();
-        ~DuckRouter();
+        DuckRouter() = default;;
+        ~DuckRouter() = default;;
+        BloomFilter& getFilter();
     protected:
         /**
          * @brief Sort the routing table using the customGreater comparator

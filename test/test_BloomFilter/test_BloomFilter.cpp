@@ -1,5 +1,5 @@
 #include <unity.h>
-#include "bloomfilter.h"
+#include "../src/routing/bloomfilter.h"
 
 void test_bloomfilter_constructor_default(void) {
     BloomFilter bf;

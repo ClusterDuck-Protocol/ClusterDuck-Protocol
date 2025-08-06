@@ -5,7 +5,7 @@
 #include "Arduino.h"
 #include "utils/DuckUtils.h"
 #include "include/cdpcfg.h"
-#include "bloomfilter.h"
+#include "./routing/bloomfilter.h"
 #include "ArduinoJson.h"
 #include <CRC32.h>
 #include <array>

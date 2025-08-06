@@ -12,3 +12,7 @@ void DuckRouter::insertIntoRoutingTable(std::string deviceID, long routingScore,
     DuckRecord record(std::move(deviceID), routingScore, lastSeen, snr, rssi);
     routingTable.insert(std::make_pair(routingScore, record));
 };
+
+BloomFilter& DuckRouter::getFilter(){
+    return filter;
+}

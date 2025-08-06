@@ -24,9 +24,7 @@ class DuckWifi {
          * @param password the access point password
          * @return DUCK_ERR_NONE if the duck reconnected to the AP sucessfully. An error code otherwise. 
          */
-        int reconnect(std::string ssid, std::string password) {
-            return DUCK_ERR_NONE;
-        }
+        int reconnect(std::string ssid, std::string password);
 
       /**
          * @brief Setup WiFi access point.
@@ -74,13 +72,9 @@ class DuckWifi {
          */
         bool connected(); //change to an option with wifi name?
 
-        void setSsid(std::string val) {
-        logwarn_ln("WARNING setSsid skipped, device has no WiFi.");
-        }
+        void setSsid(std::string val);
     
-        void setPassword(std::string val) {
-        logwarn_ln("WARNING setPassword skipped, device has no WiFi.");
-        }
+        void setPassword(std::string val);
     protected:
     private:
 

@@ -5,7 +5,7 @@
 #include "utils/MemoryFree.h"
 #include "utils/DuckUtils.h"
 #include "DuckCrypto.h"
-#include "bloomfilter.h"
+#include "./routing/bloomfilter.h"
 #include <string>
 
 

@@ -4,7 +4,7 @@
 #include "Duck.h"
 #include "../utils/MemoryFree.h"
 
-template <typename WifiCapability, typename RadioType = DuckLoRa>
+template <typename WifiCapability = DuckWifiNone, typename RadioType = DuckLoRa>
 class MamaDuck : public Duck<WifiCapability, RadioType> {
 public:
   using Duck<WifiCapability, RadioType>::Duck;
@@ -44,7 +44,7 @@ public:
       logerr_ln("ERROR setupWithDefaults rc = %d",err);
       return err;
     }
-    err = this->duckWifi->setupAccessPoint();
+    err = duckWifi.setupAccessPoint();
     if (err != DUCK_ERR_NONE) {
       logerr_ln("ERROR setupWithDefaults rc = %d",err);
       return err;
@@ -63,7 +63,7 @@ private :
   WifiCapability duckWifi;
   rxDoneCallback recvDataCallback;
 
-  void handleReceivedPacket(){
+  void handleReceivedPacket() override{
     if (this->duckRadio.getReceiveFlag()){
       std::vector<uint8_t> data;
       bool relay = false;
@@ -77,7 +77,7 @@ private :
       }
       logdbg_ln("Got data from radio, prepare for relay. size: %d",data.size());
   
-      relay = this->rxPacket->prepareForRelaying(&this->filter, data); //change to call a function on router that filters for you, filter is private
+      relay = this->rxPacket->prepareForRelaying(&this->router.getFilter(), data); //change to call a function on router that filters for you, filter is private
       if (relay) {
         //TODO: this callback is causing an issue, needs to be fixed for mamaduck to get packet data
         //recvDataCallback(this->rxPacket->getBuffer());
@@ -97,8 +97,8 @@ private :
                            packet.sduid.data());
                 ArduinoJson::JsonDocument rreqDoc;
                 deserializeJson(rreqDoc, packet.data);
-                DuckPacket::UpdateRREQ(rreqDoc, this->duid);
-                loginfo_ln("handleReceivedPacket: RREQ updated with current DUID: %s", this->duid);
+                DuckPacket::UpdateRREQ(rreqDoc, this->deviceId);
+                loginfo_ln("handleReceivedPacket: RREQ updated with current DUID: %s", this->deviceId);
                 //Serialize the updated RREQ packet
                 std::string strRREQ;
                 serializeJson(rreqDoc, strRREQ);
@@ -160,7 +160,7 @@ private :
                       loginfo_ln("handleReceivedPacket: RREQ packet RELAY DONE");
                   }
   
-                  err = this->txPacket->prepareForSending(&this->filter, PAPADUCK_DUID,
+                  err = this->txPacket->prepareForSending(&this->router.getFilter(), PAPADUCK_DUID,
                     DuckType::MAMA, reservedTopic::rreq, dataPayload);
   
                   return;
