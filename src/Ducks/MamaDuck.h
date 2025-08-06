@@ -30,14 +30,16 @@ public:
    * When ssid and password are provided the duck will setup the wifi related
    * components.
    *
-   * @param deviceId required device unique id
    * @param ssid wifi access point ssid (defaults to an empty string if not
    * provided)
    * @param password wifi password (defaults to an empty string if not provided)
    * 
    * @returns DUCK_ERR_NONE if setup is successfull, an error code otherwise.
    */
-   int setupWithDefaults(std::array<byte,8> deviceId, std::string ssid = "", std::string password = "") {
+   int setupWithDefaults(std::string ssid = "", std::string password = "") {
+
+    // Initialize the serial component with the hardware supported baudrate
+    this->setupSerial(115200);
   
     int err = this->setupLoRaRadio();
     if (err != DUCK_ERR_NONE) {

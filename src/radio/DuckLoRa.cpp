@@ -35,7 +35,7 @@ const LoRaConfigParams DuckLoRa::defaultRadioParams = {
     /* bw       = */ 125.0f,
     /* sf       = */ 7,
     /* gain     = */ 0,
-    /* func     = */ nullptr
+    /* func     = */ onInterrupt
 };
 
 int DuckLoRa::checkLoRaParameters(LoRaConfigParams config) { //this can be improved

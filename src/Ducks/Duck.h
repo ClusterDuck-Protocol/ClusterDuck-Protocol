@@ -134,7 +134,7 @@ protected:
   DuckPacket* txPacket = NULL;
   DuckPacket* rxPacket = NULL;
   std::array<uint8_t,4> lastMessageMuid;
-  std::string deviceId; //just make this a print function
+  std::string deviceId;
   std::array<uint8_t,8> duid;
   DuckRouter router;
   virtual void handleReceivedPacket() = 0;
@@ -145,6 +145,16 @@ protected:
    */ 
   std::string getDuckId() {return std::string(duid.begin(), duid.end());}
   unsigned long lastRreqTime = 0L;
+
+  int setupSerial(int baudRate) {
+    // // This gives us 10 seconds to do a hard reset if the board is in a bad state after power cycle
+    // while (!Serial && millis() < 10000);
+  
+    Serial.begin(baudRate);
+    loginfo_ln("setupSerial rc = %d",DUCK_ERR_NONE);
+    loginfo_ln("Running CDP Version: %s",getCDPVersion().c_str());
+    return DUCK_ERR_NONE;
+  }
 
 
   int setupLoRaRadio(const LoRaConfigParams& config = RadioType::defaultRadioParams){
