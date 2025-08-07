@@ -11,11 +11,6 @@ class DuckWifiNone {
             return DUCK_ERR_NONE;
         }
 
-        int setupAccessPoint(const char* ap = "🆘 DUCK EMERGENCY PORTAL") {
-            logwarn_ln("wifi is disabled");
-            return DUCK_ERR_NONE;
-        }
-
         int joinNetwork(std::string ssid, std::string password) {
             logwarn_ln("wifi is disabled");
             return DUCK_ERR_NONE;

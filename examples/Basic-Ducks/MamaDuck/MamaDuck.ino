@@ -12,6 +12,7 @@
  #include <string>
  #include <arduino-timer.h>
  #include <CDP.h>
+ #include <CaptivePortal.h>
  
  #ifdef SERIAL_PORT_USBVIRTUAL
  #define Serial SERIAL_PORT_USBVIRTUAL
@@ -22,7 +23,8 @@
  bool runSensor(void *);
  
  // --- Global Variables ---
- MamaDuck duck("MAMA0001"); // Device ID, MUST be 8 bytes and unique from other ducks;
+ MamaDuck<DuckWifi> duck("MAMA0001"); // Device ID, MUST be 8 bytes and unique from other ducks;
+ CaptivePortal* portal;
  auto timer = timer_create_default();  // Creating a timer with default settings
  const int INTERVAL_MS = 10000;        // Interval in milliseconds between runSensor call
  int counter = 1;                      // Counter for the sensor data  
@@ -46,6 +48,10 @@
    
    setupOK = true;
    Serial.println("[MAMA] Setup OK!");
+   portal = new CaptivePortal(CDPCFG_WEB_PORT);
+   portal->setupAccessPoint();
+   portal->setupDns();
+   portal->setupWebServer();
  }
  
  /**

@@ -46,7 +46,6 @@ public:
       logerr_ln("ERROR setupWithDefaults rc = %d",err);
       return err;
     }
-    err = duckWifi.setupAccessPoint();
     if (err != DUCK_ERR_NONE) {
       logerr_ln("ERROR setupWithDefaults rc = %d",err);
       return err;

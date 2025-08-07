@@ -1,24 +1,51 @@
-#include "DuckNet.h"
-
-DuckNet::DuckNet(BloomFilter *filter): bloomFilter(filter) { //remove dependence on filter
-}
+#include "../include/CaptivePortal.h"
 
 #ifndef CDPCFG_WIFI_NONE
+int CaptivePortal::setupAccessPoint(const char* ap) {
+  bool success;
 
-IPAddress apIP(CDPCFG_AP_IP1, CDPCFG_AP_IP2, CDPCFG_AP_IP3, CDPCFG_AP_IP4);
-AsyncWebServer webServer(CDPCFG_WEB_PORT);
-AsyncEventSource events("/events");
+  success = WiFi.mode(WIFI_AP);
+  if (!success) {
+    return DUCKWIFI_ERR_AP_CONFIG;
+  }
 
-DNSServer DuckNet::dnsServer;
+  success = WiFi.softAP(ap);
+  if (!success) {
+    return DUCKWIFI_ERR_AP_CONFIG;
+  }
+  //TODO: need to find out why there is a delay here
+  delay(200);
+  success = WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
+  if (!success) {
+    return DUCKWIFI_ERR_AP_CONFIG;
+  }
 
-const char* DuckNet::DNS = "duck";
-const byte DuckNet::DNS_PORT = 53;
-
-void DuckNet::setDeviceId(std::array<byte,8> devId) {
-    std::copy(devId.begin(), devId.end(), deviceId.begin());
+  loginfo_ln("Created Wifi Access Point");
+  return DUCK_ERR_NONE;
 }
 
-int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
+int CaptivePortal::setupDns() {
+  bool success = dnsServer.start(DNS_PORT, "*", apIP);
+
+  if (!success) {
+      logerr_ln("ERROR dns server start failed");
+      return DUCKDNS_ERR_STARTING;
+  }
+
+  success = MDNS.begin(DNS);
+  
+  if (!success) {
+      logerr_ln("ERROR dns server begin failed");
+      return DUCKDNS_ERR_STARTING;
+  }
+
+  loginfo_ln("Created local DNS");
+  MDNS.addService("http", "tcp", port);
+
+  return DUCK_ERR_NONE;
+}
+
+int CaptivePortal::setupWebServer() {
   loginfo_ln("Setting up Web Server");
 
   if (txPacket == nullptr) {
@@ -30,16 +57,10 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
   });
   //HTTP Basic authentication
   webServer.addHandler(&events);
+  portal = home_page;
 
-  if (html == "") {
-    logdbg_ln("Web Server using main page");
-    portal = home_page;
-  } else {
-    logdbg_ln("Web Server using custom main page");
-    portal = html;
-  }
   webServer.onNotFound([&](AsyncWebServerRequest* request) {
-    logwarn_ln("DuckNet - onNotFound: %s", request->url().c_str());
+    logwarn_ln("CaptivePortal - onNotFound: %s", request->url().c_str());
     request->send(200, "text/html", portal.c_str());
   });
 
@@ -78,13 +99,13 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
     int val = std::atoi(p->value().c_str());
     //TODO: don't use duck for everything
     //duck->setChannel(val);
-    saveChannel(val);
+    // saveChannel(val);
 
     request->send(200, "text/plain", "Success");
   });
 
   webServer.on("/success.txt", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    loginfo_ln("client connected to DuckNet");
+    loginfo_ln("client connected to CaptivePortal");
     request->send(200, "text/plain", "Success");
   });
 
@@ -113,8 +134,8 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
 
     std::vector<uint8_t> data;
     data.insert(data.end(), val.begin(), val.end());
-    //TODO: send the correct ducktype. Probably need the ducktype when DuckNet is created or setup
-    txPacket->prepareForSending(bloomFilter, PAPADUCK_DUID, DuckType::UNKNOWN, topics::cpm, data );
+    // TODO: send the correct ducktype. Probably need the ducktype when CaptivePortal is created or setup
+    // txPacket->prepareForSending(bloomFilter, PAPADUCK_DUID, DuckType::UNKNOWN, topics::cpm, data );
     // err = duckRadio.sendData(txPacket->getBuffer());
 
     CdpPacket muidPacket = CdpPacket(txPacket->getBuffer());
@@ -191,7 +212,7 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
     }
 
     if (ssid != "" && password != "") {
-      setupInternet(ssid, password);
+      // setupInternet(ssid, password);
       this->ssid = ssid;
       this->password = password;
       duckutils::saveWifiCredentials(ssid, password);
@@ -205,117 +226,5 @@ int DuckNet::setupWebServer(bool createCaptivePortal, std::string html) {
 
   return DUCK_ERR_NONE;
 }
-
-int DuckNet::setupWifiAp(const char* accessPoint) {
-
-  bool success;
-
-  success = WiFi.mode(WIFI_AP);
-  if (!success) {
-    return DUCKWIFI_ERR_AP_CONFIG;
-  }
-
-  success = WiFi.softAP(accessPoint);
-  if (!success) {
-    return DUCKWIFI_ERR_AP_CONFIG;
-  }
-  //TODO: need to find out why there is a delay here
-  delay(200);
-  success = WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
-  if (!success) {
-    return DUCKWIFI_ERR_AP_CONFIG;
-  }
-
-  loginfo_ln("Created Wifi Access Point");
-  return DUCK_ERR_NONE;
-}
-
-int DuckNet::setupDns() {
-  bool success = dnsServer.start(DNS_PORT, "*", apIP);
-
-  if (!success) {
-    logerr_ln("ERROR dns server start failed");
-    return DUCKDNS_ERR_STARTING;
-  }
-
-  success = MDNS.begin(DNS);
-  
-  if (!success) {
-    logerr_ln("ERROR dns server begin failed");
-    return DUCKDNS_ERR_STARTING;
-  }
-
-  loginfo_ln("Created local DNS");
-  MDNS.addService("http", "tcp", CDPCFG_WEB_PORT);
-
-  return DUCK_ERR_NONE;
-}
-
-int DuckNet::loadWiFiCredentials(){
-  setSsid(duckutils::loadWifiSsid());
-  setPassword(duckutils::loadWifiPassword());
-
-  if (ssid.length() == 0 || password.length() == 0){
-    loginfo_ln("ERROR setupInternet: Stored SSID and PASSWORD empty");
-    return DUCK_ERR_SETUP;
-  } else{
-    loginfo_ln("Setup Internet with saved credentials");
-    setupInternet(ssid, password);
-  }
-  return DUCK_ERR_NONE;
-}
-
-
-int DuckNet::setupInternet(std::string ssid, std::string password) 
-{
-  const uint32_t WIFI_CONNECTION_TIMEOUT_MS = 1500;
-
-  int rc = DUCK_ERR_NONE;
-  this->ssid = ssid;
-  this->password = password;
-  
-  //  Connect to Access Point
-  loginfo_ln("setupInternet: connecting to WiFi access point SSID: %s",ssid.c_str());
-  WiFi.begin(ssid.c_str(), password.c_str());
-  // We need to wait here for the connection to estanlish. Otherwise the WiFi.status() may return a false negative
-  loginfo_ln("setupInternet: Waiting for connect results for ", ssid.c_str());
-  WiFi.waitForConnectResult(WIFI_CONNECTION_TIMEOUT_MS);
-
-  if (WiFi.status() == WL_CONNECTED) {
-    loginfo_ln("Duck connected to internet!");
-    rc = DUCK_ERR_NONE;
-  } else {
-    logerr_ln("ERROR setupInternet: failed to connect to %s (status: %d)", ssid.c_str(), WiFi.status());
-    rc = DUCK_INTERNET_ERR_CONNECT;
-  };
-
-  return rc;
-
-}
-
-void DuckNet::saveChannel(int val){
-
-    EEPROM.begin(512);
-    EEPROM.write(CDPCFG_EEPROM_CHANNEL_VALUE, val);
-    EEPROM.commit();
-    loginfo_ln("Wrote channel val to EEPROM %d", val);
-    
-}
-
-void DuckNet::loadChannel(){
-    EEPROM.begin(512);
-    int val = EEPROM.read(CDPCFG_EEPROM_CHANNEL_VALUE);
-    //TODO: don't use duck for everything
-    //duck->setChannel(val);
-    loginfo_ln("Read channel val to EEPROM, setting channel: %d", val);
-}
-
-void DuckNet::setSsid(std::string val) { ssid = val; }
-
-void DuckNet::setPassword(std::string val) { password = val; }
-
-std::string DuckNet::getSsid() { return ssid; }
-
-std::string DuckNet::getPassword() { return password; }
 
 #endif
