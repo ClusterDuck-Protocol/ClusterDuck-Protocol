@@ -16,12 +16,10 @@
 #include "../utils/DuckError.h"
 #include "../utils/DuckLogger.h"
 
-// #include "../radio/DuckLoRa.h"
+#include "../radio/DuckLoRa.h"
+#include "../wifi/DuckWifi.h"
 #include "../DuckPacket.h"
-
-#ifdef CDPCFG_WIFI_NONE
-#pragma info "WARNING: WiFi is disabled. CaptivePortal will not be available."
-#else
+#include "../Ducks/Duck.h"
 
 #include <Update.h>
 #include <ESPAsyncWebServer.h>
@@ -37,31 +35,12 @@
 #include "../CaptivePortal/portalPages/cdpHome.h"
 #include "../CaptivePortal/portalPages/papaHome.h"
 
-
-#endif
-
 #define AP_SCAN_INTERVAL_MS 10
 class CaptivePortal {
-public:
-
-  int channel;
-  std::string duckSession;
-
-  #ifdef CDPCFG_WIFI_NONE
-  void setupAccessPoint(const char* ap = "🆘 DUCK EMERGENCY PORTAL"){
-    logwarn_ln("WARNING setSsid skipped, device has no WiFi.");
-  }
-  void setupDns(){
-    logwarn_ln("WARNING setSsid skipped, device has no WiFi.");
-  }
-  void setSsid(std::string val) {
-    logwarn_ln("WARNING setSsid skipped, device has no WiFi.");
-  }
-
-  void setPassword(std::string val) {
-    logwarn_ln("WARNING setPassword skipped, device has no WiFi.");
-  }
-  #else
+  public:
+    CaptivePortal(Duck<DuckWifi, DuckLoRa>& duck, int port = 80): duck(duck), port(port), webServer(port), events("/events") {}
+    std::string duckSession;
+    Duck<DuckWifi, DuckLoRa>& duck;
 
     /**
      * @brief Setup WiFi access point.
@@ -79,23 +58,25 @@ public:
      * @returns DUCK_ERROR_NONE if successful, an error code otherwise.
      */
     int setupDns();
-      /**
-       * @brief Set up the WebServer.
-       *
-       * The WebServer is used to communicate with the Duck over ad-hoc WiFi
-       * connection.
-       *
-       * @param createCaptivePortal set to true if Captive WiFi connection is
-       * needed. Defaults to false
-       * @param html A string representing custom HTML code used for the portal.
-       * Default is an empty string Default portal web page is used if the string is
-       * empty
-       */
-      int setupWebServer();
+    /**
+     * @brief Set up the WebServer.
+     *
+     * The WebServer is used to communicate with the Duck over ad-hoc WiFi
+     * connection.
+     *
+     * @param createCaptivePortal set to true if Captive WiFi connection is
+     * needed. Defaults to false
+     * @param html A string representing custom HTML code used for the portal.
+     * Default is an empty string Default portal web page is used if the string is
+     * empty
+     */
+    int setupWebServer();
 
-  #endif
-
-    CaptivePortal(int port): port(port), webServer(port), events("/events") {}
+    void launch(){
+      this->setupAccessPoint();
+      this->setupDns();
+      this->setupWebServer();
+    }
 
   private:
 
@@ -116,6 +97,4 @@ public:
     std::array<byte,8> deviceId;
 
     std::string portal = "";
-    std::string ssid = "";
-    std::string password = "";
 };

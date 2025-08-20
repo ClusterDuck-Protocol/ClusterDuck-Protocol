@@ -75,34 +75,6 @@ int CaptivePortal::setupWebServer() {
   webServer.on("/papamain", HTTP_GET, [&](AsyncWebServerRequest* request) {
     request->send(200, "text/html", papa_page);
   });
-  
-  webServer.on("/flipDetector", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    //Run flip method
-    duckutils::flipDetectState();
-    request->send(200, "text/plain", "Success");
-  });
-
-  webServer.on("/flipDecrypt", HTTP_GET, [&](AsyncWebServerRequest* request) {
-    //Flip Decrypt State
-    loginfo_ln("Flipping Decrypt");
-
-    //TODO: Don't use duck for everything
-    //duck->setDecrypt(!duck->getDecrypt());
-    //loginfo_ln("Decrypt is now: %d", duck->getDecrypt());
-    request->send(200, "text/plain", "Success");
-  });
-
-  webServer.on("/setChannel", HTTP_POST, [&](AsyncWebServerRequest* request) {
-    int paramNum = 0;
-    const AsyncWebParameter* p = request->getParam(paramNum);
-    logdbg_ln("%s : %d", p->name(), p->value());
-    int val = std::atoi(p->value().c_str());
-    //TODO: don't use duck for everything
-    //duck->setChannel(val);
-    // saveChannel(val);
-
-    request->send(200, "text/plain", "Success");
-  });
 
   webServer.on("/success.txt", HTTP_GET, [&](AsyncWebServerRequest* request) {
     loginfo_ln("client connected to CaptivePortal");
@@ -212,10 +184,8 @@ int CaptivePortal::setupWebServer() {
     }
 
     if (ssid != "" && password != "") {
-      // setupInternet(ssid, password);
-      this->ssid = ssid;
-      this->password = password;
-      duckutils::saveWifiCredentials(ssid, password);
+      // duck.joinNetwork(ssid, password);
+      // duck.saveWifiCredentials(ssid, password);
       request->send(200, "text/plain", "Success");
     } else {
       request->send(500, "text/plain", "There was an error");

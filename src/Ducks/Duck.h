@@ -275,13 +275,6 @@ protected:
    */
   virtual int getType() = 0;
 
-
-  // /**
-  //  * @brief Handle request from emergency portal.
-  //  *
-  //  */
-  // void processPortalRequest();
-
   /**
    * @brief Log an error message if the system's memory is too low.
    */
