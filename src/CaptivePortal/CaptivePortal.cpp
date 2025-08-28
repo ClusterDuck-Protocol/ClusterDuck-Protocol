@@ -48,10 +48,6 @@ int CaptivePortal::setupDns() {
 int CaptivePortal::setupWebServer() {
   loginfo_ln("Setting up Web Server");
 
-  if (txPacket == nullptr) {
-    txPacket = new DuckPacket(deviceId);
-  }
-
   events.onConnect([](AsyncEventSourceClient *client){
     client->send("hello!",NULL,millis(),1000);
   });
@@ -106,22 +102,14 @@ int CaptivePortal::setupWebServer() {
 
     std::vector<uint8_t> data;
     data.insert(data.end(), val.begin(), val.end());
-    // TODO: send the correct ducktype. Probably need the ducktype when CaptivePortal is created or setup
-    // txPacket->prepareForSending(bloomFilter, PAPADUCK_DUID, DuckType::UNKNOWN, topics::cpm, data );
-    // err = duckRadio.sendData(txPacket->getBuffer());
-
-    CdpPacket muidPacket = CdpPacket(txPacket->getBuffer());
-    std::array<byte, 4> arrMuid = muidPacket.muid;
-
-    std::string muidStr = duckutils::arrayToHexString(arrMuid);
-
-    Serial.println("{\"muid\":\"" + String(muidStr.c_str()) + "\"}");
-    muidStr = "{\"muid\":\"" + muidStr + "\"}";
+    
+     err = duck.sendData(topics::cpm, val);
+ 
 
     switch (err) {
       case DUCK_ERR_NONE:
       {
-        std::string response = muidStr.c_str();
+        std::string response = "Ok";
         request->send(200, "application/json", response.c_str());
         logdbg_ln("Sent 200 response: %s",response.c_str());
       }
@@ -133,7 +121,7 @@ int CaptivePortal::setupWebServer() {
       request->send(400, "text/html", "BadRequest");
       break;
       default:
-      request->send(500, "text/html", "Oops! Unknown error.");
+      request->send(500, "text/html", "Unknown error.");
       break;
     }
   });

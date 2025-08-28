@@ -64,7 +64,8 @@ private:
       }
       logdbg_ln("Got data from radio, prepare for relay. size: %d",data.size());
         
-      CdpPacket packet = CdpPacket(this->rxPacket->getBuffer());
+      // CdpPacket packet = CdpPacket(this->rxPacket->rawBuffer());
+      CdpPacket packet = new CdpPacket;
   
       //Check if Duck is desitination for this packet
       if (duckutils::isEqual(BROADCAST_DUID, packet.dduid)) {
@@ -78,15 +79,15 @@ private:
                            duckutils::toString(packet.data).c_str(), packet.hopCount);
                 return;
               } else {
-                this->txPacket->prepareForSending(&this->filter, duckutils::stringToArray<uint8_t,8>(this->deviceId),
-                                            DuckType::LINK, reservedTopic::rrep,
-                                            duckutils::stringToByteVector(DuckPacket::prepareRREP(this->deviceId, packet)));
-                err = this->duckRadio.sendData(this->txPacket->getBuffer());
-                if (err != DUCK_ERR_NONE) {
-                    logerr_ln("====> ERROR handleReceivedPacket failed to send. rc = %d", err);
-                } else {
+                // this->txPacket->prepareForSending(&this->filter, duckutils::stringToArray<uint8_t,8>(this->deviceId),
+                //                             DuckType::LINK, reservedTopic::rrep,
+                //                             duckutils::stringToByteVector(CdpPacket::prepareRREP(this->deviceId, packet)));
+                // err = this->duckRadio.sendData(this->txPacket->rawBuffer());
+                // if (err != DUCK_ERR_NONE) {
+                //     logerr_ln("====> ERROR handleReceivedPacket failed to send. rc = %d", err);
+                // } else {
                     loginfo_ln("handleReceivedPacket: RREP packet SEND DONE");
-                }
+                // }
               }
             break;
           }
@@ -106,13 +107,13 @@ private:
           case reservedTopic::rreq: {
             // send RREP unconditionally
 
-            this->txPacket->prepareForSending(&this->filter, this-> deviceId ,DuckType::LINK, reservedTopic::rrep, duckutils::stringToByteVector(DuckPacket::prepareRREP(this->duid, packet)));
-            err = this->duckRadio.sendData(this->txPacket->getBuffer());
-            if (err != DUCK_ERR_NONE) {
-                logerr_ln("====> ERROR handleReceivedPacket failed to send. rc = %d", err);
-            } else {
+            // this->txPacket->prepareForSending(&this->filter, this-> deviceId ,DuckType::LINK, reservedTopic::rrep, duckutils::stringToByteVector(CdpPacket::prepareRREP(this->duid, packet)));
+            // err = this->duckRadio.sendData(this->txPacket->rawBuffer());
+            // if (err != DUCK_ERR_NONE) {
+            //     logerr_ln("====> ERROR handleReceivedPacket failed to send. rc = %d", err);
+            // } else {
                 loginfo_ln("handleReceivedPacket: RREP packet SEND DONE");
-            }
+            // }
           break;
         }
         case reservedTopic::rrep: {
@@ -139,15 +140,15 @@ private:
               std::string strRREP;
               serializeJson(rrepDoc, strRREP);
               auto destinationDUID = path.end()->as<std::string>();
-              this->txPacket->prepareForSending(&this->filter, duckutils::stringToArray<uint8_t,8>(destinationDUID),
-                                          DuckType::LINK, reservedTopic::rrep,
-                                          duckutils::stringToByteVector(strRREP));
-              err = this->duckRadio.sendData(this->txPacket->getBuffer());
-              if (err != DUCK_ERR_NONE) {
-                  logerr_ln("====> ERROR handleReceivedPacket failed to send. rc = %d", err);
-              } else {
-                  loginfo_ln("handleReceivedPacket: RREP packet SEND DONE");
-              }
+              // this->txPacket->prepareForSending(&this->filter, duckutils::stringToArray<uint8_t,8>(destinationDUID),
+              //                             DuckType::LINK, reservedTopic::rrep,
+              //                             duckutils::stringToByteVector(strRREP));
+              // err = this->duckRadio.sendData(this->txPacket->rawBuffer());
+              // if (err != DUCK_ERR_NONE) {
+              //     logerr_ln("====> ERROR handleReceivedPacket failed to send. rc = %d", err);
+              // } else {
+              //     loginfo_ln("handleReceivedPacket: RREP packet SEND DONE");
+              // }
           }
         }
         case reservedTopic::ping:
@@ -160,7 +161,7 @@ private:
         }
   
       } else {
-        err = this->duckRadio.relayPacket(this->rxPacket);
+        // err = this->duckRadio.relayPacket(this->rxPacket);
         if (err != DUCK_ERR_NONE) {
           logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
         } else {
@@ -169,7 +170,6 @@ private:
       }
   
     }
-    this->rxPacket->reset();
   };
 };
 

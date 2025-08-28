@@ -90,21 +90,12 @@ public:
     std::vector<byte> dataPayload;
     dataPayload.push_back(cmd);
     dataPayload.insert(dataPayload.end(), value.begin(), value.end());
+    
+    int err = this->sendReservedTopicData(this->dduid, reservedTopic::cmd, dataPayload);
   
-    int err = this->txPacket->prepareForSending(&this->filter, this->dduid, DuckType::PAPA,
-      reservedTopic::cmd, dataPayload);
     if (err != DUCK_ERR_NONE) {
-      logerr_ln("ERROR handleReceivedPacket. Failed to prepare cmd. Error: %d",err);
-    }
-  
-    err = this->duckRadio->sendData(this->txPacket->getBuffer());
-  
-    if (err == DUCK_ERR_NONE) {
-      CdpPacket packet = CdpPacket(this->txPacket->getBuffer());
-      this->filter.bloom_add(packet.muid.data(), MUID_LENGTH);
-    } else {
       logerr_ln("ERROR handleReceivedPacket. Failed to send cmd. Error: %d",err);
-    }
+    } 
   };
 
   /**
@@ -142,16 +133,16 @@ private:
     } else if (data[TOPIC_POS] == reservedTopic::pong) {
       loginfo_ln("PONG received. Ignoring!");
     } else {
-      // build our RX DuckPacket which holds the updated path in case the packet is relayed
-      bool relay = this->rxPacket->prepareForRelaying(&this->filter, data);
-      if (relay) {
-        logdbg_ln("relaying:  %s", duckutils::convertToHex(this->rxPacket->getBuffer().data(), this->rxPacket->getBuffer().size()).c_str());
-        loginfo_ln("invoking callback in the duck application...");
+      // build our RX CdpPacket which holds the updated path in case the packet is relayed
+      // bool relay = this->rxPacket->prepareForRelaying(&this->filter, data);
+      // if (relay) {
+      //   logdbg_ln("relaying:  %s", duckutils::convertToHex(this->rxPacket->rawBuffer().data(), this->rxPacket->rawBuffer().size()).c_str());
+      //   loginfo_ln("invoking callback in the duck application...");
         
-        this->recvDataCallback(this->rxPacket->getBuffer());
-      }
+      //   this->recvDataCallback(this->rxPacket->rawBuffer());
+      // }
           loginfo_ln("handleReceivedPacket() DONE");
-          rxDoneCallback recvDataCallback;
+          // rxDoneCallback recvDataCallback;
     }
   
 

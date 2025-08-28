@@ -230,12 +230,6 @@ const char MAIN_page[] PROGMEM = R"=====(
                     <dl>
                         <dt>Last message:</dt>
                         <dd id="lastMessageField"></dd>
-                        <dt>Last message ID:</dt>
-                        <dd id="lastMessageMuid"></dd>
-                       <!-- <dt>Status:</dt>
-                        <dd id="muidStatus"></dd>
-                        <dt>Status Message:</dt>
-                        <dd id="muidStatusMessage"></dd> --!>
                     </dl>
                 </div>
 
@@ -265,8 +259,6 @@ const char MAIN_page[] PROGMEM = R"=====(
                     errEl.classList.add("hidden");
                 }
                 var res = JSON.parse(req.responseText);
-                let muidStatus = document.getElementById('lastMessageMuid');
-                muidStatus.innerHTML = res.muid;
             };
             var errorListener = function () {
                 var errorMessage = 'There was an error sending the message. Please try again.';

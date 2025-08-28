@@ -7,6 +7,7 @@
 #include <string.h>
 #include <math.h>
 #include <memory>
+#include <../CdpPacket.h>
 
 
 const int DEFAULT_NUM_SECTORS = 312; 
@@ -46,6 +47,8 @@ public:
   int bloom_check(unsigned char* msg, int msgSize);
 
   void bloom_add(unsigned char* msg, int msgSize);
+
+  void assignUniqueMessageId(CdpPacket& packet);
 
   int get_numSectors() {
     return numSectors;

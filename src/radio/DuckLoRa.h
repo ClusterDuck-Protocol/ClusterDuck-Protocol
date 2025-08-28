@@ -11,7 +11,7 @@
 #ifndef DUCKLORA_H_
 #define DUCKLORA_H_
  
-#include "DuckPacket.h"
+#include "CdpPacket.h"
 #include "utils/DuckError.h"
 #include "utils/DuckLogger.h"
 #include "utils/DuckUtils.h"
@@ -91,20 +91,10 @@ class DuckLoRa {
         /**
          * @brief Send packet data out into the mesh network
          *
-         * @param packet Duckpacket object that contains the data to send
+         * @param packet CdpPacket object that contains the data to send
          * @return DUCK_ERR_NONE if the message was sent successfully, an error code otherwise.
          */
-        int relayPacket(DuckPacket* packet)
-        {
-            if(!isSetup) {
-                logerr_ln("ERROR  LoRa radio not setup");
-                return DUCKLORA_ERR_NOT_INITIALIZED;
-            }
-            delay();
-
-            return startTransmitData(packet->getBuffer().data(),
-                                    packet->getBuffer().size());
-        }
+        int relayPacket(CdpPacket* packet);
 
 
         /**

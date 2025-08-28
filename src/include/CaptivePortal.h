@@ -18,7 +18,7 @@
 
 #include "../radio/DuckLoRa.h"
 #include "../wifi/DuckWifi.h"
-#include "../DuckPacket.h"
+#include "../CdpPacket.h"
 #include "../Ducks/Duck.h"
 
 #include <Update.h>
@@ -91,8 +91,6 @@ class CaptivePortal {
     int port;
     AsyncWebServer webServer;
     AsyncEventSource events;
-
-    DuckPacket* txPacket = NULL;
 
     std::array<byte,8> deviceId;
 

@@ -3,8 +3,8 @@
 #ifdef CDPCFG_OLED_CLASS
 #include "Ducks/DuckTypes.h"
 #include "DuckEsp.h"
-#include "/utils/DuckUtils.h"
-#include "/utils/DuckLogger.h"  // Required for logging functions
+#include "./utils/DuckUtils.h"
+#include "./utils/DuckLogger.h"  // Required for logging functions
 #include <Wire.h>  // Required for I2C initialization
 #endif
 

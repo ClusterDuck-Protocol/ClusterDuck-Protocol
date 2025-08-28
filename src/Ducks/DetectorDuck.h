@@ -17,18 +17,15 @@ public:
    * @param startReceive `true` if the device must to be ready to receive a response immediately,
    * `false` if response needs to be deffered. 
    */
-  void sendPing() {
-    loginfo("Sending PING...");
-    int err = DUCK_ERR_NONE;
-    std::vector<byte> data(1, 0);
-    err = this->txPacket->prepareForSending(&this->filter, BROADCAST_DUID, DuckType::DETECTOR, reservedTopic::ping, data);
-  
-    if (err == DUCK_ERR_NONE) {
-      err = this->duckRadio.sendData(this->txPacket->getBuffer());
-    } else {
-      logerr("ERROR Failed to build packet, err = %s\n",err);
-    }
-  };
+  // void sendPing() {
+  //   loginfo("Sending PING...");
+  //   int err = DUCK_ERR_NONE;
+  //   err = this->sendPing();
+
+  //   if (err != DUCK_ERR_NONE) {
+  //     logerr("ERROR Failed to build packet, err = %s\n",err);
+  //   }
+  // };
   
 
   /// callback definition for receiving RSSI value
