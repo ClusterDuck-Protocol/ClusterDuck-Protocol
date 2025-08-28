@@ -10,7 +10,6 @@
 #include "../utils/DuckUtils.h"
 #include <cassert>
 #include "../CdpPacket.h"
-#include "../DuckCrypto.h"
 #include "../DuckEsp.h"
 #include "../wifi/DuckWifiNone.h"
 #include "../routing/DuckRouter.h"
