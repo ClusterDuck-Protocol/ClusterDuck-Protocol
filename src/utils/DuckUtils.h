@@ -47,7 +47,7 @@ std::vector<uint8_t> stringToByteVector(const std::string& str);
  * @param length the array length
  * @param bytes array of bytes of the specified length
  */ 
-void getRandomBytes(int length, byte* bytes);
+void getRandomBytes(int length, uint8_t* bytes);
 
 /**
  * @brief Create a uuid string.
@@ -64,7 +64,7 @@ std::string createUuid(int length = CDPCFG_UUID_LEN);
  * @param size the size of the array
  * @returns A string representating the by array in hexadecimal.
  */
-std::string convertToHex(byte* data, int size);
+std::string convertToHex(uint8_t* data, int size);
 
 /**
  * @brief Convert a vector into an ASCII string.
@@ -136,7 +136,7 @@ std::string arrayToHexString(const std::array<T,S>& arr) {
     buf.reserve(S * 2); // 2 digit hex
     const char* cs = "0123456789ABCDEF";
     for (int i = 0; i < S; i++) {
-        byte val = arr[i];
+        uint8_t val = arr[i];
         buf += cs[(val >> 4) & 0x0F];
         buf += cs[val & 0x0F];
     }
@@ -174,7 +174,7 @@ bool isEqual(const std::vector<T> & a, const std::vector<T> & b) {
  * @param data byte array to convert
  * @returns a 32 bit unsigned integer.
  */
-uint32_t toUint32(const byte* data);
+uint32_t toUint32(const uint8_t* data);
 
 /**
  * @brief Get a timer instance.
