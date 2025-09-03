@@ -100,10 +100,9 @@ class DuckLoRa {
         /**
          * @brief Get the data received from the radio
          * 
-         * @param  packetBytes byte buffer to contain the data 
          * @return DUCK_ERR_NONE if the chip is sucessfuly set in standby mode, an error code otherwise. 
          */
-        int readReceivedData(std::vector<uint8_t>* packetBytes_ts);
+        std::optional<std::vector<uint8_t>> readReceivedData(); //can this be CdpPacket optional instead?
 
         /**
          * @brief Service the RadioLib SX127x and SX126x interrupt flags.

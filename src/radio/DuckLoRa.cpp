@@ -151,15 +151,15 @@ int DuckLoRa::goToReceiveMode(bool clearReceiveFlag) {
     return startReceive();
 }
 
-int DuckLoRa::readReceivedData(std::vector<uint8_t>* packetBytes) {
-
+std::optional<std::vector<uint8_t>> DuckLoRa::readReceivedData() { //return a std optional
+    std::vector<uint8_t>* packetBytes;
     int packet_length = 0;
     int err = DUCK_ERR_NONE;
     int rxState = DUCK_ERR_NONE;
 
     if (!isSetup) {
-        logerr_ln("ERROR  LoRa radio not setup");
-        return DUCKLORA_ERR_NOT_INITIALIZED;
+        logerr_ln("ERROR  LoRa radio not setup %s\n", DUCKLORA_ERR_NOT_INITIALIZED);
+        return std::nullopt;
     }
 
     packet_length = lora.getPacketLength();
@@ -168,10 +168,6 @@ int DuckLoRa::readReceivedData(std::vector<uint8_t>* packetBytes) {
         logerr_ln("ERROR  handlePacket rx data size invalid: %d", packet_length);
 
         rxState = goToReceiveMode(true); // go back to receive mode and reset the receive flag
-        if (rxState != DUCK_ERR_NONE) {
-            return rxState;
-        }
-        return DUCKLORA_ERR_HANDLE_PACKET;
     }
 
     loginfo_ln("readReceivedData() - packet length returns: %d", packet_length);
@@ -183,8 +179,7 @@ int DuckLoRa::readReceivedData(std::vector<uint8_t>* packetBytes) {
     rxState = goToReceiveMode(true);
 
     if (err != RADIOLIB_ERR_NONE) {
-        logerr_ln("ERROR  readReceivedData failed. err = %d", err);
-        return DUCKLORA_ERR_HANDLE_PACKET;
+        logerr_ln("ERROR  readReceivedData failed. err = %d", DUCKLORA_ERR_HANDLE_PACKET);
     }
 
     loginfo_ln("Rx packet: %s", duckutils::convertToHex(packetBytes->data(), packetBytes->size()).c_str());
@@ -203,21 +198,22 @@ int DuckLoRa::readReceivedData(std::vector<uint8_t>* packetBytes) {
     if (computed_data_crc != packet_data_crc) {
         lastReceiveTime = millis(); //even if the packet is invalid, we need to know when we last received
         logerr_ln("ERROR data crc mismatch: received: 0x%X, calculated: 0x%X",packet_data_crc, computed_data_crc);
-        return DUCKLORA_ERR_HANDLE_PACKET;
     }
-#ifndef CDPCFG_RADIO_SX1262
-    loginfo_ln("RX: rssi: %f snr: %f fe: %d size: %d", lora.getRSSI(), lora.getSNR(), lora.getFrequencyError(true), packet_length);
-#else
-    loginfo_ln("RX: rssi: %f snr: %f size: %d", lora.getRSSI(), lora.getSNR(), packet_length);
-#endif
+    
+    #ifndef CDPCFG_RADIO_SX1262
+        loginfo_ln("RX: rssi: %f snr: %f fe: %d size: %d", lora.getRSSI(), lora.getSNR(), lora.getFrequencyError(true), packet_length);
+    #else
+        loginfo_ln("RX: rssi: %f snr: %f size: %d", lora.getRSSI(), lora.getSNR(), packet_length);
+    #endif
 
 
     if (rxState != RADIOLIB_ERR_NONE) {
         lastReceiveTime = millis(); //even if rxState is bad, we need to know when we last received
-        return rxState;
+        return std::nullopt;
     }
     lastReceiveTime = millis(); // always update the last receive time
-    return err;
+    std::vector<uint8_t> packetVector(data, data + packet_length);
+    return packetVector;
 }
 
 int DuckLoRa::sendData(uint8_t* data, int length)
