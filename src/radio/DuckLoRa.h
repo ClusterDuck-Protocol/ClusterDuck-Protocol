@@ -94,7 +94,7 @@ class DuckLoRa {
          * @param packet CdpPacket object that contains the data to send
          * @return DUCK_ERR_NONE if the message was sent successfully, an error code otherwise.
          */
-        int relayPacket(CdpPacket* packet);
+        int relayPacket(CdpPacket& packet);
 
 
         /**

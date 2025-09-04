@@ -226,15 +226,15 @@ int DuckLoRa::sendData(uint8_t* data, int length)
     return startTransmitData(data, length);
 }
 
-int DuckLoRa::relayPacket(CdpPacket* packet) {
+int DuckLoRa::relayPacket(CdpPacket& packet) {
     if(!isSetup) {
         logerr_ln("ERROR  LoRa radio not setup");
         return DUCKLORA_ERR_NOT_INITIALIZED;
     }
     delay();
 
-    return startTransmitData(packet->rawBuffer().data(),
-                             packet->rawBuffer().size());
+    return startTransmitData(packet.rawBuffer().data(),
+                             packet.rawBuffer().size());
 }
 
 void DuckLoRa::delay() {
