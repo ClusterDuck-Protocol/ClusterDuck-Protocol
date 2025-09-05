@@ -178,7 +178,7 @@ class CdpPacket {
         /**
          * @brief Create CdpPacket from rx buffer
          */
-        CdpPacket(const std::vector<uint8_t> & buffer) {
+        CdpPacket(std::vector<uint8_t> buffer) {
             int buffer_length = buffer.size();
             // sduid
             std::copy(&buffer[SDUID_POS], &buffer[DDUID_POS], sduid.begin());
