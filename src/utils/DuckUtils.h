@@ -62,7 +62,7 @@ std::string createUuid(int length = CDPCFG_UUID_LEN);
  * 
  * @param data a byte array to convert
  * @param size the size of the array
- * @returns A string representating the by array in hexadecimal.
+ * @returns A string representating the byte array in hexadecimal.
  */
 std::string convertToHex(uint8_t* data, int size);
 
@@ -92,8 +92,8 @@ std::string toString(const std::vector<T>& vec) {
  * @returns A std::string representing the byte array in ASCII.
  *
  */
-template<typename T,size_t S>
-std::string toString(const std::array<T,S>& arr) {
+template<typename Container,size_t S>
+std::string toString(const Container& arr) {
     std::string result;
     for (const auto& element : arr) {
         if (!std::isprint(element)) {
@@ -123,24 +123,15 @@ std::array<T,S> stringToArray(const std::string& str) {
 }
 
 /**
- * @brief Convert an array into hex for sending over http or display.
- *
- * @param arr an array to convert
+ * @brief Convert an container of contiguous data into hex for sending over http or display.
+ * May be more ergonomic than the convertToHex function.
+ * @param con a container to convert
  * @returns A std::string representing the byte array in ASCII.
  *
  */
-template<typename T,size_t S>
-std::string arrayToHexString(const std::array<T,S>& arr) {
-    std::string buf = ""; // static to avoid memory leak
-    buf.clear();
-    buf.reserve(S * 2); // 2 digit hex
-    const char* cs = "0123456789ABCDEF";
-    for (int i = 0; i < S; i++) {
-        uint8_t val = arr[i];
-        buf += cs[(val >> 4) & 0x0F];
-        buf += cs[val & 0x0F];
-    }
-    return buf;
+template<typename Container>
+std::string containerToHexString(const Container& con) {
+        convertToHex(con.data(), con.size());
 }
 
 
