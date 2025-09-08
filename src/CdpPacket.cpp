@@ -52,7 +52,7 @@ int CdpPacket::prepareForSending() {
     
     // data crc
     buffer.insert(buffer.end(), crc_bytes.begin(), crc_bytes.end());
-    logdbg_ln("Data CRC:  %s", duckutils::arrayToHexString(crc_bytes).c_str());
+    logdbg_ln("Data CRC:  %s", duckutils::containerToHexString(crc_bytes).c_str());
 
     buffer.insert(buffer.end(), this->data.begin(), this->data.end());
     //convert the data to string for logging

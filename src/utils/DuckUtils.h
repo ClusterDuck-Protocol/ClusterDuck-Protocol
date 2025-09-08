@@ -130,7 +130,7 @@ std::array<T,S> stringToArray(const std::string& str) {
  *
  */
 template<typename Container>
-std::string containerToHexString(const Container& con) {
+std::string containerToHexString(Container& con) {
         convertToHex(con.data(), con.size());
 }
 
