@@ -72,11 +72,11 @@ private :
   
       int err;
       std::optional<std::vector<uint8_t>> rxData = this->duckRadio.readReceivedData();
-      CdpPacket rxPacket(*rxData);
-      if (err != DUCK_ERR_NONE) {
-        logerr_ln("ERROR failed to get data from DuckRadio. rc = %d",err);
+      if (!rxData) {
+        logerr_ln("ERROR failed to get data from DuckRadio.");
         return;
       }
+      CdpPacket rxPacket(rxData.value());
       logdbg_ln("Got data from radio, prepare for relay. size: %d",rxPacket.rawBuffer().size());
 
       recvDataCallback(rxPacket.rawBuffer());
@@ -92,7 +92,7 @@ private :
         } else if(duckutils::isEqual(this->duid, rxPacket.dduid)) { //Target device check
             ifNotBroadcast(rxPacket, err);
         } else {
-          err = this->duckRadio.relayPacket(rxPacket);
+          err = this->relayPacket(rxPacket);
           if (err != DUCK_ERR_NONE) {
             logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
           } else {
@@ -115,7 +115,7 @@ private :
                 std::string strRREQ;
                 serializeJson(rreqDoc, strRREQ);
                 // this->rxPacket->rawBuffer() = duckutils::stringToByteVector(strRREQ);
-                err = this->duckRadio.relayPacket(rxPacket);
+                err = this->relayPacket(rxPacket);
                 if (err != DUCK_ERR_NONE) {
                     logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d", err);
                 } else {
@@ -136,7 +136,7 @@ private :
             case reservedTopic::cmd:
                 loginfo_ln("Command received");
 
-                err = this->duckRadio.relayPacket(rxPacket);
+                err = this->relayPacket(rxPacket);
                 if (err != DUCK_ERR_NONE) {
                     logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
                 } else {
@@ -144,7 +144,7 @@ private :
                 }
                 break;
             default:
-                err = this->duckRadio.relayPacket(rxPacket);
+                err = this->relayPacket(rxPacket);
                 if (err != DUCK_ERR_NONE) {
                     logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
                 } else {
@@ -167,7 +167,7 @@ private :
               std::string strRREP;
               serializeJson(rreqDoc, strRREP);
               rxPacket.rawBuffer() = duckutils::stringToByteVector(strRREP);
-              err = this->duckRadio.relayPacket(rxPacket);
+              err = this->relayPacket(rxPacket);
               if (err != DUCK_ERR_NONE) {
                   logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d", err);
               } else {
@@ -178,7 +178,7 @@ private :
           }
               break;
           default:
-              err = this->duckRadio.relayPacket(rxPacket);
+              err = this->relayPacket(rxPacket);
               if (err != DUCK_ERR_NONE) {
                   logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
               } else {

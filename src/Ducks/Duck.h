@@ -117,6 +117,16 @@ class Duck {
      */ 
     virtual void handleReceivedPacket() = 0;
 
+    int relayPacket(CdpPacket packet){
+      bool alreadySeen = router.getFilter().bloom_check(packet.muid.data(), MUID_LENGTH);
+      if(alreadySeen){
+        logdbg_ln("handleReceivedPacket: Packet already seen. No relay.");
+      } else{
+        packet.rawBuffer()[HOP_COUNT_POS]++;
+        int err = sendToRadio(packet);
+      }
+    }
+
     unsigned long lastRreqTime = 0L;
 
     /**
@@ -313,16 +323,6 @@ class Duck {
         logerr_ln("ERROR Lora sendData failed, err = %d", err);
       }
       return err;
-    }
-
-    int relayPacket(CdpPacket packet){
-      bool alreadySeen = router.getFilter().bloom_check(packet.muid.data(), MUID_LENGTH);
-      if(alreadySeen){
-        logdbg_ln("handleReceivedPacket: Packet already seen. No relay.");
-      } else{
-        packet.rawBuffer()[HOP_COUNT_POS]++; //should rawBuffer be changed to a reference (it's currently returning a copied value)???
-        int err = sendToRadio(packet);
-      }
     }
 
     /**

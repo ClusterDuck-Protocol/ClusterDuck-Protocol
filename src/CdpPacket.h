@@ -250,7 +250,7 @@ class CdpPacket {
          * 
          * @returns a array of bytes representing the cdp packet
          */
-        std::vector<uint8_t> rawBuffer() { return this->buffer;}
+        std::vector<uint8_t>& rawBuffer() { return this->buffer;}
 
 
         /**
