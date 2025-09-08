@@ -53,7 +53,8 @@ class Duck {
       std::vector<byte> app_data;
       app_data.insert(app_data.end(), data.begin(), data.end());
       CdpPacket txPacket = CdpPacket(targetDevice, topic, app_data, this->duid, this->getType());
-      int err = sendToRadio(txPacket); //these arguments shouldn't need to be passed, as they are conatined in a cdppacket already
+      router.getFilter().assignUniqueMessageId(txPacket);
+      int err = sendToRadio(txPacket);
       return err;
     }
 
@@ -73,6 +74,7 @@ class Duck {
       std::vector<byte> app_data(length);
       app_data.insert(app_data.end(), &data[0], &data[length]);
       CdpPacket txPacket = CdpPacket(targetDevice, topic, app_data, this->duid, this->getType());
+      router.getFilter().assignUniqueMessageId(txPacket);
       int err = sendToRadio(txPacket);
       return err;
     }
@@ -313,6 +315,16 @@ class Duck {
       return err;
     }
 
+    int relayPacket(CdpPacket packet){
+      bool alreadySeen = router.getFilter().bloom_check(packet.muid.data(), MUID_LENGTH);
+      if(alreadySeen){
+        logdbg_ln("handleReceivedPacket: Packet already seen. No relay.");
+      } else{
+        packet.rawBuffer()[HOP_COUNT_POS]++; //should rawBuffer be changed to a reference (it's currently returning a copied value)???
+        int err = sendToRadio(packet);
+      }
+    }
+
     /**
      * @brief Passes data to radiolib for rx
      *
@@ -320,9 +332,7 @@ class Duck {
      * @return DUCK_ERR_NONE if the data was sent successfully, an error code otherwise.
      */
     int sendToRadio(CdpPacket txPacket) {
-      int err = DUCK_ERR_NONE;
-      router.getFilter().assignUniqueMessageId(txPacket);
-      err = txPacket.prepareForSending();
+      int err = txPacket.prepareForSending();
       if (err != DUCK_ERR_NONE) {
         logerr_ln("ERROR Failed to build ping packet, err = " + err);
         return err;

@@ -89,15 +89,6 @@ class DuckLoRa {
         int sendData(std::vector<uint8_t> data);
 
         /**
-         * @brief Send packet data out into the mesh network
-         *
-         * @param packet CdpPacket object that contains the data to send
-         * @return DUCK_ERR_NONE if the message was sent successfully, an error code otherwise.
-         */
-        int relayPacket(CdpPacket& packet);
-
-
-        /**
          * @brief Get the data received from the radio
          * 
          * @return DUCK_ERR_NONE if the chip is sucessfuly set in standby mode, an error code otherwise. 
