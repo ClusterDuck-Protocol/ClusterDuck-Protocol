@@ -14,8 +14,8 @@
 #include <queue>
 
 // --- WIFI Configuration ---
-const std::string WIFI_SSID="ENTER SSID";         // Replace with WiFi SSID
-const std::string WIFI_PASS="ENTER PASSWORD";     // Replace with WiFi Password
+const std::string WIFI_SSID="SweetBeet";         // Replace with WiFi SSID
+const std::string WIFI_PASS="Vincent<3";     // Replace with WiFi Password
 #define WIFI_RETRY_DELAY_MS 5000
 
 // --- MQTT Configuration ---
@@ -51,7 +51,7 @@ static const char* mosquitto_ca_cert = \
 "-----END CERTIFICATE-----\n";
 
 // --- Global Objects ---
-PapaDuck hub;                                     // PapaDuck instance
+PapaDuck hub("PAPA0001");                                     // PapaDuck instance
 WiFiClientSecure wifiClient;                      // Secure WiFi client
 PubSubClient mqttClient(wifiClient);              // MQTT client
 std::queue<std::string> mqttMessageQueue;         // Incoming mqtt messages
@@ -220,7 +220,7 @@ void processMessageFromDucks(std::vector<byte> packetBuffer) {
 
     std::string muid(cdp_packet.muid.begin(), cdp_packet.muid.end());
     std::string sduid(cdp_packet.sduid.begin(), cdp_packet.sduid.end());
-    std::string cdpTopic = toTopicString(cdp_packet.topic);
+    std::string cdpTopic = cdp_packet.topicToString();
 
     Serial.printf("[HUB] got topic: %s from %s\n",cdpTopic.c_str(), sduid.c_str());
  
@@ -280,31 +280,11 @@ void handleDuckData(std::vector<byte> packetBuffer) {
  * - Sets up MQTT client.
  */
 void setup() {
-  std::string deviceId("PAPA0001");
-  std::array<byte,8> devId;
-  std::copy(deviceId.begin(), deviceId.end(), devId.begin());
-  
   // Set the CA cert for the WiFi client
   wifiClient.setCACert(mosquitto_ca_cert);
 
   // Setup the duck link with default settings and connect to WiFi
-  uint32_t err = hub.setupWithDefaults(devId, WIFI_SSID, WIFI_PASS);
-
-  // If we fail to connect to WiFi, retry a few times
-  if (err == DUCK_INTERNET_ERR_CONNECT) {
-    int retry=0;
-    while ( err ==  DUCK_INTERNET_ERR_CONNECT && retry < 3 ) {
-      Serial.printf("[HUB] WiFi disconnected, retry connection: %s\n",WIFI_SSID.c_str());
-      delay(5000);
-      err = hub.setupInternet(WIFI_SSID, WIFI_PASS);
-      retry++;
-    }  
-  }
-  if (err != DUCK_ERR_NONE) {
-    Serial.print("[HUB] Failed to setup PapaDuck: rc = ");Serial.println(err);
-    setupOK = false;
-    return;
-  }
+  uint32_t err = hub.setupWithDefaults(WIFI_SSID, WIFI_PASS);
 
   setupOK = true;
   // register a callback to handle incoming data from duck in the network
@@ -320,10 +300,6 @@ void setup() {
     return;
   }
    
-  while (!hub.isWifiConnected()) {
-    delay(1000);
-  }
-  
   Serial.printf("[HUB] Ready!\n");
 }
 

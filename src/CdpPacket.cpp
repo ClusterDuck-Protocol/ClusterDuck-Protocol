@@ -7,7 +7,7 @@ int CdpPacket::prepareForSending() {
         return DUCKPACKET_ERR_SIZE_INVALID;
     }
 
-    loginfo_ln("packet format: DATA LENGTH: %d - TOPIC (%s)", data_length, topicToString(this->topic).c_str());
+    loginfo_ln("packet format: DATA LENGTH: %d - TOPIC (%s)", data_length, topicToString().c_str());
 
 // ----- insert packet header  -----
     loginfo_ln("packet format: START");
@@ -33,7 +33,7 @@ int CdpPacket::prepareForSending() {
 
     // topic
     buffer.insert(buffer.end(), this->topic);
-    logdbg_ln("Topic:     %s", CdpPacket::topicToString(this->topic).c_str());
+    logdbg_ln("Topic:     %s", CdpPacket::topicToString().c_str());
 
     // duckType
     buffer.insert(buffer.end(), this->duckType);

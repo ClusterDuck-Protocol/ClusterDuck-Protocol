@@ -258,8 +258,8 @@ class CdpPacket {
          * 
          * @returns string representing the topic
          */
-        std::string topicToString(byte topic) {
-            switch (topic) {
+        std::string topicToString() {
+            switch (this->topic) {
             case topics::status:
                 return "status";
             case topics::cpm:

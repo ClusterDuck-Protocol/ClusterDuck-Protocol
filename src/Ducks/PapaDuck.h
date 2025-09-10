@@ -35,44 +35,47 @@ public:
    * @param password wifi password (defaults to an empty string if not provided)
    * @returns DUCK_ERR_NONE if setup is successfull, an error code otherwise.
    */
-   int setupWithDefaults(std::array<byte,8> deviceId, std::string ssid = "", std::string password = "") {
-    loginfo_ln("setupWithDefaults...");
-  
-    int err = Duck<WifiCapability, RadioType>::setupWithDefaults(deviceId, ssid, password);
-  
-    if (err != DUCK_ERR_NONE) {
-      logerr_ln("ERROR setupWithDefaults rc = %s",err);
-      return err;
-    }
-  
-    err = this->setupRadio();
-    if (err != DUCK_ERR_NONE) {
-      logerr_ln("ERROR setupWithDefaults  rc = %d",err);
-      return err;
-    }
-  
-    std::string name(deviceId.begin(),deviceId.end());
+   int setupWithDefaults(std::string ssid = "", std::string password = "") {
+    this->setupSerial(115200);
 
-      if (err != DUCK_ERR_NONE) {
-        logerr_ln("ERROR setupWithDefaults  rc = %d",err);
-        return err;
-      }
-      if (err != DUCK_ERR_NONE) {
-        logerr_ln("ERROR setupWithDefaults  rc = %d",err);
-       
-        return err;
-      }  
-  
-    loginfo_ln("setupWithDefaults done");
-    return DUCK_ERR_NONE;
-  };
+    int err = this->setupLoRaRadio();
+    if (err != DUCK_ERR_NONE) {
+    logerr_ln("ERROR setupWithDefaults rc = %d",err);
+    return err;
+    }
+    err = this->duckWifi.joinNetwork(ssid, password);
+
+      // If we fail to connect to WiFi, retry a few times
+      // if (err == DUCK_INTERNET_ERR_CONNECT) {
+      //   int retry=0;
+      //   while ( err ==  DUCK_INTERNET_ERR_CONNECT && retry < 3 ) {
+      //     Serial.printf("[HUB] WiFi disconnected, retry connection: %s\n",WIFI_SSID.c_str());
+      //     delay(5000);
+      //     err = hub.setupInternet(WIFI_SSID, WIFI_PASS);
+      //     retry++;
+      //   }  
+      // }
+      // if (err != DUCK_ERR_NONE) {
+      //   Serial.print("[HUB] Failed to setup PapaDuck: rc = ");Serial.println(err);
+      //   setupOK = false;
+      //   return;
+      // }
+
+
+
+      //   if (err != DUCK_ERR_NONE) {
+      //     logerr_ln("ERROR setupWithDefaults rc = %d",err);
+      //     return err;
+      //   }
+      //   return DUCK_ERR_NONE;
+    };
 
   /**
    * @brief Get the DuckType
    *
    * @returns the duck type defined as DuckType
    */
-  int getType() { return DuckType::PAPA; }
+  DuckType getType() { return DuckType::PAPA; }
 
   /**
    * @brief Send duck command to entire network
@@ -111,42 +114,48 @@ public:
    */
   void sendCommand(byte cmd, std::vector<byte> value, std::array<byte,8> dduid);
 
-private:
-
-  void handleReceivedPacket() {
-
-    loginfo_ln("handleReceivedPacket() START");
-    std::vector<uint8_t> data;
-    int err = this->duckRadio->readReceivedData(&data);
-  
-    if (err != DUCK_ERR_NONE) {
-      logerr_ln("ERROR handleReceivedPacket. Failed to get data. rc = %d",err);
-      return;
-    }
-    
-    if (data[TOPIC_POS] == reservedTopic::ping) {
-      loginfo_ln("PING received. Sending PONG!");
-      err = this->sendPong();
-      if (err != DUCK_ERR_NONE) {
-        logerr_ln("ERROR failed to send pong message. rc = %d",err);
-      }
-    } else if (data[TOPIC_POS] == reservedTopic::pong) {
-      loginfo_ln("PONG received. Ignoring!");
-    } else {
-      // build our RX CdpPacket which holds the updated path in case the packet is relayed
-      // bool relay = this->rxPacket->prepareForRelaying(&this->filter, data);
-      // if (relay) {
-      //   logdbg_ln("relaying:  %s", duckutils::convertToHex(this->rxPacket->rawBuffer().data(), this->rxPacket->rawBuffer().size()).c_str());
-      //   loginfo_ln("invoking callback in the duck application...");
-        
-      //   this->recvDataCallback(this->rxPacket->rawBuffer());
-      // }
-          loginfo_ln("handleReceivedPacket() DONE");
-          // rxDoneCallback recvDataCallback;
-    }
-  
-
+  //remove this when mqtt quack pack is added
+  bool isWifiConnected(){
+    return this->duckWifi.connected();
   }
-};
+
+private:
+  rxDoneCallback recvDataCallback;
+  
+  void handleReceivedPacket() {
+        int err;
+        std::optional<std::vector<uint8_t>> rxData = this->duckRadio.readReceivedData();
+        if (!rxData) {
+        logerr_ln("ERROR failed to get data from DuckRadio.");
+        return;
+        }
+        CdpPacket rxPacket(rxData.value());
+        logdbg_ln("Got data from radio, prepare for relay. size: %d",rxPacket.rawBuffer().size());
+
+        recvDataCallback(rxPacket.rawBuffer());
+        loginfo_ln("handleReceivedPacket: packet RELAY START");
+
+      if (rxPacket.topic == reservedTopic::ping) {
+        loginfo_ln("PING received. Sending PONG!");
+        err = this->sendPong();
+        if (err != DUCK_ERR_NONE) {
+          logerr_ln("ERROR failed to send pong message. rc = %d",err);
+        }
+      } else if (rxPacket.topic == reservedTopic::pong) {
+        loginfo_ln("PONG received. Ignoring!");
+      } else {
+        // build our RX CdpPacket which holds the updated path in case the packet is relayed
+        // bool relay = this->rxPacket->prepareForRelaying(&this->filter, data);
+        // if (relay) {
+        //   logdbg_ln("relaying:  %s", duckutils::convertToHex(this->rxPacket->rawBuffer().data(), this->rxPacket->rawBuffer().size()).c_str());
+        //   loginfo_ln("invoking callback in the duck application...");
+          
+        //   this->recvDataCallback(this->rxPacket->rawBuffer());
+        // }
+            loginfo_ln("handleReceivedPacket() DONE");
+      }
+    
+    }
+  };
 
 #endif

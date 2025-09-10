@@ -30,8 +30,7 @@ int DuckWifi::joinNetwork(std::string ssid, std::string password) {
 }
 
 bool DuckWifi::connected() {
-    return DUCK_ERR_NONE;
-    logwarn_ln("wifi is disabled");
+    return true;
 }
 
 void DuckWifi::setSsid(std::string val) {

@@ -106,6 +106,7 @@ class Duck {
     }
 
     RadioType duckRadio;
+    WifiCapability duckWifi;
     NetworkState networkState = NetworkState::SEARCHING;
     static constexpr int MEMORY_LOW_THRESHOLD = PACKET_LENGTH + sizeof(CdpPacket);
     std::array<uint8_t,8> duid;
