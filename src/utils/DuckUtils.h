@@ -10,7 +10,7 @@
 #ifndef DUCKUTILS_H_
 #define DUCKUTILS_H_
 
-#include "../cdpcfg.h"
+#include "../include/cdpcfg.h"
 #include "arduino-timer.h"
 #include <Arduino.h>
 #include <EEPROM.h>

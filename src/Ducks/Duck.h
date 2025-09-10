@@ -81,6 +81,19 @@ class Duck {
     }
 
     /**
+     * @brief sendData that allows sending for reserved topic ping
+     * @returns DUCK_ERR_NONE if the data was sent successfully, an error code otherwise.
+     */
+    int sendPing(Duid targetDevice = BROADCAST_DUID){
+      std::vector<byte> data(1, 0);
+      int err = sendReservedTopicData(targetDevice, reservedTopic::ping, data);
+      if (err != DUCK_ERR_NONE){
+        logerr_ln("ERR: failed to send ping");
+      }
+      return err;
+    }
+
+    /**
      * @brief Get the duck's unique ID.
      * 
      * @returns A byte vector representing the duck's unique ID
@@ -225,20 +238,6 @@ class Duck {
       }
       return err;
     }
-    
-    /**
-     * @brief sendData that allows sending for reserved topic ping
-     * @returns DUCK_ERR_NONE if the data was sent successfully, an error code otherwise.
-     */
-    int sendPing(Duid targetDevice = BROADCAST_DUID){
-      std::vector<byte> data(1, 0);
-      int err = sendReservedTopicData(targetDevice, reservedTopic::ping, data);
-      if (err != DUCK_ERR_NONE){
-        logerr_ln("ERR: failed to send ping");
-      }
-      return err;
-    }
-    
 
     /**
      * @brief Enable duck radio to start receiving packets from the mesh network

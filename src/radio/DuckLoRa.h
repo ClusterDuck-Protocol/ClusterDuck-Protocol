@@ -107,6 +107,22 @@ class DuckLoRa {
          * @return true if the flag is set, false otherwise.
          */
         static bool getReceiveFlag() { return receivedFlag; }
+
+        /**
+         * @brief Get the current RSSI value.
+         *
+         * @returns A float representing the rssi value.
+         */
+
+         float getRSSI();
+
+        /**
+         * @brief Get the current SNR value.
+         *
+         * @returns A float representing the snr value.
+         */
+        float getSNR();
+
     private:
         static volatile uint16_t interruptFlags;
         static volatile bool receivedFlag;
@@ -164,20 +180,6 @@ class DuckLoRa {
         *
         */
         static void onInterrupt();
-
-        /**
-         * @brief Get the current RSSI value.
-         *
-         * @returns A float representing the rssi value.
-         */
-
-        float getRSSI();
-        /**
-         * @brief Get the current SNR value.
-         *
-         * @returns A float representing the snr value.
-         */
-        float getSNR();
 
 };
 

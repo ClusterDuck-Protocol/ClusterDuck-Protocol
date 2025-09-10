@@ -30,7 +30,7 @@ CRGB leds[NUM_LEDS];
 #endif
 
 // create an instance of a built-in Duck Detector
-DetectorDuck duck;
+DetectorDuck duck("DETECTOR");
 
 // Create a timer with default settings
 auto timer = timer_create_default();
@@ -40,11 +40,7 @@ const unsigned long SIGNAL_TIMEOUT_MS = INTERVAL_MS + 1000; // 5 seconds timeout
 unsigned long lastSignalTime = 0;
 
 void setup() {
-
-  std::string deviceId("DETECTOR"); // NOTE: The Device ID must be exactly 8 bytes
-  std::array<byte,8> devId;
-  std::copy(deviceId.begin(), deviceId.end(), devId.begin());
-  duck.setupWithDefaults(devId);
+  duck.setupWithDefaults();
 
   // Register  a callback that provides RSSI value
   duck.onReceiveRssi(handleReceiveRssi);

@@ -10,23 +10,18 @@ public:
 
   DetectorDuck(std::string name = "DETECTOR") : Duck<DuckWifiNone, RadioType>(std::move(name)) {}
   ~DetectorDuck() {}
-  
-  /**
-   * @brief Send a ping message to devices in the mesh network.
-   * 
-   * @param startReceive `true` if the device must to be ready to receive a response immediately,
-   * `false` if response needs to be deffered. 
-   */
-  // void sendPing() {
-  //   loginfo("Sending PING...");
-  //   int err = DUCK_ERR_NONE;
-  //   err = this->sendPing();
 
-  //   if (err != DUCK_ERR_NONE) {
-  //     logerr("ERROR Failed to build packet, err = %s\n",err);
-  //   }
-  // };
-  
+  int setupWithDefaults() {
+    // Initialize the serial component with the hardware supported baudrate
+    this->setupSerial(115200);
+    
+    int err = this->setupLoRaRadio();
+    if (err != DUCK_ERR_NONE) {
+    logerr_ln("ERROR setupWithDefaults rc = %d",err);
+    return err;
+    }
+    return DUCK_ERR_NONE;
+  }
 
   /// callback definition for receiving RSSI value
   using rssiCallback = void (*)(const int);
@@ -43,40 +38,24 @@ public:
    *
    * @returns the duck type defined as DuckType
    */
-  int getType() { return DuckType::DETECTOR; }
+  DuckType getType() { return DuckType::DETECTOR; }
 
 private:
   rssiCallback rssiCb;
-  int setupWithDefaults(std::array<byte,8> deviceId, std::string ssid = "", std::string password = "") {
-    int err = Duck<WifiCapability, RadioType>::setupWithDefaults(deviceId, ssid, password);
-    if (err != DUCK_ERR_NONE) {
-      logerr("ERROR setupWithDefaults rc = %s\n",err);
-      return err;
-    }
-  
-    err = this->setupRadio();
-    if (err != DUCK_ERR_NONE) {
-      logerr("ERROR setupWithDefaults - setupRadio rc = %s\n",err);
-      return err;
-    }
-  
-    loginfo("DetectorDuck setup done");
-    return DUCK_ERR_NONE;
-  }
-  
+
   void handleReceivedPacket() {
-  
-    loginfo("handleReceivedPacket()...");
-  
-    std::vector<byte> data;
-    int err = this->duckRadio.readReceivedData(&data);
-  
-    if (err != DUCK_ERR_NONE) {
-      logerr("ERROR Failed to get data from DuckRadio. rc = %s\n",err);
-      return;
+    loginfo_ln("====> handleReceivedPacket: START");
+
+    int err;
+    std::optional<std::vector<uint8_t>> rxData = this->duckRadio.readReceivedData();
+    if (!rxData) {
+    logerr_ln("ERROR failed to get data from DuckRadio.");
+    return;
     }
+    CdpPacket rxPacket(rxData.value());
+    logdbg_ln("Got data from radio, prepare for relay. size: %d",rxPacket.rawBuffer().size());
   
-    if (data[TOPIC_POS] == reservedTopic::pong) {
+    if (rxPacket.topic == reservedTopic::pong) {
       logdbg("run() - got ping response!");
       rssiCb(this->duckRadio.getRSSI());
     }
