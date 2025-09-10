@@ -19,7 +19,7 @@ bool runSensor(void *);
 bool sendData(std::string message, byte topic=topics::status);
 
 // --- Global Variables ---
-DuckLink duck;                            // CDP DuckLink instance
+DuckLink duck("DUCK0001");                            // CDP DuckLink instance
 auto timer = timer_create_default();      // Creating a timer with default settings
 const int INTERVAL_MS = 10000;            // Interval in milliseconds between each call of runSensor
 int counter = 1;                          // Message counter to track transmissions
@@ -33,11 +33,7 @@ bool setupOK = false;                     // Flag indicating setup completion st
  * - Sets up periodic execution of sensor data transmissions.
  */
 void setup() {
-
-  std::string deviceId("DUCK0001");    // MUST be 8 bytes and unique from other ducks
-  std::array<byte,8> devId;
-  std::copy(deviceId.begin(), deviceId.end(), devId.begin());
-  if (duck.setupWithDefaults(devId) != DUCK_ERR_NONE) {
+  if (duck.setupWithDefaults() != DUCK_ERR_NONE) {
     Serial.println("[LINK] Failed to setup DuckLink");
     return;
   }

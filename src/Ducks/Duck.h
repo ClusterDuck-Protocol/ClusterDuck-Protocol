@@ -12,6 +12,7 @@
 #include "../CdpPacket.h"
 #include "../DuckEsp.h"
 #include "../wifi/DuckWifiNone.h"
+#include "../wifi/DuckWifi.h"
 #include "../routing/DuckRouter.h"
 
 enum class NetworkState {SEARCHING, PUBLIC};

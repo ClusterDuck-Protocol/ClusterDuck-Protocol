@@ -3,7 +3,7 @@
 
 #include "Duck.h"
 
-template <typename WifiCapability, typename RadioType = DuckLoRa>
+template <typename WifiCapability = DuckWifi, typename RadioType = DuckLoRa>
 class PapaDuck : public Duck<WifiCapability, RadioType> {
 public:
   using Duck<WifiCapability, RadioType>::Duck;

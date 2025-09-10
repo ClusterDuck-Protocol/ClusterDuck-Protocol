@@ -27,16 +27,10 @@ public:
    * defaults.
    *
    * In addition to Serial component, the Radio component is also initialized.
-   * When ssid and password are provided the duck will setup the wifi related
-   * components.
-   *
-   * @param ssid wifi access point ssid (defaults to an empty string if not
-   * provided)
-   * @param password wifi password (defaults to an empty string if not provided)
-   * 
+
    * @returns DUCK_ERR_NONE if setup is successfull, an error code otherwise.
    */
-   int setupWithDefaults(std::string ssid = "", std::string password = "") {
+   int setupWithDefaults() {
 
     // Initialize the serial component with the hardware supported baudrate
     this->setupSerial(115200);
