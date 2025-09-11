@@ -45,13 +45,13 @@ class Duck {
      * @param targetDevice the device UID to receive the message (default is all papa devices)
      * @return DUCK_ERR_NONE if the data was sent successfully, an error code otherwise.
      */
-    int sendData(byte topic, const std::string data, const std::array<byte,8> targetDevice = PAPADUCK_DUID) {
+    int sendData(uint8_t topic, const std::string data, const std::array<uint8_t,8> targetDevice = PAPADUCK_DUID) {
       if (topic < reservedTopic::max_reserved) {
         logerr_ln("ERROR send data failed, topic is reserved.");
         return DUCKPACKET_ERR_TOPIC_INVALID;
       }
       
-      std::vector<byte> app_data;
+      std::vector<uint8_t> app_data;
       app_data.insert(app_data.end(), data.begin(), data.end());
       CdpPacket txPacket = CdpPacket(targetDevice, topic, app_data, this->duid, this->getType());
       router.getFilter().assignUniqueMessageId(txPacket);
@@ -66,13 +66,13 @@ class Duck {
      * @param targetDevice the device UID to receive the message (default is all papa devices)
      * @return DUCK_ERR_NONE if the data was sent successfully, an error code otherwise.
     */
-    int sendData(byte topic, const byte* data, int length, const std::array<byte,8> targetDevice = PAPADUCK_DUID) {
+    int sendData(uint8_t topic, const uint8_t* data, int length, const std::array<uint8_t,8> targetDevice = PAPADUCK_DUID) {
       if (topic < reservedTopic::max_reserved) {
         logerr_ln("ERROR send data failed, topic is reserved.");
         return DUCKPACKET_ERR_TOPIC_INVALID;
       }
       
-      std::vector<byte> app_data(length);
+      std::vector<uint8_t> app_data(length);
       app_data.insert(app_data.end(), &data[0], &data[length]);
       CdpPacket txPacket = CdpPacket(targetDevice, topic, app_data, this->duid, this->getType());
       router.getFilter().assignUniqueMessageId(txPacket);
@@ -85,7 +85,7 @@ class Duck {
      * @returns DUCK_ERR_NONE if the data was sent successfully, an error code otherwise.
      */
     int sendPing(Duid targetDevice = BROADCAST_DUID){
-      std::vector<byte> data(1, 0);
+      std::vector<uint8_t> data(1, 0);
       int err = sendReservedTopicData(targetDevice, reservedTopic::ping, data);
       if (err != DUCK_ERR_NONE){
         logerr_ln("ERR: failed to send ping");
@@ -231,7 +231,7 @@ class Duck {
      * @returns DUCK_ERR_NONE if the data was sent successfully, an error code otherwise.
      */
     int sendPong(Duid targetDevice = BROADCAST_DUID){
-      std::vector<byte> data(1, 0);
+      std::vector<uint8_t> data(1, 0);
       int err = sendReservedTopicData(targetDevice, reservedTopic::pong, data);
       if (err != DUCK_ERR_NONE){
         logerr_ln("ERR: failed to send pong");
@@ -310,7 +310,7 @@ class Duck {
      * @param data byte vector representing data to send
      * @return DUCK_ERR_NONE if the data was sent successfully, an error code otherwise.
      */
-    int sendReservedTopicData(Duid targetDevice, reservedTopic topic, std::vector<byte> data){
+    int sendReservedTopicData(Duid targetDevice, reservedTopic topic, std::vector<uint8_t> data){
       int err = DUCK_ERR_NONE;
       CdpPacket txPacket = CdpPacket(targetDevice, topic, data, this->duid, this->getType());
       router.getFilter().assignUniqueMessageId(txPacket);
