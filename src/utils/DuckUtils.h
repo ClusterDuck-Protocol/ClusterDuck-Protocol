@@ -129,11 +129,19 @@ std::array<T,S> stringToArray(const std::string& str) {
  * @returns A std::string representing the byte array in ASCII.
  *
  */
-template<typename Container>
-std::string containerToHexString(Container& con) {
-        convertToHex(con.data(), con.size());
+template<typename T,size_t S>
+std::string arrayToHexString(const std::array<T,S> arr) {
+    std::string buf = ""; // static to avoid memory leak
+    buf.clear();
+    buf.reserve(S * 2); // 2 digit hex
+    const char* cs = "0123456789ABCDEF";
+    for (int i = 0; i < S; i++) {
+        uint8_t val = arr[i];
+        buf += cs[(val >> 4) & 0x0F];
+        buf += cs[val & 0x0F];
+    }
+    return buf;
 }
-
 
 
 /**
