@@ -2,6 +2,7 @@
 
 int CdpPacket::prepareForSending() {
     uint8_t data_length = data.size();
+    buffer.clear();
 
     if ( data.empty() || data_length > MAX_DATA_LENGTH) {
         return DUCKPACKET_ERR_SIZE_INVALID;
@@ -19,12 +20,12 @@ int CdpPacket::prepareForSending() {
     logdbg_ln("SDuid:      %s", strDuid.c_str());
 
 // destination device uid  
-    if (this->dduid == BROADCAST_DUID){
+    if (this->dduid == BROADCAST_DUID || this->dduid == PAPADUCK_DUID){
     logdbg_ln("DDuid:     broadcast");
     } else{
-    buffer.insert(buffer.end(), this->dduid.begin(), this->dduid.end());
     logdbg_ln("DDuid: %s", std::string(this->dduid.begin(), this->dduid.end()).c_str());
     }
+    buffer.insert(buffer.end(), this->dduid.begin(), this->dduid.end());
     
     // message uid
     buffer.insert(buffer.end(), this->muid.begin(), this->muid.end());
@@ -44,7 +45,7 @@ int CdpPacket::prepareForSending() {
     logdbg_ln("hop count: %s", std::to_string(this->hopCount).c_str());
 
     std::array<uint8_t,DATA_CRC_LENGTH> crc_bytes; //could this belong elsewhere? like in duckradio??
-    uint32_t value = CRC32::calculate(buffer.data(), buffer.size());
+    uint32_t value = CRC32::calculate(data.data(), data.size());
     crc_bytes[0] = (value >> 24) & 0xFF;
     crc_bytes[1] = (value >> 16) & 0xFF;
     crc_bytes[2] = (value >> 8) & 0xFF;
@@ -52,12 +53,11 @@ int CdpPacket::prepareForSending() {
     
     // data crc
     buffer.insert(buffer.end(), crc_bytes.begin(), crc_bytes.end());
-    logdbg_ln("Data CRC:  %s", duckutils::arrayToHexString<uint8_t,DATA_CRC_LENGTH>(crc_bytes).c_str());
 
     buffer.insert(buffer.end(), this->data.begin(), this->data.end());
     //convert the data to string for logging
-    logdbg_ln("Data:      %s",printStr.assign(this->data.begin(), this->data.end()).c_str());
-    
+    logdbg_ln("Data (HEX): %s", duckutils::convertToHex(this->data.data(), this->data.size()).c_str());
+
     buffer.shrink_to_fit();
     logdbg_ln("Built packet (HEX): %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
 

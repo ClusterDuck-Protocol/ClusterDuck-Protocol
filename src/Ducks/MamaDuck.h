@@ -23,26 +23,6 @@ public:
     void onReceiveDuckData(rxDoneCallback cb) { this->recvDataCallback = cb; }
 
     /**
-     * @brief Override the default setup method to match MamaDuck specific
-     * defaults.
-     *
-     * In addition to Serial component, the Radio component is also initialized.
-
-    * @returns DUCK_ERR_NONE if setup is successfull, an error code otherwise.
-    */
-    int setupWithDefaults() {
-        // Initialize the serial component with the hardware supported baudrate
-        this->setupSerial(115200);
-    
-        int err = this->setupLoRaRadio();
-        if (err != DUCK_ERR_NONE) {
-        logerr_ln("ERROR setupWithDefaults rc = %d",err);
-        return err;
-        }
-        return DUCK_ERR_NONE;
-    }
-
-    /**
      * @brief Get the DuckType
      * 
      * @returns the duck type defined as DuckType
@@ -66,9 +46,9 @@ private :
         return;
         }
         CdpPacket rxPacket(rxData.value());
-        logdbg_ln("Got data from radio, prepare for relay. size: %d",rxPacket.rawBuffer().size());
+        logdbg_ln("Got data from radio, prepare for relay. size: %d",rxPacket.size());
 
-        recvDataCallback(rxPacket.rawBuffer());
+        // recvDataCallback(rxPacket.asBytes());
         loginfo_ln("handleReceivedPacket: packet RELAY START");
         // NOTE:
         // Ducks will only handle received message one at a time, so there is a chance the
@@ -96,21 +76,22 @@ private :
             case reservedTopic::rreq: {
                 loginfo_ln("RREQ received from %s. Updating RREQ!",
                            rxPacket.sduid.data());
-                ArduinoJson::JsonDocument rreqDoc;
-                deserializeJson(rreqDoc, rxPacket.data);
-                // CdpPacket::UpdateRREQ(rreqDoc, this->deviceId);
-                loginfo_ln("handleReceivedPacket: RREQ updated with current DUID: %s", this->duid);
-                //Serialize the updated RREQ packet
-                std::string strRREQ;
-                serializeJson(rreqDoc, strRREQ);
-                // this->rxPacket->rawBuffer() = duckutils::stringToByteVector(strRREQ);
-                err = this->relayPacket(rxPacket);
-                if (err != DUCK_ERR_NONE) {
-                    logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d", err);
-                } else {
-                    loginfo_ln("handleReceivedPacket: RREQ packet RELAY DONE");
-                }
-                return;
+                this->sendRouteResponse(rxPacket.sduid, this->getDuckId());
+                // ArduinoJson::JsonDocument rreqDoc;
+                // deserializeJson(rreqDoc, rxPacket.data);
+                // // CdpPacket::UpdateRREQ(rreqDoc, this->deviceId);
+                // loginfo_ln("handleReceivedPacket: RREQ updated with current DUID: %s", this->duid);
+                // //Serialize the updated RREQ packet
+                // std::string strRREQ;
+                // serializeJson(rreqDoc, strRREQ);
+                // // this->rxPacket->asBytes() = duckutils::stringToByteVector(strRREQ);
+                // err = this->relayPacket(rxPacket);
+                // if (err != DUCK_ERR_NONE) {
+                //     logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d", err);
+                // } else {
+                //     loginfo_ln("handleReceivedPacket: RREQ packet RELAY DONE");
+                // }
+                // return;
             }
             case reservedTopic::ping:
                 loginfo_ln("PING received. Sending PONG!");
@@ -155,7 +136,7 @@ private :
                 //Serialize the updated RREQ packet
                 std::string strRREP;
                 serializeJson(rreqDoc, strRREP);
-                rxPacket.rawBuffer() = duckutils::stringToByteVector(strRREP);
+                // rxPacket.asBytes() = duckutils::stringToByteVector(strRREP);
                 err = this->relayPacket(rxPacket);
                 if (err != DUCK_ERR_NONE) {
                     logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d", err);
@@ -164,6 +145,12 @@ private :
                 }
                 this->sendRouteRequest(PAPADUCK_DUID, dataPayload); //was this meant to be prepareforsending an rxPacket instead txPacket?
                 return;
+            }
+            break;
+            case reservedTopic::rrep: {
+                loginfo_ln("Received Route Response from DUID: %s", duckutils::convertToHex(rxPacket.sduid.data(), rxPacket.sduid.size()).c_str());
+
+                this->setNetworkState(NetworkState::PUBLIC);
             }
                 break;
             default:

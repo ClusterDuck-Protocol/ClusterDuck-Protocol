@@ -152,7 +152,7 @@ int DuckLoRa::goToReceiveMode(bool clearReceiveFlag) {
 }
 
 std::optional<std::vector<uint8_t>> DuckLoRa::readReceivedData() { //return a std optional
-    std::vector<uint8_t>* packetBytes;
+    std::vector<uint8_t>* packetBytes = new std::vector<uint8_t>;
     int packet_length = 0;
     int err = DUCK_ERR_NONE;
     int rxState = DUCK_ERR_NONE;

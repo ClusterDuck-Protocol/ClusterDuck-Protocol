@@ -178,7 +178,8 @@ class CdpPacket {
         /**
          * @brief Create CdpPacket from rx buffer
          */
-        CdpPacket(std::vector<uint8_t> buffer) {
+        CdpPacket(std::vector<uint8_t> rxBuffer) {
+            buffer = rxBuffer;
             int buffer_length = buffer.size();
             // sduid
             std::copy(&buffer[SDUID_POS], &buffer[DDUID_POS], sduid.begin());
@@ -197,7 +198,6 @@ class CdpPacket {
             // data section
             data.assign(&buffer[DATA_POS], &buffer[buffer_length]);
             //need to figure out how to deal with timeReceived
-
         }
 
         /**
@@ -250,8 +250,12 @@ class CdpPacket {
          * 
          * @returns a array of bytes representing the cdp packet
          */
-        std::vector<uint8_t>& rawBuffer() { return this->buffer;}
+        std::vector<uint8_t> asBytes() { return this->buffer;}
 
+        int size(){
+            //if buffer init return buffer size
+            return this->buffer.size();
+        }
 
         /**
          * @brief Convert packet topic to std::string
@@ -299,13 +303,6 @@ class CdpPacket {
 
     private:
         std::vector<uint8_t> buffer;
-
-        /**
-         * @brief Get the data section of the packet.
-         *
-         * @returns a vector of bytes representing the data section
-         */
-        std::vector<uint8_t> getDataSection() { return std::vector<uint8_t>(buffer.begin() + DATA_POS, buffer.end()); }
 };
 
 #endif

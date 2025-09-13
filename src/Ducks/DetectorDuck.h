@@ -11,18 +11,6 @@ public:
   DetectorDuck(std::string name = "DETECTOR") : Duck<DuckWifiNone, RadioType>(std::move(name)) {}
   ~DetectorDuck() {}
 
-  int setupWithDefaults() {
-    // Initialize the serial component with the hardware supported baudrate
-    this->setupSerial(115200);
-    
-    int err = this->setupLoRaRadio();
-    if (err != DUCK_ERR_NONE) {
-    logerr_ln("ERROR setupWithDefaults rc = %d",err);
-    return err;
-    }
-    return DUCK_ERR_NONE;
-  }
-
   /// callback definition for receiving RSSI value
   using rssiCallback = void (*)(const int);
   
@@ -53,7 +41,7 @@ private:
     return;
     }
     CdpPacket rxPacket(rxData.value());
-    logdbg_ln("Got data from radio, prepare for relay. size: %d",rxPacket.rawBuffer().size());
+    logdbg_ln("Got data from radio, prepare for relay. size: %d",rxPacket.size());
   
     if (rxPacket.topic == reservedTopic::pong) {
       logdbg("run() - got ping response!");

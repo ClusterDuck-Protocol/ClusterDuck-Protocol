@@ -38,7 +38,7 @@
 #define CMD_STATE_CHANNEL "/channel/"
 
 // --- Global Objects ---
-PapaDuck duck;
+PapaDuck duck("PAPADUCK");
 int QUEUE_SIZE_MAX = 5;
 auto timer = timer_create_default();
 bool retry = true; 
@@ -133,7 +133,7 @@ std::string toTopicString(byte topic) {
  * @param size Number of bytes to convert
  * @return std::string A string containing the hexadecimal representation of the byte array
  */
-std::string convertToHex(byte* data, int size) {
+std::string convertToHex(byte* data, int size) { //is this in duckutils?
   std::string buf = "";
   buf.reserve(size * 2);
   const char* cs = "0123456789ABCDEF";
@@ -180,7 +180,7 @@ int quackJson(CdpPacket packet) {
   doc["hops"].set(packet.hopCount);
   doc["duckType"].set(packet.duckType);
 
-  std::string cdpTopic = toTopicString(packet.topic);
+  std::string cdpTopic = packet.toTopicString();
 
   std::string topic = "owl/device/" + std::string(THINGNAME) + "/evt/" + cdpTopic;
 
@@ -241,13 +241,8 @@ void handleDuckData(std::vector<byte> packetBuffer) {
  * the ClusterDuck mesh and MQTT forwarding system.
  */
 void setup() {
-  
-  std::string deviceId("PAPADUCK");            // MUST be 8 bytes and unique from other ducks
-  std::array<byte,8> devId;
-  std::copy(deviceId.begin(), deviceId.end(), devId.begin());
-
-  duck.setupWithDefaults(devId, SSID, PASSWORD);
-
+  duck.setupWithDefaults();
+  duck.joinWifiNetwork(SSID, PASSWORD);
   
   duck.onReceiveDuckData(handleDuckData);     // Callback handling incoming data from the network
 

@@ -12,37 +12,6 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
     ~DuckLink() override {}
     
     /**
-     * @brief Override the default setup method to match DuckLink specific
-     * defaults.
-     *
-     * In addition to Serial component, the Radio component is also initialized.
-     * When ssid and password are provided the duck will setup the wifi related
-     * components.
-     *
-     * @param ssid wifi access point ssid (defaults to an empty string if not
-     * provided)
-     * @param password wifi password (defaults to an empty string if not provided)
-     * 
-     * @returns DUCK_ERR_NONE if setup is successfull, an error code otherwise.
-     */
-    int setupWithDefaults() {
-      // Initialize the serial component with the hardware supported baudrate
-      this->setupSerial(115200);
-
-      int err = this->setupLoRaRadio();
-      if (err != DUCK_ERR_NONE) {
-        logerr_ln("ERROR setupWithDefaults rc = %d",err);
-        return err;
-      }
-      if (err != DUCK_ERR_NONE) {
-        logerr_ln("ERROR setupWithDefaults rc = %d",err);
-        return err;
-      }
-      return DUCK_ERR_NONE;
-    };
-
-
-    /**
      * @brief Get the DuckType
      *
      * @returns the duck type defined as DuckType
@@ -63,7 +32,7 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
           return;
         }
         CdpPacket rxPacket(rxData.value());
-        logdbg_ln("Got data from radio, prepare for relay. size: %d",rxPacket.rawBuffer().size());
+        logdbg_ln("Got data from radio, prepare for relay. size: %d",rxPacket.size());
     
         //Check if Duck is desitination for this packet
         if (duckutils::isEqual(BROADCAST_DUID, rxPacket.dduid)) {
@@ -80,7 +49,7 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
                   // this->txPacket->prepareForSending(&this->filter, duckutils::stringToArray<uint8_t,8>(this->deviceId),
                   //                             DuckType::LINK, reservedTopic::rrep,
                   //                             duckutils::stringToByteVector(CdpPacket::prepareRREP(this->deviceId, packet)));
-                  // err = this->duckRadio.sendData(this->txPacket->rawBuffer());
+                  // err = this->duckRadio.sendData(this->txPacket->asBytes());
                   // if (err != DUCK_ERR_NONE) {
                   //     logerr_ln("====> ERROR handleReceivedPacket failed to send. rc = %d", err);
                   // } else {
@@ -106,7 +75,7 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
               // send RREP unconditionally
 
               // this->txPacket->prepareForSending(&this->filter, this-> deviceId ,DuckType::LINK, reservedTopic::rrep, duckutils::stringToByteVector(CdpPacket::prepareRREP(this->duid, packet)));
-              // err = this->duckRadio.sendData(this->txPacket->rawBuffer());
+              // err = this->duckRadio.sendData(this->txPacket->asBytes());
               // if (err != DUCK_ERR_NONE) {
               //     logerr_ln("====> ERROR handleReceivedPacket failed to send. rc = %d", err);
               // } else {
@@ -141,7 +110,7 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
             //     // this->txPacket->prepareForSending(&this->filter, duckutils::stringToArray<uint8_t,8>(destinationDUID),
             //     //                             DuckType::LINK, reservedTopic::rrep,
             //     //                             duckutils::stringToByteVector(strRREP));
-            //     // err = this->duckRadio.sendData(this->txPacket->rawBuffer());
+            //     // err = this->duckRadio.sendData(this->txPacket->asBytes());
             //     // if (err != DUCK_ERR_NONE) {
             //     //     logerr_ln("====> ERROR handleReceivedPacket failed to send. rc = %d", err);
             //     // } else {

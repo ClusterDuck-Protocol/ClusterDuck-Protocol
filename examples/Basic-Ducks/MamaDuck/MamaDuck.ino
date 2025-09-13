@@ -19,14 +19,13 @@
  #endif
  
  // --- Function Declarations ---
- bool sendData(std::string message, byte topic=topics::status);
  bool runSensor(void *);
  
  // --- Global Variables ---
- MamaDuck<DuckWifi> duck("MAMA0001"); // Device ID, MUST be 8 bytes and unique from other ducks;
- std::unique_ptr<CaptivePortal> portal;
+ MamaDuck duck("ORANGEMA"); // Device ID, MUST be 8 bytes and unique from other ducks;
+//  std::unique_ptr<CaptivePortal> portal;
  auto timer = timer_create_default();  // Creating a timer with default settings
- const int INTERVAL_MS = 10000;        // Interval in milliseconds between runSensor call
+ const int INTERVAL_MS = 7000;        // Interval in milliseconds between runSensor call
  int counter = 1;                      // Counter for the sensor data  
  bool setupOK = false;                 // Flag to check if setup is complete
  
@@ -48,8 +47,8 @@
    
    setupOK = true;
    Serial.println("[MAMA] Setup OK!");
-   portal = std::make_unique<CaptivePortal>(duck, CDPCFG_WEB_PORT);
-   portal->launch();
+  //  portal = std::make_unique<CaptivePortal>(duck, CDPCFG_WEB_PORT);
+  //  portal->launch();
  }
  
  /**
@@ -76,40 +75,19 @@
   * @return true if data was successfully sent, false otherwise
   */
  bool runSensor(void *) {
-   bool result;
+   bool failure;
    
-   std::string message = "C:" + std::to_string(counter) + "|" + "FM:" + std::to_string(freeMemory());
-   Serial.print("[MAMA] sensor data: ");
-   Serial.println(message.c_str());
+  //  std::string message = "C:" + std::to_string(counter) + "|" + "FM:" + std::to_string(freeMemory());
+  //  Serial.print("[MAMA] sensor data: ");
+  //  Serial.println(message.c_str());
  
-   result = sendData(message, topics::health);
-   if (result) {
-     counter++;
-     Serial.println("[MAMA] runSensor ok.");
-   } else {
-     Serial.println("[MAMA] runSensor failed.");
-   }
-   return result;
+  //  failure = duck.sendData(topics::health, message);
+  //  if (!failure) {
+  //    counter++;
+  //    Serial.println("[MAMA] runSensor ok.");
+  //  } else {
+  //    Serial.println("[MAMA] runSensor failed.");
+  //  }
+   return true;
  }
  
- /**
-  * @brief Sends the provided message as CDP packet to the mesh network.
-  *
-  * Encapsulates the message within a CDP topic and handles errors in transmission. 
-  *
-  * @param message The payload data to send as a std::string
-  * @param topic CDP topic. CDP topics can be found in CdpPacket.h (default: status)
-  * @return true if data sent successfully, false otherwise
-  */
- bool sendData(std::string message, byte topic) {
-   bool sentOk = false;
-   
-   int err = duck.sendData(topic, message);
-   if (err == DUCK_ERR_NONE) {
-     sentOk = true;
-   }
-   if (!sentOk) {
-     Serial.println(("[Link] Failed to send data. error = " + std::to_string(err)).c_str());
-   }
-   return sentOk;
- }
