@@ -76,7 +76,8 @@ private :
             case reservedTopic::rreq: {
                 loginfo_ln("RREQ received from %s. Updating RREQ!",
                            rxPacket.sduid.data());
-                this->sendRouteResponse(rxPacket.sduid, this->getDuckId());
+
+                //decide where to move CdpPacket::UpdateRREQ and CdpPacket::RREQ
                 // ArduinoJson::JsonDocument rreqDoc;
                 // deserializeJson(rreqDoc, rxPacket.data);
                 // // CdpPacket::UpdateRREQ(rreqDoc, this->deviceId);
@@ -84,14 +85,9 @@ private :
                 // //Serialize the updated RREQ packet
                 // std::string strRREQ;
                 // serializeJson(rreqDoc, strRREQ);
-                // // this->rxPacket->asBytes() = duckutils::stringToByteVector(strRREQ);
-                // err = this->relayPacket(rxPacket);
-                // if (err != DUCK_ERR_NONE) {
-                //     logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d", err);
-                // } else {
-                //     loginfo_ln("handleReceivedPacket: RREQ packet RELAY DONE");
-                // }
-                // return;
+                // // rxPacket.asBytes() = duckutils::stringToByteVector(strRREQ);
+                this->sendRouteResponse(rxPacket.sduid, this->getDuckId());
+                //update routing table with sduid
             }
             case reservedTopic::ping:
                 loginfo_ln("PING received. Sending PONG!");
@@ -133,23 +129,21 @@ private :
                 ArduinoJson::JsonDocument rreqDoc;
                 deserializeJson(rreqDoc, rxPacket.data);
                 loginfo_ln("handleReceivedPacket: Sending RREP");
+                //add current duck to path
+                //update the rreq to make it into a rrep
                 //Serialize the updated RREQ packet
                 std::string strRREP;
                 serializeJson(rreqDoc, strRREP);
                 // rxPacket.asBytes() = duckutils::stringToByteVector(strRREP);
-                err = this->relayPacket(rxPacket);
-                if (err != DUCK_ERR_NONE) {
-                    logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d", err);
-                } else {
-                    loginfo_ln("handleReceivedPacket: RREQ packet RELAY DONE");
-                }
-                this->sendRouteRequest(PAPADUCK_DUID, dataPayload); //was this meant to be prepareforsending an rxPacket instead txPacket?
+                this->sendRouteResponse(PAPADUCK_DUID, dataPayload); //was this meant to be prepareforsending an rxPacket instead txPacket?
                 return;
             }
             break;
             case reservedTopic::rrep: {
                 loginfo_ln("Received Route Response from DUID: %s", duckutils::convertToHex(rxPacket.sduid.data(), rxPacket.sduid.size()).c_str());
-
+                //pop current duck off of path and send to the next duck to get to origin
+                
+                //if duck is not in a network already
                 this->setNetworkState(NetworkState::PUBLIC);
             }
                 break;
