@@ -11,7 +11,7 @@
 #define DUCKUTILS_H_
 
 #include "../include/cdpcfg.h"
-#include "arduino-timer.h"
+#include <arduino-timer.h>
 #include <Arduino.h>
 #include <EEPROM.h>
 #include <string>
@@ -92,7 +92,7 @@ std::string toString(const std::vector<T>& vec) {
  * @returns A std::string representing the byte array in ASCII.
  *
  */
-template<typename Container,size_t S>
+template<typename Container>
 std::string toString(const Container& arr) {
     std::string result;
     for (const auto& element : arr) {
