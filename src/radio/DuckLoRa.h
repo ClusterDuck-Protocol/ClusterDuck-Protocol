@@ -133,9 +133,35 @@ class DuckLoRa {
 
         int goToReceiveMode(bool clear);
         int checkLoRaParameters(LoRaConfigParams config);
-
+        /**
+         * @brief Calculate a signal score based on the current RSSI and SNR values.
+         * The signal score is a value between 0 and 1, where 1 is the best possible
+         * signal and 0 is the worst possible signal.
+         *
+         * The formula used to calculate the signal score is:
+         *
+         * signalScore = (normalizedRSSI + normalizedSNR) / 2
+         *
+         * where:
+         *
+         * normalizedRSSI = (RSSI - RSSI_MIN) / (RSSI_MAX - RSSI_MIN)
+         * normalizedSNR = (SNR - SNR_MIN) / (SNR_MAX - SNR_MIN)
+         *
+         * RSSI_MIN = -131 dBm
+         * RSSI_MAX = -20 dBm
+         * SNR_MIN = -11.5 dB
+         * SNR_MAX = 11.5 dB
+         *
+         * @returns void
+         */
         void getSignalScore();
-        void delay();
+        /**
+         * @brief Introduce a random delay based on the size of the data to be sent.
+         * This is to help reduce collisions on the network.
+         *
+         * @param size size of the data to be sent
+         */
+        void delay(size_t size);
         std::mt19937 gen;
         static struct SignalInfo {
             float rssi;

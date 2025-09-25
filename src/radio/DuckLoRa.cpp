@@ -226,19 +226,20 @@ int DuckLoRa::sendData(uint8_t* data, int length)
     return startTransmitData(data, length);
 }
 
-void DuckLoRa::delay() {
+void DuckLoRa::delay(size_t size) {
     //Delay the transmission if we have received within the last 5 seconds
     if((millis() - this->lastReceiveTime) < 5000L) {
         std::uniform_int_distribution<> distrib(0, 3000L);
         std::chrono::milliseconds txdelay(distrib(gen));
+        //add the time on air to the delay
+        txdelay += std::chrono::milliseconds(lora.getTimeOnAir(size));
+        loginfo_ln("Last receive was %ld ms ago, delaying transmission by %ld ms", millis() - this->lastReceiveTime, txdelay.count());
         //Random delay between 0 and 3 seconds
-        std::chrono::duration<long, std::milli> txdelay_ms(txdelay.count());
-
         unsigned long current_time = millis();
         unsigned long previousMillis = 0;
-        while(previousMillis - current_time <= txdelay_ms.count()) {
+        while(previousMillis - current_time <= txdelay.count()) {
             previousMillis = millis();
-            loginfo_ln("Delaying transmission for %ld ms", txdelay_ms.count());
+            loginfo_ln("Delaying transmission for %ld ms", txdelay.count());
         }
     }
 }
@@ -249,7 +250,7 @@ int DuckLoRa::sendData(std::vector<uint8_t> data)
         logerr_ln("ERROR  LoRa radio not setup");
         return DUCKLORA_ERR_NOT_INITIALIZED;
     }
-    delay();
+    delay(data.size());
     return startTransmitData(data.data(), data.size());
 }
 
@@ -261,7 +262,7 @@ void DuckLoRa::getSignalScore()
         logerr_ln("ERROR  LoRa radio not setup");
         return;
     }
-    //Normalize the values to 0-10 range
+
     signalInfo.rssi = (getRSSI() - RSSI_MIN)/(RSSI_MAX-RSSI_MIN);
     signalInfo.snr = (getSNR() - SNR_MIN)/(SNR_MAX-SNR_MIN);
     signalInfo.signalScore = (signalInfo.rssi + signalInfo.snr) / 2.0f;
