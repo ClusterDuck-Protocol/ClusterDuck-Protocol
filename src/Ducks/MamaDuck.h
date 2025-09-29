@@ -74,19 +74,10 @@ private :
     void ifBroadcast(CdpPacket rxPacket, int err) {
         switch(rxPacket.topic) {
             case reservedTopic::rreq: {
-                loginfo_ln("RREQ received from %s. Updating RREQ!",
-                           rxPacket.sduid.data());
-
-                //decide where to move CdpPacket::UpdateRREQ and CdpPacket::RREQ
-                // ArduinoJson::JsonDocument rreqDoc;
-                // deserializeJson(rreqDoc, rxPacket.data);
-                // // CdpPacket::UpdateRREQ(rreqDoc, this->deviceId);
-                // loginfo_ln("handleReceivedPacket: RREQ updated with current DUID: %s", this->duid);
-                // //Serialize the updated RREQ packet
-                // std::string strRREQ;
-                // serializeJson(rreqDoc, strRREQ);
-                // // rxPacket.asBytes() = duckutils::stringToByteVector(strRREQ);
-                this->sendRouteResponse(rxPacket.sduid, this->getDuckId());
+                loginfo_ln("RREQ received from %s. Updating RREQ!", rxPacket.sduid.data());
+                RouteJson(rxPacket.asBytes()) rreqDoc;
+                std::string rreq = rreqDoc.addToPath(this->deviceId);
+                this->sendRouteResponse(rxPacket.sduid, rreq);
                 //update routing table with sduid
             }
             case reservedTopic::ping:

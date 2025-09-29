@@ -13,6 +13,7 @@
 #include "../DuckEsp.h"
 #include "../wifi/DuckWifiNone.h"
 #include "../routing/DuckRouter.h"
+#include "../routing/RouteJSON.h"
 
 enum class NetworkState {SEARCHING, PUBLIC};
 
