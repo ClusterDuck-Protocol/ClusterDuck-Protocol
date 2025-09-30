@@ -121,6 +121,8 @@ INPUT                  = ../src/Ducks \
                          ../src/Ducks \
                          ../src/include \
                          ../src/include/boards \
+                         ../src/routing \
+                         ../src/CaptivePortal \
                          ../src/radio \
                          ../src/utils \
                          ../src/wifi \
