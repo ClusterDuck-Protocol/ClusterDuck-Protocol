@@ -75,7 +75,7 @@ private :
         switch(rxPacket.topic) {
             case reservedTopic::rreq: {
                 loginfo_ln("RREQ received from %s. Updating RREQ!", rxPacket.sduid.data());
-                RouteJson(rxPacket.asBytes()) rreqDoc;
+                RouteJSON rreqDoc = RouteJSON(rxPacket.asBytes());
                 std::string rreq = rreqDoc.addToPath(this->deviceId);
                 this->sendRouteResponse(rxPacket.sduid, rreq);
                 //update routing table with sduid
@@ -117,15 +117,12 @@ private :
         switch(rxPacket.topic) {
             case reservedTopic::rreq: {
                 loginfo_ln("RREQ received. Updating RREQ!");
-                ArduinoJson::JsonDocument rreqDoc;
-                deserializeJson(rreqDoc, rxPacket.data);
+                RouteJSON rreqDoc = RouteJSON(rxPacket.asBytes());
                 loginfo_ln("handleReceivedPacket: Sending RREP");
                 //add current duck to path
                 //update the rreq to make it into a rrep
                 //Serialize the updated RREQ packet
-                std::string strRREP;
-                serializeJson(rreqDoc, strRREP);
-                // rxPacket.asBytes() = duckutils::stringToByteVector(strRREP);
+                std::string strRREP = rreqDoc.addToPath(this->deviceId);
                 this->sendRouteResponse(PAPADUCK_DUID, dataPayload); //was this meant to be prepareforsending an rxPacket instead txPacket?
                 return;
             }
