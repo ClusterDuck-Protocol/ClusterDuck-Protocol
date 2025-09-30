@@ -121,6 +121,9 @@ INPUT                  = ../src/Ducks \
                          ../src/Ducks \
                          ../src/include \
                          ../src/include/boards \
+                         ../src/radio \
+                         ../src/utils \
+                         ../src/wifi \
                         main.md                         
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.c \
@@ -170,7 +173,7 @@ FILE_PATTERNS          = *.c \
                          *.ucf \
                          *.qsf \
                          *.ice
-RECURSIVE              = NO
+RECURSIVE              = YES
 EXCLUDE                =
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       =
@@ -368,7 +371,7 @@ DOT_FONTPATH           =
 CLASS_GRAPH            = YES
 COLLABORATION_GRAPH    = YES
 GROUP_GRAPHS           = YES
-UML_LOOK               = NO
+UML_LOOK               = YES
 UML_LIMIT_NUM_FIELDS   = 10
 TEMPLATE_RELATIONS     = YES
 INCLUDE_GRAPH          = YES
