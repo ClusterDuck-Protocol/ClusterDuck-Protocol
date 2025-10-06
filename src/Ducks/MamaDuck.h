@@ -13,7 +13,7 @@ public:
 
     ~MamaDuck() {};
 
-    using rxDoneCallback = void (*)(std::vector<byte> data );
+    using rxDoneCallback = void (*)(CdpPacket data);
     /**
      * @brief Register callback for handling data received from duck devices
      * 
