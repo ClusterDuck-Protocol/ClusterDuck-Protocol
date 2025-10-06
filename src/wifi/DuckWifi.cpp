@@ -8,17 +8,15 @@ int DuckWifi::joinNetwork(std::string ssid, std::string password) {
   const uint32_t WIFI_CONNECTION_TIMEOUT_MS = 1500;
 
   int rc = DUCK_ERR_NONE;
-  ssid = ssid;
-  password = password;
   
   //  Connect to Access Point
   loginfo_ln("setupInternet: connecting to WiFi access point SSID: %s",ssid.c_str());
   WiFi.begin(ssid.c_str(), password.c_str());
-  // We need to wait here for the connection to estanlish. Otherwise the WiFi.status() may return a false negative
+  // We need to wait here for the connection to establish. Otherwise the WiFi.status() may return a false negative
   loginfo_ln("setupInternet: Waiting for connect results for ", ssid.c_str());
   WiFi.waitForConnectResult(WIFI_CONNECTION_TIMEOUT_MS);
 
-  if (WiFi.status() == WL_CONNECTED) {
+  if (connected()) {
     loginfo_ln("Duck connected to internet!");
     rc = DUCK_ERR_NONE;
   } else {
@@ -30,24 +28,62 @@ int DuckWifi::joinNetwork(std::string ssid, std::string password) {
 }
 
 bool DuckWifi::connected() {
-    return true;
+    return (WiFi.status() == WL_CONNECTED);
 }
 
-void DuckWifi::setSsid(std::string val) {
-    logwarn_ln("wifi is disabled");
-}
-
-void DuckWifi::setPassword(std::string val) {
-    logwarn_ln("wifi is disabled");
-}
-
-int DuckWifi::saveWifiCredentials(std::string ssid, std::string password) {
-    if (ssid != "" && password != "") {
-        // duckutils::saveWifiCredentials(ssid, password);
+int saveWifiCredentials(std::string ssid, std::string password) {
+    int err = DUCK_ERR_NONE;
+  
+    if (ssid.empty() || password.empty()) {
+      logerr("Invalid SSID or password\n");
+      return DUCK_ERR_INVALID_ARGUMENT;
     }
-    return DUCK_ERR_NONE;
+    if (!EEPROM.begin(512)) {
+      logerr("Failed to initialise EEPROM\n");
+      return DUCK_ERR_EEPROM_INIT;
+    }
+  
+    if (ssid.length() > 0 && password.length() > 0) {
+      loginfo("Clearing EEPROM\n");
+      for (int i = 0; i < 96; i++) {
+        EEPROM.write(i, 0);
+      }
+  
+      loginfo("updating EEPROM...\n");
+      for (int i = 0; i < ssid.length(); i++)
+      {
+        EEPROM.write(i, ssid[i]);
+      }
+      for (int i = 0; i < password.length(); ++i)
+      {
+        EEPROM.write(32 + i, password[i]);
+      }
+      if (!EEPROM.commit()) {
+        logerr("Failed to commit EEPROM\n");
+        err = DUCK_ERR_EEPROM_WRITE;
+      }
+    }
+    return err;
+  }
+  
+std::string loadWifiSsid() {
+    EEPROM.begin(512); //Initialasing EEPROM
+    std::string esid;
+    // loop through saved SSID characters
+    for (int i = 0; i < 32; ++i)
+    {
+      esid += char(EEPROM.read(i));
+    }
+    return esid;
 }
-
-int DuckWifi::loadWiFiCredentials() {
-    return DUCK_ERR_NONE;
+  
+std::string loadWifiPassword() {
+    EEPROM.begin(512); //Initialasing EEPROM
+    std::string epass = "";
+    // loop through saved Password characters
+    for (int i = 32; i < 96; ++i)
+    {
+      epass += char(EEPROM.read(i));
+    }
+    return epass;
 }
