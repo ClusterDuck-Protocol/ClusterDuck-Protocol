@@ -8,8 +8,8 @@ std::list<DuckRecord> DuckRouter::getRoutingTable() {
     return sortedList;
 };
 
-void DuckRouter::insertIntoRoutingTable(std::string deviceID, long routingScore, long lastSeen, float snr, float rssi) {
-    DuckRecord record(std::move(deviceID), routingScore, lastSeen, snr, rssi);
+void DuckRouter::insertIntoRoutingTable(std::string deviceID, float routingScore, long lastSeen, float snr, float rssi) {
+    DuckRecord record(std::move(deviceID), routingScore, snr, rssi, lastSeen);
     routingTable.insert(std::make_pair(routingScore, record));
 };
 

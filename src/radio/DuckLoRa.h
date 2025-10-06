@@ -159,7 +159,7 @@ class DuckLoRa {
          * @brief Introduce a random delay based on the size of the data to be sent.
          * This is to help reduce collisions on the network.
          *
-         * @param size size of the data to be sent
+         * @param size size of the data to be sent. Will be used to get time on air.
          */
         void delay(size_t size);
         std::mt19937 gen;

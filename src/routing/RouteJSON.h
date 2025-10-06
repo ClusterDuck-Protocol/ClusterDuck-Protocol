@@ -65,6 +65,9 @@ class RouteJSON {
             return json.as<std::string>();
             //add rssi snr
         }
+        std::string getDestination(){
+            return json["destination"].as<std::string>();
+        }
 
         /**
          * @brief pop the last duck node from the route response path

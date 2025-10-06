@@ -13,7 +13,7 @@
 class DuckRecord {
     public:
       //DuckRecord() : routingScore(0), lastSeen(0), snr(0), rssi(0) {}
-      DuckRecord(std::string devId, long routingScore, long lastSeen, float snr, float rssi) :
+      DuckRecord(std::string devId, float routingScore,float snr, float rssi,  long lastSeen) :
         DeviceId(std::move(devId)), routingScore(routingScore), lastSeen(lastSeen), snr(snr), rssi(rssi) {}
   
       std::string getDeviceId() { return DeviceId; }
@@ -23,8 +23,8 @@ class DuckRecord {
       long getRssi() { return rssi; }
   private:
       std::string DeviceId;
-      long routingScore, lastSeen;
-      float snr, rssi;
+      long lastSeen;
+      float snr, rssi, routingScore;
   };
 
   #endif

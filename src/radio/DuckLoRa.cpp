@@ -152,7 +152,7 @@ int DuckLoRa::goToReceiveMode(bool clearReceiveFlag) {
 }
 
 std::optional<std::vector<uint8_t>> DuckLoRa::readReceivedData() { //return a std optional
-    std::vector<uint8_t>* packetBytes = new std::vector<uint8_t>;
+    std::vector<uint8_t> packetBytes;
     int packet_length = 0;
     int err = DUCK_ERR_NONE;
     int rxState = DUCK_ERR_NONE;
@@ -172,8 +172,8 @@ std::optional<std::vector<uint8_t>> DuckLoRa::readReceivedData() { //return a st
 
     loginfo_ln("readReceivedData() - packet length returns: %d", packet_length);
 
-    packetBytes->resize(packet_length);
-    err = lora.readData(packetBytes->data(), packet_length);
+    packetBytes.resize(packet_length);
+    err = lora.readData(packetBytes.data(), packet_length);
     loginfo_ln("readReceivedData() - lora.readData returns: err = %d", err);
 
     rxState = goToReceiveMode(true);
@@ -182,11 +182,11 @@ std::optional<std::vector<uint8_t>> DuckLoRa::readReceivedData() { //return a st
         logerr_ln("ERROR  readReceivedData failed. err = %d", DUCKLORA_ERR_HANDLE_PACKET);
     }
 
-    loginfo_ln("Rx packet: %s", duckutils::convertToHex(packetBytes->data(), packetBytes->size()).c_str());
+    loginfo_ln("Rx packet: %s", duckutils::convertToHex(packetBytes.data(), packetBytes.size()).c_str());
 
     loginfo_ln("readReceivedData: checking path offset integrity");
 
-    byte* data = packetBytes->data();
+    byte* data = packetBytes.data();
 
     loginfo_ln("readReceivedData: checking data section CRC");
 

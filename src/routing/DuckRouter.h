@@ -40,7 +40,7 @@ class DuckRouter {
          * @param snr the signal to noise ratio
          * @param rssi the received signal strength indicator
          */
-        void insertIntoRoutingTable(std::string deviceID, long routingScore, long lastSeen, float snr, float rssi);
+        void insertIntoRoutingTable(std::string deviceID, float routingScore, long lastSeen, float snr, float rssi);
         
         // //put this on Router
         // void updateRoutingTable(){
@@ -48,7 +48,7 @@ class DuckRouter {
         // }
   
     private:
-        std::multimap<long,DuckRecord,std::greater<long>> routingTable;
+        std::multimap<float,DuckRecord,std::greater<>> routingTable;
         BloomFilter filter;
         
 };

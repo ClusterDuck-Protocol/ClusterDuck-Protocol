@@ -32,7 +32,11 @@ public:
 private :
     WifiCapability duckWifi;
     rxDoneCallback recvDataCallback;
-
+    /**
+     * @brief Handles any packets received by the duck. Overrides the pure virtual function in Duck base class.
+     * Could be a RREQ, RREP, PING, PONG or DATA packet on its associated topic.
+     *
+     */
     void handleReceivedPacket() override{
     if (this->duckRadio.getReceiveFlag()){
         bool relay = false;
@@ -45,6 +49,13 @@ private :
         logerr_ln("ERROR failed to get data from DuckRadio.");
         return;
         }
+        // Update routing table with signal info from last received packet
+        this->duckRadio.getSignalScore();
+        this->router.insertIntoRoutingTable(duckutils::toString(this->duid),
+                                            this->duckRadio.signalInfo.signalScore,
+                                            this->duckRadio.signalInfo.snr,
+                                            this->duckRadio.signalInfo.rssi,
+                                            millis());
         CdpPacket rxPacket(rxData.value());
         logdbg_ln("Got data from radio, prepare for relay. size: %d",rxPacket.size());
 
@@ -129,10 +140,14 @@ private :
             break;
             case reservedTopic::rrep: {
                 loginfo_ln("Received Route Response from DUID: %s", duckutils::convertToHex(rxPacket.sduid.data(), rxPacket.sduid.size()).c_str());
-                //pop current duck off of path and send to the next duck to get to origin
-                
+                //extract path from rrep and update routing table
+                RouteJSON rrepDoc = RouteJSON(rxPacket.asBytes());
                 //if duck is not in a network already
                 this->setNetworkState(NetworkState::PUBLIC);
+                //send rrep to next hop in path
+                std::string rrep = rrepDoc.addToPath(this->duid);;
+                this->sendRouteResponse(rrepDoc.getDestination(),rrep);
+                return;
             }
                 break;
             default:

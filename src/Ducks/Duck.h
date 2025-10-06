@@ -264,12 +264,12 @@ class Duck {
       return err;
     }
 
-        /**
+    /**
      * @brief sendData that allows sending for reserved topic rreq
      * @returns DUCK_ERR_NONE if the data was sent successfully, an error code otherwise.
      */
-    int sendRouteResponse(Duid targetDevice, std::vector<uint8_t> origin){
-      int err = sendReservedTopicData(targetDevice, reservedTopic::rrep, origin);
+    int sendRouteResponse(Duid targetDevice, std::vector<uint8_t> data){
+      int err = sendReservedTopicData(targetDevice, reservedTopic::rrep, data);
       if (err != DUCK_ERR_NONE){
         logerr_ln("ERR: failed to send rrep");
       }
