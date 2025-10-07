@@ -23,16 +23,14 @@ class RouteJSON {
          * @param sourceDevice the source device DUID
          */
         RouteJSON(Duid targetDevice, Duid sourceDevice) {
-            //do we want to convert to hex?
-            json["origin"] = duckutils::convertToHex(sourceDevice.data(), sourceDevice.size());
-            json["destination"] = duckutils::convertToHex(targetDevice.data(), targetDevice.size());
+            json["origin"] = duckutils::toString(sourceDevice);
+            json["destination"] = duckutils::toString(targetDevice);
             json["path"].as<ArduinoJson::JsonArray>();
 #ifdef CDP_LOG_DEBUG
             std::string log;
             serializeJson(json, log);
             logdbg_ln("RREQ: %s", log.c_str());
 #endif
-            // path = json.createNestedArray("path");
         }
 
         //Create JSON from rxPacket
@@ -65,6 +63,11 @@ class RouteJSON {
             return json.as<std::string>();
             //add rssi snr
         }
+        /**
+         * @brief get the destination device DUID from the route response
+         *
+         * @return the destination device DUID as a string
+         */
         std::string getDestination(){
             return json["destination"].as<std::string>();
         }
@@ -79,7 +82,7 @@ class RouteJSON {
             // ArduinoJson::JsonArray path = rreq["path"].to<ArduinoJson::JsonArray>();
             //delete object for current duid
             for (ArduinoJson::JsonVariant v : path) {
-                if (v.as<std::string>() == duckutils::convertToHex(deviceId.data(), deviceId.size())) {
+                if (v.as<std::string>() == duckutils::toString(deviceId)) {
 #ifdef CDP_LOG_DEBUG
                     logdbg_ln("Removing element from path: %s", v.as<std::string>().c_str());
 #endif
