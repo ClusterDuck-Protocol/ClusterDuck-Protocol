@@ -14,6 +14,7 @@
 #include <list>
 #include "bloomfilter.h"
 #include "DuckRecord.h"
+enum class NetworkState {SEARCHING, PUBLIC, DISCONNECTED};
 
 class DuckRouter {
     public:
@@ -46,10 +47,45 @@ class DuckRouter {
         // void updateRoutingTable(){
         //   Serial.println("routing table creation")
         // }
+
+         /**
+         * @brief NetworkState if the Duck joins or disconnects from a CDP network
+         * @param newState The new NetworkState to join
+         */ 
+        void setNetworkState(NetworkState newState){
+            if (networkState != newState) {
+                NetworkState oldState = networkState;
+                networkTransition(oldState, newState);
+            }
+        }
   
     private:
         std::multimap<float,DuckRecord,std::greater<>> routingTable;
         BloomFilter filter;
+        NetworkState networkState = NetworkState::SEARCHING;
+
+        /**
+         * @brief NetworkState transition for NetworkState FSM
+         * @param oldState NetworkState to transition out of
+         * @param newState NetworkState to transition in to
+         */
+        void networkTransition(NetworkState oldState, NetworkState newState){
+            if (oldState == NetworkState::SEARCHING && newState == NetworkState::PUBLIC) {
+                loginfo_ln("[ROUTER] Public network joined.");
+                networkState = newState;
+            } else if (oldState == NetworkState::PUBLIC && newState == NetworkState::DISCONNECTED){
+                networkState = newState;
+                loginfo_ln("[ROUTER] Successfully disconnected from CDP network.");
+            } else if(oldState == NetworkState::PUBLIC && newState == NetworkState::SEARCHING){
+                networkState = newState;
+                loginfo_ln("[ROUTER] Lost connection to CDP Network.");
+            } else if(oldState == NetworkState::DISCONNECTED && newState == NetworkState::SEARCHING){
+                networkState = newState;
+                logdbg_ln("[ROUTER] Leaving disconnected state, looking for CDP networks.");
+            } else {
+                logdbg_ln("[ROUTER] Invalid network state transition!");
+            }
+        }
         
 };
   #endif

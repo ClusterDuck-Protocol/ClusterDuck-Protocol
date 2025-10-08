@@ -15,8 +15,6 @@
 #include "../routing/DuckRouter.h"
 #include "../routing/RouteJSON.h"
 
-enum class NetworkState {SEARCHING, PUBLIC};
-
 //templated class to require some radio capability
 template <typename WifiCapability = DuckWifiNone, typename RadioType = DuckLoRa>
 class Duck {
@@ -30,7 +28,7 @@ class Duck {
     void run(){
       Duck::logIfLowMemory();
       duckRadio.serviceInterruptFlags();
-      if(networkState == NetworkState::PUBLIC) {
+      if(router.networkState == NetworkState::PUBLIC) {
         handleReceivedPacket();
       } else {
         attemptNetworkJoin();
@@ -156,7 +154,6 @@ class Duck {
 
     RadioType duckRadio;
     WifiCapability duckWifi;
-    NetworkState networkState = NetworkState::SEARCHING;
     static constexpr int MEMORY_LOW_THRESHOLD = PACKET_LENGTH + sizeof(CdpPacket);
     std::array<uint8_t,8> duid;
     DuckRouter router;
@@ -223,17 +220,7 @@ class Duck {
       return DUCK_ERR_NONE;
     }
 
-    /**
-     * @brief NetworkState if the Duck joins or disconnects from a CDP network
-     * @param newState The new NetworkState to join
-     */ 
-    void setNetworkState(NetworkState newState){
-      if (networkState != newState) {
-          NetworkState oldState = networkState;
-          networkState = newState;
-          networkTransition(oldState, newState);
-      }
-    }
+   
 
     /**
      * @brief Join a visible CDP network if existing
@@ -242,7 +229,7 @@ class Duck {
       std::optional<CdpPacket> cdpNode = checkForNetworks();
       if(cdpNode.has_value()){
         // updateRoutingTable(cdpNode);
-        setNetworkState(NetworkState::PUBLIC);
+        router.setNetworkState(NetworkState::PUBLIC);
       } else {
         if((millis() - this->lastRreqTime) > 30000L){
           sendRouteRequest(BROADCAST_DUID, getDuckId());
@@ -317,17 +304,6 @@ class Duck {
   private:
     Duck(Duck const&) = delete;
     Duck& operator=(Duck const&) = delete;
-
-    /**
-     * @brief NetworkState transition for NetworkState FSM
-     * @param oldState NetworkState to transition out of
-     * @param newState NetworkState to transition in to
-     */
-    void networkTransition(NetworkState oldState, NetworkState newState){
-      if (oldState == NetworkState::SEARCHING && newState == NetworkState::PUBLIC) {
-        logdbg_ln("------------- public network joined ---------------");
-      }
-    }
 
     /**
      * @brief Read packets from CDP nodes responding to our network join request
