@@ -72,6 +72,10 @@ class RouteJSON {
             return json["destination"].as<std::string>();
         }
 
+        std::string getlastInPath(){
+            return path.end()->as<std::string>();
+        }
+
         /**
          * @brief pop the last duck node from the route response path
          *

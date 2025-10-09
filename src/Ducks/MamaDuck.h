@@ -145,8 +145,8 @@ private :
                 //if duck is not in a network already
                 this->setNetworkState(NetworkState::PUBLIC);
                 //send rrep to next hop in path
-                std::string rrep = rrepDoc.addToPath(this->duid);;
-                this->sendRouteResponse(rrepDoc.getDestination(),rrep);
+                std::string rrep = rrepDoc.removeFromPath(this->duid);;
+                this->sendRouteResponse(rrepDoc.getlastInPath(),rrep);
                 return;
             }
                 break;
