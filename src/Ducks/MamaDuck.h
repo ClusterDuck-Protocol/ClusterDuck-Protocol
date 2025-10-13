@@ -49,14 +49,16 @@ private :
         logerr_ln("ERROR failed to get data from DuckRadio.");
         return;
         }
-        // Update routing table with signal info from last received packet
+
         this->duckRadio.getSignalScore();
-        this->router.insertIntoRoutingTable(duckutils::toString(this->duid),
+
+        CdpPacket rxPacket(rxData.value());
+        // Update routing table with signal info from last received packet
+        this->router.insertIntoRoutingTable(duckutils::toString(rxPacket.sduid),
                                             this->duckRadio.signalInfo.signalScore,
                                             this->duckRadio.signalInfo.snr,
                                             this->duckRadio.signalInfo.rssi,
                                             millis());
-        CdpPacket rxPacket(rxData.value());
         logdbg_ln("Got data from radio, prepare for relay. size: %d",rxPacket.size());
 
         // recvDataCallback(rxPacket.asBytes());

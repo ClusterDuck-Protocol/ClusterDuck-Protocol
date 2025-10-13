@@ -264,6 +264,10 @@ class CdpPacket {
          */
         std::string topicToString() {
             switch (this->topic) {
+            case reservedTopic::rreq:
+                return "rreq";
+            case reservedTopic::rrep:
+                return "rrep";
             case topics::status:
                 return "status";
             case topics::cpm:
@@ -292,10 +296,6 @@ class CdpPacket {
                 return "bmp180";
             case reservedTopic::ping:
                 return "ping";
-            case reservedTopic::rreq:
-            return "rreq";
-            case reservedTopic::rrep:
-            return "rrep";
             default:
                 return "unknown";
             }

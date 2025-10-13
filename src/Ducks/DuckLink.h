@@ -32,6 +32,14 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
           return;
         }
         CdpPacket rxPacket(rxData.value());
+        // Update routing table with signal info from last received packet
+        this->duckRadio.getSignalScore();
+        this->router.insertIntoRoutingTable(duckutils::toString(rxPacket.sduid),
+                                            this->duckRadio.signalInfo.signalScore,
+                                            this->duckRadio.signalInfo.snr,
+                                            this->duckRadio.signalInfo.rssi,
+                                            millis());
+
         logdbg_ln("Got data from radio, prepare for relay. size: %d",rxPacket.size());
     
         //Check if Duck is desitination for this packet
