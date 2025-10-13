@@ -73,6 +73,11 @@ private :
             ifBroadcast(rxPacket, err);
         } else if(duckutils::isEqual(this->duid, rxPacket.dduid)) { //Target device check
             ifNotBroadcast(rxPacket, err);
+          /*
+           * There needs to be a case for handling packets not addressed to this duck
+           * but also not broadcast. This method may look very different once finished
+           */
+
         } else {
             err = this->relayPacket(rxPacket);
             if (err != DUCK_ERR_NONE) {
