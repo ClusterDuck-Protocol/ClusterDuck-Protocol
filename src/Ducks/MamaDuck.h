@@ -77,14 +77,8 @@ private :
            * There needs to be a case for handling packets not addressed to this duck
            * but also not broadcast. This method may look very different once finished
            */
-
-        } else {
-            err = this->relayPacket(rxPacket);
-            if (err != DUCK_ERR_NONE) {
-            logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
-            } else {
-            loginfo_ln("handleReceivedPacket: packet RELAY DONE");
-            }
+        } else { //Source device check
+            ifNotBroadcast(rxPacket, err, true);
         }
     }
     }
@@ -128,21 +122,36 @@ private :
         }
     }
 
-    void ifNotBroadcast(CdpPacket rxPacket, int err) {
+    void ifNotBroadcast(CdpPacket rxPacket, int err, bool relay = false) {
         std::vector<uint8_t> dataPayload;
         uint8_t num = 1;
 
         switch(rxPacket.topic) {
             case reservedTopic::rreq: {
-                loginfo_ln("RREQ received. Updating RREQ!");
                 RouteJSON rreqDoc = RouteJSON(rxPacket.asBytes());
-                loginfo_ln("handleReceivedPacket: Sending RREP");
-                //add current duck to path
-                //update the rreq to make it into a rrep
-                //Serialize the updated RREQ packet
-                std::string strRREP = rreqDoc.addToPath(this->deviceId);
-                this->sendRouteResponse(PAPADUCK_DUID, dataPayload); //was this meant to be prepareforsending an rxPacket instead txPacket?
-                return;
+                if(!relay) {
+                    loginfo_ln("RREQ received. Updating RREQ!");
+
+                    loginfo_ln("handleReceivedPacket: Sending RREP");
+                    //add current duck to path
+                    //update the rreq to make it into a rrep
+                    //Serialize the updated RREQ packet
+                    std::string strRREP = rreqDoc.addToPath(this->deviceId);
+                    this->sendRouteResponse(PAPADUCK_DUID,
+                                            dataPayload); //was this meant to be prepareforsending an rxPacket instead txPacket?
+                    return;
+                } else {
+                    loginfo_ln("RREQ received for relay. Relaying!");
+                    std::string packet = rreqDoc.addToPath(this->deviceId);
+                    rxPacket.data = duckutils::stringToByteVector(packet);
+                    err = this->relayPacket(rxPacket);
+                    if (err != DUCK_ERR_NONE) {
+                        logerr_ln("====> ERROR handleReceivedPacket failed to relay RREQ. rc = %d",err);
+                    } else {
+                        loginfo_ln("handleReceivedPacket: RREQ packet RELAY DONE");
+                    }
+
+                }
             }
             break;
             case reservedTopic::rrep: {

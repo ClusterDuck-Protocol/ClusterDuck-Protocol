@@ -203,7 +203,7 @@ class CdpPacket {
         /**
          * @brief Create CdpPacket for new tx data
          */
-        CdpPacket(Duid dduid, byte topic, const std::vector<uint8_t> data, Duid sduid, DuckType duckType){
+        CdpPacket(Duid dduid, uint8_t topic, const std::vector<uint8_t> data, Duid sduid, DuckType duckType){
             // Initialize default values
             this->sduid = sduid;
             this->dduid = dduid;
