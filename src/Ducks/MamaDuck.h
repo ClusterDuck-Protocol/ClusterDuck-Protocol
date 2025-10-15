@@ -55,10 +55,8 @@ private :
         CdpPacket rxPacket(rxData.value());
         // Update routing table with signal info from last received packet
         this->router.insertIntoRoutingTable(duckutils::toString(rxPacket.sduid),
-                                            this->duckRadio.signalInfo.signalScore,
-                                            this->duckRadio.signalInfo.snr,
-                                            this->duckRadio.signalInfo.rssi,
-                                            millis());
+                                            millis(),
+                                            this->duckRadio.signalInfo);
         logdbg_ln("Got data from radio, prepare for relay. size: %d",rxPacket.size());
 
         // recvDataCallback(rxPacket.asBytes());
@@ -88,8 +86,8 @@ private :
             case reservedTopic::rreq: {
                 loginfo_ln("RREQ received from %s. Updating RREQ!", rxPacket.sduid.data());
                 RouteJSON rreqDoc = RouteJSON(rxPacket.asBytes());
-                std::string rreq = rreqDoc.addToPath(this->deviceId);
-                this->sendRouteResponse(rxPacket.sduid, rreq);
+                std::string rreq = rreqDoc.addToPath(this->duid);
+                this->sendRouteResponse(rxPacket.sduid, duckutils::stringToByteVector(rreq));
                 //update routing table with sduid
             }
             case reservedTopic::ping:
@@ -136,13 +134,13 @@ private :
                     //add current duck to path
                     //update the rreq to make it into a rrep
                     //Serialize the updated RREQ packet
-                    std::string strRREP = rreqDoc.addToPath(this->deviceId);
+                    std::string strRREP = rreqDoc.addToPath(this->duid);
                     this->sendRouteResponse(PAPADUCK_DUID,
                                             dataPayload); //was this meant to be prepareforsending an rxPacket instead txPacket?
                     return;
                 } else {
                     loginfo_ln("RREQ received for relay. Relaying!");
-                    std::string packet = rreqDoc.addToPath(this->deviceId);
+                    std::string packet = rreqDoc.addToPath(this->duid);
                     rxPacket.data = duckutils::stringToByteVector(packet);
                     err = this->relayPacket(rxPacket);
                     if (err != DUCK_ERR_NONE) {
@@ -161,8 +159,8 @@ private :
                 //if duck is not in a network already
                 this->setNetworkState(NetworkState::PUBLIC);
                 //send rrep to next hop in path
-                std::string rrep = rrepDoc.removeFromPath(this->duid);;
-                this->sendRouteResponse(rrepDoc.getlastInPath(),rrep);
+                std::string rrep = rrepDoc.removeFromPath(this->duid);
+                this->sendRouteResponse(duckutils::stringToArray<uint8_t,8>(rrepDoc.getlastInPath()),duckutils::stringToByteVector(rrep));
                 return;
             }
                 break;

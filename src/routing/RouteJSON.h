@@ -53,7 +53,7 @@ class RouteJSON {
         std::string addToPath(Duid deviceId){
             
              json["path"].to<ArduinoJson::JsonArray>()
-                     .add(duckutils::convertToHex(deviceId.data(), deviceId.size()));
+                     .add(duckutils::toString(deviceId));
              path = json["path"];
 #ifdef CDP_LOG_DEBUG
             std::string log;
@@ -82,8 +82,7 @@ class RouteJSON {
          * @param deviceId of the duck node to be removed
          * @return the newly modified Arduino JSON document
          */
-        ArduinoJson::JsonDocument removeFromPath(Duid deviceId){
-            // ArduinoJson::JsonArray path = rreq["path"].to<ArduinoJson::JsonArray>();
+        std::string removeFromPath(Duid deviceId){
             //delete object for current duid
             for (ArduinoJson::JsonVariant v : path) {
                 if (v.as<std::string>() == duckutils::toString(deviceId)) {
@@ -99,7 +98,7 @@ class RouteJSON {
                     break;
                 }
             }
-            return json;
+            return json.as<std::string>();
         }
 
   private:
