@@ -123,16 +123,6 @@ class DuckLoRa {
          */
         float getSNR();
 
-    private:
-        static volatile uint16_t interruptFlags;
-        static volatile bool receivedFlag;
-        volatile bool isSetup = false;
-        unsigned long lastReceiveTime = 0L;
-
-        static void setReceiveFlag(bool value) { receivedFlag = value; }
-
-        int goToReceiveMode(bool clear);
-        int checkLoRaParameters(LoRaConfigParams config);
         /**
          * @brief Calculate a signal score based on the current RSSI and SNR values.
          * The signal score is a value between 0 and 1, where 1 is the best possible
@@ -155,6 +145,17 @@ class DuckLoRa {
          * @returns void
          */
         void getSignalScore();
+
+    private:
+        static volatile uint16_t interruptFlags;
+        static volatile bool receivedFlag;
+        volatile bool isSetup = false;
+        unsigned long lastReceiveTime = 0L;
+
+        static void setReceiveFlag(bool value) { receivedFlag = value; }
+
+        int goToReceiveMode(bool clear);
+        int checkLoRaParameters(LoRaConfigParams config);
         /**
          * @brief Introduce a random delay based on the size of the data to be sent.
          * This is to help reduce collisions on the network.

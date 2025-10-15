@@ -11,6 +11,7 @@
 #include <Update.h>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
+#include <EEPROM.h>
 
 class DuckWifi {
     public:

@@ -186,28 +186,5 @@ Timer<> getTimer();
 bool getDetectState();
 bool flipDetectState();
 
-/**
- * @brief Save / Write Wifi credentials to EEPROM
- *
- * @param ssid        the ssid of the WiFi network
- * @param password    password to join the network
- * @return DUCK_ERR_NONE if successful, an error code otherwise.
- */
-int saveWifiCredentials(std::string ssid, std::string password);
-
-/**
- * @brief Load WiFi SSID from EEPROM
- *
- * @returns A string representing the WiFi SSID
- */
-std::string loadWifiSsid();
-
-/**
- * @brief Load WiFi password from EEPROM
- *
- * @returns A string representing the WiFi password
- */
-std::string loadWifiPassword();
-
-} // namespace duckutils
+}
 #endif

@@ -28,7 +28,7 @@ class Duck {
     void run(){
       Duck::logIfLowMemory();
       duckRadio.serviceInterruptFlags();
-      if(router.networkState == NetworkState::PUBLIC) {
+      if(router.getNetworkState() == NetworkState::PUBLIC) {
         handleReceivedPacket();
       } else {
         attemptNetworkJoin();

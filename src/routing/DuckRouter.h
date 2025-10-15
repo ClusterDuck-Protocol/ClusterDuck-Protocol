@@ -21,6 +21,18 @@ class DuckRouter {
         DuckRouter() = default;;
         ~DuckRouter() = default;;
         BloomFilter& getFilter();
+        NetworkState getNetworkState(){ return networkState };
+
+                /**
+         * @brief Insert a new record into the routing table
+         *
+         * @param deviceID the device ID
+         * @param routingScore the routing score
+         * @param lastSeen the last seen timestamp
+         * @param snr the signal to noise ratio
+         * @param rssi the received signal strength indicator
+         */
+        void insertIntoRoutingTable(std::string deviceID, float routingScore, long lastSeen, float snr, float rssi);
     protected:
         /**
          * @brief Sort the routing table using the customGreater comparator
@@ -32,16 +44,6 @@ class DuckRouter {
         //        return lhs.getRoutingScore() > rhs.getRoutingScore();
         //    });
         //  }
-        /**
-         * @brief Insert a new record into the routing table
-         *
-         * @param deviceID the device ID
-         * @param routingScore the routing score
-         * @param lastSeen the last seen timestamp
-         * @param snr the signal to noise ratio
-         * @param rssi the received signal strength indicator
-         */
-        void insertIntoRoutingTable(std::string deviceID, float routingScore, long lastSeen, float snr, float rssi);
         
         // //put this on Router
         // void updateRoutingTable(){
