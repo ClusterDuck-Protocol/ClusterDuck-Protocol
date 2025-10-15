@@ -121,8 +121,6 @@ private :
     }
 
     void ifNotBroadcast(CdpPacket rxPacket, int err, bool relay = false) {
-        std::vector<uint8_t> dataPayload;
-        uint8_t num = 1;
 
         switch(rxPacket.topic) {
             case reservedTopic::rreq: {
@@ -136,7 +134,7 @@ private :
                     //Serialize the updated RREQ packet
                     std::string strRREP = rreqDoc.addToPath(this->duid);
                     this->sendRouteResponse(PAPADUCK_DUID,
-                                            dataPayload); //was this meant to be prepareforsending an rxPacket instead txPacket?
+                                            strRREP.data()); //was this meant to be prepareforsending an rxPacket instead txPacket?
                     return;
                 } else {
                     loginfo_ln("RREQ received for relay. Relaying!");
