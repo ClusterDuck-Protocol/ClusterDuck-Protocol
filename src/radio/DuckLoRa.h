@@ -15,6 +15,7 @@
 #include "utils/DuckError.h"
 #include "utils/DuckLogger.h"
 #include "utils/DuckUtils.h"
+#include "radio/Signal.h"
 #include <RadioLib.h>
 #include <memory>
 #include <chrono>
@@ -122,29 +123,29 @@ class DuckLoRa {
          * @returns A float representing the snr value.
          */
         float getSNR();
-
-        /**
-         * @brief Calculate a signal score based on the current RSSI and SNR values.
-         * The signal score is a value between 0 and 1, where 1 is the best possible
-         * signal and 0 is the worst possible signal.
-         *
-         * The formula used to calculate the signal score is:
-         *
-         * signalScore = (normalizedRSSI + normalizedSNR) / 2
-         *
-         * where:
-         *
-         * normalizedRSSI = (RSSI - RSSI_MIN) / (RSSI_MAX - RSSI_MIN)
-         * normalizedSNR = (SNR - SNR_MIN) / (SNR_MAX - SNR_MIN)
-         *
-         * RSSI_MIN = -131 dBm
-         * RSSI_MAX = -20 dBm
-         * SNR_MIN = -11.5 dB
-         * SNR_MAX = 11.5 dB
-         *
-         * @returns void
-         */
-        void getSignalScore();
+    /**
+     * @brief Calculate a signal score based on the current RSSI and SNR values.
+     * The signal score is a value between 0 and 1, where 1 is the best possible
+     * signal and 0 is the worst possible signal.
+     *
+     * The formula used to calculate the signal score is:
+     *
+     * signalScore = (normalizedRSSI + normalizedSNR) / 2
+     *
+     * where:
+     *
+     * normalizedRSSI = (RSSI - RSSI_MIN) / (RSSI_MAX - RSSI_MIN)
+     * normalizedSNR = (SNR - SNR_MIN) / (SNR_MAX - SNR_MIN)
+     *
+     * RSSI_MIN = -131 dBm
+     * RSSI_MAX = -20 dBm
+     * SNR_MIN = -11.5 dB
+     * SNR_MAX = 11.5 dB
+     *
+     * @returns void
+     */
+    void getSignalScore();
+    Signal signalInfo;
 
     private:
         static volatile uint16_t interruptFlags;
@@ -164,11 +165,6 @@ class DuckLoRa {
          */
         void delay(size_t size);
         std::mt19937 gen;
-        static struct SignalInfo {
-            float rssi;
-            float snr;
-            float signalScore;
-        } signalInfo;
 
         /**
          * @brief Set the Duck to be ready to recieve LoRa packets.

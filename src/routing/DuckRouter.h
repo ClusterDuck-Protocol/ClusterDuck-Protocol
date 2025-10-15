@@ -14,6 +14,7 @@
 #include <list>
 #include "bloomfilter.h"
 #include "DuckRecord.h"
+#include "radio/Signal.h"
 enum class NetworkState {SEARCHING, PUBLIC, DISCONNECTED};
 
 class DuckRouter {
@@ -21,7 +22,7 @@ class DuckRouter {
         DuckRouter() = default;;
         ~DuckRouter() = default;;
         BloomFilter& getFilter();
-        NetworkState getNetworkState(){ return networkState };
+        NetworkState getNetworkState(){ return networkState; };
 
                 /**
          * @brief Insert a new record into the routing table
@@ -32,7 +33,7 @@ class DuckRouter {
          * @param snr the signal to noise ratio
          * @param rssi the received signal strength indicator
          */
-        void insertIntoRoutingTable(std::string deviceID, float routingScore, long lastSeen, float snr, float rssi);
+        void insertIntoRoutingTable(std::string deviceID, long lastSeen, Signal signalInfo);
     protected:
         /**
          * @brief Sort the routing table using the customGreater comparator

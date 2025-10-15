@@ -1,4 +1,5 @@
 #include "DuckRouter.h"
+#include <radio/Signal.h>
 
 std::list<DuckRecord> DuckRouter::getRoutingTable() {
     std::list<DuckRecord> sortedList;
@@ -8,9 +9,9 @@ std::list<DuckRecord> DuckRouter::getRoutingTable() {
     return sortedList;
 };
 
-void DuckRouter::insertIntoRoutingTable(std::string deviceID, float routingScore, long lastSeen, float snr, float rssi) {
-    DuckRecord record(std::move(deviceID), routingScore, snr, rssi, lastSeen);
-    routingTable.insert(std::make_pair(routingScore, record));
+void DuckRouter::insertIntoRoutingTable(std::string deviceID,long lastSeen, Signal signalInfo) {
+    DuckRecord record(std::move(deviceID), signalInfo.signalScore, signalInfo.snr, signalInfo.rssi, lastSeen);
+    routingTable.insert(std::make_pair(signalInfo.signalScore, record));
 };
 
 BloomFilter& DuckRouter::getFilter(){
