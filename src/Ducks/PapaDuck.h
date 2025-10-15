@@ -97,16 +97,12 @@ private:
       } else if (rxPacket.topic == reservedTopic::pong) {
         loginfo_ln("PONG received. Ignoring!");
       } else {
-        // build our RX CdpPacket which holds the updated path in case the packet is relayed
-        // bool relay = this->rxPacket->prepareForRelaying(&this->filter, data);
-        // if (relay) {
-        //   logdbg_ln("relaying:  %s", duckutils::convertToHex(this->rxPacket->asBytes().data(), this->rxPacket->asBytes().size()).c_str());
-        //   loginfo_ln("invoking callback in the duck application...");
+          err = this->relayPacket(rxPacket);
           
-        //   this->recvDataCallback(this->rxPacket->asBytes());
-        // }
-            loginfo_ln("handleReceivedPacket() DONE");
+          // this->recvDataCallback(this->rxPacket->asBytes());
       }
+      
+      loginfo_ln("handleReceivedPacket() DONE");
     
     }
   };
