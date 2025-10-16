@@ -41,16 +41,16 @@ class DuckRouter {
          * @param rssi the received signal strength indicator
          */
         void insertIntoRoutingTable(Duid deviceID, SignalScore signalInfo, long lastSeen);
-    /**
-     * @brief NetworkState if the Duck joins or disconnects from a CDP network
-     * @param newState The new NetworkState to join
-     */
-    void setNetworkState(NetworkState newState){
-        if (networkState != newState) {
-            NetworkState oldState = networkState;
-            networkTransition(oldState, newState);
+        /**
+         * @brief NetworkState if the Duck joins or disconnects from a CDP network
+         * @param newState The new NetworkState to join
+         */
+        void setNetworkState(NetworkState newState){
+            if (networkState != newState) {
+                NetworkState oldState = networkState;
+                networkTransition(oldState, newState);
+            }
         }
-    }
     protected:
         /**
          * @brief Sort the routing table using the customGreater comparator

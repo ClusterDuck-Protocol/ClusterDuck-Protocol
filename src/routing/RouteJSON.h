@@ -76,8 +76,12 @@ class RouteJSON {
             return json["destination"].as<std::string>();
         }
 
-        std::string getlastInPath(){
-            return path.end()->as<std::string>();
+        Duid getlastInPath(){
+            Duid lastDuid;
+            std::string last = path[path.size() - 1].as<std::string>();
+            std::copy(last.begin(), last.end(),lastDuid.begin());
+
+            return lastDuid;
         }
 
         /**

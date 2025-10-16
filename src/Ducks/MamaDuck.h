@@ -135,8 +135,8 @@ private :
                 loginfo_ln("Received Route Response from DUID: %s", duckutils::convertToHex(rxPacket.sduid.data(), rxPacket.sduid.size()).c_str());
                 //extract path from rrep and update routing table
                 RouteJSON rrepDoc = RouteJSON(rxPacket.asBytes());
-                //if duck is not in a network already
-                this->setNetworkState(NetworkState::PUBLIC);
+                //if duck is not in a network already -- should this even be happening??
+                // this->router.setNetworkState(NetworkState::PUBLIC);
                 //send rrep to next hop in path
                 this->sendRouteResponse(rrepDoc.getlastInPath(), rrepDoc.removeFromPath(this->duid));
                 return;
