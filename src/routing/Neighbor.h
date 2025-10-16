@@ -25,15 +25,5 @@ class Neighbor {
       long lastSeen;
       float snr, rssi, routingScore;
   };
-
-  class SignalScore {
-    public:
-        SignalScore(){};
-        SignalScore(float rssi, float snr, float signalScore): rssi(rssi), snr(snr), signalScore(signalScore) {};
-        float rssi;
-        float snr;
-        float signalScore;
-    
-    };
     
   #endif

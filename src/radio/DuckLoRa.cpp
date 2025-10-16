@@ -21,11 +21,6 @@ CDPCFG_LORA_CLASS lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO0,
                   CDPCFG_PIN_LORA_RST, CDPCFG_PIN_LORA_DIO1);
 #endif
 
-#define RSSI_MAX (-20.0f)
-#define RSSI_MIN (-131.0f)
-#define SNR_MAX 11.5f
-#define SNR_MIN (-11.5f)
-
 volatile uint16_t DuckLoRa::interruptFlags = 0;
 volatile bool DuckLoRa::receivedFlag = false;
 

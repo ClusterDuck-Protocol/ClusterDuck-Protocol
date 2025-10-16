@@ -16,6 +16,14 @@
 #include "Neighbor.h"
 enum class NetworkState {SEARCHING, PUBLIC, DISCONNECTED};
 
+struct SignalScore {
+    public:
+        SignalScore() {};
+        float rssi;
+        float snr;
+        float signalScore;
+};
+
 class DuckRouter {
     public:
         DuckRouter() = default;;
@@ -32,7 +40,7 @@ class DuckRouter {
          * @param snr the signal to noise ratio
          * @param rssi the received signal strength indicator
          */
-        void insertIntoRoutingTable(std::string deviceID, long lastSeen, Signal signalInfo);
+        void insertIntoRoutingTable(Duid deviceID, SignalScore signalInfo, long lastSeen);
     /**
      * @brief NetworkState if the Duck joins or disconnects from a CDP network
      * @param newState The new NetworkState to join

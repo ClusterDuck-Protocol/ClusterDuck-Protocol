@@ -44,6 +44,10 @@ class RouteJSON {
             path = json["path"].to<ArduinoJson::JsonArray>();
         }
 
+        std::string asString(){
+            return json.as<std::string>();
+        }
+
         /**
          * @brief add a duck node to the path to route the request path
          *
