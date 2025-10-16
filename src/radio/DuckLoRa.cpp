@@ -254,20 +254,6 @@ int DuckLoRa::sendData(std::vector<uint8_t> data)
     return startTransmitData(data.data(), data.size());
 }
 
-//internal convenience method for now, may use in the routing branch later
-void DuckLoRa::getSignalScore()
-{
-
-    if (!isSetup) {
-        logerr_ln("ERROR  LoRa radio not setup");
-        return;
-    }
-
-    signalInfo.rssi = (getRSSI() - RSSI_MIN)/(RSSI_MAX-RSSI_MIN);
-    signalInfo.snr = (getSNR() - SNR_MIN)/(SNR_MAX-SNR_MIN);
-    signalInfo.signalScore = (signalInfo.rssi + signalInfo.snr) / 2.0f;
-}
-
 int DuckLoRa::startReceive()
 {
     if (!isSetup) {

@@ -13,8 +13,7 @@
 #include <map>
 #include <list>
 #include "bloomfilter.h"
-#include "DuckRecord.h"
-#include "radio/Signal.h"
+#include "Neighbor.h"
 enum class NetworkState {SEARCHING, PUBLIC, DISCONNECTED};
 
 class DuckRouter {
@@ -48,10 +47,10 @@ class DuckRouter {
         /**
          * @brief Sort the routing table using the customGreater comparator
          */
-        std::list<DuckRecord> getRoutingTable();
+        std::list<Neighbor> getRoutingTable();
 
         //  void sortRoutingTable() {
-        //    getRoutingTable().sort([](const DuckRecord& lhs, const DuckRecord& rhs){
+        //    getRoutingTable().sort([](const Neighbor& lhs, const Neighbor& rhs){
         //        return lhs.getRoutingScore() > rhs.getRoutingScore();
         //    });
         //  }
@@ -62,7 +61,7 @@ class DuckRouter {
         // }
   
     private:
-        std::multimap<float,DuckRecord,std::greater<>> routingTable;
+        std::multimap<float,Neighbor,std::greater<>> routingTable;
         BloomFilter filter;
         NetworkState networkState = NetworkState::SEARCHING;
 

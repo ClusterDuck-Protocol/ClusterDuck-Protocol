@@ -1,19 +1,18 @@
 /**
- * @file DuckLoRa.h
- * @brief This file is internal to CDP and provides direct routing
- *functionality and a routing table
+ * @file Neighbor.h
+ * @brief This file is internal to CDP and sorts nearest neighbors
+ * on a route path
  * @version
  * @date 2025-7-24
  *
  * @copyright
  */
-#ifndef DUCKRECORD_H_
-#define DUCKRECORD_H_
+#ifndef NEIGHBOR_H
+#define NEIGHBOR_H
 
-class DuckRecord {
+class Neighbor {
     public:
-      //DuckRecord() : routingScore(0), lastSeen(0), snr(0), rssi(0) {}
-      DuckRecord(std::string devId, float routingScore,float snr, float rssi,  long lastSeen) :
+      Neighbor(std::string devId, float routingScore,float snr, float rssi,  long lastSeen) :
         DeviceId(std::move(devId)), routingScore(routingScore), lastSeen(lastSeen), snr(snr), rssi(rssi) {}
   
       std::string getDeviceId() { return DeviceId; }
@@ -27,4 +26,14 @@ class DuckRecord {
       float snr, rssi, routingScore;
   };
 
+  class SignalScore {
+    public:
+        SignalScore(){};
+        SignalScore(float rssi, float snr, float signalScore): rssi(rssi), snr(snr), signalScore(signalScore) {};
+        float rssi;
+        float snr;
+        float signalScore;
+    
+    };
+    
   #endif
