@@ -50,16 +50,10 @@ private :
         return;
         }
         CdpPacket rxPacket(rxData.value());
-        // Update routing table with signal info from last received packet
-        this->router.insertIntoRoutingTable(rxPacket.sduid, this->getSignalScore(), millis());
         logdbg_ln("Got data from radio, prepare for relay. size: %d",rxPacket.size());
 
         // recvDataCallback(rxPacket.asBytes());
         loginfo_ln("handleReceivedPacket: packet RELAY START");
-        // NOTE:
-        // Ducks will only handle received message one at a time, so there is a chance the
-        // packet being sent below will never be received, especially if the cluster is small
-        // there are not many alternative paths to reach other mama ducks that could relay the rxPacket.
         
         //Check if Duck is desitination for this packet before relaying
         if (duckutils::isEqual(BROADCAST_DUID, rxPacket.dduid)) {
@@ -75,10 +69,11 @@ private :
     void ifBroadcast(CdpPacket rxPacket, int err) {
         switch(rxPacket.topic) {
             case reservedTopic::rreq: {
-                loginfo_ln("RREQ received from %s. Updating RREQ!", rxPacket.sduid.data());
-                RouteJSON rreqDoc = RouteJSON(rxPacket.asBytes());
-                this->sendRouteResponse(rxPacket.sduid, rreqDoc.addToPath(this->duid));
-                //update routing table with sduid
+                loginfo_ln("RREQ received from %s. Sending Response!", rxPacket.sduid.data());
+                RouteJSON rrepDoc = RouteJSON(rxPacket.sduid, this->duid);
+                this->sendRouteResponse(rxPacket.sduid, rrepDoc.asString());
+                // Update routing table with signal info
+                this->router.insertIntoRoutingTable(rxPacket.sduid, this->getSignalScore(), millis());
             }
             case reservedTopic::ping:
                 loginfo_ln("PING received. Sending PONG!");
@@ -94,6 +89,7 @@ private :
                 loginfo_ln("Command received");
 
                 err = this->relayPacket(rxPacket);
+                
                 if (err != DUCK_ERR_NONE) {
                     logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
                 } else {
@@ -131,19 +127,21 @@ private :
                 }
             }
             break;
+          
             case reservedTopic::rrep: {
-                loginfo_ln("Received Route Response from DUID: %s", duckutils::convertToHex(rxPacket.sduid.data(), rxPacket.sduid.size()).c_str());
-                //extract path from rrep and update routing table
-                RouteJSON rrepDoc = RouteJSON(rxPacket.asBytes());
-                //if duck is not in a network already -- should this even be happening??
-                // this->router.setNetworkState(NetworkState::PUBLIC);
-                //send rrep to next hop in path
-                this->sendRouteResponse(rrepDoc.getlastInPath(), rrepDoc.removeFromPath(this->duid));
-                return;
+                // if(relay){ //might not need this because a duck that isn't in network can't use handleReceivedPacket
+                    loginfo_ln("Received Route Response from DUID: %s", duckutils::convertToHex(rxPacket.sduid.data(), rxPacket.sduid.size()).c_str());
+                    RouteJSON rrepDoc = RouteJSON(rxPacket.asBytes());
+                    rrepDoc.removeFromPath(this->duid);
+                    this->sendRouteResponse(rrepDoc.getlastInPath(), rrepDoc.asString); //so here the relaying duck is known from sduid
+                // }
             }
                 break;
             default:
-                err = this->relayPacket(rxPacket);
+                //check where to relay it to 
+                //use packet.dduid as key to retrieve best next hop
+                //forward packet only to next hop
+                err = this->relayPacket(rxPacket); //make a relayBroadcast and relayDirect?
                 if (err != DUCK_ERR_NONE) {
                     logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
                 } else {
