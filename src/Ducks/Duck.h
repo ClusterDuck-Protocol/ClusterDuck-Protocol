@@ -228,7 +228,7 @@ class Duck {
     void attemptNetworkJoin(){
       std::optional<CdpPacket> cdpNode = checkForNetworks();
       if(cdpNode.has_value()){
-        router.insertIntoRoutingTable(cdpNode.sduid, this->getSignalScore(), millis()); //should signal score be stored on cdp packet?
+        router.insertIntoRoutingTable(cdpNode->sduid, this->getSignalScore(), millis()); //should signal score be stored on cdp packet?
         router.setNetworkState(NetworkState::PUBLIC);
       } else {
         if((millis() - this->lastRreqTime) > 30000L){

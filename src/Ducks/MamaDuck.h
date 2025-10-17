@@ -133,7 +133,7 @@ private :
                     loginfo_ln("Received Route Response from DUID: %s", duckutils::convertToHex(rxPacket.sduid.data(), rxPacket.sduid.size()).c_str());
                     RouteJSON rrepDoc = RouteJSON(rxPacket.asBytes());
                     rrepDoc.removeFromPath(this->duid);
-                    this->sendRouteResponse(rrepDoc.getlastInPath(), rrepDoc.asString); //so here the relaying duck is known from sduid
+                    this->sendRouteResponse(rrepDoc.getlastInPath(), rrepDoc.asString()); //so here the relaying duck is known from sduid
                 // }
             }
                 break;
