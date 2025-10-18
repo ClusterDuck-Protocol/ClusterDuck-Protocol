@@ -73,7 +73,7 @@ private :
                 RouteJSON rrepDoc = RouteJSON(rxPacket.sduid, this->duid);
                 this->sendRouteResponse(rxPacket.sduid, rrepDoc.asString());
                 // Update routing table with signal info
-                this->router.insertIntoRoutingTable(rxPacket.sduid, this->getSignalScore(), millis());
+                this->router.insertIntoRoutingTable(rxPacket.sduid, rrepDoc.getlastInPath(), this->getSignalScore());
             }
             case reservedTopic::ping:
                 loginfo_ln("PING received. Sending PONG!");
@@ -88,7 +88,7 @@ private :
             case reservedTopic::cmd:
                 loginfo_ln("Command received");
 
-                err = this->relayPacket(rxPacket);
+                err = this->broadcastPacket(rxPacket);
                 
                 if (err != DUCK_ERR_NONE) {
                     logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
@@ -97,7 +97,7 @@ private :
                 }
                 break;
             default:
-                err = this->relayPacket(rxPacket);
+                err = this->broadcastPacket(rxPacket);
                 if (err != DUCK_ERR_NONE) {
                     logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
                 } else {
@@ -118,13 +118,14 @@ private :
                 } else {
                     loginfo_ln("RREQ received for relay. Relaying!");
                     rxPacket.data = duckutils::stringToByteVector(rreqDoc.addToPath(this->duid)); //why is this different from stringToArray
-                    err = this->relayPacket(rxPacket);
+                    err = this->broadcastPacket(rxPacket);
                     if (err != DUCK_ERR_NONE) {
                         logerr_ln("====> ERROR handleReceivedPacket failed to relay RREQ. rc = %d",err);
                     } else {
                         loginfo_ln("handleReceivedPacket: RREQ packet RELAY DONE");
                     }
                 }
+                this->router.insertIntoRoutingTable(rxPacket.sduid, rrepDoc.getlastInPath(), this->getSignalScore());
             }
             break;
           
@@ -133,15 +134,20 @@ private :
                     loginfo_ln("Received Route Response from DUID: %s", duckutils::convertToHex(rxPacket.sduid.data(), rxPacket.sduid.size()).c_str());
                     RouteJSON rrepDoc = RouteJSON(rxPacket.asBytes());
                     rrepDoc.removeFromPath(this->duid);
-                    this->sendRouteResponse(rrepDoc.getlastInPath(), rrepDoc.asString()); //so here the relaying duck is known from sduid
+                    //route responses need a way to keep tray of who relayed the packet, but a response needs to be directed and not broadly relayed
+                    this->sendRouteResponse(rrepDoc.getlastInPath(), rrepDoc.asString); //so here the relaying duck is known from sduid
                 // }
+                //destination = sender of the rrep -> the last hop to current duck
+                this->router.insertIntoRoutingTable(rrepDoc.getDestination(), rxPacket.sduid, this->getSignalScore(), millis());
             }
                 break;
             default:
                 //check where to relay it to 
+                //if don't know send an rreq?
                 //use packet.dduid as key to retrieve best next hop
                 //forward packet only to next hop
-                err = this->relayPacket(rxPacket); //make a relayBroadcast and relayDirect?
+
+                err = this->broadcastPacket(rxPacket); //make a broadcastPacket and forwardPacket?
                 if (err != DUCK_ERR_NONE) {
                     logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
                 } else {

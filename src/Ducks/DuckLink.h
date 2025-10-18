@@ -131,7 +131,7 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
           }
     
         } else {
-          err = this->relayPacket(rxPacket);
+          err = this->broadcastPacket(rxPacket);
           if (err != DUCK_ERR_NONE) {
             logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
           } else {

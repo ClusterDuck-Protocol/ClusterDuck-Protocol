@@ -73,7 +73,7 @@ class RouteJSON {
          * @return the destination device DUID as a string
          */
         std::string getDestination(){
-            return json["destination"].as<std::string>();
+            return json["destination"];
         }
 
         Duid getlastInPath(){

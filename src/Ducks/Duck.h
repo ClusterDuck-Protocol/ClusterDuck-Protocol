@@ -165,7 +165,7 @@ class Duck {
      */ 
     virtual void handleReceivedPacket() = 0;
 
-    int relayPacket(CdpPacket& packet){
+    int broadcastPacket(CdpPacket& packet){
       bool alreadySeen = router.getFilter().bloom_check(packet.muid.data(), MUID_LENGTH);
       int err;
       if(alreadySeen){

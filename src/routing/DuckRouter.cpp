@@ -7,9 +7,10 @@ std::list<Neighbor> DuckRouter::getRoutingTable() {
     return sortedList;
 };
 
-void DuckRouter::insertIntoRoutingTable(Duid deviceID, SignalScore signalInfo, long lastSeen) {
-    Neighbor record(duckutils::toString(deviceID), signalInfo.signalScore, signalInfo.snr, signalInfo.rssi, lastSeen);
-    routingTable.insert(std::make_pair(signalInfo.signalScore, record));
+void DuckRouter::insertIntoRoutingTable(Duid deviceID, Duid nextHop, SignalScore signalInfo) {
+    Neighbor neighborRecord(deviceID, nextHop signalInfo, millis());
+
+    routingTable.insert(std::make_pair(signalInfo.signalScore, nextHop, neighborRecord));
 };
 
 void DuckRouter::CullRoutingTable(size_t maxSize) {
