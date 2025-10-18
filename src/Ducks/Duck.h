@@ -56,6 +56,11 @@ class Duck {
         logerr_ln("ERROR send data failed, topic is reserved.");
         return DUCKPACKET_ERR_TOPIC_INVALID;
       }
+      //just send it out normally (because we can't keep destination id if we direct it to a duck)
+      //next node checks if it has the destination in it's table
+      //if in table, and ttl hasn't expired, forward the packet
+      //if in the table and ttl has expired, send a rreq and wait for response before sending?<--- do this later?
+      //if the duck can't find the destination in it's routing table then it just doesn't send
       
       std::vector<uint8_t> app_data;
       app_data.insert(app_data.end(), data.begin(), data.end());
@@ -78,6 +83,7 @@ class Duck {
         return DUCKPACKET_ERR_TOPIC_INVALID;
       }
       
+      //check what next hop to send the packet to
       std::vector<uint8_t> app_data(length);
       app_data.insert(app_data.end(), &data[0], &data[length]);
       CdpPacket txPacket = CdpPacket(targetDevice, topic, app_data, this->duid, this->getType());
@@ -165,7 +171,7 @@ class Duck {
      */ 
     virtual void handleReceivedPacket() = 0;
 
-    int broadcastPacket(CdpPacket& packet){
+    int relayPacket(CdpPacket& packet){
       bool alreadySeen = router.getFilter().bloom_check(packet.muid.data(), MUID_LENGTH);
       int err;
       if(alreadySeen){

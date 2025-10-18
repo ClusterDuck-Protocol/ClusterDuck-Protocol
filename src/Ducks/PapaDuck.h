@@ -97,7 +97,7 @@ private:
       } else if (rxPacket.topic == reservedTopic::pong) {
         loginfo_ln("PONG received. Ignoring!");
       } else {
-          err = this->broadcastPacket(rxPacket);
+          err = this->relayPacket(rxPacket);
           
           // this->recvDataCallback(this->rxPacket->asBytes());
       }

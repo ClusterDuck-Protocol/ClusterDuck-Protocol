@@ -88,7 +88,7 @@ private :
             case reservedTopic::cmd:
                 loginfo_ln("Command received");
 
-                err = this->broadcastPacket(rxPacket);
+                err = this->relayPacket(rxPacket);
                 
                 if (err != DUCK_ERR_NONE) {
                     logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
@@ -97,7 +97,7 @@ private :
                 }
                 break;
             default:
-                err = this->broadcastPacket(rxPacket);
+                err = this->relayPacket(rxPacket);
                 if (err != DUCK_ERR_NONE) {
                     logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
                 } else {
@@ -118,7 +118,7 @@ private :
                 } else {
                     loginfo_ln("RREQ received for relay. Relaying!");
                     rxPacket.data = duckutils::stringToByteVector(rreqDoc.addToPath(this->duid)); //why is this different from stringToArray
-                    err = this->broadcastPacket(rxPacket);
+                    err = this->relayPacket(rxPacket);
                     if (err != DUCK_ERR_NONE) {
                         logerr_ln("====> ERROR handleReceivedPacket failed to relay RREQ. rc = %d",err);
                     } else {
@@ -147,7 +147,7 @@ private :
                 //use packet.dduid as key to retrieve best next hop
                 //forward packet only to next hop
 
-                err = this->broadcastPacket(rxPacket); //make a broadcastPacket and forwardPacket?
+                err = this->relayPacket(rxPacket); //make a relayPacket and forwardPacket?
                 if (err != DUCK_ERR_NONE) {
                     logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
                 } else {
