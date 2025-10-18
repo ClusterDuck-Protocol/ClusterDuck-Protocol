@@ -130,29 +130,40 @@ private :
             break;
           
             case reservedTopic::rrep: {
-                // if(relay){ //might not need this because a duck that isn't in network can't use handleReceivedPacket
+                //we still need to recieve rreps in case of ttl expiry
+                if(relay){ 
                     loginfo_ln("Received Route Response from DUID: %s", duckutils::convertToHex(rxPacket.sduid.data(), rxPacket.sduid.size()).c_str());
                     RouteJSON rrepDoc = RouteJSON(rxPacket.asBytes());
                     rrepDoc.removeFromPath(this->duid);
                     //route responses need a way to keep tray of who relayed the packet, but a response needs to be directed and not broadly relayed
                     this->sendRouteResponse(rrepDoc.getlastInPath(), rrepDoc.asString); //so here the relaying duck is known from sduid
-                // }
+                }
                 //destination = sender of the rrep -> the last hop to current duck
                 this->router.insertIntoRoutingTable(rrepDoc.getDestination(), rxPacket.sduid, this->getSignalScore(), millis());
             }
                 break;
             default:
-                //check where to relay it to 
-                //if don't know send an rreq?
-                //use packet.dduid as key to retrieve best next hop
-                //forward packet only to next hop
-
-                err = this->relayPacket(rxPacket); //make a relayPacket and forwardPacket?
-                if (err != DUCK_ERR_NONE) {
-                    logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
-                } else {
-                    loginfo_ln("handleReceivedPacket: packet RELAY DONE");
+                    //next node checks if it has the destination in it's table
+                    //if in table, and ttl hasn't expired, forward the packet
+                    //if in the table and ttl has expired, send a rreq and wait for response before sending?<--- do this later?
+                    //if the duck can't find the destination in it's routing table then it just doesn't send
+                    
+                    //should this happen for all relays? no it should only happen for forwarded not broadcast
+                std::optional<Duid> nextHop = this->router.getBestNextHop(packet.dduid);//neighbor record?
+                if(nextHop.has_value()){
+                    if(nextHop.ttl > 0){
+                        err = this->relayPacket(rxPacket);
+                        if (err != DUCK_ERR_NONE) {
+                            logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
+                        } else {
+                            loginfo_ln("handleReceivedPacket: packet RELAY DONE");
+                        }
+                    } else{
+                        logdbg_ln("no entry for this id, skipping relay");
+                    }
+                    
                 }
+                
         }
     }
 

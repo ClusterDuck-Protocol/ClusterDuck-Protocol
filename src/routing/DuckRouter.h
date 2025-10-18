@@ -38,7 +38,10 @@ class DuckRouter {
          * @param snr the signal to noise ratio
          * @param rssi the received signal strength indicator
          */
-        void insertIntoRoutingTable(Duid deviceID, SignalScore signalInfo, long lastSeen);
+        void insertIntoRoutingTable(Duid deviceID, Duid nextHop, SignalScore signalInfo);
+
+        Duid getBestNextHop(Duid targetDeviceId);
+
         /**
          * @brief NetworkState if the Duck joins or disconnects from a CDP network
          * @param newState The new NetworkState to join

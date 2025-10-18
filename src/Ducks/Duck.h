@@ -56,12 +56,7 @@ class Duck {
         logerr_ln("ERROR send data failed, topic is reserved.");
         return DUCKPACKET_ERR_TOPIC_INVALID;
       }
-      //just send it out normally (because we can't keep destination id if we direct it to a duck)
-      //next node checks if it has the destination in it's table
-      //if in table, and ttl hasn't expired, forward the packet
-      //if in the table and ttl has expired, send a rreq and wait for response before sending?<--- do this later?
-      //if the duck can't find the destination in it's routing table then it just doesn't send
-      
+
       std::vector<uint8_t> app_data;
       app_data.insert(app_data.end(), data.begin(), data.end());
       CdpPacket txPacket = CdpPacket(targetDevice, topic, app_data, this->duid, this->getType());
@@ -234,7 +229,8 @@ class Duck {
     void attemptNetworkJoin(){
       std::optional<CdpPacket> cdpNode = checkForNetworks();
       if(cdpNode.has_value()){
-        router.insertIntoRoutingTable(cdpNode->sduid, this->getSignalScore(), millis()); //should signal score be stored on cdp packet?
+        //add an entry for the nearest neighbor, next hop is itself
+        router.insertIntoRoutingTable(cdpNode->sduid, cdpNode->sduid, this->getSignalScore()); //should signal score be stored on cdp packet?
         router.setNetworkState(NetworkState::PUBLIC);
       } else {
         if((millis() - this->lastRreqTime) > 30000L){
