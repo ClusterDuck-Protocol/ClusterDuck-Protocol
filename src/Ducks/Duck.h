@@ -321,7 +321,7 @@ class Duck {
      * SNR_MIN = -11.5 dB
      * SNR_MAX = 11.5 dB
      *
-     * @returns void
+     * @returns SignalScore struct containing rssi, snr, and signalScore values
      */
     SignalScore getSignalScore(){
       SignalScore signalInfo;

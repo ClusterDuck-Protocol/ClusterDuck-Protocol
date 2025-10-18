@@ -17,8 +17,6 @@
 enum class NetworkState {SEARCHING, PUBLIC, DISCONNECTED};
 
 struct SignalScore {
-    public:
-        SignalScore() {};
         float rssi;
         float snr;
         float signalScore;
@@ -56,6 +54,11 @@ class DuckRouter {
          * @brief Sort the routing table using the customGreater comparator
          */
         std::list<Neighbor> getRoutingTable();
+        /**
+         * @brief Cull the routing table to a maximum size. Default is 3 entries. Can be expanded for larger networks.
+         * @param maxSize the maximum size of the routing table
+         */
+        void CullRoutingTable(size_t maxSize = 3);
 
         //  void sortRoutingTable() {
         //    getRoutingTable().sort([](const Neighbor& lhs, const Neighbor& rhs){
