@@ -166,7 +166,7 @@ class Duck {
      */ 
     virtual void handleReceivedPacket() = 0;
 
-    int relayPacket(CdpPacket& packet){
+    int broadcastPacket(CdpPacket& packet){
       bool alreadySeen = router.getFilter().bloom_check(packet.muid.data(), MUID_LENGTH);
       int err;
       if(alreadySeen){
@@ -176,6 +176,27 @@ class Duck {
         err = sendToRadio(packet);
       }
       return err;
+    }
+
+    int forwardPacket(CdpPacket& packet){
+      //next node checks if it has the destination in its table
+      //if in table, and ttl hasn't expired, forward the packet
+      //if in the table and ttl has expired, send a rreq and wait for response before sending?<--- do this later?
+      //if the duck can't find the destination in its routing table then it just doesn't send
+
+      std::optional<Duid> nextHop = router.getBestNextHop(packet.dduid);//neighbor record?
+      if(nextHop.has_value()){
+          if(nextHop.ttl > 0){
+              err = broadcastPacket(rxPacket);
+              if (err != DUCK_ERR_NONE) {
+                  logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
+              } else {
+                  loginfo_ln("handleReceivedPacket: packet RELAY DONE");
+              }
+          } else{
+              logdbg_ln("no entry for this id, skipping relay");
+          }
+      }
     }
 
     unsigned long lastRreqTime = 0L;

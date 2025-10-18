@@ -88,7 +88,7 @@ private :
             case reservedTopic::cmd:
                 loginfo_ln("Command received");
 
-                err = this->relayPacket(rxPacket);
+                err = this->broadcastPacket(rxPacket);
                 
                 if (err != DUCK_ERR_NONE) {
                     logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
@@ -97,7 +97,7 @@ private :
                 }
                 break;
             default:
-                err = this->relayPacket(rxPacket);
+                err = this->broadcastPacket(rxPacket);
                 if (err != DUCK_ERR_NONE) {
                     logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
                 } else {
@@ -118,7 +118,7 @@ private :
                 } else {
                     loginfo_ln("RREQ received for relay. Relaying!");
                     rxPacket.data = duckutils::stringToByteVector(rreqDoc.addToPath(this->duid)); //why is this different from stringToArray
-                    err = this->relayPacket(rxPacket);
+                    err = this->broadcastPacket(rxPacket);
                     if (err != DUCK_ERR_NONE) {
                         logerr_ln("====> ERROR handleReceivedPacket failed to relay RREQ. rc = %d",err);
                     } else {
@@ -143,27 +143,7 @@ private :
             }
                 break;
             default:
-                    //next node checks if it has the destination in it's table
-                    //if in table, and ttl hasn't expired, forward the packet
-                    //if in the table and ttl has expired, send a rreq and wait for response before sending?<--- do this later?
-                    //if the duck can't find the destination in it's routing table then it just doesn't send
-                    
-                    //should this happen for all relays? no it should only happen for forwarded not broadcast
-                std::optional<Duid> nextHop = this->router.getBestNextHop(packet.dduid);//neighbor record?
-                if(nextHop.has_value()){
-                    if(nextHop.ttl > 0){
-                        err = this->relayPacket(rxPacket);
-                        if (err != DUCK_ERR_NONE) {
-                            logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
-                        } else {
-                            loginfo_ln("handleReceivedPacket: packet RELAY DONE");
-                        }
-                    } else{
-                        logdbg_ln("no entry for this id, skipping relay");
-                    }
-                    
-                }
-                
+                this->forwardPacket(rxPacket);        
         }
     }
 
