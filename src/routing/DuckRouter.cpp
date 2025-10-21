@@ -8,9 +8,9 @@ std::list<Neighbor> DuckRouter::getRoutingTable() {
 };
 
 void DuckRouter::insertIntoRoutingTable(Duid deviceID, Duid nextHop, SignalScore signalInfo) {
-    Neighbor neighborRecord(deviceID, nextHop signalInfo, millis());
+    Neighbor neighborRecord(duckutils::toString(deviceID), nextHop, signalInfo, millis());
 
-    routingTable.insert(std::make_pair(signalInfo.signalScore, nextHop, neighborRecord));
+    routingTable.insert(std::make_pair(signalInfo.signalScore,neighborRecord));
 };
 
 std::optional<Duid> DuckRouter::getBestNextHop(Duid targetDeviceId){

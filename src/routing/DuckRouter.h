@@ -16,12 +16,6 @@
 #include "Neighbor.h"
 enum class NetworkState {SEARCHING, PUBLIC, DISCONNECTED};
 
-struct SignalScore {
-        float rssi;
-        float snr;
-        float signalScore;
-};
-
 class DuckRouter {
     public:
         DuckRouter() = default;;

@@ -9,11 +9,11 @@
  */
 #ifndef NEIGHBOR_H
 #define NEIGHBOR_H
-
+#include "SignalScore.h"
 class Neighbor {
     public:
-      Neighbor(std::string devId, float routingScore,float snr, float rssi,  long lastSeen) :
-        DeviceId(std::move(devId)), routingScore(routingScore), lastSeen(lastSeen), snr(snr), rssi(rssi) {}
+      Neighbor(std::string devId, Duid nextHop, SignalScore signalInfo, long lastSeen) :
+        DeviceId(std::move(devId)), routingScore(signalInfo.signalScore), lastSeen(lastSeen), snr(signalInfo.snr), rssi(signalInfo.rssi) {}
   
       std::string getDeviceId() { return DeviceId; }
       long getRoutingScore() const { return routingScore; }
