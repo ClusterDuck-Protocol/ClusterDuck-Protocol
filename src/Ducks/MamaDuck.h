@@ -125,18 +125,19 @@ private :
                         loginfo_ln("handleReceivedPacket: RREQ packet RELAY DONE");
                     }
                 }
-                this->router.insertIntoRoutingTable(rxPacket.sduid, rrepDoc.getlastInPath(), this->getSignalScore());
+                this->router.insertIntoRoutingTable(rxPacket.sduid, rreqDoc.getlastInPath(), this->getSignalScore());
             }
             break;
           
             case reservedTopic::rrep: {
                 //we still need to recieve rreps in case of ttl expiry
+                RouteJSON rrepDoc = RouteJSON(rxPacket.asBytes());
                 if(relay){ 
                     loginfo_ln("Received Route Response from DUID: %s", duckutils::convertToHex(rxPacket.sduid.data(), rxPacket.sduid.size()).c_str());
-                    RouteJSON rrepDoc = RouteJSON(rxPacket.asBytes());
+
                     rrepDoc.removeFromPath(this->duid);
                     //route responses need a way to keep tray of who relayed the packet, but a response needs to be directed and not broadly relayed
-                    this->sendRouteResponse(rrepDoc.getlastInPath(), rrepDoc.asString); //so here the relaying duck is known from sduid
+                    this->sendRouteResponse(rrepDoc.getlastInPath(), rrepDoc.asString()); //so here the relaying duck is known from sduid
                 }
                 //destination = sender of the rrep -> the last hop to current duck
                 this->router.insertIntoRoutingTable(rrepDoc.getDestination(), rxPacket.sduid, this->getSignalScore(), millis());

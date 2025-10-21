@@ -34,7 +34,7 @@ class DuckRouter {
          */
         void insertIntoRoutingTable(Duid deviceID, Duid nextHop, SignalScore signalInfo);
 
-        Duid getBestNextHop(Duid targetDeviceId);
+        std::optional<Duid> getBestNextHop(Duid targetDeviceId);
 
         /**
          * @brief NetworkState if the Duck joins or disconnects from a CDP network
