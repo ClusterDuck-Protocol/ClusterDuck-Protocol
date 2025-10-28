@@ -17,6 +17,8 @@
 #include <string>
 #include <vector>
 #include "DuckError.h"
+#include <functional>
+#include <thread>
 
 namespace duckutils {
 
@@ -176,12 +178,46 @@ bool isEqual(const std::vector<T> & a, const std::vector<T> & b) {
 uint32_t toUint32(const uint8_t* data);
 
 /**
- * @brief Get a timer instance.
+ * @brief Create a timer instance.
  * 
  * @returns A Timer instance.
  */
-Timer<> getTimer();
+template <class callable, class... arguments>
+class Timer
+    {
+    typedef std::chrono::time_point<std::chrono::steady_clock, std::chrono::duration<int,std::milli>> time_point_t;
+    public:
 
+        Timer(unsigned int in, bool async, callable&& f, arguments&&... args)
+        {
+            after(in, async, std::forward<callable>(f), std::forward<arguments>(args)...);
+        }
+        Timer(Timer::time_point_t at, bool async, callable&& f, arguments&&... args){
+            auto now = std::chrono::steady_clock::now();
+
+            auto diff= std::chrono::duration_cast<std::chrono::milliseconds>(at - now).count();
+
+            after(diff, async, std::forward<callable>(f), std::forward<arguments>(args)...);
+        }
+private:
+       void after(unsigned int after, bool async,  callable&& f, arguments&&... args){
+           std::function<std::invoke_result_t<callable, arguments...>()> task(std::bind(std::forward<callable>(f), std::forward<arguments>(args)...));
+
+           if (async)
+           {
+               std::thread([after, task]() {
+                   std::this_thread::sleep_for(std::chrono::milliseconds(after));
+                   task();
+               }).detach();
+           }
+           else
+           {
+               std::this_thread::sleep_for(std::chrono::milliseconds(after));
+               task();
+           }
+        }
+
+    };
 
 bool getDetectState();
 bool flipDetectState();

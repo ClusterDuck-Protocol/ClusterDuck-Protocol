@@ -1,16 +1,28 @@
 #include "DuckRouter.h"
-std::list<Neighbor> DuckRouter::getRoutingTable() {
-    std::list<Neighbor> sortedList;
-    for (const auto& pair : routingTable) {
-    sortedList.push_back(pair.second);
-    }
-    return sortedList;
-};
+
+//std::list<Neighbor> DuckRouter::getRoutingTable() {
+//    std::list<Neighbor> sortedList;
+//    for (const auto& pair : routingTable) {
+//    sortedList.push_back(pair.second);
+//    }
+//    return sortedList;
+//};
 
 void DuckRouter::insertIntoRoutingTable(Duid deviceID, Duid nextHop, SignalScore signalInfo) {
-    Neighbor neighborRecord(duckutils::toString(deviceID), nextHop, signalInfo, millis());
 
-    routingTable.insert(std::make_pair(signalInfo.signalScore,neighborRecord));
+    Neighbor neighborRecord(duckutils::toString(deviceID), nextHop, signalInfo, millis());
+    auto it = routingTable.find(duckutils::toString(deviceID));
+    if (it == routingTable.end()) {
+        std::list<Neighbor> neighborList;
+        neighborList.push_back(neighborRecord);
+        routingTable.insert(std::make_pair(duckutils::toString(deviceID), neighborList));
+    } else {
+        // Update existing record
+        it->second.push_back(neighborRecord);
+        it->second.remove_if([neighborRecord](const Neighbor& n) {
+            return n.getLastSeen() < neighborRecord.getLastSeen() && n.getDeviceId() == neighborRecord.getDeviceId();
+        });
+    }
 };
 
 std::optional<Duid> DuckRouter::getBestNextHop(Duid targetDeviceId){

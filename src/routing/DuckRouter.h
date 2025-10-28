@@ -48,12 +48,13 @@ class DuckRouter {
         }
     protected:
         /**
-         * @brief Sort the routing table using the customGreater comparator
+         * @brief Returns a copy of the current routing table
          */
-        std::list<Neighbor> getRoutingTable();
+        std::unordered_map<std::string, std::list<Neighbor>> getRoutingTable(){return reoutingTable;}
         /**
          * @brief Cull the routing table to a maximum size. Default is 3 entries. Can be expanded for larger networks.
          * @param maxSize the maximum size of the routing table
+         * @Note This may not be used
          */
         void CullRoutingTable(size_t maxSize = 3);
 
@@ -69,7 +70,7 @@ class DuckRouter {
         // }
   
     private:
-        std::multimap<float,Neighbor,std::greater<>> routingTable;
+        std::unordered_map<std::string, std::list<Neighbor>> routingTable;
         BloomFilter filter;
         NetworkState networkState = NetworkState::SEARCHING;
 

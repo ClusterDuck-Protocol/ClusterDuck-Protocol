@@ -10,14 +10,21 @@
 #ifndef NEIGHBOR_H
 #define NEIGHBOR_H
 #include "SignalScore.h"
+#include <list>
+
 class Neighbor {
     public:
-      Neighbor(std::string devId, Duid nextHop, SignalScore signalInfo, long lastSeen) :
-        DeviceId(std::move(devId)), routingScore(signalInfo.signalScore), lastSeen(lastSeen), snr(signalInfo.snr), rssi(signalInfo.rssi) {}
+      Neighbor(std::string devId, Duid nextHop, SignalScore signalInfo, unsigned long lastSeen) :
+        DeviceId(std::move(devId)), routingScore(signalInfo.signalScore), lastSeen(lastSeen), snr(signalInfo.snr), rssi(signalInfo.rssi) {
+        // How to handle multiple next hops?
+      }
+        bool operator>(const Neighbor& other) const {
+            return this->routingScore > other.routingScore;
+        }
   
-      std::string getDeviceId() { return DeviceId; }
+      std::string getDeviceId() const { return DeviceId; }
       long getRoutingScore() const { return routingScore; }
-      long getLastSeen() { return lastSeen; }
+      long getLastSeen() const { return lastSeen; }
       long getSnr() { return snr; }
       long getRssi() { return rssi; }
   private:
