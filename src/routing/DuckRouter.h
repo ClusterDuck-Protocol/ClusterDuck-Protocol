@@ -50,7 +50,7 @@ class DuckRouter {
         /**
          * @brief Returns a copy of the current routing table
          */
-        std::unordered_map<std::string, std::list<Neighbor>> getRoutingTable(){return reoutingTable;}
+        std::unordered_map<std::string, std::list<Neighbor>> getRoutingTable(){return routingTable;}
         /**
          * @brief Cull the routing table to a maximum size. Default is 3 entries. Can be expanded for larger networks.
          * @param maxSize the maximum size of the routing table
