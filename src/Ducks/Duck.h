@@ -183,20 +183,19 @@ class Duck {
       //if in table, and ttl hasn't expired, forward the packet
       //if in the table and ttl has expired, send a rreq and wait for response before sending?<--- do this later?
       //if the duck can't find the destination in its routing table then it just doesn't send
-
-      std::optional<Duid> nextHop = router.getBestNextHop(packet.dduid);//neighbor record?
+      int err = DUCK_ERR_NONE;
+      std::optional<Duid> nextHop = router.getBestNextHop(packet.dduid);
       if(nextHop.has_value()){
-          if(nextHop.ttl > 0){
-              err = broadcastPacket(rxPacket);
-              if (err != DUCK_ERR_NONE) {
-                  logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
-              } else {
-                  loginfo_ln("handleReceivedPacket: packet RELAY DONE");
-              }
-          } else{
-              logdbg_ln("no entry for this id, skipping relay");
-          }
+        err = broadcastPacket(packet);
+        if (err != DUCK_ERR_NONE) {
+            logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
+        } else {
+            loginfo_ln("handleReceivedPacket: packet RELAY DONE");
+        }
+      } else{
+        logdbg_ln("no entry for this id, skipping relay");
       }
+      return err;
     }
 
     unsigned long lastRreqTime = 0L;

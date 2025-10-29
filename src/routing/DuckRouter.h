@@ -18,8 +18,8 @@ enum class NetworkState {SEARCHING, PUBLIC, DISCONNECTED};
 
 class DuckRouter {
     public:
-        DuckRouter() = default;;
-        ~DuckRouter() = default;;
+        // DuckRouter() = default;
+        ~DuckRouter() = default;
         BloomFilter& getFilter();
         NetworkState getNetworkState(){ return networkState; };
 
@@ -34,7 +34,7 @@ class DuckRouter {
          */
         void insertIntoRoutingTable(Duid deviceID, Duid nextHop, SignalScore signalInfo);
 
-        std::optional<Duid> getBestNextHop(Duid targetDeviceId);
+        std::optional<Neighbor> getBestNextHop(Duid targetDeviceId);
 
         /**
          * @brief NetworkState if the Duck joins or disconnects from a CDP network
@@ -48,29 +48,14 @@ class DuckRouter {
         }
     protected:
         /**
-         * @brief Returns a copy of the current routing table
-         */
-        std::unordered_map<std::string, std::list<Neighbor>> getRoutingTable(){return reoutingTable;}
-        /**
          * @brief Cull the routing table to a maximum size. Default is 3 entries. Can be expanded for larger networks.
          * @param maxSize the maximum size of the routing table
          * @Note This may not be used
          */
         void CullRoutingTable(size_t maxSize = 3);
 
-        //  void sortRoutingTable() {
-        //    getRoutingTable().sort([](const Neighbor& lhs, const Neighbor& rhs){
-        //        return lhs.getRoutingScore() > rhs.getRoutingScore();
-        //    });
-        //  }
-        
-        // //put this on Router
-        // void updateRoutingTable(){
-        //   Serial.println("routing table creation")
-        // }
-  
     private:
-        std::unordered_map<std::string, std::list<Neighbor>> routingTable;
+        std::unordered_map<Duid, std::list<Neighbor>> routingTable;
         BloomFilter filter;
         NetworkState networkState = NetworkState::SEARCHING;
 

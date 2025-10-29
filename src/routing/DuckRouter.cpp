@@ -1,21 +1,13 @@
 #include "DuckRouter.h"
 
-//std::list<Neighbor> DuckRouter::getRoutingTable() {
-//    std::list<Neighbor> sortedList;
-//    for (const auto& pair : routingTable) {
-//    sortedList.push_back(pair.second);
-//    }
-//    return sortedList;
-//};
-
 void DuckRouter::insertIntoRoutingTable(Duid deviceID, Duid nextHop, SignalScore signalInfo) {
 
     Neighbor neighborRecord(duckutils::toString(deviceID), nextHop, signalInfo, millis());
-    auto it = routingTable.find(duckutils::toString(deviceID));
+    auto it = routingTable.find(deviceID);
     if (it == routingTable.end()) {
         std::list<Neighbor> neighborList;
         neighborList.push_back(neighborRecord);
-        routingTable.insert(std::make_pair(duckutils::toString(deviceID), neighborList));
+        routingTable.insert(std::make_pair(deviceID, neighborList));
     } else {
         // Update existing record
         it->second.push_back(neighborRecord);
@@ -28,13 +20,18 @@ void DuckRouter::insertIntoRoutingTable(Duid deviceID, Duid nextHop, SignalScore
 std::optional<Duid> DuckRouter::getBestNextHop(Duid targetDeviceId){
     // I'm not sure if this is what we're looking for since we still need to handle
     // sending the very first message to the target when we don't have a known path yet.
-    auto it = routingTable.find(duckutils::toString(targetDeviceId));
-    if (it == routingTable.end()) {
+    //check if nextHop = the duid of the last duid in path/last duid that relayed to the current duck so that it doesn't transmit back the way it came from
+    auto nextHopRecord = routingTable.find(targetDeviceId);
+    if (nextHopRecord == routingTable.end()) {
         return std::nullopt; // No entry found
     }
-    it->second.sort(std::greater<>());
-    auto duid = it->second.front().getDeviceId();
-    return duckutils::stringToArray<uint8_t,8>(duid);
+    nextHopRecord->second.sort(std::greater<>());
+    Duid nextHopId = nextHopRecord->second.front().getDeviceId(); //??
+
+    // if(nextHop.ttl > 0){
+              //send a new rreq
+    // }
+    return nextHopId;
 
 };
 
