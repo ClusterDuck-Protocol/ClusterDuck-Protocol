@@ -28,12 +28,13 @@ void DuckRouter::insertIntoRoutingTable(Duid deviceID, Duid nextHop, SignalScore
 std::optional<Duid> DuckRouter::getBestNextHop(Duid targetDeviceId){
     // I'm not sure if this is what we're looking for since we still need to handle
     // sending the very first message to the target when we don't have a known path yet.
-    for (const auto& pair : routingTable) {
-        Neighbor neighbor = pair.second;
-        if (neighbor.getDeviceId() == duckutils::toString(targetDeviceId))
-            return duckutils::stringToArray<uint8_t,8>(neighbor.getDeviceId());
+    auto it = routingTable.find(duckutils::toString(targetDeviceId));
+    if (it == routingTable.end()) {
+        return std::nullopt; // No entry found
     }
-    return std::nullopt;
+    it->second.sort(std::greater<>());
+    auto duid = it->second.front().getDeviceId();
+    return duckutils::stringToArray<uint8_t,8>(duid);
 
 };
 
