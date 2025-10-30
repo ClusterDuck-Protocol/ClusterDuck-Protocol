@@ -22,7 +22,6 @@
 
 namespace duckutils {
 
-//extern Timer<> duckTimer;
 extern bool detectState;
 
 std::string getCDPVersion();

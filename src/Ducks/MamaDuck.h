@@ -140,7 +140,8 @@ private :
                     this->sendRouteResponse(rrepDoc.getlastInPath(), rrepDoc.asString()); //so here the relaying duck is known from sduid
                 }
                 //destination = sender of the rrep -> the last hop to current duck
-                this->router.insertIntoRoutingTable(rrepDoc.getDestination(), rxPacket.sduid, this->getSignalScore());
+                Duid thisId = rxPacket.sduid;
+                this->router.insertIntoRoutingTable(rrepDoc.getDestination(), thisId, this->getSignalScore()); //why do i need to copy here 
             }
                 break;
             default:

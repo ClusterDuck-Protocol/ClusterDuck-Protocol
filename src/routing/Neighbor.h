@@ -14,7 +14,7 @@
 
 class Neighbor {
     public:
-      Neighbor(std::string devId, Duid nextHop, SignalScore signalInfo, unsigned long lastSeen) :
+      Neighbor(Duid devId, Duid nextHop, SignalScore signalInfo, unsigned long lastSeen) :
         DeviceId(devId), routingScore(signalInfo.signalScore), lastSeen(lastSeen), snr(signalInfo.snr), rssi(signalInfo.rssi) {
         // How to handle multiple next hops?
       }
@@ -22,13 +22,13 @@ class Neighbor {
             return this->routingScore > other.routingScore;
         }
   
-      [[nodiscard]] std::string getDeviceId() const { return DeviceId; }
+      [[nodiscard]] Duid getDeviceId() const { return DeviceId; }
       long getRoutingScore() const { return routingScore; }
       unsigned long getLastSeen() const { return lastSeen; }
       long getSnr() { return snr; }
       long getRssi() { return rssi; }
   private:
-      std::string DeviceId;
+      Duid DeviceId;
       unsigned long lastSeen;
       float snr, rssi, routingScore;
   };
