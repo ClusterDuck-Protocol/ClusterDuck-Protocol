@@ -141,7 +141,7 @@ private :
                 }
                 //destination = sender of the rrep -> the last hop to current duck
                 Duid thisId = rxPacket.sduid;
-                this->router.insertIntoRoutingTable(rrepDoc.getDestination(), thisId, this->getSignalScore(), millis()); //why do i need to copy here 
+                this->router.insertIntoRoutingTable(rrepDoc.getDestination(), thisId, this->getSignalScore()); //why do i need to copy here 
             }
                 break;
             default:

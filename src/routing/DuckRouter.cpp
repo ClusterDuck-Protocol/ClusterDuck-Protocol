@@ -2,7 +2,7 @@
 
 void DuckRouter::insertIntoRoutingTable(Duid deviceID, Duid nextHop, SignalScore signalInfo) {
 
-    Neighbor neighborRecord(duckutils::toString(deviceID), nextHop, signalInfo, millis());
+    Neighbor neighborRecord(deviceID, nextHop, signalInfo, millis());
     auto it = routingTable.find(deviceID);
     if (it == routingTable.end()) {
         std::list<Neighbor> neighborList;

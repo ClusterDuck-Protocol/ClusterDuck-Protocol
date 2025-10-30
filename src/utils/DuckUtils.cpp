@@ -4,14 +4,11 @@
 
 namespace duckutils {
 
-Timer<> duckTimer = timer_create_default();
 bool detectState = false;
 
 std::string getCDPVersion() {
   return std::to_string(CDP_VERSION_MAJOR) + "." + std::to_string(CDP_VERSION_MINOR) + "." + std::to_string(CDP_VERSION_PATCH);
 }
-
-Timer<> getTimer() { return duckTimer; }
 
 bool getDetectState() { return detectState; }
 bool flipDetectState() {
@@ -31,7 +28,7 @@ void  getRandomBytes(int length, uint8_t* bytes) {
 }
 
 std::string createUuid(int length) {
-  std::string msg = "";
+  std::string msg;
   int i;
 
   for (i = 0; i < length; i++) {
