@@ -22,7 +22,7 @@ class Neighbor {
             return this->routingScore > other.routingScore;
         }
   
-      [[nodiscard]] Duid getDeviceId() const { return DeviceId; }
+      [[nodiscard]] std::string getDeviceId() const { return duckutils::toString(DeviceId); }
       long getRoutingScore() const { return routingScore; }
       unsigned long getLastSeen() const { return lastSeen; }
       long getSnr() { return snr; }
