@@ -18,7 +18,7 @@ enum class NetworkState {SEARCHING, PUBLIC, DISCONNECTED};
 
 class DuckRouter {
     public:
-        // DuckRouter() = default;
+        DuckRouter() = default;
         ~DuckRouter() = default;
         BloomFilter& getFilter();
         NetworkState getNetworkState(){ return networkState; };
@@ -34,7 +34,7 @@ class DuckRouter {
          */
         void insertIntoRoutingTable(Duid deviceID, Duid nextHop, SignalScore signalInfo);
 
-        std::optional<Neighbor> getBestNextHop(Duid targetDeviceId);
+        std::optional<Duid> getBestNextHop(Duid targetDeviceId);
 
         /**
          * @brief NetworkState if the Duck joins or disconnects from a CDP network
@@ -55,7 +55,7 @@ class DuckRouter {
         void CullRoutingTable(size_t maxSize = 3);
 
     private:
-        std::unordered_map<Duid, std::list<Neighbor>> routingTable;
+        std::unordered_map<std::string, std::list<Neighbor>> routingTable;
         BloomFilter filter;
         NetworkState networkState = NetworkState::SEARCHING;
 

@@ -3,15 +3,15 @@
 void DuckRouter::insertIntoRoutingTable(Duid deviceID, Duid nextHop, SignalScore signalInfo) {
 
     Neighbor neighborRecord(deviceID, nextHop, signalInfo, millis());
-    auto it = routingTable.find(deviceID);
-    if (it == routingTable.end()) {
+    auto index = routingTable.find(duckutils::toString(deviceID));
+    if (index == routingTable.end()) {
         std::list<Neighbor> neighborList;
         neighborList.push_back(neighborRecord);
-        routingTable.insert(std::make_pair(deviceID, neighborList));
+        routingTable.insert(std::make_pair(neighborRecord.getDeviceId(), neighborList));
     } else {
         // Update existing record
-        it->second.push_back(neighborRecord);
-        it->second.remove_if([neighborRecord](const Neighbor& n) {
+        index->second.push_back(neighborRecord);
+        index->second.remove_if([neighborRecord](const Neighbor& n) { //whats happening here
             return n.getLastSeen() < neighborRecord.getLastSeen() && n.getDeviceId() == neighborRecord.getDeviceId();
         });
     }
@@ -21,12 +21,14 @@ std::optional<Duid> DuckRouter::getBestNextHop(Duid targetDeviceId){
     // I'm not sure if this is what we're looking for since we still need to handle
     // sending the very first message to the target when we don't have a known path yet.
     //check if nextHop = the duid of the last duid in path/last duid that relayed to the current duck so that it doesn't transmit back the way it came from
-    auto nextHopRecord = routingTable.find(targetDeviceId);
+    auto nextHopRecord = routingTable.find(duckutils::toString(targetDeviceId));
     if (nextHopRecord == routingTable.end()) {
         return std::nullopt; // No entry found
     }
     nextHopRecord->second.sort(std::greater<>());
-    Duid nextHopId = nextHopRecord->second.front().getDeviceId(); //??
+    std::string nextHopStr = nextHopRecord->second.front().getDeviceId();
+    Duid nextHopId;
+    std::copy(nextHopStr.begin(), nextHopStr.end(),nextHopId.begin());
 
     // if(nextHop.ttl > 0){
               //send a new rreq
