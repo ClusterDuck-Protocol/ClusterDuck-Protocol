@@ -118,7 +118,7 @@ public:
                 logwarn("Unable to enable NMEA GGA.\n");
             }
             if (std::equal(hardwareVersion.begin(),hardwareVersion.end(), "00080000")) {
-                msglen = makeUBXPacket(0x06, 0x17, sizeof(_message_NMEA), _message_NMEA);
+                msglen = makeUBXPacket(0x06, 0x17, _message_NMEA.size(), _message_NMEA.data());
                 clearBuffer();
                 GPSSerial.write(UBXscratch.data(), msglen);
                 if (getACK(0x06, 0x17, 500) != GNSS_RESPONSE_OK) {
@@ -283,7 +283,7 @@ private:
             0x05, 0x00, 0x03, 0x00, 0x01, 0x00, 0x01, 0x01, // QZSS
             0x06, 0x08, 0x0E, 0x00, 0x01, 0x00, 0x01, 0x01  // GLONASS
     };
-    uint8_t _message_NMEA[20]{
+    std::array<uint8_t,20> _message_NMEA = {
             0x00,                              // filter flags
             0x41,                              // NMEA Version
             0x00,                              // Max number of SVs to report per TaklerId
