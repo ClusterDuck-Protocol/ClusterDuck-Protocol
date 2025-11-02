@@ -24,8 +24,8 @@ public:
 
     };
     void setup(){
-        memset(&info, 0, sizeof(struct GnssModelInfo));
-        uint8_t buffer[768] = {0};
+       // memset(&info, 0, sizeof(struct GnssModelInfo));
+        std::array<uint8_t,768> buffer = {0};
         delay(100);
         GPSSerial.write("$PCAS03,0,0,0,0,0,0,0,0,0,0,,,0,0*02\r\n");
         delay(20);
@@ -201,7 +201,7 @@ private:
         std::array<char,30> swVersion;
         std::array<char,10> hwVersion;
         uint8_t extensionNo;
-        char extension[10][30];
+        std::array<std::array<char,30>,10> extension;
     } info;
     typedef enum
     {
@@ -231,7 +231,7 @@ private:
         sfe_ublox_packet_validity_e classAndIDmatch; // Goes from NOT_DEFINED to VALID or NOT_VALID when the Class and ID match the requestedClass and requestedID
     };
 
-    const uint8_t ubx_cfg_gnss[58] = {
+    std::array<const uint8_t,58> ubx_cfg_gnss = {
             0x00,0x08,0x10,0x00,0x01,0x00,0x01,0x01, // GPS, Min/Max Channel Resources, ENABLED, L1, BIT24 (per uCenter/Query, cut-n-paste of hex frame)
             0x01,0x01,0x03,0x00,0x01,0x00,0x01,0x01, // SBAS
             0x02,0x04,0x08,0x00,0x01,0x00,0x01,0x01, // GALILEO
@@ -241,7 +241,7 @@ private:
             0x06,0x08,0x0E,0x00,0x01,0x00,0x01,0x01, // GLONASS
             0x30,0xAD }; // Fletcher checksum, correct for preceeding frame
 
-    const uint8_t _message_GPSGLONASSGAL[68] = {// GPS + GALILEO + GLONASS wo / SBAS
+    std::array<const uint8_t,68> _message_GPSGLONASSGAL = {// GPS + GALILEO + GLONASS wo / SBAS
 
             0xB5,0x62,0x06,0x3E, 0x3C, 0x00,
 
@@ -296,7 +296,7 @@ private:
             0x00, 0x00,                        // bdsTalkerId 2 chars 0=default
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00 // Reserved
     };
-    uint8_t _message_GNSS[28] = {
+    std::array<uint8_t,28> _message_GNSS = {
             0x00, // msgVer (0 for this version)
             0x00, // numTrkChHw (max number of hardware channels, read only, so it's always 0)
             0xff, // numTrkChUse (max number of channels to use, 0xff = max available)
