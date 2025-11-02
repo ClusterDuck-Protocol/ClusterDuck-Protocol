@@ -116,65 +116,68 @@ uint8_t DuckGPS::makeUBXPacket(uint8_t class_id, uint8_t msg_id, uint8_t payload
     return length;
 }
 
-DuckGPS::GPS_RESPONSE DuckGPS::getACK(uint8_t class_id, uint8_t msg_id, uint32_t waitMillis)
-{
-uint8_t b;
-uint8_t ack = 0;
-const uint8_t ackP[2] = {class_id, msg_id};
-uint8_t buf[10] = {0xB5, 0x62, 0x05, 0x01, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00};
-uint32_t startTime = millis();
-const char frame_errors[] = "More than 100 frame errors";
-int sCounter = 0;
+DuckGPS::GPS_RESPONSE DuckGPS::getACK(uint8_t class_id, uint8_t msg_id, uint32_t waitMillis) {
+    uint8_t b;
+    uint8_t ack = 0;
+    std::array<const uint8_t,2> ackP{class_id, msg_id};
+    std::array<uint8_t,10> buf{0xB5, 0x62, 0x05, 0x01, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00};
+    uint32_t startTime = millis();
+    const char frame_errors[] = "More than 100 frame errors";
+    int sCounter = 0;
+// Calculate checksum for ACK message
+    for (int j = 2; j < 6; j++) {
+        buf[8] += buf[j];
+        buf[9] += buf[8];
+    }
 
-for (int j = 2; j < 6; j++) {
-buf[8] += buf[j];
-buf[9] += buf[8];
-}
+    for (int j = 0; j < 2; j++) {
+        buf[6 + j] = ackP[j];
+        buf[8] += buf[6 + j];
+        buf[9] += buf[8];
+    }
 
-for (int j = 0; j < 2; j++) {
-buf[6 + j] = ackP[j];
-buf[8] += buf[6 + j];
-buf[9] += buf[8];
-}
+    while (millis() - startTime < waitMillis) {
+        if (ack > 9) {
+#ifdef GPS_DEBUG
+            LOG_DEBUG("\n");
+                LOG_INFO("Got ACK for class %02X message %02X in %d millis.\n", class_id, msg_id, millis() - startTime);
+#endif
+            return GNSS_RESPONSE_OK; // ACK received
+        }
 
-while (millis() - startTime < waitMillis) {
-if (ack > 9) {
+        if (GPSSerial.available()) {
+            b = GPSSerial.read();
+            if (b == frame_errors[sCounter]) {
+                sCounter++;
+                if (sCounter == 26) {
+                    return GNSS_RESPONSE_FRAME_ERRORS;
+                }
+            } else {
+                sCounter = 0;
+            }
+
 #ifdef GPS_DEBUG
-LOG_DEBUG("\n");
-            LOG_INFO("Got ACK for class %02X message %02X in %d millis.\n", class_id, msg_id, millis() - startTime);
+            LOG_DEBUG("%02X", b);
 #endif
-return GNSS_RESPONSE_OK; // ACK received
-}
-if (GPSSerial.available()) {
-b = GPSSerial.read();
-if (b == frame_errors[sCounter]) {
-sCounter++;
-if (sCounter == 26) {
-return GNSS_RESPONSE_FRAME_ERRORS;
-}
-} else {
-sCounter = 0;
-}
+
+            if (b == buf[ack]) {
+                ack++;
+            } else {
+                if (ack == 3 && b == 0x00) { // UBX-ACK-NAK message
 #ifdef GPS_DEBUG
-LOG_DEBUG("%02X", b);
+                    LOG_DEBUG("\n");
 #endif
-if (b == buf[ack]) {
-ack++;
-} else {
-if (ack == 3 && b == 0x00) { // UBX-ACK-NAK message
+                    logwarn("Got NAK for class %02X message %02X\n", class_id, msg_id);
+                    return GNSS_RESPONSE_NAK; // NAK received
+                }
+                ack = 0; // Reset the acknowledgement counter
+            }
+        }
+    }
+
 #ifdef GPS_DEBUG
-LOG_DEBUG("\n");
+    LOG_DEBUG("\n");
+        logwarn_f("No response for class %02X message %02X\n", class_id, msg_id);
 #endif
-logwarn("Got NAK for class %02X message %02X\n", class_id, msg_id);
-return GNSS_RESPONSE_NAK; // NAK received
-}
-ack = 0; // Reset the acknowledgement counter
-}
-}
-}
-#ifdef GPS_DEBUG
-LOG_DEBUG("\n");
-    logwarn_f("No response for class %02X message %02X\n", class_id, msg_id);
-#endif
-return GNSS_RESPONSE_NONE; // No response received within timeout
+    return GNSS_RESPONSE_NONE; // No response received within timeout
 }
