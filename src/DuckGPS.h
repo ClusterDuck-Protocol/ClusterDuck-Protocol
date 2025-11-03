@@ -37,7 +37,7 @@ public:
                   info.hwVersion.end(),
                   hardwareVersion.begin());
         loginfo("Configuring GNSS module, HW Version: %s\n", hardwareVersion.c_str());
-        if (std::equal(hardwareVersion.begin(), hardwareVersion.end(),"00040007"), "00040007", 8) { // The original ublox 6 is GPS only and doesn't support the UBX-CFG-GNSS message
+        if (std::equal(hardwareVersion.begin(), hardwareVersion.end(),"00040007")) { // The original ublox 6 is GPS only and doesn't support the UBX-CFG-GNSS message
             if (std::equal(hardwareVersion.begin(), hardwareVersion.end(), "00070000")) { // Max7 seems to only support GPS *or* GLONASS
                 logdbg("Setting GPS+SBAS\n");
                 msglen = makeUBXPacket(0x06, 0x3e, _message_GNSS_7.size(), _message_GNSS_7.data());
