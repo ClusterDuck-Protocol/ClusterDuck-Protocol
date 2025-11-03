@@ -19,7 +19,7 @@ bool runSensor(void *);
 bool sendData(std::string message, byte topic=topics::status);
 
 // --- Global Variables ---
-DuckLink duck("DUCK0001");                            // CDP DuckLink instance
+DuckLink duck("Link1276");                            // CDP DuckLink instance
 auto timer = timer_create_default();      // Creating a timer with default settings
 const int INTERVAL_MS = 10000;            // Interval in milliseconds between each call of runSensor
 int counter = 1;                          // Message counter to track transmissions

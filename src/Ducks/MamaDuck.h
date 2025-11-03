@@ -114,7 +114,7 @@ private :
                 if(!relay) {
                     loginfo_ln("handleReceivedPacket: Sending RREP");
                     this->sendRouteResponse(rreqDoc.getlastInPath(), rreqDoc.asString());
-                    return;
+                    return;//should this be here?
                 } else {
                     loginfo_ln("RREQ received for relay. Relaying!");
                     rxPacket.data = duckutils::stringToByteVector(rreqDoc.addToPath(this->duid)); //why is this different from stringToArray
