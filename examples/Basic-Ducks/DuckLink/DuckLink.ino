@@ -8,7 +8,7 @@
  * @date 2025-05-07
  */
 
- #include <CDP.h>
+#include <CDP.h>
 
 #ifdef SERIAL_PORT_USBVIRTUAL
 #define Serial SERIAL_PORT_USBVIRTUAL
