@@ -14,8 +14,8 @@
 #include <queue>
 
 // --- WIFI Configuration ---
-const std::string WIFI_SSID="SweetBeet";         // Replace with WiFi SSID
-const std::string WIFI_PASS="Vincent<3";     // Replace with WiFi Password
+const std::string WIFI_SSID="MyOptimum ac9021";         // Replace with WiFi SSID
+const std::string WIFI_PASS="periwinkle-101-741";     // Replace with WiFi Password
 #define WIFI_RETRY_DELAY_MS 5000
 
 // --- MQTT Configuration ---
@@ -51,7 +51,7 @@ static const char* mosquitto_ca_cert = \
 "-----END CERTIFICATE-----\n";
 
 // --- Global Objects ---
-PapaDuck hub("PAPA0001");                                     // PapaDuck instance
+PapaDuck hub("PAPA1262");                                     // PapaDuck instance
 WiFiClientSecure wifiClient;                      // Secure WiFi client
 PubSubClient mqttClient(wifiClient);              // MQTT client
 std::queue<std::string> mqttMessageQueue;         // Incoming mqtt messages
@@ -266,10 +266,10 @@ void processMessageFromDucks(std::vector<byte> packetBuffer) {
 
 // The callback method simply takes the incoming packet and
 // converts it to a JSON string, before sending it out over MQTT
-void handleDuckData(std::vector<byte> packetBuffer) {
-  Serial.printf("[HUB] got packet: %s\n", arduinoStringFromHex(packetBuffer.data(), packetBuffer.size()).c_str());
-  processMessageFromDucks(packetBuffer);
-}
+// void handleDuckData(std::vector<byte> packetBuffer) {
+//   Serial.printf("[HUB] got packet: %s\n", arduinoStringFromHex(packetBuffer.data(), packetBuffer.size()).c_str());
+//   processMessageFromDucks(packetBuffer);
+// }
 
 /**
  * @brief Setup function to initialize the PapaDuck
@@ -284,11 +284,12 @@ void setup() {
   wifiClient.setCACert(mosquitto_ca_cert);
 
   // Setup the duck link with default settings and connect to WiFi
-  uint32_t err = hub.setupWithDefaults(WIFI_SSID, WIFI_PASS);
+  uint32_t err = hub.setupWithDefaults();
+  hub.joinWifiNetwork(WIFI_SSID, WIFI_PASS);
 
   setupOK = true;
   // register a callback to handle incoming data from duck in the network
-  hub.onReceiveDuckData(handleDuckData);
+  // hub.onReceiveDuckData(handleDuckData);
 
   // setup MQTT client
   mqttClient.setServer(MQTT_SERVER, PORT);

@@ -27,12 +27,15 @@ class Duck {
      */
     void run(){
       Duck::logIfLowMemory();
-      duckRadio.serviceInterruptFlags();
       if(router.getNetworkState() == NetworkState::PUBLIC) {
-        handleReceivedPacket();
+        if(duckRadio.getReceiveFlag()){
+          loginfo_ln("RECEIBED FLAG _______________________________");
+          handleReceivedPacket();
+        }
       } else {
         attemptNetworkJoin();
       }
+      duckRadio.serviceInterruptFlags();
     }
 
     int setupWithDefaults() {
@@ -119,22 +122,15 @@ class Duck {
       int err = this->duckWifi.joinNetwork(ssid, password);
 
       // If we fail to connect to WiFi, retry a few times
-      // if (err == DUCK_INTERNET_ERR_CONNECT) {
-      //   int retry=0;
-      //   while ( err ==  DUCK_INTERNET_ERR_CONNECT && retry < 3 ) {
-      //     Serial.printf("[HUB] WiFi disconnected, retry connection: %s\n",WIFI_SSID.c_str());
-      //     delay(5000);
-      //     err = hub.setupInternet(WIFI_SSID, WIFI_PASS);
-      //     retry++;
-      //   }  
-      // }
-      // if (err != DUCK_ERR_NONE) {
-      //   Serial.print("[HUB] Failed to setup PapaDuck: rc = ");Serial.println(err);
-      //   setupOK = false;
-      //   return;
-      // }
-
-
+      if (err == DUCK_INTERNET_ERR_CONNECT) {
+        int retry=0;
+        while ( err ==  DUCK_INTERNET_ERR_CONNECT && retry < 30 ) {
+          Serial.printf("WiFi conenction failed, retry connection: %s\n", ssid.c_str());
+          delay(5000);
+          err = err = this->duckWifi.joinNetwork(ssid, password);
+          retry++;
+        }  
+      }
 
       //   if (err != DUCK_ERR_NONE) {
       //     logerr_ln("ERROR setupWithDefaults rc = %d",err);
