@@ -7,23 +7,43 @@
 void DuckGPS::setup() {
     // Configure GNSS settings: Enable GPS, disable others
     Adafruit_UBX ubx(GPSSerial);
-    UBXSendStatus status = ubx.sendMessageWithAck(UBXMessageClass::UBX_CLASS_CFG, UBXCfgMessageId::UBX_CFG_GNSS,
-                                                  ubx_cfg_gnss.data(), message_GNSS.size(), 1000);
+    UBXSendStatus status = ubx.sendMessageWithAck(
+            UBXMessageClass::UBX_CLASS_CFG,
+            UBXCfgMessageId::UBX_CFG_GNSS,
+            ubx_cfg_gnss.data(),
+            message_GNSS.size(),
+            100
+    );
     if (status != UBX_SEND_SUCCESS)
         logdbg_ln("Failed to configure GNSS settings");
-    // Set update rate to 1Hz
-    status = ubx.sendMessageWithAck(UBXMessageClass::UBX_CLASS_CFG, UBXCfgMessageId::UBX_CFG_RATE,
-                                    message_1HZ.data(), message_1HZ.size(), 1000);
+// Set update rate to 1Hz
+    status = ubx.sendMessageWithAck(
+            UBXMessageClass::UBX_CLASS_CFG,
+            UBXCfgMessageId::UBX_CFG_RATE,
+            message_1HZ.data(),
+            message_1HZ.size(),
+            100
+    );
     if (status != UBX_SEND_SUCCESS)
         logdbg_ln("Failed to set update rate");
-    // Configure navigation settings
-    status = ubx.sendMessageWithAck(UBXMessageClass::UBX_CLASS_CFG, UBXCfgMessageId::UBX_CFG_NAVX5,
-                                    message_NAVX5.data(), message_NAVX5.size(), 1000);
+// Configure navigation settings
+    status = ubx.sendMessageWithAck(
+            UBXMessageClass::UBX_CLASS_CFG,
+            UBXCfgMessageId::UBX_CFG_NAVX5,
+            message_NAVX5.data(),
+            message_NAVX5.size(),
+            100
+    );
     if (status != UBX_SEND_SUCCESS)
         logdbg_ln("Failed to configure navigation settings");
-    // Enable Jamming resistance
-    status = ubx.sendMessageWithAck(UBXMessageClass::UBX_CLASS_CFG, 0x39,
-                                    message_JAM.data(), message_JAM.size(), 1000);
+// Enable Jamming resistance
+    status = ubx.sendMessageWithAck(
+            UBXMessageClass::UBX_CLASS_CFG,
+            0x39,
+            message_JAM.data(),
+            message_JAM.size(),
+            100
+    );
     if (status != UBX_SEND_SUCCESS)
         logdbg_ln("Failed to enable jamming resistance");
     // Disable unnecessary NMEA sentences
@@ -38,8 +58,7 @@ void DuckGPS::setup() {
 
     for (const auto p : disable_msgs) {
         auto msg = p.first;
-        status = ubx.sendMessageWithAck(UBXMessageClass::UBX_CLASS_CFG, UBXCfgMessageId::UBX_CFG_MSG,
-                                        msg->data(), msg->size(), 1000);
+        status = ubx.sendMessageWithAck(UBXMessageClass::UBX_CLASS_CFG, UBXCfgMessageId::UBX_CFG_MSG,msg->data(), msg->size(), 100);
         if (status != UBX_SEND_SUCCESS) {
             std::string err = std::string("Failed to ").append(p.second);
             logdbg_ln(err.c_str());
