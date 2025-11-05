@@ -74,6 +74,7 @@ private :
                 this->sendRouteResponse(rxPacket.sduid, rrepDoc.asString());
                 // Update routing table with signal info
                 this->router.insertIntoRoutingTable(rxPacket.sduid, rrepDoc.getlastInPath(), this->getSignalScore());
+                break;
             }
             case reservedTopic::ping:
                 loginfo_ln("PING received. Sending PONG!");
