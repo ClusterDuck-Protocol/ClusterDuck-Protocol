@@ -15,7 +15,7 @@
 
 // --- WIFI Configuration ---
 const std::string WIFI_SSID="MyOptimum ac9021";         // Replace with WiFi SSID
-const std::string WIFI_PASS="periwinkle-101-741";     // Replace with WiFi Password
+const std::string WIFI_PASS="periwinkle-101-747";     // Replace with WiFi Password
 #define WIFI_RETRY_DELAY_MS 5000
 
 // --- MQTT Configuration ---

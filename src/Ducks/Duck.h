@@ -15,6 +15,8 @@
 #include "../routing/DuckRouter.h"
 #include "../routing/RouteJSON.h"
 
+#define NET_JOIN_DELAY 15000L
+
 //templated class to require some radio capability
 template <typename WifiCapability = DuckWifiNone, typename RadioType = DuckLoRa>
 class Duck {
@@ -29,11 +31,14 @@ class Duck {
       Duck::logIfLowMemory();
       if(router.getNetworkState() == NetworkState::PUBLIC) {
         if(duckRadio.getReceiveFlag()){
-          loginfo_ln("RECEIBED FLAG _______________________________");
           handleReceivedPacket();
         }
       } else {
         attemptNetworkJoin();
+        if(router.getNetworkState() == NetworkState::SEARCHING && (millis() > (NET_JOIN_DELAY * 5 + 5000L))){
+          loginfo_ln("No existing network found, creating new CDP network...");
+          router.setNetworkState(NetworkState::PUBLIC);
+        }
       }
       duckRadio.serviceInterruptFlags();
     }
@@ -124,19 +129,17 @@ class Duck {
       // If we fail to connect to WiFi, retry a few times
       if (err == DUCK_INTERNET_ERR_CONNECT) {
         int retry=0;
-        while ( err ==  DUCK_INTERNET_ERR_CONNECT && retry < 30 ) {
-          Serial.printf("WiFi conenction failed, retry connection: %s\n", ssid.c_str());
+        while ( err ==  DUCK_INTERNET_ERR_CONNECT && retry < 5 ) {
+          Serial.printf("WiFi connection failed, retry connection: %s\n", ssid.c_str());
           delay(5000);
           err = err = this->duckWifi.joinNetwork(ssid, password);
           retry++;
         }  
       }
 
-      //   if (err != DUCK_ERR_NONE) {
-      //     logerr_ln("ERROR setupWithDefaults rc = %d",err);
-      //     return err;
-      //   }
-      //   return DUCK_ERR_NONE;
+        if (err == DUCK_INTERNET_ERR_CONNECT) {
+          logerr_ln("ERROR wifi setup failed = %d",err);
+        }
     }
 
 
@@ -249,7 +252,7 @@ class Duck {
         router.insertIntoRoutingTable(cdpNode->sduid, cdpNode->sduid, this->getSignalScore()); //should signal score be stored on cdp packet?
         router.setNetworkState(NetworkState::PUBLIC);
       } else {
-        if((millis() - this->lastRreqTime) > 30000L){
+        if((millis() - this->lastRreqTime) > NET_JOIN_DELAY){
           sendRouteRequest(BROADCAST_DUID, getDuckId());
           Serial.println("searching for networks....");
           lastRreqTime = millis();

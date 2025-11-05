@@ -20,9 +20,9 @@
  bool runSensor(void *);
  
  // --- Global Variables ---
- MamaDuck duck("ORANGEMA"); // Device ID, MUST be 8 bytes and unique from other ducks;
+ MamaDuck duck("MAMA1276"); // Device ID, MUST be 8 bytes and unique from other ducks;
  auto timer = timer_create_default();  // Creating a timer with default settings
- const int INTERVAL_MS = 7000;        // Interval in milliseconds between runSensor call
+ const int INTERVAL_MS = 42600;        // Interval in milliseconds between runSensor call
  int counter = 1;                      // Counter for the sensor data  
  bool setupOK = false;                 // Flag to check if setup is complete
  
