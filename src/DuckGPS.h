@@ -5,11 +5,14 @@
 #ifndef CLUSTERDUCK_PROTOCOL_DUCKGPS_H
 #define CLUSTERDUCK_PROTOCOL_DUCKGPS_H
 #include "utils/DuckLogger.h"
-#include <include/cdpcfg.h>
-#include <TinyGPS++.h>
+#include "include/cdpcfg.h"
+#include "TinyGPS++.h"
+#include "Adafruit_UBloxDDC.h"
+#include "Adafruit_uBlox_typedef.h"
 #include <ctime>
 #include <memory>
 #include <array>
+#include <chrono>
 
 class DuckGPS {
 public:
@@ -23,110 +26,7 @@ public:
 
 
     };
-    void setup(){
-       // memset(&info, 0, sizeof(struct GnssModelInfo));
-        std::array<uint8_t,768> buffer = {0};
-        delay(100);
-        GPSSerial.write("$PCAS03,0,0,0,0,0,0,0,0,0,0,,,0,0*02\r\n");
-        delay(20);
-
-        clearBuffer();
-        int msglen = 0;
-        std::string hardwareVersion;
-        std::copy(info.hwVersion.begin(),
-                  info.hwVersion.end(),
-                  hardwareVersion.begin());
-        loginfo("Configuring GNSS module, HW Version: %s\n", hardwareVersion.c_str());
-        if (std::equal(hardwareVersion.begin(), hardwareVersion.end(),"00040007")) { // The original ublox 6 is GPS only and doesn't support the UBX-CFG-GNSS message
-            if (std::equal(hardwareVersion.begin(), hardwareVersion.end(), "00070000")) { // Max7 seems to only support GPS *or* GLONASS
-                logdbg("Setting GPS+SBAS\n");
-                msglen = makeUBXPacket(0x06, 0x3e, _message_GNSS_7.size(), _message_GNSS_7.data());
-                GPSSerial.write(UBXscratch.data(), msglen);
-            } else {
-                msglen = makeUBXPacket(0x06, 0x3e, _message_GNSS_8.size(), _message_GNSS_8.data());
-                GPSSerial.write(UBXscratch.data(), msglen);
-            }
-
-            if (getACK(0x06, 0x3e, 800) == GNSS_RESPONSE_NAK) {
-                // It's not critical if the module doesn't acknowledge this configuration.
-                loginfo("Unable to reconfigure GNSS - defaults maintained. Is this module GPS-only?\n");
-            } else {
-                if (std::equal(hardwareVersion.begin(), hardwareVersion.end(), "00070000")) {
-                    loginfo("GNSS configured for GPS+SBAS. Pause for 0.75s before sending next command.\n");
-                } else {
-                    loginfo("GNSS configured for GPS+SBAS+GLONASS+Galileo. Pause for 0.75s before sending next command.\n");
-                }
-                // Documentation say, we need wait atleast 0.5s after reconfiguration of GNSS module, before sending next
-                // commands
-
-            }
-            delay(1000);
-
-            msglen = makeUBXPacket(0x06, 0x39, _message_JAM.size(), _message_JAM.data());
-            GPSSerial.write(UBXscratch.data(), msglen);
-            if (getACK(0x06, 0x39, 300) != GNSS_RESPONSE_OK) {
-                logwarn("Unable to enable interference resistance.\n");
-            }
-
-            msglen = makeUBXPacket(0x06, 0x23, _message_NAVX5.size(), _message_NAVX5.data());
-            GPSSerial.write(UBXscratch.data(), msglen);
-            if (getACK(0x06, 0x23, 300) != GNSS_RESPONSE_OK) {
-                logwarn("Unable to configure extra settings.\n");
-            }
-
-            // ublox-M10S can be compatible with UBLOX traditional protocol, so the following sentence settings are also valid
-
-            msglen = makeUBXPacket(0x06, 0x08, _message_1HZ.size(), _message_1HZ.data());
-            GPSSerial.write(UBXscratch.data(), msglen);
-            if (getACK(0x06, 0x08, 300) != GNSS_RESPONSE_OK) {
-                logwarn("Unable to set GPS update rate.\n");
-            }
-//
-            msglen = makeUBXPacket(0x06, 0x01, _message_GGL.size(), _message_GGL.data());
-            GPSSerial.write(UBXscratch.data(), msglen);
-            if (getACK(0x06, 0x01, 300) != GNSS_RESPONSE_OK) {
-                logwarn("Unable to disable NMEA GGL.\n");
-            }
-
-            msglen = makeUBXPacket(0x06, 0x01, _message_GSA.size(), _message_GSA.data());
-            GPSSerial.write(UBXscratch.data(), msglen);
-            if (getACK(0x06, 0x01, 300) != GNSS_RESPONSE_OK) {
-                logwarn("Unable to Enable NMEA GSA.\n");
-            }
-
-            msglen = makeUBXPacket(0x06, 0x01, _message_GSV.size(), _message_GSV.data());
-            GPSSerial.write(UBXscratch.data(), msglen);
-            if (getACK(0x06, 0x01, 300) != GNSS_RESPONSE_OK) {
-                logwarn("Unable to disable NMEA GSV.\n");
-            }
-
-            msglen = makeUBXPacket(0x06, 0x01, _message_VTG.size(), _message_VTG.data());
-            GPSSerial.write(UBXscratch.data(), msglen);
-            if (getACK(0x06, 0x01, 300) != GNSS_RESPONSE_OK) {
-                logwarn("Unable to disable NMEA VTG.\n");
-            }
-
-            msglen = makeUBXPacket(0x06, 0x01, _message_RMC.size(), _message_RMC.data());
-            GPSSerial.write(UBXscratch.data(), msglen);
-            if (getACK(0x06, 0x01, 300) != GNSS_RESPONSE_OK) {
-                logwarn("Unable to enable NMEA RMC.\n");
-            }
-
-            msglen = makeUBXPacket(0x06, 0x01, _message_GGA.size(), _message_GGA.data());
-            GPSSerial.write(UBXscratch.data(), msglen);
-            if (getACK(0x06, 0x01, 300) != GNSS_RESPONSE_OK) {
-                logwarn("Unable to enable NMEA GGA.\n");
-            }
-            if (std::equal(hardwareVersion.begin(),hardwareVersion.end(), "00080000")) {
-                msglen = makeUBXPacket(0x06, 0x17, _message_NMEA.size(), _message_NMEA.data());
-                clearBuffer();
-                GPSSerial.write(UBXscratch.data(), msglen);
-                if (getACK(0x06, 0x17, 500) != GNSS_RESPONSE_OK) {
-                    logwarn("Unable to enable NMEA 4.10.\n");
-                }
-            }
-        }
-    }
+    void setup();
     enum AltitudeUnit{
         meter,
         kilo,
@@ -142,10 +42,10 @@ public:
     /**
    * @brief continuously reads data from GPS chip
    *
-   * @param unsigned long value for number of milliseconds to read data for
+   * @param std::chrono::time_point value for number of milliseconds to read data for
    * @return none
    */
-    void readData(unsigned long ms);
+    void readData(std::chrono::time_point<std::chrono::steady_clock> ms);
     double lat(), lng();
     /**
   * @brief helper method for getting [lat,lng] as a GeoJSON object.
@@ -184,19 +84,19 @@ public:
     double altitude(AltitudeUnit u);
 protected:
     void printData();
-    std::time_t tmConvert_t(int YYYY, byte MM, byte DD, byte hh, byte mm, byte ss);
-    uint8_t makeUBXPacket(uint8_t class_id, uint8_t msg_id, uint8_t payload_size, const uint8_t *msg);
+    std::time_t tmConvert_t(int YYYY, uint8_t MM, uint8_t DD, uint8_t hh, uint8_t mm, uint8_t ss);
 
 private:
     TinyGPSPlus gps;
     HardwareSerial GPSSerial;
-    std::array<uint8_t,250> UBXscratch = {0};
+
     void clearBuffer()
     {
         int x = GPSSerial.available();
         while (x--)
             GPSSerial.read();
     }
+
     struct GnssModelInfo {
         std::array<char,30> swVersion;
         std::array<char,10> hwVersion;
@@ -216,7 +116,6 @@ private:
         GNSS_RESPONSE_FRAME_ERRORS,
         GNSS_RESPONSE_OK,
     } GPS_RESPONSE;
-    GPS_RESPONSE getACK(uint8_t class_id, uint8_t msg_id, uint32_t waitMillis);
     struct ubxPacket
     {
         uint8_t cls;
@@ -231,7 +130,7 @@ private:
         sfe_ublox_packet_validity_e classAndIDmatch; // Goes from NOT_DEFINED to VALID or NOT_VALID when the Class and ID match the requestedClass and requestedID
     };
 
-    std::array<const uint8_t,58> ubx_cfg_gnss = {
+    std::array<uint8_t,58> ubx_cfg_gnss = {
             0x00,0x08,0x10,0x00,0x01,0x00,0x01,0x01, // GPS, Min/Max Channel Resources, ENABLED, L1, BIT24 (per uCenter/Query, cut-n-paste of hex frame)
             0x01,0x01,0x03,0x00,0x01,0x00,0x01,0x01, // SBAS
             0x02,0x04,0x08,0x00,0x01,0x00,0x01,0x01, // GALILEO
@@ -241,7 +140,7 @@ private:
             0x06,0x08,0x0E,0x00,0x01,0x00,0x01,0x01, // GLONASS
             0x30,0xAD }; // Fletcher checksum, correct for preceeding frame
 
-    std::array<const uint8_t,68> _message_GPSGLONASSGAL = {// GPS + GALILEO + GLONASS wo / SBAS
+    std::array<uint8_t,68> message_GPSGLONASSGAL = {// GPS + GALILEO + GLONASS wo / SBAS
 
             0xB5,0x62,0x06,0x3E, 0x3C, 0x00,
 
@@ -262,16 +161,8 @@ private:
             0x06,0x00,0x10,0x00,0x01,0x00,0x01,0x01,
 
             0xF5,0x8A};
-    std::array<uint8_t,20> _message_GNSS_7 = {
-            0x00, // msgVer (0 for this version)
-            0x00, // numTrkChHw (max number of hardware channels, read only, so it's always 0)
-            0xff, // numTrkChUse (max number of channels to use, 0xff = max available)
-            0x02, // numConfigBlocks (number of GNSS systems), most modules support maximum 3 GNSS systems
-            // GNSS config format: gnssId, resTrkCh, maxTrkCh, reserved1, flags
-            0x00, 0x08, 0x10, 0x00, 0x01, 0x00, 0x00, 0x01, // GPS
-            0x01, 0x01, 0x03, 0x00, 0x01, 0x00, 0x00, 0x01  // SBAS
-    };
-    std::array<uint8_t,44> _message_GNSS_8 = {
+
+    std::array<uint8_t,44> message_GNSS_8 = {
             0x00,                                           // msgVer (0 for this version)
             0x00,                                           // numTrkChHw (max number of hardware channels, read only, so it's always 0)
             0xff,                                           // numTrkChUse (max number of channels to use, 0xff = max available)
@@ -283,7 +174,7 @@ private:
             0x05, 0x00, 0x03, 0x00, 0x01, 0x00, 0x01, 0x01, // QZSS
             0x06, 0x08, 0x0E, 0x00, 0x01, 0x00, 0x01, 0x01  // GLONASS
     };
-    std::array<uint8_t,20> _message_NMEA = {
+    std::array<uint8_t,20> message_NMEA = {
             0x00,                              // filter flags
             0x41,                              // NMEA Version
             0x00,                              // Max number of SVs to report per TaklerId
@@ -296,7 +187,7 @@ private:
             0x00, 0x00,                        // bdsTalkerId 2 chars 0=default
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00 // Reserved
     };
-    std::array<uint8_t,28> _message_GNSS = {
+    std::array<uint8_t,28> message_GNSS = {
             0x00, // msgVer (0 for this version)
             0x00, // numTrkChHw (max number of hardware channels, read only, so it's always 0)
             0xff, // numTrkChUse (max number of channels to use, 0xff = max available)
@@ -306,7 +197,7 @@ private:
             0x01, 0x01, 0x03, 0x00, 0x01, 0x00, 0x01, 0x01, // SBAS
             0x06, 0x08, 0x0e, 0x00, 0x01, 0x00, 0x01, 0x01  // GLONASS
     };
-    std::array<const uint8_t,8> _message_JAM = {
+    std::array<uint8_t,8> message_JAM = {
             // bbThreshold (Broadband jamming detection threshold) is set to 0x3F (63 in decimal)
             // cwThreshold (CW jamming detection threshold) is set to 0x10 (16 in decimal)
             // algorithmBits (Reserved algorithm settings) is set to 0x16B156 as recommended
@@ -319,7 +210,7 @@ private:
             // (enabled)
             0x1E, 0x03, 0x00, 0x01 // config2: Extra settings for jamming/interference monitor
     };
-    std::array<const uint8_t,40> _message_NAVX5 = {
+    std::array<uint8_t,40> message_NAVX5 = {
             0x00, 0x00, // msgVer (0 for this version)
             // minMax flag = 1: apply min/max SVs settings
             // minCno flag = 1: apply minimum C/N0 setting
@@ -348,42 +239,42 @@ private:
             0x00, 0x00, 0x00,                   // Reserved
             0x01,                               // useAdr (Enable/disable ADR sensor fusion) = 1 (enabled)
     };
-    std::array<const uint8_t,6> _message_1HZ = {
+    std::array<uint8_t,6> message_1HZ = {
             0xE8, 0x03, // Measurement Rate (1000ms for 1Hz)
             0x01, 0x00, // Navigation rate, always 1 in GPS mode
             0x01, 0x00, // Time reference
     };
-    std::array<const uint8_t,8> _message_GGL =  {
+    std::array<uint8_t,8> message_GGL =  {
             0xF0, 0x01,            // NMEA ID for GLL
             0x01,                  // I/O Target 0=I/O, 1=UART1, 2=UART2, 3=USB, 4=SPI
             0x00,                  // Disable
             0x01, 0x01, 0x01, 0x01 // Reserved
     };
-    std::array<const uint8_t,8> _message_GSA = {
+    std::array<uint8_t,8> message_GSA = {
             0xF0, 0x02,            // NMEA ID for GSA
             0x01,                  // I/O Target 0=I/O, 1=UART1, 2=UART2, 3=USB, 4=SPI
             0x01,                  // Enable
             0x01, 0x01, 0x01, 0x01 // Reserved
     };
-    std::array<const uint8_t,8> _message_GSV = {
-        0xF0, 0x03,            // NMEA ID for GSV
-                0x01,                  // I/O Target 0=I/O, 1=UART1, 2=UART2, 3=USB, 4=SPI
-                0x00,                  // Disable
-                0x01, 0x01, 0x01, 0x01 // Reserved
+    std::array<uint8_t,8> message_GSV = {
+            0xF0, 0x03,            // NMEA ID for GSV
+            0x01,                  // I/O Target 0=I/O, 1=UART1, 2=UART2, 3=USB, 4=SPI
+            0x00,                  // Disable
+            0x01, 0x01, 0x01, 0x01 // Reserved
     };
-    std::array<const uint8_t,8> _message_VTG = {
+    std::array<uint8_t,8> message_VTG = {
             0xF0, 0x05,            // NMEA ID for VTG
             0x01,                  // I/O Target 0=I/O, 1=UART1, 2=UART2, 3=USB, 4=SPI
             0x00,                  // Disable
             0x01, 0x01, 0x01, 0x01 // Reserved
     };
-    std::array<const uint8_t,8> _message_RMC = {
+    std::array<uint8_t,8> message_RMC = {
             0xF0, 0x04,            // NMEA ID for RMC
             0x01,                  // I/O Target 0=I/O, 1=UART1, 2=UART2, 3=USB, 4=SPI
             0x01,                  // Enable
             0x01, 0x01, 0x01, 0x01 // Reserved
     };
-    std::array<const uint8_t,8> _message_GGA = {
+    std::array<uint8_t,8> message_GGA = {
             0xF0, 0x00,            // NMEA ID for GGA
             0x01,                  // I/O Target 0=I/O, 1=UART1, 2=UART2, 3=USB, 4=SPI
             0x01,                  // Enable

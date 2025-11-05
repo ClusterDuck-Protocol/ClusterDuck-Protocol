@@ -3,17 +3,60 @@
 //
 
 #include "DuckGPS.h"
-void DuckGPS::readData(unsigned long ms) {
-    unsigned long start = millis();
+#include "Adafruit_UBX.h"
+void DuckGPS::setup() {
+    // Configure GNSS settings: Enable GPS, disable others
+    Adafruit_UBX ubx(GPSSerial);
+    UBXSendStatus status = ubx.sendMessageWithAck(UBXMessageClass::UBX_CLASS_CFG, UBXCfgMessageId::UBX_CFG_GNSS,
+                                                  ubx_cfg_gnss.data(), message_GNSS.size(), 1000);
+    if (status != UBX_SEND_SUCCESS)
+        logdbg_ln("Failed to configure GNSS settings");
+    // Set update rate to 1Hz
+    status = ubx.sendMessageWithAck(UBXMessageClass::UBX_CLASS_CFG, UBXCfgMessageId::UBX_CFG_RATE,
+                                    message_1HZ.data(), message_1HZ.size(), 1000);
+    if (status != UBX_SEND_SUCCESS)
+        logdbg_ln("Failed to set update rate");
+    // Configure navigation settings
+    status = ubx.sendMessageWithAck(UBXMessageClass::UBX_CLASS_CFG, UBXCfgMessageId::UBX_CFG_NAVX5,
+                                    message_NAVX5.data(), message_NAVX5.size(), 1000);
+    if (status != UBX_SEND_SUCCESS)
+        logdbg_ln("Failed to configure navigation settings");
+    // Enable Jamming resistance
+    status = ubx.sendMessageWithAck(UBXMessageClass::UBX_CLASS_CFG, 0x39,
+                                    message_JAM.data(), message_JAM.size(), 1000);
+    if (status != UBX_SEND_SUCCESS)
+        logdbg_ln("Failed to enable jamming resistance");
+    // Disable unnecessary NMEA sentences
+    const std::array<std::pair<std::array<uint8_t,8>, std::string>,6> disable_msgs = {
+            std::make_pair(message_GGL, "GGL"),
+            std::make_pair(message_GSV, "GSV"),
+            std::make_pair(message_VTG, "VTG"),
+            std::make_pair(message_GGA, "GGA"),
+            std::make_pair(message_GSA, "GSA"),
+            std::make_pair(message_RMC, "RMC")
+    };
+
+    for (const auto p : disable_msgs) {
+        auto msg = p.first;
+        status = ubx.sendMessageWithAck(UBXMessageClass::UBX_CLASS_CFG, UBXCfgMessageId::UBX_CFG_MSG,
+                                        msg.data(), msg.size(), 1000);
+        if (status != UBX_SEND_SUCCESS) {
+            std::string err = std::string("Failed to disable ").append(p.second);
+            logdbg_ln(err.c_str());
+        }
+    }
+}
+void DuckGPS::readData(std::chrono::time_point<std::chrono::steady_clock> ms) {
+    std::chrono::time_point<std::chrono::steady_clock> start = std::chrono::steady_clock::now();
     do
     {
-        while (GPSSerial.available())
+        if (GPSSerial.available())
             gps.encode(GPSSerial.read());
-    } while (millis() - start < ms);
+    } while (std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start).count() < ms);
     printData();
 }
 
-std::time_t DuckGPS::tmConvert_t(int YYYY, byte MM, byte DD, byte hh, byte mm, byte ss)
+std::time_t DuckGPS::tmConvert_t(int YYYY, uint8_t MM, uint8_t DD, uint8_t hh, uint8_t mm, uint8_t ss)
 {
     std::tm tmSet{};
     tmSet.tm_year = YYYY - 1900;
@@ -84,100 +127,4 @@ double DuckGPS::speed(SpeedUnit u){
 
 uint32_t DuckGPS::satellites() {
     return gps.satellites.value();
-}
-
-uint8_t DuckGPS::makeUBXPacket(uint8_t class_id, uint8_t msg_id, uint8_t payload_size, const uint8_t *msg)
-{
-    // Construct the UBX packet
-    UBXscratch[0] = 0xB5;         // header
-    UBXscratch[1] = 0x62;         // header
-    UBXscratch[2] = class_id;     // class
-    UBXscratch[3] = msg_id;       // id
-    UBXscratch[4] = payload_size; // length
-    UBXscratch[5] = 0x00;
-
-    UBXscratch[6 + payload_size] = 0x00; // CK_A
-    UBXscratch[7 + payload_size] = 0x00; // CK_B
-
-    for (int i = 0; i < payload_size; i++) {
-        UBXscratch[6 + i] = pgm_read_byte(&msg[i]);
-    }
-
-    uint8_t CK_A = 0, CK_B = 0;
-    int length = payload_size + 8;
-    for (size_t i = 2; i < length - 2; i++) {
-        CK_A = (CK_A + UBXscratch[i]) & 0xFF;
-        CK_B = (CK_B + CK_A) & 0xFF;
-    }
-
-    // Place the calculated checksum values in the message
-    UBXscratch[length - 2] = CK_A;
-    UBXscratch[length - 1] = CK_B;
-    return length;
-}
-
-DuckGPS::GPS_RESPONSE DuckGPS::getACK(uint8_t class_id, uint8_t msg_id, uint32_t waitMillis) {
-    uint8_t b;
-    uint8_t ack = 0;
-    std::array<const uint8_t,2> ackP{class_id, msg_id};
-    std::array<uint8_t,10> buf{0xB5, 0x62, 0x05, 0x01, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00};
-    uint32_t startTime = millis();
-    const char frame_errors[] = "More than 100 frame errors";
-    int sCounter = 0;
-// Calculate checksum for ACK message
-    for (int j = 2; j < 6; j++) {
-        buf[8] += buf[j];
-        buf[9] += buf[8];
-    }
-
-    for (int j = 0; j < 2; j++) {
-        buf[6 + j] = ackP[j];
-        buf[8] += buf[6 + j];
-        buf[9] += buf[8];
-    }
-
-    while (millis() - startTime < waitMillis) {
-        if (ack > 9) {
-#ifdef GPS_DEBUG
-            LOG_DEBUG("\n");
-                LOG_INFO("Got ACK for class %02X message %02X in %d millis.\n", class_id, msg_id, millis() - startTime);
-#endif
-            return GNSS_RESPONSE_OK; // ACK received
-        }
-
-        if (GPSSerial.available()) {
-            b = GPSSerial.read();
-            if (b == frame_errors[sCounter]) {
-                sCounter++;
-                if (sCounter == 26) {
-                    return GNSS_RESPONSE_FRAME_ERRORS;
-                }
-            } else {
-                sCounter = 0;
-            }
-
-#ifdef GPS_DEBUG
-            LOG_DEBUG("%02X", b);
-#endif
-
-            if (b == buf[ack]) {
-                ack++;
-            } else {
-                if (ack == 3 && b == 0x00) { // UBX-ACK-NAK message
-#ifdef GPS_DEBUG
-                    LOG_DEBUG("\n");
-#endif
-                    logwarn("Got NAK for class %02X message %02X\n", class_id, msg_id);
-                    return GNSS_RESPONSE_NAK; // NAK received
-                }
-                ack = 0; // Reset the acknowledgement counter
-            }
-        }
-    }
-
-#ifdef GPS_DEBUG
-    LOG_DEBUG("\n");
-        logwarn_f("No response for class %02X message %02X\n", class_id, msg_id);
-#endif
-    return GNSS_RESPONSE_NONE; // No response received within timeout
 }
