@@ -27,19 +27,19 @@ void DuckGPS::setup() {
     if (status != UBX_SEND_SUCCESS)
         logdbg_ln("Failed to enable jamming resistance");
     // Disable unnecessary NMEA sentences
-    const std::array<std::pair<std::array<uint8_t,8>, std::string>,6> disable_msgs = {
-            std::make_pair(message_GGL, "GGL"),
-            std::make_pair(message_GSV, "GSV"),
-            std::make_pair(message_VTG, "VTG"),
-            std::make_pair(message_GGA, "GGA"),
-            std::make_pair(message_GSA, "GSA"),
-            std::make_pair(message_RMC, "RMC")
+    const std::array<std::pair<std::array<uint8_t,8>*, std::string>,6> disable_msgs = {
+            std::make_pair(&message_GGL, "GGL"),
+            std::make_pair(&message_GSV, "GSV"),
+            std::make_pair(&message_VTG, "VTG"),
+            std::make_pair(&message_GGA, "GGA"),
+            std::make_pair(&message_GSA, "GSA"),
+            std::make_pair(&message_RMC, "RMC")
     };
 
     for (const auto p : disable_msgs) {
         auto msg = p.first;
         status = ubx.sendMessageWithAck(UBXMessageClass::UBX_CLASS_CFG, UBXCfgMessageId::UBX_CFG_MSG,
-                                        msg.data(), msg.size(), 1000);
+                                        msg->data(), msg->size(), 1000);
         if (status != UBX_SEND_SUCCESS) {
             std::string err = std::string("Failed to disable ").append(p.second);
             logdbg_ln(err.c_str());
