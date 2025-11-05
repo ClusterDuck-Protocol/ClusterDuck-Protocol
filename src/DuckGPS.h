@@ -26,6 +26,9 @@ public:
 
 
     };
+    /**
+     * @brief initializes GPS chip with recommended settings
+     */
     void setup();
     enum AltitudeUnit{
         meter,
@@ -97,12 +100,6 @@ private:
             GPSSerial.read();
     }
 
-    struct GnssModelInfo {
-        std::array<char,30> swVersion;
-        std::array<char,10> hwVersion;
-        uint8_t extensionNo;
-        std::array<std::array<char,30>,10> extension;
-    } info;
     typedef enum
     {
         SFE_UBLOX_PACKET_VALIDITY_NOT_VALID,
