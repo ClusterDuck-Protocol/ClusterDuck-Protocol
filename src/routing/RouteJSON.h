@@ -29,7 +29,7 @@ class RouteJSON {
 #ifdef CDP_LOG_DEBUG
             std::string log;
             serializeJson(json, log);
-            logdbg_ln("RREQ: %s", log.c_str());
+            logdbg_ln("RouteDoc: %s", log.c_str());
 #endif
         }
 

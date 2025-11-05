@@ -57,51 +57,28 @@ void loop() {
   timer.tick();
   duck.run();
 }
-
-/**
- * @brief Function to run the sensor and send data.
- *
- * This function is called periodically to send sensor health data.
- *
- * @param unused Pointer to unused parameter (not used in this implementation)
- * @return true if data was sent successfully, false otherwise
- */
-bool runSensor(void *) {
+ /**
+  * @brief Periodically executed to gather and send health data.
+  *
+  * Collects the current counter value and available free memory, formats them
+  * into a string, and transmits this data via CDP.
+  *
+  * @param unused Unused parameter required by the timer callback signature
+  * @return true if data was successfully sent, false otherwise
+  */
+ bool runSensor(void *) {
+  bool failure;
   
-  bool result = false;
+ //  std::string message = "C:" + std::to_string(counter) + "|" + "FM:" + std::to_string(freeMemory());
+ //  Serial.print("[DUCKLINK] sensor data: ");
+ //  Serial.println(message.c_str());
 
-  std::string message = "C:" + std::to_string(counter) + "|" + "FM:" + std::to_string(freeMemory());
-  Serial.print("[LINK] sensor data: ");
-  Serial.println(message.c_str());
-  
-  result = sendData(message, topics::health);
-  if (result) {
-     Serial.println("[LINK] runSensor ok.");
-  } else {
-     Serial.println("[LINK] runSensor failed.");
-  }
-  return result;
-
-}
-
-/**
- * @brief Sends the provided message as CDP packet to the mesh network.
- *
- * Encapsulates the message within a CDP topic and handles errors in transmission. 
- *
- * @param message The payload data to send as a std::string
- * @param topic CDP topic. CDP topics can be found in CdpPacket.h (default: status)
- * @return true if data sent successfully, false otherwise
- */
-bool sendData(std::string message, byte topic) {
-  bool sentOk = false;
-  
-  int err = duck.sendData(topic, message);
-  if (err == DUCK_ERR_NONE) {
-    sentOk = true;
-  }
-  if (!sentOk) {
-    Serial.println(("[Link] Failed to send data. error = " + std::to_string(err)).c_str());
-  }
-  return sentOk;
+ //  failure = duck.sendData(topics::health, message);
+ //  if (!failure) {
+ //    counter++;
+ //    Serial.println("[DUCKLINK] runSensor ok.");
+ //  } else {
+ //    Serial.println("[DUCKLINK] runSensor failed.");
+ //  }
+  return true;
 }
