@@ -46,13 +46,13 @@ void DuckGPS::setup() {
         }
     }
 }
-void DuckGPS::readData(std::chrono::time_point<std::chrono::steady_clock> ms) {
+void DuckGPS::readData(unsigned long ms) {
     std::chrono::time_point<std::chrono::steady_clock> start = std::chrono::steady_clock::now();
     do
     {
         if (GPSSerial.available())
             gps.encode(GPSSerial.read());
-    } while (std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start).count() < ms);
+    } while (ms > std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start).count());
     printData();
 }
 

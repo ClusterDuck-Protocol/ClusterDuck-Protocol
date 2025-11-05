@@ -45,10 +45,10 @@ public:
     /**
    * @brief continuously reads data from GPS chip
    *
-   * @param std::chrono::time_point value for number of milliseconds to read data for
+   * @param unsigned long value for number of milliseconds to read data for
    * @return none
    */
-    void readData(std::chrono::time_point<std::chrono::steady_clock> ms);
+    void readData(unsigned long ms);
     double lat(), lng();
     /**
   * @brief helper method for getting [lat,lng] as a GeoJSON object.
