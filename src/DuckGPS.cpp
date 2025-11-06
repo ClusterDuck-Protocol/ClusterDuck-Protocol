@@ -58,7 +58,11 @@ void DuckGPS::setup() {
 
     for (const auto p : config_msgs) {
         auto msg = p.first;
-        status = ubx.sendMessageWithAck(UBXMessageClass::UBX_CLASS_CFG, UBXCfgMessageId::UBX_CFG_MSG,msg->data(), msg->size(), 100);
+        status = ubx.sendMessageWithAck(UBXMessageClass::UBX_CLASS_CFG,
+                                        UBXCfgMessageId::UBX_CFG_MSG,
+                                        msg->data(),
+                                        msg->size(),
+                                        100);
         if (status != UBX_SEND_SUCCESS) {
             std::string err = std::string("Failed to ").append(p.second);
             logdbg_ln(err.c_str());
