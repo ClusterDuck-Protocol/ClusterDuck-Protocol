@@ -181,7 +181,7 @@ std::optional<std::vector<uint8_t>> DuckLoRa::readReceivedData() { //return a st
 
     loginfo_ln("readReceivedData: checking path offset integrity");
 
-    byte* data = packetBytes.data();
+    uint8_t* data = packetBytes.data();
 
     loginfo_ln("readReceivedData: checking data section CRC");
 

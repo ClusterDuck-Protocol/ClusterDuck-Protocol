@@ -41,9 +41,9 @@ public:
    * @param cmd byte enum for command to be executed.
    * @param value contextual data to be used in executed command.
    */
-  void sendCommand(byte cmd, std::vector<byte> value) {
+  void sendCommand(uint8_t cmd, std::vector<uint8_t> value) {
     loginfo_ln("Initiate sending command");
-    std::vector<byte> dataPayload;
+    std::vector<uint8_t> dataPayload;
     dataPayload.push_back(cmd);
     dataPayload.insert(dataPayload.end(), value.begin(), value.end());
     
@@ -65,7 +65,7 @@ public:
    * @param value contextual data to be used in executed command.
    * @param dduid destination duck ID for command to be executed.
    */
-  void sendCommand(byte cmd, std::vector<byte> value, std::array<byte,8> dduid);
+  void sendCommand(uint8_t cmd, std::vector<uint8_t> value, std::array<uint8_t,8> dduid);
 
   //remove this when mqtt quack pack is added
   bool isWifiConnected(){
