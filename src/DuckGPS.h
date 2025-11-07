@@ -100,33 +100,6 @@ private:
             GPSSerial.read();
     }
 
-    typedef enum
-    {
-        SFE_UBLOX_PACKET_VALIDITY_NOT_VALID,
-        SFE_UBLOX_PACKET_VALIDITY_VALID,
-        SFE_UBLOX_PACKET_VALIDITY_NOT_DEFINED,
-        SFE_UBLOX_PACKET_NOTACKNOWLEDGED // This indicates that we received a NACK
-    } sfe_ublox_packet_validity_e;
-    typedef enum {
-        GNSS_RESPONSE_NONE,
-        GNSS_RESPONSE_NAK,
-        GNSS_RESPONSE_FRAME_ERRORS,
-        GNSS_RESPONSE_OK,
-    } GPS_RESPONSE;
-    struct ubxPacket
-    {
-        uint8_t cls;
-        uint8_t id;
-        uint16_t len;          // Length of the payload. Does not include cls, id, or checksum bytes
-        uint16_t counter;      // Keeps track of number of overall bytes received. Some responses are larger than 255 bytes.
-        uint16_t startingSpot; // The counter value needed to go past before we begin recording into payload array
-        uint8_t *payload;      // We will allocate RAM for the payload if/when needed.
-        uint8_t checksumA;     // Given to us from module. Checked against the rolling calculated A/B checksums.
-        uint8_t checksumB;
-        sfe_ublox_packet_validity_e valid;           // Goes from NOT_DEFINED to VALID or NOT_VALID when checksum is checked
-        sfe_ublox_packet_validity_e classAndIDmatch; // Goes from NOT_DEFINED to VALID or NOT_VALID when the Class and ID match the requestedClass and requestedID
-    };
-
     std::array<uint8_t,58> ubx_cfg_gnss = {
             0x00,0x08,0x10,0x00,0x01,0x00,0x01,0x01, // GPS, Min/Max Channel Resources, ENABLED, L1, BIT24 (per uCenter/Query, cut-n-paste of hex frame)
             0x01,0x01,0x03,0x00,0x01,0x00,0x01,0x01, // SBAS
