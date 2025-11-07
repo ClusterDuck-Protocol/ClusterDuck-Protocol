@@ -38,7 +38,7 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
           logdbg_ln("Got data from radio, prepare for relay. size: %d",rxPacket.size());
   
           // recvDataCallback(rxPacket.asBytes());
-          loginfo_ln("handleReceivedPacket: packet RELAY START");
+          loginfo_ln("handleReceivedPacket: START");
           
           //Check if Duck is desitination for this packet before relaying
           if (duckutils::isEqual(BROADCAST_DUID, rxPacket.dduid)) {
