@@ -38,31 +38,29 @@ private :
      *
      */
     void handleReceivedPacket() override{
-        if (this->duckRadio.getReceiveFlag()){
-            bool relay = false;
-            
-            loginfo_ln("====> handleReceivedPacket: START");
+        bool relay = false;
+        
+        loginfo_ln("====> handleReceivedPacket: START");
 
-            int err;
-            std::optional<std::vector<uint8_t>> rxData = this->duckRadio.readReceivedData();
-            if (!rxData) {
-            logerr_ln("ERROR failed to get data from DuckRadio.");
-            return;
-            }
-            CdpPacket rxPacket(rxData.value());
-            logdbg_ln("Got data from radio, prepare for relay. size: %d",rxPacket.size());
+        int err;
+        std::optional<std::vector<uint8_t>> rxData = this->duckRadio.readReceivedData();
+        if (!rxData) {
+        logerr_ln("ERROR failed to get data from DuckRadio.");
+        return;
+        }
+        CdpPacket rxPacket(rxData.value());
+        logdbg_ln("Got data from radio. size: %d",rxPacket.size());
 
-            // recvDataCallback(rxPacket.asBytes());
-            loginfo_ln("handleReceivedPacket: START");
-            
-            //Check if Duck is desitination for this packet before relaying
-            if (duckutils::isEqual(BROADCAST_DUID, rxPacket.dduid)) {
-                ifBroadcast(rxPacket, err);
-            } else if(duckutils::isEqual(this->duid, rxPacket.dduid)) { //Target device check
-                ifNotBroadcast(rxPacket, err);
-            } else { //If it's meant for a specific target but not this one
-                ifNotBroadcast(rxPacket, err, true);
-            }
+        // recvDataCallback(rxPacket.asBytes());
+        loginfo_ln("handleReceivedPacket: START");
+        
+        //Check if Duck is desitination for this packet before relaying
+        if (duckutils::isEqual(BROADCAST_DUID, rxPacket.dduid)) {
+            ifBroadcast(rxPacket, err);
+        } else if(duckutils::isEqual(this->duid, rxPacket.dduid)) { //Target device check
+            ifNotBroadcast(rxPacket, err);
+        } else { //If it's meant for a specific target but not this one
+            ifNotBroadcast(rxPacket, err, true);
         }
     }
 

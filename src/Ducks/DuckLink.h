@@ -35,7 +35,7 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
           return;
           }
           CdpPacket rxPacket(rxData.value());
-          logdbg_ln("Got data from radio, prepare for relay. size: %d",rxPacket.size());
+          logdbg_ln("Got data from radio. size: %d",rxPacket.size());
   
           // recvDataCallback(rxPacket.asBytes());
           loginfo_ln("handleReceivedPacket: START");

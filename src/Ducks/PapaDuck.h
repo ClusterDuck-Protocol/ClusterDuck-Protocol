@@ -76,28 +76,26 @@ private:
   rxDoneCallback recvDataCallback;
   
   void handleReceivedPacket() {
-    // if (this->duckRadio.getReceiveFlag()){
-      int err;
-      std::optional<std::vector<uint8_t>> rxData = this->duckRadio.readReceivedData();
-      if (!rxData) {
-      logerr_ln("ERROR failed to get data from DuckRadio.");
-      return;
-      }
-      CdpPacket rxPacket(rxData.value());
-      logdbg_ln("Got data from radio, prepare for relay. size: %d",rxPacket.size());
+    int err;
+    std::optional<std::vector<uint8_t>> rxData = this->duckRadio.readReceivedData();
+    if (!rxData) {
+    logerr_ln("ERROR failed to get data from DuckRadio.");
+    return;
+    }
+    CdpPacket rxPacket(rxData.value());
+    logdbg_ln("Got data from radio, prepare for relay. size: %d",rxPacket.size());
 
-      // recvDataCallback(rxPacket.asBytes());
-      loginfo_ln("handleReceivedPacket: START");
+    // recvDataCallback(rxPacket.asBytes());
+    loginfo_ln("handleReceivedPacket: START");
 
-      //Check if Duck is desitination for this packet before relaying
-      if (duckutils::isEqual(BROADCAST_DUID, rxPacket.dduid)) {
-          ifBroadcast(rxPacket, err);
-      } else if(duckutils::isEqual(this->duid, rxPacket.dduid) || duckutils::isEqual(rxPacket.dduid, PAPADUCK_DUID)) { //Target device check
-          ifNotBroadcast(rxPacket, err);
-      } else { //If it's meant for a specific target but not this one
-          ifNotBroadcast(rxPacket, err, true);
-      }
-      //}
+    //Check if Duck is desitination for this packet before relaying
+    if (duckutils::isEqual(BROADCAST_DUID, rxPacket.dduid)) {
+        ifBroadcast(rxPacket, err);
+    } else if(duckutils::isEqual(this->duid, rxPacket.dduid) || duckutils::isEqual(rxPacket.dduid, PAPADUCK_DUID)) { //Target device check
+        ifNotBroadcast(rxPacket, err);
+    } else { //If it's meant for a specific target but not this one
+        ifNotBroadcast(rxPacket, err, true);
+    }
   } 
 
   void ifBroadcast(CdpPacket rxPacket, int err) {

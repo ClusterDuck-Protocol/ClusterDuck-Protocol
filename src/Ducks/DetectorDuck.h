@@ -41,7 +41,7 @@ private:
     return;
     }
     CdpPacket rxPacket(rxData.value());
-    logdbg_ln("Got data from radio, prepare for relay. size: %d",rxPacket.size());
+    logdbg_ln("Got data from radio. size: %d",rxPacket.size());
   
     if (rxPacket.topic == reservedTopic::pong) {
       logdbg("run() - got ping response!");
