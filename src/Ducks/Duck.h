@@ -270,6 +270,7 @@ class Duck {
      * @returns DUCK_ERR_NONE if the data was sent successfully, an error code otherwise.
      */
     int sendRouteRequest(Duid targetDevice, std::vector<uint8_t> origin){
+      Serial.println("preparing to send a rreq to join netowrk");
       int err = sendReservedTopicData(targetDevice, reservedTopic::rreq, origin);
       if (err != DUCK_ERR_NONE){
         logerr_ln("ERR: failed to send rreq");
@@ -399,19 +400,19 @@ class Duck {
      */
     int sendReservedTopicData(Duid targetDevice, reservedTopic topic, std::vector<uint8_t> data){
       int err = DUCK_ERR_NONE;
-      if(router.getNetworkState() == NetworkState::PUBLIC){
+      if((router.getNetworkState() == NetworkState::PUBLIC) || ((router.getNetworkState() == NetworkState::SEARCHING) && (topic == reservedTopic::rreq))){
         CdpPacket txPacket = CdpPacket(targetDevice, topic, data, this->duid, this->getType());
         router.getFilter().assignUniqueMessageId(txPacket);
         err = txPacket.prepareForSending();
         if (err != DUCK_ERR_NONE) {
-          logerr_ln("ERROR Failed to build ping packet, err = " + err);
+          logerr_ln("ERROR Failed to build packet, err = " + err);
           return err;
         }
         err = duckRadio.sendData(txPacket.asBytes());
         if (err != DUCK_ERR_NONE) {
           logerr_ln("ERROR Lora sendData failed, err = %d", err);
         }
-      }
+      } 
       return err;
     }
 
