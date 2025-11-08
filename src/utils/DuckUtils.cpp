@@ -81,7 +81,7 @@ std::string toUpperCase(std::string str) {
       byteVec.reserve(str.length());
 
       for (unsigned int i = 0; i < str.length(); ++i) {
-          byteVec.push_back(static_cast<byte>(str[i]));
+          byteVec.push_back(static_cast<uint8_t>(str[i]));
       }
 
       return byteVec;
