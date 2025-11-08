@@ -14,8 +14,8 @@
 #include <queue>
 
 // --- WIFI Configuration ---
-const std::string WIFI_SSID="MyOptimum ac9021";         // Replace with WiFi SSID
-const std::string WIFI_PASS="periwinkle-101-747";     // Replace with WiFi Password
+const std::string WIFI_SSID="";         // Replace with WiFi SSID
+const std::string WIFI_PASS="";     // Replace with WiFi Password
 
 // --- MQTT Configuration ---
 #define MQTT_RETRY_DELAY_MS 500
@@ -95,7 +95,6 @@ bool setup_mqtt(void)
     
     return true;
 }
-
 
 // Incoming MQTT messages from the controller
 // This needs to be fast, so we simply queue the raw message
