@@ -22,7 +22,7 @@
  // --- Global Variables ---
  MamaDuck duck("MAMA1276"); // Device ID, MUST be 8 bytes and unique from other ducks;
  auto timer = timer_create_default();  // Creating a timer with default settings
- const int INTERVAL_MS = 42600;        // Interval in milliseconds between runSensor call
+ const int INTERVAL_MS = 48600;        // Interval in milliseconds between runSensor call
  int counter = 1;                      // Counter for the sensor data  
  bool setupOK = false;                 // Flag to check if setup is complete
  
@@ -72,17 +72,17 @@
  bool runSensor(void *) {
    bool failure;
    
-  //  std::string message = "C:" + std::to_string(counter) + "|" + "FM:" + std::to_string(freeMemory());
-  //  Serial.print("[MAMA] sensor data: ");
-  //  Serial.println(message.c_str());
+   std::string message = "C:" + std::to_string(counter) + "|" + "FM:" + std::to_string(freeMemory());
+   Serial.print("[MAMA] sensor data: ");
+   Serial.println(message.c_str());
  
-  //  failure = duck.sendData(topics::health, message);
-  //  if (!failure) {
-  //    counter++;
-  //    Serial.println("[MAMA] runSensor ok.");
-  //  } else {
-  //    Serial.println("[MAMA] runSensor failed.");
-  //  }
+   failure = duck.sendData(topics::health, message);
+   if (!failure) {
+     counter++;
+     Serial.println("[MAMA] runSensor ok.");
+   } else {
+     Serial.println("[MAMA] runSensor failed.");
+   }
    return true;
  }
  

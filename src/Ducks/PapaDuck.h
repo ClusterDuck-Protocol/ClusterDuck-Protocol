@@ -83,9 +83,9 @@ private:
     return;
     }
     CdpPacket rxPacket(rxData.value());
-    logdbg_ln("Got data from radio, prepare for relay. size: %d",rxPacket.size());
+    logdbg_ln("Got data from radio. size: %d",rxPacket.size());
 
-    // recvDataCallback(rxPacket.asBytes());
+    recvDataCallback(rxPacket);
     loginfo_ln("handleReceivedPacket: START");
 
     //Check if Duck is desitination for this packet before relaying
