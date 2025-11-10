@@ -5,10 +5,6 @@
 #include "DuckEsp.h"
 #include "./utils/DuckUtils.h"
 #include "./utils/DuckLogger.h"  // Required for logging functions
-#include "include/DuckTypes.h"
-#include "include/DuckEsp.h"
-#include "include/DuckUtils.h"
-#include "DuckLogger.h"  // Required for logging functions
 #include <Wire.h>  // Required for I2C initialization
 #endif
 
