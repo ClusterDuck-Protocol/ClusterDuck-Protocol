@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['decrypt_0',['decrypt',['../class_duck.html#a9980d0144dbcd4698d21c1e87902aa2f',1,'Duck']]],
-  ['decryptdata_1',['decryptData',['../namespaceduckcrypto.html#a4eb30dba2b8da5b5ed71520702e0edb5',1,'duckcrypto']]],
-  ['duck_2',['duck',['../class_duck.html#aeb0a83da19c0accf415052d9e2626b68',1,'Duck::Duck(std::string name=&quot;&quot;)'],['../class_duck.html#a87b5981a405d694d6796cb56fe52c698',1,'Duck::Duck(Duck const &amp;)=delete']]],
-  ['ducknet_3',['DuckNet',['../class_duck_net.html#a732adcbd8649a905be85b406d441bc3e',1,'DuckNet']]],
-  ['duckpacket_4',['duckpacket',['../class_duck_packet.html#a0d70cc32e12585c7c1ac4da10fec80af',1,'DuckPacket::DuckPacket()'],['../class_duck_packet.html#a2353be5e63d55a5d7f2193c02b76c640',1,'DuckPacket::DuckPacket(std::array&lt; byte, 8 &gt; duid)']]]
+  ['detectorduck_0',['DetectorDuck',['../class_detector_duck.html#a726ae2e7e7e3a255529c437e5291cf2f',1,'DetectorDuck']]],
+  ['duck_1',['Duck',['../class_duck.html#a901e043ed475f629c8251be99f2a99e9',1,'Duck']]],
+  ['ducklink_2',['DuckLink',['../class_duck_link.html#a6f943b3a755cb13e55639ea7a802ca4f',1,'DuckLink']]],
+  ['ducklora_3',['ducklora',['../class_duck_lo_ra.html#a2a572ca25a87a204b537cf89bc06fcd7',1,'DuckLoRa::DuckLoRa()'],['../class_duck_lo_ra.html#a1ac33b168c2d379bcf12952008d015eb',1,'DuckLoRa::DuckLoRa(DuckLoRa const &amp;)=delete']]],
+  ['duckrouter_4',['DuckRouter',['../class_duck_router.html#a0ef970f187ed03923f8db576c47b348e',1,'DuckRouter']]]
 ];

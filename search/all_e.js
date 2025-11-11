@@ -1,13 +1,10 @@
 var searchData=
 [
-  ['readme_2emd_0',['README.md',['../_r_e_a_d_m_e_8md.html',1,'']]],
-  ['readreceiveddata_1',['readReceivedData',['../class_duck_radio.html#ad2e398fdfbccae3b7e07abad41fb13fa',1,'DuckRadio']]],
-  ['reboot_2',['reboot',['../class_duck.html#a64f61f312f2e077477369750188bfccf',1,'Duck']]],
-  ['reconnectwifi_3',['reconnectWifi',['../class_duck.html#a230809997b45df2613791cbeeab19726',1,'Duck']]],
-  ['relaypacket_4',['relayPacket',['../class_duck_radio.html#adf58a5b83c5632d37c5c05aa37f53035',1,'DuckRadio']]],
-  ['reset_5',['reset',['../class_duck_packet.html#a9e7b7886b7e7600698df5aec5b064224',1,'DuckPacket']]],
-  ['restartduck_6',['restartDuck',['../namespaceduckesp.html#a1bccb912823b8261c7ef8559efc3d5ec',1,'duckesp']]],
-  ['rst_7',['rst',['../struct_lora_config_params.html#aa5beddcb6adbe7a6b4bfcc8c2c0ad58f',1,'LoraConfigParams']]],
-  ['run_8',['run',['../class_duck.html#ae563c92e38f7f99412eb4445f6429366',1,'Duck']]],
-  ['rxpacket_9',['rxPacket',['../class_duck.html#ae5a77bb03f168ea6181ad426d3c49d84',1,'Duck']]]
+  ['papa_0',['PAPA',['../_duck_types_8h.html#ae840cd9270fc5804ad85c80de1686d4aae3eec4dfdc41211205c40372d228ed25',1,'DuckTypes.h']]],
+  ['papaduck_1',['papaduck',['../class_papa_duck.html',1,'PapaDuck&lt; WifiCapability, RadioType &gt;'],['../class_papa_duck.html#a363d497d3c52490c9b48a762b29ec595',1,'PapaDuck::PapaDuck()']]],
+  ['papaduck_2eh_2',['PapaDuck.h',['../_papa_duck_8h.html',1,'']]],
+  ['pins_3',['Defining the Pins',['../md__2home_2runner_2work_2_cluster_duck-_protocol_2_cluster_duck-_protocol_2src_2include_2boards_2_r_e_a_d_m_e.html#autotoc_md3',1,'']]],
+  ['port_4',['PORT',['../_duck_logger_8h.html#a614217d263be1fb1a5f76e2ff7be19a2',1,'DuckLogger.h']]],
+  ['protocol_20info_5',['ClusterDuck Protocol Info',['../index.html',1,'']]],
+  ['public_6',['PUBLIC',['../_duck_router_8h.html#a350d04c55f1ef121ca2c7396cae452a0acd0c6092d6a6874f379fe4827ed1db8b',1,'DuckRouter.h']]]
 ];

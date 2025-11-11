@@ -43,10 +43,12 @@ var NAVTREE =
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
       [ "Class Index", "classes.html", null ],
+      [ "Class Hierarchy", "hierarchy.html", "hierarchy" ],
       [ "Class Members", "functions.html", [
         [ "All", "functions.html", null ],
         [ "Functions", "functions_func.html", null ],
         [ "Variables", "functions_vars.html", null ],
+        [ "Typedefs", "functions_type.html", null ],
         [ "Related Symbols", "functions_rela.html", null ]
       ] ]
     ] ],
@@ -54,6 +56,7 @@ var NAVTREE =
       [ "File List", "files.html", "files_dup" ],
       [ "File Members", "globals.html", [
         [ "All", "globals.html", null ],
+        [ "Functions", "globals_func.html", null ],
         [ "Variables", "globals_vars.html", null ],
         [ "Enumerations", "globals_enum.html", null ],
         [ "Enumerator", "globals_eval.html", null ],
@@ -65,8 +68,8 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"_duck_8cpp.html",
-"heltec__wifi__lora__32___v3_8h_source.html"
+"_c_d_p_8h.html",
+"class_duck_lo_ra.html#a7d7aee040d022dce28dd374a78f19e9c"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

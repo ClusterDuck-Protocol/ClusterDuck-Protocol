@@ -1,13 +1,20 @@
 var searchData=
 [
-  ['lastmessagemuid_0',['lastMessageMuid',['../class_duck.html#abc15ce7c15e57083bcd6dafdd58ebfeb',1,'Duck']]],
+  ['lastrreqtime_0',['lastRreqTime',['../class_duck.html#a97b9b046f7ea68b31d010fa2537d6a62',1,'Duck']]],
   ['lilygo_5ft_5fbeam_5fsupreme_5fsx1262_2eh_1',['lilygo_t_beam_supreme_sx1262.h',['../lilygo__t__beam__supreme__sx1262_8h.html',1,'']]],
   ['lilygo_5ft_5fbeam_5fsx1262_2eh_2',['lilygo_t_beam_sx1262.h',['../lilygo__t__beam__sx1262_8h.html',1,'']]],
   ['link_3',['LINK',['../_duck_types_8h.html#ae840cd9270fc5804ad85c80de1686d4aaf2fe1bf26da6f8a451f054e30b3ce0f3',1,'DuckTypes.h']]],
-  ['loadchannel_4',['loadChannel',['../class_duck_net.html#ae67d21661ff5a48777d902e1abf9f9f4',1,'DuckNet']]],
-  ['loadwificredentials_5',['loadWiFiCredentials',['../class_duck_net.html#a98508f1de7a2bf259d91d770b358f6ae',1,'DuckNet']]],
-  ['loadwifipassword_6',['loadWifiPassword',['../namespaceduckutils.html#a56ea08fb08a402d391f3582a309d8899',1,'duckutils']]],
-  ['loadwifissid_7',['loadWifiSsid',['../namespaceduckutils.html#a0a14835a59650aef58f9ffbd107586fe',1,'duckutils']]],
-  ['logiflowmemory_8',['logIfLowMemory',['../class_duck.html#a76ad584ab3b1eee157b9c2bbda491248',1,'Duck']]],
-  ['loraconfigparams_9',['LoraConfigParams',['../struct_lora_config_params.html',1,'']]]
+  ['loadwifipassword_4',['loadWifiPassword',['../_duck_wifi_8cpp.html#aa6bb586df864c88a0cc509b47a6add24',1,'DuckWifi.cpp']]],
+  ['loadwifissid_5',['loadWifiSsid',['../_duck_wifi_8cpp.html#ad281b4f542e99a9cee3cab4f05e65e19',1,'DuckWifi.cpp']]],
+  ['logdbg_6',['logdbg',['../_duck_logger_8h.html#ac7231f787c670cbb35904e6d7f88a03d',1,'DuckLogger.h']]],
+  ['logdbg_5fln_7',['logdbg_ln',['../_duck_logger_8h.html#a37597e40d30475478e32279e405398b3',1,'DuckLogger.h']]],
+  ['logerr_8',['logerr',['../_duck_logger_8h.html#ad73923c0ccf72d4d95e6d7ba48805652',1,'DuckLogger.h']]],
+  ['logerr_5fln_9',['logerr_ln',['../_duck_logger_8h.html#a349b1444b9cf677be64411d800bc981e',1,'DuckLogger.h']]],
+  ['logiflowmemory_10',['logIfLowMemory',['../class_duck.html#a97b7053b0e18fa459d6e1722c5175564',1,'Duck']]],
+  ['loginfo_11',['loginfo',['../_duck_logger_8h.html#ad0bfc9a650d204428d85317e9bebaa8a',1,'DuckLogger.h']]],
+  ['loginfo_5fln_12',['loginfo_ln',['../_duck_logger_8h.html#a3e508d643a1499c7832bf6eae0f93098',1,'DuckLogger.h']]],
+  ['logwarn_13',['logwarn',['../_duck_logger_8h.html#aaa9ca5001a8d072659c5054e3846a058',1,'DuckLogger.h']]],
+  ['logwarn_5fln_14',['logwarn_ln',['../_duck_logger_8h.html#ac65b05826ae88236064ac236c18c2dbe',1,'DuckLogger.h']]],
+  ['lora_15',['lora',['../_duck_lo_ra_8cpp.html#a9bd751f428f37e0cf9d3af962ca26bb6',1,'DuckLoRa.cpp']]],
+  ['loraconfigparams_16',['LoRaConfigParams',['../struct_lo_ra_config_params.html',1,'']]]
 ];

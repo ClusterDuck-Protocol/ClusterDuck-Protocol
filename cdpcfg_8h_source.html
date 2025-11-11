@@ -172,19 +172,25 @@ $(document).ready(function(){initNavTree('cdpcfg_8h_source.html',''); initResiza
 <div class="line"><a id="l00103" name="l00103"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#aadc152e03a61e8df938e6b90a2702eea">  103</a></span><span class="preprocessor">#define CDPCFG_RADIO_CHANNEL_5 911.0</span></div>
 <div class="line"><a id="l00104" name="l00104"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#a76d128470d7fd3c8be2c17db2a9c0b48">  104</a></span><span class="preprocessor">#define CDPCFG_RADIO_CHANNEL_6 910.0</span></div>
 <div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span> </div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span><span class="preprocessor">#ifndef CDPCFG_OLED_CLASS</span></div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span><span class="preprocessor">#if defined(CDPCFG_OLED_NONE)</span></div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span><span class="comment">// do nothing</span></div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span><span class="preprocessor">#elif defined(CDPCFG_OLED_64x32)</span></div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span><span class="comment">// smaller displays</span></div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span><span class="preprocessor">#define CDPCFG_OLED_CLASS U8G2_SSD1306_64X32_NONAME_F_SW_I2C</span></div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span><span class="comment">// classic default</span></div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#acef35f728d68db44426088bbc112128b">  114</a></span><span class="preprocessor">#define CDPCFG_OLED_CLASS U8G2_SSD1306_128X64_NONAME_F_SW_I2C</span></div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span><span class="preprocessor">#endif </span><span class="comment">// CDPCFG_OLED_NONE</span></div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span><span class="preprocessor">#endif </span><span class="comment">// CDPCFG_OLED_CLASS</span></div>
-<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span> </div>
-<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span><span class="preprocessor">#endif </span><span class="comment">// CDPCFG_H</span></div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span><span class="comment">// CDP Acceptable Signal Ranges</span></div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ab652764fbf40028378be3faf48507c99">  107</a></span><span class="preprocessor">#define RSSI_MAX (-20.0f)</span></div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ab50c48d5321c8e53337b36a5add64671">  108</a></span><span class="preprocessor">#define RSSI_MIN (-131.0f)</span></div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ad13a6df57d1b67b66eaa52cf04c9c4b9">  109</a></span><span class="preprocessor">#define SNR_MAX 11.5f</span></div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#ac2040e558d08d0197a6eecfa0b08dcc5">  110</a></span><span class="preprocessor">#define SNR_MIN (-11.5f)</span></div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span> </div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span><span class="preprocessor">#ifndef CDPCFG_OLED_CLASS</span></div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span><span class="preprocessor">#if defined(CDPCFG_OLED_NONE)</span></div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span><span class="comment">// do nothing</span></div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span><span class="preprocessor">#elif defined(CDPCFG_OLED_64x32)</span></div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span><span class="comment">// smaller displays</span></div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span><span class="preprocessor">#define CDPCFG_OLED_CLASS U8G2_SSD1306_64X32_NONAME_F_SW_I2C</span></div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span><span class="preprocessor">#else</span></div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span><span class="comment">// classic default</span></div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno"><a class="line" href="cdpcfg_8h.html#acef35f728d68db44426088bbc112128b">  120</a></span><span class="preprocessor">#define CDPCFG_OLED_CLASS U8G2_SSD1306_128X64_NONAME_F_SW_I2C</span></div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span><span class="preprocessor">#endif </span><span class="comment">// CDPCFG_OLED_NONE</span></div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span><span class="preprocessor">#endif </span><span class="comment">// CDPCFG_OLED_CLASS</span></div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span> </div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span><span class="preprocessor">#endif </span><span class="comment">// CDPCFG_H</span></div>
 <div class="ttc" id="aheltec__wifi__lora__32___v2_8h_html"><div class="ttname"><a href="heltec__wifi__lora__32___v2_8h.html">heltec_wifi_lora_32_V2.h</a></div></div>
 <div class="ttc" id="aheltec__wifi__lora__32___v3_8h_html"><div class="ttname"><a href="heltec__wifi__lora__32___v3_8h.html">heltec_wifi_lora_32_V3.h</a></div></div>
 <div class="ttc" id="alilygo__t__beam__supreme__sx1262_8h_html"><div class="ttname"><a href="lilygo__t__beam__supreme__sx1262_8h.html">lilygo_t_beam_supreme_sx1262.h</a></div></div>

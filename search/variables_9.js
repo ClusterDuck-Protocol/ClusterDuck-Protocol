@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['sf_0',['sf',['../struct_lora_config_params.html#adf32006329871580821a9979a77ae102',1,'LoraConfigParams']]],
-  ['ss_1',['ss',['../struct_lora_config_params.html#ae97055396dcf7dc6e39d5c2fbe627572',1,'LoraConfigParams']]]
+  ['txpower_0',['txPower',['../struct_lo_ra_config_params.html#ab9d693fd47ea19448dbfc802ac17f3a1',1,'LoRaConfigParams']]]
 ];

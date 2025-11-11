@@ -106,116 +106,119 @@ $(document).ready(function(){initNavTree('bloomfilter_8h_source.html',''); initR
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &lt;string.h&gt;</span></div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &lt;math.h&gt;</span></div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;memory&gt;</span></div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;../CdpPacket.h&gt;</span></div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno"><a class="line" href="bloomfilter_8h.html#a1bc57c63fd841e88778cc23c76596e22">   12</a></span><span class="keyword">const</span> <span class="keywordtype">int</span> <a class="code hl_variable" href="bloomfilter_8h.html#a1bc57c63fd841e88778cc23c76596e22">DEFAULT_NUM_SECTORS</a> = 312; </div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno"><a class="line" href="bloomfilter_8h.html#ad96a9546ee0cf9b4c324f24f78d0b4c1">   13</a></span><span class="keyword">const</span> <span class="keywordtype">int</span> <a class="code hl_variable" href="bloomfilter_8h.html#ad96a9546ee0cf9b4c324f24f78d0b4c1">DEFAULT_NUM_HASH_FUNCS</a> = 2;</div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno"><a class="line" href="bloomfilter_8h.html#ad7e50076ccbcbfb1ae1fc0b81f60382e">   14</a></span><span class="keyword">const</span> <span class="keywordtype">int</span> <a class="code hl_variable" href="bloomfilter_8h.html#ad7e50076ccbcbfb1ae1fc0b81f60382e">DEFAULT_BITS_PER_SECTOR</a> = 32;</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno"><a class="line" href="bloomfilter_8h.html#aba21c65b85cbcf357555e2ed91100dcf">   15</a></span><span class="keyword">const</span> <span class="keywordtype">int</span> <a class="code hl_variable" href="bloomfilter_8h.html#aba21c65b85cbcf357555e2ed91100dcf">DEFAULT_MAX_MESSAGES</a> = 100;</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment">// two-phase bloom filter</span></div>
-<div class="foldopen" id="foldopen00018" data-start="{" data-end="};">
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="class_bloom_filter.html">   18</a></span><span class="keyword">class </span><a class="code hl_class" href="class_bloom_filter.html">BloomFilter</a> {</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno"><a class="line" href="class_bloom_filter.html#a37d4fd86dd5e960d606f6abfda4f3ce3">   21</a></span>  <span class="keyword">friend</span> <span class="keyword">class </span><a class="code hl_friend" href="class_bloom_filter.html#a37d4fd86dd5e960d606f6abfda4f3ce3">BloomFilterTester</a>;</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
-<div class="foldopen" id="foldopen00027" data-start="{" data-end="}">
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno"><a class="line" href="class_bloom_filter.html#a64e9f133cd9bb65d55a5e31f701bbca0">   27</a></span>  <a class="code hl_function" href="class_bloom_filter.html#a64e9f133cd9bb65d55a5e31f701bbca0">BloomFilter</a>() : <a class="code hl_class" href="class_bloom_filter.html">BloomFilter</a>(<a class="code hl_variable" href="bloomfilter_8h.html#a1bc57c63fd841e88778cc23c76596e22">DEFAULT_NUM_SECTORS</a>, <a class="code hl_variable" href="bloomfilter_8h.html#ad96a9546ee0cf9b4c324f24f78d0b4c1">DEFAULT_NUM_HASH_FUNCS</a>, <a class="code hl_variable" href="bloomfilter_8h.html#ad7e50076ccbcbfb1ae1fc0b81f60382e">DEFAULT_BITS_PER_SECTOR</a>, <a class="code hl_variable" href="bloomfilter_8h.html#aba21c65b85cbcf357555e2ed91100dcf">DEFAULT_MAX_MESSAGES</a>) {</div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span> </div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>  }</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno"><a class="line" href="bloomfilter_8h.html#a1bc57c63fd841e88778cc23c76596e22">   13</a></span><span class="keyword">const</span> <span class="keywordtype">int</span> <a class="code hl_variable" href="bloomfilter_8h.html#a1bc57c63fd841e88778cc23c76596e22">DEFAULT_NUM_SECTORS</a> = 312; </div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno"><a class="line" href="bloomfilter_8h.html#ad96a9546ee0cf9b4c324f24f78d0b4c1">   14</a></span><span class="keyword">const</span> <span class="keywordtype">int</span> <a class="code hl_variable" href="bloomfilter_8h.html#ad96a9546ee0cf9b4c324f24f78d0b4c1">DEFAULT_NUM_HASH_FUNCS</a> = 2;</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno"><a class="line" href="bloomfilter_8h.html#ad7e50076ccbcbfb1ae1fc0b81f60382e">   15</a></span><span class="keyword">const</span> <span class="keywordtype">int</span> <a class="code hl_variable" href="bloomfilter_8h.html#ad7e50076ccbcbfb1ae1fc0b81f60382e">DEFAULT_BITS_PER_SECTOR</a> = 32;</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno"><a class="line" href="bloomfilter_8h.html#aba21c65b85cbcf357555e2ed91100dcf">   16</a></span><span class="keyword">const</span> <span class="keywordtype">int</span> <a class="code hl_variable" href="bloomfilter_8h.html#aba21c65b85cbcf357555e2ed91100dcf">DEFAULT_MAX_MESSAGES</a> = 100;</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="comment">// two-phase bloom filter</span></div>
+<div class="foldopen" id="foldopen00019" data-start="{" data-end="};">
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="class_bloom_filter.html">   19</a></span><span class="keyword">class </span><a class="code hl_class" href="class_bloom_filter.html">BloomFilter</a> {</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno"><a class="line" href="class_bloom_filter.html#a37d4fd86dd5e960d606f6abfda4f3ce3">   22</a></span>  <span class="keyword">friend</span> <span class="keyword">class </span><a class="code hl_friend" href="class_bloom_filter.html#a37d4fd86dd5e960d606f6abfda4f3ce3">BloomFilterTester</a>;</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
+<div class="foldopen" id="foldopen00028" data-start="{" data-end="}">
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="class_bloom_filter.html#a64e9f133cd9bb65d55a5e31f701bbca0">   28</a></span>  <a class="code hl_function" href="class_bloom_filter.html#a64e9f133cd9bb65d55a5e31f701bbca0">BloomFilter</a>() : <a class="code hl_class" href="class_bloom_filter.html">BloomFilter</a>(<a class="code hl_variable" href="bloomfilter_8h.html#a1bc57c63fd841e88778cc23c76596e22">DEFAULT_NUM_SECTORS</a>, <a class="code hl_variable" href="bloomfilter_8h.html#ad96a9546ee0cf9b4c324f24f78d0b4c1">DEFAULT_NUM_HASH_FUNCS</a>, <a class="code hl_variable" href="bloomfilter_8h.html#ad7e50076ccbcbfb1ae1fc0b81f60382e">DEFAULT_BITS_PER_SECTOR</a>, <a class="code hl_variable" href="bloomfilter_8h.html#aba21c65b85cbcf357555e2ed91100dcf">DEFAULT_MAX_MESSAGES</a>) {</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span> </div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>  }</div>
 </div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno"><a class="line" href="class_bloom_filter.html#aba4255db5abc946c5d89826e026cc4b8">   39</a></span>  <a class="code hl_function" href="class_bloom_filter.html#aba4255db5abc946c5d89826e026cc4b8">BloomFilter</a>(<span class="keywordtype">int</span> numSectors, <span class="keywordtype">int</span> numHashes, <span class="keywordtype">int</span> bitsPerSector, <span class="keywordtype">int</span> maxMsgs);</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno"><a class="line" href="class_bloom_filter.html#a27358192f6e0d7aba2b24be36c5d3580">   41</a></span>  <a class="code hl_function" href="class_bloom_filter.html#a27358192f6e0d7aba2b24be36c5d3580">~BloomFilter</a>();</div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span> </div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno"><a class="line" href="class_bloom_filter.html#ae976246f2899c2b10166a25e026c91c5">   46</a></span>  <span class="keywordtype">int</span> <a class="code hl_function" href="class_bloom_filter.html#ae976246f2899c2b10166a25e026c91c5">bloom_check</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>* msg, <span class="keywordtype">int</span> msgSize);</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno"><a class="line" href="class_bloom_filter.html#a9324ec548ffba472c579dc4a0655c4f4">   48</a></span>  <span class="keywordtype">void</span> <a class="code hl_function" href="class_bloom_filter.html#a9324ec548ffba472c579dc4a0655c4f4">bloom_add</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>* msg, <span class="keywordtype">int</span> msgSize);</div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
-<div class="foldopen" id="foldopen00050" data-start="{" data-end="}">
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno"><a class="line" href="class_bloom_filter.html#a789ecd421bc4c7a3cabfe514e7cd0c02">   50</a></span>  <span class="keywordtype">int</span> <a class="code hl_function" href="class_bloom_filter.html#a789ecd421bc4c7a3cabfe514e7cd0c02">get_numSectors</a>() {</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <span class="keywordflow">return</span> numSectors;</div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>  }</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span> </div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>  <a class="code hl_function" href="class_bloom_filter.html#a64e9f133cd9bb65d55a5e31f701bbca0">BloomFilter</a>(<span class="keywordtype">int</span> numSectors, <span class="keywordtype">int</span> numHashes, <span class="keywordtype">int</span> bitsPerSector, <span class="keywordtype">int</span> maxMsgs);</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>  <a class="code hl_function" href="class_bloom_filter.html#a27358192f6e0d7aba2b24be36c5d3580">~BloomFilter</a>();</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>  <span class="keywordtype">int</span> <a class="code hl_function" href="class_bloom_filter.html#ae976246f2899c2b10166a25e026c91c5">bloom_check</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>* msg, <span class="keywordtype">int</span> msgSize);</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>  <span class="keywordtype">void</span> <a class="code hl_function" href="class_bloom_filter.html#a9324ec548ffba472c579dc4a0655c4f4">bloom_add</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>* msg, <span class="keywordtype">int</span> msgSize);</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>  <span class="keywordtype">void</span> <a class="code hl_function" href="class_bloom_filter.html#afdef5b1cb533edfc864114fd584a9521">assignUniqueMessageId</a>(CdpPacket&amp; packet);</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
+<div class="foldopen" id="foldopen00053" data-start="{" data-end="}">
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno"><a class="line" href="class_bloom_filter.html#a789ecd421bc4c7a3cabfe514e7cd0c02">   53</a></span>  <span class="keywordtype">int</span> <a class="code hl_function" href="class_bloom_filter.html#a789ecd421bc4c7a3cabfe514e7cd0c02">get_numSectors</a>() {</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    <span class="keywordflow">return</span> numSectors;</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>  }</div>
 </div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
-<div class="foldopen" id="foldopen00054" data-start="{" data-end="}">
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno"><a class="line" href="class_bloom_filter.html#a028bbd0e8487aa7121987bc8785f0d5a">   54</a></span>  <span class="keywordtype">int</span> <a class="code hl_function" href="class_bloom_filter.html#a028bbd0e8487aa7121987bc8785f0d5a">get_numHashes</a>() {</div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    <span class="keywordflow">return</span> numHashes;</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>  }</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span> </div>
+<div class="foldopen" id="foldopen00057" data-start="{" data-end="}">
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno"><a class="line" href="class_bloom_filter.html#a028bbd0e8487aa7121987bc8785f0d5a">   57</a></span>  <span class="keywordtype">int</span> <a class="code hl_function" href="class_bloom_filter.html#a028bbd0e8487aa7121987bc8785f0d5a">get_numHashes</a>() {</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    <span class="keywordflow">return</span> numHashes;</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>  }</div>
 </div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
-<div class="foldopen" id="foldopen00058" data-start="{" data-end="}">
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno"><a class="line" href="class_bloom_filter.html#af01868484be21e1735c617db8758e9fe">   58</a></span>  <span class="keywordtype">int</span> <a class="code hl_function" href="class_bloom_filter.html#af01868484be21e1735c617db8758e9fe">get_bitsPerSector</a>() {</div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    <span class="keywordflow">return</span> bitsPerSector;</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>  }</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
+<div class="foldopen" id="foldopen00061" data-start="{" data-end="}">
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno"><a class="line" href="class_bloom_filter.html#af01868484be21e1735c617db8758e9fe">   61</a></span>  <span class="keywordtype">int</span> <a class="code hl_function" href="class_bloom_filter.html#af01868484be21e1735c617db8758e9fe">get_bitsPerSector</a>() {</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    <span class="keywordflow">return</span> bitsPerSector;</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>  }</div>
 </div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
-<div class="foldopen" id="foldopen00062" data-start="{" data-end="}">
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno"><a class="line" href="class_bloom_filter.html#a2fe6a3e759a5b752f3c49a674064a24a">   62</a></span>  <span class="keywordtype">int</span> <a class="code hl_function" href="class_bloom_filter.html#a2fe6a3e759a5b752f3c49a674064a24a">get_maxMsgs</a>() {</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    <span class="keywordflow">return</span> maxMsgs;</div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>  }</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
+<div class="foldopen" id="foldopen00065" data-start="{" data-end="}">
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno"><a class="line" href="class_bloom_filter.html#a2fe6a3e759a5b752f3c49a674064a24a">   65</a></span>  <span class="keywordtype">int</span> <a class="code hl_function" href="class_bloom_filter.html#a2fe6a3e759a5b752f3c49a674064a24a">get_maxMsgs</a>() {</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    <span class="keywordflow">return</span> maxMsgs;</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>  }</div>
 </div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
-<div class="foldopen" id="foldopen00066" data-start="{" data-end="}">
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno"><a class="line" href="class_bloom_filter.html#adeb7e046bdb08e38c0fd0accfee3edc3">   66</a></span>  <span class="keywordtype">int</span> <a class="code hl_function" href="class_bloom_filter.html#adeb7e046bdb08e38c0fd0accfee3edc3">get_nMsg</a>() {</div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    <span class="keywordflow">return</span> nMsg;</div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>  }</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span> </div>
+<div class="foldopen" id="foldopen00069" data-start="{" data-end="}">
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno"><a class="line" href="class_bloom_filter.html#adeb7e046bdb08e38c0fd0accfee3edc3">   69</a></span>  <span class="keywordtype">int</span> <a class="code hl_function" href="class_bloom_filter.html#adeb7e046bdb08e38c0fd0accfee3edc3">get_nMsg</a>() {</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    <span class="keywordflow">return</span> nMsg;</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>  }</div>
 </div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span> </div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>* filter1;</div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>* filter2;</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>  <span class="keywordtype">int</span> activeFilter; <span class="comment">// 1 or 2 </span></div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>  <span class="keywordtype">int</span> numSectors; <span class="comment">// power of 2</span></div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>  <span class="keywordtype">int</span> numHashes;  </div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>  <span class="keywordtype">int</span> bitsPerSector; <span class="comment">//power of 2, smaller than numSectors</span></div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>  <span class="keywordtype">int</span> nMsg;</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>  <span class="keywordtype">int</span> maxMsgs;</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>  <span class="keywordtype">int</span>* Seeds;</div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span> </div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>  <span class="keyword">static</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> djb2Hash(<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>* str, <span class="keywordtype">int</span> seed, <span class="keywordtype">int</span> msgSize);</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>  <span class="keywordtype">void</span> set_hash_results(<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>* msg, <span class="keywordtype">int</span> msgSize,</div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    std::unique_ptr&lt;<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>[]&gt; &amp; hashResults);</div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span> </div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>  <span class="keywordtype">void</span> set_sectors_and_slots(<span class="keyword">const</span> std::unique_ptr&lt;<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>[]&gt; &amp; hashResults,</div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    std::unique_ptr&lt;<span class="keywordtype">int</span>[]&gt; &amp; sectors, std::unique_ptr&lt;<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>[]&gt; &amp; slots</div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>  );</div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span> </div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>  <span class="keywordtype">int</span> is_collision(<span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>* filter,</div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    <span class="keyword">const</span> std::unique_ptr&lt;<span class="keywordtype">int</span>[]&gt; &amp; sectors,</div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    <span class="keyword">const</span> std::unique_ptr&lt;<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>[]&gt; &amp; slots</div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>  );</div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span> </div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>};</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span> </div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span> </div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>* filter1;</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>* filter2;</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>  <span class="keywordtype">int</span> activeFilter; <span class="comment">// 1 or 2 </span></div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>  <span class="keywordtype">int</span> numSectors; <span class="comment">// power of 2</span></div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>  <span class="keywordtype">int</span> numHashes;  </div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>  <span class="keywordtype">int</span> bitsPerSector; <span class="comment">//power of 2, smaller than numSectors</span></div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>  <span class="keywordtype">int</span> nMsg;</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>  <span class="keywordtype">int</span> maxMsgs;</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>  <span class="keywordtype">int</span>* Seeds;</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span> </div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>  <span class="keyword">static</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> djb2Hash(<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>* str, <span class="keywordtype">int</span> seed, <span class="keywordtype">int</span> msgSize);</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span> </div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>  <span class="keywordtype">void</span> set_hash_results(<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>* msg, <span class="keywordtype">int</span> msgSize,</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    std::unique_ptr&lt;<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>[]&gt; &amp; hashResults);</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span> </div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>  <span class="keywordtype">void</span> set_sectors_and_slots(<span class="keyword">const</span> std::unique_ptr&lt;<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>[]&gt; &amp; hashResults,</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    std::unique_ptr&lt;<span class="keywordtype">int</span>[]&gt; &amp; sectors, std::unique_ptr&lt;<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>[]&gt; &amp; slots</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>  );</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span> </div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>  <span class="keywordtype">int</span> is_collision(<span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>* filter,</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    <span class="keyword">const</span> std::unique_ptr&lt;<span class="keywordtype">int</span>[]&gt; &amp; sectors,</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>    <span class="keyword">const</span> std::unique_ptr&lt;<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>[]&gt; &amp; slots</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>  );</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span> </div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>};</div>
 </div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span> </div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span><span class="preprocessor">#endif</span></div>
-<div class="ttc" id="abloomfilter_8h_html_a1bc57c63fd841e88778cc23c76596e22"><div class="ttname"><a href="bloomfilter_8h.html#a1bc57c63fd841e88778cc23c76596e22">DEFAULT_NUM_SECTORS</a></div><div class="ttdeci">const int DEFAULT_NUM_SECTORS</div><div class="ttdef"><b>Definition</b> bloomfilter.h:12</div></div>
-<div class="ttc" id="abloomfilter_8h_html_aba21c65b85cbcf357555e2ed91100dcf"><div class="ttname"><a href="bloomfilter_8h.html#aba21c65b85cbcf357555e2ed91100dcf">DEFAULT_MAX_MESSAGES</a></div><div class="ttdeci">const int DEFAULT_MAX_MESSAGES</div><div class="ttdef"><b>Definition</b> bloomfilter.h:15</div></div>
-<div class="ttc" id="abloomfilter_8h_html_ad7e50076ccbcbfb1ae1fc0b81f60382e"><div class="ttname"><a href="bloomfilter_8h.html#ad7e50076ccbcbfb1ae1fc0b81f60382e">DEFAULT_BITS_PER_SECTOR</a></div><div class="ttdeci">const int DEFAULT_BITS_PER_SECTOR</div><div class="ttdef"><b>Definition</b> bloomfilter.h:14</div></div>
-<div class="ttc" id="abloomfilter_8h_html_ad96a9546ee0cf9b4c324f24f78d0b4c1"><div class="ttname"><a href="bloomfilter_8h.html#ad96a9546ee0cf9b4c324f24f78d0b4c1">DEFAULT_NUM_HASH_FUNCS</a></div><div class="ttdeci">const int DEFAULT_NUM_HASH_FUNCS</div><div class="ttdef"><b>Definition</b> bloomfilter.h:13</div></div>
-<div class="ttc" id="aclass_bloom_filter_html"><div class="ttname"><a href="class_bloom_filter.html">BloomFilter</a></div><div class="ttdef"><b>Definition</b> bloomfilter.h:18</div></div>
-<div class="ttc" id="aclass_bloom_filter_html_a028bbd0e8487aa7121987bc8785f0d5a"><div class="ttname"><a href="class_bloom_filter.html#a028bbd0e8487aa7121987bc8785f0d5a">BloomFilter::get_numHashes</a></div><div class="ttdeci">int get_numHashes()</div><div class="ttdef"><b>Definition</b> bloomfilter.h:54</div></div>
-<div class="ttc" id="aclass_bloom_filter_html_a27358192f6e0d7aba2b24be36c5d3580"><div class="ttname"><a href="class_bloom_filter.html#a27358192f6e0d7aba2b24be36c5d3580">BloomFilter::~BloomFilter</a></div><div class="ttdeci">~BloomFilter()</div></div>
-<div class="ttc" id="aclass_bloom_filter_html_a2fe6a3e759a5b752f3c49a674064a24a"><div class="ttname"><a href="class_bloom_filter.html#a2fe6a3e759a5b752f3c49a674064a24a">BloomFilter::get_maxMsgs</a></div><div class="ttdeci">int get_maxMsgs()</div><div class="ttdef"><b>Definition</b> bloomfilter.h:62</div></div>
-<div class="ttc" id="aclass_bloom_filter_html_a37d4fd86dd5e960d606f6abfda4f3ce3"><div class="ttname"><a href="class_bloom_filter.html#a37d4fd86dd5e960d606f6abfda4f3ce3">BloomFilter::BloomFilterTester</a></div><div class="ttdeci">friend class BloomFilterTester</div><div class="ttdef"><b>Definition</b> bloomfilter.h:21</div></div>
-<div class="ttc" id="aclass_bloom_filter_html_a64e9f133cd9bb65d55a5e31f701bbca0"><div class="ttname"><a href="class_bloom_filter.html#a64e9f133cd9bb65d55a5e31f701bbca0">BloomFilter::BloomFilter</a></div><div class="ttdeci">BloomFilter()</div><div class="ttdoc">Initialize a bloom filter with default values.</div><div class="ttdef"><b>Definition</b> bloomfilter.h:27</div></div>
-<div class="ttc" id="aclass_bloom_filter_html_a789ecd421bc4c7a3cabfe514e7cd0c02"><div class="ttname"><a href="class_bloom_filter.html#a789ecd421bc4c7a3cabfe514e7cd0c02">BloomFilter::get_numSectors</a></div><div class="ttdeci">int get_numSectors()</div><div class="ttdef"><b>Definition</b> bloomfilter.h:50</div></div>
-<div class="ttc" id="aclass_bloom_filter_html_a9324ec548ffba472c579dc4a0655c4f4"><div class="ttname"><a href="class_bloom_filter.html#a9324ec548ffba472c579dc4a0655c4f4">BloomFilter::bloom_add</a></div><div class="ttdeci">void bloom_add(unsigned char *msg, int msgSize)</div></div>
-<div class="ttc" id="aclass_bloom_filter_html_aba4255db5abc946c5d89826e026cc4b8"><div class="ttname"><a href="class_bloom_filter.html#aba4255db5abc946c5d89826e026cc4b8">BloomFilter::BloomFilter</a></div><div class="ttdeci">BloomFilter(int numSectors, int numHashes, int bitsPerSector, int maxMsgs)</div><div class="ttdoc">Initialize a bloom filter.</div></div>
-<div class="ttc" id="aclass_bloom_filter_html_adeb7e046bdb08e38c0fd0accfee3edc3"><div class="ttname"><a href="class_bloom_filter.html#adeb7e046bdb08e38c0fd0accfee3edc3">BloomFilter::get_nMsg</a></div><div class="ttdeci">int get_nMsg()</div><div class="ttdef"><b>Definition</b> bloomfilter.h:66</div></div>
-<div class="ttc" id="aclass_bloom_filter_html_ae976246f2899c2b10166a25e026c91c5"><div class="ttname"><a href="class_bloom_filter.html#ae976246f2899c2b10166a25e026c91c5">BloomFilter::bloom_check</a></div><div class="ttdeci">int bloom_check(unsigned char *msg, int msgSize)</div></div>
-<div class="ttc" id="aclass_bloom_filter_html_af01868484be21e1735c617db8758e9fe"><div class="ttname"><a href="class_bloom_filter.html#af01868484be21e1735c617db8758e9fe">BloomFilter::get_bitsPerSector</a></div><div class="ttdeci">int get_bitsPerSector()</div><div class="ttdef"><b>Definition</b> bloomfilter.h:58</div></div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span> </div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span><span class="preprocessor">#endif</span></div>
+<div class="ttc" id="abloomfilter_8h_html_a1bc57c63fd841e88778cc23c76596e22"><div class="ttname"><a href="bloomfilter_8h.html#a1bc57c63fd841e88778cc23c76596e22">DEFAULT_NUM_SECTORS</a></div><div class="ttdeci">const int DEFAULT_NUM_SECTORS</div><div class="ttdef"><b>Definition</b> bloomfilter.h:13</div></div>
+<div class="ttc" id="abloomfilter_8h_html_aba21c65b85cbcf357555e2ed91100dcf"><div class="ttname"><a href="bloomfilter_8h.html#aba21c65b85cbcf357555e2ed91100dcf">DEFAULT_MAX_MESSAGES</a></div><div class="ttdeci">const int DEFAULT_MAX_MESSAGES</div><div class="ttdef"><b>Definition</b> bloomfilter.h:16</div></div>
+<div class="ttc" id="abloomfilter_8h_html_ad7e50076ccbcbfb1ae1fc0b81f60382e"><div class="ttname"><a href="bloomfilter_8h.html#ad7e50076ccbcbfb1ae1fc0b81f60382e">DEFAULT_BITS_PER_SECTOR</a></div><div class="ttdeci">const int DEFAULT_BITS_PER_SECTOR</div><div class="ttdef"><b>Definition</b> bloomfilter.h:15</div></div>
+<div class="ttc" id="abloomfilter_8h_html_ad96a9546ee0cf9b4c324f24f78d0b4c1"><div class="ttname"><a href="bloomfilter_8h.html#ad96a9546ee0cf9b4c324f24f78d0b4c1">DEFAULT_NUM_HASH_FUNCS</a></div><div class="ttdeci">const int DEFAULT_NUM_HASH_FUNCS</div><div class="ttdef"><b>Definition</b> bloomfilter.h:14</div></div>
+<div class="ttc" id="aclass_bloom_filter_html"><div class="ttname"><a href="class_bloom_filter.html">BloomFilter</a></div><div class="ttdef"><b>Definition</b> bloomfilter.h:19</div></div>
+<div class="ttc" id="aclass_bloom_filter_html_a028bbd0e8487aa7121987bc8785f0d5a"><div class="ttname"><a href="class_bloom_filter.html#a028bbd0e8487aa7121987bc8785f0d5a">BloomFilter::get_numHashes</a></div><div class="ttdeci">int get_numHashes()</div><div class="ttdef"><b>Definition</b> bloomfilter.h:57</div></div>
+<div class="ttc" id="aclass_bloom_filter_html_a27358192f6e0d7aba2b24be36c5d3580"><div class="ttname"><a href="class_bloom_filter.html#a27358192f6e0d7aba2b24be36c5d3580">BloomFilter::~BloomFilter</a></div><div class="ttdeci">~BloomFilter()</div><div class="ttdef"><b>Definition</b> bloomfilter.cpp:74</div></div>
+<div class="ttc" id="aclass_bloom_filter_html_a2fe6a3e759a5b752f3c49a674064a24a"><div class="ttname"><a href="class_bloom_filter.html#a2fe6a3e759a5b752f3c49a674064a24a">BloomFilter::get_maxMsgs</a></div><div class="ttdeci">int get_maxMsgs()</div><div class="ttdef"><b>Definition</b> bloomfilter.h:65</div></div>
+<div class="ttc" id="aclass_bloom_filter_html_a37d4fd86dd5e960d606f6abfda4f3ce3"><div class="ttname"><a href="class_bloom_filter.html#a37d4fd86dd5e960d606f6abfda4f3ce3">BloomFilter::BloomFilterTester</a></div><div class="ttdeci">friend class BloomFilterTester</div><div class="ttdef"><b>Definition</b> bloomfilter.h:22</div></div>
+<div class="ttc" id="aclass_bloom_filter_html_a64e9f133cd9bb65d55a5e31f701bbca0"><div class="ttname"><a href="class_bloom_filter.html#a64e9f133cd9bb65d55a5e31f701bbca0">BloomFilter::BloomFilter</a></div><div class="ttdeci">BloomFilter()</div><div class="ttdoc">Initialize a bloom filter with default values.</div><div class="ttdef"><b>Definition</b> bloomfilter.h:28</div></div>
+<div class="ttc" id="aclass_bloom_filter_html_a789ecd421bc4c7a3cabfe514e7cd0c02"><div class="ttname"><a href="class_bloom_filter.html#a789ecd421bc4c7a3cabfe514e7cd0c02">BloomFilter::get_numSectors</a></div><div class="ttdeci">int get_numSectors()</div><div class="ttdef"><b>Definition</b> bloomfilter.h:53</div></div>
+<div class="ttc" id="aclass_bloom_filter_html_a9324ec548ffba472c579dc4a0655c4f4"><div class="ttname"><a href="class_bloom_filter.html#a9324ec548ffba472c579dc4a0655c4f4">BloomFilter::bloom_add</a></div><div class="ttdeci">void bloom_add(unsigned char *msg, int msgSize)</div><div class="ttdef"><b>Definition</b> bloomfilter.cpp:158</div></div>
+<div class="ttc" id="aclass_bloom_filter_html_adeb7e046bdb08e38c0fd0accfee3edc3"><div class="ttname"><a href="class_bloom_filter.html#adeb7e046bdb08e38c0fd0accfee3edc3">BloomFilter::get_nMsg</a></div><div class="ttdeci">int get_nMsg()</div><div class="ttdef"><b>Definition</b> bloomfilter.h:69</div></div>
+<div class="ttc" id="aclass_bloom_filter_html_ae976246f2899c2b10166a25e026c91c5"><div class="ttname"><a href="class_bloom_filter.html#ae976246f2899c2b10166a25e026c91c5">BloomFilter::bloom_check</a></div><div class="ttdeci">int bloom_check(unsigned char *msg, int msgSize)</div><div class="ttdef"><b>Definition</b> bloomfilter.cpp:116</div></div>
+<div class="ttc" id="aclass_bloom_filter_html_af01868484be21e1735c617db8758e9fe"><div class="ttname"><a href="class_bloom_filter.html#af01868484be21e1735c617db8758e9fe">BloomFilter::get_bitsPerSector</a></div><div class="ttdeci">int get_bitsPerSector()</div><div class="ttdef"><b>Definition</b> bloomfilter.h:61</div></div>
+<div class="ttc" id="aclass_bloom_filter_html_afdef5b1cb533edfc864114fd584a9521"><div class="ttname"><a href="class_bloom_filter.html#afdef5b1cb533edfc864114fd584a9521">BloomFilter::assignUniqueMessageId</a></div><div class="ttdeci">void assignUniqueMessageId(CdpPacket &amp;packet)</div><div class="ttdef"><b>Definition</b> bloomfilter.cpp:106</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath" ><!-- id is needed for treeview function! -->
   <ul>
-      <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_b0856f6b0d80ccb263b2f415c91f9e17.html">include</a></li><li class="navelem"><a class="el" href="bloomfilter_8h.html">bloomfilter.h</a></li>
+      <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_30cdb0ba73ec6aa07266999f59822b7b.html">routing</a></li><li class="navelem"><a class="el" href="bloomfilter_8h.html">bloomfilter.h</a></li>
       <li class="footer"><a href="https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol/wiki" target="_blank">Wiki</a></li>
       <li class="footer"><a href="https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol" target="_blank">GitHub</a></li>
       <li class="footer"><a href="https://clusterduckprotocol.org/" target="_blank">Project Page</a></li>

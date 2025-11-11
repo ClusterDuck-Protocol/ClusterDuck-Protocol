@@ -101,142 +101,186 @@ $(document).ready(function(){initNavTree('_duck_utils_8h_source.html',''); initR
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#ifndef DUCKUTILS_H_</span></div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#define DUCKUTILS_H_</span></div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &quot;<a class="code" href="cdpcfg_8h.html">cdpcfg.h</a>&quot;</span></div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &quot;arduino-timer.h&quot;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &quot;../include/cdpcfg.h&quot;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &lt;arduino-timer.h&gt;</span></div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &lt;Arduino.h&gt;</span></div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &lt;EEPROM.h&gt;</span></div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="preprocessor">#include &lt;string&gt;</span></div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="preprocessor">#include &lt;vector&gt;</span></div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">#include &quot;../DuckError.h&quot;</span></div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
-<div class="foldopen" id="foldopen00021" data-start="{" data-end="}">
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno"><a class="line" href="namespaceduckutils.html">   21</a></span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceduckutils.html">duckutils</a> {</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">#include &quot;<a class="code" href="_duck_error_8h.html">DuckError.h</a>&quot;</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="preprocessor">#include &lt;functional&gt;</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="preprocessor">#include &lt;thread&gt;</span></div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="keyword">extern</span> Timer&lt;&gt; <a class="code hl_variable" href="namespaceduckutils.html#a6a89c26b27f49a64aa4ad62479da0327">duckTimer</a>;</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="keyword">extern</span> <span class="keywordtype">bool</span> <a class="code hl_variable" href="namespaceduckutils.html#a0f01261a6300cd0d8079981838ede1c2">detectState</a>;</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno"><a class="line" href="namespaceduckutils.html#a3ee943927ff96bc0edbe3b37f2396a7b">   26</a></span>std::string <a class="code hl_function" href="namespaceduckutils.html#a3ee943927ff96bc0edbe3b37f2396a7b">getCDPVersion</a>();</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="namespaceduckutils.html#a0a51e5d45425646f2d70f63c3de51faa">   34</a></span>std::string <a class="code hl_function" href="namespaceduckutils.html#a0a51e5d45425646f2d70f63c3de51faa">toUpperCase</a>(std::string str);</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno"><a class="line" href="namespaceduckutils.html#aca7b40acfbb2b68b7155571fe11fd98f">   42</a></span>std::vector&lt;byte&gt; <a class="code hl_function" href="namespaceduckutils.html#aca7b40acfbb2b68b7155571fe11fd98f">stringToByteVector</a>(<span class="keyword">const</span> String&amp; str);</div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno"><a class="line" href="namespaceduckutils.html#a9a259c88457e4fac2bdc6042aa229dec">   50</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="namespaceduckutils.html#a9a259c88457e4fac2bdc6042aa229dec">getRandomBytes</a>(<span class="keywordtype">int</span> length, <span class="keywordtype">byte</span>* bytes);</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno"><a class="line" href="namespaceduckutils.html#aff2e7f9ce8df861a748df8a3f84be721">   58</a></span>std::string <a class="code hl_function" href="namespaceduckutils.html#aff2e7f9ce8df861a748df8a3f84be721">createUuid</a>(<span class="keywordtype">int</span> length = <a class="code hl_define" href="cdpcfg_8h.html#ae8f9a966c10a74fe57e8d30290d10227">CDPCFG_UUID_LEN</a>);</div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno"><a class="line" href="namespaceduckutils.html#a7af6fab5b312e69d35f62c81150eb752">   67</a></span>std::string <a class="code hl_function" href="namespaceduckutils.html#a7af6fab5b312e69d35f62c81150eb752">convertToHex</a>(<span class="keywordtype">byte</span>* data, <span class="keywordtype">int</span> size);</div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span> </div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="foldopen" id="foldopen00077" data-start="{" data-end="}">
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno"><a class="line" href="namespaceduckutils.html#a232773eaac919a424cf6c8737c6843f0">   77</a></span>std::string <a class="code hl_function" href="namespaceduckutils.html#a232773eaac919a424cf6c8737c6843f0">toString</a>(<span class="keyword">const</span> std::vector&lt;T&gt;&amp; vec) {</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    std::string result;</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; element : vec) {</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>        <span class="keywordflow">if</span> (!std::isprint(element)) {</div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>            <span class="keywordflow">return</span> <span class="stringliteral">&quot;ERROR: Non-printable character&quot;</span>;</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>        }</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>        result += <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(element);</div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    }</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    <span class="keywordflow">return</span> result;</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>}</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceduckutils.html">duckutils</a> {</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span> </div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="keyword">extern</span> <span class="keywordtype">bool</span> <a class="code hl_variable" href="namespaceduckutils.html#a0f01261a6300cd0d8079981838ede1c2">detectState</a>;</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>std::string <a class="code hl_function" href="namespaceduckutils.html#a3ee943927ff96bc0edbe3b37f2396a7b">getCDPVersion</a>();</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span> </div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>std::string <a class="code hl_function" href="namespaceduckutils.html#a0a51e5d45425646f2d70f63c3de51faa">toUpperCase</a>(std::string str);</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span> </div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>std::vector&lt;uint8_t&gt; <a class="code hl_function" href="namespaceduckutils.html#a942ad7b394b64c3ba7fef87c1b27e2a7">stringToByteVector</a>(<span class="keyword">const</span> std::string&amp; str);</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="keywordtype">void</span> <a class="code hl_function" href="namespaceduckutils.html#af78c3c72848c8c50effe19cd5edc25d3">getRandomBytes</a>(<span class="keywordtype">int</span> length, uint8_t* bytes);</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>std::string <a class="code hl_function" href="namespaceduckutils.html#aff2e7f9ce8df861a748df8a3f84be721">createUuid</a>(<span class="keywordtype">int</span> length = <a class="code hl_define" href="cdpcfg_8h.html#ae8f9a966c10a74fe57e8d30290d10227">CDPCFG_UUID_LEN</a>);</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>std::string <a class="code hl_function" href="namespaceduckutils.html#afe0c55ac9f352c8295641a6f50915b1b">convertToHex</a>(uint8_t* data, <span class="keywordtype">int</span> size);</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span> </div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="foldopen" id="foldopen00078" data-start="{" data-end="}">
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno"><a class="line" href="namespaceduckutils.html#a232773eaac919a424cf6c8737c6843f0">   78</a></span>std::string <a class="code hl_function" href="namespaceduckutils.html#a232773eaac919a424cf6c8737c6843f0">toString</a>(<span class="keyword">const</span> std::vector&lt;T&gt;&amp; vec) {</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    std::string result;</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; element : vec) {</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>        <span class="keywordflow">if</span> (!std::isprint(element)) {</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>            <span class="keywordflow">return</span> <span class="stringliteral">&quot;ERROR: Non-printable character&quot;</span>;</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>        }</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>        result += <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(element);</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    }</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    <span class="keywordflow">return</span> result;</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>}</div>
 </div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span> </div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T,<span class="keywordtype">size_t</span> S&gt;</div>
-<div class="foldopen" id="foldopen00096" data-start="{" data-end="}">
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno"><a class="line" href="namespaceduckutils.html#acda8fcf6c67d4a8c3e675a9c22288dcf">   96</a></span>std::string <a class="code hl_function" href="namespaceduckutils.html#a232773eaac919a424cf6c8737c6843f0">toString</a>(<span class="keyword">const</span> std::array&lt;T,S&gt;&amp; arr) {</div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    std::string result;</div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; element : arr) {</div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>        <span class="keywordflow">if</span> (!std::isprint(element)) {</div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>            <span class="keywordflow">return</span> <span class="stringliteral">&quot;ERROR: Non-printable character&quot;</span>;</div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>        }</div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>        result += <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(element);</div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>    }</div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>    <span class="keywordflow">return</span> result;</div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>}</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span> </div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Container&gt;</div>
+<div class="foldopen" id="foldopen00097" data-start="{" data-end="}">
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno"><a class="line" href="namespaceduckutils.html#acd6c9c35c2a066adc8dd835ee7f04bb3">   97</a></span>std::string <a class="code hl_function" href="namespaceduckutils.html#a232773eaac919a424cf6c8737c6843f0">toString</a>(<span class="keyword">const</span> Container&amp; arr) {</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    std::string result;</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; element : arr) {</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>        <span class="keywordflow">if</span> (!std::isprint(element)) {</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>            <span class="keywordflow">return</span> <span class="stringliteral">&quot;ERROR: Non-printable character&quot;</span>;</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>        }</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>        result += <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(element);</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>    }</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>    <span class="keywordflow">return</span> result;</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>}</div>
 </div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span> </div>
 <div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T,<span class="keywordtype">size_t</span> S&gt;</div>
 <div class="foldopen" id="foldopen00115" data-start="{" data-end="}">
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno"><a class="line" href="namespaceduckutils.html#ac1e7d2b9804f5f2e9d5d3f44ae11d875">  115</a></span>std::string <a class="code hl_function" href="namespaceduckutils.html#ac1e7d2b9804f5f2e9d5d3f44ae11d875">arrayToHexString</a>(<span class="keyword">const</span> std::array&lt;T,S&gt;&amp; arr) {</div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    std::string buf = <span class="stringliteral">&quot;&quot;</span>; <span class="comment">// static to avoid memory leak</span></div>
-<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    buf.clear();</div>
-<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>    buf.reserve(S * 2); <span class="comment">// 2 digit hex</span></div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>    <span class="keyword">const</span> <span class="keywordtype">char</span>* cs = <span class="stringliteral">&quot;0123456789ABCDEF&quot;</span>;</div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; S; i++) {</div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>        <span class="keywordtype">byte</span> val = arr[i];</div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>        buf += cs[(val &gt;&gt; 4) &amp; 0x0F];</div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>        buf += cs[val &amp; 0x0F];</div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>    }</div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>    <span class="keywordflow">return</span> buf;</div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>}</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno"><a class="line" href="namespaceduckutils.html#a46c1f1a9161c53d8489a80aa75a2b8a8">  115</a></span>std::array&lt;T,S&gt; <a class="code hl_function" href="namespaceduckutils.html#a46c1f1a9161c53d8489a80aa75a2b8a8">stringToArray</a>(<span class="keyword">const</span> std::string&amp; str) {</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    std::array&lt;T,S&gt; arr;</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    <span class="keywordflow">if</span> (str.size() &gt; S) {</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>        <span class="keywordflow">throw</span> std::out_of_range(<span class="stringliteral">&quot;String size exceeds array size&quot;</span>);</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>    }</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; str.size(); ++i) {</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>        arr[i] = <span class="keyword">static_cast&lt;</span>T<span class="keyword">&gt;</span>(str[i]);</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>    }</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>    <span class="keywordflow">return</span> arr;</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>}</div>
 </div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span> </div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span> </div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span> </div>
-<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="foldopen" id="foldopen00138" data-start="{" data-end="}">
-<div class="line"><a id="l00138" name="l00138"></a><span class="lineno"><a class="line" href="namespaceduckutils.html#a73122238e9e6161a781b25f4a74cca44">  138</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="namespaceduckutils.html#a73122238e9e6161a781b25f4a74cca44">isEqual</a>(<span class="keyword">const</span> std::vector&lt;T&gt; &amp; a, <span class="keyword">const</span> std::vector&lt;T&gt; &amp; b) {</div>
-<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>  <span class="keywordflow">if</span> (a.size() != b.size()) {</div>
-<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>  }</div>
-<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>  <span class="keywordflow">return</span> std::equal(a.begin(), a.end(), b.begin());</div>
-<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>}</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span> </div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T,<span class="keywordtype">size_t</span> S&gt;</div>
+<div class="foldopen" id="foldopen00134" data-start="{" data-end="}">
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno"><a class="line" href="namespaceduckutils.html#a53498bb1e1c667d10957b46309232a09">  134</a></span>std::string <a class="code hl_function" href="namespaceduckutils.html#a53498bb1e1c667d10957b46309232a09">arrayToHexString</a>(<span class="keyword">const</span> std::array&lt;T,S&gt; arr) {</div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>    std::string buf = <span class="stringliteral">&quot;&quot;</span>; <span class="comment">// static to avoid memory leak</span></div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>    buf.clear();</div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>    buf.reserve(S * 2); <span class="comment">// 2 digit hex</span></div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>    <span class="keyword">const</span> <span class="keywordtype">char</span>* cs = <span class="stringliteral">&quot;0123456789ABCDEF&quot;</span>;</div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; S; i++) {</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>        uint8_t val = arr[i];</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>        buf += cs[(val &gt;&gt; 4) &amp; 0x0F];</div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>        buf += cs[val &amp; 0x0F];</div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>    }</div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>    <span class="keywordflow">return</span> buf;</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>}</div>
 </div>
-<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span> </div>
-<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T,<span class="keywordtype">size_t</span> S&gt;</div>
-<div class="foldopen" id="foldopen00146" data-start="{" data-end="}">
-<div class="line"><a id="l00146" name="l00146"></a><span class="lineno"><a class="line" href="namespaceduckutils.html#a97f2ca60c96157b104216f166439f78b">  146</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="namespaceduckutils.html#a73122238e9e6161a781b25f4a74cca44">isEqual</a>(<span class="keyword">const</span> std::array&lt;T,S&gt; &amp; a, <span class="keyword">const</span> std::array&lt;T,S&gt; &amp; b) {</div>
-<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>        <span class="keywordflow">if</span> (a.size() != b.size()) {</div>
-<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>        }</div>
-<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>        <span class="keywordflow">return</span> std::equal(a.begin(), a.end(), b.begin());</div>
-<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>    }</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span> </div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span> </div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="foldopen" id="foldopen00156" data-start="{" data-end="}">
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno"><a class="line" href="namespaceduckutils.html#a73122238e9e6161a781b25f4a74cca44">  156</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="namespaceduckutils.html#a73122238e9e6161a781b25f4a74cca44">isEqual</a>(<span class="keyword">const</span> std::vector&lt;T&gt; &amp; a, <span class="keyword">const</span> std::vector&lt;T&gt; &amp; b) {</div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>  <span class="keywordflow">if</span> (a.size() != b.size()) {</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>  }</div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>  <span class="keywordflow">return</span> std::equal(a.begin(), a.end(), b.begin());</div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>}</div>
 </div>
-<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span> </div>
-<div class="line"><a id="l00159" name="l00159"></a><span class="lineno"><a class="line" href="namespaceduckutils.html#a3dc52038752191518492e540418c195b">  159</a></span>uint32_t <a class="code hl_function" href="namespaceduckutils.html#a3dc52038752191518492e540418c195b">toUint32</a>(<span class="keyword">const</span> <span class="keywordtype">byte</span>* data);</div>
-<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span> </div>
-<div class="line"><a id="l00166" name="l00166"></a><span class="lineno"><a class="line" href="namespaceduckutils.html#afdb0bf8814af2145ed0d183ad5523157">  166</a></span>Timer&lt;&gt; <a class="code hl_function" href="namespaceduckutils.html#afdb0bf8814af2145ed0d183ad5523157">getTimer</a>();</div>
-<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span> </div>
-<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span> </div>
-<div class="line"><a id="l00169" name="l00169"></a><span class="lineno"><a class="line" href="namespaceduckutils.html#a4767620f654cbb1e876562754cffb77a">  169</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="namespaceduckutils.html#a4767620f654cbb1e876562754cffb77a">getDetectState</a>();</div>
-<div class="line"><a id="l00170" name="l00170"></a><span class="lineno"><a class="line" href="namespaceduckutils.html#a687a9ca39ed93decec5870a794acbbff">  170</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="namespaceduckutils.html#a687a9ca39ed93decec5870a794acbbff">flipDetectState</a>();</div>
-<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span> </div>
-<div class="line"><a id="l00179" name="l00179"></a><span class="lineno"><a class="line" href="namespaceduckutils.html#a37eec93ee812bf6f0c50eb00928605ad">  179</a></span><span class="keywordtype">int</span> <a class="code hl_function" href="namespaceduckutils.html#a37eec93ee812bf6f0c50eb00928605ad">saveWifiCredentials</a>(std::string ssid, std::string password);</div>
-<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span> </div>
-<div class="line"><a id="l00186" name="l00186"></a><span class="lineno"><a class="line" href="namespaceduckutils.html#a0a14835a59650aef58f9ffbd107586fe">  186</a></span>std::string <a class="code hl_function" href="namespaceduckutils.html#a0a14835a59650aef58f9ffbd107586fe">loadWifiSsid</a>();</div>
-<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span> </div>
-<div class="line"><a id="l00193" name="l00193"></a><span class="lineno"><a class="line" href="namespaceduckutils.html#a56ea08fb08a402d391f3582a309d8899">  193</a></span>std::string <a class="code hl_function" href="namespaceduckutils.html#a56ea08fb08a402d391f3582a309d8899">loadWifiPassword</a>();</div>
-<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span> </div>
-<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>} <span class="comment">// namespace duckutils</span></div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span> </div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T,<span class="keywordtype">size_t</span> S&gt;</div>
+<div class="foldopen" id="foldopen00164" data-start="{" data-end="}">
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno"><a class="line" href="namespaceduckutils.html#a97f2ca60c96157b104216f166439f78b">  164</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="namespaceduckutils.html#a73122238e9e6161a781b25f4a74cca44">isEqual</a>(<span class="keyword">const</span> std::array&lt;T,S&gt; &amp; a, <span class="keyword">const</span> std::array&lt;T,S&gt; &amp; b) {</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>        <span class="keywordflow">if</span> (a.size() != b.size()) {</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>        }</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>        <span class="keywordflow">return</span> std::equal(a.begin(), a.end(), b.begin());</div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>    }</div>
 </div>
-<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span><span class="preprocessor">#endif</span></div>
-<div class="ttc" id="acdpcfg_8h_html"><div class="ttname"><a href="cdpcfg_8h.html">cdpcfg.h</a></div><div class="ttdoc">CDP central compile-time configuration file.</div></div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span> </div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>uint32_t <a class="code hl_function" href="namespaceduckutils.html#a694ac8062f355bd3bab23bca809dd102">toUint32</a>(<span class="keyword">const</span> uint8_t* data);</div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span> </div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span><span class="keyword">template</span> &lt;<span class="keyword">class </span>callable, <span class="keyword">class</span>... arguments&gt;</div>
+<div class="foldopen" id="foldopen00185" data-start="{" data-end="};">
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno"><a class="line" href="classduckutils_1_1_timer.html">  185</a></span><span class="keyword">class </span><a class="code hl_class" href="classduckutils_1_1_timer.html">Timer</a></div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>    {</div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>    <span class="keyword">typedef</span> std::chrono::time_point&lt;std::chrono::steady_clock, std::chrono::duration&lt;int,std::milli&gt;&gt; time_point_t;</div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>    <span class="keyword">public</span>:</div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span> </div>
+<div class="foldopen" id="foldopen00190" data-start="{" data-end="}">
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno"><a class="line" href="classduckutils_1_1_timer.html#a796b6c5a7c87d1e33cac482989ff9bfb">  190</a></span>        <a class="code hl_function" href="classduckutils_1_1_timer.html#a796b6c5a7c87d1e33cac482989ff9bfb">Timer</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> in, <span class="keywordtype">bool</span> async, callable&amp;&amp; f, arguments&amp;&amp;... args)</div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>        {</div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>            after(in, async, std::forward&lt;callable&gt;(f), std::forward&lt;arguments&gt;(args)...);</div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>        }</div>
+</div>
+<div class="foldopen" id="foldopen00194" data-start="{" data-end="}">
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno"><a class="line" href="classduckutils_1_1_timer.html#a1667ef76bfbf3f5b3eed81f0a0746c2e">  194</a></span>        <a class="code hl_function" href="classduckutils_1_1_timer.html#a1667ef76bfbf3f5b3eed81f0a0746c2e">Timer</a>(Timer::time_point_t at, <span class="keywordtype">bool</span> async, callable&amp;&amp; f, arguments&amp;&amp;... args){</div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>            <span class="keyword">auto</span> now = std::chrono::steady_clock::now();</div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span> </div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>            <span class="keyword">auto</span> diff= std::chrono::duration_cast&lt;std::chrono::milliseconds&gt;(at - now).count();</div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span> </div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>            after(diff, async, std::forward&lt;callable&gt;(f), std::forward&lt;arguments&gt;(args)...);</div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>        }</div>
+</div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>       <span class="keywordtype">void</span> after(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> after, <span class="keywordtype">bool</span> async,  callable&amp;&amp; f, arguments&amp;&amp;... args){</div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>           std::function&lt;std::invoke_result_t&lt;callable, arguments...&gt;()&gt; task(std::bind(std::forward&lt;callable&gt;(f), std::forward&lt;arguments&gt;(args)...));</div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span> </div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>           <span class="keywordflow">if</span> (async)</div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>           {</div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>               std::thread([after, task]() {</div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>                   std::this_thread::sleep_for(std::chrono::milliseconds(after));</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>                   task();</div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>               }).detach();</div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>           }</div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>           <span class="keywordflow">else</span></div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>           {</div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>               std::this_thread::sleep_for(std::chrono::milliseconds(after));</div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>               task();</div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>           }</div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>        }</div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span> </div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>    };</div>
+</div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span> </div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span><span class="keywordtype">bool</span> <a class="code hl_function" href="namespaceduckutils.html#a4767620f654cbb1e876562754cffb77a">getDetectState</a>();</div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span><span class="keywordtype">bool</span> <a class="code hl_function" href="namespaceduckutils.html#a687a9ca39ed93decec5870a794acbbff">flipDetectState</a>();</div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span> </div>
+<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>}</div>
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span><span class="preprocessor">#endif</span></div>
+<div class="ttc" id="a_duck_error_8h_html"><div class="ttname"><a href="_duck_error_8h.html">DuckError.h</a></div></div>
 <div class="ttc" id="acdpcfg_8h_html_ae8f9a966c10a74fe57e8d30290d10227"><div class="ttname"><a href="cdpcfg_8h.html#ae8f9a966c10a74fe57e8d30290d10227">CDPCFG_UUID_LEN</a></div><div class="ttdeci">#define CDPCFG_UUID_LEN</div><div class="ttdoc">CDP UUID generator max length.</div><div class="ttdef"><b>Definition</b> cdpcfg.h:81</div></div>
-<div class="ttc" id="anamespaceduckutils_html"><div class="ttname"><a href="namespaceduckutils.html">duckutils</a></div><div class="ttdef"><b>Definition</b> DuckUtils.h:21</div></div>
-<div class="ttc" id="anamespaceduckutils_html_a0a14835a59650aef58f9ffbd107586fe"><div class="ttname"><a href="namespaceduckutils.html#a0a14835a59650aef58f9ffbd107586fe">duckutils::loadWifiSsid</a></div><div class="ttdeci">std::string loadWifiSsid()</div><div class="ttdoc">Load WiFi SSID from EEPROM.</div></div>
-<div class="ttc" id="anamespaceduckutils_html_a0a51e5d45425646f2d70f63c3de51faa"><div class="ttname"><a href="namespaceduckutils.html#a0a51e5d45425646f2d70f63c3de51faa">duckutils::toUpperCase</a></div><div class="ttdeci">std::string toUpperCase(std::string str)</div><div class="ttdoc">Convert a string to upper case.</div></div>
-<div class="ttc" id="anamespaceduckutils_html_a0f01261a6300cd0d8079981838ede1c2"><div class="ttname"><a href="namespaceduckutils.html#a0f01261a6300cd0d8079981838ede1c2">duckutils::detectState</a></div><div class="ttdeci">bool detectState</div></div>
-<div class="ttc" id="anamespaceduckutils_html_a232773eaac919a424cf6c8737c6843f0"><div class="ttname"><a href="namespaceduckutils.html#a232773eaac919a424cf6c8737c6843f0">duckutils::toString</a></div><div class="ttdeci">std::string toString(const std::vector&lt; T &gt; &amp;vec)</div><div class="ttdoc">Convert a vector into an ASCII string.</div><div class="ttdef"><b>Definition</b> DuckUtils.h:77</div></div>
-<div class="ttc" id="anamespaceduckutils_html_a37eec93ee812bf6f0c50eb00928605ad"><div class="ttname"><a href="namespaceduckutils.html#a37eec93ee812bf6f0c50eb00928605ad">duckutils::saveWifiCredentials</a></div><div class="ttdeci">int saveWifiCredentials(std::string ssid, std::string password)</div><div class="ttdoc">Save / Write Wifi credentials to EEPROM.</div></div>
-<div class="ttc" id="anamespaceduckutils_html_a3dc52038752191518492e540418c195b"><div class="ttname"><a href="namespaceduckutils.html#a3dc52038752191518492e540418c195b">duckutils::toUint32</a></div><div class="ttdeci">uint32_t toUint32(const byte *data)</div><div class="ttdoc">Convert a byte array to unsigned 32 bit integer.</div></div>
-<div class="ttc" id="anamespaceduckutils_html_a3ee943927ff96bc0edbe3b37f2396a7b"><div class="ttname"><a href="namespaceduckutils.html#a3ee943927ff96bc0edbe3b37f2396a7b">duckutils::getCDPVersion</a></div><div class="ttdeci">std::string getCDPVersion()</div></div>
-<div class="ttc" id="anamespaceduckutils_html_a4767620f654cbb1e876562754cffb77a"><div class="ttname"><a href="namespaceduckutils.html#a4767620f654cbb1e876562754cffb77a">duckutils::getDetectState</a></div><div class="ttdeci">bool getDetectState()</div></div>
-<div class="ttc" id="anamespaceduckutils_html_a56ea08fb08a402d391f3582a309d8899"><div class="ttname"><a href="namespaceduckutils.html#a56ea08fb08a402d391f3582a309d8899">duckutils::loadWifiPassword</a></div><div class="ttdeci">std::string loadWifiPassword()</div><div class="ttdoc">Load WiFi password from EEPROM.</div></div>
-<div class="ttc" id="anamespaceduckutils_html_a687a9ca39ed93decec5870a794acbbff"><div class="ttname"><a href="namespaceduckutils.html#a687a9ca39ed93decec5870a794acbbff">duckutils::flipDetectState</a></div><div class="ttdeci">bool flipDetectState()</div></div>
-<div class="ttc" id="anamespaceduckutils_html_a6a89c26b27f49a64aa4ad62479da0327"><div class="ttname"><a href="namespaceduckutils.html#a6a89c26b27f49a64aa4ad62479da0327">duckutils::duckTimer</a></div><div class="ttdeci">Timer duckTimer</div></div>
-<div class="ttc" id="anamespaceduckutils_html_a73122238e9e6161a781b25f4a74cca44"><div class="ttname"><a href="namespaceduckutils.html#a73122238e9e6161a781b25f4a74cca44">duckutils::isEqual</a></div><div class="ttdeci">bool isEqual(const std::vector&lt; T &gt; &amp;a, const std::vector&lt; T &gt; &amp;b)</div><div class="ttdoc">Compare two vectors with regard to both size and contents.</div><div class="ttdef"><b>Definition</b> DuckUtils.h:138</div></div>
-<div class="ttc" id="anamespaceduckutils_html_a7af6fab5b312e69d35f62c81150eb752"><div class="ttname"><a href="namespaceduckutils.html#a7af6fab5b312e69d35f62c81150eb752">duckutils::convertToHex</a></div><div class="ttdeci">std::string convertToHex(byte *data, int size)</div><div class="ttdoc">Convert a byte array into a hex string.</div></div>
-<div class="ttc" id="anamespaceduckutils_html_a9a259c88457e4fac2bdc6042aa229dec"><div class="ttname"><a href="namespaceduckutils.html#a9a259c88457e4fac2bdc6042aa229dec">duckutils::getRandomBytes</a></div><div class="ttdeci">void getRandomBytes(int length, byte *bytes)</div><div class="ttdoc">Creates a byte array with random alpha numerical values.</div></div>
-<div class="ttc" id="anamespaceduckutils_html_ac1e7d2b9804f5f2e9d5d3f44ae11d875"><div class="ttname"><a href="namespaceduckutils.html#ac1e7d2b9804f5f2e9d5d3f44ae11d875">duckutils::arrayToHexString</a></div><div class="ttdeci">std::string arrayToHexString(const std::array&lt; T, S &gt; &amp;arr)</div><div class="ttdoc">Convert an array into hex for sending over http or display.</div><div class="ttdef"><b>Definition</b> DuckUtils.h:115</div></div>
-<div class="ttc" id="anamespaceduckutils_html_aca7b40acfbb2b68b7155571fe11fd98f"><div class="ttname"><a href="namespaceduckutils.html#aca7b40acfbb2b68b7155571fe11fd98f">duckutils::stringToByteVector</a></div><div class="ttdeci">std::vector&lt; byte &gt; stringToByteVector(const String &amp;str)</div><div class="ttdoc">Convert a string to a byte array.</div></div>
-<div class="ttc" id="anamespaceduckutils_html_afdb0bf8814af2145ed0d183ad5523157"><div class="ttname"><a href="namespaceduckutils.html#afdb0bf8814af2145ed0d183ad5523157">duckutils::getTimer</a></div><div class="ttdeci">Timer getTimer()</div><div class="ttdoc">Get a timer instance.</div></div>
-<div class="ttc" id="anamespaceduckutils_html_aff2e7f9ce8df861a748df8a3f84be721"><div class="ttname"><a href="namespaceduckutils.html#aff2e7f9ce8df861a748df8a3f84be721">duckutils::createUuid</a></div><div class="ttdeci">std::string createUuid(int length=CDPCFG_UUID_LEN)</div><div class="ttdoc">Create a uuid string.</div></div>
+<div class="ttc" id="aclassduckutils_1_1_timer_html"><div class="ttname"><a href="classduckutils_1_1_timer.html">duckutils::Timer</a></div><div class="ttdoc">Create a timer instance.</div><div class="ttdef"><b>Definition</b> DuckUtils.h:186</div></div>
+<div class="ttc" id="aclassduckutils_1_1_timer_html_a1667ef76bfbf3f5b3eed81f0a0746c2e"><div class="ttname"><a href="classduckutils_1_1_timer.html#a1667ef76bfbf3f5b3eed81f0a0746c2e">duckutils::Timer::Timer</a></div><div class="ttdeci">Timer(Timer::time_point_t at, bool async, callable &amp;&amp;f, arguments &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> DuckUtils.h:194</div></div>
+<div class="ttc" id="aclassduckutils_1_1_timer_html_a796b6c5a7c87d1e33cac482989ff9bfb"><div class="ttname"><a href="classduckutils_1_1_timer.html#a796b6c5a7c87d1e33cac482989ff9bfb">duckutils::Timer::Timer</a></div><div class="ttdeci">Timer(unsigned int in, bool async, callable &amp;&amp;f, arguments &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> DuckUtils.h:190</div></div>
+<div class="ttc" id="anamespaceduckutils_html"><div class="ttname"><a href="namespaceduckutils.html">duckutils</a></div><div class="ttdef"><b>Definition</b> DuckUtils.cpp:5</div></div>
+<div class="ttc" id="anamespaceduckutils_html_a0a51e5d45425646f2d70f63c3de51faa"><div class="ttname"><a href="namespaceduckutils.html#a0a51e5d45425646f2d70f63c3de51faa">duckutils::toUpperCase</a></div><div class="ttdeci">std::string toUpperCase(std::string str)</div><div class="ttdoc">Convert a string to upper case.</div><div class="ttdef"><b>Definition</b> DuckUtils.cpp:69</div></div>
+<div class="ttc" id="anamespaceduckutils_html_a0f01261a6300cd0d8079981838ede1c2"><div class="ttname"><a href="namespaceduckutils.html#a0f01261a6300cd0d8079981838ede1c2">duckutils::detectState</a></div><div class="ttdeci">bool detectState</div><div class="ttdef"><b>Definition</b> DuckUtils.cpp:7</div></div>
+<div class="ttc" id="anamespaceduckutils_html_a232773eaac919a424cf6c8737c6843f0"><div class="ttname"><a href="namespaceduckutils.html#a232773eaac919a424cf6c8737c6843f0">duckutils::toString</a></div><div class="ttdeci">std::string toString(const std::vector&lt; T &gt; &amp;vec)</div><div class="ttdoc">Convert a vector into an ASCII string.</div><div class="ttdef"><b>Definition</b> DuckUtils.h:78</div></div>
+<div class="ttc" id="anamespaceduckutils_html_a3ee943927ff96bc0edbe3b37f2396a7b"><div class="ttname"><a href="namespaceduckutils.html#a3ee943927ff96bc0edbe3b37f2396a7b">duckutils::getCDPVersion</a></div><div class="ttdeci">std::string getCDPVersion()</div><div class="ttdef"><b>Definition</b> DuckUtils.cpp:9</div></div>
+<div class="ttc" id="anamespaceduckutils_html_a46c1f1a9161c53d8489a80aa75a2b8a8"><div class="ttname"><a href="namespaceduckutils.html#a46c1f1a9161c53d8489a80aa75a2b8a8">duckutils::stringToArray</a></div><div class="ttdeci">std::array&lt; T, S &gt; stringToArray(const std::string &amp;str)</div><div class="ttdoc">Convert a string into an array of bytes.</div><div class="ttdef"><b>Definition</b> DuckUtils.h:115</div></div>
+<div class="ttc" id="anamespaceduckutils_html_a4767620f654cbb1e876562754cffb77a"><div class="ttname"><a href="namespaceduckutils.html#a4767620f654cbb1e876562754cffb77a">duckutils::getDetectState</a></div><div class="ttdeci">bool getDetectState()</div><div class="ttdef"><b>Definition</b> DuckUtils.cpp:13</div></div>
+<div class="ttc" id="anamespaceduckutils_html_a53498bb1e1c667d10957b46309232a09"><div class="ttname"><a href="namespaceduckutils.html#a53498bb1e1c667d10957b46309232a09">duckutils::arrayToHexString</a></div><div class="ttdeci">std::string arrayToHexString(const std::array&lt; T, S &gt; arr)</div><div class="ttdoc">Convert an container of contiguous data into hex for sending over http or display....</div><div class="ttdef"><b>Definition</b> DuckUtils.h:134</div></div>
+<div class="ttc" id="anamespaceduckutils_html_a687a9ca39ed93decec5870a794acbbff"><div class="ttname"><a href="namespaceduckutils.html#a687a9ca39ed93decec5870a794acbbff">duckutils::flipDetectState</a></div><div class="ttdeci">bool flipDetectState()</div><div class="ttdef"><b>Definition</b> DuckUtils.cpp:14</div></div>
+<div class="ttc" id="anamespaceduckutils_html_a694ac8062f355bd3bab23bca809dd102"><div class="ttname"><a href="namespaceduckutils.html#a694ac8062f355bd3bab23bca809dd102">duckutils::toUint32</a></div><div class="ttdeci">uint32_t toUint32(const uint8_t *data)</div><div class="ttdoc">Convert a byte array to unsigned 32 bit integer.</div><div class="ttdef"><b>Definition</b> DuckUtils.cpp:59</div></div>
+<div class="ttc" id="anamespaceduckutils_html_a73122238e9e6161a781b25f4a74cca44"><div class="ttname"><a href="namespaceduckutils.html#a73122238e9e6161a781b25f4a74cca44">duckutils::isEqual</a></div><div class="ttdeci">bool isEqual(const std::vector&lt; T &gt; &amp;a, const std::vector&lt; T &gt; &amp;b)</div><div class="ttdoc">Compare two vectors with regard to both size and contents.</div><div class="ttdef"><b>Definition</b> DuckUtils.h:156</div></div>
+<div class="ttc" id="anamespaceduckutils_html_a942ad7b394b64c3ba7fef87c1b27e2a7"><div class="ttname"><a href="namespaceduckutils.html#a942ad7b394b64c3ba7fef87c1b27e2a7">duckutils::stringToByteVector</a></div><div class="ttdeci">std::vector&lt; uint8_t &gt; stringToByteVector(const std::string &amp;str)</div><div class="ttdoc">Convert a string to a byte array.</div><div class="ttdef"><b>Definition</b> DuckUtils.cpp:79</div></div>
+<div class="ttc" id="anamespaceduckutils_html_af78c3c72848c8c50effe19cd5edc25d3"><div class="ttname"><a href="namespaceduckutils.html#af78c3c72848c8c50effe19cd5edc25d3">duckutils::getRandomBytes</a></div><div class="ttdeci">void getRandomBytes(int length, uint8_t *bytes)</div><div class="ttdoc">Creates a byte array with random alpha numerical values.</div><div class="ttdef"><b>Definition</b> DuckUtils.cpp:20</div></div>
+<div class="ttc" id="anamespaceduckutils_html_afe0c55ac9f352c8295641a6f50915b1b"><div class="ttname"><a href="namespaceduckutils.html#afe0c55ac9f352c8295641a6f50915b1b">duckutils::convertToHex</a></div><div class="ttdeci">std::string convertToHex(uint8_t *data, int size)</div><div class="ttdoc">Convert a byte array into a hex string.</div><div class="ttdef"><b>Definition</b> DuckUtils.cpp:46</div></div>
+<div class="ttc" id="anamespaceduckutils_html_aff2e7f9ce8df861a748df8a3f84be721"><div class="ttname"><a href="namespaceduckutils.html#aff2e7f9ce8df861a748df8a3f84be721">duckutils::createUuid</a></div><div class="ttdeci">std::string createUuid(int length)</div><div class="ttdoc">Create a uuid string.</div><div class="ttdef"><b>Definition</b> DuckUtils.cpp:30</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath" ><!-- id is needed for treeview function! -->
   <ul>
-      <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_b0856f6b0d80ccb263b2f415c91f9e17.html">include</a></li><li class="navelem"><a class="el" href="_duck_utils_8h.html">DuckUtils.h</a></li>
+      <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_313caf1132e152dd9b58bea13a4052ca.html">utils</a></li><li class="navelem"><a class="el" href="_duck_utils_8h.html">DuckUtils.h</a></li>
       <li class="footer"><a href="https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol/wiki" target="_blank">Wiki</a></li>
       <li class="footer"><a href="https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol" target="_blank">GitHub</a></li>
       <li class="footer"><a href="https://clusterduckprotocol.org/" target="_blank">Project Page</a></li>

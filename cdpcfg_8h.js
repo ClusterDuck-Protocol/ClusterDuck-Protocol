@@ -39,5 +39,9 @@ var cdpcfg_8h =
     [ "CDPCFG_UPDATE_PASSWORD", "cdpcfg_8h.html#a18efacccf4c956bdcc082d9540e42ca5", null ],
     [ "CDPCFG_UPDATE_USERNAME", "cdpcfg_8h.html#accf2dc3b0d9894db8be9f990a4059f72", null ],
     [ "CDPCFG_UUID_LEN", "cdpcfg_8h.html#ae8f9a966c10a74fe57e8d30290d10227", null ],
-    [ "CDPCFG_WEB_PORT", "cdpcfg_8h.html#a821294e2f6701503091a967cac63d2c9", null ]
+    [ "CDPCFG_WEB_PORT", "cdpcfg_8h.html#a821294e2f6701503091a967cac63d2c9", null ],
+    [ "RSSI_MAX", "cdpcfg_8h.html#ab652764fbf40028378be3faf48507c99", null ],
+    [ "RSSI_MIN", "cdpcfg_8h.html#ab50c48d5321c8e53337b36a5add64671", null ],
+    [ "SNR_MAX", "cdpcfg_8h.html#ad13a6df57d1b67b66eaa52cf04c9c4b9", null ],
+    [ "SNR_MIN", "cdpcfg_8h.html#ac2040e558d08d0197a6eecfa0b08dcc5", null ]
 ];

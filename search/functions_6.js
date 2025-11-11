@@ -1,31 +1,4 @@
 var searchData=
 [
-  ['get_5fbitspersector_0',['get_bitsPerSector',['../class_bloom_filter.html#af01868484be21e1735c617db8758e9fe',1,'BloomFilter']]],
-  ['get_5fmaxmsgs_1',['get_maxMsgs',['../class_bloom_filter.html#a2fe6a3e759a5b752f3c49a674064a24a',1,'BloomFilter']]],
-  ['get_5fnmsg_2',['get_nMsg',['../class_bloom_filter.html#adeb7e046bdb08e38c0fd0accfee3edc3',1,'BloomFilter']]],
-  ['get_5fnumhashes_3',['get_numHashes',['../class_bloom_filter.html#a028bbd0e8487aa7121987bc8785f0d5a',1,'BloomFilter']]],
-  ['get_5fnumsectors_4',['get_numSectors',['../class_bloom_filter.html#a789ecd421bc4c7a3cabfe514e7cd0c02',1,'BloomFilter']]],
-  ['getbuffer_5',['getBuffer',['../class_duck_packet.html#ad14a9674270761d1326fe8e2a5560e98',1,'DuckPacket']]],
-  ['getcdpversion_6',['getcdpversion',['../namespaceduckutils.html#a3ee943927ff96bc0edbe3b37f2396a7b',1,'duckutils::getCDPVersion()'],['../class_duck.html#a79f7fe319da92ab3aaf300d2e3581028',1,'Duck::getCDPVersion()']]],
-  ['getchannel_7',['getchannel',['../class_duck_net.html#a46aee82eff4b1b77df321b0250fa046a',1,'DuckNet::getChannel()'],['../class_duck_radio.html#ade2da34b1dadc3aadf165d9ffe0b86bd',1,'DuckRadio::getChannel()']]],
-  ['getdecrypt_8',['getdecrypt',['../class_duck.html#a590efad5dfc0ca20df20c0d03d2f7baa',1,'Duck::getDecrypt()'],['../namespaceduckcrypto.html#a8761031d3e412289350782f8a5fa4a85',1,'duckcrypto::getDecrypt()']]],
-  ['getdetectstate_9',['getDetectState',['../namespaceduckutils.html#a4767620f654cbb1e876562754cffb77a',1,'duckutils']]],
-  ['getdeviceid_10',['getDeviceId',['../class_duck_packet.html#a990641dc5974aab2602057231f551178',1,'DuckPacket']]],
-  ['getduckid_11',['getDuckId',['../class_duck.html#a25028a15e17e15cc23c84a71c904ab9b',1,'Duck']]],
-  ['getduckmacaddress_12',['getDuckMacAddress',['../namespaceduckesp.html#aa47f3e7f6013904e199bcb6ac8bcab67',1,'duckesp']]],
-  ['getencrypt_13',['getEncrypt',['../class_duck.html#a2d3a51960c30dd3346661c52f66b2d6c',1,'Duck']]],
-  ['geterrorstring_14',['getErrorString',['../class_duck.html#a433177787634e874f4836067c6ee7eb7',1,'Duck']]],
-  ['getinstance_15',['getinstance',['../class_duck_led.html#aeba6efc2fd6b67fd353300a46154b17e',1,'DuckLed::getInstance()'],['../class_duck_radio.html#a44a79333509f33d1a89d30c637170a22',1,'DuckRadio::getInstance()']]],
-  ['getmaxallocheap_16',['getMaxAllocHeap',['../namespaceduckesp.html#aed41c96f426661ae0c3eaef453dd5f89',1,'duckesp']]],
-  ['getminfreeheap_17',['getMinFreeHeap',['../namespaceduckesp.html#a5338d6f79be1fb629ffc5f1d1b4495a6',1,'duckesp']]],
-  ['getpassword_18',['getpassword',['../class_duck_net.html#afcac65512ef0a9b74f6f0826300612e8',1,'DuckNet::getPassword()'],['../class_duck.html#a041a7773e559efb4bf8e0e20c493ceff',1,'Duck::getPassword()']]],
-  ['getrandombytes_19',['getRandomBytes',['../namespaceduckutils.html#a9a259c88457e4fac2bdc6042aa229dec',1,'duckutils']]],
-  ['getreceiveflag_20',['getReceiveFlag',['../class_duck_radio.html#ad02e74c1329e584c9d461e247173a2e5',1,'DuckRadio']]],
-  ['getrssi_21',['getRSSI',['../class_duck_radio.html#adf8d6541b860531b030fc8b169c21687',1,'DuckRadio']]],
-  ['getsnr_22',['getSNR',['../class_duck_radio.html#a9dfe6c07410f19412bf3bf73bb73b500',1,'DuckRadio']]],
-  ['getssid_23',['getssid',['../class_duck_net.html#a4bac22808e4120262d1538e9be816698',1,'DuckNet::getSsid()'],['../class_duck.html#abfceae63bc916c2f878d629613d50c57',1,'Duck::getSsid()']]],
-  ['getstate_24',['getState',['../namespaceduckcrypto.html#a54b3103192a6ab83dbee1883246b485e',1,'duckcrypto']]],
-  ['gettimer_25',['getTimer',['../namespaceduckutils.html#afdb0bf8814af2145ed0d183ad5523157',1,'duckutils']]],
-  ['gettopic_26',['getTopic',['../class_duck_packet.html#a81d0ea3aaeac549e206b5fded15987ec',1,'DuckPacket']]],
-  ['gettype_27',['getType',['../class_duck.html#a3d0b92824388146c6e4e7d15d5f3c449',1,'Duck']]]
+  ['handlereceivedpacket_0',['handleReceivedPacket',['../class_duck.html#a769be988f578dec859e38a0a6530daf2',1,'Duck']]]
 ];

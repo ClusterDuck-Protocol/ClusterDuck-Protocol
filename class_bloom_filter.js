@@ -3,6 +3,7 @@ var class_bloom_filter =
     [ "BloomFilter", "class_bloom_filter.html#a64e9f133cd9bb65d55a5e31f701bbca0", null ],
     [ "BloomFilter", "class_bloom_filter.html#aba4255db5abc946c5d89826e026cc4b8", null ],
     [ "~BloomFilter", "class_bloom_filter.html#a27358192f6e0d7aba2b24be36c5d3580", null ],
+    [ "assignUniqueMessageId", "class_bloom_filter.html#afdef5b1cb533edfc864114fd584a9521", null ],
     [ "bloom_add", "class_bloom_filter.html#a9324ec548ffba472c579dc4a0655c4f4", null ],
     [ "bloom_check", "class_bloom_filter.html#ae976246f2899c2b10166a25e026c91c5", null ],
     [ "get_bitsPerSector", "class_bloom_filter.html#af01868484be21e1735c617db8758e9fe", null ],

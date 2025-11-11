@@ -1,5 +1,26 @@
 var searchData=
 [
-  ['flipdetectstate_0',['flipDetectState',['../namespaceduckutils.html#a687a9ca39ed93decec5870a794acbbff',1,'duckutils']]],
-  ['freeheapmemory_1',['freeHeapMemory',['../namespaceduckesp.html#ae50a3039b7243bdf5d1d094cb8b59182',1,'duckesp']]]
+  ['get_5fbitspersector_0',['get_bitsPerSector',['../class_bloom_filter.html#af01868484be21e1735c617db8758e9fe',1,'BloomFilter']]],
+  ['get_5fmaxmsgs_1',['get_maxMsgs',['../class_bloom_filter.html#a2fe6a3e759a5b752f3c49a674064a24a',1,'BloomFilter']]],
+  ['get_5fnmsg_2',['get_nMsg',['../class_bloom_filter.html#adeb7e046bdb08e38c0fd0accfee3edc3',1,'BloomFilter']]],
+  ['get_5fnumhashes_3',['get_numHashes',['../class_bloom_filter.html#a028bbd0e8487aa7121987bc8785f0d5a',1,'BloomFilter']]],
+  ['get_5fnumsectors_4',['get_numSectors',['../class_bloom_filter.html#a789ecd421bc4c7a3cabfe514e7cd0c02',1,'BloomFilter']]],
+  ['getbestnexthop_5',['getBestNextHop',['../class_duck_router.html#a4c9d5c2d62feaf8a461af098a8770ba7',1,'DuckRouter']]],
+  ['getcdpversion_6',['getCDPVersion',['../namespaceduckutils.html#a3ee943927ff96bc0edbe3b37f2396a7b',1,'duckutils']]],
+  ['getdestination_7',['getDestination',['../class_route_j_s_o_n.html#a24d95567561212af92c7a17e5f7ea5ae',1,'RouteJSON']]],
+  ['getdetectstate_8',['getDetectState',['../namespaceduckutils.html#a4767620f654cbb1e876562754cffb77a',1,'duckutils']]],
+  ['getdeviceid_9',['getDeviceId',['../class_neighbor.html#af45de499da5d65f99db1f1e2f8bc4542',1,'Neighbor']]],
+  ['getduckid_10',['getDuckId',['../class_duck.html#ace62f3e1b3be097a46751e6f1461b218',1,'Duck']]],
+  ['geterrorstring_11',['getErrorString',['../namespaceduckutils.html#a9f5c50360f2e8a77f3347b41af29cbc8',1,'duckutils']]],
+  ['getfilter_12',['getFilter',['../class_duck_router.html#a88f5baff74c37509d4a36d874dc810ef',1,'DuckRouter']]],
+  ['getlastinpath_13',['getlastInPath',['../class_route_j_s_o_n.html#a123b37fb0d16be8d6a620d87974b22f1',1,'RouteJSON']]],
+  ['getlastseen_14',['getLastSeen',['../class_neighbor.html#af991e2fa2c16a8895875f907145367dc',1,'Neighbor']]],
+  ['getnetworkstate_15',['getNetworkState',['../class_duck_router.html#a21c0b7870847c92698eb252980f94471',1,'DuckRouter']]],
+  ['getrandombytes_16',['getRandomBytes',['../namespaceduckutils.html#af78c3c72848c8c50effe19cd5edc25d3',1,'duckutils']]],
+  ['getreceiveflag_17',['getReceiveFlag',['../class_duck_lo_ra.html#a946c2dd9d8667051f6b99a929d510ede',1,'DuckLoRa']]],
+  ['getroutingscore_18',['getRoutingScore',['../class_neighbor.html#a1d20fc33c9afc5ac6b6663e979c4045b',1,'Neighbor']]],
+  ['getrssi_19',['getrssi',['../class_duck_lo_ra.html#a0f5ef68bf4dee5a6570797e225b7b0ff',1,'DuckLoRa::getRSSI()'],['../class_neighbor.html#a0aa7cc4d0d3af849ff9348f7acbc2986',1,'Neighbor::getRssi()']]],
+  ['getsignalscore_20',['getSignalScore',['../class_duck.html#acb9c57dec730e6ea5f093d6b02350ee1',1,'Duck']]],
+  ['getsnr_21',['getsnr',['../class_duck_lo_ra.html#a0ff1b5a694b6214679ed48b6cfbcfbff',1,'DuckLoRa::getSNR()'],['../class_neighbor.html#a571c1e89e43a3721b37d91230b12cbc7',1,'Neighbor::getSnr()']]],
+  ['gettype_22',['gettype',['../class_detector_duck.html#a1a58d4c3149924dbab1c5939fc9cfa0c',1,'DetectorDuck::getType()'],['../class_duck.html#a24c439482eb73a628fa7f173f463af5f',1,'Duck::getType()'],['../class_duck_link.html#aef02d9be83d1fe510e54e666f3dffd62',1,'DuckLink::getType()'],['../class_mama_duck.html#a7b8b62f6e1567358594999c6df29a7ec',1,'MamaDuck::getType()'],['../class_papa_duck.html#aeb913950a14965e59c07907559ba6780',1,'PapaDuck::getType()']]]
 ];
