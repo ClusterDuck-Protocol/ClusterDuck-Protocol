@@ -132,7 +132,7 @@ private :
                 //we still need to recieve rreps in case of ttl expiry
                 RouteJSON rrepDoc = RouteJSON(rxPacket.asBytes());
                 if(relay){ 
-                    loginfo_ln("Received Route Response from DUID: %s", rxPacket.sduid.data(), rxPacket.sduid.size().c_str());
+                    loginfo_ln("Received Route Response from DUID: %s", rxPacket.sduid.data(), rxPacket.sduid.size());
 
                     rrepDoc.removeFromPath(this->duid);
                     //route responses need a way to keep tray of who relayed the packet, but a response needs to be directed and not broadly relayed

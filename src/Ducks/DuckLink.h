@@ -91,7 +91,7 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
               case reservedTopic::rrep: {
                   //we still need to recieve rreps in case of ttl expiry
                   RouteJSON rrepDoc = RouteJSON(rxPacket.asBytes());
-                  loginfo_ln("Received Route Response from DUID: %s", duckutils::convertToHex(rxPacket.sduid.data(), rxPacket.sduid.size()).c_str());
+                  loginfo_ln("Received Route Response from DUID: %s", duckutils::convertToHex(rxPacket.sduid.data(), rxPacket.sduid.size()));
                   //destination = sender of the rrep -> the last hop to current duck
                   Duid thisId = rxPacket.sduid;
                   this->router.insertIntoRoutingTable(rrepDoc.getDestination(), thisId, this->getSignalScore()); //why do i need to copy here 
