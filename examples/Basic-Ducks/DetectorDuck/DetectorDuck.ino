@@ -3,7 +3,7 @@
    @author
    @brief Builds a Duck to get RSSI signal strength value.
 
-   This example builds a duck using the preset DuckDetect to periodically send a ping message
+   This example builds a duck using the preset DetectorDuck to periodically send a ping message
    then provide the RSSI value of the response.
 
    @version
@@ -12,9 +12,7 @@
    @copyright
 */
 
-#include <arduino-timer.h>
-#include <string>
-#include <DuckDetect.h>
+#include <CDP.h>
 #include "FastLED.h"
 
 // Setup for W2812 (LED)
@@ -32,7 +30,7 @@ CRGB leds[NUM_LEDS];
 #endif
 
 // create an instance of a built-in Duck Detector
-DuckDetect duck;
+DetectorDuck duck("DETECTOR");
 
 // Create a timer with default settings
 auto timer = timer_create_default();
@@ -42,11 +40,7 @@ const unsigned long SIGNAL_TIMEOUT_MS = INTERVAL_MS + 1000; // 5 seconds timeout
 unsigned long lastSignalTime = 0;
 
 void setup() {
-
-  std::string deviceId("DETECTOR"); // NOTE: The Device ID must be exactly 8 bytes
-  std::array<byte,8> devId;
-  std::copy(deviceId.begin(), deviceId.end(), devId.begin());
-  duck.setupWithDefaults(devId);
+  duck.setupWithDefaults();
 
   // Register  a callback that provides RSSI value
   duck.onReceiveRssi(handleReceiveRssi);

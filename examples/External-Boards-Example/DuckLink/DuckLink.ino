@@ -5,15 +5,11 @@
 #endif
 
 // create a built-in duck link
-DuckLink duck;
+DuckLink duck("LINK0001");
 
 void setup()
 {
-    std::string deviceId("LINK0001");
-    std::array<byte,8> devId;
-    std::copy(deviceId.begin(), deviceId.end(), devId.begin());
-    int rc;
-    rc = duck.setupWithDefaults(devId);
+    rc = duck.setupWithDefaults();
 
     loginfo_ln("Hello, World!");
 }

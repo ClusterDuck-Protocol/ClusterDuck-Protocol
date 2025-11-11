@@ -42,7 +42,7 @@ jobs:
     - name: Run cppcheck
       run: |
         cppcheck --version
-        cppcheck --error-exitcode=1 --std=c++20 --force src
+        cppcheck --error-exitcode=1 --std=c++2a --force src
 
     - name: Arduino setup
       run: |
@@ -56,7 +56,7 @@ jobs:
         # install the Heltec ESP32 boards
         if [[ "${{ matrix.board }}" =~ "esp32:esp32:" ]]; then
           echo "[ARDUINO SETUP] Installing the Heltec ESP32 board"
-          arduino-cli core install esp32:esp32@2.0.17 --additional-urls https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series/releases/download/3.0.0/package_heltec_esp32_index.json
+          arduino-cli core install esp32:esp32@3.2.0[] --additional-urls https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series/releases/download/3.0.0/package_heltec_esp32_index.json
         fi
 
     - name: Install CDP
@@ -108,7 +108,7 @@ jobs:
         buildExampleSketch() { 
           BOARD=${{ matrix.board }}
           echo "Building $1/$2/$2.ino..."
-          arduino-cli compile -v -t -b ${{ matrix.board }} $PWD/examples/$1/$2/$2.ino > ${BOARD##*:}-$2-build.log 2>&1; 
+          arduino-cli compile -v -t -b ${{ matrix.board }} --build-property compiler.cpp.extra_flags=-std=c++2a $PWD/examples/$1/$2/$2.ino > ${BOARD##*:}-$2-build.log 2>&1; 
           echo "Build complete."
         } 
         buildExampleSketch Basic-Ducks DuckLink
@@ -119,7 +119,7 @@ jobs:
         buildExampleSketch() { 
           BOARD=${{ matrix.board }}
           echo "Building $1/$2/$2.ino..."
-          arduino-cli compile -v -t -b ${{ matrix.board }} $PWD/examples/$1/$2/$2.ino > ${BOARD##*:}-$2-build.log 2>&1; 
+          arduino-cli compile -v -t -b ${{ matrix.board }} --build-property compiler.cpp.extra_flags=-std=c++2a $PWD/examples/$1/$2/$2.ino > ${BOARD##*:}-$2-build.log 2>&1; 
           echo "Build complete."
         } 
         buildExampleSketch Basic-Ducks PapaDuck

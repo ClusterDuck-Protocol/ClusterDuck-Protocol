@@ -11,16 +11,10 @@
  *
  * @date 05-07-2025
  */
-
-#include <ArduinoJson.h>
+#include <CDP.h>
 #include <PubSubClient.h>
 #include <WiFiClientSecure.h>
-#include <arduino-timer.h>
-#include <string>
-
-/* CDP Headers */
-#include <PapaDuck.h>
-#include <CdpPacket.h>
+// #include <arduino-timer.h>
 #include <queue>
 #include "secrets.h"
 
@@ -29,8 +23,8 @@
 #endif
 
 // --- WiFi Configuration ---
-#define SSID ""                    // Your WiFi SSID (Needs to be 2.4 Ghz network)
-#define PASSWORD ""                // Your WiFi Password
+#define WIFI_SSID ""                    // Your WiFi SSID (Needs to be 2.4 Ghz network)
+#define WIFI_PASSWORD ""                // Your WiFi Password
 
 // --- Command Definitions ---
 #define CMD_STATE_WIFI "/wifi/"
@@ -38,7 +32,7 @@
 #define CMD_STATE_CHANNEL "/channel/"
 
 // --- Global Objects ---
-PapaDuck duck;
+PapaDuck duck(THINGNAME);
 int QUEUE_SIZE_MAX = 5;
 auto timer = timer_create_default();
 bool retry = true; 
@@ -46,12 +40,9 @@ const char commandTopic[] = "iot-2/cmd/+/fmt/+";
 
 // --- Function Declarations ---
 std::queue<std::vector<byte>> packetQueue;
-std::string toTopicString(byte topic);
-std::string convertToHex(byte* data, int size);
 int quackJson(CdpPacket packet);
-void handleDuckData(std::vector<byte> packetBuffer);
-void gotMsg(char* topic, byte* payload, unsigned int payloadLength);
-void wifiConnect();
+void handleDuckData(CdpPacket receivedPacket);
+void dmsCmdReceived(char* topic, byte* payload, unsigned int payloadLength);
 void mqttConnect();
 void subscribeTo(const char* topic);
 bool enableRetry(void*);
@@ -59,91 +50,7 @@ void publishQueue();
 
 // --- WIFI Setup Function ---
 WiFiClientSecure wifiClient;
-PubSubClient client(AWS_IOT_ENDPOINT, 8883, gotMsg, wifiClient);
-
-/**
- * @brief Converts a CDP topic byte value into a string.
- *
- * This utility function maps a given `byte` topic identifier to its corresponding
- * topic name string. If the topic does not match any known value, it defaults to 
- * `"status"`.
- *
- * @param topic The CDP topic identifier (byte) from a received packet
- * @return A std::string representing the corresponding topic name
- */
-std::string toTopicString(byte topic) {
-
-  std::string topicString;
-
-  switch (topic) {
-    case topics::status:
-      topicString = "status";
-      break;
-    case topics::cpm:
-      topicString = "portal";
-      break;
-    case topics::sensor:
-      topicString = "sensor";
-      break;
-    case topics::alert:
-      topicString = "alert";
-      break;
-    case topics::location:
-      topicString = "gps";
-      break;
-    case topics::health:
-      topicString = "health";
-      break;
-    case topics::bmp180:
-      topicString = "bmp180";
-      break;
-    case topics::pir:
-      topicString = "pir";
-      break;
-    case topics::dht11:
-      topicString = "dht";
-      break;
-    case topics::bmp280:
-      topicString = "bmp280";
-      break;
-    case topics::mq7:
-      topicString = "mq7";
-      break;
-    case topics::gp2y:
-      topicString = "gp2y";
-      break;
-    case reservedTopic::ack:
-      topicString = "ack";
-      break;
-    default:
-      topicString = "status";
-  }
-
-  return topicString;
-}
-
-/**
- * @brief Converts a byte buffer into a hexadecimal string representation.
- *
- * This utility function takes a raw byte array and converts it into a readable
- * hexadecimal string. Each byte is represented by two hexadecimal characters. This 
- * is useful for debugging or displaying binary data in logs or user interfaces.
- *
- * @param data Pointer to the byte array to convert
- * @param size Number of bytes to convert
- * @return std::string A string containing the hexadecimal representation of the byte array
- */
-std::string convertToHex(byte* data, int size) {
-  std::string buf = "";
-  buf.reserve(size * 2);
-  const char* cs = "0123456789ABCDEF";
-  for (int i = 0; i < size; i++) {
-    byte val = data[i];
-    buf += cs[(val >> 4) & 0x0F];
-    buf += cs[val & 0x0F];
-  }
-  return buf;
-}
+PubSubClient client(AWS_IOT_ENDPOINT, 8883, dmsCmdReceived, wifiClient);
 
 /**
  * @brief Converts a received CDP packet into JSON format and publishes it to an MQTT topic.
@@ -151,7 +58,7 @@ std::string convertToHex(byte* data, int size) {
  * This function parses key metadata fields from the incoming `CdpPacket`. These fields are 
  * encoded into a structured JSON document and then serialized into a string. The JSON 
  * message is published to an MQTT topic derived from the packet topic code using the 
- * `toTopicString` function. The topic format is: `owl/device/THINGNAME/evt/<topic>`
+ * `topicToString` function. The topic format is: `owl/device/THINGNAME/evt/<topic>`
  *
  * @param packet A CDP packet received from the mesh network
  * @return int Returns 0 if the message is successfully published to MQTT; -1 on failure
@@ -180,7 +87,7 @@ int quackJson(CdpPacket packet) {
   doc["hops"].set(packet.hopCount);
   doc["duckType"].set(packet.duckType);
 
-  std::string cdpTopic = toTopicString(packet.topic);
+  std::string cdpTopic = packet.topicToString();
 
   std::string topic = "owl/device/" + std::string(THINGNAME) + "/evt/" + cdpTopic;
 
@@ -208,18 +115,18 @@ int quackJson(CdpPacket packet) {
  *
  * @param packetBuffer The received packet buffer
  */
-void handleDuckData(std::vector<byte> packetBuffer) {
-  Serial.printf("[PAPA] got packet: %s\n" ,
-                 convertToHex(packetBuffer.data(), packetBuffer.size()).c_str());
+void handleDuckData(CdpPacket receivedPacket) {
+  Serial.printf("[PAPA] got packet");
 
-  CdpPacket packet = CdpPacket(packetBuffer);
-  if(packet.topic != reservedTopic::ack) {
-    if(quackJson(packet) == -1) {
+  if (receivedPacket.topic != reservedTopic::ack && 
+      receivedPacket.topic != reservedTopic::rrep && 
+      receivedPacket.topic != reservedTopic::rreq) {
+    if(quackJson(receivedPacket) == -1) {
       if(packetQueue.size() > QUEUE_SIZE_MAX) {
         packetQueue.pop();
-        packetQueue.push(packetBuffer);
+        packetQueue.push(receivedPacket.data);
       } else {
-        packetQueue.push(packetBuffer);
+        packetQueue.push(receivedPacket.data);
       }
       Serial.print("[PAPA] New size of queue: ");
       Serial.println(packetQueue.size());
@@ -241,13 +148,8 @@ void handleDuckData(std::vector<byte> packetBuffer) {
  * the ClusterDuck mesh and MQTT forwarding system.
  */
 void setup() {
-  
-  std::string deviceId("PAPADUCK");            // MUST be 8 bytes and unique from other ducks
-  std::array<byte,8> devId;
-  std::copy(deviceId.begin(), deviceId.end(), devId.begin());
-
-  duck.setupWithDefaults(devId, SSID, PASSWORD);
-
+  duck.setupWithDefaults();
+  duck.joinWifiNetwork(WIFI_SSID, WIFI_PASSWORD);
   
   duck.onReceiveDuckData(handleDuckData);     // Callback handling incoming data from the network
 
@@ -267,17 +169,7 @@ void setup() {
 void loop() {
   
   if (!duck.isWifiConnected() && retry) {
-    std::string ssid = duck.getSsid();
-    std::string password = duck.getPassword();
-
-    Serial.println(("[PAPA] WiFi disconnected, reconnecting to local network: " + ssid).c_str());
-                     
-    int err = duck.reconnectWifi(ssid, password);
-
-    if (err != DUCK_ERR_NONE) {
-      retry = false;
-    }
-    timer.in(5000, enableRetry);
+    duck.joinWifiNetwork(WIFI_SSID, WIFI_PASSWORD);
   }
 
   if (!client.loop()) {
@@ -291,8 +183,8 @@ void loop() {
 
 }
 
-void gotMsg(char* topic, byte* payload, unsigned int payloadLength) {
-  Serial.print("[PAPA] gotMsg: invoked for topic: "); Serial.println(topic);
+void dmsCmdReceived(char* topic, byte* payload, unsigned int payloadLength) {
+  Serial.print("[PAPA] DMS Command Received: invoked for topic: "); Serial.println(topic);
 
   if (std::string(topic).find(CMD_STATE_WIFI) > 0) {
     Serial.println("[PAPA] Start WiFi Command");
@@ -308,10 +200,10 @@ void gotMsg(char* topic, byte* payload, unsigned int payloadLength) {
         std::array<byte,8> dDevId;
         std::copy(destination.begin(), destination.end(), dDevId.begin());
 
-      duck.sendCommand(sCmd, sValue, dDevId);
-    } else {
-      duck.sendCommand(sCmd, sValue);
-    }
+      // duck.sendCommand(sCmd, sValue, dDevId);
+    } //else {
+      // duck.sendCommand(sCmd, sValue);
+    // }
   } else if (std::string(topic).find(CMD_STATE_HEALTH) > 0) {
     byte sCmd = 0;
     std::vector<byte> sValue = {payload[0]};
@@ -324,26 +216,15 @@ void gotMsg(char* topic, byte* payload, unsigned int payloadLength) {
       std::array<byte,8> dDevId;
       std::copy(destination.begin(), destination.end(), dDevId.begin());
 
-      duck.sendCommand(sCmd, sValue, dDevId);
+      // duck.sendCommand(sCmd, sValue, dDevId);
 
     } else {
       Serial.println("[PAPA] Payload size too small");
     }
   } else {
-    Serial.print("[PAPA] gotMsg: unexpected topic: "); Serial.println(topic);
+    Serial.print("[PAPA] dmsCmdReceived: unexpected topic: "); Serial.println(topic);
   }
 }
-
-void wifiConnect() {
- Serial.print("[PAPA] Connecting to "); Serial.print(SSID);
- WiFi.begin(SSID, PASSWORD);
- while (WiFi.status() != WL_CONNECTED) {
-   delay(500);
-   Serial.print(".");
- }
- Serial.print("\n[PAPA] WiFi connected, IP address: "); Serial.println(WiFi.localIP());
-}
-
 void mqttConnect() {
    if (!!!client.connected()) {
       Serial.print("[PAPA] Reconnecting MQTT client to "); Serial.println(AWS_IOT_ENDPOINT);

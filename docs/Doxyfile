@@ -121,6 +121,11 @@ INPUT                  = ../src/Ducks \
                          ../src/Ducks \
                          ../src/include \
                          ../src/include/boards \
+                         ../src/routing \
+                         ../src/CaptivePortal \
+                         ../src/radio \
+                         ../src/utils \
+                         ../src/wifi \
                         main.md                         
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.c \
@@ -170,7 +175,7 @@ FILE_PATTERNS          = *.c \
                          *.ucf \
                          *.qsf \
                          *.ice
-RECURSIVE              = NO
+RECURSIVE              = YES
 EXCLUDE                =
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       =
@@ -360,7 +365,7 @@ EXTERNAL_PAGES         = YES
 CLASS_DIAGRAMS         = YES
 DIA_PATH               =
 HIDE_UNDOC_RELATIONS   = YES
-HAVE_DOT               = NO
+HAVE_DOT               = YES
 DOT_NUM_THREADS        = 0
 DOT_FONTNAME           = Helvetica
 DOT_FONTSIZE           = 10
@@ -368,9 +373,9 @@ DOT_FONTPATH           =
 CLASS_GRAPH            = YES
 COLLABORATION_GRAPH    = YES
 GROUP_GRAPHS           = YES
-UML_LOOK               = NO
+UML_LOOK               = YES
 UML_LIMIT_NUM_FIELDS   = 10
-TEMPLATE_RELATIONS     = NO
+TEMPLATE_RELATIONS     = YES
 INCLUDE_GRAPH          = YES
 INCLUDED_BY_GRAPH      = YES
 CALL_GRAPH             = NO
