@@ -32,7 +32,7 @@
 #define CMD_STATE_CHANNEL "/channel/"
 
 // --- Global Objects ---
-PapaDuck duck("PAPADUCK");
+PapaDuck duck(THINGNAME);
 int QUEUE_SIZE_MAX = 5;
 auto timer = timer_create_default();
 bool retry = true; 
@@ -118,7 +118,9 @@ int quackJson(CdpPacket packet) {
 void handleDuckData(CdpPacket receivedPacket) {
   Serial.printf("[PAPA] got packet");
 
-  if(receivedPacket.topic != reservedTopic::ack) {
+  if (receivedPacket.topic != reservedTopic::ack && 
+      receivedPacket.topic != reservedTopic::rrep && 
+      receivedPacket.topic != reservedTopic::rreq) {
     if(quackJson(receivedPacket) == -1) {
       if(packetQueue.size() > QUEUE_SIZE_MAX) {
         packetQueue.pop();
