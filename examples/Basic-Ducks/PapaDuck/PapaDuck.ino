@@ -14,9 +14,8 @@
 #include <queue>
 
 // --- WIFI Configuration ---
-const std::string WIFI_SSID="SweetBeet";         // Replace with WiFi SSID
-const std::string WIFI_PASS="Vincent<3";     // Replace with WiFi Password
-#define WIFI_RETRY_DELAY_MS 5000
+const std::string WIFI_SSID="";         // Replace with WiFi SSID
+const std::string WIFI_PASS="";     // Replace with WiFi Password
 
 // --- MQTT Configuration ---
 #define MQTT_RETRY_DELAY_MS 500
@@ -51,7 +50,7 @@ static const char* mosquitto_ca_cert = \
 "-----END CERTIFICATE-----\n";
 
 // --- Global Objects ---
-PapaDuck hub("PAPA0001");                                     // PapaDuck instance
+PapaDuck hub("PAPA1262");                                     // PapaDuck instance
 WiFiClientSecure wifiClient;                      // Secure WiFi client
 PubSubClient mqttClient(wifiClient);              // MQTT client
 std::queue<std::string> mqttMessageQueue;         // Incoming mqtt messages
@@ -62,30 +61,11 @@ auto timer = timer_create_default();              // Timer instance
 bool wifiConnected = false;                       // Flag to check if WiFi is connected
 
 // --- Function Declarations ---
-std::vector<uint8_t> fromHexString(const std::string& hexString);
-std::string toTopicString(byte topic);
 bool setup_mqtt(void);
-std::string arduinoStringFromHex(byte* data, int size);
-bool publishToMqttTopic(std::string source, std::string topic, std::string message);
 void mqtt_callback(char* topic, byte* message, unsigned int length);
 void handleIncomingMqttMessages(void);
 void processMessageFromDucks(std::vector<byte> packetBuffer);
-void handleDuckData(std::vector<byte> packetBuffer);
-
-// --- Convert Packet to Hex String ---
-std::vector<uint8_t> fromHexString(const std::string& hexString) {
-    if (hexString.length() % 2 != 0) {
-        throw std::invalid_argument("Hex string must have an even length");
-    }
-
-    std::vector<uint8_t> bytes;
-    for (size_t i = 0; i < hexString.length(); i += 2) {
-        std::string byteString = hexString.substr(i, 2);
-        uint8_t byte = (uint8_t) strtol(byteString.c_str(), NULL, 16);
-        bytes.push_back(byte);
-    }
-    return bytes;
-}
+void handleDuckData(CdpPacket receivedPacket);
 
 bool setup_mqtt(void) 
 {
@@ -114,63 +94,6 @@ bool setup_mqtt(void)
     }
     
     return true;
-}
-
-std::string toTopicString(byte topic) 
-{
-
-  std::string topicString;
-
-  switch (topic) {
-    case topics::status:
-      topicString = "status";
-      break;
-    case topics::sensor:
-      topicString = "sensor";
-      break;
-    case topics::health:
-      topicString = "health";
-      break;
-    default:
-      topicString = "status";
-  }
-  return topicString;
-}
-
-// --- Convert Packet to Hex String ---
-std::string arduinoStringFromHex(byte* data, int size) 
-{
-  std::string buf = "";
-  buf.reserve(size * 2); // 2 digit hex
-  const char* cs = "0123456789ABCDEF";
-  for (int i = 0; i < size; i++) {
-    byte val = data[i];
-    buf += cs[(val >> 4) & 0x0F];
-    buf += cs[val & 0x0F];
-  }
-  return buf;
-}
-
-bool publishToMqttTopic(std::string source, std::string topic, std::string message) {
-  bool ok = false;
-  if (hub.isWifiConnected()) {
-    ok = setup_mqtt();  
-    if (!ok) {
-      Serial.println("[HUB] ERROR - Failed to connect to MQTT broker");
-      return false;
-    }
-    if (mqttClient.publish(topic.c_str(), message.c_str(), message.length())) {
-      ok = true;
-      Serial.println("[HUB] Publish ok");        
-    } else {
-      ok = false;
-      Serial.println("[HUB] Publish failed");
-    }
-  } else {
-    Serial.println("[HUB] ERROR No WiFi connection!!!");
-    ok = false;
-  }  
-  return ok;
 }
 
 // Incoming MQTT messages from the controller
@@ -209,10 +132,9 @@ void handleIncomingMqttMessages(void) {
   }
 }
 
-void processMessageFromDucks(std::vector<byte> packetBuffer) {
+void processMessageFromDucks(CdpPacket cdp_packet) {
 
     JsonDocument doc;
-    CdpPacket cdp_packet = CdpPacket(packetBuffer);
 
     int messageLength = cdp_packet.data.size();
 
@@ -266,9 +188,9 @@ void processMessageFromDucks(std::vector<byte> packetBuffer) {
 
 // The callback method simply takes the incoming packet and
 // converts it to a JSON string, before sending it out over MQTT
-void handleDuckData(std::vector<byte> packetBuffer) {
-  Serial.printf("[HUB] got packet: %s\n", arduinoStringFromHex(packetBuffer.data(), packetBuffer.size()).c_str());
-  processMessageFromDucks(packetBuffer);
+void handleDuckData(CdpPacket receivedPacket) {
+  Serial.println("[HUB] got packet");
+  processMessageFromDucks(receivedPacket);
 }
 
 /**
@@ -284,7 +206,8 @@ void setup() {
   wifiClient.setCACert(mosquitto_ca_cert);
 
   // Setup the duck link with default settings and connect to WiFi
-  uint32_t err = hub.setupWithDefaults(WIFI_SSID, WIFI_PASS);
+  uint32_t err = hub.setupWithDefaults();
+  hub.joinWifiNetwork(WIFI_SSID, WIFI_PASS);
 
   setupOK = true;
   // register a callback to handle incoming data from duck in the network

@@ -15,6 +15,8 @@
 #include "../routing/DuckRouter.h"
 #include "../routing/RouteJSON.h"
 
+#define NET_JOIN_DELAY 15000L
+
 //templated class to require some radio capability
 template <typename WifiCapability = DuckWifiNone, typename RadioType = DuckLoRa>
 class Duck {
@@ -27,12 +29,18 @@ class Duck {
      */
     void run(){
       Duck::logIfLowMemory();
-      duckRadio.serviceInterruptFlags();
       if(router.getNetworkState() == NetworkState::PUBLIC) {
-        handleReceivedPacket();
+        if(duckRadio.getReceiveFlag()){
+          handleReceivedPacket();
+        }
       } else {
         attemptNetworkJoin();
+        if(router.getNetworkState() == NetworkState::SEARCHING && (millis() > (NET_JOIN_DELAY * 5 + 5000L))){
+          loginfo_ln("No existing network found, creating new CDP network...");
+          router.setNetworkState(NetworkState::PUBLIC);
+        }
       }
+      duckRadio.serviceInterruptFlags();
     }
 
     int setupWithDefaults() {
@@ -52,16 +60,18 @@ class Duck {
      * @return DUCK_ERR_NONE if the data was sent successfully, an error code otherwise.
      */
     int sendData(uint8_t topic, const std::string data, const std::array<uint8_t,8> targetDevice = PAPADUCK_DUID) {
+      int err = DUCK_ERR_NONE;
       if (topic < reservedTopic::max_reserved) {
         logerr_ln("ERROR send data failed, topic is reserved.");
         return DUCKPACKET_ERR_TOPIC_INVALID;
       }
-
-      std::vector<uint8_t> app_data;
-      app_data.insert(app_data.end(), data.begin(), data.end());
-      CdpPacket txPacket = CdpPacket(targetDevice, topic, app_data, this->duid, this->getType());
-      router.getFilter().assignUniqueMessageId(txPacket);
-      int err = sendToRadio(txPacket);
+      if(router.getNetworkState() == NetworkState::PUBLIC){
+        std::vector<uint8_t> app_data;
+        app_data.insert(app_data.end(), data.begin(), data.end());
+        CdpPacket txPacket = CdpPacket(targetDevice, topic, app_data, this->duid, this->getType());
+        router.getFilter().assignUniqueMessageId(txPacket);
+        err = sendToRadio(txPacket);
+      }
       return err;
     }
 
@@ -73,17 +83,20 @@ class Duck {
      * @return DUCK_ERR_NONE if the data was sent successfully, an error code otherwise.
     */
     int sendData(uint8_t topic, const uint8_t* data, int length, const std::array<uint8_t,8> targetDevice = PAPADUCK_DUID) {
+      int err = DUCK_ERR_NONE;
       if (topic < reservedTopic::max_reserved) {
         logerr_ln("ERROR send data failed, topic is reserved.");
         return DUCKPACKET_ERR_TOPIC_INVALID;
       }
       
-      //check what next hop to send the packet to
-      std::vector<uint8_t> app_data(length);
-      app_data.insert(app_data.end(), &data[0], &data[length]);
-      CdpPacket txPacket = CdpPacket(targetDevice, topic, app_data, this->duid, this->getType());
-      router.getFilter().assignUniqueMessageId(txPacket);
-      int err = sendToRadio(txPacket);
+      if(router.getNetworkState() == NetworkState::PUBLIC){
+         //check what next hop to send the packet to
+        std::vector<uint8_t> app_data(length);
+        app_data.insert(app_data.end(), &data[0], &data[length]);
+        CdpPacket txPacket = CdpPacket(targetDevice, topic, app_data, this->duid, this->getType());
+        router.getFilter().assignUniqueMessageId(txPacket);
+        err = sendToRadio(txPacket);
+      }
       return err;
     }
 
@@ -119,28 +132,19 @@ class Duck {
       int err = this->duckWifi.joinNetwork(ssid, password);
 
       // If we fail to connect to WiFi, retry a few times
-      // if (err == DUCK_INTERNET_ERR_CONNECT) {
-      //   int retry=0;
-      //   while ( err ==  DUCK_INTERNET_ERR_CONNECT && retry < 3 ) {
-      //     Serial.printf("[HUB] WiFi disconnected, retry connection: %s\n",WIFI_SSID.c_str());
-      //     delay(5000);
-      //     err = hub.setupInternet(WIFI_SSID, WIFI_PASS);
-      //     retry++;
-      //   }  
-      // }
-      // if (err != DUCK_ERR_NONE) {
-      //   Serial.print("[HUB] Failed to setup PapaDuck: rc = ");Serial.println(err);
-      //   setupOK = false;
-      //   return;
-      // }
+      if (err == DUCK_INTERNET_ERR_CONNECT) {
+        int retry=0;
+        while ( err ==  DUCK_INTERNET_ERR_CONNECT && retry < 5 ) {
+          Serial.printf("WiFi connection failed, retry connection: %s\n", ssid.c_str());
+          delay(5000);
+          err = err = this->duckWifi.joinNetwork(ssid, password);
+          retry++;
+        }  
+      }
 
-
-
-      //   if (err != DUCK_ERR_NONE) {
-      //     logerr_ln("ERROR setupWithDefaults rc = %d",err);
-      //     return err;
-      //   }
-      //   return DUCK_ERR_NONE;
+        if (err == DUCK_INTERNET_ERR_CONNECT) {
+          logerr_ln("ERROR wifi setup failed = %d",err);
+        }
     }
 
 
@@ -193,7 +197,7 @@ class Duck {
             loginfo_ln("handleReceivedPacket: packet RELAY DONE");
         }
       } else{
-        logdbg_ln("no entry for this id, skipping relay");
+        logdbg_ln("no entry for this id, skipping relay DDuid: %s", std::string(packet.dduid.begin(), packet.dduid.end()).c_str());
       }
       return err;
     }
@@ -253,9 +257,9 @@ class Duck {
         router.insertIntoRoutingTable(cdpNode->sduid, cdpNode->sduid, this->getSignalScore()); //should signal score be stored on cdp packet?
         router.setNetworkState(NetworkState::PUBLIC);
       } else {
-        if((millis() - this->lastRreqTime) > 30000L){
+        if((millis() - this->lastRreqTime) > NET_JOIN_DELAY){
           sendRouteRequest(BROADCAST_DUID, getDuckId());
-          Serial.println("searching for networks....");
+          loginfo_ln("searching for networks....");
           lastRreqTime = millis();
         }
       }
@@ -266,6 +270,7 @@ class Duck {
      * @returns DUCK_ERR_NONE if the data was sent successfully, an error code otherwise.
      */
     int sendRouteRequest(Duid targetDevice, std::vector<uint8_t> origin){
+      Serial.println("preparing to send a rreq to join netowrk");
       int err = sendReservedTopicData(targetDevice, reservedTopic::rreq, origin);
       if (err != DUCK_ERR_NONE){
         logerr_ln("ERR: failed to send rreq");
@@ -373,7 +378,11 @@ class Duck {
         } else{
           CdpPacket rxPacket(rxData.value());
           Serial.print(rxPacket.topic);
-          result = (rxPacket.topic == reservedTopic::rrep) ? std::optional<CdpPacket>{rxPacket} : std::nullopt; //need to make sure rrep is addressed to us
+          if((rxPacket.topic == reservedTopic::rrep) && (rxPacket.dduid == this->duid)){ //should all packets without valid crc immediately be discarded at a lower level?
+            result = std::optional<CdpPacket>{rxPacket}; 
+          } else {
+            result = std::nullopt;
+          }
         }
       } else {
         result = std::nullopt;
@@ -391,17 +400,19 @@ class Duck {
      */
     int sendReservedTopicData(Duid targetDevice, reservedTopic topic, std::vector<uint8_t> data){
       int err = DUCK_ERR_NONE;
-      CdpPacket txPacket = CdpPacket(targetDevice, topic, data, this->duid, this->getType());
-      router.getFilter().assignUniqueMessageId(txPacket);
-      err = txPacket.prepareForSending();
-      if (err != DUCK_ERR_NONE) {
-        logerr_ln("ERROR Failed to build ping packet, err = " + err);
-        return err;
-      }
-      err = duckRadio.sendData(txPacket.asBytes());
-      if (err != DUCK_ERR_NONE) {
-        logerr_ln("ERROR Lora sendData failed, err = %d", err);
-      }
+      if((router.getNetworkState() == NetworkState::PUBLIC) || ((router.getNetworkState() == NetworkState::SEARCHING) && (topic == reservedTopic::rreq))){
+        CdpPacket txPacket = CdpPacket(targetDevice, topic, data, this->duid, this->getType());
+        router.getFilter().assignUniqueMessageId(txPacket);
+        err = txPacket.prepareForSending();
+        if (err != DUCK_ERR_NONE) {
+          logerr_ln("ERROR Failed to build packet, err = " + err);
+          return err;
+        }
+        err = duckRadio.sendData(txPacket.asBytes());
+        if (err != DUCK_ERR_NONE) {
+          logerr_ln("ERROR Lora sendData failed, err = %d", err);
+        }
+      } 
       return err;
     }
 
