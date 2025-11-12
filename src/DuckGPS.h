@@ -27,7 +27,9 @@ public:
 
     };
     /**
-     * @brief initializes GPS chip with recommended settings
+     * @brief initializes GPS chip with recommended settings. Will enable GPS, GLONASS, and GALILEO constellations.
+     * @param none
+     * @return none
      */
     void setup();
     enum AltitudeUnit{

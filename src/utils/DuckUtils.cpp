@@ -67,7 +67,7 @@ uint32_t toUint32(const uint8_t* data) {
 }
 
 std::string toUpperCase(std::string str) {
-  std::string upper = "";
+  std::string upper;
   for (int i = 0; i < str.length(); i++) {
     upper += toupper(str[i]);
   }
