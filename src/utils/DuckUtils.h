@@ -176,7 +176,7 @@ bool isEqual(const std::vector<T> & a, const std::vector<T> & b) {
 uint32_t toUint32(const uint8_t* data);
 typedef std::chrono::time_point<std::chrono::steady_clock, std::chrono::duration<long long,std::milli>> time_point_t;
 /**
- * @brief Create a timer instance.
+ * @brief Create a timer instance. Takes packed arguments for the callable. Is a blocking call.
  * 
  * @returns A Timer instance.
  */
@@ -195,6 +195,11 @@ class Timer
 
             after(diff, std::forward<callable>(f), std::forward<arguments>(args)...);
         }
+        /**
+         * @brief Get the current time point in milliseconds since epoch.
+         *
+         * @returns A time_point_t representing the current time.
+         */
         static time_point_t now() {
             auto time = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::steady_clock::now().time_since_epoch());
