@@ -56,7 +56,7 @@ jobs:
         # install the Heltec ESP32 boards
         if [[ "${{ matrix.board }}" =~ "esp32:esp32:" ]]; then
           echo "[ARDUINO SETUP] Installing the Heltec ESP32 board"
-          arduino-cli core install esp32:esp32@3.2.0 --additional-urls https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series/releases/download/3.0.0/package_heltec_esp32_index.json
+          arduino-cli core install esp32:esp32@3.3.4 --additional-urls https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series/releases/download/3.0.0/package_heltec_esp32_index.json
         fi
 
     - name: Install CDP
