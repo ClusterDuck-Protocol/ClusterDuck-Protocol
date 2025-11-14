@@ -38,6 +38,7 @@
         "jgromes/RadioLib": "^7.1.2",
         "mathieucarbou/ESP Async WebServer": "^2.7.0",
         "knolleary/PubSubClient":"^2.8",
-        "mikalhart/TinyGPSPlus": "~1.0.2"
+        "mikalhart/TinyGPSPlus": "~1.0.2",
+        "FastLED /FastLED": "^3.10.3"
     }
 }

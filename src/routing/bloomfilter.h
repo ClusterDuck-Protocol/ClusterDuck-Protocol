@@ -7,7 +7,7 @@
 #include <string.h>
 #include <math.h>
 #include <memory>
-#include <../CdpPacket.h>
+#include "../CdpPacket.h"
 
 
 const int DEFAULT_NUM_SECTORS = 312; 

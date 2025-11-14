@@ -13,16 +13,16 @@
 #include "cdp_external_board.h"
 #endif
 
-#include "cdpcfg.h"
-#include "../Ducks/DetectorDuck.h"
-#include "../Ducks/DuckLink.h"
-#include "../Ducks/MamaDuck.h"
-#include "../Ducks/PapaDuck.h"
-#include "../utils/MemoryFree.h"
-#include "../CdpPacket.h"
-#include "../utils/DuckError.h"
-#include "../utils/DuckLogger.h"
-#include "../wifi/DuckWifi.h"
+#include "./include/cdpcfg.h"
+#include "./Ducks/DetectorDuck.h"
+#include "./Ducks/DuckLink.h"
+#include "./Ducks/MamaDuck.h"
+#include "./Ducks/PapaDuck.h"
+#include "./utils/MemoryFree.h"
+#include "./CdpPacket.h"
+#include "./utils/DuckError.h"
+#include "./utils/DuckLogger.h"
+#include "./wifi/DuckWifi.h"
 #define CDP_STRINGIFY(x) #x
 #define CDP_VALUE(x) CDP_STRINGIFY(x)
 
