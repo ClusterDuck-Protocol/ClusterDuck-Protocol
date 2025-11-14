@@ -9,15 +9,10 @@ digraph "/home/runner/work/ClusterDuck-Protocol/ClusterDuck-Protocol/src/routing
   Node2 [id="Node000002",label="/home/runner/work/Cluster\lDuck-Protocol/ClusterDuck\l-Protocol/src/Ducks/Duck.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$_duck_8h.html",tooltip=" "];
   Node2 -> Node3 [id="edge2_Node000002_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node3 [id="Node000003",label="/home/runner/work/Cluster\lDuck-Protocol/ClusterDuck\l-Protocol/src/Ducks/DetectorDuck.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$_detector_duck_8h.html",tooltip=" "];
-  Node3 -> Node4 [id="edge3_Node000003_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node4 [id="Node000004",label="/home/runner/work/Cluster\lDuck-Protocol/ClusterDuck\l-Protocol/src/include/CDP.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$_c_d_p_8h.html",tooltip="CDP public header."];
+  Node2 -> Node4 [id="edge3_Node000002_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node4 [id="Node000004",label="/home/runner/work/Cluster\lDuck-Protocol/ClusterDuck\l-Protocol/src/Ducks/DuckLink.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$_duck_link_8h.html",tooltip=" "];
   Node2 -> Node5 [id="edge4_Node000002_Node000005",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node5 [id="Node000005",label="/home/runner/work/Cluster\lDuck-Protocol/ClusterDuck\l-Protocol/src/Ducks/DuckLink.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$_duck_link_8h.html",tooltip=" "];
-  Node5 -> Node4 [id="edge5_Node000005_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node2 -> Node6 [id="edge6_Node000002_Node000006",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node6 [id="Node000006",label="/home/runner/work/Cluster\lDuck-Protocol/ClusterDuck\l-Protocol/src/Ducks/MamaDuck.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$_mama_duck_8h.html",tooltip=" "];
-  Node6 -> Node4 [id="edge7_Node000006_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node2 -> Node7 [id="edge8_Node000002_Node000007",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node7 [id="Node000007",label="/home/runner/work/Cluster\lDuck-Protocol/ClusterDuck\l-Protocol/src/Ducks/PapaDuck.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$_papa_duck_8h.html",tooltip=" "];
-  Node7 -> Node4 [id="edge9_Node000007_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node5 [id="Node000005",label="/home/runner/work/Cluster\lDuck-Protocol/ClusterDuck\l-Protocol/src/Ducks/MamaDuck.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$_mama_duck_8h.html",tooltip=" "];
+  Node2 -> Node6 [id="edge5_Node000002_Node000006",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node6 [id="Node000006",label="/home/runner/work/Cluster\lDuck-Protocol/ClusterDuck\l-Protocol/src/Ducks/PapaDuck.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$_papa_duck_8h.html",tooltip=" "];
 }

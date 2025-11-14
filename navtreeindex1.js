@@ -1,9 +1,5 @@
 var NAVTREEINDEX1 =
 {
-"class_duck_lo_ra.html#a7d7aee040d022dce28dd374a78f19e9c":[3,0,5,5],
-"class_duck_lo_ra.html#a889bd584b29b55901cb3d3214031028e":[3,0,5,8],
-"class_duck_lo_ra.html#a969895f9786937206f531781bb00c8c5":[3,0,5,6],
-"class_duck_router.html":[3,0,6],
 "class_duck_router.html#a0ef970f187ed03923f8db576c47b348e":[3,0,6,0],
 "class_duck_router.html#a21c0b7870847c92698eb252980f94471":[3,0,6,5],
 "class_duck_router.html#a3ad7b06ef6b4c9c9c902f7d4ded21cb8":[3,0,6,7],
