@@ -296,6 +296,8 @@ class CdpPacket {
                 return "bmp180";
             case reservedTopic::ping:
                 return "ping";
+            case reservedTopic::pong:
+                return "pong";
             default:
                 return "unknown";
             }
