@@ -34,10 +34,15 @@ class Duck {
           handleReceivedPacket();
         }
       } else {
-        attemptNetworkJoin();
-        if(router.getNetworkState() == NetworkState::SEARCHING && (millis() > (NET_JOIN_DELAY * 5 + 5000L))){
-          loginfo_ln("No existing network found, creating new CDP network...");
+        if(this->getType() == DuckType::DETECTOR){
+          loginfo_ln("Detector duck -- bypassing network search.");
           router.setNetworkState(NetworkState::PUBLIC);
+        } else{
+            attemptNetworkJoin();
+            if(router.getNetworkState() == NetworkState::SEARCHING && (millis() > (NET_JOIN_DELAY * 5 + 5000L))){
+              loginfo_ln("No existing network found, creating new CDP network...");
+              router.setNetworkState(NetworkState::PUBLIC);
+            }
         }
       }
       duckRadio.serviceInterruptFlags();
