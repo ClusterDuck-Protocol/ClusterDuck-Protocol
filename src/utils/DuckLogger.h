@@ -1,13 +1,10 @@
 #ifndef DUCKLOGGER_H
 #define DUCKLOGGER_H
 
-#ifndef CDP_NO_LOG
-#include "Arduino.h"
-#define CDP_DEBUG
-#endif
-
-
-#define CDP_DEBUG
+//#ifndef CDP_NO_LOG
+//#include "Arduino.h"
+//#define CDP_DEBUG
+//#endif
 
 
 #ifdef CDP_DEBUG
@@ -17,6 +14,21 @@
 #define CDP_LOG_WARN
 #endif
 
+#ifdef CDP_INFO
+#define CDP_LOG_ERROR
+#define CDP_LOG_INFO
+#define CDP_LOG_WARN
+#endif
+
+#ifdef CDP_WARN
+#define CDP_LOG_ERROR
+#define CDP_LOG_WARN
+#endif
+
+#ifdef CDP_ERROR
+#define CDP_LOG_ERROR
+#endif
+
 #ifndef __FILENAME__
 #define __FILENAME__                                                           \
   (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
@@ -24,6 +36,7 @@
 
 
 #if defined(ARDUINO)
+#include "Arduino.h"
 #define OUTPUT_PORT Serial
 #else
 #define PORT std::cout
@@ -54,7 +67,7 @@ static size_t cdpPrintf(const char *format, ...) {
     return len;
 }
 
-#if defined(CDP_LOG_ERROR)
+#ifdef CDP_LOG_ERROR
 #define logerr(format, ...)                                     \
   do {                                                          \
     cdpPrintf("[E]");                                           \
@@ -70,13 +83,13 @@ static size_t cdpPrintf(const char *format, ...) {
   } while (0)
 #else
 #define logerr(format, ...)                                     \
-  {}                                                                            
+  {}
 #define logerr_ln(format, ...)                                  \
   {}
 #endif // CDP_LOG_ERROR
 
 
-#if defined(CDP_LOG_WARN)
+#ifdef CDP_LOG_WARN
 #define logwarn(format, ...)                                    \
   do {                                                          \
     cdpPrintf("[W]");                                           \
@@ -92,7 +105,7 @@ static size_t cdpPrintf(const char *format, ...) {
   } while (0)
 #else
 #define logwarn(format, ...)                                    \
-  {}                                                                            
+  {}
 #define logwarn_ln(format, ...)                                 \
   {}
 #endif // CDP_LOG_WARN
@@ -113,12 +126,12 @@ static size_t cdpPrintf(const char *format, ...) {
   } while (0)
 #else
 #define loginfo(format, ...)                                    \
-  {}                                                                            
+  {}
 #define loginfo_ln(format, ...)                                 \
   {}
 #endif // CDP_LOG_INFO
 
-#if defined(CDP_LOG_DEBUG)
+#ifdef CDP_LOG_DEBUG
 #define logdbg(format, ...)                                     \
   do {                                                          \
     cdpPrintf("[D]");                                           \
@@ -134,7 +147,7 @@ static size_t cdpPrintf(const char *format, ...) {
   } while (0)
 #else
 #define logdbg(format, ...)                                     \
-  {}                                                                            
+  {}
 #define logdbg_ln(format, ...)                                  \
   {}
 #endif
