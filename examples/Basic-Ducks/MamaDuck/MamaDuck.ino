@@ -53,7 +53,7 @@
    if (!setupOK) {
      return; 
    }
-   duckutils::Timer timer(INTERVAL_MS,runSensor, nullptr);
+   duckutils::Timer(INTERVAL_MS,runSensor, nullptr);
  
    duck.run();
  }

@@ -69,7 +69,7 @@ void handleReceiveRssi(const int rssi) {
 }
 
 void loop() {
-  duckutils::Timer timer(INTERVAL_MS,pingHandler, nullptr);
+  duckutils::Timer(INTERVAL_MS,pingHandler, nullptr);
   duck.run(); // use internal duck detect behavior
   
   // Check if signal timeout occurred
