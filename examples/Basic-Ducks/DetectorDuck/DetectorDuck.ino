@@ -33,11 +33,14 @@ CRGB leds[NUM_LEDS];
 DetectorDuck duck("DETECTOR");
 
 // Create a timer with default settings
-auto timer = timer_create_default();
+//auto timer = timer_create_default();
 
 const int INTERVAL_MS = 5000;
 const unsigned long SIGNAL_TIMEOUT_MS = INTERVAL_MS + 1000; // 5 seconds timeout
 unsigned long lastSignalTime = 0;
+bool pingHandler(void *);
+void handleReceiveRssi(const int rssi);
+void showSignalQuality(int rssi);
 
 void setup() {
   duck.setupWithDefaults();
@@ -66,7 +69,7 @@ void handleReceiveRssi(const int rssi) {
 }
 
 void loop() {
-  timer.tick();
+  duckutils::Timer timer(INTERVAL_MS,pingHandler, nullptr);
   duck.run(); // use internal duck detect behavior
   
   // Check if signal timeout occurred
