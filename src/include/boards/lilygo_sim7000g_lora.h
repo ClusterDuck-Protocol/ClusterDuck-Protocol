@@ -41,9 +41,7 @@
 #define CDPCFG_PIN_LORA_MOSI    23
 #define CDPCFG_PIN_LORA_SCK     18
 
-// Display configuration (using I2C OLED if connected)
-#define CDPCFG_PIN_OLED_CLOCK 22
-#define CDPCFG_PIN_OLED_DATA 21
-#define CDPCFG_PIN_OLED_RESET 16
+// Display configuration - No OLED display on this board
+#define CDPCFG_OLED_NONE
 
 #endif
