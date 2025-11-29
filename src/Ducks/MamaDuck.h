@@ -55,7 +55,7 @@ private :
         loginfo_ln("handleReceivedPacket: START");
         
         //Check if Duck is desitination for this packet before relaying
-        if (duckutils::isEqual(BROADCAST_DUID, rxPacket.dduid)) {
+        if (duckutils::isEqual(BROADCAST_DUID, rxPacket.dduid) || duckutils::isEqual(PAPADUCK_DUID, rxPacket.dduid)) {
             ifBroadcast(rxPacket, err);
         } else if(duckutils::isEqual(this->duid, rxPacket.dduid)) { //Target device check
             ifNotBroadcast(rxPacket, err);
