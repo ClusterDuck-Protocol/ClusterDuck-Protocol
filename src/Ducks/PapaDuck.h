@@ -82,17 +82,17 @@ private:
         case reservedTopic::pong:
             loginfo_ln("PONG received. Ignoring!");
             break;
-        case reservedTopic::cmd:
-            loginfo_ln("Command received");
+        // case reservedTopic::cmd:
+        //     loginfo_ln("Command received");
 
-            err = this->broadcastPacket(rxPacket);
+        //     err = this->broadcastPacket(rxPacket);
             
-            if (err != DUCK_ERR_NONE) {
-                logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
-            } else {
-                loginfo_ln("handleReceivedPacket: packet RELAY DONE");
-            }
-            break;
+        //     if (err != DUCK_ERR_NONE) {
+        //         logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
+        //     } else {
+        //         loginfo_ln("handleReceivedPacket: packet RELAY DONE");
+        //     }
+        //     break;
         default:
             err = this->broadcastPacket(rxPacket);
             if (err != DUCK_ERR_NONE) {
@@ -140,6 +140,27 @@ void ifNotBroadcast(CdpPacket rxPacket, int err, bool relay = false) {
             this->router.insertIntoRoutingTable(rrepDoc.getDestination(), thisId, this->getSignalScore()); //why do i need to copy here 
         }
             break;
+        case reservedTopic::ping:
+            loginfo_ln("PING received. Sending PONG!");
+            err = this->sendPong();
+            if (err != DUCK_ERR_NONE) {
+                logerr_ln("ERROR failed to send pong message. rc = %d",err);
+            }
+            return;
+        case reservedTopic::pong:
+            loginfo_ln("PONG received. Ignoring!");
+            break;
+        // case reservedTopic::cmd:
+        //     loginfo_ln("Command received");
+
+        //     err = this->broadcastPacket(rxPacket);
+            
+        //     if (err != DUCK_ERR_NONE) {
+        //         logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
+        //     } else {
+        //         loginfo_ln("handleReceivedPacket: packet RELAY DONE");
+        //     }
+        //     break;
         default:
           if(relay){
             this->forwardPacket(rxPacket);
