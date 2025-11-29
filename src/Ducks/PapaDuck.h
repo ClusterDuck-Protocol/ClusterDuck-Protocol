@@ -39,6 +39,8 @@ private:
   rxDoneCallback recvDataCallback;
   
   void handleReceivedPacket() {
+    loginfo_ln("====> handleReceivedPacket: START");
+    
     int err;
     std::optional<std::vector<uint8_t>> rxData = this->duckRadio.readReceivedData();
     if (!rxData) {
@@ -49,7 +51,6 @@ private:
     logdbg_ln("Got data from radio. size: %d",rxPacket.size());
 
     recvDataCallback(rxPacket);
-    loginfo_ln("handleReceivedPacket: START");
 
     //Check if Duck is desitination for this packet before relaying
     if (duckutils::isEqual(BROADCAST_DUID, rxPacket.dduid)) {

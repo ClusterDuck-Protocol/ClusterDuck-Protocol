@@ -186,6 +186,7 @@ class Duck {
       }
       return err;
     }
+    //this->dduid == BROADCAST_DUID || this->dduid == PAPADUCK_DUID
 
     int forwardPacket(CdpPacket& packet){
       //next node checks if it has the destination in its table
@@ -194,7 +195,7 @@ class Duck {
       //if the duck can't find the destination in its routing table then it just doesn't send
       int err = DUCK_ERR_NONE;
       std::optional<Duid> nextHop = router.getBestNextHop(packet.dduid);
-      if(nextHop.has_value()){
+      if(nextHop.has_value() || packet.dduid == PAPADUCK_DUID){ //do we need to make sure this duck isn't a papa?
         err = broadcastPacket(packet);
         if (err != DUCK_ERR_NONE) {
             logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
@@ -202,7 +203,10 @@ class Duck {
             loginfo_ln("handleReceivedPacket: packet RELAY DONE");
         }
       } else{
-        logdbg_ln("no entry for this id, skipping relay DDuid: %s", std::string(packet.dduid.begin(), packet.dduid.end()).c_str());
+        std::string strDuid(packet.dduid.begin(), packet.dduid.end());
+        logdbg_ln("no entry for this id, skipping relay DDuid: %s", strDuid.c_str());
+        std::string strSduid(packet.sduid.begin(), packet.sduid.end());
+        logdbg_ln("PACKET CAME FROM SDUID: %s", strSduid.c_str());
       }
       return err;
     }

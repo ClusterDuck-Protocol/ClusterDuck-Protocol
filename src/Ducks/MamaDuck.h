@@ -37,9 +37,7 @@ private :
      * Could be a RREQ, RREP, PING, PONG or DATA packet on its associated topic.
      *
      */
-    void handleReceivedPacket() override{
-        bool relay = false;
-        
+    void handleReceivedPacket() override {
         loginfo_ln("====> handleReceivedPacket: START");
 
         int err;
@@ -52,10 +50,9 @@ private :
         logdbg_ln("Got data from radio. size: %d",rxPacket.size());
 
         // recvDataCallback(rxPacket); crashes the duck if callback body not defined in sketch
-        loginfo_ln("handleReceivedPacket: START");
         
         //Check if Duck is desitination for this packet before relaying
-        if (duckutils::isEqual(BROADCAST_DUID, rxPacket.dduid) || duckutils::isEqual(PAPADUCK_DUID, rxPacket.dduid)) {
+        if (duckutils::isEqual(BROADCAST_DUID, rxPacket.dduid)) {
             ifBroadcast(rxPacket, err);
         } else if(duckutils::isEqual(this->duid, rxPacket.dduid)) { //Target device check
             ifNotBroadcast(rxPacket, err);
