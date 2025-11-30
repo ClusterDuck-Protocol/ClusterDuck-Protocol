@@ -193,6 +193,8 @@ class CdpPacket {
             duckType = buffer[DUCK_TYPE_POS];
             // hop count
             hopCount = buffer[HOP_COUNT_POS];
+            Serial.print("HOPS :         ");
+            Serial.println(hopCount);
             // data crc
             dcrc = duckutils::toUint32(&buffer[DATA_CRC_POS]);
             // data section

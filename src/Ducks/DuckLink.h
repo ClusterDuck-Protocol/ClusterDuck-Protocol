@@ -54,10 +54,13 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
           switch(rxPacket.topic) {
               case reservedTopic::rreq: {
                   loginfo_ln("RREQ received from %s. Sending Response!", rxPacket.sduid.data());
+                  Serial.print("hops on rreq:       ");
+                  Serial.println(rxPacket.hopCount);
                   RouteJSON rrepDoc = RouteJSON(rxPacket.sduid, this->duid);
                   this->sendRouteResponse(rxPacket.sduid, rrepDoc.asString());
                   // Update routing table with signal info
                   this->router.insertIntoRoutingTable(rxPacket.sduid, rrepDoc.getlastInPath(), this->getSignalScore());
+                  break;
               }
               case reservedTopic::ping:
                   loginfo_ln("PING received. Sending PONG!");
@@ -65,7 +68,7 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
                   if (err != DUCK_ERR_NONE) {
                       logerr_ln("ERROR failed to send pong message. rc = %d",err);
                   }
-                  return;
+                  break;
               case reservedTopic::cmd:
                   loginfo_ln("Command received");
                   err = this->broadcastPacket(rxPacket);
@@ -97,7 +100,9 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
               }
                   break;
               default:
-              loginfo_ln("handleReceivedPacket: packet received, skipping forward.");        
+              loginfo_ln("handleReceivedPacket: packet received, skipping forward.");    
+              loginfo_ln("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+              loginfo_ln("RREQ received from %s", rxPacket.sduid.data());    
           }
       }
 };

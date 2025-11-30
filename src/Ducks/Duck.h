@@ -82,7 +82,8 @@ class Duck {
         } else {
             if((millis() - this->lastRreqTime) > 30000){
               loginfo_ln("[DUCK] Destination not in table, sending new RREQ.");
-              sendRouteRequest(txPacket.dduid, getDuckId());
+              RouteJSON rreqDoc = RouteJSON(txPacket.dduid, this->duid);
+              sendRouteRequest(txPacket.dduid, rreqDoc);
             }
         }
       }
@@ -115,7 +116,8 @@ class Duck {
         } else {
             if((millis() - this->lastRreqTime) > 30000){
               loginfo_ln("[DUCK] Destination not in table, sending new RREQ.");
-              sendRouteRequest(txPacket.dduid, getDuckId());
+              RouteJSON rreqDoc = RouteJSON(txPacket.dduid, this->duid);
+              sendRouteRequest(txPacket.dduid, rreqDoc);
             }
         }
       }
@@ -283,7 +285,8 @@ class Duck {
         router.setNetworkState(NetworkState::PUBLIC);
       } else {
         if((millis() - this->lastRreqTime) > NET_JOIN_DELAY){
-          sendRouteRequest(BROADCAST_DUID, getDuckId());
+          RouteJSON rreqDoc = RouteJSON(BROADCAST_DUID, this->duid);
+          sendRouteRequest(BROADCAST_DUID, rreqDoc);
           loginfo_ln("searching for networks....");
           lastRreqTime = millis();
         }
@@ -294,8 +297,11 @@ class Duck {
      * @brief sendData that allows sending for reserved topic rreq
      * @returns DUCK_ERR_NONE if the data was sent successfully, an error code otherwise.
      */
-    int sendRouteRequest(Duid targetDevice, std::vector<uint8_t> origin){
-      int err = sendReservedTopicData(targetDevice, reservedTopic::rreq, origin);
+    int sendRouteRequest(Duid targetDevice, RouteJSON json){
+      std::string strJson = json.asString();
+      std::vector<uint8_t> app_data;
+      app_data.insert(app_data.end(), strJson.begin(), strJson.end());
+      int err = sendReservedTopicData(targetDevice, reservedTopic::rreq, app_data);
       if (err != DUCK_ERR_NONE){
         logerr_ln("ERR: failed to send rreq");
       }

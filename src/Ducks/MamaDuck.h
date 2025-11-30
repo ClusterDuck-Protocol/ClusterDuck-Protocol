@@ -68,7 +68,7 @@ private :
                 RouteJSON rrepDoc = RouteJSON(rxPacket.sduid, this->duid);
                 this->sendRouteResponse(rxPacket.sduid, rrepDoc.asString());
                 // Update routing table with signal info
-                this->router.insertIntoRoutingTable(rxPacket.sduid, rrepDoc.getlastInPath(), this->getSignalScore());
+                this->router.insertIntoRoutingTable(rxPacket.sduid, rxPacket.sduid, this->getSignalScore()); //can only be one hop away
                 break;
             }
             case reservedTopic::ping:
@@ -77,7 +77,7 @@ private :
                 if (err != DUCK_ERR_NONE) {
                     logerr_ln("ERROR failed to send pong message. rc = %d",err);
                 }
-                return;
+                break;
             case reservedTopic::pong:
                 loginfo_ln("PONG received. Ignoring!");
                 break;
@@ -110,7 +110,10 @@ private :
                 if(!relay) {
                     loginfo_ln("handleReceivedPacket: Sending RREP");
                     this->sendRouteResponse(rreqDoc.getlastInPath(), rreqDoc.asString());
-                    // return;//should this be here?
+                    Duid last = rreqDoc.getlastInPath();
+                    loginfo_ln("========================= =TARGET NO RELAY RREQ =======================================");
+                    logdbg_ln("GET LAST IN PATH:                   %s", std::string(last.begin(), last.end()).c_str());
+                    loginfo_ln("=======================================================================================");
                 } else {
                     loginfo_ln("RREQ received for relay. Relaying!");
                     rxPacket.data = duckutils::stringToByteVector(rreqDoc.addToPath(this->duid)); //why is this different from stringToArray
@@ -122,6 +125,10 @@ private :
                     }
                 }
                 this->router.insertIntoRoutingTable(rxPacket.sduid, rreqDoc.getlastInPath(), this->getSignalScore());
+                Duid last = rreqDoc.getlastInPath();
+                loginfo_ln("========================TARGET WITH RELAY RREQ ========================================");
+                logdbg_ln("GET LAST IN PATH:                   %s", std::string(last.begin(), last.end()).c_str());
+                loginfo_ln("=======================================================================================");
             }
             break;
           
@@ -134,6 +141,10 @@ private :
                     rrepDoc.removeFromPath(this->duid);
                     //route responses need a way to keep tray of who relayed the packet, but a response needs to be directed and not broadly relayed
                     this->sendRouteResponse(rrepDoc.getlastInPath(), rrepDoc.asString()); //so here the relaying duck is known from sduid
+                    Duid last = rrepDoc.getlastInPath();
+                    loginfo_ln("======================== TARGET WITH RELAY  RREP ======================================");
+                    logdbg_ln("GET LAST IN PATH:                   %s", std::string(last.begin(), last.end()).c_str());
+                    loginfo_ln("=======================================================================================");
                 }
                 //destination = sender of the rrep -> the last hop to current duck
                 Duid thisId = rxPacket.sduid;
@@ -146,7 +157,7 @@ private :
                 if (err != DUCK_ERR_NONE) {
                     logerr_ln("ERROR failed to send pong message. rc = %d",err);
                 }
-                return;
+                break;
             case reservedTopic::pong:
                 loginfo_ln("PONG received. Ignoring!");
                 break;

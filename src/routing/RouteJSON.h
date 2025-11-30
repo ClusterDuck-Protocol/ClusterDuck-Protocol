@@ -26,11 +26,11 @@ class RouteJSON {
             json["origin"] = duckutils::toString(sourceDevice);
             json["destination"] = duckutils::toString(targetDevice);
             json["path"].as<ArduinoJson::JsonArray>();
-#ifdef CDP_LOG_DEBUG
+// #ifdef CDP_LOG_DEBUG
             std::string log;
             serializeJson(json, log);
-            logdbg_ln("RouteDoc: %s", log.c_str());
-#endif
+            loginfo_ln("RouteDoc: %s", log.c_str());
+// #endif
         }
 
         //Create JSON from rxPacket
@@ -82,8 +82,12 @@ class RouteJSON {
 
         Duid getlastInPath(){
             Duid lastDuid;
-            auto last = path[path.size() - 1].as<std::string>();
+            auto last = path[path.size() -1].as<std::string>();
             std::copy(last.begin(), last.end(),lastDuid.begin());
+
+            std::string log;
+            serializeJson(json, log);
+            logdbg_ln("RREQ: %s", log.c_str());
 
             return lastDuid;
         }

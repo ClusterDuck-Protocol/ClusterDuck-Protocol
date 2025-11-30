@@ -146,7 +146,7 @@ void ifNotBroadcast(CdpPacket rxPacket, int err, bool relay = false) {
             if (err != DUCK_ERR_NONE) {
                 logerr_ln("ERROR failed to send pong message. rc = %d",err);
             }
-            return;
+            break;
         case reservedTopic::pong:
             loginfo_ln("PONG received. Ignoring!");
             break;
