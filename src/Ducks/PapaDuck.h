@@ -112,7 +112,7 @@ void ifNotBroadcast(CdpPacket rxPacket, int err, bool relay = false) {
                 this->sendRouteResponse(rreqDoc.getlastInPath(), rreqDoc.asString());
                 // return;//should this be here?
             } else {
-                loginfo_ln("RREQ received for relay. Relaying!");
+                loginfo_ln("RREQ received for relay.");
                 rxPacket.data = duckutils::stringToByteVector(rreqDoc.addToPath(this->duid)); //why is this different from stringToArray
                 err = this->forwardPacket(rxPacket);
                 if (err != DUCK_ERR_NONE) {

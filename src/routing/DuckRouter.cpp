@@ -10,24 +10,25 @@ void DuckRouter::insertIntoRoutingTable(Duid deviceID, Duid nextHop, SignalScore
         routingTable.insert(std::make_pair(neighborRecord.getDeviceId(), neighborList));
     } else {
         // Update existing record
-        index->second.push_back(neighborRecord);
-        index->second.remove_if([neighborRecord](const Neighbor& n) { //whats happening here
+        index->second.remove_if([neighborRecord](const Neighbor& n) {
             return n.getLastSeen() < neighborRecord.getLastSeen() && n.getDeviceId() == neighborRecord.getDeviceId();
         });
+        index->second.push_back(neighborRecord);
     }
 };
 
 std::optional<Duid> DuckRouter::getBestNextHop(Duid targetDeviceId){
-    // I'm not sure if this is what we're looking for since we still need to handle
-    // sending the very first message to the target when we don't have a known path yet.
     //check if nextHop = the duid of the last duid in path/last duid that relayed to the current duck so that it doesn't transmit back the way it came from
     auto nextHopRecord = routingTable.find(duckutils::toString(targetDeviceId));
     if (nextHopRecord == routingTable.end()) {
         return std::nullopt; // No entry found
+        loginfo_ln("=========================== NO ENTRY IN ROUTING TABLE FOUND +++++++++++++++++++++++++");
     }
+    loginfo_ln("=========================== ENTRY FOUND !!!!!!!!!!! +++++++++++++++++++++++++");
     nextHopRecord->second.sort(std::greater<>());
     std::string nextHopStr = nextHopRecord->second.front().getDeviceId();
     Duid nextHopId;
+    loginfo_ln("                       ENTRY DUID IS : %s", nextHopStr.c_str());
     std::copy(nextHopStr.begin(), nextHopStr.end(),nextHopId.begin());
 
     // if(nextHop.ttl > 0){

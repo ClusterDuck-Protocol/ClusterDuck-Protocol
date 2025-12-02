@@ -115,7 +115,7 @@ private :
                     logdbg_ln("GET LAST IN PATH:                   %s", std::string(last.begin(), last.end()).c_str());
                     loginfo_ln("=======================================================================================");
                 } else {
-                    loginfo_ln("RREQ received for relay. Relaying!");
+                    loginfo_ln("RREQ received for relay.");
                     rxPacket.data = duckutils::stringToByteVector(rreqDoc.addToPath(this->duid)); //why is this different from stringToArray
                     err = this->forwardPacket(rxPacket);//how much difference does this make?
                     if (err != DUCK_ERR_NONE) {

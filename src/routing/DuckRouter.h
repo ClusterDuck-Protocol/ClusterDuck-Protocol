@@ -36,6 +36,10 @@ class DuckRouter {
 
         std::optional<Duid> getBestNextHop(Duid targetDeviceId);
 
+        std::string printRoutingTable(){
+            
+        }
+
         /**
          * @brief NetworkState if the Duck joins or disconnects from a CDP network
          * @param newState The new NetworkState to join
