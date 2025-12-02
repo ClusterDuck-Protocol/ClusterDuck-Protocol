@@ -111,9 +111,6 @@ private :
                     loginfo_ln("handleReceivedPacket: Sending RREP");
                     this->sendRouteResponse(rreqDoc.getlastInPath(), rreqDoc.asString());
                     Duid last = rreqDoc.getlastInPath();
-                    loginfo_ln("========================= =TARGET NO RELAY RREQ =======================================");
-                    logdbg_ln("GET LAST IN PATH:                   %s", std::string(last.begin(), last.end()).c_str());
-                    loginfo_ln("=======================================================================================");
                 } else {
                     loginfo_ln("RREQ received for relay.");
                     rxPacket.data = duckutils::stringToByteVector(rreqDoc.addToPath(this->duid)); //why is this different from stringToArray
@@ -126,9 +123,6 @@ private :
                 }
                 this->router.insertIntoRoutingTable(rxPacket.sduid, rreqDoc.getlastInPath(), this->getSignalScore());
                 Duid last = rreqDoc.getlastInPath();
-                loginfo_ln("========================TARGET WITH RELAY RREQ ========================================");
-                logdbg_ln("GET LAST IN PATH:                   %s", std::string(last.begin(), last.end()).c_str());
-                loginfo_ln("=======================================================================================");
             }
             break;
           
@@ -142,9 +136,6 @@ private :
                     //route responses need a way to keep tray of who relayed the packet, but a response needs to be directed and not broadly relayed
                     this->sendRouteResponse(rrepDoc.getlastInPath(), rrepDoc.asString()); //so here the relaying duck is known from sduid
                     Duid last = rrepDoc.getlastInPath();
-                    loginfo_ln("======================== TARGET WITH RELAY  RREP ======================================");
-                    logdbg_ln("GET LAST IN PATH:                   %s", std::string(last.begin(), last.end()).c_str());
-                    loginfo_ln("=======================================================================================");
                 }
                 //destination = sender of the rrep -> the last hop to current duck
                 Duid thisId = rxPacket.sduid;
