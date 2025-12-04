@@ -22,11 +22,13 @@ std::optional<Duid> DuckRouter::getBestNextHop(Duid targetDeviceId){
     auto nextHopRecord = routingTable.find(duckutils::toString(targetDeviceId));
     if (nextHopRecord == routingTable.end()) {
         return std::nullopt; // No entry found
+        loginfo_ln("=========================== NO ENTRY IN ROUTING TABLE FOUND +++++++++++++++++++++++++");
     }
+    loginfo_ln("=========================== ENTRY FOUND !!!!!!!!!!! +++++++++++++++++++++++++");
     nextHopRecord->second.sort(std::greater<>());
     std::string nextHopStr = nextHopRecord->second.front().getDeviceId();
     Duid nextHopId;
-    logdbg_ln("[ROUTER] Best next hop is : %s", nextHopStr.c_str());
+    loginfo_ln("                       ENTRY DUID IS : %s", nextHopStr.c_str());
     std::copy(nextHopStr.begin(), nextHopStr.end(),nextHopId.begin());
 
     // if(nextHop.ttl > 0){

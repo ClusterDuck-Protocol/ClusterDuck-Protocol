@@ -84,6 +84,7 @@ class Duck {
               loginfo_ln("[DUCK] Destination not in table, sending new RREQ.");
               RouteJSON rreqDoc = RouteJSON(txPacket.dduid, this->duid);
               sendRouteRequest(txPacket.dduid, rreqDoc);
+              this->lastRreqTime = millis();
             }
         }
       }
@@ -118,6 +119,7 @@ class Duck {
               loginfo_ln("[DUCK] Destination not in table, sending new RREQ.");
               RouteJSON rreqDoc = RouteJSON(txPacket.dduid, this->duid);
               sendRouteRequest(txPacket.dduid, rreqDoc);
+              this->lastRreqTime = millis();
             }
         }
       }

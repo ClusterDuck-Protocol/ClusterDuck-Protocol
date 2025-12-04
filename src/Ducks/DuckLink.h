@@ -59,7 +59,9 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
                   RouteJSON rrepDoc = RouteJSON(rxPacket.sduid, this->duid);
                   this->sendRouteResponse(rxPacket.sduid, rrepDoc.asString());
                   // Update routing table with signal info
-                  this->router.insertIntoRoutingTable(rxPacket.sduid, rrepDoc.getlastInPath(), this->getSignalScore());
+                  std::optional<Duid> last = rrepDoc.getlastInPath();
+                  Duid lastInPath = last.has_value() ? last.value() : rxPacket.sduid;
+                  this->router.insertIntoRoutingTable(rxPacket.sduid, lastInPath, this->getSignalScore());
                   break;
               }
               case reservedTopic::ping:
@@ -84,25 +86,32 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
                   RouteJSON rreqDoc = RouteJSON(rxPacket.asBytes());
                   if(!relay) {
                       loginfo_ln("handleReceivedPacket: Sending RREP");
-                      this->sendRouteResponse(rreqDoc.getlastInPath(), rreqDoc.asString());
-                      this->router.insertIntoRoutingTable(rxPacket.sduid, rreqDoc.getlastInPath(), this->getSignalScore());
+                      std::optional<Duid> last = rreqDoc.getlastInPath();
+                      Duid lastInPath = last.has_value() ? last.value() : rxPacket.sduid;
+                      this->sendRouteResponse(lastInPath, rreqDoc.asString());
+                      this->router.insertIntoRoutingTable(rxPacket.sduid, lastInPath, this->getSignalScore());
                   }
               }
-              break;
-            
+                break;
               case reservedTopic::rrep: {
                   //we still need to recieve rreps in case of ttl expiry
                   RouteJSON rrepDoc = RouteJSON(rxPacket.asBytes());
-                  loginfo_ln("Received Route Response from DUID: %s", duckutils::convertToHex(rxPacket.sduid.data(), rxPacket.sduid.size()));
+                  loginfo_ln("Received Route Response from DUID: %s", rxPacket.sduid.data());
                   //destination = sender of the rrep -> the last hop to current duck
-                  Duid thisId = rxPacket.sduid;
-                  this->router.insertIntoRoutingTable(rrepDoc.getDestination(), thisId, this->getSignalScore()); //why do i need to copy here 
+                  std::optional<Duid> last = rrepDoc.getlastInPath();
+                  std::string packetString(rxPacket.data.begin(), rxPacket.data.end());
+                    logdbg_ln("Raw packet data as string: %s", packetString.c_str());
+                  Serial.println("still alive 1");
+                  Duid lastInPath = last.value();
+                  Serial.println("still alive 2");
+                  this->router.insertIntoRoutingTable(rxPacket.sduid, lastInPath, this->getSignalScore());
+                  Serial.println("still alive 3");
+                  this->router.getBestNextHop(rxPacket.sduid);
+                  Serial.println("still alive 4");
               }
                   break;
               default:
               loginfo_ln("handleReceivedPacket: packet received, skipping forward.");    
-              loginfo_ln("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-              loginfo_ln("RREQ received from %s", rxPacket.sduid.data());    
           }
       }
 };

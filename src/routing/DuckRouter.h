@@ -12,6 +12,7 @@
 
 #include <map>
 #include <list>
+#include <optional>
 #include "bloomfilter.h"
 #include "Neighbor.h"
 enum class NetworkState {SEARCHING, PUBLIC, DISCONNECTED};
@@ -35,10 +36,6 @@ class DuckRouter {
         void insertIntoRoutingTable(Duid deviceID, Duid nextHop, SignalScore signalInfo);
 
         std::optional<Duid> getBestNextHop(Duid targetDeviceId);
-
-        std::string printRoutingTable(){
-            
-        }
 
         /**
          * @brief NetworkState if the Duck joins or disconnects from a CDP network

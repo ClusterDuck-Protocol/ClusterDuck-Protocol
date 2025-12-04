@@ -67,29 +67,23 @@ class RouteJSON {
             return json.as<std::string>();
             //add rssi snr
         }
-        /**
-         * @brief get the destination device DUID from the route response
-         *
-         * @return the destination device DUID as a string
-         */
-        Duid getDestination(){
-            Duid destinationDuid;
-            auto destination = json["destination"].as<std::string>();
-            std::copy(destination.begin(), destination.end(),destinationDuid.begin());
 
-            return destinationDuid;
-        }
-
-        Duid getlastInPath(){
+        std::optional<Duid> getlastInPath(){
             Duid lastDuid;
-            auto last = path[path.size() -1].as<std::string>();
-            std::copy(last.begin(), last.end(),lastDuid.begin());
+            if(path.size() > 0){
+                auto last = path[path.size() -1].as<std::string>();
+                std::copy(last.begin(), last.end(),lastDuid.begin());
 
-            std::string log;
-            serializeJson(json, log);
-            logdbg_ln("RREQ: %s", log.c_str());
+                std::string log;
+                serializeJson(json, log);
+                logdbg_ln("RREQ: %s", log.c_str());
 
-            return lastDuid;
+                return lastDuid;
+
+            } else{
+                logdbg_ln("RREQ path empty, filling with self");
+                return std::nullopt;
+            }
         }
 
         /**
