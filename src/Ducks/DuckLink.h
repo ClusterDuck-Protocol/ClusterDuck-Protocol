@@ -83,7 +83,7 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
       void ifNotBroadcast(CdpPacket rxPacket, int err, bool relay = false) {
           switch(rxPacket.topic) {
               case reservedTopic::rreq: {
-                  RouteJSON rreqDoc = RouteJSON(rxPacket.asBytes());
+                  RouteJSON rreqDoc = RouteJSON(rxPacket.data);
                   if(!relay) {
                       loginfo_ln("handleReceivedPacket: Sending RREP");
                       std::optional<Duid> last = rreqDoc.getlastInPath();
@@ -95,19 +95,13 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
                 break;
               case reservedTopic::rrep: {
                   //we still need to recieve rreps in case of ttl expiry
-                  RouteJSON rrepDoc = RouteJSON(rxPacket.asBytes());
+                  RouteJSON rrepDoc = RouteJSON(rxPacket.data);
                   loginfo_ln("Received Route Response from DUID: %s", rxPacket.sduid.data());
                   //destination = sender of the rrep -> the last hop to current duck
                   std::optional<Duid> last = rrepDoc.getlastInPath();
                   std::string packetString(rxPacket.data.begin(), rxPacket.data.end());
-                    logdbg_ln("Raw packet data as string: %s", packetString.c_str());
-                  Serial.println("still alive 1");
                   Duid lastInPath = last.value();
-                  Serial.println("still alive 2");
-                  this->router.insertIntoRoutingTable(rxPacket.sduid, lastInPath, this->getSignalScore());
-                  Serial.println("still alive 3");
-                  this->router.getBestNextHop(rxPacket.sduid);
-                  Serial.println("still alive 4");
+                  this->router.insertIntoRoutingTable(rrepDoc.getOriginOfRrep(), lastInPath, this->getSignalScore());
               }
                   break;
               default:

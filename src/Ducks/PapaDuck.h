@@ -106,11 +106,10 @@ private:
 void ifNotBroadcast(CdpPacket rxPacket, int err, bool relay = false) {
     switch(rxPacket.topic) {
         case reservedTopic::rreq: {
-            RouteJSON rreqDoc = RouteJSON(rxPacket.asBytes());
+            RouteJSON rreqDoc = RouteJSON(rxPacket.data);
             if(!relay) {
                 loginfo_ln("handleReceivedPacket: Sending RREP");
                 this->sendRouteResponse(rreqDoc.getlastInPath(), rreqDoc.asString());
-                // return;//should this be here?
             } else {
                 loginfo_ln("RREQ received for relay. Relaying!");
                 rxPacket.data = duckutils::stringToByteVector(rreqDoc.addToPath(this->duid)); //why is this different from stringToArray
@@ -127,21 +126,18 @@ void ifNotBroadcast(CdpPacket rxPacket, int err, bool relay = false) {
       
         case reservedTopic::rrep: {
             //we still need to recieve rreps in case of ttl expiry
-            RouteJSON rrepDoc = RouteJSON(rxPacket.asBytes());
+            RouteJSON rrepDoc = RouteJSON(rxPacket.data);
             std::optional<Duid> last = rrepDoc.getlastInPath();
             Duid lastInPath = last.has_value() ? last.value() : rxPacket.sduid;
             if(relay){ 
                 loginfo_ln("Received Route Response from DUID: %s", rxPacket.sduid.data(), rxPacket.sduid.size());
 
                 rrepDoc.removeFromPath(this->duid);
-                //route responses need a way to keep tray of who relayed the packet, but a response needs to be directed and not broadly relayed
+                //route responses need a way to keep track of who relayed the packet, but a response needs to be directed and not broadly relayed
                 this->sendRouteResponse(lastInPath, rrepDoc.asString()); //so here the relaying duck is known from sduid
-                loginfo_ln("======================== TARGET WITH RELAY  RREP ======================================");
-                logdbg_ln("GET LAST IN PATH:                   %s", std::string(lastInPath.begin(), lastInPath.end()).c_str());
-                loginfo_ln("=======================================================================================");
             }
             //destination = sender of the rrep -> the last hop to current duck
-            this->router.insertIntoRoutingTable(rxPacket.sduid, last.value(), this->getSignalScore());
+            this->router.insertIntoRoutingTable(rrepDoc.getOriginOfRrep(), last.value(), this->getSignalScore());
         }
             break;
         case reservedTopic::ping:

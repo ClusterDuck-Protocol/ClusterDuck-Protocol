@@ -83,6 +83,7 @@ class Duck {
             if((millis() - this->lastRreqTime) > 30000){
               loginfo_ln("[DUCK] Destination not in table, sending new RREQ.");
               RouteJSON rreqDoc = RouteJSON(txPacket.dduid, this->duid);
+              rreqDoc.addToPath(this->duid);
               sendRouteRequest(txPacket.dduid, rreqDoc);
               this->lastRreqTime = millis();
             }
@@ -118,6 +119,7 @@ class Duck {
             if((millis() - this->lastRreqTime) > 30000){
               loginfo_ln("[DUCK] Destination not in table, sending new RREQ.");
               RouteJSON rreqDoc = RouteJSON(txPacket.dduid, this->duid);
+              rreqDoc.addToPath(this->duid);
               sendRouteRequest(txPacket.dduid, rreqDoc);
               this->lastRreqTime = millis();
             }
@@ -288,6 +290,7 @@ class Duck {
       } else {
         if((millis() - this->lastRreqTime) > NET_JOIN_DELAY){
           RouteJSON rreqDoc = RouteJSON(BROADCAST_DUID, this->duid);
+          rreqDoc.addToPath(this->duid);
           sendRouteRequest(BROADCAST_DUID, rreqDoc);
           loginfo_ln("searching for networks....");
           lastRreqTime = millis();

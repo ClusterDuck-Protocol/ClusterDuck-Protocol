@@ -46,12 +46,34 @@ class RouteJSON {
                 logerr_ln("RouteJSON deserialization failed: %s", error.c_str());
             }
             path = json["path"].as<ArduinoJson::JsonArray>();
+            origin = json["origin"].as<const char*>();
+            destination = json["destination"].as<const char*>();
             logdbg_ln("Built RouteJSON from packet data: %s",json.as<std::string>().c_str());
         }
 
         std::string asString(){
             return json.as<std::string>();
         }
+
+        Duid getOriginOfRrep(){
+            std::string oldOrigin = origin;
+            Duid newOriginDuid;
+            std::copy(destination.begin(), destination.end(), newOriginDuid.begin());
+            //update rreq to rrep
+            origin = destination;
+            destination = oldOrigin;
+
+            std::string log;
+            serializeJson(json, log);
+            loginfo_ln("RREP Doc Updated: %s", log.c_str());
+
+            return newOriginDuid;
+        }
+        // Duid getDestination(){
+        //     Duid destinationDuid;
+        //     std::copy(destination.begin(), destination.end(), destinationDuid.begin());
+        //     return destinationDuid;
+        // }
 
         /**
          * @brief add a duck node to the path to route the request path
@@ -119,6 +141,8 @@ class RouteJSON {
   private:
         ArduinoJson::JsonDocument json;
         ArduinoJson::JsonArray path;
+        std::string origin;
+        std::string destination;
   };
 
   #endif
