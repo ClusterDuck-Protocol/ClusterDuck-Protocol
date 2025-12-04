@@ -40,8 +40,13 @@ class RouteJSON {
          * @param packetData the received packet data as a byte vector
          */
         RouteJSON(std::vector<uint8_t> packetData) {
-            deserializeJson(json, packetData);
-            path = json["path"].to<ArduinoJson::JsonArray>();
+            std::string packetStr(packetData.begin(), packetData.end());
+            DeserializationError error = deserializeJson(json, packetStr);
+            if (error) {
+                logerr_ln("RouteJSON deserialization failed: %s", error.c_str());
+            }
+            path = json["path"].as<ArduinoJson::JsonArray>();
+            logdbg_ln("Built RouteJSON from packet data: %s",json.as<std::string>().c_str());
         }
 
         std::string asString(){
@@ -71,7 +76,7 @@ class RouteJSON {
         std::optional<Duid> getlastInPath(){
             Duid lastDuid;
             if(path.size() > 0){
-                auto last = path[path.size() -1].as<std::string>();
+                auto last = path[path.size()-1].as<std::string>();
                 std::copy(last.begin(), last.end(),lastDuid.begin());
 
                 std::string log;
@@ -96,9 +101,9 @@ class RouteJSON {
             //delete object for current duid
             for (ArduinoJson::JsonVariant v : path) {
                 if (v.as<std::string>() == duckutils::toString(deviceId)) {
-#ifdef CDP_LOG_DEBUG
+
                     logdbg_ln("Removing element from path: %s", v.as<std::string>().c_str());
-#endif
+
                     path.remove(v);
 #ifdef CDP_LOG_DEBUG
                     std::string log;
