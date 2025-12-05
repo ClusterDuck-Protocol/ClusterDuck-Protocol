@@ -218,6 +218,7 @@ int DuckLoRa::sendData(uint8_t* data, int length)
         logerr_ln("ERROR  LoRa radio not setup");
         return DUCKLORA_ERR_NOT_INITIALIZED;
     }
+    delay(length);
     return startTransmitData(data, length);
 }
 
