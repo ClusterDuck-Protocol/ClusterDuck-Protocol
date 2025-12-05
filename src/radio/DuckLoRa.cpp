@@ -394,7 +394,7 @@ int DuckLoRa::startTransmitData(uint8_t* data, int length) {
     }
 
     loginfo_ln("TX data");
-    logdbg_ln(" -> len: %d, %s", length, duckutils::toCStr(data, length));
+    logdbg_ln(" -> len: %d, %s", length, duckutils::toString(data, length));
 
     long t1 = millis();
     // non blocking transmit
