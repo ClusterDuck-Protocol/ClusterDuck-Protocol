@@ -130,14 +130,14 @@ static size_t cdpPrintf(const char *format, ...) {
 #define logdbg(format, ...)                                     \
   do {                                                          \
     cdpPrintf("[D]");                                           \
-    cdpPrintf("[%s] ",__FILENAME__);                            \
+    cdpPrintf("[** %s : %d] ",__FILENAME__, __LINE__);                            \
     cdpPrintf(format, ##__VA_ARGS__);                           \
   } while (0)
 
 #define logdbg_ln(format, ...)                                  \
   do {                                                          \
     cdpPrintf("[D]");                                           \
-    cdpPrintf("[%s] ",__FILENAME__);                            \
+    cdpPrintf("[** %s : %d] ",__FILENAME__, __LINE__);                            \
     cdpPrintf(format, ##__VA_ARGS__);cdpPrintf("\n");           \
   } while (0)
 #else

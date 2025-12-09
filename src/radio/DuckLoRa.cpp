@@ -177,7 +177,7 @@ std::optional<std::vector<uint8_t>> DuckLoRa::readReceivedData() { //return a st
         logerr_ln("ERROR  readReceivedData failed. err = %d", DUCKLORA_ERR_HANDLE_PACKET);
     }
 
-    loginfo_ln("Rx packet: %s", duckutils::convertToHex(packetBytes.data(), packetBytes.size()).c_str());
+    loginfo_ln("Rx packet: %s", duckutils::toString(packetBytes.data(), packetBytes.size()).c_str());
 
     loginfo_ln("readReceivedData: checking path offset integrity");
 
@@ -394,7 +394,7 @@ int DuckLoRa::startTransmitData(uint8_t* data, int length) {
     }
 
     loginfo_ln("TX data");
-    logdbg_ln(" -> len: %d, %s", length, duckutils::toString(data, length));
+    logdbg_ln(" -> len: %d, %s", length, duckutils::toString(data, length).c_str());
 
     long t1 = millis();
     // non blocking transmit
