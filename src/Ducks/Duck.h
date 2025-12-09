@@ -28,6 +28,7 @@ class Duck {
      * @brief Duck main running loop
      */
     void run(){
+      duckRadio.serviceInterruptFlags();
       Duck::logIfLowMemory();
       if(router.getNetworkState() == NetworkState::PUBLIC) {
         if(duckRadio.getReceiveFlag()){
@@ -45,7 +46,7 @@ class Duck {
             }
         }
       }
-      duckRadio.serviceInterruptFlags();
+
     }
 
     int setupWithDefaults() {

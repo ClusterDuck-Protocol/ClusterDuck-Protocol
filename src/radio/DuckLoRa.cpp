@@ -228,7 +228,7 @@ void DuckLoRa::delay(size_t size) {
         std::uniform_int_distribution<> distrib(0, 3000L);
         std::chrono::milliseconds txdelay(distrib(gen));
         //add the time on air to the delay
-        txdelay += std::chrono::milliseconds(lora.getTimeOnAir(size));
+        // txdelay += std::chrono::milliseconds(lora.getTimeOnAir(size));
         loginfo_ln("Last receive was %ld ms ago, delaying transmission by %ld ms", millis() - this->lastReceiveTime, txdelay.count());
         //Random delay between 0 and 3 seconds
         std::this_thread::sleep_for(txdelay);
