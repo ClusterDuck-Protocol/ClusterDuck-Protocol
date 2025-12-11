@@ -235,7 +235,8 @@ void DuckLoRa::delay(size_t size) {
         loginfo_ln("Last receive was %ld ms ago, delaying transmission by %ld ms", millis() - this->lastReceiveTime, txdelay.count());
 
         // Use FreeRTOS task delay, which will not block other tasks
-        vTaskDelay(txdelay.count());
+        // must pass ticks, so convert from ms to ticks
+        vTaskDelay(pdMS_TO_TICKS(txdelay.count()));
     }
 }
 
