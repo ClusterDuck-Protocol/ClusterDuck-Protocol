@@ -201,7 +201,7 @@ class Duck {
 
     int broadcastPacket(CdpPacket& packet){
       bool alreadySeen = router.getFilter().bloom_check(packet.muid.data(), MUID_LENGTH);
-      int err;
+      int err = DUCK_ERR_NONE;
       if(alreadySeen){
         logdbg_ln("broadcastPacket: Packet already seen. No relay.");
       } else{
@@ -229,7 +229,6 @@ class Duck {
       } else{
         std::string strDuid(packet.dduid.begin(), packet.dduid.end());
         logdbg_ln("no entry for this id, skipping relay DDuid: %s", strDuid.c_str());
-        std::string strSduid(packet.sduid.begin(), packet.sduid.end());
       }
       return err;
     }
@@ -464,12 +463,14 @@ class Duck {
         logerr_ln("ERROR Failed to build ping packet, err = " + err);
         return err;
       }
+
+      router.getFilter().bloom_add(txPacket.muid.data(), MUID_LENGTH);
+
       err = duckRadio.sendData(txPacket.asBytes());
       if (err != DUCK_ERR_NONE) {
         logerr_ln("ERROR Lora sendData failed, err = %d", err);
       }
-      router.getFilter().bloom_add(txPacket.muid.data(), MUID_LENGTH);
-    
+     
       return err;
     }
 };

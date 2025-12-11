@@ -47,8 +47,9 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
           } else { //If it's meant for a specific target but not this one
               ifNotBroadcast(rxPacket, err, true);
           }
+          this->router.getFilter().bloom_add(rxPacket.muid.data(), MUID_LENGTH);
       }
-      }
+    }
   
       void ifBroadcast(CdpPacket rxPacket, int err) {
           switch(rxPacket.topic) {

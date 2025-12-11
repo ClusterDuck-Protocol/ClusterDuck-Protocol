@@ -1,4 +1,5 @@
 #include "DuckLoRa.h"
+#include <random>
 #ifdef CDPCFG_RADIO_SX1262
 #define DUCK_RADIO_IRQ_TIMEOUT RADIOLIB_SX126X_IRQ_TIMEOUT
 #define DUCK_RADIO_IRQ_TX_DONE RADIOLIB_SX126X_IRQ_TX_DONE
@@ -223,15 +224,18 @@ int DuckLoRa::sendData(uint8_t* data, int length)
 }
 
 void DuckLoRa::delay(size_t size) {
-    //Delay the transmission if we have received within the last 5 seconds
-    if((millis() - this->lastReceiveTime) < 5000L) {
+    // Delay the transmission if we have received within the last 5 seconds
+    if ((millis() - this->lastReceiveTime) < 5000L) {
         std::uniform_int_distribution<> distrib(0, 3000L);
         std::chrono::milliseconds txdelay(distrib(gen));
-        //add the time on air to the delay
-        // txdelay += std::chrono::milliseconds(lora.getTimeOnAir(size));
+        
+        // Add the time on air to the delay
+        // txdelay_ms += lora.getTimeOnAir(size);
+
         loginfo_ln("Last receive was %ld ms ago, delaying transmission by %ld ms", millis() - this->lastReceiveTime, txdelay.count());
-        //Random delay between 0 and 3 seconds
-        std::this_thread::sleep_for(txdelay);
+
+        // Use FreeRTOS task delay, which will not block other tasks
+        vTaskDelay(txdelay.count());
     }
 }
 
