@@ -92,17 +92,19 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
                       this->sendRouteResponse(lastInPath, rreqDoc.asString());
                       this->router.insertIntoRoutingTable(rxPacket.sduid, lastInPath, this->getSignalScore());
                   }
+                  Serial.println(" ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ this is really weird");
               }
                 break;
               case reservedTopic::rrep: {
                   //we still need to recieve rreps in case of ttl expiry
                   RouteJSON rrepDoc = RouteJSON(rxPacket.data);
-                  loginfo_ln("Received Route Response from DUID: %s", rxPacket.sduid.data());
+                  loginfo_ln("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Received Route Response from DUID: %s", rxPacket.sduid.data());
                   //destination = sender of the rrep -> the last hop to current duck
                   std::optional<Duid> last = rrepDoc.getlastInPath();
-                  std::string packetString(rxPacket.data.begin(), rxPacket.data.end());
                   Duid lastInPath = last.value();
-                  this->router.insertIntoRoutingTable(rrepDoc.getOriginOfRrep(), lastInPath, this->getSignalScore());
+                  
+                  rrepDoc.convertReqToRep();
+                  this->router.insertIntoRoutingTable(rrepDoc.getOrigin(), lastInPath, this->getSignalScore());
               }
                   break;
               default:

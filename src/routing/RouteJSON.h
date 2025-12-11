@@ -55,25 +55,28 @@ class RouteJSON {
             return json.as<std::string>();
         }
 
-        Duid getOriginOfRrep(){
+        void convertReqToRep(){
             std::string oldOrigin = origin;
-            Duid newOriginDuid;
-            std::copy(destination.begin(), destination.end(), newOriginDuid.begin());
             //update rreq to rrep
             origin = destination;
             destination = oldOrigin;
 
             std::string log;
             serializeJson(json, log);
-            loginfo_ln("RREP Doc Updated: %s", log.c_str());
-
-            return newOriginDuid;
+            loginfo_ln(" ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ RREP Doc Updated: %s", log.c_str());
+            logdbg_ln("LOG OF JSON !!!!!1: %s",json.as<std::string>().c_str());
+            Serial.println("===================================================================================================");
         }
-        // Duid getDestination(){
-        //     Duid destinationDuid;
-        //     std::copy(destination.begin(), destination.end(), destinationDuid.begin());
-        //     return destinationDuid;
-        // }
+        Duid getOrigin(){
+            Duid originDuid;
+            std::copy(origin.begin(), origin.end(), originDuid.begin());
+            return originDuid;
+        }
+        Duid getDestination(){
+            Duid destinationDuid;
+            std::copy(destination.begin(), destination.end(), destinationDuid.begin());
+            return destinationDuid;
+        }
 
         /**
          * @brief add a duck node to the path to route the request path

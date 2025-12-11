@@ -115,6 +115,7 @@ private :
                 //addToPath
                 if(!relay) {
                     loginfo_ln("handleReceivedPacket: Sending RREP");
+                    rreqDoc.convertReqToRep();
                     rxPacket.data = duckutils::stringToByteVector(rreqDoc.addToPath(this->duid));
                     this->sendRouteResponse(lastInPath, rreqDoc.asString());
                 } else {
@@ -136,15 +137,16 @@ private :
                 RouteJSON rrepDoc = RouteJSON(rxPacket.data);
                 std::optional<Duid> last = rrepDoc.getlastInPath();
                 Duid lastInPath = last.has_value() ? last.value() : rxPacket.sduid;
-                if(relay){ 
+                if(rrepDoc.getDestination() != this->duid){
                     loginfo_ln("Received Route Response from DUID: %s", rxPacket.sduid.data(), rxPacket.sduid.size());
 
                     rrepDoc.removeFromPath(this->duid);
                     //route responses need a way to keep tray of who relayed the packet, but a response needs to be directed and not broadly relayed
                     this->sendRouteResponse(lastInPath, rrepDoc.asString()); //so here the relaying duck is known from sduid
                 }
+                Serial.println(" +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ rrep already seen");
                 //destination = sender of the rrep -> the last hop to current duck
-                this->router.insertIntoRoutingTable(rrepDoc.getOriginOfRrep(), last.value(), this->getSignalScore());
+                this->router.insertIntoRoutingTable(rrepDoc.getOrigin(), lastInPath, this->getSignalScore());
             }
                 break;
             case reservedTopic::ping:
@@ -170,6 +172,7 @@ private :
                 break;
             default:
                 if(relay){
+                    Serial.println(" ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ default behavior");
                     this->forwardPacket(rxPacket); 
                 }       
         }
