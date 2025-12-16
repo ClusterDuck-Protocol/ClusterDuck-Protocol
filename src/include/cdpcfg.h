@@ -64,14 +64,14 @@
 #define CDPCFG_WEB_PORT 80
 
 /// Frequency Range. Set for US Region 915.0Mhz
-#define CDPCFG_RF_LORA_FREQ 915.0
+#define CDPCFG_RF_LORA_FREQ 915.0f
 #define CDPCFG_RF_LORA_FREQ_HZ 915000000
 /// Bandwidth. Default is 125Mhz
-#define CDPCFG_RF_LORA_BW 125.0
+#define CDPCFG_RF_LORA_BW 125.0f
 /// Spread Factor
 #define CDPCFG_RF_LORA_SF 7
 /// Transmit Power
-#define CDPCFG_RF_LORA_TXPOW 20
+#define CDPCFG_RF_LORA_TXPOW 14
 /// Antenna Gain correction
 #define CDPCFG_RF_LORA_GAIN 0
 

@@ -25,11 +25,11 @@ volatile uint16_t DuckLoRa::interruptFlags = 0;
 volatile bool DuckLoRa::receivedFlag = false;
 
 const LoRaConfigParams DuckLoRa::defaultRadioParams = {
-    /* band     = */ 915.0f,
-    /* txPower  = */ 14,
-    /* bw       = */ 125.0f,
-    /* sf       = */ 7,
-    /* gain     = */ 0,
+    /* band     = */ CDPCFG_RF_LORA_FREQ,
+    /* txPower  = */ CDPCFG_RF_LORA_TXPOW,
+    /* bw       = */ CDPCFG_RF_LORA_BW,
+    /* sf       = */ CDPCFG_RF_LORA_SF,
+    /* gain     = */ CDPCFG_RF_LORA_GAIN,
     /* func     = */ onInterrupt
 };
 
@@ -193,6 +193,7 @@ std::optional<std::vector<uint8_t>> DuckLoRa::readReceivedData() { //return a st
     if (computed_data_crc != packet_data_crc) {
         lastReceiveTime = millis(); //even if the packet is invalid, we need to know when we last received
         logerr_ln("ERROR data crc mismatch: received: 0x%X, calculated: 0x%X",packet_data_crc, computed_data_crc);
+        return std::nullopt;
     }
     
     #ifndef CDPCFG_RADIO_SX1262
