@@ -141,7 +141,7 @@ void ifNotBroadcast(CdpPacket rxPacket, int err, bool relay = false) {
 
                 rrepDoc.removeFromPath(this->duid);
                 //route responses need a way to keep track of who relayed the packet, but a response needs to be directed and not broadly relayed
-                this->sendRouteResponse(lastInPath, rrepDoc.asString()); //so here the relaying duck is known from sduid
+                this->sendRouteResponse(rrepDoc.getDestination(), rrepDoc.asString()); //so here the relaying duck is known from sduid
             }
             //destination = sender of the rrep -> the last hop to current duck
             this->router.insertIntoRoutingTable(rrepDoc.getOrigin(), lastInPath, this->getSignalScore());

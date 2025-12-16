@@ -65,12 +65,14 @@ private :
     void ifBroadcast(CdpPacket rxPacket, int err) {
         switch(rxPacket.topic) {
             case reservedTopic::rreq: {
-                loginfo_ln("RREQ received from %s. Sending Response!", rxPacket.sduid.data());
-                RouteJSON rrepDoc = RouteJSON(rxPacket.sduid, this->duid);
-                rrepDoc.addToPath(this->duid);
-                this->sendRouteResponse(rxPacket.sduid, rrepDoc.asString());
-                // Update routing table with signal info
-                this->router.insertIntoRoutingTable(rxPacket.sduid, rxPacket.sduid, this->getSignalScore()); //can only be one hop away
+                if(rxPacket.hopCount <= 0){
+                    loginfo_ln("RREQ received from %s. Sending Response!", rxPacket.sduid.data());
+                    RouteJSON rrepDoc = RouteJSON(rxPacket.sduid, this->duid);
+                    rrepDoc.addToPath(this->duid);
+                    this->sendRouteResponse(rxPacket.sduid, rrepDoc.asString());
+                    // Update routing table with signal info
+                    this->router.insertIntoRoutingTable(rxPacket.sduid, rxPacket.sduid, this->getSignalScore()); //can only be one hop away
+                } else{ Serial.println(" ===========================  too many hops away, no rrep");}
                 break;
             }
             case reservedTopic::ping:
@@ -137,16 +139,19 @@ private :
                 RouteJSON rrepDoc = RouteJSON(rxPacket.data);
                 std::optional<Duid> last = rrepDoc.getlastInPath();
                 Duid lastInPath = last.has_value() ? last.value() : rxPacket.sduid;
-                if(rrepDoc.getDestination() != this->duid){
+                if((rrepDoc.getDestination() != this->duid) && (router.getBestNextHop(rrepDoc.getDestination()) !=  rrepDoc.getOrigin())){  //if it needs to be forwarded, and I know a path to it that is not going back where I came from
                     loginfo_ln("Received Route Response from DUID: %s", rxPacket.sduid.data(), rxPacket.sduid.size());
 
-                    rrepDoc.removeFromPath(this->duid);
+                    rrepDoc.removeFromPath(lastInPath);
+                    rrepDoc.addToPath(this->duid);
                     //route responses need a way to keep tray of who relayed the packet, but a response needs to be directed and not broadly relayed
-                    this->sendRouteResponse(lastInPath, rrepDoc.asString()); //so here the relaying duck is known from sduid
+                    this->sendRouteResponse(rrepDoc.getDestination(), rrepDoc.asString()); //so here the relaying duck is known from sduid
+                    this->router.insertIntoRoutingTable(rxPacket.sduid, lastInPath, this->getSignalScore());
+                } else {
+                    Serial.println(" +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ rrep already seen");
+                    //destination = sender of the rrep -> the last hop to current duck
+                    this->router.insertIntoRoutingTable(rrepDoc.getOrigin(), lastInPath, this->getSignalScore());
                 }
-                Serial.println(" +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ rrep already seen");
-                //destination = sender of the rrep -> the last hop to current duck
-                this->router.insertIntoRoutingTable(rrepDoc.getOrigin(), lastInPath, this->getSignalScore());
             }
                 break;
             case reservedTopic::ping:

@@ -60,6 +60,8 @@ class RouteJSON {
             //update rreq to rrep
             origin = destination;
             destination = oldOrigin;
+            json["origin"] = origin;
+            json["destination"] = destination;
 
             std::string log;
             serializeJson(json, log);
