@@ -139,7 +139,7 @@ void ifNotBroadcast(CdpPacket rxPacket, int err, bool relay = false) {
             if(rrepDoc.getDestination() != this->duid){ 
                 loginfo_ln("Received Route Response from DUID: %s", rxPacket.sduid.data(), rxPacket.sduid.size());
 
-                rrepDoc.removeFromPath(this->duid);
+                rrepDoc.popFromPath();
                 //route responses need a way to keep track of who relayed the packet, but a response needs to be directed and not broadly relayed
                 this->sendRouteResponse(rrepDoc.getDestination(), rrepDoc.asString()); //so here the relaying duck is known from sduid
             }

@@ -72,7 +72,7 @@ private :
                     this->sendRouteResponse(rxPacket.sduid, rrepDoc.asString());
                     // Update routing table with signal info
                     this->router.insertIntoRoutingTable(rxPacket.sduid, rxPacket.sduid, this->getSignalScore()); //can only be one hop away
-                } else{ Serial.println(" ===========================  too many hops away, no rrep");}
+                }
                 break;
             }
             case reservedTopic::ping:
@@ -114,11 +114,10 @@ private :
                 //route requests are just forwarded so we can use the sduid as the origin
                 std::optional<Duid> last = rreqDoc.getlastInPath();
                 Duid lastInPath = last.has_value() ? last.value() : rxPacket.sduid;
-                //addToPath
+                loginfo_ln("Last in Path: %s", lastInPath.data(), lastInPath.size());
                 if(!relay) {
                     loginfo_ln("handleReceivedPacket: Sending RREP");
-                    rreqDoc.convertReqToRep();
-                    rxPacket.data = duckutils::stringToByteVector(rreqDoc.addToPath(this->duid));
+                    rxPacket.data = duckutils::stringToByteVector(rreqDoc.convertReqToRep());
                     this->sendRouteResponse(lastInPath, rreqDoc.asString());
                 } else {
                     rxPacket.data = duckutils::stringToByteVector(rreqDoc.addToPath(this->duid)); //why is this different from stringToArray
@@ -139,16 +138,19 @@ private :
                 RouteJSON rrepDoc = RouteJSON(rxPacket.data);
                 std::optional<Duid> last = rrepDoc.getlastInPath();
                 Duid lastInPath = last.has_value() ? last.value() : rxPacket.sduid;
-                if((rrepDoc.getDestination() != this->duid) && (router.getBestNextHop(rrepDoc.getDestination()) !=  rrepDoc.getOrigin())){  //if it needs to be forwarded, and I know a path to it that is not going back where I came from
-                    loginfo_ln("Received Route Response from DUID: %s", rxPacket.sduid.data(), rxPacket.sduid.size());
 
-                    rrepDoc.removeFromPath(lastInPath);
+                std::optional<Duid> nextHop = this->router.getBestNextHop(rrepDoc.getDestination());
+                //if((rrepDoc.getDestination() != this->duid) && (nextHop.has_value()) && (nextHop.value() !=  rrepDoc.getOrigin()))
+                if((rrepDoc.getDestination() != this->duid) && (nextHop.has_value()) && (nextHop.value() !=  rxPacket.sduid)){  //if it needs to be forwarded, and I know a path to it that is not going back where I came from
+                    Serial.println("need to be forwarded and know a next hop that isn't packet sduid");
+                    loginfo_ln("Received Route Response from DUID: %s", rxPacket.sduid.data(), rxPacket.sduid.size());
+                    loginfo_ln("NEXT HOP: %s", nextHop.value().data(), nextHop.value().size());
+                    rrepDoc.popFromPath();
                     rrepDoc.addToPath(this->duid);
                     //route responses need a way to keep tray of who relayed the packet, but a response needs to be directed and not broadly relayed
                     this->sendRouteResponse(rrepDoc.getDestination(), rrepDoc.asString()); //so here the relaying duck is known from sduid
                     this->router.insertIntoRoutingTable(rxPacket.sduid, lastInPath, this->getSignalScore());
                 } else {
-                    Serial.println(" +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ rrep already seen");
                     //destination = sender of the rrep -> the last hop to current duck
                     this->router.insertIntoRoutingTable(rrepDoc.getOrigin(), lastInPath, this->getSignalScore());
                 }
@@ -177,7 +179,6 @@ private :
                 break;
             default:
                 if(relay){
-                    Serial.println(" ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ default behavior");
                     this->forwardPacket(rxPacket); 
                 }       
         }

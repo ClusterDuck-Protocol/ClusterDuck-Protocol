@@ -26,11 +26,10 @@ class RouteJSON {
             json["origin"] = duckutils::toString(sourceDevice);
             json["destination"] = duckutils::toString(targetDevice);
             json["path"].as<ArduinoJson::JsonArray>();
-// #ifdef CDP_LOG_DEBUG
+
             std::string log;
             serializeJson(json, log);
             loginfo_ln("RouteDoc: %s", log.c_str());
-// #endif
         }
 
         //Create JSON from rxPacket
@@ -45,7 +44,9 @@ class RouteJSON {
             if (error) {
                 logerr_ln("RouteJSON deserialization failed: %s", error.c_str());
             }
-            path = json["path"].as<ArduinoJson::JsonArray>();
+            for (JsonVariant value : json["path"].as<JsonArray>()) {
+                objPath.push_back(value);  // Copy each element to myPath
+            }
             origin = json["origin"].as<const char*>();
             destination = json["destination"].as<const char*>();
             logdbg_ln("Built RouteJSON from packet data: %s",json.as<std::string>().c_str());
@@ -55,7 +56,7 @@ class RouteJSON {
             return json.as<std::string>();
         }
 
-        void convertReqToRep(){
+        std::string convertReqToRep(){
             std::string oldOrigin = origin;
             //update rreq to rrep
             origin = destination;
@@ -68,6 +69,8 @@ class RouteJSON {
             loginfo_ln(" ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ RREP Doc Updated: %s", log.c_str());
             logdbg_ln("LOG OF JSON !!!!!1: %s",json.as<std::string>().c_str());
             Serial.println("===================================================================================================");
+
+            return json.as<std::string>();
         }
         Duid getOrigin(){
             Duid originDuid;
@@ -87,10 +90,14 @@ class RouteJSON {
          * @return the newly modified Arduino JSON document
          */
         std::string addToPath(Duid deviceId){
-            
-             json["path"].to<ArduinoJson::JsonArray>()
-                     .add(duckutils::toString(deviceId));
-             path = json["path"];
+            objPath.push_back(duckutils::toString(deviceId));
+            json["path"].to<ArduinoJson::JsonArray>(); //.to erases content of the field in the doc, but .as does not modify the doc at all.
+            updateJsonPath(); //so we will manually copy the local obj path to the doc
+            //  for (JsonVariant value : objPath.as<JsonArray>()) { /
+            //     json["path"].add(value);  // Copy each element to myPath
+            // }
+            // json["path"].add(duckutils::toString(deviceId));
+            //  path.set(json["path"]);
 #ifdef CDP_LOG_DEBUG
             std::string log;
             serializeJson(json, log);
@@ -102,8 +109,8 @@ class RouteJSON {
 
         std::optional<Duid> getlastInPath(){
             Duid lastDuid;
-            if(path.size() > 0){
-                auto last = path[path.size()-1].as<std::string>();
+            if(objPath.size() > 0){
+                auto last = objPath[objPath.size()-1];
                 std::copy(last.begin(), last.end(),lastDuid.begin());
 
                 std::string log;
@@ -118,36 +125,39 @@ class RouteJSON {
             }
         }
 
-        /**
-         * @brief pop the last duck node from the route response path
-         *
-         * @param deviceId of the duck node to be removed
-         * @return the newly modified Arduino JSON document
-         */
-        std::string removeFromPath(Duid deviceId){
-            //delete object for current duid
-            for (ArduinoJson::JsonVariant v : path) {
-                if (v.as<std::string>() == duckutils::toString(deviceId)) {
+    /**
+     * @brief pop the last duck node from the route response path
+     *
+     * @param deviceId of the duck node to be removed
+     * @return the newly modified Arduino JSON document
+     */
+    std::string popFromPath(){
+        logdbg_ln("Popping element from path: %s", objPath.back().c_str());
+    
+        objPath.pop_back();
+        updateJsonPath();
+        
+        std::string log;
+        serializeJson(json, log);
+        logdbg_ln("Packet: %s", log.c_str());
 
-                    logdbg_ln("Removing element from path: %s", v.as<std::string>().c_str());
-
-                    path.remove(v);
-#ifdef CDP_LOG_DEBUG
-                    std::string log;
-                    serializeJson(json, log);
-                    logdbg_ln("Packet: %s", log.c_str());
-#endif
-                    break;
-                }
-            }
-            return json.as<std::string>();
-        }
+        return json.as<std::string>();
+    }
 
   private:
         ArduinoJson::JsonDocument json;
-        ArduinoJson::JsonArray path;
+        std::vector<std::string> objPath;
         std::string origin;
         std::string destination;
+
+        void updateJsonPath(){
+            JsonArray path = json["path"].to<JsonArray>();
+            path.clear();
+
+            for (const auto& s : objPath) {
+                path.add(s);
+            }
+        }
   };
 
   #endif
