@@ -66,9 +66,6 @@ class RouteJSON {
 
             std::string log;
             serializeJson(json, log);
-            loginfo_ln(" ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ RREP Doc Updated: %s", log.c_str());
-            logdbg_ln("LOG OF JSON !!!!!1: %s",json.as<std::string>().c_str());
-            Serial.println("===================================================================================================");
 
             return json.as<std::string>();
         }
@@ -93,11 +90,6 @@ class RouteJSON {
             objPath.push_back(duckutils::toString(deviceId));
             json["path"].to<ArduinoJson::JsonArray>(); //.to erases content of the field in the doc, but .as does not modify the doc at all.
             updateJsonPath(); //so we will manually copy the local obj path to the doc
-            //  for (JsonVariant value : objPath.as<JsonArray>()) { /
-            //     json["path"].add(value);  // Copy each element to myPath
-            // }
-            // json["path"].add(duckutils::toString(deviceId));
-            //  path.set(json["path"]);
 #ifdef CDP_LOG_DEBUG
             std::string log;
             serializeJson(json, log);
@@ -132,8 +124,6 @@ class RouteJSON {
      * @return the newly modified Arduino JSON document
      */
     std::string popFromPath(){
-        logdbg_ln("Popping element from path: %s", objPath.back().c_str());
-    
         objPath.pop_back();
         updateJsonPath();
         

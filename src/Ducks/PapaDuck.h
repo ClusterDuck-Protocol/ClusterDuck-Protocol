@@ -63,14 +63,17 @@ private:
     this->router.getFilter().bloom_add(rxPacket.muid.data(), MUID_LENGTH);
   } 
 
-  void ifBroadcast(CdpPacket rxPacket, int err) {
+  void ifBroadcast(CdpPacket rxPacket, int err) { 
     switch(rxPacket.topic) {
         case reservedTopic::rreq: {
-            loginfo_ln("RREQ received from %s. Sending Response!", rxPacket.sduid.data());
-            RouteJSON rrepDoc = RouteJSON(rxPacket.sduid, this->duid);
-            this->sendRouteResponse(rxPacket.sduid, rrepDoc.asString());
-            // Update routing table with signal info
-            this->router.insertIntoRoutingTable(rxPacket.sduid, rrepDoc.getlastInPath(), this->getSignalScore());
+            if(rxPacket.hopCount <= 0){
+                loginfo_ln("RREQ received from %s. Sending Response!", rxPacket.sduid.data());
+                RouteJSON rrepDoc = RouteJSON(rxPacket.sduid, this->duid);
+                rrepDoc.addToPath(this->duid);
+                this->sendRouteResponse(rxPacket.sduid, rrepDoc.asString());
+                // Update routing table with signal info
+                this->router.insertIntoRoutingTable(rxPacket.sduid, rxPacket.sduid, this->getSignalScore()); //can only be one hop away
+            }
             break;
         }
         case reservedTopic::ping:
@@ -79,7 +82,7 @@ private:
             if (err != DUCK_ERR_NONE) {
                 logerr_ln("ERROR failed to send pong message. rc = %d",err);
             }
-            return;
+            break;
         case reservedTopic::pong:
             loginfo_ln("PONG received. Ignoring!");
             break;
@@ -108,17 +111,14 @@ void ifNotBroadcast(CdpPacket rxPacket, int err, bool relay = false) {
     switch(rxPacket.topic) {
         case reservedTopic::rreq: {
             RouteJSON rreqDoc = RouteJSON(rxPacket.data);
-
             //route requests are just forwarded so we can use the sduid as the origin
             std::optional<Duid> last = rreqDoc.getlastInPath();
             Duid lastInPath = last.has_value() ? last.value() : rxPacket.sduid;
             if(!relay) {
                 loginfo_ln("handleReceivedPacket: Sending RREP");
-                rreqDoc.convertReqToRep();
-                rxPacket.data = duckutils::stringToByteVector(rreqDoc.addToPath(this->duid));
+                rxPacket.data = duckutils::stringToByteVector(rreqDoc.convertReqToRep());
                 this->sendRouteResponse(lastInPath, rreqDoc.asString());
             } else {
-                loginfo_ln("RREQ received for relay. Relaying!");
                 rxPacket.data = duckutils::stringToByteVector(rreqDoc.addToPath(this->duid)); //why is this different from stringToArray
                 err = this->forwardPacket(rxPacket);
                 if (err != DUCK_ERR_NONE) {
@@ -127,7 +127,6 @@ void ifNotBroadcast(CdpPacket rxPacket, int err, bool relay = false) {
                     loginfo_ln("handleReceivedPacket: RREQ packet RELAY DONE");
                 }
             }
-            this->router.insertIntoRoutingTable(rxPacket.sduid, rreqDoc.getlastInPath(), this->getSignalScore());
         }
         break;
       
@@ -136,15 +135,19 @@ void ifNotBroadcast(CdpPacket rxPacket, int err, bool relay = false) {
             RouteJSON rrepDoc = RouteJSON(rxPacket.data);
             std::optional<Duid> last = rrepDoc.getlastInPath();
             Duid lastInPath = last.has_value() ? last.value() : rxPacket.sduid;
-            if(rrepDoc.getDestination() != this->duid){ 
-                loginfo_ln("Received Route Response from DUID: %s", rxPacket.sduid.data(), rxPacket.sduid.size());
+            loginfo_ln("Received Route Response from DUID: %s", rxPacket.sduid.data(), rxPacket.sduid.size());
 
+            std::optional<Duid> nextHop = this->router.getBestNextHop(rrepDoc.getDestination());
+            if((rrepDoc.getDestination() != this->duid) && (nextHop.has_value()) && (nextHop.value() !=  rxPacket.sduid)){
                 rrepDoc.popFromPath();
-                //route responses need a way to keep track of who relayed the packet, but a response needs to be directed and not broadly relayed
-                this->sendRouteResponse(rrepDoc.getDestination(), rrepDoc.asString()); //so here the relaying duck is known from sduid
+                rrepDoc.addToPath(this->duid);
+                //route responses need a way to keep tray of who relayed the packet, but a response needs to be directed and not broadly relayed
+                this->sendRouteResponse(rrepDoc.getDestination(), rrepDoc.asString()); //so here the "relaying" duck is known from sduid
+                this->router.insertIntoRoutingTable(rxPacket.sduid, lastInPath, this->getSignalScore());
+            } else {
+                //destination = sender of the rrep -> the last hop to current duck
+                this->router.insertIntoRoutingTable(rrepDoc.getOrigin(), lastInPath, this->getSignalScore());
             }
-            //destination = sender of the rrep -> the last hop to current duck
-            this->router.insertIntoRoutingTable(rrepDoc.getOrigin(), lastInPath, this->getSignalScore());
         }
             break;
         case reservedTopic::ping:

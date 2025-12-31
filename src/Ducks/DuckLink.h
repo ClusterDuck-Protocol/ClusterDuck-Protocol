@@ -56,8 +56,6 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
               case reservedTopic::rreq: {
                 if(rxPacket.hopCount <= 0){
                   loginfo_ln("RREQ received from %s. Sending Response!", rxPacket.sduid.data());
-                  Serial.print("hops on rreq:       ");
-                  Serial.println(rxPacket.hopCount);
                   RouteJSON rrepDoc = RouteJSON(rxPacket.sduid, this->duid);
                   this->sendRouteResponse(rxPacket.sduid, rrepDoc.asString());
                   // Update routing table with signal info
@@ -95,7 +93,6 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
                       this->sendRouteResponse(lastInPath, rreqDoc.asString());
                       this->router.insertIntoRoutingTable(rxPacket.sduid, lastInPath, this->getSignalScore());
                   }
-                  Serial.println(" ++++++++++++++++++++++++++++ ignoring my own message");
               }
                 break;
               case reservedTopic::rrep: {
@@ -105,10 +102,6 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
                   //destination = sender of the rrep -> the last hop to current duck
                   std::optional<Duid> last = rrepDoc.getlastInPath();
                   Duid lastInPath = last.value();
-                  Serial.print("+++++++++++++++++++++++++++++++++++ adding DUID to routing table : ");
-                  Duid orig = rrepDoc.getOrigin();
-                  loginfo_ln("Origin: %s", orig.data(), orig.size());
-                  loginfo_ln("Next Hop: %s", lastInPath.data(), lastInPath.size());
                   
                   this->router.insertIntoRoutingTable(rrepDoc.getOrigin(), lastInPath, this->getSignalScore());
               }

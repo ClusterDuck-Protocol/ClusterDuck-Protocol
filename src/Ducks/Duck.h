@@ -412,7 +412,6 @@ class Duck {
           result = std::nullopt;
         } else{
           CdpPacket rxPacket(rxData.value());
-          Serial.print(rxPacket.topic);
           if((rxPacket.topic == reservedTopic::rrep) && (rxPacket.dduid == this->duid)){ //should all packets without valid crc immediately be discarded at a lower level?
             result = std::optional<CdpPacket>{rxPacket}; 
           } else {
