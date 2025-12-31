@@ -236,7 +236,7 @@ void DuckLoRa::delay(size_t size) {
 
         // Use FreeRTOS task delay, which will not block other tasks
         // must pass ticks, so convert from ms to ticks
-        vTaskDelay(pdMS_TO_TICKS(txdelay.count()));
+        vTaskDelay(txdelay.count());
     }
 }
 
