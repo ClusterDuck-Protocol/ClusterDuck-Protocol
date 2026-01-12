@@ -11,7 +11,6 @@
 #define DUCKUTILS_H_
 
 #include "../include/cdpcfg.h"
-#include <arduino-timer.h>
 #include <Arduino.h>
 #include <EEPROM.h>
 #include <string>

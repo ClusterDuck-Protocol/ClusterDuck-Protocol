@@ -48,9 +48,6 @@ void setup() {
   // Register  a callback that provides RSSI value
   duck.onReceiveRssi(handleReceiveRssi);
 
-  // Initialize the timer. The timer thread runs separately from the main loop
-  // and will trigger sending a counter message.
-  timer.every(INTERVAL_MS, pingHandler);
 
   // Setup the LED
   FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalSMD5050 );
