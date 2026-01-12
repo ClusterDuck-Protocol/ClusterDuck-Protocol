@@ -16,7 +16,7 @@
 #include <pgmspace.h>
 
 #define SECRET
-#define THINGNAME "" // Your AWS IoT core Thing Name
+#define THINGNAME "PAPADUCK" // Replace with your AWS IoT core Thing Name
 
 const char AWS_IOT_ENDPOINT[] = ""; // Your AWS IoT Core Endpoint
 

@@ -20,10 +20,12 @@ int CdpPacket::prepareForSending() {
     logdbg_ln("SDuid:      %s", strDuid.c_str());
 
 // destination device uid  
-    if (this->dduid == BROADCAST_DUID || this->dduid == PAPADUCK_DUID){
+    if (this->dduid == BROADCAST_DUID){
     logdbg_ln("DDuid:     broadcast");
+    } else if(this->dduid == PAPADUCK_DUID){
+        logdbg_ln("DDuid:     papa");
     } else{
-    logdbg_ln("DDuid: %s", std::string(this->dduid.begin(), this->dduid.end()).c_str());
+    logdbg_ln("DDuid:     %s", std::string(this->dduid.begin(), this->dduid.end()).c_str());
     }
     buffer.insert(buffer.end(), this->dduid.begin(), this->dduid.end());
     

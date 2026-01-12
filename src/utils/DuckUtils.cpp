@@ -56,6 +56,11 @@ std::string convertToHex( uint8_t* data, int size) {
   return buf;
 }
 
+std::string toString(uint8_t* data, int size) {
+    std::string str = std::string(data, data + size); //data + size for the entire length
+    return str;
+}
+
 uint32_t toUint32(const uint8_t* data) {
     uint32_t value = 0;
 

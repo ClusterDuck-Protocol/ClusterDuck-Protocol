@@ -12,6 +12,7 @@
 
 #include <map>
 #include <list>
+#include <optional>
 #include "bloomfilter.h"
 #include "Neighbor.h"
 enum class NetworkState {SEARCHING, PUBLIC, DISCONNECTED};

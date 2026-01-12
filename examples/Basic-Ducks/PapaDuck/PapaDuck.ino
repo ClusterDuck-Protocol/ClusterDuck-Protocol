@@ -50,7 +50,7 @@ static const char* mosquitto_ca_cert = \
 "-----END CERTIFICATE-----\n";
 
 // --- Global Objects ---
-PapaDuck hub("PAPA1262");                                     // PapaDuck instance
+PapaDuck hub("PAPADUCK");                                     // PapaDuck instance
 WiFiClientSecure wifiClient;                      // Secure WiFi client
 PubSubClient mqttClient(wifiClient);              // MQTT client
 std::queue<std::string> mqttMessageQueue;         // Incoming mqtt messages
