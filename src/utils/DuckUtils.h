@@ -11,7 +11,6 @@
 #define DUCKUTILS_H_
 
 #include "../include/cdpcfg.h"
-#include <arduino-timer.h>
 #include <Arduino.h>
 #include <EEPROM.h>
 #include <string>
@@ -185,48 +184,47 @@ bool isEqual(const std::vector<T> & a, const std::vector<T> & b) {
  */
 uint32_t toUint32(const uint8_t* data);
 
+typedef std::chrono::time_point<std::chrono::steady_clock, std::chrono::duration<long long,std::milli>> time_point_t;
 /**
  * @brief Create a timer instance.
  * 
  * @returns A Timer instance.
  */
-template <class callable, class... arguments>
-class Timer
+    class Timer
     {
-    typedef std::chrono::time_point<std::chrono::steady_clock, std::chrono::duration<int,std::milli>> time_point_t;
     public:
-
-        Timer(unsigned int in, bool async, callable&& f, arguments&&... args)
+        template <class callable = nullptr_t, class... arguments>
+        Timer(unsigned int in, callable&& f, arguments&&... args)
         {
-            after(in, async, std::forward<callable>(f), std::forward<arguments>(args)...);
+            after(in, std::forward<callable>(f), std::forward<arguments>(args)...);
         }
-        Timer(Timer::time_point_t at, bool async, callable&& f, arguments&&... args){
-            auto now = std::chrono::steady_clock::now();
+        template <class callable = nullptr_t, class... arguments>
+        Timer(time_point_t at, callable&& f, arguments&&... args){
 
-            auto diff= std::chrono::duration_cast<std::chrono::milliseconds>(at - now).count();
+            auto diff= std::chrono::duration_cast<std::chrono::milliseconds>(at - now()).count();
 
-            after(diff, async, std::forward<callable>(f), std::forward<arguments>(args)...);
+            after(diff, std::forward<callable>(f), std::forward<arguments>(args)...);
         }
-private:
-       void after(unsigned int after, bool async,  callable&& f, arguments&&... args){
-           std::function<std::invoke_result_t<callable, arguments...>()> task(std::bind(std::forward<callable>(f), std::forward<arguments>(args)...));
+        /**
+         * @brief Get the current time point in milliseconds since epoch.
+         *
+         * @returns A time_point_t representing the current time.
+         */
+        static time_point_t now() {
+            auto time = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::steady_clock::now().time_since_epoch());
+            return time_point_t(time);
+        }
 
-           if (async)
-           {
-               std::thread([after, task]() {
-                   std::this_thread::sleep_for(std::chrono::milliseconds(after));
-                   task();
-               }).detach();
-           }
-           else
-           {
-               std::this_thread::sleep_for(std::chrono::milliseconds(after));
-               task();
-           }
+    private:
+        template <class callable = nullptr_t, class... arguments>
+        void after(unsigned int after, callable&& f, arguments&&... args){
+            std::function<std::invoke_result_t<callable, arguments...>()> task(std::bind(std::forward<callable>(f), std::forward<arguments>(args)...));
+            std::this_thread::sleep_for(std::chrono::milliseconds(after));
+            task();
         }
 
     };
-
 bool getDetectState();
 bool flipDetectState();
 

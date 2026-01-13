@@ -31,7 +31,6 @@
         "examples/*/*.ino"
     ],
     "dependencies": {
-        "contrem/arduino-timer": "^3.0.1",
         "olikraus/U8g2": "^2.35.9",
         "bblanchon/ArduinoJson": "^7.0.3",
         "bakercp/CRC32": "2.0.0",

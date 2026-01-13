@@ -10,7 +10,6 @@
  */
 
  #include <string>
- #include <arduino-timer.h>
  #include <CDP.h>
  #ifdef SERIAL_PORT_USBVIRTUAL
  #define Serial SERIAL_PORT_USBVIRTUAL
@@ -21,7 +20,6 @@
  
  // --- Global Variables ---
  MamaDuck duck("MAMADUCK"); // Device ID, MUST be 8 bytes and unique from other ducks;
- auto timer = timer_create_default();  // Creating a timer with default settings
  const int INTERVAL_MS = 10000;        // Interval in milliseconds between runSensor call
  int counter = 1;                      // Counter for the sensor data  
  bool setupOK = false;                 // Flag to check if setup is complete
@@ -39,8 +37,6 @@
      Serial.println("[MAMA] Failed to setup MamaDuck");
      return;
    }
- 
-   timer.every(INTERVAL_MS, runSensor); // Triggers runSensor every INTERVAL_MS
    
    setupOK = true;
    Serial.println("[MAMA] Setup OK!");
@@ -55,7 +51,7 @@
    if (!setupOK) {
      return; 
    }
-   timer.tick();
+   duckutils::Timer(INTERVAL_MS,runSensor, nullptr);
  
    duck.run();
  }

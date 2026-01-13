@@ -57,7 +57,6 @@ std::queue<std::string> mqttMessageQueue;         // Incoming mqtt messages
 std::string mqttPubTopic = "hub/event";           // Published by the hub
 std::string mqttSubTopic = "incoming/say_hello";  // Subscribed by the hub
 bool setupOK = false;                             // Flag to check if setup is complete
-auto timer = timer_create_default();              // Timer instance
 bool wifiConnected = false;                       // Flag to check if WiFi is connected
 
 // --- Function Declarations ---
@@ -237,7 +236,6 @@ void loop()
     return;
   }
   hub.run();
-  timer.tick();
 
   // Check for incoming messages from MQTT
   mqttClient.loop();
