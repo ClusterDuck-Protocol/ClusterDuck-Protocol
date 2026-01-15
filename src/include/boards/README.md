@@ -109,9 +109,8 @@ where the other board headers are included:
 #include "boards/heltec_wifi_lora_32_V2.h"
 #include "boards/lilygo_t_beam_sx1262.h"
 #include "boards/ttgo_t_beam_v1_sx1276.h"
-// Extra boards (available but not officially supported/maintained)
-#include "boards/extra_boards/lilygo_t_beam_supreme_sx1262.h"
-#include "boards/extra_boards/lilygo_sim7000g_lora.h"
+#include "boards/lilygo_t_beam_supreme_sx1262.h"
+#include "boards/lilygo_sim7000g_lora.h"
 #endif
 
 ...
