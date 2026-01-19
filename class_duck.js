@@ -15,7 +15,7 @@ var class_duck =
     [ "sendData", "class_duck.html#a13d33b31a7140638bb0834b0a22349d7", null ],
     [ "sendPing", "class_duck.html#ab9b47428d9d0870552fdb27a72c6cbaa", null ],
     [ "sendPong", "class_duck.html#ad71fe532aae2f1d84eb47926d703e93f", null ],
-    [ "sendRouteRequest", "class_duck.html#ab7caaf41b25edca09de364b3958b87fe", null ],
+    [ "sendRouteRequest", "class_duck.html#a428462f353dd9885fccb37bb59c3fc23", null ],
     [ "sendRouteResponse", "class_duck.html#a9a67a2d2ad45b6006a5d667e10fc150a", null ],
     [ "setupLoRaRadio", "class_duck.html#a10801b2109985b1d1d3ff175ff1795e0", null ],
     [ "setupSerial", "class_duck.html#aa8f9e3f37a1fd5213cace3de610416ce", null ],

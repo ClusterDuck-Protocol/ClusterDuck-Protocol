@@ -120,6 +120,9 @@ Functions</h2></td></tr>
 <tr class="memitem:afe0c55ac9f352c8295641a6f50915b1b" id="r_afe0c55ac9f352c8295641a6f50915b1b"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceduckutils.html#afe0c55ac9f352c8295641a6f50915b1b">convertToHex</a> (uint8_t *data, int size)</td></tr>
 <tr class="memdesc:afe0c55ac9f352c8295641a6f50915b1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a byte array into a hex string.  <br /></td></tr>
 <tr class="separator:afe0c55ac9f352c8295641a6f50915b1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a91fce9184c053641286aab2492572e41" id="r_a91fce9184c053641286aab2492572e41"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceduckutils.html#a91fce9184c053641286aab2492572e41">toString</a> (uint8_t *data, int size)</td></tr>
+<tr class="memdesc:a91fce9184c053641286aab2492572e41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a byte array into an ASCII string. This function assumes that the byte array contains printable ASCII characters. Intended for debugging purposes.  <br /></td></tr>
+<tr class="separator:a91fce9184c053641286aab2492572e41"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a694ac8062f355bd3bab23bca809dd102" id="r_a694ac8062f355bd3bab23bca809dd102"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceduckutils.html#a694ac8062f355bd3bab23bca809dd102">toUint32</a> (const uint8_t *data)</td></tr>
 <tr class="memdesc:a694ac8062f355bd3bab23bca809dd102"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a byte array to unsigned 32 bit integer.  <br /></td></tr>
 <tr class="separator:a694ac8062f355bd3bab23bca809dd102"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -504,7 +507,7 @@ template&lt;typename T , size_t S&gt; </div>
 </div>
 </div>
 <a id="acd6c9c35c2a066adc8dd835ee7f04bb3" name="acd6c9c35c2a066adc8dd835ee7f04bb3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acd6c9c35c2a066adc8dd835ee7f04bb3">&#9670;&#160;</a></span>toString() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#acd6c9c35c2a066adc8dd835ee7f04bb3">&#9670;&#160;</a></span>toString() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -533,7 +536,7 @@ template&lt;typename Container &gt; </div>
 </div>
 </div>
 <a id="a232773eaac919a424cf6c8737c6843f0" name="a232773eaac919a424cf6c8737c6843f0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a232773eaac919a424cf6c8737c6843f0">&#9670;&#160;</a></span>toString() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a232773eaac919a424cf6c8737c6843f0">&#9670;&#160;</a></span>toString() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -554,6 +557,44 @@ template&lt;typename T &gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">vec</td><td>A vector to convert </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A std::string representing the byte array in ASCII. </dd></dl>
+
+</div>
+</div>
+<a id="a91fce9184c053641286aab2492572e41" name="a91fce9184c053641286aab2492572e41"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a91fce9184c053641286aab2492572e41">&#9670;&#160;</a></span>toString() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string duckutils::toString </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t *&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Convert a byte array into an ASCII string. This function assumes that the byte array contains printable ASCII characters. Intended for debugging purposes. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">data</td><td>a byte array to convert </td></tr>
+    <tr><td class="paramname">size</td><td>the size of the array </td></tr>
   </table>
   </dd>
 </dl>

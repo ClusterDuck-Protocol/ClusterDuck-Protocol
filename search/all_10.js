@@ -5,7 +5,7 @@ var searchData=
   ['senddata_2',['senddata',['../class_duck.html#a23058628cd8901bb4d3fe6b22f0fa1ae',1,'Duck::sendData(uint8_t topic, const std::string data, const std::array&lt; uint8_t, 8 &gt; targetDevice=PAPADUCK_DUID)'],['../class_duck.html#a13d33b31a7140638bb0834b0a22349d7',1,'Duck::sendData(uint8_t topic, const uint8_t *data, int length, const std::array&lt; uint8_t, 8 &gt; targetDevice=PAPADUCK_DUID)'],['../class_duck_lo_ra.html#a4935020a0e813de0279743780bd9934c',1,'DuckLoRa::sendData(uint8_t *data, int length)'],['../class_duck_lo_ra.html#a969895f9786937206f531781bb00c8c5',1,'DuckLoRa::sendData(std::vector&lt; uint8_t &gt; data)']]],
   ['sendping_3',['sendPing',['../class_duck.html#ab9b47428d9d0870552fdb27a72c6cbaa',1,'Duck']]],
   ['sendpong_4',['sendPong',['../class_duck.html#ad71fe532aae2f1d84eb47926d703e93f',1,'Duck']]],
-  ['sendrouterequest_5',['sendRouteRequest',['../class_duck.html#ab7caaf41b25edca09de364b3958b87fe',1,'Duck']]],
+  ['sendrouterequest_5',['sendRouteRequest',['../class_duck.html#a428462f353dd9885fccb37bb59c3fc23',1,'Duck']]],
   ['sendrouteresponse_6',['sendRouteResponse',['../class_duck.html#a9a67a2d2ad45b6006a5d667e10fc150a',1,'Duck']]],
   ['serviceinterruptflags_7',['serviceInterruptFlags',['../class_duck_lo_ra.html#a889bd584b29b55901cb3d3214031028e',1,'DuckLoRa']]],
   ['setnetworkstate_8',['setNetworkState',['../class_duck_router.html#a3ad7b06ef6b4c9c9c902f7d4ded21cb8',1,'DuckRouter']]],

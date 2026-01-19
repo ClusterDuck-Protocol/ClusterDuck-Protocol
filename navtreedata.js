@@ -69,7 +69,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "_detector_duck_8h.html",
-"class_duck_router.html#a0ef970f187ed03923f8db576c47b348e"
+"class_duck_router.html#a676d4c6e29c1803f5970daafb2067193"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

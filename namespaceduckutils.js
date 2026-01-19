@@ -15,6 +15,7 @@ var namespaceduckutils =
     [ "stringToByteVector", "namespaceduckutils.html#a942ad7b394b64c3ba7fef87c1b27e2a7", null ],
     [ "toString", "namespaceduckutils.html#acd6c9c35c2a066adc8dd835ee7f04bb3", null ],
     [ "toString", "namespaceduckutils.html#a232773eaac919a424cf6c8737c6843f0", null ],
+    [ "toString", "namespaceduckutils.html#a91fce9184c053641286aab2492572e41", null ],
     [ "toUint32", "namespaceduckutils.html#a694ac8062f355bd3bab23bca809dd102", null ],
     [ "toUpperCase", "namespaceduckutils.html#a0a51e5d45425646f2d70f63c3de51faa", null ],
     [ "detectState", "namespaceduckutils.html#a0f01261a6300cd0d8079981838ede1c2", null ]

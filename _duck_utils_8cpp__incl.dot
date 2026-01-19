@@ -38,5 +38,4 @@ digraph "/home/runner/work/ClusterDuck-Protocol/ClusterDuck-Protocol/src/utils/D
   Node1 -> Node12 [id="edge16_Node000001_Node000012",color="steelblue1",style="solid",tooltip=" "];
   Node1 -> Node17 [id="edge17_Node000001_Node000017",color="steelblue1",style="solid",tooltip=" "];
   Node17 [id="Node000017",label="DuckLogger.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$_duck_logger_8h.html",tooltip=" "];
-  Node17 -> Node10 [id="edge18_Node000017_Node000010",color="steelblue1",style="solid",tooltip=" "];
 }

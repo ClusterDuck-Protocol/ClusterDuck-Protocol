@@ -23,6 +23,4 @@ digraph "/home/runner/work/ClusterDuck-Protocol/ClusterDuck-Protocol/src/routing
   Node9 [id="Node000009",label="../CdpPacket.h",height=0.2,width=0.4,color="grey60", fillcolor="#E0E0E0", style="filled",tooltip=" "];
   Node1 -> Node10 [id="edge9_Node000001_Node000010",color="steelblue1",style="solid",tooltip=" "];
   Node10 [id="Node000010",label="utils/DuckLogger.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$_duck_logger_8h.html",tooltip=" "];
-  Node10 -> Node11 [id="edge10_Node000010_Node000011",color="steelblue1",style="solid",tooltip=" "];
-  Node11 [id="Node000011",label="Arduino.h",height=0.2,width=0.4,color="grey60", fillcolor="#E0E0E0", style="filled",tooltip=" "];
 }

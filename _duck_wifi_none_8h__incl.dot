@@ -9,6 +9,4 @@ digraph "/home/runner/work/ClusterDuck-Protocol/ClusterDuck-Protocol/src/wifi/Du
   Node2 [id="Node000002",label="../utils/DuckError.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$_duck_error_8h.html",tooltip=" "];
   Node1 -> Node3 [id="edge2_Node000001_Node000003",color="steelblue1",style="solid",tooltip=" "];
   Node3 [id="Node000003",label="../utils/DuckLogger.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$_duck_logger_8h.html",tooltip=" "];
-  Node3 -> Node4 [id="edge3_Node000003_Node000004",color="steelblue1",style="solid",tooltip=" "];
-  Node4 [id="Node000004",label="Arduino.h",height=0.2,width=0.4,color="grey60", fillcolor="#E0E0E0", style="filled",tooltip=" "];
 }

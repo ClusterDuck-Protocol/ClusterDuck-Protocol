@@ -14,6 +14,7 @@ var _duck_utils_8h =
     [ "stringToByteVector", "_duck_utils_8h.html#a942ad7b394b64c3ba7fef87c1b27e2a7", null ],
     [ "toString", "_duck_utils_8h.html#acd6c9c35c2a066adc8dd835ee7f04bb3", null ],
     [ "toString", "_duck_utils_8h.html#a232773eaac919a424cf6c8737c6843f0", null ],
+    [ "toString", "_duck_utils_8h.html#a91fce9184c053641286aab2492572e41", null ],
     [ "toUint32", "_duck_utils_8h.html#a694ac8062f355bd3bab23bca809dd102", null ],
     [ "toUpperCase", "_duck_utils_8h.html#a0a51e5d45425646f2d70f63c3de51faa", null ]
 ];
