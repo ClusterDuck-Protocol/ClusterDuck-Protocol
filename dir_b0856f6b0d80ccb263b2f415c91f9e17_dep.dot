@@ -13,5 +13,5 @@ digraph "/home/runner/work/ClusterDuck-Protocol/ClusterDuck-Protocol/src/include
   dir_f720216755f5a1ced203babe1ca6998b [label="boards", fillcolor="#a2b4d6", color="grey25", style="filled", URL="dir_f720216755f5a1ced203babe1ca6998b.html",tooltip=""];
   }
   }
-  dir_b0856f6b0d80ccb263b2f415c91f9e17->dir_f720216755f5a1ced203babe1ca6998b [headlabel="5", labeldistance=1.5 headhref="dir_000002_000000.html" href="dir_000002_000000.html" color="steelblue1" fontcolor="steelblue1"];
+  dir_b0856f6b0d80ccb263b2f415c91f9e17->dir_f720216755f5a1ced203babe1ca6998b [headlabel="6", labeldistance=1.5 headhref="dir_000002_000000.html" href="dir_000002_000000.html" color="steelblue1" fontcolor="steelblue1"];
 }
