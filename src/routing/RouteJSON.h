@@ -26,11 +26,10 @@ class RouteJSON {
             json["origin"] = duckutils::toString(sourceDevice);
             json["destination"] = duckutils::toString(targetDevice);
             json["path"].as<ArduinoJson::JsonArray>();
-#ifdef CDP_LOG_DEBUG
+
             std::string log;
             serializeJson(json, log);
-            logdbg_ln("RouteDoc: %s", log.c_str());
-#endif
+            loginfo_ln("RouteDoc: %s", log.c_str());
         }
 
         //Create JSON from rxPacket
@@ -40,12 +39,45 @@ class RouteJSON {
          * @param packetData the received packet data as a byte vector
          */
         RouteJSON(std::vector<uint8_t> packetData) {
-            deserializeJson(json, packetData);
-            path = json["path"].to<ArduinoJson::JsonArray>();
+            std::string packetStr(packetData.begin(), packetData.end());
+            DeserializationError error = deserializeJson(json, packetStr);
+            if (error) {
+                logerr_ln("RouteJSON deserialization failed: %s", error.c_str());
+            }
+            for (JsonVariant value : json["path"].as<JsonArray>()) {
+                objPath.push_back(value);  // Copy each element to myPath
+            }
+            origin = json["origin"].as<const char*>();
+            destination = json["destination"].as<const char*>();
+            logdbg_ln("Built RouteJSON from packet data: %s",json.as<std::string>().c_str());
         }
 
         std::string asString(){
             return json.as<std::string>();
+        }
+
+        std::string convertReqToRep(){
+            std::string oldOrigin = origin;
+            //update rreq to rrep
+            origin = destination;
+            destination = oldOrigin;
+            json["origin"] = origin;
+            json["destination"] = destination;
+
+            std::string log;
+            serializeJson(json, log);
+
+            return json.as<std::string>();
+        }
+        Duid getOrigin(){
+            Duid originDuid;
+            std::copy(origin.begin(), origin.end(), originDuid.begin());
+            return originDuid;
+        }
+        Duid getDestination(){
+            Duid destinationDuid;
+            std::copy(destination.begin(), destination.end(), destinationDuid.begin());
+            return destinationDuid;
         }
 
         /**
@@ -55,10 +87,9 @@ class RouteJSON {
          * @return the newly modified Arduino JSON document
          */
         std::string addToPath(Duid deviceId){
-            
-             json["path"].to<ArduinoJson::JsonArray>()
-                     .add(duckutils::toString(deviceId));
-             path = json["path"];
+            objPath.push_back(duckutils::toString(deviceId));
+            json["path"].to<ArduinoJson::JsonArray>(); //.to erases content of the field in the doc, but .as does not modify the doc at all.
+            updateJsonPath(); //so we will manually copy the local obj path to the doc
 #ifdef CDP_LOG_DEBUG
             std::string log;
             serializeJson(json, log);
@@ -67,55 +98,56 @@ class RouteJSON {
             return json.as<std::string>();
             //add rssi snr
         }
-        /**
-         * @brief get the destination device DUID from the route response
-         *
-         * @return the destination device DUID as a string
-         */
-        Duid getDestination(){
-            Duid destinationDuid;
-            auto destination = json["destination"].as<std::string>();
-            std::copy(destination.begin(), destination.end(),destinationDuid.begin());
 
-            return destinationDuid;
-        }
-
-        Duid getlastInPath(){
+        std::optional<Duid> getlastInPath(){
             Duid lastDuid;
-            auto last = path[path.size() - 1].as<std::string>();
-            std::copy(last.begin(), last.end(),lastDuid.begin());
+            if(objPath.size() > 0){
+                auto last = objPath[objPath.size()-1];
+                std::copy(last.begin(), last.end(),lastDuid.begin());
 
-            return lastDuid;
-        }
+                std::string log;
+                serializeJson(json, log);
+                logdbg_ln("RREQ: %s", log.c_str());
 
-        /**
-         * @brief pop the last duck node from the route response path
-         *
-         * @param deviceId of the duck node to be removed
-         * @return the newly modified Arduino JSON document
-         */
-        std::string removeFromPath(Duid deviceId){
-            //delete object for current duid
-            for (ArduinoJson::JsonVariant v : path) {
-                if (v.as<std::string>() == duckutils::toString(deviceId)) {
-#ifdef CDP_LOG_DEBUG
-                    logdbg_ln("Removing element from path: %s", v.as<std::string>().c_str());
-#endif
-                    path.remove(v);
-#ifdef CDP_LOG_DEBUG
-                    std::string log;
-                    serializeJson(json, log);
-                    logdbg_ln("Packet: %s", log.c_str());
-#endif
-                    break;
-                }
+                return lastDuid;
+
+            } else{
+                logdbg_ln("RREQ path empty, filling with self");
+                return std::nullopt;
             }
-            return json.as<std::string>();
         }
+
+    /**
+     * @brief pop the last duck node from the route response path
+     *
+     * @param deviceId of the duck node to be removed
+     * @return the newly modified Arduino JSON document
+     */
+    std::string popFromPath(){
+        objPath.pop_back();
+        updateJsonPath();
+        
+        std::string log;
+        serializeJson(json, log);
+        logdbg_ln("Packet: %s", log.c_str());
+
+        return json.as<std::string>();
+    }
 
   private:
         ArduinoJson::JsonDocument json;
-        ArduinoJson::JsonArray path;
+        std::vector<std::string> objPath;
+        std::string origin;
+        std::string destination;
+
+        void updateJsonPath(){
+            JsonArray path = json["path"].to<JsonArray>();
+            path.clear();
+
+            for (const auto& s : objPath) {
+                path.add(s);
+            }
+        }
   };
 
   #endif
