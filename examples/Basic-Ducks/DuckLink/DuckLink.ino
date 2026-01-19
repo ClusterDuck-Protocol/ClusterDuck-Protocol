@@ -19,7 +19,7 @@ bool runSensor(void *);
 bool sendData(std::string message, byte topic=topics::status);
 
 // --- Global Variables ---
-DuckLink duck("Link1276");                            // CDP DuckLink instance
+DuckLink duck("DUCKLINK");                            // CDP DuckLink instance
 auto timer = timer_create_default();      // Creating a timer with default settings
 const int INTERVAL_MS = 10000;            // Interval in milliseconds between each call of runSensor
 int counter = 1;                          // Message counter to track transmissions
@@ -69,16 +69,16 @@ void loop() {
  bool runSensor(void *) {
   bool failure;
   
- //  std::string message = "C:" + std::to_string(counter) + "|" + "FM:" + std::to_string(freeMemory());
- //  Serial.print("[DUCKLINK] sensor data: ");
- //  Serial.println(message.c_str());
+  std::string message = "C:" + std::to_string(counter) + "|" + "FM:" + std::to_string(freeMemory());
+  Serial.print("[DUCKLINK] sensor data: ");
+  Serial.println(message.c_str());
 
- //  failure = duck.sendData(topics::health, message);
- //  if (!failure) {
- //    counter++;
- //    Serial.println("[DUCKLINK] runSensor ok.");
- //  } else {
- //    Serial.println("[DUCKLINK] runSensor failed.");
- //  }
+  failure = duck.sendData(topics::health, message);
+  if (!failure) {
+    counter++;
+    Serial.println("[DUCKLINK] runSensor ok.");
+  } else {
+    Serial.println("[DUCKLINK] runSensor failed.");
+  }
   return true;
 }

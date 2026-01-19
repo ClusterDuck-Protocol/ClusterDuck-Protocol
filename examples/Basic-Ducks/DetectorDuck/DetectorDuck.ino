@@ -13,7 +13,7 @@
 */
 
 #include <CDP.h>
-#include "FastLED.h"
+#include <FastLED.h>
 
 // Setup for W2812 (LED)
 #define LED_TYPE WS2812

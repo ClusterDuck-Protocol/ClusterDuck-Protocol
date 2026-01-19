@@ -25,11 +25,11 @@ volatile uint16_t DuckLoRa::interruptFlags = 0;
 volatile bool DuckLoRa::receivedFlag = false;
 
 const LoRaConfigParams DuckLoRa::defaultRadioParams = {
-    /* band     = */ 915.0f,
-    /* txPower  = */ 14,
-    /* bw       = */ 125.0f,
-    /* sf       = */ 7,
-    /* gain     = */ 0,
+    /* band     = */ CDPCFG_RF_LORA_FREQ,
+    /* txPower  = */ CDPCFG_RF_LORA_TXPOW,
+    /* bw       = */ CDPCFG_RF_LORA_BW,
+    /* sf       = */ CDPCFG_RF_LORA_SF,
+    /* gain     = */ CDPCFG_RF_LORA_GAIN,
     /* func     = */ onInterrupt
 };
 
@@ -177,7 +177,7 @@ std::optional<std::vector<uint8_t>> DuckLoRa::readReceivedData() { //return a st
         logerr_ln("ERROR  readReceivedData failed. err = %d", DUCKLORA_ERR_HANDLE_PACKET);
     }
 
-    loginfo_ln("Rx packet: %s", duckutils::convertToHex(packetBytes.data(), packetBytes.size()).c_str());
+    loginfo_ln("Rx packet: %s", duckutils::toString(packetBytes.data(), packetBytes.size()).c_str());
 
     loginfo_ln("readReceivedData: checking path offset integrity");
 
@@ -193,6 +193,7 @@ std::optional<std::vector<uint8_t>> DuckLoRa::readReceivedData() { //return a st
     if (computed_data_crc != packet_data_crc) {
         lastReceiveTime = millis(); //even if the packet is invalid, we need to know when we last received
         logerr_ln("ERROR data crc mismatch: received: 0x%X, calculated: 0x%X",packet_data_crc, computed_data_crc);
+        return std::nullopt;
     }
     
     #ifndef CDPCFG_RADIO_SX1262
@@ -218,24 +219,24 @@ int DuckLoRa::sendData(uint8_t* data, int length)
         logerr_ln("ERROR  LoRa radio not setup");
         return DUCKLORA_ERR_NOT_INITIALIZED;
     }
+    delay(length);
     return startTransmitData(data, length);
 }
 
 void DuckLoRa::delay(size_t size) {
-    //Delay the transmission if we have received within the last 5 seconds
-    if((millis() - this->lastReceiveTime) < 5000L) {
+    // Delay the transmission if we have received within the last 5 seconds
+    if ((millis() - this->lastReceiveTime) < 5000L) {
         std::uniform_int_distribution<> distrib(0, 3000L);
         std::chrono::milliseconds txdelay(distrib(gen));
-        //add the time on air to the delay
-        txdelay += std::chrono::milliseconds(lora.getTimeOnAir(size));
+        
+        // Add the time on air to the delay
+        // txdelay_ms += lora.getTimeOnAir(size);
+
         loginfo_ln("Last receive was %ld ms ago, delaying transmission by %ld ms", millis() - this->lastReceiveTime, txdelay.count());
-        //Random delay between 0 and 3 seconds
-        unsigned long current_time = millis();
-        unsigned long previousMillis = 0;
-        while(previousMillis - current_time <= txdelay.count()) {
-            previousMillis = millis();
-            loginfo_ln("Delaying transmission for %ld ms", txdelay.count());
-        }
+
+        // Use FreeRTOS task delay, which will not block other tasks
+        // must pass ticks, so convert from ms to ticks
+        vTaskDelay(txdelay.count());
     }
 }
 
@@ -398,7 +399,7 @@ int DuckLoRa::startTransmitData(uint8_t* data, int length) {
     }
 
     loginfo_ln("TX data");
-    logdbg_ln(" -> len: %d, %s", length, duckutils::convertToHex(data, length).c_str());
+    logdbg_ln(" -> len: %d, %s", length, duckutils::toString(data, length).c_str());
 
     long t1 = millis();
     // non blocking transmit
