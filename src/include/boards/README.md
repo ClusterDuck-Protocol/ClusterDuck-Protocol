@@ -8,7 +8,6 @@ The ClusterDuck Protocol currently supports the following boards out of the box:
 - **Heltec WiFi LoRa 32 V2** - `src/include/boards/heltec_wifi_lora_32_V2.h`
 - **Heltec WiFi LoRa 32 V3** - `src/include/boards/heltec_wifi_lora_32_V3.h`
 - **LilyGO T-Beam SX1262** - `src/include/boards/lilygo_t_beam_sx1262.h`
-- **LilyGO T-Beam Supreme ESP32-S3 SX1262** - `src/include/boards/lilygo_t_beam_supreme_sx1262.h`
 - **TTGO T-Beam V1 SX1276** - `src/include/boards/ttgo_t_beam_v1_sx1276.h`
 
 ## Board Format
@@ -110,6 +109,8 @@ where the other board headers are included:
 #include "boards/heltec_wifi_lora_32_V2.h"
 #include "boards/lilygo_t_beam_sx1262.h"
 #include "boards/ttgo_t_beam_v1_sx1276.h"
+#include "boards/lilygo_t_beam_supreme_sx1262.h"
+#include "boards/lilygo_sim7000g_lora.h"
 #endif
 
 ...
