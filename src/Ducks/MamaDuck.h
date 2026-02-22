@@ -31,12 +31,27 @@ public:
 
 private :
     WifiCapability duckWifi;
-    rxDoneCallback recvDataCallback;
+    rxDoneCallback recvDataCallback = nullptr;
     /**
      * @brief Handles any packets received by the duck. Overrides the pure virtual function in Duck base class.
      * Could be a RREQ, RREP, PING, PONG or DATA packet on its associated topic.
      *
      */
+    void handlePendingPacket(CdpPacket& packet) override {
+        loginfo_ln("====> handlePendingPacket: dispatching buffered packet, topic=%d", (int)packet.topic);
+        this->router.getFilter().bloom_add(packet.muid.data(), MUID_LENGTH);
+        if (duckutils::isEqual(BROADCAST_DUID, packet.dduid)) {
+            if (recvDataCallback != nullptr) {
+                recvDataCallback(packet);
+            }
+        } else if (duckutils::isEqual(this->duid, packet.dduid)) {
+            if (recvDataCallback != nullptr) {
+                recvDataCallback(packet);
+            }
+        }
+        /* else: packet is for another duck — ignore, no radio access here */
+    }
+
     void handleReceivedPacket() override {
         loginfo_ln("====> handleReceivedPacket: START");
 
@@ -49,7 +64,7 @@ private :
         CdpPacket rxPacket(rxData.value());
         logdbg_ln("Got data from radio. size: %d",rxPacket.size());
 
-        // recvDataCallback(rxPacket); crashes the duck if callback body not defined in sketch
+        /* recvDataCallback is invoked below inside each routing branch */
         
         //Check if Duck is desitination for this packet before relaying
         if (duckutils::isEqual(BROADCAST_DUID, rxPacket.dduid)) {
@@ -97,6 +112,9 @@ private :
                 }
                 break;
             default:
+                if (recvDataCallback != nullptr) {
+                    recvDataCallback(rxPacket);
+                }
                 err = this->broadcastPacket(rxPacket);
                 if (err != DUCK_ERR_NONE) {
                     logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
@@ -174,7 +192,12 @@ private :
             default:
                 if(relay){
                     this->forwardPacket(rxPacket); 
-                }       
+                } else {
+                    /* Packet is addressed directly to this duck — invoke user callback */
+                    if (recvDataCallback != nullptr) {
+                        recvDataCallback(rxPacket);
+                    }
+                }
         }
     }
 
