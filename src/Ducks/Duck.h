@@ -46,11 +46,7 @@ class Duck {
             }
         }
       }
-      /* If we just transitioned to PUBLIC and have a buffered packet, process it now */
-      if(router.getNetworkState() == NetworkState::PUBLIC && hasPendingRxPacket) {
-        hasPendingRxPacket = false;
-        handlePendingPacket(pendingRxPacket);
-      }
+
     }
 
     int setupWithDefaults() {
@@ -238,8 +234,6 @@ class Duck {
     }
 
     unsigned long lastRreqTime = 0L;
-    bool hasPendingRxPacket = false;
-    CdpPacket pendingRxPacket;
 
     /**
      * @brief Set up USB serial port
@@ -408,11 +402,6 @@ class Duck {
      * @brief Read packets from CDP nodes responding to our network join request
      * @returns Optional<CdpPacket> if network join response is found, nullopt if not 
      */
-    /* Dispatch a packet that was buffered during SEARCHING state */
-    virtual void handlePendingPacket(CdpPacket& packet) {
-      (void)packet; /* base class no-op; overridden in MamaDuck */
-    }
-
     std::optional<CdpPacket> checkForNetworks(){ 
       std::optional<CdpPacket> result;
 
@@ -423,16 +412,8 @@ class Duck {
           result = std::nullopt;
         } else{
           CdpPacket rxPacket(rxData.value());
-          if((rxPacket.topic == reservedTopic::rrep) && (rxPacket.dduid == this->duid)){
-            // Standard join: received our RREP
-            result = std::optional<CdpPacket>{rxPacket};
-          } else if(rxPacket.sduid != this->duid) {
-            // Received a valid CDP packet from another duck while still SEARCHING.
-            // Buffer it so handleReceivedPacket() can process it once we go PUBLIC.
-            loginfo_ln("checkForNetworks: non-RREP received while SEARCHING, buffering and joining");
-            hasPendingRxPacket = true;
-            pendingRxPacket = rxPacket;
-            result = std::optional<CdpPacket>{rxPacket};
+          if((rxPacket.topic == reservedTopic::rrep) && (rxPacket.dduid == this->duid)){ //should all packets without valid crc immediately be discarded at a lower level?
+            result = std::optional<CdpPacket>{rxPacket}; 
           } else {
             result = std::nullopt;
           }

@@ -3,8 +3,6 @@
 
 #include "Duck.h"
 #include "../wifi/DuckWifi.h"
-#include <thread>
-#include <chrono>
 
 template <typename WifiCapability = DuckWifi, typename RadioType = DuckLoRa>
 class PapaDuck : public Duck<WifiCapability, RadioType> {
@@ -72,8 +70,6 @@ private:
                 loginfo_ln("RREQ received from %s. Sending Response!", rxPacket.sduid.data());
                 RouteJSON rrepDoc = RouteJSON(rxPacket.sduid, this->duid);
                 rrepDoc.addToPath(this->duid);
-                // Give MamaDuck 500ms to return to RX mode after its RREQ transmission
-                std::this_thread::sleep_for(std::chrono::milliseconds(500));
                 this->sendRouteResponse(rxPacket.sduid, rrepDoc.asString());
                 // Update routing table with signal info
                 this->router.insertIntoRoutingTable(rxPacket.sduid, rxPacket.sduid, this->getSignalScore()); //can only be one hop away
