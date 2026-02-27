@@ -1,0 +1,230 @@
+/**
+ * @file MamaDuck.ino
+ * @brief Implements a MamaDuck using the ClusterDuck Protocol (CDP).
+ * 
+ * This example firmware periodically sends sensor health data (counter and free memory) 
+ * through a CDP mesh network. It also relays messages that it receives from other ducks
+ * that has not seen yet.
+ * 
+ * @date 2025-05-07
+ */
+
+ #define HELTEC_POWER_BUTTON
+
+ #include <string>
+ #include <cstdio>
+ #include <arduino-timer.h>
+ #include <CDP.h>
+ #ifdef SERIAL_PORT_USBVIRTUAL
+ #define Serial SERIAL_PORT_USBVIRTUAL
+ #endif
+ #include <heltec_unofficial.h>
+// #include "wifi.h"
+ #include "taqisystems_logo.h"
+ #define DUCK_NAME "ZAIHAN12"
+ 
+ // --- Function Declarations ---
+ bool runSensor(void *);
+ bool sendEmergency();
+ void handleDuckData(CdpPacket packet);
+ void displayMessage(String msg);
+ void flashLED();
+ void displayID();
+ void displayBatt();
+ 
+ // --- Global Variables ---
+ MamaDuck duck(DUCK_NAME); // Device ID, MUST be 8 bytes and unique from other ducks;
+ auto timer = timer_create_default();  // Creating a timer with default settings
+ const int INTERVAL_MS = 10000;        // Interval in milliseconds between runSensor call
+ int counter = 1;                      // Counter for the sensor data  
+ bool setupOK = false;                 // Flag to check if setup is complete
+ char buffer[100];
+ const char* s = DUCK_NAME;
+
+/* display stuff */
+
+/* end of display stuff */
+
+ /**
+  * @brief Setup function to initialize the MamaDuck
+  *
+  * - Sets up the Duck device ID (exactly 8 bytes).
+  * - Initializes MamaDuck using default configuration.
+  * - Sets up periodic execution of sensor data transmissions.
+  */
+ void setup() {
+   heltec_setup(); 
+   heltec_ve(true);
+   if (duck.setupWithDefaults() != DUCK_ERR_NONE) {
+     Serial.println("[MAMA] Failed to setup MamaDuck");
+     return;
+   }
+ 
+   setupOK = true;
+   Serial.println("[MAMA] Setup OK!");
+
+  esp_sleep_wakeup_cause_t wakeup_reason = esp_sleep_get_wakeup_cause();
+  std::snprintf(buffer, sizeof(buffer), "ID: %s", s);
+
+  display.init();
+  display.flipScreenVertically();
+
+  display.drawXbm(34,14, taqisystems_small_width, taqisystems_small_height, taqisystems_small_bits);
+  display.display();
+  heltec_delay(10000);
+  display.clear();
+
+  displayID();
+  displayBatt();
+  display.setFont(ArialMT_Plain_10);
+  display.setTextAlignment(TEXT_ALIGN_CENTER);
+  display.drawString(64, 22, "Tekan butang atas\nsekali untuk hantar\nmesej kecemasan.");
+  display.display();
+
+  duck.onReceiveDuckData(handleDuckData);
+  heltec_delay(5000);
+  display.displayOff();
+ }
+
+ /**
+  * @brief Main loop runs continuously.
+  *
+  * Executes scheduled tasks and maintains Duck operation.
+  */
+ void loop() {
+   if (!setupOK) {
+     return; 
+   }
+
+   //timer.tick();
+
+  heltec_loop();
+  // Button
+  if (button.isSingleClick()) {
+    displayID();
+    displayBatt();
+    display.setFont(ArialMT_Plain_10);
+    display.setTextAlignment(TEXT_ALIGN_CENTER);
+    display.drawString(64, 22, "Sedang menghantar\nmesej kecemasan...");
+    display.display();
+
+    sendEmergency();
+    heltec_delay(1000);
+  }
+
+  if (button.isDoubleClick()) {
+    display.displayOn();
+  }
+
+  duck.run();
+ }
+
+ void handleDuckData(CdpPacket packet) {
+    bool isForMe = (memcmp(packet.dduid.data(), duck.getDuckId().data(), 8) == 0);
+    bool isBroadcast = (packet.dduid[0] == 0xFF);
+
+    if (!isForMe && !isBroadcast) return;
+
+    Serial.println("HANDLING RECEIVING DATA....");
+
+    String message = String((char*)packet.data.data(), packet.data.size());
+
+    switch (packet.topic) {
+        case 22:  // Text message
+            Serial.println("📨 Message: " + message);
+            displayMessage(message);
+            duck.sendData(22, "MSG_READ");
+            break;
+
+        case 23:  // Alert
+            Serial.println("⚠️  ALERT: " + message);
+            flashLED();
+            duck.sendData(23, "ALERT_ACK");
+            break;
+
+        /*case 24:  // Announcement
+            Serial.println("📢 Announcement: " + message);
+            displayAnnouncement(message);
+            break;
+        */
+    }
+ }
+
+ void displayMessage(String msg) {
+    displayID();
+    displayBatt();
+    display.setFont(ArialMT_Plain_10);
+    display.setTextAlignment(TEXT_ALIGN_LEFT);
+    //display.println("Message:");
+    display.drawStringMaxWidth(0, 10, 128, msg);
+    //display.println(msg);
+    display.display();
+ }
+
+ void displayID() {
+    display.clear();
+    display.setTextAlignment(TEXT_ALIGN_RIGHT);
+    display.setFont(ArialMT_Plain_10);
+    display.drawString(128, 0, buffer);
+    display.display();
+ }
+
+ void displayBatt() {
+    display.setTextAlignment(TEXT_ALIGN_LEFT);
+    display.setFont(ArialMT_Plain_10);
+    display.drawString(0, 0, "Batt: 100%");
+    display.display();
+ }
+
+ void flashLED() {
+    for (int i = 0; i < 5; i++) {
+        digitalWrite(LED_PIN, HIGH);
+        delay(200);
+        digitalWrite(LED_PIN, LOW);
+        delay(200);
+    }
+ }
+
+ bool sendEmergency() {
+   bool failure;
+
+   std::string message = "Saya berada dalam kecemasan!";
+   Serial.print("[MAMA] sendEmergency data: ");
+   Serial.println(message.c_str());
+
+   failure = duck.sendData(topics::alert, message);
+   if (!failure) {
+     counter++;
+     displayID();
+     displayBatt();
+     display.setFont(ArialMT_Plain_10);
+     display.setTextAlignment(TEXT_ALIGN_CENTER);
+     display.drawString(64, 22, "Berjaya hantar\nmesej kecemasan!");
+
+     // no displayID. because this has no clear();
+     display.setTextAlignment(TEXT_ALIGN_RIGHT);
+     display.setFont(ArialMT_Plain_10);
+     display.drawString(128, 0, buffer);
+     display.display();
+
+     displayBatt();
+     heltec_delay(3000);
+
+     display.clear();
+     display.setFont(ArialMT_Plain_10);
+     display.setTextAlignment(TEXT_ALIGN_CENTER);
+     display.drawString(64, 22, "Tekan butang atas\nsekali untuk hantar\nmesej kecemasan.");
+     display.display();
+     heltec_delay(5000);
+     display.displayOff();
+   } else {
+     Serial.println("[MAMA] sendEmergency failed.");
+     displayID();
+     displayBatt();
+     display.setFont(ArialMT_Plain_10);
+     display.setTextAlignment(TEXT_ALIGN_CENTER);
+     display.drawString(64, 22, "Ralat. Tidak boleh\nhantar mesej kecemasan.");
+     display.display();
+   }
+   return true;
+ }
