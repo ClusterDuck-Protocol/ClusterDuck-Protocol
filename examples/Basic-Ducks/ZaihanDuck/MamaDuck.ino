@@ -1,11 +1,11 @@
 /**
  * @file MamaDuck.ino
  * @brief Implements a MamaDuck using the ClusterDuck Protocol (CDP).
- * 
- * This example firmware periodically sends sensor health data (counter and free memory) 
+ *
+ * This example firmware periodically sends sensor health data (counter and free memory)
  * through a CDP mesh network. It also relays messages that it receives from other ducks
  * that has not seen yet.
- * 
+ *
  * @date 2025-05-07
  */
 
@@ -43,6 +43,8 @@
  void broadcast(const String& frame);
  void handleSOS(const String& body);
  void handleMsg(const String& body);
+ void handleMamaTalk(const String& body);
+ bool sendMamaTalk(const String& targetId, const String& msg, const String& mid = "");
  String extractField(const String& body, const String& key);
  void sendFrame(const String& frame);
  
@@ -268,6 +270,46 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
             // Forward to connected phone via USB serial and BLE
             broadcast(String("CDK:BCAST,TEXT:") + message);
             break;
+        case 25:
+            Serial.println("Personal message: " + message);
+            broadcast(String("CDK:PMSG:,TEXT:") + message);
+            break;
+
+        case 26:  // MamaDuck-to-MamaDuck (MTALK)
+            Serial.println("[MTALK] Received: " + message);
+            if (message.startsWith("[MACK:")) {
+              // ── Delivery receipt coming back to the original sender ───────
+              // Forward to app: CDK:MACK,ID:<mid>,FROM:<senderDuckId>
+              int end = message.indexOf(']', 6);
+              String ackId = (end > 6) ? message.substring(6, end) : "";
+              String senderId = String((char*)packet.sduid.data(), 8);
+              broadcast("CDK:MACK,ID:" + ackId + ",FROM:" + senderId);
+            } else {
+              // ── Incoming message ─────────────────────────────────────────
+              // Strip optional ",MID:<4chars>" suffix embedded by sender firmware.
+              String text = message;
+              String mid  = "";
+              int midIdx = message.lastIndexOf(",MID:");
+              if (midIdx >= 0 && (int)(message.length() - midIdx) == 9) {
+                mid  = message.substring(midIdx + 5);
+                text = message.substring(0, midIdx);
+              }
+              // Extract sender duck ID from the LoRa packet source field.
+              String senderId = String((char*)packet.sduid.data(), 8);
+              // Deliver to the connected app with sender info and MID (if any).
+              String frameOut = "CDK:MTALK,TEXT:" + text + ",FROM:" + senderId;
+              if (mid.length() > 0) frameOut += ",MID:" + mid;
+              broadcast(frameOut);
+              // Send targeted delivery receipt back to the original sender.
+              if (mid.length() > 0) {
+                std::array<uint8_t, 8> senderDuid;
+                for (int i = 0; i < 8; i++) senderDuid[i] = packet.sduid[i];
+                String mack = "[MACK:" + mid + "]";
+                duck.sendData(26, std::string(mack.c_str()), senderDuid);
+                Serial.println("[MTALK] MACK sent back to " + senderId);
+              }
+            }
+            break;
     }
  }
 
@@ -389,12 +431,21 @@ void handleFrame(const String& line) {
   int comma = body.indexOf(',');
   String type = (comma == -1) ? body : body.substring(0, comma);
 
-  if (type == "SOS") {
-    handleSOS(body);
-  } else if (type == "MSG") {
-    handleMsg(body);
+  // C++ can't switch on strings; map type to enum first
+  enum FrameType { FT_UNKNOWN, FT_SOS, FT_MSG, FT_PING, FT_MTALK };
+  FrameType ft = FT_UNKNOWN;
+  if      (type == "SOS")   ft = FT_SOS;
+  else if (type == "MSG")   ft = FT_MSG;
+  else if (type == "PING")  ft = FT_PING;
+  else if (type == "MTALK") ft = FT_MTALK;
+
+  switch (ft) {
+    case FT_SOS:   handleSOS(body);       break;
+    case FT_MSG:   handleMsg(body);       break;
+    case FT_PING:  /* ID already broadcast above */ break;
+    case FT_MTALK: handleMamaTalk(body);  break;
+    default:       break;
   }
-  // Add more types here as needed
 }
 
 void handleSOS(const String& body) {
@@ -431,6 +482,40 @@ void handleMsg(const String& body) {
   } else {
     Serial.println("[MAMA] send failed.");
   }
+}
+
+bool sendMamaTalk(const String& targetId, const String& msg, const String& mid) {
+  if (targetId.length() != 8) {
+    Serial.println("[MTALK] ERROR: targetId must be exactly 8 characters.");
+    return false;
+  }
+  std::array<uint8_t, 8> targetDuid = duckutils::stringToArray<uint8_t, 8>(std::string(targetId.c_str()));
+  // Embed the MID as a trailing ",MID:<id>" suffix so the receiver can echo it
+  // back as a targeted delivery receipt ([MACK:<id>] on topic 26).
+  String payload = msg;
+  if (mid.length() > 0) payload += ",MID:" + mid;
+  int failure = duck.sendData(26, std::string(payload.c_str()), targetDuid);
+  if (!failure) {
+    Serial.println("[MAMA] MTALK sent to " + targetId + ": " + payload);
+    broadcast("CDK:ACK,ID:MTALK,TARGET:" + targetId);
+  } else {
+    Serial.println("[MAMA] MTALK send failed.");
+  }
+  return !failure;
+}
+
+void handleMamaTalk(const String& body) {
+  String target = extractField(body, "TARGET");
+  String text   = extractField(body, "TEXT");
+  String mid    = extractField(body, "MID");
+  Serial.print("[MTALK] target="); Serial.print(target);
+  Serial.print(" text="); Serial.print(text);
+  Serial.print(" mid="); Serial.println(mid);
+  if (target.length() == 0) {
+    Serial.println("[MTALK] ERROR: missing TARGET field.");
+    return;
+  }
+  sendMamaTalk(target, text, mid);
 }
 
 String extractField(const String& body, const String& key) {
