@@ -36,13 +36,11 @@ PapaDuck duck(THINGNAME);
 int QUEUE_SIZE_MAX = 5;
 auto timer = timer_create_default();
 bool retry = true; 
-const char commandTopic[] = "iot-2/cmd/+/fmt/+";
 
 // --- Function Declarations ---
 std::queue<std::vector<byte>> packetQueue;
 int quackJson(CdpPacket packet);
 void handleDuckData(CdpPacket receivedPacket);
-void dmsCmdReceived(char* topic, byte* payload, unsigned int payloadLength);
 void mqttConnect();
 void subscribeTo(const char* topic);
 bool enableRetry(void*);
@@ -50,7 +48,7 @@ void publishQueue();
 
 // --- WIFI Setup Function ---
 WiFiClientSecure wifiClient;
-PubSubClient client(AWS_IOT_ENDPOINT, 8883, dmsCmdReceived, wifiClient);
+PubSubClient client(AWS_IOT_ENDPOINT, 8883, wifiClient);
 
 /**
  * @brief Converts a received CDP packet into JSON format and publishes it to an MQTT topic.
@@ -132,8 +130,6 @@ void handleDuckData(CdpPacket receivedPacket) {
       Serial.println(packetQueue.size());
     }
   }
-
-  subscribeTo(commandTopic);
 }
 
 /**
@@ -183,48 +179,6 @@ void loop() {
 
 }
 
-void dmsCmdReceived(char* topic, byte* payload, unsigned int payloadLength) {
-  Serial.print("[PAPA] DMS Command Received: invoked for topic: "); Serial.println(topic);
-
-  if (std::string(topic).find(CMD_STATE_WIFI) > 0) {
-    Serial.println("[PAPA] Start WiFi Command");
-    byte sCmd = 1;
-    std::vector<byte> sValue = {payload[0]};
-
-    if(payloadLength > 3) {
-      std::string destination = "";
-      for (int i=0; i<payloadLength; i++) {
-        destination += (char)payload[i];
-      }
-
-        std::array<byte,8> dDevId;
-        std::copy(destination.begin(), destination.end(), dDevId.begin());
-
-      // duck.sendCommand(sCmd, sValue, dDevId);
-    } //else {
-      // duck.sendCommand(sCmd, sValue);
-    // }
-  } else if (std::string(topic).find(CMD_STATE_HEALTH) > 0) {
-    byte sCmd = 0;
-    std::vector<byte> sValue = {payload[0]};
-    if(payloadLength >= 8) {
-      std::string destination = "";
-      for (int i=1; i<payloadLength; i++) {
-        destination += (char)payload[i];
-      }
-
-      std::array<byte,8> dDevId;
-      std::copy(destination.begin(), destination.end(), dDevId.begin());
-
-      // duck.sendCommand(sCmd, sValue, dDevId);
-
-    } else {
-      Serial.println("[PAPA] Payload size too small");
-    }
-  } else {
-    Serial.print("[PAPA] dmsCmdReceived: unexpected topic: "); Serial.println(topic);
-  }
-}
 void mqttConnect() {
    if (!!!client.connected()) {
       Serial.print("[PAPA] Reconnecting MQTT client to "); Serial.println(AWS_IOT_ENDPOINT);
@@ -238,8 +192,6 @@ void mqttConnect() {
       if(packetQueue.size() > 0) {
          publishQueue();
       }
-      //Subscribe to command topic to receive commands from cloud
-      subscribeTo(commandTopic);
    }
 }
 
