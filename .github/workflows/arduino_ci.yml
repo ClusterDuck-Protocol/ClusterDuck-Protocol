@@ -56,14 +56,14 @@ jobs:
         EXAMPLE_DIR=Basic-Ducks/DuckLink platformio run -e local_lilygo_t_beam_sx1262
         EXAMPLE_DIR=Basic-Ducks/MamaDuck platformio run -e local_lilygo_t_beam_sx1262
     - name: Release Build
-      if: startsWith(github.ref, 'refs/heads/release')
+      if: startsWith(github.head_ref, 'release') || github.ref_type == 'tag'
       run: |
         EXAMPLE_DIR=Basic-Ducks/PapaDuck platformio run -e local_lilygo_t_beam_sx1262
         EXAMPLE_DIR=Basic-Ducks/DetectorDuck platformio run -e local_lilygo_t_beam_sx1262
     - name: Lint Preparation
       run: rm -rf .pio
     - name: Arduino Registry Lint
-      if: startsWith(github.ref, 'refs/heads/release')
+      if: startsWith(github.head_ref, 'release') || github.ref_type == 'tag'
       uses: arduino/arduino-lint-action@v2
       with:
         library-manager: update
