@@ -8,7 +8,7 @@
         "email": "cdp@owlintegrations.com",
         "url": "https://clusterduckprotocol.org/"
     },
-    "version": "5.0.0",
+    "version": "5.0.1",
     "repository":
     {
         "type": "git",
