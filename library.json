@@ -29,9 +29,9 @@
     ],
     "dependencies": {
         "contrem/arduino-timer": "^3.0.1",
-        "bblanchon/ArduinoJson": "^7.0.3",
-        "bakercp/CRC32": "2.0.0",
-        "jgromes/RadioLib": "^7.1.2",
+        "bblanchon/ArduinoJson": "^7.4.3",
+        "bakercp/CRC32": "2.0.1",
+        "jgromes/RadioLib": "^7.6.0",
         "knolleary/PubSubClient":"^2.8",
         "fastled/FastLED": "^3.10.3"
     }
