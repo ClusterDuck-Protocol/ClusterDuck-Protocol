@@ -17,7 +17,6 @@
 
 // Setup for W2812 (LED)
 #define LED_TYPE WS2812
-#define DATA_PIN 4
 #define NUM_LEDS 1
 #define COLOR_ORDER GRB
 #define BRIGHTNESS  128
@@ -50,7 +49,7 @@ void setup() {
   timer.every(INTERVAL_MS, pingHandler);
 
   // Setup the LED
-  FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalSMD5050 );
+  FastLED.addLeds<LED_TYPE, CDPCFG_PIN_LED1, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalSMD5050 );
   FastLED.setBrightness(  BRIGHTNESS );
   leds[0] = CRGB::Gold;
   FastLED.show();

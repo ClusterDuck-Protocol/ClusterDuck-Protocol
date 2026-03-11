@@ -77,7 +77,7 @@ After you have the pins you need, they should be defined in the board file like 
 #define CDPCFG_PIN_BAT 35
 #define CDPCFG_BAT_MULDIV 200 / 100
 
-#define CDPCFG_PIN_LED1 25
+#define CDPCFG_PIN_LED1 4
 
 // LoRa configuration
 #define CDPCFG_PIN_LORA_CS 18

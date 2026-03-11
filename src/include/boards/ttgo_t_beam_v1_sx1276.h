@@ -13,7 +13,7 @@
 #define CDP_BOARD_NAME "TTGO LoRa32 V1 (SX1276)"
 
 
-#define CDPCFG_PIN_LED1 25
+#define CDPCFG_PIN_LED1 4
 
 // LoRa configuration
 #define CDPCFG_PIN_LORA_CS 18

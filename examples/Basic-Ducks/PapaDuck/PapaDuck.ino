@@ -13,6 +13,15 @@
 #include <WiFiClientSecure.h>
 #include <queue>
 
+// Setup for W2812 (LED)
+#include <FastLED.h>
+#include <pixeltypes.h>
+#define LED_TYPE WS2812
+#define NUM_LEDS 1
+#define COLOR_ORDER GRB
+#define BRIGHTNESS  128
+CRGB leds[NUM_LEDS];
+
 // --- WIFI Configuration ---
 const std::string WIFI_SSID="";         // Replace with WiFi SSID
 const std::string WIFI_PASS="";     // Replace with WiFi Password
@@ -202,6 +211,12 @@ void handleDuckData(CdpPacket receivedPacket) {
  * - Sets up MQTT client.
  */
 void setup() {
+  // Initialize LED
+  FastLED.addLeds<LED_TYPE, CDPCFG_PIN_LED1, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalSMD5050 );
+  FastLED.setBrightness(BRIGHTNESS);
+  leds[0] = CRGB::Cyan;
+  FastLED.show();
+
   // Set the CA cert for the WiFi client
   wifiClient.setCACert(mosquitto_ca_cert);
 
@@ -220,7 +235,12 @@ void setup() {
   
   if (!setup_mqtt()) {
     setupOK = false;
+    leds[0] = CRGB::Red;
+    FastLED.show();
     return;
+  } else {
+    leds[0] = CRGB::Gold;
+    FastLED.show();
   }
    
   Serial.printf("[HUB] Ready!\n");

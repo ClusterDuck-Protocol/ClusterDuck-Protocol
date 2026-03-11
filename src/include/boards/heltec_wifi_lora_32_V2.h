@@ -9,7 +9,7 @@
 
 #define CDPCFG_PIN_VEXT 21
 
-#define CDPCFG_PIN_LED1 25
+#define CDPCFG_PIN_LED1 13
 
 // LoRa configuration
 #define CDPCFG_PIN_LORA_CS      18
