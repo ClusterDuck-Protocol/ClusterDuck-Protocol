@@ -12,9 +12,20 @@
  #include <string>
  #include <arduino-timer.h>
  #include <CDP.h>
+
  #ifdef SERIAL_PORT_USBVIRTUAL
  #define Serial SERIAL_PORT_USBVIRTUAL
  #endif
+
+
+// Setup for W2812 (LED)
+#include <FastLED.h>
+#include <pixeltypes.h>
+#define LED_TYPE WS2812
+#define NUM_LEDS 1
+#define COLOR_ORDER GRB
+#define BRIGHTNESS  128
+CRGB leds[NUM_LEDS];
  
  // --- Function Declarations ---
  bool runSensor(void *);
@@ -34,11 +45,21 @@
   * - Sets up periodic execution of sensor data transmissions.
   */
  void setup() {
+  // Initialize LED
+  FastLED.addLeds<LED_TYPE, CDPCFG_PIN_LED1, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalSMD5050 );
+  FastLED.setBrightness(BRIGHTNESS);
+  leds[0] = CRGB::Cyan;
+  FastLED.show();
  
    if (duck.setupWithDefaults() != DUCK_ERR_NONE) {
-     Serial.println("[MAMA] Failed to setup MamaDuck");
-     return;
-   }
+      Serial.println("[MAMA] Failed to setup MamaDuck");
+      leds[0] = CRGB::Red;
+      FastLED.show();
+      return;
+    } else { 
+      leds[0] = CRGB::Gold;
+      FastLED.show();
+    }
  
    timer.every(INTERVAL_MS, runSensor); // Triggers runSensor every INTERVAL_MS
    

@@ -31,6 +31,15 @@
 #define CMD_STATE_HEALTH "/health/"
 #define CMD_STATE_CHANNEL "/channel/"
 
+// Setup for W2812 (LED)
+#include <FastLED.h>
+#include <pixeltypes.h>
+#define LED_TYPE WS2812
+#define NUM_LEDS 1
+#define COLOR_ORDER GRB
+#define BRIGHTNESS  128
+CRGB leds[NUM_LEDS];
+
 // --- Global Objects ---
 PapaDuck duck(THINGNAME);
 int QUEUE_SIZE_MAX = 5;
@@ -144,6 +153,12 @@ void handleDuckData(CdpPacket receivedPacket) {
  * the ClusterDuck mesh and MQTT forwarding system.
  */
 void setup() {
+  // Initialize LED
+  FastLED.addLeds<LED_TYPE, CDPCFG_PIN_LED1, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalSMD5050 );
+  FastLED.setBrightness(BRIGHTNESS);
+  leds[0] = CRGB::Cyan;
+  FastLED.show();
+
   duck.setupWithDefaults();
   duck.joinWifiNetwork(WIFI_SSID, WIFI_PASSWORD);
   
@@ -165,11 +180,15 @@ void setup() {
 void loop() {
   
   if (!duck.isWifiConnected() && retry) {
+    leds[0] = CRGB::Red;
+    FastLED.show();
     duck.joinWifiNetwork(WIFI_SSID, WIFI_PASSWORD);
   }
 
   if (!client.loop()) {
     if(duck.isWifiConnected()) {
+      leds[0] = CRGB::Gold;
+      FastLED.show();
       mqttConnect();
     }
   }
@@ -183,14 +202,19 @@ void mqttConnect() {
    if (!!!client.connected()) {
       Serial.print("[PAPA] Reconnecting MQTT client to "); Serial.println(AWS_IOT_ENDPOINT);
       if(!!!client.connect(THINGNAME) && retry) {
-         Serial.print("[PAPA] Connection failed, retry in 5 seconds");
-         retry = false;
-         timer.in(5000, enableRetry);
+        leds[0] = CRGB::Red;
+        FastLED.show();
+        Serial.print("[PAPA] Connection failed, retry in 5 seconds");
+        retry = false;
+        timer.in(5000, enableRetry);
       }
       Serial.println();
    } else {
+    
       if(packetQueue.size() > 0) {
-         publishQueue();
+        leds[0] = CRGB::Gold;
+        FastLED.show();
+        publishQueue();
       }
    }
 }
