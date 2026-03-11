@@ -19,23 +19,19 @@
     "license": "Apache-2.0",
     "export": {
         "include": [
-            "src/*.cpp",
-            "src/*.h", 
-            "src/Ducks/**",
-            "src/include/**",            
+            "src/**",           
             "tools/**",
-            "examples/1.Ducks/**"
+            "examples/**"
         ]
     },
     "examples": [
-        "examples/*/*.ino"
+        "examples/**"
     ],
     "dependencies": {
         "contrem/arduino-timer": "^3.0.1",
         "bblanchon/ArduinoJson": "^7.0.3",
         "bakercp/CRC32": "2.0.0",
         "jgromes/RadioLib": "^7.1.2",
-        "mathieucarbou/ESP Async WebServer": "^2.7.0",
         "knolleary/PubSubClient":"^2.8",
         "fastled/FastLED": "^3.10.3"
     }
