@@ -1,6 +1,6 @@
 #ifndef DUCKLOGGER_H
 #define DUCKLOGGER_H
-
+#include "tinyformat.h"
 
 #ifdef CDP_DEBUG
 #define CDP_LOG_ERROR
@@ -67,14 +67,13 @@ static size_t cdpPrintf(const char *format, ...) {
   do {                                                          \
     cdpPrintf("[E]");                                           \
     cdpPrintf("[** %s : %d] ",__FILENAME__, __LINE__);          \
-    cdpPrintf(format, ##__VA_ARGS__);                           \
+    tfm::format(format, ##__VA_ARGS__);                           \
   } while (0)
-
 #define logerr_ln(format, ...)                                  \
   do {                                                          \
     cdpPrintf("[E]");                                           \
     cdpPrintf("[** %s : %d] ",__FILENAME__, __LINE__);          \
-    cdpPrintf(format, ##__VA_ARGS__);cdpPrintf("\n");           \
+    tfm::format(format, ##__VA_ARGS__);cdpPrintf("\n");           \
   } while (0)
 #else
 #define logerr(format, ...)                                     \
@@ -88,15 +87,15 @@ static size_t cdpPrintf(const char *format, ...) {
 #define logwarn(format, ...)                                    \
   do {                                                          \
     cdpPrintf("[W]");                                           \
-    cdpPrintf("[%s : %d] ",__FILENAME__, __LINE__);              \
-    cdpPrintf(format, ##__VA_ARGS__);                           \
+    cdpPrintf("[%s : %d] ",__FILENAME__, __LINE__);             \
+    tfm::format(format, ##__VA_ARGS__);                           \
   } while (0)
 
 #define logwarn_ln(format, ...)                                 \
   do {                                                          \
     cdpPrintf("[W]");                                           \
-    cdpPrintf("[%s : %d] ",__FILENAME__, __LINE__);              \
-    cdpPrintf(format, ##__VA_ARGS__);cdpPrintf("\n");           \
+    cdpPrintf("[%s : %d] ",__FILENAME__, __LINE__);             \
+    tfm::format(format, ##__VA_ARGS__);cdpPrintf("\n");           \
   } while (0)
 #else
 #define logwarn(format, ...)                                    \
@@ -110,14 +109,14 @@ static size_t cdpPrintf(const char *format, ...) {
   do {                                                          \
     cdpPrintf("[I]");                                           \
     cdpPrintf("[%s] ",__FILENAME__);                            \
-    cdpPrintf(format, ##__VA_ARGS__);                           \
+    tfm::format(format, ##__VA_ARGS__);                           \
   } while (0)
 
 #define loginfo_ln(format, ...)                                 \
   do {                                                          \
     cdpPrintf("[I]");                                           \
     cdpPrintf("[%s] ",__FILENAME__);                            \
-    cdpPrintf(format, ##__VA_ARGS__);cdpPrintf("\n");           \
+    tfm::format(format, ##__VA_ARGS__);cdpPrintf("\n");           \
   } while (0)
 #else
 #define loginfo(format, ...)                                    \
@@ -131,14 +130,14 @@ static size_t cdpPrintf(const char *format, ...) {
   do {                                                          \
     cdpPrintf("[D]");                                           \
     cdpPrintf("[** %s : %d] ",__FILENAME__, __LINE__);                            \
-    cdpPrintf(format, ##__VA_ARGS__);                           \
+    tfm::format(format, ##__VA_ARGS__);                           \
   } while (0)
 
 #define logdbg_ln(format, ...)                                  \
   do {                                                          \
     cdpPrintf("[D]");                                           \
-    cdpPrintf("[** %s : %d] ",__FILENAME__, __LINE__);                            \
-    cdpPrintf(format, ##__VA_ARGS__);cdpPrintf("\n");           \
+    cdpPrintf("[** %s : %d] ",__FILENAME__, __LINE__);          \
+    tfm::format(format, ##__VA_ARGS__);cdpPrintf("\n");           \
   } while (0)
 #else
 #define logdbg(format, ...)                                     \
