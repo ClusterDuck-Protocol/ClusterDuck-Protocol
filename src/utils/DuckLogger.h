@@ -30,10 +30,8 @@
 #endif
 
 
-#if defined(ARDUINO)
 #include "Arduino.h"
 #define OUTPUT_PORT Serial
-#else
 #define PORT std::cout
 #endif
 
