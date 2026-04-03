@@ -64,12 +64,12 @@ static size_t cdpPrintf(const char *format, ...) {
 #define logerr(format, ...)                                     \
   do {                                                          \
     cdpPrintf("[E][** %s : %d] ",__FILENAME__, __LINE__);          \
-    tfm::format(format, ##__VA_ARGS__);                         \
+    tfm::printf(format, ##__VA_ARGS__);                         \
   } while (0)
 #define logerr_ln(format, ...)                                  \
   do {                                                          \
     cdpPrintf("[E][** %s : %d] ",__FILENAME__, __LINE__);          \
-    tfm::format(format"\n", ##__VA_ARGS__);        \
+    tfm::printf(format"\n", ##__VA_ARGS__);        \
   } while (0)
 #else
 #define logerr(format, ...)                                     \
