@@ -3,7 +3,7 @@
 
 #ifdef CDPCFG_WIFI_NONE
  #pragma info "WARNING: WiFi is disabled. DuckNet will not be available."
-#endif
+#else
 
 #include "../utils/DuckError.h"
 #include "../utils/DuckLogger.h"
