@@ -33,7 +33,6 @@
 #include "Arduino.h"
 #define OUTPUT_PORT Serial
 #define PORT std::cout
-#endif
 
 
 // https://github.com/esp8266/Arduino/blob/65579d29081cb8501e4d7f786747bf12e7b37da2/cores/esp8266/Print.cpp#L50
