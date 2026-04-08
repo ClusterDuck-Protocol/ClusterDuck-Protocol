@@ -60,3 +60,4 @@ class DuckWifi {
         int loadWiFiCredentials();
 };
 #endif
+#endif
