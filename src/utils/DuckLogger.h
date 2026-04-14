@@ -95,7 +95,7 @@
 
 #define logdbg_ln(format, ...)                                  \
   do {                                                          \
-    cdpPrintf("[D][** %s : %d] ",__FILENAME__, __LINE__);          \
+    tfm::printf("[D][** %s : %d] ",__FILENAME__, __LINE__);          \
     tfm::printfln(format, ##__VA_ARGS__);          \
   } while (0)
 #else
