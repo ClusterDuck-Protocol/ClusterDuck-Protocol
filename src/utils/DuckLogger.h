@@ -51,14 +51,14 @@
 #ifdef CDP_LOG_WARN
 #define logwarn(format, ...)                                    \
   do {                                                          \
-    cdpPrintf("[W][%s : %d] ",__FILENAME__, __LINE__);          \
+    tfm::printf("[W][%s : %d] ",__FILENAME__, __LINE__);          \
     tfm::printf(format, ##__VA_ARGS__);                         \
   } while (0)
 
 #define logwarn_ln(format, ...)                                 \
   do {                                                          \
-    cdpPrintf("[W][%s : %d] ",__FILENAME__, __LINE__);             \
-    tfm::printf(format"\n", ##__VA_ARGS__);          \
+    tfm::printf("[W][%s : %d] ",__FILENAME__, __LINE__);             \
+    tfm::printfln(format"\n", ##__VA_ARGS__);          \
   } while (0)
 #else
 #define logwarn(format, ...)                                    \
