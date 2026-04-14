@@ -80,13 +80,13 @@ int quackJson(CdpPacket packet) {
   std::string dduid(packet.dduid.begin(), packet.dduid.end());
   std::string muid(packet.muid.begin(), packet.muid.end());
 
-  Serial.println("[PAPA] Packet Received:");
-  Serial.printf("[PAPA] sduid:   %s\n" , sduid.c_str());
-  Serial.printf("[PAPA] dduid:   %s\n" , dduid.c_str());
-  Serial.printf("[PAPA] muid:    %s\n" , muid.c_str());
-  Serial.printf("[PAPA] data:    %s\n" , payload.c_str());
-  Serial.printf("[PAPA] hops:    %s\n", std::to_string(packet.hopCount).c_str());
-  Serial.printf("[PAPA] duck:    %s\n" , std::to_string(packet.duckType).c_str());
+  loginfo_ln("[PAPA] Packet Received:");
+  loginfo("[PAPA] sduid:   %s\n" , sduid.c_str());
+  loginfo("[PAPA] dduid:   %s\n" , dduid.c_str());
+  loginfo("[PAPA] muid:    %s\n" , muid.c_str());
+  loginfo("[PAPA] data:    %s\n" , payload.c_str());
+  loginfo("[PAPA] hops:    %s\n", std::to_string(packet.hopCount).c_str());
+  loginfo("[PAPA] duck:    %s\n" , std::to_string(packet.duckType).c_str());
 
   doc["DeviceID"] = sduid;
   doc["MessageID"] = muid;
@@ -102,13 +102,13 @@ int quackJson(CdpPacket packet) {
   serializeJson(doc, jsonstat);
 
   if(client.publish(topic.c_str(), jsonstat.c_str())) {
-    Serial.println("[PAPA] Packet forwarded:");
+    loginfo_ln("[PAPA] Packet forwarded:");
     serializeJsonPretty(doc, Serial);
-    Serial.println("");
-    Serial.println("[PAPA] Publish ok");
+    loginfo_ln("");
+    loginfo_ln("[PAPA] Publish ok");
     return 0;
   } else {
-    Serial.println("[PAPA] Publish failed");
+    loginfo_ln("[PAPA] Publish failed");
     return -1;
   }
 }
@@ -123,7 +123,7 @@ int quackJson(CdpPacket packet) {
  * @param packetBuffer The received packet buffer
  */
 void handleDuckData(CdpPacket receivedPacket) {
-  Serial.printf("[PAPA] got packet");
+  loginfo_ln("[PAPA] got packet");
 
   if (receivedPacket.topic != reservedTopic::ack && 
       receivedPacket.topic != reservedTopic::rrep && 
@@ -136,7 +136,7 @@ void handleDuckData(CdpPacket receivedPacket) {
         packetQueue.push(receivedPacket.data);
       }
       Serial.print("[PAPA] New size of queue: ");
-      Serial.println(packetQueue.size());
+      loginfo_ln(packetQueue.size());
     }
   }
 }
@@ -165,16 +165,16 @@ void setup() {
   duck.onReceiveDuckData(handleDuckData);     // Callback handling incoming data from the network
 
   #ifdef CA_CERT
-  Serial.println("[PAPA] Using root CA cert");
+  loginfo_ln("[PAPA] Using root CA cert");
   wifiClient.setCACert(AWS_CERT_CA);
   wifiClient.setCertificate(AWS_CERT_CRT);
   wifiClient.setPrivateKey(AWS_CERT_PRIVATE);
   #else
-  Serial.println("[PAPA] Using insecure TLS");
+  loginfo_ln("[PAPA] Using insecure TLS");
   wifiClient.setInsecure();
   #endif
   
-  Serial.println("[PAPA] Setup OK! ");
+  loginfo_ln("[PAPA] Setup OK! ");
 }
 
 void loop() {
@@ -200,7 +200,7 @@ void loop() {
 
 void mqttConnect() {
    if (!!!client.connected()) {
-      Serial.print("[PAPA] Reconnecting MQTT client to "); Serial.println(AWS_IOT_ENDPOINT);
+      Serial.print("[PAPA] Reconnecting MQTT client to "); loginfo_ln(AWS_IOT_ENDPOINT);
       if(!!!client.connect(THINGNAME) && retry) {
         leds[0] = CRGB::Red;
         FastLED.show();
@@ -208,7 +208,7 @@ void mqttConnect() {
         retry = false;
         timer.in(5000, enableRetry);
       }
-      Serial.println();
+      loginfo_ln();
    } else {
     
       if(packetQueue.size() > 0) {
@@ -222,9 +222,9 @@ void mqttConnect() {
 void subscribeTo(const char* topic) {
  Serial.print("[PAPA] subscribe to "); Serial.print(topic);
  if (client.subscribe(topic)) {
-   Serial.println(" OK");
+   loginfo_ln(" OK");
  } else {
-   Serial.println(" FAILED");
+   loginfo_ln(" FAILED");
  }
 }
 
@@ -238,7 +238,7 @@ void publishQueue() {
     if(quackJson(packetQueue.front()) == 0) {
       packetQueue.pop();
       Serial.print("[PAPA] Queue size: ");
-      Serial.println(packetQueue.size());
+      loginfo_ln(packetQueue.size());
     } else {
       return;
     }

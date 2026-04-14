@@ -83,22 +83,22 @@ bool setup_mqtt(void)
         return false;
     }
     
-    Serial.println("[HUB] MQTT client connecting to broker...");
+    loginfo_ln("[HUB] MQTT client connecting to broker...");
 
     // Connect to the MQTT broker with the client ID only
     // If you need to use a username and password, use the connect method with 3 parameters below
     // boolean mqttClient.connect(const char *id, const char *user, const char *pass) 
     connected = mqttClient.connect(MQTT_CLIENT_ID);
     if (!connected) {
-        Serial.println("[HUB] ERROR - Failed to connect to MQTT broker");
+        loginfo_ln("[HUB] ERROR - Failed to connect to MQTT broker");
         return false;
     }
 
-    Serial.println("[HUB] MQTT client connected");
+    loginfo_ln("[HUB] MQTT client connected");
 
     // This is an example if you want to subscribe to an incoming topic
     if (!mqttClient.subscribe(mqttSubTopic.c_str(),0)) {
-        Serial.println("[HUB] ERROR - Failed to subscribe to topic");
+        loginfo_ln("[HUB] ERROR - Failed to subscribe to topic");
         return false;
     }
     
@@ -113,8 +113,8 @@ void mqtt_callback(char* topic, byte* message, unsigned int length) {
   // Convert byte array to std::string
   std::string msg(message, message + length);
 
-  Serial.printf("[HUB] Message arrived on topic: %s\n", topic);
-  Serial.printf("[HUB] queuing msg: %s\n", msg.c_str());
+  loginfo("[HUB] Message arrived on topic: %s\n", topic);
+  loginfo("[HUB] queuing msg: %s\n", msg.c_str());
  
   // Push the raw message
   mqttMessageQueue.push(msg);
@@ -129,8 +129,8 @@ void handleIncomingMqttMessages(void) {
     JsonDocument doc;
     DeserializationError err = deserializeJson(doc, rawMessage);
     if (err) {
-      Serial.print("[HUB] deserializeJson() failed with code: ");
-      Serial.println(err.c_str());
+      loginfo("[HUB] deserializeJson() failed with code: ");
+      loginfo_ln(err.c_str());
       continue;
     }
     std::string jsonstat;
@@ -147,13 +147,13 @@ void processMessageFromDucks(CdpPacket cdp_packet) {
 
     int messageLength = cdp_packet.data.size();
 
-    Serial.printf("Packet data size=%d\n", messageLength);
+    loginfo("Packet data size=%d\n", messageLength);
 
     std::string muid(cdp_packet.muid.begin(), cdp_packet.muid.end());
     std::string sduid(cdp_packet.sduid.begin(), cdp_packet.sduid.end());
     std::string cdpTopic = cdp_packet.topicToString();
 
-    Serial.printf("[HUB] got topic: %s from %s\n",cdpTopic.c_str(), sduid.c_str());
+    loginfo("[HUB] got topic: %s from %s\n",cdpTopic.c_str(), sduid.c_str());
  
     // Counter Message
     std::string payload(cdp_packet.data.begin(), cdp_packet.data.end());
@@ -176,29 +176,29 @@ void processMessageFromDucks(CdpPacket cdp_packet) {
        
     std::string jsonstat;
     serializeJson(doc, jsonstat);
-    Serial.printf("%s\n",jsonstat.c_str());
+    loginfo("%s\n",jsonstat.c_str());
 
     if (hub.isWifiConnected()) {
       setup_mqtt();  
       if (mqttClient.publish(mqttPubTopic.c_str(), jsonstat.c_str(), jsonstat.length())) {
-        Serial.println("[HUB] Packet forwarded:");
+        loginfo_ln("[HUB] Packet forwarded:");
         serializeJsonPretty(doc, Serial);
-        Serial.println("");
-        Serial.println("[HUB] Publish ok");
+        loginfo_ln("");
+        loginfo_ln("[HUB] Publish ok");
         
       } else {
-        Serial.println("[HUB] Publish failed");
+        loginfo_ln("[HUB] Publish failed");
       }
 
     } else {
-      Serial.println("[HUB] ERROR No WiFi connection!!!");
+      loginfo_ln("[HUB] ERROR No WiFi connection!!!");
     }
 }
 
 // The callback method simply takes the incoming packet and
 // converts it to a JSON string, before sending it out over MQTT
 void handleDuckData(CdpPacket receivedPacket) {
-  Serial.println("[HUB] got packet");
+  loginfo_ln("[HUB] got packet");
   processMessageFromDucks(receivedPacket);
 }
 
@@ -243,7 +243,7 @@ void setup() {
     FastLED.show();
   }
    
-  Serial.printf("[HUB] Ready!\n");
+  loginfo("[HUB] Ready!\n");
 }
 
 /**

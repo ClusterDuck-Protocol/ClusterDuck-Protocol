@@ -52,7 +52,7 @@ CRGB leds[NUM_LEDS];
   FastLED.show();
  
    if (duck.setupWithDefaults() != DUCK_ERR_NONE) {
-      Serial.println("[MAMA] Failed to setup MamaDuck");
+      loginfo_ln("[MAMA] Failed to setup MamaDuck");
       leds[0] = CRGB::Red;
       FastLED.show();
       return;
@@ -64,7 +64,7 @@ CRGB leds[NUM_LEDS];
    timer.every(INTERVAL_MS, runSensor); // Triggers runSensor every INTERVAL_MS
    
    setupOK = true;
-   Serial.println("[MAMA] Setup OK!");
+   loginfo_ln("[MAMA] Setup OK!");
  }
  
  /**
@@ -94,15 +94,15 @@ CRGB leds[NUM_LEDS];
    bool failure;
    
    std::string message = "C:" + std::to_string(counter) + "|" + "FM:" + std::to_string(freeMemory());
-   Serial.print("[MAMA] sensor data: ");
-   Serial.println(message.c_str());
+   loginfo("[MAMA] sensor data: ");
+   loginfo_ln(message.c_str());
  
    failure = duck.sendData(topics::health, message);
    if (!failure) {
      counter++;
-     Serial.println("[MAMA] runSensor ok.");
+     loginfo_ln("[MAMA] runSensor ok.");
    } else {
-     Serial.println("[MAMA] runSensor failed.");
+     loginfo_ln("[MAMA] runSensor failed.");
    }
    return true;
  }
