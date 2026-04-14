@@ -29,36 +29,6 @@
   (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 #endif
 
-
-#include "Arduino.h"
-#define OUTPUT_PORT Serial
-#define PORT std::cout
-
-
-// https://github.com/esp8266/Arduino/blob/65579d29081cb8501e4d7f786747bf12e7b37da2/cores/esp8266/Print.cpp#L50
-static size_t cdpPrintf(const char *format, ...) {
-    va_list arg;
-    va_start(arg, format);
-    char temp[64];
-    char* buffer = temp;
-    size_t len = vsnprintf(temp, sizeof(temp), format, arg);
-    va_end(arg);
-    if (len > sizeof(temp) - 1) {
-        buffer = new (std::nothrow) char[len + 1];
-        if (!buffer) {
-            return 0;
-        }
-        va_start(arg, format);
-        vsnprintf(buffer, len + 1, format, arg);
-        va_end(arg);
-    }
-    len = OUTPUT_PORT.write((const uint8_t*) buffer, len);
-    if (buffer != temp) {
-        delete[] buffer;
-    }
-    return len;
-}
-
 #ifdef CDP_LOG_ERROR
 #define logerr(format, ...)                                     \
   do {                                                          \
