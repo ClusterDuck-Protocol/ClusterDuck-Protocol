@@ -87,19 +87,20 @@ bool pingHandler(void *) {
 void showSignalQuality(int incoming) {
   int rssi = incoming;
   loginfo("[DETECTOR] RSSI value: ");
-  loginfo(rssi);
+  char buffer[10];
+  loginfo(itoa(rssi,buffer, 10));
 
   if (rssi > -95) {
     loginfo_ln(" - GOOD SIGNAL");
     leds[0] = CRGB::Green;
     FastLED.show();
   }
-  else if (rssi <= -95 && rssi > -108) {
+  else if (rssi > -108) {
     loginfo_ln(" - OKAY SIGNAL");
     leds[0] = CRGB::Blue;
     FastLED.show();
   }
-  else if (rssi <= -108 <= -118) {
+  else if (rssi > -118 ) {
     loginfo_ln(" - LOW SIGNAL");
     leds[0] = CRGB::Purple;
     FastLED.show();

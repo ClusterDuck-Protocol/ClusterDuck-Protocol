@@ -200,15 +200,14 @@ void loop() {
 
 void mqttConnect() {
    if (!!!client.connected()) {
-      Serial.print("[PAPA] Reconnecting MQTT client to "); loginfo_ln(AWS_IOT_ENDPOINT);
+      loginfo_ln("[PAPA] Reconnecting MQTT client to %s",AWS_IOT_ENDPOINT);
       if(!!!client.connect(THINGNAME) && retry) {
         leds[0] = CRGB::Red;
         FastLED.show();
-        Serial.print("[PAPA] Connection failed, retry in 5 seconds");
+        loginfo_ln("[PAPA] Connection failed, retry in 5 seconds");
         retry = false;
         timer.in(5000, enableRetry);
       }
-      loginfo_ln();
    } else {
     
       if(packetQueue.size() > 0) {
@@ -220,7 +219,7 @@ void mqttConnect() {
 }
 
 void subscribeTo(const char* topic) {
- Serial.print("[PAPA] subscribe to "); Serial.print(topic);
+ loginfo_ln("[PAPA] subscribe to %s",topic);
  if (client.subscribe(topic)) {
    loginfo_ln(" OK");
  } else {
@@ -237,8 +236,7 @@ void publishQueue() {
   while(!packetQueue.empty()) {
     if(quackJson(packetQueue.front()) == 0) {
       packetQueue.pop();
-      Serial.print("[PAPA] Queue size: ");
-      loginfo_ln(packetQueue.size());
+      loginfo_ln("[PAPA] Queue size: %i",packetQueue.size());
     } else {
       return;
     }

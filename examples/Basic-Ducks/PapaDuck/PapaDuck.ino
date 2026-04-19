@@ -15,6 +15,7 @@
 
 // Setup for W2812 (LED)
 #include <FastLED.h>
+#include <iostream>
 #include <pixeltypes.h>
 #define LED_TYPE WS2812
 #define NUM_LEDS 1
@@ -135,7 +136,7 @@ void handleIncomingMqttMessages(void) {
     }
     std::string jsonstat;
     serializeJson(doc, jsonstat);
-    serializeJsonPretty(doc, Serial);
+    serializeJsonPretty(doc, std::cout);
 
     // Process the topic and message here
   }
@@ -182,7 +183,7 @@ void processMessageFromDucks(CdpPacket cdp_packet) {
       setup_mqtt();  
       if (mqttClient.publish(mqttPubTopic.c_str(), jsonstat.c_str(), jsonstat.length())) {
         loginfo_ln("[HUB] Packet forwarded:");
-        serializeJsonPretty(doc, Serial);
+        serializeJsonPretty(doc, std::cout);
         loginfo_ln("");
         loginfo_ln("[HUB] Publish ok");
         
