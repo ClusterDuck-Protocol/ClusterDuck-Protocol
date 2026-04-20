@@ -184,7 +184,6 @@ void processMessageFromDucks(CdpPacket cdp_packet) {
       if (mqttClient.publish(mqttPubTopic.c_str(), jsonstat.c_str(), jsonstat.length())) {
         loginfo_ln("[HUB] Packet forwarded:");
         serializeJsonPretty(doc, std::cout);
-        loginfo_ln("");
         loginfo_ln("[HUB] Publish ok");
         
       } else {
