@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['port_0',['PORT',['../_duck_logger_8h.html#a614217d263be1fb1a5f76e2ff7be19a2',1,'DuckLogger.h']]]
+  ['rssi_5fmax_0',['RSSI_MAX',['../cdpcfg_8h.html#ab652764fbf40028378be3faf48507c99',1,'cdpcfg.h']]],
+  ['rssi_5fmin_1',['RSSI_MIN',['../cdpcfg_8h.html#ab50c48d5321c8e53337b36a5add64671',1,'cdpcfg.h']]]
 ];

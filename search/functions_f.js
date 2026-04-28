@@ -8,13 +8,15 @@ var searchData=
   ['sendrouteresponse_5',['sendRouteResponse',['../class_duck.html#a9a67a2d2ad45b6006a5d667e10fc150a',1,'Duck']]],
   ['serviceinterruptflags_6',['serviceInterruptFlags',['../class_duck_lo_ra.html#a889bd584b29b55901cb3d3214031028e',1,'DuckLoRa']]],
   ['setnetworkstate_7',['setNetworkState',['../class_duck_router.html#a3ad7b06ef6b4c9c9c902f7d4ded21cb8',1,'DuckRouter']]],
-  ['setpassword_8',['setpassword',['../class_duck_wifi_none.html#ac074e2bcf9b746ef93817bd16bfe2eeb',1,'DuckWifiNone::setPassword()'],['../class_duck_wifi.html#abd7cb951e424b919729d37018a7f5e99',1,'DuckWifi::setPassword(std::string val)']]],
+  ['setpassword_8',['setpassword',['../class_duck_wifi.html#abd7cb951e424b919729d37018a7f5e99',1,'DuckWifi::setPassword()'],['../class_duck_wifi_none.html#ac074e2bcf9b746ef93817bd16bfe2eeb',1,'DuckWifiNone::setPassword()']]],
   ['setssid_9',['setssid',['../class_duck_wifi.html#a676d6c7ee9aa91ef1d9f286950c08552',1,'DuckWifi::setSsid()'],['../class_duck_wifi_none.html#a1143bd8a6280364b124c71ec518dafa8',1,'DuckWifiNone::setSsid()']]],
   ['setuploraradio_10',['setupLoRaRadio',['../class_duck.html#a10801b2109985b1d1d3ff175ff1795e0',1,'Duck']]],
   ['setupradio_11',['setupRadio',['../class_duck_lo_ra.html#a57d049535a75ecc7b55ebb08a7daa5b1',1,'DuckLoRa']]],
   ['setupserial_12',['setupSerial',['../class_duck.html#aa8f9e3f37a1fd5213cace3de610416ce',1,'Duck']]],
   ['setupwithdefaults_13',['setupWithDefaults',['../class_duck.html#a4d99cc27966ace28ba4b17d39c66f104',1,'Duck']]],
-  ['startreceive_14',['startReceive',['../class_duck.html#a755f6defcaa6c7f10ce796922064987e',1,'Duck']]],
-  ['stringtoarray_15',['stringToArray',['../namespaceduckutils.html#a46c1f1a9161c53d8489a80aa75a2b8a8',1,'duckutils']]],
-  ['stringtobytevector_16',['stringToByteVector',['../namespaceduckutils.html#a942ad7b394b64c3ba7fef87c1b27e2a7',1,'duckutils']]]
+  ['spacefillifnotfinite_14',['spaceFillIfNotFinite',['../namespacetinyformat_1_1detail.html#ac3cb0c83aca0c39ba026189e61080761',1,'tinyformat::detail']]],
+  ['startreceive_15',['startReceive',['../class_duck.html#a755f6defcaa6c7f10ce796922064987e',1,'Duck']]],
+  ['streamstatefromformat_16',['streamStateFromFormat',['../namespacetinyformat_1_1detail.html#abbdd8c3b545f996b866bd22cf6aa444c',1,'tinyformat::detail']]],
+  ['stringtoarray_17',['stringToArray',['../namespaceduckutils.html#a46c1f1a9161c53d8489a80aa75a2b8a8',1,'duckutils']]],
+  ['stringtobytevector_18',['stringToByteVector',['../namespaceduckutils.html#a942ad7b394b64c3ba7fef87c1b27e2a7',1,'duckutils']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['timer_0',['Timer',['../classduckutils_1_1_timer.html',1,'duckutils']]]
+  ['papaduck_0',['PapaDuck',['../class_papa_duck.html',1,'']]]
 ];

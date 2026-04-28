@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['rssi_5fmax_0',['RSSI_MAX',['../cdpcfg_8h.html#ab652764fbf40028378be3faf48507c99',1,'cdpcfg.h']]],
-  ['rssi_5fmin_1',['RSSI_MIN',['../cdpcfg_8h.html#ab50c48d5321c8e53337b36a5add64671',1,'cdpcfg.h']]]
+  ['snr_5fmax_0',['SNR_MAX',['../cdpcfg_8h.html#ad13a6df57d1b67b66eaa52cf04c9c4b9',1,'cdpcfg.h']]],
+  ['snr_5fmin_1',['SNR_MIN',['../cdpcfg_8h.html#ac2040e558d08d0197a6eecfa0b08dcc5',1,'cdpcfg.h']]]
 ];

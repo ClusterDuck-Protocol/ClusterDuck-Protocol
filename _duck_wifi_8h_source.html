@@ -100,9 +100,9 @@ $(document).ready(function(){initNavTree('_duck_wifi_8h_source.html',''); initRe
 <a href="_duck_wifi_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#ifndef DUCKWIFI_H</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#define DUCKWIFI_H</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment">// #ifdef CDPCFG_WIFI_NONE</span></div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment">// #pragma info &quot;WARNING: WiFi is disabled. DuckNet will not be available.&quot;</span></div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment">// #else</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#ifdef CDPCFG_WIFI_NONE</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor"> #pragma info &quot;WARNING: WiFi is disabled. DuckNet will not be available.&quot;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#else</span></div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &quot;../utils/DuckError.h&quot;</span></div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &quot;../utils/DuckLogger.h&quot;</span></div>
@@ -131,7 +131,7 @@ $(document).ready(function(){initNavTree('_duck_wifi_8h_source.html',''); initRe
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>        <span class="keywordtype">int</span> loadWiFiCredentials();</div>
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>};</div>
 </div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span> </div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="preprocessor">#endif</span></div>
 <div class="ttc" id="aclass_duck_wifi_html"><div class="ttname"><a href="class_duck_wifi.html">DuckWifi</a></div><div class="ttdef"><b>Definition</b> DuckWifi.h:16</div></div>
 <div class="ttc" id="aclass_duck_wifi_html_a2d4f4470f8464a78da8a3eb74d3a8caf"><div class="ttname"><a href="class_duck_wifi.html#a2d4f4470f8464a78da8a3eb74d3a8caf">DuckWifi::reconnect</a></div><div class="ttdeci">int reconnect(std::string ssid, std::string password)</div><div class="ttdoc">reconnect the duck to the given wifi access point</div><div class="ttdef"><b>Definition</b> DuckWifi.cpp:3</div></div>

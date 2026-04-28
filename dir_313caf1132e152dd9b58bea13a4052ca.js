@@ -5,5 +5,6 @@ var dir_313caf1132e152dd9b58bea13a4052ca =
     [ "DuckUtils.cpp", "_duck_utils_8cpp.html", "_duck_utils_8cpp" ],
     [ "DuckUtils.h", "_duck_utils_8h.html", "_duck_utils_8h" ],
     [ "MemoryFree.cpp", "_memory_free_8cpp.html", "_memory_free_8cpp" ],
-    [ "MemoryFree.h", "_memory_free_8h.html", "_memory_free_8h" ]
+    [ "MemoryFree.h", "_memory_free_8h.html", "_memory_free_8h" ],
+    [ "tinyformat.h", "tinyformat_8h.html", "tinyformat_8h" ]
 ];

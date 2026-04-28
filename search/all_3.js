@@ -55,11 +55,13 @@ var searchData=
   ['cdpcfg_5fuuid_5flen_52',['CDPCFG_UUID_LEN',['../cdpcfg_8h.html#ae8f9a966c10a74fe57e8d30290d10227',1,'cdpcfg.h']]],
   ['cdpcfg_5fweb_5fport_53',['CDPCFG_WEB_PORT',['../cdpcfg_8h.html#a821294e2f6701503091a967cac63d2c9',1,'cdpcfg.h']]],
   ['clusterduck_20protocol_20info_54',['ClusterDuck Protocol Info',['../index.html',1,'']]],
-  ['connected_55',['connected',['../class_duck_wifi.html#a749c2ac3737419b06094d0d8a577ce60',1,'DuckWifi::connected()'],['../class_duck_wifi_none.html#a5c28a3ef1355e14d0f8eb939a15bb9ca',1,'DuckWifiNone::connected()']]],
+  ['connected_55',['connected',['../class_duck_wifi_none.html#a5c28a3ef1355e14d0f8eb939a15bb9ca',1,'DuckWifiNone::connected()'],['../class_duck_wifi.html#a749c2ac3737419b06094d0d8a577ce60',1,'DuckWifi::connected()']]],
   ['contribute_56',['How to Contribute',['../index.html#autotoc_md10',1,'']]],
   ['conversation_57',['Join the Conversation',['../index.html#autotoc_md11',1,'']]],
   ['convertreqtorep_58',['convertReqToRep',['../class_route_j_s_o_n.html#a11bb9a46022814972beb78fe082a3c42',1,'RouteJSON']]],
   ['converttohex_59',['convertToHex',['../namespaceduckutils.html#afe0c55ac9f352c8295641a6f50915b1b',1,'duckutils']]],
-  ['createuuid_60',['createUuid',['../namespaceduckutils.html#aff2e7f9ce8df861a748df8a3f84be721',1,'duckutils']]],
-  ['cullroutingtable_61',['CullRoutingTable',['../class_duck_router.html#a676d4c6e29c1803f5970daafb2067193',1,'DuckRouter']]]
+  ['converttoint_60',['convertToInt',['../structtinyformat_1_1detail_1_1convert_to_int.html',1,'tinyformat::detail']]],
+  ['converttoint_3c_20t_2c_20true_20_3e_61',['convertToInt&lt; T, true &gt;',['../structtinyformat_1_1detail_1_1convert_to_int_3_01_t_00_01true_01_4.html',1,'tinyformat::detail']]],
+  ['createuuid_62',['createUuid',['../namespaceduckutils.html#aff2e7f9ce8df861a748df8a3f84be721',1,'duckutils']]],
+  ['cullroutingtable_63',['CullRoutingTable',['../class_duck_router.html#a676d4c6e29c1803f5970daafb2067193',1,'DuckRouter']]]
 ];

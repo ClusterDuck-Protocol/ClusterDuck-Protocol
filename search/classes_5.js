@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['papaduck_0',['PapaDuck',['../class_papa_duck.html',1,'']]]
+  ['loraconfigparams_0',['LoRaConfigParams',['../struct_lo_ra_config_params.html',1,'']]]
 ];

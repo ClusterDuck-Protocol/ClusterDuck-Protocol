@@ -40,4 +40,16 @@ digraph "/home/runner/work/ClusterDuck-Protocol/ClusterDuck-Protocol/src/utils/D
   Node1 -> Node13 [id="edge17_Node000001_Node000013",color="steelblue1",style="solid",tooltip=" "];
   Node1 -> Node18 [id="edge18_Node000001_Node000018",color="steelblue1",style="solid",tooltip=" "];
   Node18 [id="Node000018",label="DuckLogger.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$_duck_logger_8h.html",tooltip=" "];
+  Node18 -> Node19 [id="edge19_Node000018_Node000019",color="steelblue1",style="solid",tooltip=" "];
+  Node19 [id="Node000019",label="tinyformat.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$tinyformat_8h.html",tooltip=" "];
+  Node19 -> Node20 [id="edge20_Node000019_Node000020",color="steelblue1",style="solid",tooltip=" "];
+  Node20 [id="Node000020",label="algorithm",height=0.2,width=0.4,color="grey60", fillcolor="#E0E0E0", style="filled",tooltip=" "];
+  Node19 -> Node21 [id="edge21_Node000019_Node000021",color="steelblue1",style="solid",tooltip=" "];
+  Node21 [id="Node000021",label="iostream",height=0.2,width=0.4,color="grey60", fillcolor="#E0E0E0", style="filled",tooltip=" "];
+  Node19 -> Node22 [id="edge22_Node000019_Node000022",color="steelblue1",style="solid",tooltip=" "];
+  Node22 [id="Node000022",label="sstream",height=0.2,width=0.4,color="grey60", fillcolor="#E0E0E0", style="filled",tooltip=" "];
+  Node19 -> Node23 [id="edge23_Node000019_Node000023",color="steelblue1",style="solid",tooltip=" "];
+  Node23 [id="Node000023",label="cmath",height=0.2,width=0.4,color="grey60", fillcolor="#E0E0E0", style="filled",tooltip=" "];
+  Node19 -> Node24 [id="edge24_Node000019_Node000024",color="steelblue1",style="solid",tooltip=" "];
+  Node24 [id="Node000024",label="cassert",height=0.2,width=0.4,color="grey60", fillcolor="#E0E0E0", style="filled",tooltip=" "];
 }

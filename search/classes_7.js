@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['signalscore_0',['SignalScore',['../struct_signal_score.html',1,'']]]
+  ['neighbor_0',['Neighbor',['../class_neighbor.html',1,'']]]
 ];
