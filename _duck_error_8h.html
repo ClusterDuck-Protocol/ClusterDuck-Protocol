@@ -90,7 +90,8 @@ $(document).ready(function(){initNavTree('_duck_error_8h.html',''); initResizabl
 
 <div class="header">
   <div class="summary">
-<a href="#define-members">Macros</a>  </div>
+<a href="#enum-members">Enumerations</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">DuckError.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -102,532 +103,166 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 <p><a href="_duck_error_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:af5b0c7002feba000355ea4d8d5ca7809" id="r_af5b0c7002feba000355ea4d8d5ca7809"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#af5b0c7002feba000355ea4d8d5ca7809">DUCK_ERR_NONE</a>&#160;&#160;&#160;0</td></tr>
-<tr class="memdesc:af5b0c7002feba000355ea4d8d5ca7809"><td class="mdescLeft">&#160;</td><td class="mdescRight">No Error.  <br /></td></tr>
-<tr class="separator:af5b0c7002feba000355ea4d8d5ca7809"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9dc0e55748578c30ca5331111219c7ee" id="r_a9dc0e55748578c30ca5331111219c7ee"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#a9dc0e55748578c30ca5331111219c7ee">DUCK_ERR_NOT_SUPPORTED</a>&#160;&#160;&#160;-5000</td></tr>
-<tr class="separator:a9dc0e55748578c30ca5331111219c7ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a015459825890dced6023d813d754a64a" id="r_a015459825890dced6023d813d754a64a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#a015459825890dced6023d813d754a64a">DUCK_ERR_SETUP</a>&#160;&#160;&#160;-5100</td></tr>
-<tr class="separator:a015459825890dced6023d813d754a64a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8f566352af9ed48f8b75bf83f2f4924e" id="r_a8f566352af9ed48f8b75bf83f2f4924e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#a8f566352af9ed48f8b75bf83f2f4924e">DUCK_ERR_INVALID_ARGUMENT</a>&#160;&#160;&#160;-5101</td></tr>
-<tr class="separator:a8f566352af9ed48f8b75bf83f2f4924e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af4b3564a7ee862912c4e9b561e1a20d1" id="r_af4b3564a7ee862912c4e9b561e1a20d1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#af4b3564a7ee862912c4e9b561e1a20d1">DUCK_ERR_ID_TOO_LONG</a>&#160;&#160;&#160;-5101</td></tr>
-<tr class="separator:af4b3564a7ee862912c4e9b561e1a20d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeefa7baeb9b7860e4c9685a83109ec04" id="r_aeefa7baeb9b7860e4c9685a83109ec04"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#aeefa7baeb9b7860e4c9685a83109ec04">DUCKLORA_ERR_BEGIN</a>&#160;&#160;&#160;-1000</td></tr>
-<tr class="memdesc:aeefa7baeb9b7860e4c9685a83109ec04"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lora module initialization error.  <br /></td></tr>
-<tr class="separator:aeefa7baeb9b7860e4c9685a83109ec04"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4b394b3b17c64880100d06b40ec34263" id="r_a4b394b3b17c64880100d06b40ec34263"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#a4b394b3b17c64880100d06b40ec34263">DUCKLORA_ERR_SETUP</a>&#160;&#160;&#160;-1001</td></tr>
-<tr class="memdesc:a4b394b3b17c64880100d06b40ec34263"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lora module configuration error.  <br /></td></tr>
-<tr class="separator:a4b394b3b17c64880100d06b40ec34263"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1d357ed0ba4ff6f9643d4520b2744347" id="r_a1d357ed0ba4ff6f9643d4520b2744347"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#a1d357ed0ba4ff6f9643d4520b2744347">DUCKLORA_ERR_RECEIVE</a>&#160;&#160;&#160;-1002</td></tr>
-<tr class="memdesc:a1d357ed0ba4ff6f9643d4520b2744347"><td class="mdescLeft">&#160;</td><td class="mdescRight">Failure to read data from the Lora module.  <br /></td></tr>
-<tr class="separator:a1d357ed0ba4ff6f9643d4520b2744347"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a54f1ddd51dfbcdebe7fa8edf2b7b0504" id="r_a54f1ddd51dfbcdebe7fa8edf2b7b0504"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#a54f1ddd51dfbcdebe7fa8edf2b7b0504">DUCKLORA_ERR_TIMEOUT</a>&#160;&#160;&#160;-1003</td></tr>
-<tr class="memdesc:a54f1ddd51dfbcdebe7fa8edf2b7b0504"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lora module timeout error.  <br /></td></tr>
-<tr class="separator:a54f1ddd51dfbcdebe7fa8edf2b7b0504"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a27eac55353e1716c67c9228fae0e5bd0" id="r_a27eac55353e1716c67c9228fae0e5bd0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#a27eac55353e1716c67c9228fae0e5bd0">DUCKLORA_ERR_TRANSMIT</a>&#160;&#160;&#160;-1004</td></tr>
-<tr class="memdesc:a27eac55353e1716c67c9228fae0e5bd0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Failed to send data.  <br /></td></tr>
-<tr class="separator:a27eac55353e1716c67c9228fae0e5bd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af700f59a812db02715a023731cc6ed5a" id="r_af700f59a812db02715a023731cc6ed5a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#af700f59a812db02715a023731cc6ed5a">DUCKLORA_ERR_HANDLE_PACKET</a>&#160;&#160;&#160;-1050</td></tr>
-<tr class="memdesc:af700f59a812db02715a023731cc6ed5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Failed to handle data received from the Lora module.  <br /></td></tr>
-<tr class="separator:af700f59a812db02715a023731cc6ed5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada4445c845045691ccd743ef322b5f83" id="r_ada4445c845045691ccd743ef322b5f83"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#ada4445c845045691ccd743ef322b5f83">DUCKLORA_ERR_MSG_TOO_LARGE</a>&#160;&#160;&#160;-1051</td></tr>
-<tr class="memdesc:ada4445c845045691ccd743ef322b5f83"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempted to send a message larger than 256 bytes.  <br /></td></tr>
-<tr class="separator:ada4445c845045691ccd743ef322b5f83"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3460e8d5f77183b598f98e2969715ffe" id="r_a3460e8d5f77183b598f98e2969715ffe"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#a3460e8d5f77183b598f98e2969715ffe">DUCKLORA_ERR_TX_BUSY</a>&#160;&#160;&#160;-1052</td></tr>
-<tr class="memdesc:a3460e8d5f77183b598f98e2969715ffe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Radio is busy sending data.  <br /></td></tr>
-<tr class="separator:a3460e8d5f77183b598f98e2969715ffe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abca5370defcf8f1646b9081dd8fdb212" id="r_abca5370defcf8f1646b9081dd8fdb212"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#abca5370defcf8f1646b9081dd8fdb212">DUCKLORA_ERR_INVALID_CHANNEL</a>&#160;&#160;&#160;-1053</td></tr>
-<tr class="memdesc:abca5370defcf8f1646b9081dd8fdb212"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invalid channel.  <br /></td></tr>
-<tr class="separator:abca5370defcf8f1646b9081dd8fdb212"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaa9233d6e0b90db00104c35e8a1dbda3" id="r_aaa9233d6e0b90db00104c35e8a1dbda3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#aaa9233d6e0b90db00104c35e8a1dbda3">DUCKLORA_ERR_NOT_INITIALIZED</a>&#160;&#160;&#160;-1054</td></tr>
-<tr class="memdesc:aaa9233d6e0b90db00104c35e8a1dbda3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Radio not initialized.  <br /></td></tr>
-<tr class="separator:aaa9233d6e0b90db00104c35e8a1dbda3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a50957cc12c5380adce8399732bf2832d" id="r_a50957cc12c5380adce8399732bf2832d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#a50957cc12c5380adce8399732bf2832d">DUCKLORA_ERR_STANDBY</a>&#160;&#160;&#160;-1055</td></tr>
-<tr class="separator:a50957cc12c5380adce8399732bf2832d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65b2329ec158b9694c60df31c77e07be" id="r_a65b2329ec158b9694c60df31c77e07be"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#a65b2329ec158b9694c60df31c77e07be">DUCKLORA_ERR_SLEEP</a>&#160;&#160;&#160;-1056</td></tr>
-<tr class="separator:a65b2329ec158b9694c60df31c77e07be"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a020d0a43679fa3563afbbf16b12e5b07" id="r_a020d0a43679fa3563afbbf16b12e5b07"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#a020d0a43679fa3563afbbf16b12e5b07">DUCKWIFI_ERR_NOT_AVAILABLE</a>&#160;&#160;&#160;-2000</td></tr>
-<tr class="memdesc:a020d0a43679fa3563afbbf16b12e5b07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wifi network is not availble.  <br /></td></tr>
-<tr class="separator:a020d0a43679fa3563afbbf16b12e5b07"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adfd1ac4c035f65f78f19b71f65beceb5" id="r_adfd1ac4c035f65f78f19b71f65beceb5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#adfd1ac4c035f65f78f19b71f65beceb5">DUCKWIFI_ERR_DISCONNECTED</a>&#160;&#160;&#160;-2001</td></tr>
-<tr class="memdesc:adfd1ac4c035f65f78f19b71f65beceb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wifi is disconnected.  <br /></td></tr>
-<tr class="separator:adfd1ac4c035f65f78f19b71f65beceb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65469093bb802f8c898752ff57cab276" id="r_a65469093bb802f8c898752ff57cab276"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#a65469093bb802f8c898752ff57cab276">DUCKWIFI_ERR_AP_CONFIG</a>&#160;&#160;&#160;-2002</td></tr>
-<tr class="memdesc:a65469093bb802f8c898752ff57cab276"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wifi generic setup error.  <br /></td></tr>
-<tr class="separator:a65469093bb802f8c898752ff57cab276"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8071cbedd0b245ec3cc42739131c5b42" id="r_a8071cbedd0b245ec3cc42739131c5b42"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#a8071cbedd0b245ec3cc42739131c5b42">DUCKDNS_ERR_STARTING</a>&#160;&#160;&#160;-3000</td></tr>
-<tr class="memdesc:a8071cbedd0b245ec3cc42739131c5b42"><td class="mdescLeft">&#160;</td><td class="mdescRight">DNS initialization failed.  <br /></td></tr>
-<tr class="separator:a8071cbedd0b245ec3cc42739131c5b42"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abaa0ea96b0f782739bc60173f8ba7a76" id="r_abaa0ea96b0f782739bc60173f8ba7a76"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#abaa0ea96b0f782739bc60173f8ba7a76">DUCKPACKET_ERR_SIZE_INVALID</a>&#160;&#160;&#160;-4000</td></tr>
-<tr class="separator:abaa0ea96b0f782739bc60173f8ba7a76"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6482332bb46139842038ae285d0e69e9" id="r_a6482332bb46139842038ae285d0e69e9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#a6482332bb46139842038ae285d0e69e9">DUCKPACKET_ERR_TOPIC_INVALID</a>&#160;&#160;&#160;-4001</td></tr>
-<tr class="separator:a6482332bb46139842038ae285d0e69e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0d5eff2e75f821e80596144ad0a9e740" id="r_a0d5eff2e75f821e80596144ad0a9e740"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#a0d5eff2e75f821e80596144ad0a9e740">DUCKPACKET_ERR_MAX_HOPS</a>&#160;&#160;&#160;-4002</td></tr>
-<tr class="separator:a0d5eff2e75f821e80596144ad0a9e740"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a91c2118433a377fb4615bb8c7e65a91c" id="r_a91c2118433a377fb4615bb8c7e65a91c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#a91c2118433a377fb4615bb8c7e65a91c">DUCK_INTERNET_ERR_SETUP</a>&#160;&#160;&#160;-6000</td></tr>
-<tr class="separator:a91c2118433a377fb4615bb8c7e65a91c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac951a303846a3fd25f8e4c013358b569" id="r_ac951a303846a3fd25f8e4c013358b569"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#ac951a303846a3fd25f8e4c013358b569">DUCK_INTERNET_ERR_SSID</a>&#160;&#160;&#160;-6001</td></tr>
-<tr class="separator:ac951a303846a3fd25f8e4c013358b569"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a775f64dce81fb955f41786fb8babc874" id="r_a775f64dce81fb955f41786fb8babc874"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#a775f64dce81fb955f41786fb8babc874">DUCK_INTERNET_ERR_CONNECT</a>&#160;&#160;&#160;-6002</td></tr>
-<tr class="separator:a775f64dce81fb955f41786fb8babc874"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec17d42d42260f9aca96863a0960305f" id="r_aec17d42d42260f9aca96863a0960305f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#aec17d42d42260f9aca96863a0960305f">DUCK_ERR_EEPROM_INIT</a>&#160;&#160;&#160;-7000</td></tr>
-<tr class="separator:aec17d42d42260f9aca96863a0960305f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:accd62610ae0d8cc5f9a4c453e5f39b70" id="r_accd62610ae0d8cc5f9a4c453e5f39b70"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#accd62610ae0d8cc5f9a4c453e5f39b70">DUCK_ERR_EEPROM_WRITE</a>&#160;&#160;&#160;-7001</td></tr>
-<tr class="separator:accd62610ae0d8cc5f9a4c453e5f39b70"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a86138c455c71a1e91185aac39da94538" id="r_a86138c455c71a1e91185aac39da94538"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#a86138c455c71a1e91185aac39da94538">DUCK_ERR_EEPROM_READ</a>&#160;&#160;&#160;-7002</td></tr>
-<tr class="separator:a86138c455c71a1e91185aac39da94538"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="enum-members" name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:af2d4aaa2f0cf74655cd02f8f9189ab7d" id="r_af2d4aaa2f0cf74655cd02f8f9189ab7d"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7d">DuckError</a> : int { <br />
+&#160;&#160;<a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7daf587ef039ebf19644b71d18ec6b11b58">DUCK_ERR_NONE</a> = 0
+, <a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7da5b0e0a94863c1bfc2f9730c480812a40">DUCK_ERR_NOT_SUPPORTED</a> = -5000
+, <a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7daab86c4e3c5ff0a194ce215a211d0bb78">DUCK_ERR_SETUP</a> = -5100
+, <a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7da561f521c494f75fc6e5946b705da1067">DUCK_ERR_INVALID_ARGUMENT</a> = -5101
+, <br />
+&#160;&#160;<a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7da14af98406b300210ea089a6cd34c47f4">DUCK_ERR_ID_TOO_LONG</a> = -5102
+, <a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7da16d961f8d6dc6f71da1b17985b65dea1">DUCKLORA_ERR_BEGIN</a> = -1000
+, <a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7da5b20cc12cfb4aa16f3dc0c491f0c167a">DUCKLORA_ERR_SETUP</a> = -1001
+, <a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7da6c24bc5e8bacba31bdc79f1ffe80ae14">DUCKLORA_ERR_RECEIVE</a> = -1002
+, <br />
+&#160;&#160;<a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7daf880e3e682c85311b0e2cdac87080d8f">DUCKLORA_ERR_TIMEOUT</a> = -1003
+, <a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7da45c299137cb97517880437eb10a48e37">DUCKLORA_ERR_TRANSMIT</a> = -1004
+, <a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7daa1b00a620a42658bf0d363c10fc103ef">DUCKLORA_ERR_HANDLE_PACKET</a> = -1050
+, <a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7daf3a77bac39088a31979ad475ba4ad8c2">DUCKLORA_ERR_MSG_TOO_LARGE</a> = -1051
+, <br />
+&#160;&#160;<a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7da9b5c3486a7f896c03fb00a4eba2fe2d0">DUCKLORA_ERR_TX_BUSY</a> = -1052
+, <a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7daa15078f0e4b05c107d8ea2ff2d7e5d31">DUCKLORA_ERR_INVALID_CHANNEL</a> = -1053
+, <a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7da5d36182c2b6578ae3fb7fe05f2672ec7">DUCKLORA_ERR_NOT_INITIALIZED</a> = -1054
+, <a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7dafd48e8a597a066931a128b87cddac421">DUCKLORA_ERR_STANDBY</a> = -1055
+, <br />
+&#160;&#160;<a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7daa6e1609de01b45829f2e17f0f6180ade">DUCKLORA_ERR_SLEEP</a> = -1056
+, <a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7daf5e4b6f4809e6e28530691eb91e24849">DUCKWIFI_ERR_NOT_AVAILABLE</a> = -2000
+, <a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7daa672b322fb8ff32c22136217a18efc95">DUCKWIFI_ERR_DISCONNECTED</a> = -2001
+, <a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7daf5e113bf32ba0aa0e5e06b125af16be9">DUCKWIFI_ERR_AP_CONFIG</a> = -2002
+, <br />
+&#160;&#160;<a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7dae16969352d6f0270d92a924f7a74474e">DUCKDNS_ERR_STARTING</a> = -3000
+, <a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7dab1fd1ed653230ac63d6c2f77ba83dd2e">DUCKPACKET_ERR_SIZE_INVALID</a> = -4000
+, <a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7da6e0d746b7e5618cc494f4db81e7b1365">DUCKPACKET_ERR_TOPIC_INVALID</a> = -4001
+, <a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7daadc88c45aea753becfac739bc9c67a28">DUCKPACKET_ERR_MAX_HOPS</a> = -4002
+, <br />
+&#160;&#160;<a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7daf9984e58056a0232e17236a382a04b20">DUCK_INTERNET_ERR_SETUP</a> = -6000
+, <a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7daa9afcf5c4cfd8da4ab1667ff6a2dac21">DUCK_INTERNET_ERR_SSID</a> = -6001
+, <a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7da28c2870c3b637c813ffccc21c1472645">DUCK_INTERNET_ERR_CONNECT</a> = -6002
+, <a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7daded2a6637e3ef162a5c7ac00106e16eb">DUCK_ERR_EEPROM_INIT</a> = -7000
+, <br />
+&#160;&#160;<a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7da3df577a67734503f75b15260457545cc">DUCK_ERR_EEPROM_WRITE</a> = -7001
+, <a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7da014a5e038f86af93bbd64521d29cc8af">DUCK_ERR_EEPROM_READ</a> = -7002
+<br />
+ }</td></tr>
+<tr class="memdesc:af2d4aaa2f0cf74655cd02f8f9189ab7d"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="class_duck.html">Duck</a> error codes enum.  <a href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7d">More...</a><br /></td></tr>
+<tr class="separator:af2d4aaa2f0cf74655cd02f8f9189ab7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:ae0f1fec98d73e74f7b7459d908daf022" id="r_ae0f1fec98d73e74f7b7459d908daf022"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_duck_error_8h.html#ae0f1fec98d73e74f7b7459d908daf022">getDuckErrorString</a> (int error)</td></tr>
+<tr class="separator:ae0f1fec98d73e74f7b7459d908daf022"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="aec17d42d42260f9aca96863a0960305f" name="aec17d42d42260f9aca96863a0960305f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aec17d42d42260f9aca96863a0960305f">&#9670;&#160;</a></span>DUCK_ERR_EEPROM_INIT</h2>
+<h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="af2d4aaa2f0cf74655cd02f8f9189ab7d" name="af2d4aaa2f0cf74655cd02f8f9189ab7d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af2d4aaa2f0cf74655cd02f8f9189ab7d">&#9670;&#160;</a></span>DuckError</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define DUCK_ERR_EEPROM_INIT&#160;&#160;&#160;-7000</td>
+          <td class="memname">enum <a class="el" href="_duck_error_8h.html#af2d4aaa2f0cf74655cd02f8f9189ab7d">DuckError</a> : int</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p><a class="el" href="class_duck.html">Duck</a> error codes enum. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7daf587ef039ebf19644b71d18ec6b11b58" name="af2d4aaa2f0cf74655cd02f8f9189ab7daf587ef039ebf19644b71d18ec6b11b58"></a>DUCK_ERR_NONE&#160;</td><td class="fielddoc"><p>No Error. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7da5b0e0a94863c1bfc2f9730c480812a40" name="af2d4aaa2f0cf74655cd02f8f9189ab7da5b0e0a94863c1bfc2f9730c480812a40"></a>DUCK_ERR_NOT_SUPPORTED&#160;</td><td class="fielddoc"><p>Feature not supported. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7daab86c4e3c5ff0a194ce215a211d0bb78" name="af2d4aaa2f0cf74655cd02f8f9189ab7daab86c4e3c5ff0a194ce215a211d0bb78"></a>DUCK_ERR_SETUP&#160;</td><td class="fielddoc"><p>Failed to setup device. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7da561f521c494f75fc6e5946b705da1067" name="af2d4aaa2f0cf74655cd02f8f9189ab7da561f521c494f75fc6e5946b705da1067"></a>DUCK_ERR_INVALID_ARGUMENT&#160;</td><td class="fielddoc"><p>Invalid argument. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7da14af98406b300210ea089a6cd34c47f4" name="af2d4aaa2f0cf74655cd02f8f9189ab7da14af98406b300210ea089a6cd34c47f4"></a>DUCK_ERR_ID_TOO_LONG&#160;</td><td class="fielddoc"><p>Device Id is too long. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7da16d961f8d6dc6f71da1b17985b65dea1" name="af2d4aaa2f0cf74655cd02f8f9189ab7da16d961f8d6dc6f71da1b17985b65dea1"></a>DUCKLORA_ERR_BEGIN&#160;</td><td class="fielddoc"><p>Lora module initialization error. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7da5b20cc12cfb4aa16f3dc0c491f0c167a" name="af2d4aaa2f0cf74655cd02f8f9189ab7da5b20cc12cfb4aa16f3dc0c491f0c167a"></a>DUCKLORA_ERR_SETUP&#160;</td><td class="fielddoc"><p>Lora module configuration error. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7da6c24bc5e8bacba31bdc79f1ffe80ae14" name="af2d4aaa2f0cf74655cd02f8f9189ab7da6c24bc5e8bacba31bdc79f1ffe80ae14"></a>DUCKLORA_ERR_RECEIVE&#160;</td><td class="fielddoc"><p>Failure to read data from the Lora module. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7daf880e3e682c85311b0e2cdac87080d8f" name="af2d4aaa2f0cf74655cd02f8f9189ab7daf880e3e682c85311b0e2cdac87080d8f"></a>DUCKLORA_ERR_TIMEOUT&#160;</td><td class="fielddoc"><p>Lora module timeout error. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7da45c299137cb97517880437eb10a48e37" name="af2d4aaa2f0cf74655cd02f8f9189ab7da45c299137cb97517880437eb10a48e37"></a>DUCKLORA_ERR_TRANSMIT&#160;</td><td class="fielddoc"><p>Failed to send data. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7daa1b00a620a42658bf0d363c10fc103ef" name="af2d4aaa2f0cf74655cd02f8f9189ab7daa1b00a620a42658bf0d363c10fc103ef"></a>DUCKLORA_ERR_HANDLE_PACKET&#160;</td><td class="fielddoc"><p>Failed to handle data received from the Lora module. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7daf3a77bac39088a31979ad475ba4ad8c2" name="af2d4aaa2f0cf74655cd02f8f9189ab7daf3a77bac39088a31979ad475ba4ad8c2"></a>DUCKLORA_ERR_MSG_TOO_LARGE&#160;</td><td class="fielddoc"><p>Attempted to send a message larger than 256 bytes. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7da9b5c3486a7f896c03fb00a4eba2fe2d0" name="af2d4aaa2f0cf74655cd02f8f9189ab7da9b5c3486a7f896c03fb00a4eba2fe2d0"></a>DUCKLORA_ERR_TX_BUSY&#160;</td><td class="fielddoc"><p>Radio is busy sending data. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7daa15078f0e4b05c107d8ea2ff2d7e5d31" name="af2d4aaa2f0cf74655cd02f8f9189ab7daa15078f0e4b05c107d8ea2ff2d7e5d31"></a>DUCKLORA_ERR_INVALID_CHANNEL&#160;</td><td class="fielddoc"><p>Invalid channel. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7da5d36182c2b6578ae3fb7fe05f2672ec7" name="af2d4aaa2f0cf74655cd02f8f9189ab7da5d36182c2b6578ae3fb7fe05f2672ec7"></a>DUCKLORA_ERR_NOT_INITIALIZED&#160;</td><td class="fielddoc"><p>Radio not initialized. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7dafd48e8a597a066931a128b87cddac421" name="af2d4aaa2f0cf74655cd02f8f9189ab7dafd48e8a597a066931a128b87cddac421"></a>DUCKLORA_ERR_STANDBY&#160;</td><td class="fielddoc"><p>Lora standby error. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7daa6e1609de01b45829f2e17f0f6180ade" name="af2d4aaa2f0cf74655cd02f8f9189ab7daa6e1609de01b45829f2e17f0f6180ade"></a>DUCKLORA_ERR_SLEEP&#160;</td><td class="fielddoc"><p>Lora sleep error. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7daf5e4b6f4809e6e28530691eb91e24849" name="af2d4aaa2f0cf74655cd02f8f9189ab7daf5e4b6f4809e6e28530691eb91e24849"></a>DUCKWIFI_ERR_NOT_AVAILABLE&#160;</td><td class="fielddoc"><p>Wifi network is not available. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7daa672b322fb8ff32c22136217a18efc95" name="af2d4aaa2f0cf74655cd02f8f9189ab7daa672b322fb8ff32c22136217a18efc95"></a>DUCKWIFI_ERR_DISCONNECTED&#160;</td><td class="fielddoc"><p>Wifi is disconnected. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7daf5e113bf32ba0aa0e5e06b125af16be9" name="af2d4aaa2f0cf74655cd02f8f9189ab7daf5e113bf32ba0aa0e5e06b125af16be9"></a>DUCKWIFI_ERR_AP_CONFIG&#160;</td><td class="fielddoc"><p>Wifi generic setup error. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7dae16969352d6f0270d92a924f7a74474e" name="af2d4aaa2f0cf74655cd02f8f9189ab7dae16969352d6f0270d92a924f7a74474e"></a>DUCKDNS_ERR_STARTING&#160;</td><td class="fielddoc"><p>DNS initialization failed. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7dab1fd1ed653230ac63d6c2f77ba83dd2e" name="af2d4aaa2f0cf74655cd02f8f9189ab7dab1fd1ed653230ac63d6c2f77ba83dd2e"></a>DUCKPACKET_ERR_SIZE_INVALID&#160;</td><td class="fielddoc"><p>Packet size invalid. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7da6e0d746b7e5618cc494f4db81e7b1365" name="af2d4aaa2f0cf74655cd02f8f9189ab7da6e0d746b7e5618cc494f4db81e7b1365"></a>DUCKPACKET_ERR_TOPIC_INVALID&#160;</td><td class="fielddoc"><p>Packet topic invalid. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7daadc88c45aea753becfac739bc9c67a28" name="af2d4aaa2f0cf74655cd02f8f9189ab7daadc88c45aea753becfac739bc9c67a28"></a>DUCKPACKET_ERR_MAX_HOPS&#160;</td><td class="fielddoc"><p>Packet max hops exceeded. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7daf9984e58056a0232e17236a382a04b20" name="af2d4aaa2f0cf74655cd02f8f9189ab7daf9984e58056a0232e17236a382a04b20"></a>DUCK_INTERNET_ERR_SETUP&#160;</td><td class="fielddoc"><p>Internet setup error. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7daa9afcf5c4cfd8da4ab1667ff6a2dac21" name="af2d4aaa2f0cf74655cd02f8f9189ab7daa9afcf5c4cfd8da4ab1667ff6a2dac21"></a>DUCK_INTERNET_ERR_SSID&#160;</td><td class="fielddoc"><p>Internet SSID error. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7da28c2870c3b637c813ffccc21c1472645" name="af2d4aaa2f0cf74655cd02f8f9189ab7da28c2870c3b637c813ffccc21c1472645"></a>DUCK_INTERNET_ERR_CONNECT&#160;</td><td class="fielddoc"><p>Internet connection error. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7daded2a6637e3ef162a5c7ac00106e16eb" name="af2d4aaa2f0cf74655cd02f8f9189ab7daded2a6637e3ef162a5c7ac00106e16eb"></a>DUCK_ERR_EEPROM_INIT&#160;</td><td class="fielddoc"><p>EEPROM initialization error. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7da3df577a67734503f75b15260457545cc" name="af2d4aaa2f0cf74655cd02f8f9189ab7da3df577a67734503f75b15260457545cc"></a>DUCK_ERR_EEPROM_WRITE&#160;</td><td class="fielddoc"><p>EEPROM write error. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af2d4aaa2f0cf74655cd02f8f9189ab7da014a5e038f86af93bbd64521d29cc8af" name="af2d4aaa2f0cf74655cd02f8f9189ab7da014a5e038f86af93bbd64521d29cc8af"></a>DUCK_ERR_EEPROM_READ&#160;</td><td class="fielddoc"><p>EEPROM read error. </p>
+</td></tr>
+</table>
+
 </div>
 </div>
-<a id="a86138c455c71a1e91185aac39da94538" name="a86138c455c71a1e91185aac39da94538"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a86138c455c71a1e91185aac39da94538">&#9670;&#160;</a></span>DUCK_ERR_EEPROM_READ</h2>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="ae0f1fec98d73e74f7b7459d908daf022" name="ae0f1fec98d73e74f7b7459d908daf022"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae0f1fec98d73e74f7b7459d908daf022">&#9670;&#160;</a></span>getDuckErrorString()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">#define DUCK_ERR_EEPROM_READ&#160;&#160;&#160;-7002</td>
+          <td class="memname">const char * getDuckErrorString </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>error</em></td><td>)</td>
+          <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
-
-</div>
-</div>
-<a id="accd62610ae0d8cc5f9a4c453e5f39b70" name="accd62610ae0d8cc5f9a4c453e5f39b70"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#accd62610ae0d8cc5f9a4c453e5f39b70">&#9670;&#160;</a></span>DUCK_ERR_EEPROM_WRITE</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCK_ERR_EEPROM_WRITE&#160;&#160;&#160;-7001</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="af4b3564a7ee862912c4e9b561e1a20d1" name="af4b3564a7ee862912c4e9b561e1a20d1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af4b3564a7ee862912c4e9b561e1a20d1">&#9670;&#160;</a></span>DUCK_ERR_ID_TOO_LONG</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCK_ERR_ID_TOO_LONG&#160;&#160;&#160;-5101</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a8f566352af9ed48f8b75bf83f2f4924e" name="a8f566352af9ed48f8b75bf83f2f4924e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8f566352af9ed48f8b75bf83f2f4924e">&#9670;&#160;</a></span>DUCK_ERR_INVALID_ARGUMENT</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCK_ERR_INVALID_ARGUMENT&#160;&#160;&#160;-5101</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="af5b0c7002feba000355ea4d8d5ca7809" name="af5b0c7002feba000355ea4d8d5ca7809"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af5b0c7002feba000355ea4d8d5ca7809">&#9670;&#160;</a></span>DUCK_ERR_NONE</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCK_ERR_NONE&#160;&#160;&#160;0</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>No Error. </p>
-
-</div>
-</div>
-<a id="a9dc0e55748578c30ca5331111219c7ee" name="a9dc0e55748578c30ca5331111219c7ee"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9dc0e55748578c30ca5331111219c7ee">&#9670;&#160;</a></span>DUCK_ERR_NOT_SUPPORTED</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCK_ERR_NOT_SUPPORTED&#160;&#160;&#160;-5000</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a015459825890dced6023d813d754a64a" name="a015459825890dced6023d813d754a64a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a015459825890dced6023d813d754a64a">&#9670;&#160;</a></span>DUCK_ERR_SETUP</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCK_ERR_SETUP&#160;&#160;&#160;-5100</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a775f64dce81fb955f41786fb8babc874" name="a775f64dce81fb955f41786fb8babc874"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a775f64dce81fb955f41786fb8babc874">&#9670;&#160;</a></span>DUCK_INTERNET_ERR_CONNECT</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCK_INTERNET_ERR_CONNECT&#160;&#160;&#160;-6002</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a91c2118433a377fb4615bb8c7e65a91c" name="a91c2118433a377fb4615bb8c7e65a91c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a91c2118433a377fb4615bb8c7e65a91c">&#9670;&#160;</a></span>DUCK_INTERNET_ERR_SETUP</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCK_INTERNET_ERR_SETUP&#160;&#160;&#160;-6000</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ac951a303846a3fd25f8e4c013358b569" name="ac951a303846a3fd25f8e4c013358b569"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac951a303846a3fd25f8e4c013358b569">&#9670;&#160;</a></span>DUCK_INTERNET_ERR_SSID</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCK_INTERNET_ERR_SSID&#160;&#160;&#160;-6001</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a8071cbedd0b245ec3cc42739131c5b42" name="a8071cbedd0b245ec3cc42739131c5b42"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8071cbedd0b245ec3cc42739131c5b42">&#9670;&#160;</a></span>DUCKDNS_ERR_STARTING</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCKDNS_ERR_STARTING&#160;&#160;&#160;-3000</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>DNS initialization failed. </p>
-
-</div>
-</div>
-<a id="aeefa7baeb9b7860e4c9685a83109ec04" name="aeefa7baeb9b7860e4c9685a83109ec04"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeefa7baeb9b7860e4c9685a83109ec04">&#9670;&#160;</a></span>DUCKLORA_ERR_BEGIN</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCKLORA_ERR_BEGIN&#160;&#160;&#160;-1000</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Lora module initialization error. </p>
-
-</div>
-</div>
-<a id="af700f59a812db02715a023731cc6ed5a" name="af700f59a812db02715a023731cc6ed5a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af700f59a812db02715a023731cc6ed5a">&#9670;&#160;</a></span>DUCKLORA_ERR_HANDLE_PACKET</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCKLORA_ERR_HANDLE_PACKET&#160;&#160;&#160;-1050</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Failed to handle data received from the Lora module. </p>
-
-</div>
-</div>
-<a id="abca5370defcf8f1646b9081dd8fdb212" name="abca5370defcf8f1646b9081dd8fdb212"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abca5370defcf8f1646b9081dd8fdb212">&#9670;&#160;</a></span>DUCKLORA_ERR_INVALID_CHANNEL</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCKLORA_ERR_INVALID_CHANNEL&#160;&#160;&#160;-1053</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Invalid channel. </p>
-
-</div>
-</div>
-<a id="ada4445c845045691ccd743ef322b5f83" name="ada4445c845045691ccd743ef322b5f83"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ada4445c845045691ccd743ef322b5f83">&#9670;&#160;</a></span>DUCKLORA_ERR_MSG_TOO_LARGE</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCKLORA_ERR_MSG_TOO_LARGE&#160;&#160;&#160;-1051</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Attempted to send a message larger than 256 bytes. </p>
-
-</div>
-</div>
-<a id="aaa9233d6e0b90db00104c35e8a1dbda3" name="aaa9233d6e0b90db00104c35e8a1dbda3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaa9233d6e0b90db00104c35e8a1dbda3">&#9670;&#160;</a></span>DUCKLORA_ERR_NOT_INITIALIZED</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCKLORA_ERR_NOT_INITIALIZED&#160;&#160;&#160;-1054</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Radio not initialized. </p>
-
-</div>
-</div>
-<a id="a1d357ed0ba4ff6f9643d4520b2744347" name="a1d357ed0ba4ff6f9643d4520b2744347"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1d357ed0ba4ff6f9643d4520b2744347">&#9670;&#160;</a></span>DUCKLORA_ERR_RECEIVE</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCKLORA_ERR_RECEIVE&#160;&#160;&#160;-1002</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Failure to read data from the Lora module. </p>
-
-</div>
-</div>
-<a id="a4b394b3b17c64880100d06b40ec34263" name="a4b394b3b17c64880100d06b40ec34263"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4b394b3b17c64880100d06b40ec34263">&#9670;&#160;</a></span>DUCKLORA_ERR_SETUP</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCKLORA_ERR_SETUP&#160;&#160;&#160;-1001</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Lora module configuration error. </p>
-
-</div>
-</div>
-<a id="a65b2329ec158b9694c60df31c77e07be" name="a65b2329ec158b9694c60df31c77e07be"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a65b2329ec158b9694c60df31c77e07be">&#9670;&#160;</a></span>DUCKLORA_ERR_SLEEP</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCKLORA_ERR_SLEEP&#160;&#160;&#160;-1056</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a50957cc12c5380adce8399732bf2832d" name="a50957cc12c5380adce8399732bf2832d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a50957cc12c5380adce8399732bf2832d">&#9670;&#160;</a></span>DUCKLORA_ERR_STANDBY</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCKLORA_ERR_STANDBY&#160;&#160;&#160;-1055</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a54f1ddd51dfbcdebe7fa8edf2b7b0504" name="a54f1ddd51dfbcdebe7fa8edf2b7b0504"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a54f1ddd51dfbcdebe7fa8edf2b7b0504">&#9670;&#160;</a></span>DUCKLORA_ERR_TIMEOUT</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCKLORA_ERR_TIMEOUT&#160;&#160;&#160;-1003</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Lora module timeout error. </p>
-
-</div>
-</div>
-<a id="a27eac55353e1716c67c9228fae0e5bd0" name="a27eac55353e1716c67c9228fae0e5bd0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a27eac55353e1716c67c9228fae0e5bd0">&#9670;&#160;</a></span>DUCKLORA_ERR_TRANSMIT</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCKLORA_ERR_TRANSMIT&#160;&#160;&#160;-1004</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Failed to send data. </p>
-
-</div>
-</div>
-<a id="a3460e8d5f77183b598f98e2969715ffe" name="a3460e8d5f77183b598f98e2969715ffe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3460e8d5f77183b598f98e2969715ffe">&#9670;&#160;</a></span>DUCKLORA_ERR_TX_BUSY</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCKLORA_ERR_TX_BUSY&#160;&#160;&#160;-1052</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Radio is busy sending data. </p>
-
-</div>
-</div>
-<a id="a0d5eff2e75f821e80596144ad0a9e740" name="a0d5eff2e75f821e80596144ad0a9e740"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0d5eff2e75f821e80596144ad0a9e740">&#9670;&#160;</a></span>DUCKPACKET_ERR_MAX_HOPS</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCKPACKET_ERR_MAX_HOPS&#160;&#160;&#160;-4002</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="abaa0ea96b0f782739bc60173f8ba7a76" name="abaa0ea96b0f782739bc60173f8ba7a76"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abaa0ea96b0f782739bc60173f8ba7a76">&#9670;&#160;</a></span>DUCKPACKET_ERR_SIZE_INVALID</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCKPACKET_ERR_SIZE_INVALID&#160;&#160;&#160;-4000</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a6482332bb46139842038ae285d0e69e9" name="a6482332bb46139842038ae285d0e69e9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6482332bb46139842038ae285d0e69e9">&#9670;&#160;</a></span>DUCKPACKET_ERR_TOPIC_INVALID</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCKPACKET_ERR_TOPIC_INVALID&#160;&#160;&#160;-4001</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a65469093bb802f8c898752ff57cab276" name="a65469093bb802f8c898752ff57cab276"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a65469093bb802f8c898752ff57cab276">&#9670;&#160;</a></span>DUCKWIFI_ERR_AP_CONFIG</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCKWIFI_ERR_AP_CONFIG&#160;&#160;&#160;-2002</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Wifi generic setup error. </p>
-
-</div>
-</div>
-<a id="adfd1ac4c035f65f78f19b71f65beceb5" name="adfd1ac4c035f65f78f19b71f65beceb5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adfd1ac4c035f65f78f19b71f65beceb5">&#9670;&#160;</a></span>DUCKWIFI_ERR_DISCONNECTED</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCKWIFI_ERR_DISCONNECTED&#160;&#160;&#160;-2001</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Wifi is disconnected. </p>
-
-</div>
-</div>
-<a id="a020d0a43679fa3563afbbf16b12e5b07" name="a020d0a43679fa3563afbbf16b12e5b07"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a020d0a43679fa3563afbbf16b12e5b07">&#9670;&#160;</a></span>DUCKWIFI_ERR_NOT_AVAILABLE</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DUCKWIFI_ERR_NOT_AVAILABLE&#160;&#160;&#160;-2000</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Wifi network is not availble. </p>
+<p>Get human-readable error string for a given error code </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">error</td><td>The error code </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A string describing the error </dd></dl>
 
 </div>
 </div>

@@ -1,5 +1,7 @@
 var NAVTREEINDEX2 =
 {
+"tinyformat_8h.html#a923c19355d6b85fd5d9fb2b7a1185a44":[4,0,0,4,6,78],
+"tinyformat_8h.html#a9554232e7446c62a5aae21f59917a5ff":[4,0,0,4,6,36],
 "tinyformat_8h.html#a970fd8292e14eb74ba55bafb41017016":[4,0,0,4,6,99],
 "tinyformat_8h.html#a97775445fea05ffaaa0690ab3bb1a920":[4,0,0,4,6,100],
 "tinyformat_8h.html#a9c70447bc42824aeaae231a7e8a04cd5":[4,0,0,4,6,88],
