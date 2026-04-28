@@ -54,13 +54,13 @@ void setup() {
   leds[0] = CRGB::Gold;
   FastLED.show();
 
-  Serial.println("[DETECTOR] Setup OK!");
+  loginfo_ln("[DETECTOR] Setup OK!");
 }
 
 void handleReceiveRssi(const int rssi) {
-  Serial.println("[DETECTOR] RSSI callback called");
+  loginfo_ln("[DETECTOR] RSSI callback called");
   showSignalQuality(rssi);
-  Serial.println("[DETECTOR] Reseting signal timeout");
+  loginfo_ln("[DETECTOR] Reseting signal timeout");
   lastSignalTime = millis();
 }
 
@@ -70,7 +70,7 @@ void loop() {
   
   // Check if signal timeout occurred
   if (millis() - lastSignalTime > SIGNAL_TIMEOUT_MS) {
-    Serial.println("[DETECTOR] No signal");
+    loginfo_ln("[DETECTOR] No signal");
     leds[0] = CRGB::Red;
     FastLED.show();
     lastSignalTime = millis(); // Reset to prevent continuous messages
@@ -86,26 +86,27 @@ bool pingHandler(void *) {
 
 void showSignalQuality(int incoming) {
   int rssi = incoming;
-  Serial.print("[DETECTOR] RSSI value: ");
-  Serial.print(rssi);
+  loginfo("[DETECTOR] RSSI value: ");
+  char buffer[10];
+  loginfo(itoa(rssi,buffer, 10));
 
   if (rssi > -95) {
-    Serial.println(" - GOOD SIGNAL");
+    loginfo_ln(" - GOOD SIGNAL");
     leds[0] = CRGB::Green;
     FastLED.show();
   }
-  else if (rssi <= -95 && rssi > -108) {
-    Serial.println(" - OKAY SIGNAL");
+  else if (rssi > -108) {
+    loginfo_ln(" - OKAY SIGNAL");
     leds[0] = CRGB::Blue;
     FastLED.show();
   }
-  else if (rssi <= -108 <= -118) {
-    Serial.println(" - LOW SIGNAL");
+  else if (rssi > -118 ) {
+    loginfo_ln(" - LOW SIGNAL");
     leds[0] = CRGB::Purple;
     FastLED.show();
   }
   else {
-    Serial.println(" - NO SIGNAL");
+    loginfo_ln(" - NO SIGNAL");
     leds[0] = CRGB::Red;
     FastLED.show();
   }

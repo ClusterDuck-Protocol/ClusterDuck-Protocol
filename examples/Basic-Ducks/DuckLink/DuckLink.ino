@@ -9,7 +9,7 @@
  */
 
 #include <CDP.h>
-
+#include "utils/DuckLogger.h"
 // Setup for W2812 (LED)
 #include <FastLED.h>
 #include <pixeltypes.h>
@@ -49,7 +49,7 @@ void setup() {
   FastLED.show();
 
   if (duck.setupWithDefaults() != DUCK_ERR_NONE) {
-    Serial.println("[LINK] Failed to setup DuckLink");
+    loginfo_ln("[LINK] Failed to setup DuckLink");
     leds[0] = CRGB::Red;
     FastLED.show();
     return;
@@ -60,7 +60,7 @@ void setup() {
   
   timer.every(INTERVAL_MS, runSensor);     // Triggers runSensor every INTERVAL_MS
   
-  Serial.println("[LINK] Setup OK!");
+  loginfo_ln("[LINK] Setup OK!");
   setupOK = true;
 
 }
@@ -91,15 +91,15 @@ void loop() {
   bool failure;
   
   std::string message = "C:" + std::to_string(counter) + "|" + "FM:" + std::to_string(freeMemory());
-  Serial.print("[DUCKLINK] sensor data: ");
-  Serial.println(message.c_str());
+  loginfo("[DUCKLINK] sensor data: ");
+  loginfo_ln(message.c_str());
 
   failure = duck.sendData(topics::health, message);
   if (!failure) {
     counter++;
-    Serial.println("[DUCKLINK] runSensor ok.");
+    loginfo_ln("[DUCKLINK] runSensor ok.");
   } else {
-    Serial.println("[DUCKLINK] runSensor failed.");
+    loginfo_ln("[DUCKLINK] runSensor failed.");
   }
   return true;
 }
