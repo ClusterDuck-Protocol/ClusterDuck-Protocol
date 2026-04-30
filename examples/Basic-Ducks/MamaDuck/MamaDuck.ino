@@ -33,6 +33,7 @@ CRGB leds[NUM_LEDS];
  MamaDuck duck("MAMADUCK"); // Device ID, MUST be 8 bytes and unique from other ducks;
  auto timer = timer_create_default();  // Creating a timer with default settings
  const int INTERVAL_MS = 10000;        // Interval in milliseconds between runSensor call
+ int counter = 1;                      // Counter for the sensor data  
  bool setupOK = false;                 // Flag to check if setup is complete
  
  /**
@@ -89,16 +90,16 @@ CRGB leds[NUM_LEDS];
   * @return true if data was successfully sent, false otherwise
   */
  bool runSensor(void *) {
-   bool failure;
-   
-   std::string message = "Placeholder Sensor Data";
-  
-   failure = duck.sendData(topics::sensor, message);
-   if (!failure) {
-     Serial.println("[MAMA] runSensor ok.");
-   } else {
-     Serial.println("[MAMA] runSensor failed.");
-   }
-   return true;
+    bool failure;
+
+    std::string message = "Placeholder Sensor Data. C: " + std::to_string(counter);
+
+    failure = duck.sendData(topics::sensor, message);
+    if (!failure) {
+    Serial.println("[MAMA] runSensor ok.");
+    } else {
+    Serial.println("[MAMA] runSensor failed.");
+    }
+    return true;
  }
  
