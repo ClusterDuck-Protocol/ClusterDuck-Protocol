@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
+#include <arduino-timer.h>
 #include "../utils/DuckError.h"
 #include "../include/cdpcfg.h"
 #include "../radio/DuckLoRa.h"
@@ -53,7 +54,8 @@ class Duck {
       this->setupSerial(115200);
       int err = this->setupLoRaRadio();
       if (err != DUCK_ERR_NONE) {
-      logerr_ln("ERROR setupWithDefaults rc = %d",err); 
+        duckTimer.every(HEALTH_INTERVAL, this->sendHealth()); 
+        logerr_ln("ERROR setupWithDefaults rc = %d",err); 
       }
       return err;
     }
@@ -328,6 +330,22 @@ class Duck {
     }
 
     /**
+     * @brief sendData that allows sending for health on an internal timer
+     * @returns DUCK_ERR_NONE if the data was sent successfully, an error code otherwise.
+     */
+    int sendHealth(){
+      std::string message = "C:" + std::to_string(counter) + "|" + "FM:" + std::to_string(freeMemory());
+      int err = this->sendData(topics::health, message);
+      if (err != DUCK_ERR_NONE) {
+        counter++;
+        loginfo_ln("[MAMA] health message failed to send.");
+      } else {
+        loginfo_ln("[MAMA] health message successfully sent.");
+      }
+      return err;
+    }
+
+    /**
      * @brief sendData that allows sending for reserved topic pong
      * @returns DUCK_ERR_NONE if the data was sent successfully, an error code otherwise.
      */
@@ -397,6 +415,9 @@ class Duck {
   private:
     Duck(Duck const&) = delete;
     Duck& operator=(Duck const&) = delete;
+    const int HEALTH_INTERVAL = 1000 * 60 * 15; //15 minutes
+    int counter = 1;
+    auto duckTimer = timer_create_default();
 
     /**
      * @brief Read packets from CDP nodes responding to our network join request

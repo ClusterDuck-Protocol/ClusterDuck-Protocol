@@ -89,14 +89,11 @@ void loop() {
   */
  bool runSensor(void *) {
   bool failure;
-  
-  std::string message = "C:" + std::to_string(counter) + "|" + "FM:" + std::to_string(freeMemory());
-  Serial.print("[DUCKLINK] sensor data: ");
-  Serial.println(message.c_str());
-
-  failure = duck.sendData(topics::health, message);
+   
+  std::string message = "Placeholder Sensor Data";
+ 
+  failure = duck.sendData(topics::sensor, message);
   if (!failure) {
-    counter++;
     Serial.println("[DUCKLINK] runSensor ok.");
   } else {
     Serial.println("[DUCKLINK] runSensor failed.");
