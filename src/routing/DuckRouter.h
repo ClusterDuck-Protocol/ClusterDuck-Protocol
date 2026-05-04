@@ -59,6 +59,7 @@ class DuckRouter {
         std::unordered_map<std::string, std::list<Neighbor>> routingTable;
         BloomFilter filter;
         NetworkState networkState = NetworkState::SEARCHING;
+        unsigned long ROUTE_TTL = 1000 * 60 * 30; //30 minutes
 
         /**
          * @brief NetworkState transition for NetworkState FSM

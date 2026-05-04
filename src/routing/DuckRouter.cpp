@@ -23,19 +23,22 @@ std::optional<Duid> DuckRouter::getBestNextHop(Duid targetDeviceId){
     if (nextHopRecord == routingTable.end()) {
         return std::nullopt; // No entry found
     }
-    nextHopRecord->second.sort(std::greater<>());
+    nextHopRecord->second.sort(std::greater<>()); 
     std::string nextHopStr = nextHopRecord->second.front().getDeviceId();
     Duid nextHopId;
     std::copy(nextHopStr.begin(), nextHopStr.end(),nextHopId.begin());
 
-    // if(nextHop.ttl > 0){
-              //send a new rreq
-    // }
+    if(nextHopRecord->second.front().getLastSeen() <= millis()- ROUTE_TTL){
+              loginfo_ln("[ROUTER] route ttl expired");
+              routingTable.erase(nextHopStr);
+              return std::nullopt;
+    }
     return nextHopId;
 
 };
 
 void DuckRouter::CullRoutingTable(size_t maxSize) {
+    //iterate through and remove all expired ttl routes
     std::size_t size = routingTable.size();
     while (size > maxSize) {
         auto it = std::prev(routingTable.end(),1); // Get iterator to the last element
