@@ -54,7 +54,8 @@ class Duck {
       this->setupSerial(115200);
       int err = this->setupLoRaRadio();
       if (err != DUCK_ERR_NONE) {
-        duckTimer.every(HEALTH_INTERVAL, this->sendHealth()); 
+        duckTimer.every(HEALTH_INTERVAL, this->sendHealth());
+        duckTimer.every(SIGNAL_INTERVAL, this->sendSignalData()); 
         logerr_ln("ERROR setupWithDefaults rc = %d",err); 
       }
       return err;
@@ -346,6 +347,30 @@ class Duck {
     }
 
     /**
+     * @brief sendData that allows sending for signal info for DMS mapping on an internal timer
+     * @returns DUCK_ERR_NONE if the data was sent successfully, an error code otherwise.
+     */
+    int sendSignalData(){
+      int err;
+      router.cullRoutingTable();
+      std::optional<std::string> message = router.getEntriesFor(PAPADUCK_DUID);
+
+      if(message.has_value()){
+        err = this->sendData(topics::health, message);
+        if (err != DUCK_ERR_NONE) {
+          loginfo_ln("[MAMA] signal info for DMS message failed to send.");
+        } else {
+          loginfo_ln("[MAMA] signal info for DMS message successfully sent.");
+        }
+      } else { 
+        loginfo_ln("[MAMA] No route entry for specified target was found.");
+        err = -1;
+      }
+      
+      return err;
+    }
+
+    /**
      * @brief sendData that allows sending for reserved topic pong
      * @returns DUCK_ERR_NONE if the data was sent successfully, an error code otherwise.
      */
@@ -416,6 +441,7 @@ class Duck {
     Duck(Duck const&) = delete;
     Duck& operator=(Duck const&) = delete;
     const int HEALTH_INTERVAL = 1000 * 60 * 15; //15 minutes
+    const int SIGNAL_INTERVAL = 1000 * 60 * 60; //1 hour
     int counter = 1;
     auto duckTimer = timer_create_default();
 

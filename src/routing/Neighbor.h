@@ -27,6 +27,7 @@ class Neighbor {
       unsigned long getLastSeen() const { return lastSeen; }
       long getSnr() { return snr; }
       long getRssi() { return rssi; }
+      Duid getDuid(){  return DeviceId; }
   private:
       Duid DeviceId;
       unsigned long lastSeen;

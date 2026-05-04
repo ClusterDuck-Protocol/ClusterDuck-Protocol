@@ -37,15 +37,53 @@ std::optional<Duid> DuckRouter::getBestNextHop(Duid targetDeviceId){
 
 };
 
-void DuckRouter::CullRoutingTable(size_t maxSize) {
-    //iterate through and remove all expired ttl routes
-    std::size_t size = routingTable.size();
-    while (size > maxSize) {
-        auto it = std::prev(routingTable.end(),1); // Get iterator to the last element
-        routingTable.erase(it);
-        size = routingTable.size(); // Update size after erasure
+void DuckRouter::cullRoutingTable(size_t maxSize) {
+    //iterate through and remove all expired ttl routes based off of the route ttl expiry above
+    auto neighborIndex = routingTable.begin();
+    while(neighborIndex != routingTable.end()) {
+        auto& neighborList = neighborIndex->second;
+        
+        auto entry = neighborList.begin();
+        while(entry != neighborList.end()) {
+            if (entry->getLastSeen() <= millis()- ROUTE_TTL) {
+                loginfo_ln("[ROUTER] culling route with ttl expired");
+                entry = neighborList.erase(entry);
+            } else {
+                ++entry;
+            }
+        }
+        
+        if (neighborList.empty()) {
+            neighborIndex = routingTable.erase(neighborIndex);
+        } else {
+            ++neighborIndex;
+        }
+        //check to make sure entries per destination doesn't exceed max
+        std::size_t size = routingTable.size();
+        while (size > maxSize) {
+            auto it = std::prev(routingTable.end(),1); // Get iterator to the last element
+            loginfo_ln("[ROUTER] culling route that exceeded max entries");
+            routingTable.erase(it);
+            size = routingTable.size(); // Update size after erasure
+        }
     }
 };
+
+std::optional<std::string> DuckRouter::getEntriesFor(Duid targetDuid){
+    auto target = routingTable.find(duckutils::toString(targetDuid));
+    std::string result = "";
+
+    if (target == routingTable.end()) {
+        return std::nullopt; // No entry found
+    }
+    auto entry = target->second.begin();
+    while(entry != target->second.end()){
+        result += "[ Duid: " + duckutils::toString(entry->getDuid());
+        result += ", rssi: " + entry->getRssi();
+        result += ", snr: " + entry->getSnr() + ']';
+        ++entry;
+    }
+}
 
 BloomFilter& DuckRouter::getFilter(){
     return filter; //just call the bloomfilter function here?

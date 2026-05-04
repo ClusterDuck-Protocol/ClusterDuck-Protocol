@@ -49,11 +49,17 @@ class DuckRouter {
         }
     protected:
         /**
-         * @brief Cull the routing table to a maximum size. Default is 3 entries. Can be expanded for larger networks.
-         * @param maxSize the maximum size of the routing table
-         * @Note This may not be used
+         * @brief Cull the routing table to a maximum size and remove expired routes. Default is 3 entries.
+         * @param maxSize the maximum size of neighbor entries per destination target
          */
-        void CullRoutingTable(size_t maxSize = 3);
+        void cullRoutingTable(size_t maxSize = 3);
+
+        /**
+         * @brief retrieve all neighbor entries for a given destination target
+         * @param targetDuid destination duid
+         * @returns the list of all best-next-hops for the destination id in string format, to be sent as packet data.
+         */
+        std::optional<std::string> getEntriesFor(Duid targetDuid);
 
     private:
         std::unordered_map<std::string, std::list<Neighbor>> routingTable;
