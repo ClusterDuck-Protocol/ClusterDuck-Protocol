@@ -47,8 +47,8 @@ class DuckRouter {
                 networkTransition(oldState, newState);
             }
         }
-    protected:
-        /**
+
+                /**
          * @brief Cull the routing table to a maximum size and remove expired routes. Default is 3 entries.
          * @param maxSize the maximum size of neighbor entries per destination target
          */

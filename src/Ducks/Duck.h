@@ -15,6 +15,7 @@
 #include "../wifi/DuckWifiNone.h"
 #include "../routing/DuckRouter.h"
 #include "../routing/RouteJSON.h"
+#include "../utils/MemoryFree.h"
 
 #define NET_JOIN_DELAY 15000L
 
@@ -54,8 +55,8 @@ class Duck {
       this->setupSerial(115200);
       int err = this->setupLoRaRadio();
       if (err != DUCK_ERR_NONE) {
-        duckTimer.every(HEALTH_INTERVAL, this->sendHealth());
-        duckTimer.every(SIGNAL_INTERVAL, this->sendSignalData()); 
+        duckTimer.every(HEALTH_INTERVAL, sendHealth, this);
+        duckTimer.every(SIGNAL_INTERVAL, sendSignalData, this);
         logerr_ln("ERROR setupWithDefaults rc = %d",err); 
       }
       return err;
@@ -334,40 +335,42 @@ class Duck {
      * @brief sendData that allows sending for health on an internal timer
      * @returns DUCK_ERR_NONE if the data was sent successfully, an error code otherwise.
      */
-    int sendHealth(){
-      std::string message = "C:" + std::to_string(counter) + "|" + "FM:" + std::to_string(freeMemory());
-      int err = this->sendData(topics::health, message);
+    static bool sendHealth(void* p){
+      Duck* duckInstance = static_cast<Duck*>(p);
+      std::string message = "C:" + std::to_string(duckInstance->counter) + "|" + "FM:" + std::to_string(freeMemory());
+      int err = duckInstance->sendData(topics::health, message);
       if (err != DUCK_ERR_NONE) {
-        counter++;
-        loginfo_ln("[MAMA] health message failed to send.");
+        duckInstance->counter++;
+        loginfo_ln("[DUCK] health message failed to send.");
       } else {
-        loginfo_ln("[MAMA] health message successfully sent.");
+        loginfo_ln("[DUCK] health message successfully sent.");
       }
-      return err;
+      return err == DUCK_ERR_NONE;
     }
 
     /**
      * @brief sendData that allows sending for signal info for DMS mapping on an internal timer
      * @returns DUCK_ERR_NONE if the data was sent successfully, an error code otherwise.
      */
-    int sendSignalData(){
+    static bool sendSignalData(void* p){
+      Duck* duckInstance = static_cast<Duck*>(p);
       int err;
-      router.cullRoutingTable();
-      std::optional<std::string> message = router.getEntriesFor(PAPADUCK_DUID);
+      duckInstance->router.cullRoutingTable();
+      std::optional<std::string> message = duckInstance->router.getEntriesFor(PAPADUCK_DUID);
 
       if(message.has_value()){
-        err = this->sendData(topics::health, message);
+        err = duckInstance->sendData(topics::health, message.value());
         if (err != DUCK_ERR_NONE) {
-          loginfo_ln("[MAMA] signal info for DMS message failed to send.");
+          loginfo_ln("[DUCK] signal info for DMS message failed to send.");
         } else {
-          loginfo_ln("[MAMA] signal info for DMS message successfully sent.");
+          loginfo_ln("[DUCK] signal info for DMS message successfully sent.");
         }
       } else { 
-        loginfo_ln("[MAMA] No route entry for specified target was found.");
+        loginfo_ln("[DUCK] No route entry for specified target was found.");
         err = -1;
       }
       
-      return err;
+      return err == DUCK_ERR_NONE;
     }
 
     /**
@@ -443,7 +446,7 @@ class Duck {
     const int HEALTH_INTERVAL = 1000 * 60 * 15; //15 minutes
     const int SIGNAL_INTERVAL = 1000 * 60 * 60; //1 hour
     int counter = 1;
-    auto duckTimer = timer_create_default();
+    Timer<10> duckTimer;
 
     /**
      * @brief Read packets from CDP nodes responding to our network join request
