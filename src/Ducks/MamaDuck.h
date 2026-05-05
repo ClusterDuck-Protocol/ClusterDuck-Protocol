@@ -48,6 +48,9 @@ private :
         }
         CdpPacket rxPacket(rxData.value());
         logdbg_ln("Got data from radio. size: %d",rxPacket.size());
+        //insert packet into rx queue. processing below is deferred to another function
+        //move handle receieve packet to duck base, turn this into route protocol?
+        //how do we decide when to take a moment to read packets? is a flagbcheck in looop good en9ugh?
 
         // recvDataCallback(rxPacket); crashes the duck if callback body not defined in sketch
         

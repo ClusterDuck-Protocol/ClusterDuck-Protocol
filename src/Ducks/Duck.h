@@ -15,6 +15,7 @@
 #include "../wifi/DuckWifiNone.h"
 #include "../routing/DuckRouter.h"
 #include "../routing/RouteJSON.h"
+#include "../routing/SizedQueue.h"
 #include "../utils/MemoryFree.h"
 
 #define NET_JOIN_DELAY 15000L
@@ -34,7 +35,13 @@ class Duck {
       Duck::logIfLowMemory();
       if(router.getNetworkState() == NetworkState::PUBLIC) {
         if(duckRadio.getReceiveFlag()){
-          handleReceivedPacket();
+          handleReceivedPacket(); //add packetto queue
+        } else{
+            //process a rxPacket if any
+            //routeProtocol.processPacket(rxQueue.dequeu())
+            //semd a txPacket if any -- hopefully doing both doesnt take too much time
+            CdpPacket txPacket = txQueue.dequeue();
+            this->sendData(txPacket.topic, txPackrt.data, txzpadket.dduid);
         }
       } else {
         if(this->getType() == DuckType::DETECTOR){
@@ -443,12 +450,16 @@ class Duck {
   private:
     Duck(Duck const&) = delete;
     Duck& operator=(Duck const&) = delete;
+    SizedQueue<CdpPacket> rxQueue();
+    SizedQueue<CdpPacket> txQueue();
+
+    //Telemetry
     const int HEALTH_INTERVAL = 1000 * 60 * 15; //15 minutes
     const int SIGNAL_INTERVAL = 1000 * 60 * 60; //1 hour
     int counter = 1;
     Timer<10> duckTimer;
 
-    /**
+    /** 
      * @brief Read packets from CDP nodes responding to our network join request
      * @returns Optional<CdpPacket> if network join response is found, nullopt if not 
      */
