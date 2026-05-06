@@ -12,14 +12,14 @@ public:
   ~DetectorDuck() {}
 
   /// callback definition for receiving RSSI value
-  using rssiCallback = void (*)(const int);
+  using rxDoneCallback = void (*)(CdpPacket data);
   
   /**
    * @brief Regsiter a callback for receiving and handling RSSI value
    *
    * @param rssiCb a call back defined with the following signature: `void (*)(const int)`
    */
-  void onReceiveRssi(rssiCallback rssiCb) { this->rssiCb = rssiCb; }
+  void onReceiveDuckData(rxDoneCallback cb) { this->recvDataCallback = cb; }
 
   /**
    * @brief Get the DuckType
@@ -29,7 +29,7 @@ public:
   DuckType getType() { return DuckType::DETECTOR; }
 
 private:
-  rssiCallback rssiCb;
+  rxDoneCallback recvDataCallback;
 
   void handleReceivedPacket() {
     loginfo_ln("====> handleReceivedPacket: START");
@@ -45,8 +45,8 @@ private:
   
     if (rxPacket.topic == reservedTopic::pong) {
       logdbg("run() - got ping response!");
-      rssiCb(this->duckRadio.getRSSI());
-    }
+      if (recvDataCallback) recvDataCallback(rxPacket);
+    } 
   }
 };
 #endif

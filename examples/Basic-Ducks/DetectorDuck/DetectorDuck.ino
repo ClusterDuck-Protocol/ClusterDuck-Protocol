@@ -42,7 +42,7 @@ void setup() {
   duck.setupWithDefaults();
 
   // Register  a callback that provides RSSI value
-  duck.onReceiveRssi(handleReceiveRssi);
+  duck.onReceiveDuckData(handleReceiveRssi);
 
   // Initialize the timer. The timer thread runs separately from the main loop
   // and will trigger sending a counter message.
@@ -57,11 +57,11 @@ void setup() {
   Serial.println("[DETECTOR] Setup OK!");
 }
 
-void handleReceiveRssi(const int rssi) {
+void handleReceiveRssi(CdpPacket packet) {
   Serial.println("[DETECTOR] RSSI callback called");
-  showSignalQuality(rssi);
-  Serial.println("[DETECTOR] Reseting signal timeout");
-  lastSignalTime = millis();
+  // showSignalQuality(rssi);
+  // Serial.println("[DETECTOR] Reseting signal timeout");
+  // lastSignalTime = millis();
 }
 
 void loop() {

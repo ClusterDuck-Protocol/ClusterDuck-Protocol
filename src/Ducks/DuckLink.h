@@ -18,7 +18,18 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
      */
     DuckType getType() { return DuckType::LINK; }
 
+    using rxDoneCallback = void (*)(CdpPacket data);
+    /**
+     * @brief Register callback for handling data received from duck devices
+     * 
+     * The callback will be invoked if the packet needs to be relayed (i.e not seen before)
+     * @param cb a callback to handle data received by the papa duck
+     */
+    void onReceiveDuckData(rxDoneCallback cb) { this->recvDataCallback = cb; }
+
   private:
+    rxDoneCallback recvDataCallback;
+
     /**
      * @brief Handles any packets received by the duck. Overrides the pure virtual function in Duck base class.
      */
@@ -37,7 +48,7 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
           CdpPacket rxPacket(rxData.value());
           logdbg_ln("Got data from radio. size: %d",rxPacket.size());
   
-          // recvDataCallback(rxPacket.asBytes());
+          if (recvDataCallback) recvDataCallback(rxPacket);
           
           //Check if Duck is desitination for this packet before relaying
           if (duckutils::isEqual(BROADCAST_DUID, rxPacket.dduid)) {

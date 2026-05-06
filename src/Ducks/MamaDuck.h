@@ -52,7 +52,7 @@ private :
         //move handle receieve packet to duck base, turn this into route protocol?
         //how do we decide when to take a moment to read packets? is a flagbcheck in looop good en9ugh?
 
-        // recvDataCallback(rxPacket); crashes the duck if callback body not defined in sketch
+        if (recvDataCallback) recvDataCallback(rxPacket);
         
         //Check if Duck is desitination for this packet before relaying
         if (duckutils::isEqual(BROADCAST_DUID, rxPacket.dduid)) {
