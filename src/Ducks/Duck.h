@@ -41,7 +41,7 @@ class Duck {
             //routeProtocol.processPacket(rxQueue.dequeu())
             //semd a txPacket if any -- hopefully doing both doesnt take too much time
             CdpPacket txPacket = txQueue.dequeue();
-            this->sendData(txPacket.topic, txPackrt.data, txzpadket.dduid);
+            this->sendData(txPacket.topic, txPacket.data.data(), txPacket.data.size(), txPacket.dduid);
         }
       } else {
         if(this->getType() == DuckType::DETECTOR){
@@ -450,8 +450,8 @@ class Duck {
   private:
     Duck(Duck const&) = delete;
     Duck& operator=(Duck const&) = delete;
-    SizedQueue<CdpPacket> rxQueue();
-    SizedQueue<CdpPacket> txQueue();
+    SizedQueue rxQueue;
+    SizedQueue txQueue;
 
     //Telemetry
     const int HEALTH_INTERVAL = 1000 * 60 * 15; //15 minutes

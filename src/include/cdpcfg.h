@@ -54,6 +54,9 @@
 /// Serial Console Baud Rate
 #define CDPCFG_SERIAL_BAUD 115200
 
+//Max TX and RX packet queue size
+#define CDPCFG_MAX_QUEUE_SIZE 10
+
 // Access point IP adress
 
 #define CDPCFG_AP_IP1 192

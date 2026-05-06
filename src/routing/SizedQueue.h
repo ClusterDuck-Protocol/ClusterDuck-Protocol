@@ -1,28 +1,29 @@
 //wrap std::queue with push and pop functions that enforce max size, max size should bebadded to cdp cfg
-#include "../utils/DuckLogger.h";
-#include "../CdpPacket. h"
+#include "../utils/DuckLogger.h"
+#include <queue>
+#include "../CdpPacket.h"
 
 class SizedQueue{
+  public:
+  SizedQueue(int maxSize = CDPCFG_MAX_QUEUE_SIZE): maxSize(maxSize) {}
+  ~SizedQueue() = default; 
 
-}
-
-public:
-  SizedQueue::SizedQueue(int maxSize = CDPCFG_MAX_QUEUE_SIZE): this->maxSize;
-  SizedQueue::~SizedQueue()
-
-  SizedQueue::enqueue(CdpPacket packet){
-    if (packetQueue.size( )> maxSize){
-      packetQueue.enqueue(packet);
+  void enqueue(CdpPacket packet){ //pass copy or reference here?
+    if (packetQueue.size() < maxSize){
+      packetQueue.push(packet);
     }else{
      loginfo_ln("[ROUTER] rx packet queue max size exceeded");
     }
-    loginfo_ln(maxSize);
+    loginfo_ln("[ROUTER] queue size: %d", maxSize);
   }
-  CdpPacket SizedQueue::dequeue(CdpPacket packet){
+  CdpPacket dequeue(){
     if(!packetQueue.empty()){
-      return packetQueue.dequeue(packet);
+      CdpPacket packet = packetQueue.front();
+      packetQueue.pop();
+      return packet;
     }
   }
 private:
-  int MAX_QUEUE_SIZE;
+  int maxSize;
   std::queue<CdpPacket> packetQueue;
+};
