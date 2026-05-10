@@ -120,7 +120,8 @@ int DuckLoRa::setupRadio(const LoRaConfigParams &config) {
 
     // set sync word to private network
 
-    rc = lora.setSyncWord(0x12); //should this be passed?
+    //rc = lora.setSyncWord(0x12); //should this be passed?
+    rc = lora.setSyncWord(0x34); // public instead of ClusterDuck default 0x12
 
     if (rc != RADIOLIB_ERR_NONE) {
         logerr_ln("ERROR  sync word is invalid");
