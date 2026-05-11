@@ -36,7 +36,18 @@ private:
 
     if (rxPacket.topic == reservedTopic::pong) {
       logdbg("run() - got ping response!");
-      if (recvDataCallback) recvDataCallback(rxPacket);
+      CdpPacket signalDataPacket = rxPacket;
+
+      JsonDocument doc;
+      doc["rssi"] = this->duckRadio.getRSSI();
+      doc["snr"] = this->duckRadio.getSNR();
+
+      String jsonString;
+      serializeJson(doc, jsonString);
+
+      signalDataPacket.data = std::vector<byte>(jsonString.begin(), jsonString.end());
+
+      if (recvDataCallback) recvDataCallback(signalDataPacket);
     } 
   }
 };

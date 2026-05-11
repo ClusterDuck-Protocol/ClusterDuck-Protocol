@@ -34,11 +34,23 @@ class Duck {
       duckRadio.serviceInterruptFlags();
       Duck::logIfLowMemory();
       if(router.getNetworkState() == NetworkState::PUBLIC) {
-        if(duckRadio.getReceiveFlag()){
-          queueReceivedPacket();
+        if (duckRadio.getReceiveFlag()){
+          if(this->getType() == DuckType::DETECTOR){ //maybe we should have an alternate run for detector>?
+            std::optional<std::vector<uint8_t>> rxData = this->duckRadio.readReceivedData();
+            if (!rxData.has_value()) {
+              logerr_ln("ERROR failed to get data from DuckRadio.");
+              return;
+            }
+            CdpPacket rxPacket(rxData.value());
+            logdbg_ln("Got data from radio. size: %d",rxPacket.size());
+            handleReceivedPacket(rxPacket);
+          } else{ 
+            queueReceivedPacket(); 
+          }
         } else{
             std::optional<CdpPacket> rxPacket = rxQueue.dequeue();
             if(rxPacket.has_value()){
+              Serial.println("process next queued RX packet");
               handleReceivedPacket(rxPacket.value());
             }
       
@@ -46,6 +58,7 @@ class Duck {
             //semd a txPacket if any -- hopefully doing both doesnt take too much time
             std::optional<CdpPacket> txPacket = txQueue.dequeue();
             if(txPacket.has_value()){
+              Serial.println("send a queued packet");
               this->sendData(txPacket->topic, txPacket->data.data(), txPacket->data.size(), txPacket->dduid);
             }
         }
@@ -542,8 +555,9 @@ class Duck {
 
     void queueReceivedPacket(){
         std::optional<std::vector<uint8_t>> rxData = this->duckRadio.readReceivedData();
-        if (!rxData) {
-        logerr_ln("ERROR failed to get data from DuckRadio.");
+        if (!rxData.has_value()) {
+          logerr_ln("ERROR failed to get data from DuckRadio.");
+          return;
         }
         CdpPacket rxPacket(rxData.value());
         logdbg_ln("Got data from radio. size: %d",rxPacket.size());
