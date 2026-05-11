@@ -35,13 +35,19 @@ class Duck {
       Duck::logIfLowMemory();
       if(router.getNetworkState() == NetworkState::PUBLIC) {
         if(duckRadio.getReceiveFlag()){
-          handleReceivedPacket(); //add packetto queue
+          queueReceivedPacket();
         } else{
-            //process a rxPacket if any
+            std::optional<CdpPacket> rxPacket = rxQueue.dequeue();
+            if(rxPacket.has_value()){
+              handleReceivedPacket(rxPacket.value());
+            }
+      
             //routeProtocol.processPacket(rxQueue.dequeu())
             //semd a txPacket if any -- hopefully doing both doesnt take too much time
-            CdpPacket txPacket = txQueue.dequeue();
-            this->sendData(txPacket.topic, txPacket.data.data(), txPacket.data.size(), txPacket.dduid);
+            std::optional<CdpPacket> txPacket = txQueue.dequeue();
+            if(txPacket.has_value()){
+              this->sendData(txPacket->topic, txPacket->data.data(), txPacket->data.size(), txPacket->dduid);
+            }
         }
       } else {
         if(this->getType() == DuckType::DETECTOR){
@@ -208,7 +214,7 @@ class Duck {
     /**
      * @brief Duck-type specific handler for different packet topics
      */ 
-    virtual void handleReceivedPacket() = 0;
+    virtual void handleReceivedPacket(CdpPacket packet) = 0;
 
     int broadcastPacket(CdpPacket& packet){
       bool alreadySeen = router.getFilter().bloom_check(packet.muid.data(), MUID_LENGTH);
@@ -532,6 +538,17 @@ class Duck {
       }
      
       return err;
+    }
+
+    void queueReceivedPacket(){
+        std::optional<std::vector<uint8_t>> rxData = this->duckRadio.readReceivedData();
+        if (!rxData) {
+        logerr_ln("ERROR failed to get data from DuckRadio.");
+        }
+        CdpPacket rxPacket(rxData.value());
+        logdbg_ln("Got data from radio. size: %d",rxPacket.size());
+        rxQueue.enqueue(rxPacket);
+        //move handle receieve packet to duck base, turn old handlereceive into route protocol?
     }
 };
 

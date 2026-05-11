@@ -31,18 +31,9 @@ public:
 private:
   rxDoneCallback recvDataCallback;
 
-  void handleReceivedPacket() {
+  void handleReceivedPacket(CdpPacket rxPacket) {
     loginfo_ln("====> handleReceivedPacket: START");
 
-    int err;
-    std::optional<std::vector<uint8_t>> rxData = this->duckRadio.readReceivedData();
-    if (!rxData) {
-    logerr_ln("ERROR failed to get data from DuckRadio.");
-    return;
-    }
-    CdpPacket rxPacket(rxData.value());
-    logdbg_ln("Got data from radio. size: %d",rxPacket.size());
-  
     if (rxPacket.topic == reservedTopic::pong) {
       logdbg("run() - got ping response!");
       if (recvDataCallback) recvDataCallback(rxPacket);

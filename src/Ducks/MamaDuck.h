@@ -37,35 +37,23 @@ private :
      * Could be a RREQ, RREP, PING, PONG or DATA packet on its associated topic.
      *
      */
-    void handleReceivedPacket() override {
+    void handleReceivedPacket(CdpPacket rxPacket) override {
         loginfo_ln("====> handleReceivedPacket: START");
-
-        int err;
-        std::optional<std::vector<uint8_t>> rxData = this->duckRadio.readReceivedData();
-        if (!rxData) {
-        logerr_ln("ERROR failed to get data from DuckRadio.");
-        return;
-        }
-        CdpPacket rxPacket(rxData.value());
-        logdbg_ln("Got data from radio. size: %d",rxPacket.size());
-        //insert packet into rx queue. processing below is deferred to another function
-        //move handle receieve packet to duck base, turn this into route protocol?
-        //how do we decide when to take a moment to read packets? is a flagbcheck in looop good en9ugh?
-
         if (recvDataCallback) recvDataCallback(rxPacket);
-        
+
         //Check if Duck is desitination for this packet before relaying
         if (duckutils::isEqual(BROADCAST_DUID, rxPacket.dduid)) {
-            ifBroadcast(rxPacket, err);
+            ifBroadcast(rxPacket);
         } else if(duckutils::isEqual(this->duid, rxPacket.dduid)) { //Target device check
-            ifNotBroadcast(rxPacket, err);
+            ifNotBroadcast(rxPacket);
         } else { //If it's meant for a specific target but not this one
-            ifNotBroadcast(rxPacket, err, true);
+            ifNotBroadcast(rxPacket, true);
         }
         this->router.getFilter().bloom_add(rxPacket.muid.data(), MUID_LENGTH);
     }
 
-    void ifBroadcast(CdpPacket rxPacket, int err) {
+    void ifBroadcast(CdpPacket rxPacket) {
+        int err;
         switch(rxPacket.topic) {
             case reservedTopic::rreq: {
                 if(rxPacket.hopCount <= 0){
@@ -109,8 +97,8 @@ private :
         }
     }
 
-    void ifNotBroadcast(CdpPacket rxPacket, int err, bool relay = false) {
-
+    void ifNotBroadcast(CdpPacket rxPacket, bool relay = false) {
+        int err;
         switch(rxPacket.topic) {
             case reservedTopic::rreq: {
                 RouteJSON rreqDoc = RouteJSON(rxPacket.data);

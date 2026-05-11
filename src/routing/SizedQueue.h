@@ -16,13 +16,17 @@ class SizedQueue{
     }
     loginfo_ln("[ROUTER] queue size: %d", maxSize);
   }
-  CdpPacket dequeue(){
+
+  std::optional<CdpPacket> dequeue(){
     if(!packetQueue.empty()){
       CdpPacket packet = packetQueue.front();
       packetQueue.pop();
       return packet;
+    } else{
+      return std::nullopt;
     }
   }
+  
 private:
   int maxSize;
   std::queue<CdpPacket> packetQueue;
