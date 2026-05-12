@@ -93,6 +93,10 @@ enum topics {
   alert = 0x14,
   /// Device health status
   health = 0x15,
+  //node signal data
+  sig = 0x17,
+  //battery level
+  bat = 0x18,
   // Send duck commands
   dcmd = 0x16,
   //gps
@@ -276,6 +280,10 @@ class CdpPacket {
                 return "gps";
             case topics::sensor:
                 return "sensor";
+            case topics::bat:
+                return "battery";
+            case topics::sig:
+                return "signal health";
             case topics::alert:
                 return "alert";
             case topics::health:

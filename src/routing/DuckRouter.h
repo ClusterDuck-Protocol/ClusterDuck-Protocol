@@ -59,7 +59,7 @@ class DuckRouter {
          * @param targetDuid destination duid
          * @returns the list of all best-next-hops for the destination id in string format, to be sent as packet data.
          */
-        std::optional<std::string> getEntriesFor(Duid targetDuid);
+        std::optional<std::string> getEntriesFor(Duid targetDuid, Duid thisDuck);
 
     private:
         std::unordered_map<std::string, std::list<Neighbor>> routingTable;

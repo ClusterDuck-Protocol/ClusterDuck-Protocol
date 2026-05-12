@@ -42,7 +42,7 @@ private:
       doc["rssi"] = this->duckRadio.getRSSI();
       doc["snr"] = this->duckRadio.getSNR();
 
-      String jsonString;
+      std::string jsonString;
       serializeJson(doc, jsonString);
 
       signalDataPacket.data = std::vector<byte>(jsonString.begin(), jsonString.end());

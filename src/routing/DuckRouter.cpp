@@ -1,4 +1,5 @@
 #include "DuckRouter.h"
+#include <ArduinoJson.h>
 
 void DuckRouter::insertIntoRoutingTable(Duid deviceID, Duid nextHop, SignalScore signalInfo) {
 
@@ -39,13 +40,14 @@ std::optional<Duid> DuckRouter::getBestNextHop(Duid targetDeviceId){
 
 void DuckRouter::cullRoutingTable(size_t maxSize) {
     //iterate through and remove all expired ttl routes based off of the route ttl expiry above
+
     auto neighborIndex = routingTable.begin();
     while(neighborIndex != routingTable.end()) {
         auto& neighborList = neighborIndex->second;
         
         auto entry = neighborList.begin();
         while(entry != neighborList.end()) {
-            if (entry->getLastSeen() <= millis()- ROUTE_TTL) {
+            if (entry->getLastSeen() >= millis()- ROUTE_TTL) {
                 loginfo_ln("[ROUTER] culling route with ttl expired");
                 entry = neighborList.erase(entry);
             } else {
@@ -69,20 +71,30 @@ void DuckRouter::cullRoutingTable(size_t maxSize) {
     }
 };
 
-std::optional<std::string> DuckRouter::getEntriesFor(Duid targetDuid){
+std::optional<std::string> DuckRouter::getEntriesFor(Duid targetDuid, Duid thisDuck){
     auto target = routingTable.find(duckutils::toString(targetDuid));
-    std::string result = "";
+    JsonDocument doc;
 
     if (target == routingTable.end()) {
-        return std::nullopt; // No entry found
+        return std::nullopt;
     }
+
+    doc["s"] = duckutils::toString(thisDuck);
+    JsonArray neighborsArr = doc.createNestedArray("n");
+
     auto entry = target->second.begin();
     while(entry != target->second.end()){
-        result += "[ Duid: " + duckutils::toString(entry->getDuid());
-        result += ", rssi: " + entry->getRssi();
-        result += ", snr: " + entry->getSnr() + ']';
-        ++entry;
+        JsonArray node = neighborsArr.createNestedArray();
+        node.add(duckutils::toString(entry->getDuid()));
+        node.add(entry->getRssi());
+        node.add(entry->getSnr());
+        entry++;
     }
+
+    std::string jsonString;
+    serializeJson(doc, jsonString);
+
+    return jsonString;
 }
 
 BloomFilter& DuckRouter::getFilter(){

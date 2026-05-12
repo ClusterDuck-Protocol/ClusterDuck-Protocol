@@ -74,16 +74,17 @@ class Duck {
             }
         }
       }
-
+      duckTimer.tick();
     }
 
     int setupWithDefaults() {
       this->setupSerial(115200);
       int err = this->setupLoRaRadio();
       if (err != DUCK_ERR_NONE) {
+        logerr_ln("ERROR setupWithDefaults rc = %d",err); 
+      } else{
         duckTimer.every(HEALTH_INTERVAL, sendHealth, this);
         duckTimer.every(SIGNAL_INTERVAL, sendSignalData, this);
-        logerr_ln("ERROR setupWithDefaults rc = %d",err); 
       }
       return err;
     }
@@ -371,7 +372,7 @@ class Duck {
       } else {
         loginfo_ln("[DUCK] health message successfully sent.");
       }
-      return err == DUCK_ERR_NONE;
+      return true;
     }
 
     /**
@@ -382,10 +383,11 @@ class Duck {
       Duck* duckInstance = static_cast<Duck*>(p);
       int err;
       duckInstance->router.cullRoutingTable();
-      std::optional<std::string> message = duckInstance->router.getEntriesFor(PAPADUCK_DUID);
+      std::optional<std::string> message = duckInstance->router.getEntriesFor("PAPADUCK_DUID", duckInstance->duid);
 
       if(message.has_value()){
-        err = duckInstance->sendData(topics::health, message.value());
+        loginfo_ln("signal data: %s", message.c_str());
+        err = duckInstance->sendData(topics::sig, message.value());
         if (err != DUCK_ERR_NONE) {
           loginfo_ln("[DUCK] signal info for DMS message failed to send.");
         } else {
@@ -396,7 +398,7 @@ class Duck {
         err = -1;
       }
       
-      return err == DUCK_ERR_NONE;
+      return true;
     }
 
     /**
@@ -474,7 +476,7 @@ class Duck {
 
     //Telemetry
     const int HEALTH_INTERVAL = 1000 * 60 * 15; //15 minutes
-    const int SIGNAL_INTERVAL = 1000 * 60 * 60; //1 hour
+    const int SIGNAL_INTERVAL = 1000 * 60 * 62; //1 hour 2 min
     int counter = 1;
     Timer<10> duckTimer;
 
