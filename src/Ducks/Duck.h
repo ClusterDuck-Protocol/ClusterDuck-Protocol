@@ -383,7 +383,7 @@ class Duck {
       Duck* duckInstance = static_cast<Duck*>(p);
       int err;
       duckInstance->router.cullRoutingTable();
-      std::optional<std::string> message = duckInstance->router.getEntriesFor("PAPADUCK_DUID", duckInstance->duid);
+      std::optional<std::string> message = duckInstance->router.getEntriesFor(PAPADUCK_DUID, duckInstance->duid);
 
       if(message.has_value()){
         loginfo_ln("signal data: %s", message.c_str());
