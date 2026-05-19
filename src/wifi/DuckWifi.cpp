@@ -13,7 +13,7 @@ int DuckWifi::joinNetwork(std::string ssid, std::string password) {
   loginfo_ln("setupInternet: connecting to WiFi access point SSID: %s", ssid.c_str());
   WiFi.begin(ssid.c_str(), password.c_str());
   // We need to wait here for the connection to establish. Otherwise the WiFi.status() may return a false negative
-  loginfo_ln("setupInternet: Waiting for connect results for ", ssid.c_str());
+  loginfo_ln("setupInternet: Waiting for connect results for %s", ssid.c_str());
   WiFi.waitForConnectResult(WIFI_CONNECTION_TIMEOUT_MS);
 
   if (connected()) {
