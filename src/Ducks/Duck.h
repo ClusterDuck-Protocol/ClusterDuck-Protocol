@@ -386,7 +386,7 @@ class Duck {
       std::optional<std::string> message = duckInstance->router.getEntriesFor(PAPADUCK_DUID, duckInstance->duid);
 
       if(message.has_value()){
-        loginfo_ln("signal data: %s", message.c_str());
+        loginfo_ln("signal data: %s", message.value().c_str());
         err = duckInstance->sendData(topics::sig, message.value());
         if (err != DUCK_ERR_NONE) {
           loginfo_ln("[DUCK] signal info for DMS message failed to send.");
