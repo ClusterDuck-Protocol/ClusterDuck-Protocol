@@ -1,9 +1,9 @@
 #ifndef DUCKWIFI_H
 #define DUCKWIFI_H
 
-// #ifdef CDPCFG_WIFI_NONE
-// #pragma info "WARNING: WiFi is disabled. DuckNet will not be available."
-// #else
+#ifdef CDPCFG_WIFI_NONE
+ #pragma info "WARNING: WiFi is disabled. DuckNet will not be available."
+#else
 
 #include "../utils/DuckError.h"
 #include "../utils/DuckLogger.h"
@@ -59,5 +59,5 @@ class DuckWifi {
          */
         int loadWiFiCredentials();
 };
-
+#endif
 #endif

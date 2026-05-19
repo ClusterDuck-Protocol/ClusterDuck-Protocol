@@ -521,7 +521,7 @@ class Duck {
         router.getFilter().assignUniqueMessageId(txPacket);
         err = txPacket.prepareForSending();
         if (err != DUCK_ERR_NONE) {
-          logerr_ln("ERROR Failed to build packet, err = " + err);
+          logerr_ln("ERROR Failed to build packet: %s err = %i",getDuckErrorString(err), err);
           return err;
         }
         err = duckRadio.sendData(txPacket.asBytes());
@@ -541,7 +541,7 @@ class Duck {
     int sendToRadio(CdpPacket& txPacket) {
       int err = txPacket.prepareForSending();
       if (err != DUCK_ERR_NONE) {
-        logerr_ln("ERROR Failed to build ping packet, err = " + err);
+        logerr_ln("ERROR Failed to build ping packet: %s, err = %i",getDuckErrorString(err), err);
         return err;
       }
 
