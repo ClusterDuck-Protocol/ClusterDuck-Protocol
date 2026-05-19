@@ -389,13 +389,19 @@ class Duck {
         loginfo_ln("signal data: %s", message.value().c_str());
         err = duckInstance->sendData(topics::sig, message.value());
         if (err != DUCK_ERR_NONE) {
-          loginfo_ln("[DUCK] signal info for DMS message failed to send.");
+          logdbg_ln("[DUCK] signal info for DMS message failed to send.");
         } else {
-          loginfo_ln("[DUCK] signal info for DMS message successfully sent.");
+          logdbg_ln("[DUCK] signal info for DMS message successfully sent.");
         }
       } else { 
-        loginfo_ln("[DUCK] No route entry for specified target was found.");
-        err = -1;
+        logdbg_ln("[DUCK] No route entry for specified target was found.");
+        JsonDocument doc;
+        doc["s"] = duckutils::toString(duckInstance->duid);
+        JsonArray neighborsArr = doc.createNestedArray("n");
+        std::string jsonString;
+        serializeJson(doc, jsonString);
+        
+        err = duckInstance->sendData(topics::sig, jsonString);
       }
       
       return true;
