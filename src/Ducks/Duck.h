@@ -397,7 +397,7 @@ class Duck {
         logdbg_ln("[DUCK] No route entry for specified target was found.");
         JsonDocument doc;
         doc["s"] = duckutils::toString(duckInstance->duid);
-        JsonArray neighborsArr = doc.createNestedArray("n");
+        JsonArray neighborsArr = doc["n"].to<JsonArray>();
         std::string jsonString;
         serializeJson(doc, jsonString);
         

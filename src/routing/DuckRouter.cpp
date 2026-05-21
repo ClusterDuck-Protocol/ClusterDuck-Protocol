@@ -80,7 +80,7 @@ std::optional<std::string> DuckRouter::getEntriesFor(Duid targetDuid, Duid thisD
     }
 
     doc["s"] = duckutils::toString(thisDuck);
-    JsonArray neighborsArr = doc.createNestedArray("n");
+    JsonArray neighborsArr = doc["n"].to<JsonArray>();
 
     auto entry = target->second.begin();
     while(entry != target->second.end()){
