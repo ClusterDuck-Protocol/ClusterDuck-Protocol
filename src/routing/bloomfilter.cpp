@@ -113,7 +113,7 @@ void BloomFilter::assignUniqueMessageId(CdpPacket& packet) {
     }
 }
 
-int BloomFilter::bloom_check(unsigned char* msg, int msgSize) {
+int BloomFilter::bloom_check(unsigned char* msg, int msgSize) { //update to use Muid directly and change to bool
 
     std::unique_ptr<unsigned int[]> hashResults(new unsigned int[this->numHashes]); 
     set_hash_results(msg, msgSize, hashResults);

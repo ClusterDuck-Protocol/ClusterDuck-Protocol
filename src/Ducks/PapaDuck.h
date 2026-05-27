@@ -35,6 +35,10 @@ public:
     return this->duckWifi.connected();
   }
 
+  bool muidNotReceived(Muid muid){
+   return this->router.getFilter().bloom_check(muid.data(), MUID_LENGTH) == 0;
+  }
+
 private:
   rxDoneCallback recvDataCallback;
   
