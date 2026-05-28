@@ -52,11 +52,17 @@ private :
         // recvDataCallback(rxPacket); crashes the duck if callback body not defined in sketch
         
         //Check if Duck is desitination for this packet before relaying
+        std::string rxDduid(rxPacket.dduid.begin(), rxPacket.dduid.end());
+        std::string myDuid(this->duid.begin(), this->duid.end());
+        loginfo_ln("handleReceivedPacket: dduid=%s myDuid=%s topic=%d", rxDduid.c_str(), myDuid.c_str(), (int)rxPacket.topic);
+
         if (duckutils::isEqual(BROADCAST_DUID, rxPacket.dduid)) {
             ifBroadcast(rxPacket, err);
         } else if(duckutils::isEqual(this->duid, rxPacket.dduid)) { //Target device check
+            loginfo_ln("handleReceivedPacket: packet is FOR ME, delivering to sketch");
             ifNotBroadcast(rxPacket, err);
         } else { //If it's meant for a specific target but not this one
+            loginfo_ln("handleReceivedPacket: packet NOT for me, relaying");
             ifNotBroadcast(rxPacket, err, true);
         }
         this->router.getFilter().bloom_add(rxPacket.muid.data(), MUID_LENGTH);
@@ -172,9 +178,15 @@ private :
                 }
                 break;
             default:
+                loginfo_ln("ifNotBroadcast: default topic=%d relay=%d cbSet=%d", (int)rxPacket.topic, (int)relay, (recvDataCallback != nullptr ? 1 : 0));
                 if(relay){
                     this->forwardPacket(rxPacket); 
-                }       
+                } else if (recvDataCallback) {
+                    // Packet is directly addressed to this duck — deliver to sketch
+                    recvDataCallback(rxPacket);
+                } else {
+                    loginfo_ln("ifNotBroadcast: recvDataCallback is NULL, packet dropped!");
+                }
         }
     }
 
