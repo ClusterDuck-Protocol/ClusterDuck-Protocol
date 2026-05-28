@@ -71,7 +71,7 @@
 #define CDPCFG_RF_LORA_BW 125.0f
 /// Spread Factor
 //#define CDPCFG_RF_LORA_SF 7
-#define CDPCFG_RF_LORA_SF 12
+#define CDPCFG_RF_LORA_SF 7
 /// Transmit Power
 #define CDPCFG_RF_LORA_TXPOW 14
 /// Antenna Gain correction

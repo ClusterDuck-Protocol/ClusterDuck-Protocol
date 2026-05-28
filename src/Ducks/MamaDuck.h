@@ -109,6 +109,11 @@ private :
                 } else {
                     loginfo_ln("handleReceivedPacket: packet RELAY DONE");
                 }
+                // Also deliver to the sketch — broadcast data (e.g. emergency
+                // broadcast topic 24) must reach handleDuckData on this duck.
+                if (recvDataCallback) {
+                    recvDataCallback(rxPacket);
+                }
         }
     }
 

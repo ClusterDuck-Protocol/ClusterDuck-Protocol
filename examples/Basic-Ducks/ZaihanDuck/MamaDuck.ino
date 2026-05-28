@@ -9,8 +9,6 @@
  * @date 2025-05-07
  */
 
- #define HELTEC_POWER_BUTTON
-
  #include <string>
  #include <cstdio>
  #include <arduino-timer.h>
@@ -23,7 +21,7 @@
  #include "image.h"
  #include <NimBLEDevice.h>
 
- #define DUCK_NAME "ZAIHAN12"
+ #define DUCK_NAME "MAMADUCK"
  // Bluetooth Low energgy definitions
  #define NUS_SERVICE "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
  #define NUS_RX_CHAR "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
@@ -39,14 +37,17 @@
  void flashLED();
  void displayID();
  void displayBatt();
+ void displayHome();
  void handleFrame(const String& line);
  void broadcast(const String& frame);
+ void sendBattery();
  void handleSOS(const String& body);
  void handleMsg(const String& body);
  void handleMamaTalk(const String& body);
  bool sendMamaTalk(const String& targetId, const String& msg, const String& mid = "");
  String extractField(const String& body, const String& key);
  void sendFrame(const String& frame);
+ static float readVbat();
  
  // --- Global Variables ---
  MamaDuck duck(DUCK_NAME); // Device ID, MUST be 8 bytes and unique from other ducks;
@@ -63,18 +64,22 @@ static String bleInBuf = "";
 static String usbInBuf = "";
 static unsigned long lastUsbRxMs = 0;   // last time a byte arrived over USB
 static bool bleAdvertising = true;       // track advertising state
+static bool displayEnabled = true;       // track display on/off state
 const unsigned long USB_IDLE_TIMEOUT_MS = 30000UL; // resume BLE after 30 s of USB silence
- // static unsigned long lastBattMs = 0; battery for later
+static unsigned long lastBattMs = 0;
 
 // ── BLE callbacks ─────────────────────────────────────────────────────
 class ServerCallbacks : public NimBLEServerCallbacks {
-  void onConnect(NimBLEServer*, NimBLEConnInfo& connInfo) override {
+  void onConnect(NimBLEServer* pServer, NimBLEConnInfo& connInfo) override {
     bleConnected = true;
+    // Request longer connection interval to reduce radio duty cycle.
+    // 80*1.25ms=100ms min, 160*1.25ms=200ms max, latency=4, timeout=4000ms.
+    pServer->updateConnParams(connInfo.getConnHandle(), 80, 160, 4, 400);
     // The app will send CDK:PING after subscribing; handleFrame() will reply
     // with CDK:ID. Keep a short delay as a fallback for older app versions.
     delay(500);
     broadcast("CDK:ID,VALUE:" DUCK_NAME);
-    //sendBattery();
+    sendBattery();
   }
   void onDisconnect(NimBLEServer*, NimBLEConnInfo& connInfo, int reason) override {
     bleConnected = false;
@@ -127,16 +132,11 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
   heltec_delay(10000);
   display.clear();
 
-  displayID();
-  displayBatt();
-  display.setFont(ArialMT_Plain_10);
-  display.setTextAlignment(TEXT_ALIGN_CENTER);
-  display.drawString(64, 22, "Tekan butang atas\nsekali untuk hantar\nmesej kecemasan.");
-  display.display();
+  displayHome();
 
   duck.onReceiveDuckData(handleDuckData);
   heltec_delay(5000);
-  display.displayOff();
+  displayHome();
 
  Serial.begin(115200);
   delay(200);
@@ -144,11 +144,11 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
   // Send ID + battery over USB immediately
   Serial.println("CDK:ID,VALUE:" DUCK_NAME);
   Serial.println("[MAMA] Firmware v2 (with LAT/LNG support)");
-  //sendBattery();
+  sendBattery();
 
   // BLE init
   NimBLEDevice::init(DUCK_NAME);
-  NimBLEDevice::setPower(ESP_PWR_LVL_P9);
+  NimBLEDevice::setPower(ESP_PWR_LVL_P3); // +3 dBm — ample for <10 m, saves ~15 mW vs P9
   NimBLEServer* pServer = NimBLEDevice::createServer();
   pServer->setCallbacks(new ServerCallbacks());
   NimBLEService* pSvc = pServer->createService(NUS_SERVICE);
@@ -158,6 +158,10 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
   pRxChar->setCallbacks(new RxCallbacks());
   pSvc->start();
   NimBLEAdvertising* pAdv = NimBLEDevice::getAdvertising();
+  // Slower advertising interval (250-500 ms) cuts idle radio-on time vs the
+  // ~100 ms default. Units: 0.625 ms per BLE spec (400=250 ms, 800=500 ms).
+  pAdv->setMinInterval(400);
+  pAdv->setMaxInterval(800);
   // Put the NUS UUID in the advertising packet (not scan response) so Android
   // discovers it without needing a scan response exchange.
   NimBLEAdvertisementData advData;
@@ -182,20 +186,26 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
 
   heltec_loop();
   // Button
-  if (button.isSingleClick()) {
+  if (button.pressedFor(2000)) {
     displayID();
     displayBatt();
     display.setFont(ArialMT_Plain_10);
     display.setTextAlignment(TEXT_ALIGN_CENTER);
-    display.drawString(64, 22, "Sedang menghantar\nmesej kecemasan...");
+    display.drawString(64, 22, "Sedang menghantar\nisyarat kecemasan...");
     display.display();
 
     sendEmergency();
     heltec_delay(1000);
   }
 
-  if (button.isDoubleClick()) {
-    display.displayOn();
+  if (button.isSingleClick()) {
+    displayEnabled = !displayEnabled;
+    if (displayEnabled) {
+      display.displayOn();
+      displayHome();
+    } else {
+      display.displayOff();
+    }
   }
 
   // USB incoming
@@ -222,11 +232,11 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
       Serial.println("[BLE] USB idle — advertising resumed.");
     }
   }
-  // Periodic battery
-  /*if (millis() - lastBattMs >= 60000UL) {
+  // Periodic battery update every 60 s
+  if (millis() - lastBattMs >= 60000UL) {
     sendBattery();
     lastBattMs = millis();
-  }*/
+  }
   delay(5);
 
 
@@ -260,6 +270,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
         case 23:  // Alert
             Serial.println("⚠️  ALERT: " + message);
             flashLED();
+            broadcast(String("CDK:MSG,TEXT:") + message);
             duck.sendData(23, "ALERT_ACK");
             break;
 
@@ -324,6 +335,19 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     display.display();
  }
 
+ void displayHome() {
+    display.clear();
+    display.setTextAlignment(TEXT_ALIGN_RIGHT);
+    display.setFont(ArialMT_Plain_10);
+    display.drawString(128, 0, buffer);          // ID top-right
+    display.setTextAlignment(TEXT_ALIGN_LEFT);
+    display.drawString(0, 0, "Batt: " + String(heltec_battery_percent(readVbat())) + "%"); // battery top-left
+    display.setFont(ArialMT_Plain_10);
+    display.setTextAlignment(TEXT_ALIGN_CENTER);
+    display.drawString(64, 22, "Tekan butang atas\nutk 2 saat\nutk isyarat kecemasan.");
+    display.display();
+ }
+
  void displayID() {
     display.clear();
     display.setTextAlignment(TEXT_ALIGN_RIGHT);
@@ -332,12 +356,28 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     display.display();
  }
 
- void displayBatt() {
-    display.setTextAlignment(TEXT_ALIGN_LEFT);
-    display.setFont(ArialMT_Plain_10);
-    display.drawString(0, 0, "Batt: 100%");
-    display.display();
- }
+/** Read battery voltage with VBAT_CTRL HIGH (library uses LOW which reads 0 on this board). */
+static float readVbat() {
+  pinMode(VBAT_CTRL, OUTPUT);
+  digitalWrite(VBAT_CTRL, HIGH);
+  delay(5);
+  float vbat = analogRead(VBAT_ADC) / 238.7;
+  pinMode(VBAT_CTRL, INPUT);
+  return vbat;
+}
+
+void sendBattery() {
+  int pct = heltec_battery_percent(readVbat());
+  broadcast("CDK:BATT,LEVEL:" + String(pct));
+}
+
+void displayBatt() {
+  int pct = heltec_battery_percent(readVbat());
+  display.setTextAlignment(TEXT_ALIGN_LEFT);
+  display.setFont(ArialMT_Plain_10);
+  display.drawString(0, 0, "Batt: " + String(pct) + "%");
+  display.display();
+}
 
  void flashLED() {
     for (int i = 0; i < 5; i++) {
@@ -365,7 +405,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
      displayBatt();
      display.setFont(ArialMT_Plain_10);
      display.setTextAlignment(TEXT_ALIGN_CENTER);
-     display.drawString(64, 22, "Berjaya hantar\nmesej kecemasan!");
+     display.drawString(64, 22, "Berjaya hantar\nisyarat kecemasan!");
 
      // no displayID. because this has no clear();
      display.setTextAlignment(TEXT_ALIGN_RIGHT);
@@ -379,7 +419,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
      display.clear();
      display.setFont(ArialMT_Plain_10);
      display.setTextAlignment(TEXT_ALIGN_CENTER);
-     display.drawString(64, 22, "Tekan butang atas\nsekali untuk hantar\nmesej kecemasan.");
+     display.drawString(64, 22, "Tekan butang atas\nutk 2 saat\nutk isyarat kecemasan.");
      display.display();
      heltec_delay(5000);
      display.displayOff();
@@ -389,7 +429,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
      displayBatt();
      display.setFont(ArialMT_Plain_10);
      display.setTextAlignment(TEXT_ALIGN_CENTER);
-     display.drawString(64, 22, "Ralat. Tidak boleh\nhantar mesej kecemasan.");
+     display.drawString(64, 22, "Ralat. Tidak boleh\nhantar isyarat kecemasan.");
      display.display();
    }
    return true;
