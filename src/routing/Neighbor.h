@@ -25,8 +25,8 @@ class Neighbor {
       [[nodiscard]] std::string getDeviceId() const { return duckutils::duidAsString(DeviceId); }
       long getRoutingScore() const { return routingScore; }
       unsigned long getLastSeen() const { return lastSeen; }
-      long getSnr() { return snr; }
-      long getRssi() { return rssi; }
+      float getSnr() { return snr; }
+      float getRssi() { return rssi; }
       Duid getDuid(){  return DeviceId; }
   private:
       Duid DeviceId;

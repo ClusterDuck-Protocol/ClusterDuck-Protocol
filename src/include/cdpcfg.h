@@ -110,8 +110,8 @@
 // CDP Acceptable Signal Ranges
 #define RSSI_MAX (-20.0f)
 #define RSSI_MIN (-131.0f)
-#define SNR_MAX 11.5f
-#define SNR_MIN (-11.5f)
+#define SNR_MAX 30.0f
+#define SNR_MIN (-30.0f)
 
 #ifndef CDPCFG_OLED_CLASS
 #if defined(CDPCFG_OLED_NONE)
