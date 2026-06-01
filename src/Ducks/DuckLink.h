@@ -62,7 +62,11 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
                   // Update routing table with signal info
                   std::optional<Duid> last = rrepDoc.getlastInPath();
                   Duid lastInPath = last.has_value() ? last.value() : rxPacket.sduid;
-                  this->router.insertIntoRoutingTable(rxPacket.sduid, lastInPath, this->getSignalScore());
+                  if(rxPacket.duckType == DuckType::PAPA){
+                    this->router.insertIntoRoutingTable(PAPADUCK_DUID, lastInPath, this->getSignalScore());
+                  } else {
+                    this->router.insertIntoRoutingTable(rxPacket.sduid, lastInPath, this->getSignalScore());
+                  }
                 }
                   break;
               }
@@ -93,7 +97,11 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
                       Duid lastInPath = last.has_value() ? last.value() : rxPacket.sduid;
                       rreqDoc.convertReqToRep();
                       this->sendRouteResponse(lastInPath, rreqDoc.asString());
-                      this->router.insertIntoRoutingTable(rxPacket.sduid, lastInPath, this->getSignalScore());
+                      if(rxPacket.duckType == DuckType::PAPA){
+                        this->router.insertIntoRoutingTable(PAPADUCK_DUID, lastInPath, this->getSignalScore());
+                      } else {
+                        this->router.insertIntoRoutingTable(rxPacket.sduid, lastInPath, this->getSignalScore());
+                      }
                   }
               }
                 break;

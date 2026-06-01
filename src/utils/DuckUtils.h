@@ -66,6 +66,8 @@ std::string createUuid(int length = CDPCFG_UUID_LEN);
  * @returns A string representating the byte array in hexadecimal.
  */
 std::string convertToHex(uint8_t* data, int size);
+
+std::string hexToString(const std::string& hex);
 /**
  * @brief Convert a byte array into an ASCII string.
  * This function assumes that the byte array contains printable ASCII characters. Intended for debugging purposes.
@@ -75,6 +77,9 @@ std::string convertToHex(uint8_t* data, int size);
  *
  */
 std::string toString(uint8_t* data, int size);
+
+
+std::string duidAsString(std::array<uint8_t,8> duid);
 
 /**
  * @brief Convert a vector into an ASCII string.

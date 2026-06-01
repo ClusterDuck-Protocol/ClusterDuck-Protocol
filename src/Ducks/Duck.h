@@ -56,10 +56,10 @@ class Duck {
       
             //routeProtocol.processPacket(rxQueue.dequeu())
             //semd a txPacket if any -- hopefully doing both doesnt take too much time
-            std::optional<CdpPacket> txPacket = txQueue.dequeue();
+            std::optional<CdpPacket> txPacket = txQueue.dequeue(); 
             if(txPacket.has_value()){
               Serial.println("send a queued packet");
-              this->sendData(txPacket->topic, txPacket->data.data(), txPacket->data.size(), txPacket->dduid);
+              this->sendData(txPacket->topic, txPacket->data.data(), txPacket->data.size(), txPacket->dduid); //we can't guratnee that this is the correct function for sending the next packet
             }
         }
       } else {
@@ -220,7 +220,7 @@ class Duck {
     RadioType duckRadio;
     WifiCapability duckWifi;
     static constexpr int MEMORY_LOW_THRESHOLD = PACKET_LENGTH + sizeof(CdpPacket);
-    std::array<uint8_t,8> duid;
+    Duid duid;
     DuckRouter router;
 
 
@@ -316,7 +316,11 @@ class Duck {
       std::optional<CdpPacket> cdpNode = checkForNetworks();
       if(cdpNode.has_value()){
         //add an entry for the nearest neighbor, next hop is itself
-        router.insertIntoRoutingTable(cdpNode->sduid, cdpNode->sduid, this->getSignalScore()); //should signal score be stored on cdp packet?
+        if(cdpNode->duckType == DuckType::PAPA){
+          router.insertIntoRoutingTable(PAPADUCK_DUID, PAPADUCK_DUID, this->getSignalScore()); //papa not being stored as unique id for now
+        } else{
+          router.insertIntoRoutingTable(cdpNode->sduid, cdpNode->sduid, this->getSignalScore()); //should signal score be stored on cdp packet?
+        }
         router.setNetworkState(NetworkState::PUBLIC);
       } else {
         if((millis() - this->lastRreqTime) > NET_JOIN_DELAY){
@@ -396,7 +400,7 @@ class Duck {
       } else { 
         logdbg_ln("[DUCK] No route entry for specified target was found.");
         JsonDocument doc;
-        doc["s"] = duckutils::toString(duckInstance->duid);
+        doc["s"] = duckutils::duidAsString(duckInstance->duid);
         JsonArray neighborsArr = doc["n"].to<JsonArray>();
         std::string jsonString;
         serializeJson(doc, jsonString);
@@ -482,7 +486,7 @@ class Duck {
 
     //Telemetry
     const int HEALTH_INTERVAL = 1000 * 60 * 15; //15 minutes
-    const int SIGNAL_INTERVAL = 1000 * 60 * 7; //1 hour 2 min
+    const int SIGNAL_INTERVAL = 1000 * 5;//0 * 7; //1 hour 2 min
     int counter = 1;
     Timer<10> duckTimer;
 

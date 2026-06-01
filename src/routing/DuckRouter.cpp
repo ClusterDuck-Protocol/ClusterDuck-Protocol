@@ -4,7 +4,7 @@
 void DuckRouter::insertIntoRoutingTable(Duid deviceID, Duid nextHop, SignalScore signalInfo) {
 
     Neighbor neighborRecord(deviceID, nextHop, signalInfo, millis());
-    auto index = routingTable.find(duckutils::toString(deviceID));
+    auto index = routingTable.find(duckutils::duidAsString(deviceID));
     if (index == routingTable.end()) { //need to make sure we aren't adding Link1276->Link1276 to Mama1262
         std::list<Neighbor> neighborList;
         neighborList.push_back(neighborRecord);
@@ -20,7 +20,7 @@ void DuckRouter::insertIntoRoutingTable(Duid deviceID, Duid nextHop, SignalScore
 
 std::optional<Duid> DuckRouter::getBestNextHop(Duid targetDeviceId){
     //check if nextHop = the duid of the last duid in path/last duid that relayed to the current duck so that it doesn't transmit back the way it came from
-    auto nextHopRecord = routingTable.find(duckutils::toString(targetDeviceId));
+    auto nextHopRecord = routingTable.find(duckutils::duidAsString(targetDeviceId));
     if (nextHopRecord == routingTable.end()) {
         return std::nullopt; // No entry found
     }
@@ -29,7 +29,15 @@ std::optional<Duid> DuckRouter::getBestNextHop(Duid targetDeviceId){
     Duid nextHopId;
     std::copy(nextHopStr.begin(), nextHopStr.end(),nextHopId.begin());
 
-    if(nextHopRecord->second.front().getLastSeen() <= millis()- ROUTE_TTL){
+    if(nextHopRecord->second.front().getLastSeen() >= millis()- ROUTE_TTL){ 
+        Serial.printf(
+            "millis=%lu lastSeen=%lu ttl=%lu threshold=%lu\n",
+            millis(),
+            nextHopRecord->second.front().getLastSeen(),
+            ROUTE_TTL,
+            millis() - ROUTE_TTL
+        );
+        Serial.println(nextHopStr.c_str());
               loginfo_ln("[ROUTER] route ttl expired");
               routingTable.erase(nextHopStr);
               return std::nullopt;
@@ -72,20 +80,20 @@ void DuckRouter::cullRoutingTable(size_t maxSize) {
 };
 
 std::optional<std::string> DuckRouter::getEntriesFor(Duid targetDuid, Duid thisDuck){
-    auto target = routingTable.find(duckutils::toString(targetDuid));
+    auto target = routingTable.find(duckutils::duidAsString(targetDuid));
     JsonDocument doc;
 
     if (target == routingTable.end()) {
         return std::nullopt;
     }
 
-    doc["s"] = duckutils::toString(thisDuck);
+    doc["s"] = duckutils::hexToString(duckutils::duidAsString(thisDuck));
     JsonArray neighborsArr = doc["n"].to<JsonArray>();
 
     auto entry = target->second.begin();
     while(entry != target->second.end()){
         JsonArray node = neighborsArr.createNestedArray();
-        node.add(duckutils::toString(entry->getDuid()));
+        node.add(duckutils::hexToString(duckutils::duidAsString(entry->getDuid())));
         node.add(entry->getRssi());
         node.add(entry->getSnr());
         entry++;

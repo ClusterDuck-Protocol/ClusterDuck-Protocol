@@ -133,9 +133,7 @@ enum reservedTopic {
  * @brief Use this DUID to send to all PapaDucks
  * 
  */
-static std::array<uint8_t,8> PAPADUCK_DUID = {0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00};
-
+static std::array<uint8_t,8> PAPADUCK_DUID = {0x31,0x31,0x31,0x31,0x31,0x31,0x31,0x31};
 /**
 * @brief Use this DUID to be received by every duck in the network
 * 
