@@ -14,8 +14,8 @@
 #include <queue>
 
 // --- WIFI Configuration ---
-const std::string WIFI_SSID="muhammads-ThinkPad";         // Replace with WiFi SSID
-const std::string WIFI_PASS="12345678";     // Replace with WiFi Password
+const std::string WIFI_SSID="";         // Replace with WiFi SSID
+const std::string WIFI_PASS="";     // Replace with WiFi Password
 
 // --- MQTT Configuration ---
 #define MQTT_RETRY_DELAY_MS 500
