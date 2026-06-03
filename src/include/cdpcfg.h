@@ -17,7 +17,6 @@
 #else
 #include "boards/heltec_wifi_lora_32_V3.h"
 #include "boards/heltec_wifi_lora_32_V2.h"
-#include "boards/heltec_wifi_lora_32_V4.h"
 #include "boards/lilygo_t_beam_sx1262.h"
 #include "boards/ttgo_t_beam_v1_sx1276.h"
 #include "boards/lilygo_t_beam_supreme_sx1262.h"
