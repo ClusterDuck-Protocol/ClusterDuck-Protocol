@@ -14,13 +14,15 @@
 #include <queue>
 
 // --- WIFI Configuration ---
-const std::string WIFI_SSID="";         // Replace with WiFi SSID
-const std::string WIFI_PASS="";     // Replace with WiFi Password
+const std::string WIFI_SSID="muhammads-ThinkPad";         // Replace with WiFi SSID
+const std::string WIFI_PASS="12345678";     // Replace with WiFi Password
 
 // --- MQTT Configuration ---
 #define MQTT_RETRY_DELAY_MS 500
-#define MQTT_SERVER     "test.mosquitto.org" 
-#define PORT            8883
+#define MQTT_SERVER     "10.42.0.1"
+#define PORT 1883
+//#define MQTT_SERVER     "test.mosquitto.org" 
+//#define PORT            8883
 #define MQTT_CLIENT_ID  "papa-duck-mqtt-1"  // This must be unique
 // from https://test.mosquitto.org/
 static const char* mosquitto_ca_cert = \
@@ -51,11 +53,12 @@ static const char* mosquitto_ca_cert = \
 
 // --- Global Objects ---
 PapaDuck hub("PAPADUCK");                                     // PapaDuck instance
-WiFiClientSecure wifiClient;                      // Secure WiFi client
+//WiFiClientSecure wifiClient;                      // Secure WiFi client
+WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);              // MQTT client
 std::queue<std::string> mqttMessageQueue;         // Incoming mqtt messages
 std::string mqttPubTopic = "hub/event";           // Published by the hub
-std::string mqttSubTopic = "incoming/say_hello";  // Subscribed by the hub
+std::string mqttSubTopic = "hub/command";  // Subscribed by the hub
 bool setupOK = false;                             // Flag to check if setup is complete
 auto timer = timer_create_default();              // Timer instance
 bool wifiConnected = false;                       // Flag to check if WiFi is connected
@@ -128,7 +131,23 @@ void handleIncomingMqttMessages(void) {
     serializeJson(doc, jsonstat);
     serializeJsonPretty(doc, Serial);
 
-    // Process the topic and message here
+    String message = doc["message"];
+    int topic = doc["topic"];
+    String targetId = doc["target"];
+
+    // Resolve target DUID: "BROADCAST" maps to the all-0xFF broadcast address,
+    // otherwise convert the device ID string to a Duid array.
+    std::array<uint8_t, 8> target;
+    if (targetId == "BROADCAST") {
+      target = BROADCAST_DUID;
+    } else {
+      target = duckutils::stringToArray<uint8_t, 8>(std::string(targetId.c_str()));
+    }
+
+    // Send data using the hub's sendData method
+    int failure = hub.sendData(topic, std::string(message.c_str()), target);
+    if (failure) 
+       Serial.println("Send failed.");
   }
 }
 
@@ -203,7 +222,7 @@ void handleDuckData(CdpPacket receivedPacket) {
  */
 void setup() {
   // Set the CA cert for the WiFi client
-  wifiClient.setCACert(mosquitto_ca_cert);
+  //wifiClient.setCACert(mosquitto_ca_cert);
 
   // Setup the duck link with default settings and connect to WiFi
   uint32_t err = hub.setupWithDefaults();

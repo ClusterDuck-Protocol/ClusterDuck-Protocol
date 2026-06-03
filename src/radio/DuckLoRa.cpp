@@ -184,6 +184,14 @@ std::optional<std::vector<uint8_t>> DuckLoRa::readReceivedData() { //return a st
 
     uint8_t* data = packetBytes.data();
 
+    // Log signal quality for every received packet (before CRC check so
+    // corrupted packets also show RSSI/SNR for diagnostics).
+    #ifndef CDPCFG_RADIO_SX1262
+        loginfo_ln("RX: rssi: %f snr: %f fe: %d size: %d", lora.getRSSI(), lora.getSNR(), lora.getFrequencyError(true), packet_length);
+    #else
+        loginfo_ln("RX: rssi: %f snr: %f size: %d", lora.getRSSI(), lora.getSNR(), packet_length);
+    #endif
+
     loginfo_ln("readReceivedData: checking data section CRC");
 
     std::vector<uint8_t> data_section;
@@ -196,12 +204,6 @@ std::optional<std::vector<uint8_t>> DuckLoRa::readReceivedData() { //return a st
         logerr_ln("ERROR data crc mismatch: received: 0x%X, calculated: 0x%X",packet_data_crc, computed_data_crc);
         return std::nullopt;
     }
-    
-    #ifndef CDPCFG_RADIO_SX1262
-        loginfo_ln("RX: rssi: %f snr: %f fe: %d size: %d", lora.getRSSI(), lora.getSNR(), lora.getFrequencyError(true), packet_length);
-    #else
-        loginfo_ln("RX: rssi: %f snr: %f size: %d", lora.getRSSI(), lora.getSNR(), packet_length);
-    #endif
 
 
     if (rxState != RADIOLIB_ERR_NONE) {
