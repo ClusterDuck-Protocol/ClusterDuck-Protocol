@@ -25,13 +25,12 @@ class DuckRouter {
         NetworkState getNetworkState(){ return networkState; };
 
                 /**
-         * @brief Insert a new record into the routing table
+         * @brief Insert a new record into the routing table. Does not sort Neighbor list, but updates last seen timestamp if device already exists in the list.
+         * Routing score is calculated based on signal info and may be updated in existing record if new score is better than old score.
          *
          * @param deviceID the device ID
-         * @param routingScore the routing score
          * @param lastSeen the last seen timestamp
-         * @param snr the signal to noise ratio
-         * @param rssi the received signal strength indicator
+         * @param signalInfo the signal information (SNR & RSSI) used to sort the @p nextHop elements in the routing table
          */
         void insertIntoRoutingTable(Duid deviceID, Duid nextHop, SignalScore signalInfo);
     /**
