@@ -29,7 +29,7 @@ class DuckRouter {
          * Routing score is calculated based on signal info and may be updated in existing record if new score is better than old score.
          *
          * @param deviceID the device ID
-         * @param lastSeen the last seen timestamp
+         * @param nextHop the next hop device ID to reach the target device
          * @param signalInfo the signal information (SNR & RSSI) used to sort the @p nextHop elements in the routing table
          */
         void insertIntoRoutingTable(Duid deviceID, Duid nextHop, SignalScore signalInfo);
