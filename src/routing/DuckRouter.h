@@ -34,7 +34,26 @@ class DuckRouter {
          * @param rssi the received signal strength indicator
          */
         void insertIntoRoutingTable(Duid deviceID, Duid nextHop, SignalScore signalInfo);
-
+    /**
+* @brief Get the best next hop DUID for reaching a target device.
+*
+* The routing table stores, for each destination device, a list of Neighbor
+* records (likely representing possible next hops and their signal scores /
+* last-seen timestamps). This function:
+* - Looks up the routing table entry for @p targetDeviceId.
+* - If an entry exists, sorts the neighbor list by Neighbor's operator> (so
+*   presumably highest-quality neighbors come first).
+* - Returns the device id of the top neighbor as a Duid.
+*
+* Notes and caveats:
+* - If no routing entry exists for the requested target, returns std::nullopt.
+* - Sorting is done in-place (side effect) on the stored neighbor list.
+*
+* @param targetDeviceId The destination device identifier for which a next hop
+*                       is requested.
+* @return std::optional<Duid> The Duid of the selected next hop, or
+*                             std::nullopt if none exists.
+*/
         std::optional<Duid> getBestNextHop(Duid targetDeviceId);
 
         /**

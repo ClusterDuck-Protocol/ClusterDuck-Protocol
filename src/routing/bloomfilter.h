@@ -22,9 +22,33 @@ public:
   friend class BloomFilterTester;
 
   /**
-   * @brief Initialize a bloom filter with default values
-   * 
-  */
+   * @brief Initialize a two-phase bloom filter with default configuration values
+   *
+   * This constructor initializes a space-efficient probabilistic data structure used for
+   * detecting duplicate messages in the ClusterDuck network. It creates a two-phase bloom
+   * filter that operates by maintaining two independent filter arrays that alternate based
+   * on message count thresholds, allowing old messages to be forgotten over time.
+   *
+   * @details Inner workings:
+   * - Allocates two unsigned int arrays (filter1 and filter2), each containing DEFAULT_NUM_SECTORS
+   *   elements initialized to zero
+   * - Sets the active filter to filter1 upon initialization
+   * - Initializes an array of DEFAULT_NUM_HASH_FUNCS random seed values, ensuring no duplicate seeds
+   * - These seeds are used by the djb2Hash function to generate consistent hash values for messages
+   *
+   * Default parameters used:
+   * - DEFAULT_NUM_SECTORS: 312 sectors for bit storage
+   * - DEFAULT_NUM_HASH_FUNCS: 2 independent hash functions
+   * - DEFAULT_BITS_PER_SECTOR: 32 bits per sector (matches unsigned int size)
+   * - DEFAULT_MAX_MESSAGES: 100 messages before filter rotation
+   *
+   * The two-phase approach allows the filter to implement a sliding time window: after reaching
+   * maxMsgs, the inactive filter is cleared and becomes active, effectively discarding old entries.
+   *
+   * @see BloomFilter(int, int, int, int) for the parameterized constructor
+   * @see bloom_add() to add messages to the active filter
+   * @see bloom_check() to check if a message exists in either filter
+   */
   BloomFilter() : BloomFilter(DEFAULT_NUM_SECTORS, DEFAULT_NUM_HASH_FUNCS, DEFAULT_BITS_PER_SECTOR, DEFAULT_MAX_MESSAGES) {
 
   }
