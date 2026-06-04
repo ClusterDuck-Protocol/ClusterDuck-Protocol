@@ -44,7 +44,7 @@
  
  // --- Function Declarations ---
  bool runSensor(void *);
- bool sendEmergency(String lat = "", String lng = "");
+ bool sendEmergency(String lat = "", String lng = "", String alt = "", String spd = "", String hdg = "");
  void handleDuckData(CdpPacket packet);
  void displayMessage(String msg);
  void displayAnnouncement(const String& msg);
@@ -96,9 +96,12 @@ static volatile bool phoneGpsDisplayPending = false;
 static volatile bool phoneGpsNoFix          = false;
 static volatile bool gpsLoraOk              = false;  // result of last duck.sendData() for GPS
 static volatile bool gpsTxPending           = false;  // deferred GPS LoRa TX requested by handleGps()
-static char          gpsTxPayload[80]       = {};     // payload for deferred GPS TX
+static char          gpsTxPayload[128]      = {};     // payload for deferred GPS TX
 static char          phoneGpsLatBuf[20]     = {};
 static char          phoneGpsLngBuf[20]     = {};
+static char          phoneGpsAltBuf[12]     = {};     // altitude in metres
+static char          phoneGpsSpdBuf[12]     = {};     // speed in km/h
+static char          phoneGpsHdgBuf[12]     = {};     // heading in degrees
 static unsigned long gpsReqSentMs           = 0;      // millis() when CDK:GPSREQ was sent; 0 if none pending
 
 // ── BLE callbacks ─────────────────────────────────────────────────────
@@ -277,15 +280,36 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
   if (button.pressedFor(2000)) {
     String gpsLat = "";
     String gpsLng = "";
+    String gpsAlt = "";
+    String gpsSpd = "";
+    String gpsHdg = "";
+    bool gotGps = false;
 #ifdef ARDUINO_heltec_wifi_lora_32_V4
     if (tinyGps.location.isValid() && tinyGps.location.age() < 5000) {
       gpsLat = String(tinyGps.location.lat(), 6);
       gpsLng = String(tinyGps.location.lng(), 6);
-      Serial.printf("[GPS] Fix: lat=%s lng=%s\n", gpsLat.c_str(), gpsLng.c_str());
+      if (tinyGps.altitude.isValid())  gpsAlt = String(tinyGps.altitude.meters(), 1);
+      if (tinyGps.speed.isValid())     gpsSpd = String(tinyGps.speed.kmph(), 1);
+      if (tinyGps.course.isValid())    gpsHdg = String(tinyGps.course.deg(), 1);
+      gotGps = true;
+      Serial.printf("[GPS] Fix: lat=%s lng=%s alt=%sm spd=%skm/h hdg=%sdeg\n",
+                    gpsLat.c_str(), gpsLng.c_str(), gpsAlt.c_str(), gpsSpd.c_str(), gpsHdg.c_str());
     } else {
-      Serial.println("[GPS] No valid fix — sending SOS without coordinates");
+      Serial.println("[GPS] No valid fix — trying phone GPS");
     }
 #endif
+    // Fall back to last known phone GPS if device GPS unavailable and phone is connected
+    if (!gotGps && isPhoneConnected() && phoneGpsLatBuf[0] != '\0') {
+      gpsLat = String(phoneGpsLatBuf);
+      gpsLng = String(phoneGpsLngBuf);
+      if (phoneGpsAltBuf[0] != '\0') gpsAlt = String(phoneGpsAltBuf);
+      if (phoneGpsSpdBuf[0] != '\0') gpsSpd = String(phoneGpsSpdBuf);
+      if (phoneGpsHdgBuf[0] != '\0') gpsHdg = String(phoneGpsHdgBuf);
+      Serial.printf("[GPS] Using phone GPS: lat=%s lng=%s alt=%s spd=%s hdg=%s\n",
+                    gpsLat.c_str(), gpsLng.c_str(), gpsAlt.c_str(), gpsSpd.c_str(), gpsHdg.c_str());
+    } else if (!gotGps) {
+      Serial.println("[GPS] No GPS available — SOS sent without coordinates");
+    }
     displayID();
     displayBatt();
     display.setFont(ArialMT_Plain_10);
@@ -293,7 +317,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     display.drawString(64, 22, "SEDANG HANTAR\nISYARAT KECEMASAN...");
     display.display();
 
-    sendEmergency(gpsLat, gpsLng);
+    sendEmergency(gpsLat, gpsLng, gpsAlt, gpsSpd, gpsHdg);
     //heltec_delay(1000);
   }
 
@@ -733,15 +757,20 @@ void displayBatt() {
     }
  }
 
- bool sendEmergency(String lat, String lng) {
+ bool sendEmergency(String lat, String lng, String alt, String spd, String hdg) {
    bool failure;
    bool hasGps = (lat.length() > 0 && lng.length() > 0);
+   int battPct = heltec_battery_percent(readVbat());
 
    // Human-readable LoRa payload — clearly identifies hardware button origin
    std::string loraMsg = "SOS,SRC:DEVICE,ID:" DUCK_NAME;
    if (hasGps) {
      loraMsg += ",LAT:" + std::string(lat.c_str()) + ",LNG:" + std::string(lng.c_str());
+     if (alt.length() > 0) loraMsg += ",ALT:" + std::string(alt.c_str());
+     if (spd.length() > 0) loraMsg += ",SPD:" + std::string(spd.c_str());
+     if (hdg.length() > 0) loraMsg += ",HDG:" + std::string(hdg.c_str());
    }
+   loraMsg += ",BATT:" + std::to_string(battPct);
    Serial.print("[MAMA] sendEmergency data: ");
    Serial.println(loraMsg.c_str());
 
@@ -755,6 +784,10 @@ void displayBatt() {
      String sosFrame = "CDK:SOS,SRC:DEVICE,ID:" DUCK_NAME
                        ",LAT:" + (hasGps ? lat : "none") +
                        ",LNG:" + (hasGps ? lng : "none");
+     if (hasGps && alt.length() > 0) sosFrame += ",ALT:" + alt;
+     if (hasGps && spd.length() > 0) sosFrame += ",SPD:" + spd;
+     if (hasGps && hdg.length() > 0) sosFrame += ",HDG:" + hdg;
+     sosFrame += ",BATT:" + String(battPct);
      broadcast(sosFrame);
      displayID();
      displayBatt();
@@ -869,8 +902,16 @@ void handleFrame(const String& line) {
 void handleSOS(const String& body) {
   String lat = extractField(body, "LAT");
   String lng = extractField(body, "LNG");
+  String alt = extractField(body, "ALT");
+  String spd = extractField(body, "SPD");
+  String hdg = extractField(body, "HDG");
+  int battPct = heltec_battery_percent(readVbat());
   Serial.print("[SOS] LAT="); Serial.print(lat);
-  Serial.print(" LNG="); Serial.println(lng);
+  Serial.print(" LNG="); Serial.print(lng);
+  Serial.print(" ALT="); Serial.print(alt);
+  Serial.print(" SPD="); Serial.print(spd);
+  Serial.print(" HDG="); Serial.print(hdg);
+  Serial.print(" BATT="); Serial.println(battPct);
   // show message sending
   displayID(); 
   displayBatt();
@@ -878,8 +919,12 @@ void handleSOS(const String& body) {
   display.setTextAlignment(TEXT_ALIGN_CENTER);
   display.drawString(64, 22, "SEDANG HANTAR\nISYARAT KECEMASAN...");
   display.display();
-  // construct the message
-  String message = "SOS,LAT:" + lat + ",LNG:" + lng;  // no \n — sendData handles its own framing
+  // construct the message — include phone telemetry + device battery
+  String message = "SOS,LAT:" + lat + ",LNG:" + lng;
+  if (alt.length() > 0) message += ",ALT:" + alt;
+  if (spd.length() > 0) message += ",SPD:" + spd;
+  if (hdg.length() > 0) message += ",HDG:" + hdg;
+  message += ",BATT:" + String(battPct);  // no \n — sendData handles its own framing
   int failure = duck.sendData(topics::status, std::string(message.c_str()));
   // blink LED to show activity
   blinkLed(3);
@@ -1002,11 +1047,25 @@ void handleGps(const String& body) {
     gpsTxPending = true;
     return;
   }
-  char gpsBuf[80];
-  std::snprintf(gpsBuf, sizeof(gpsBuf), "GPS,SRC:PHONE,LAT:%s,LNG:%s,BATT:%d",
-                lat.c_str(), lng.c_str(), heltec_battery_percent(readVbat()));
+  char gpsBuf[128];
+  std::snprintf(gpsBuf, sizeof(gpsBuf), "GPS,SRC:PHONE,LAT:%s,LNG:%s",
+                lat.c_str(), lng.c_str());
   strncpy(phoneGpsLatBuf, lat.c_str(), sizeof(phoneGpsLatBuf) - 1);
   strncpy(phoneGpsLngBuf, lng.c_str(), sizeof(phoneGpsLngBuf) - 1);
+  // Cache optional telemetry for use by hardware SOS button fallback
+  String alt = extractField(body, "ALT");
+  String spd = extractField(body, "SPD");
+  String hdg = extractField(body, "HDG");
+  phoneGpsAltBuf[0] = '\0';
+  phoneGpsSpdBuf[0] = '\0';
+  phoneGpsHdgBuf[0] = '\0';
+  if (alt.length() > 0) { strncpy(phoneGpsAltBuf, alt.c_str(), sizeof(phoneGpsAltBuf) - 1); strncat(gpsBuf, (",ALT:" + alt).c_str(), sizeof(gpsBuf) - strlen(gpsBuf) - 1); }
+  if (spd.length() > 0) { strncpy(phoneGpsSpdBuf, spd.c_str(), sizeof(phoneGpsSpdBuf) - 1); strncat(gpsBuf, (",SPD:" + spd).c_str(), sizeof(gpsBuf) - strlen(gpsBuf) - 1); }
+  if (hdg.length() > 0) { strncpy(phoneGpsHdgBuf, hdg.c_str(), sizeof(phoneGpsHdgBuf) - 1); strncat(gpsBuf, (",HDG:" + hdg).c_str(), sizeof(gpsBuf) - strlen(gpsBuf) - 1); }
+  // Append battery last so telemetry fields stay grouped
+  char battSuffix[16];
+  std::snprintf(battSuffix, sizeof(battSuffix), ",BATT:%d", heltec_battery_percent(readVbat()));
+  strncat(gpsBuf, battSuffix, sizeof(gpsBuf) - strlen(gpsBuf) - 1);
   phoneGpsNoFix = false;
   phoneGpsDisplayPending = true;  // render from main loop (I2C not thread-safe)
   // Defer duck.sendData() to after duck.run() — see comment above.
