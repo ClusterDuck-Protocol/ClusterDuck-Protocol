@@ -465,9 +465,12 @@ class Duck {
 
       router.getFilter().bloom_add(txPacket.muid.data(), MUID_LENGTH);
 
-      if (txPacket.dduid == PAPADUCK_DUID) {
-        // Switch to a random uplink channel so Papa-bound TX is spread across
-        // all 8 SX1302 demodulators. Mesh channel is restored in TX_DONE handler.
+      if (txPacket.dduid == PAPADUCK_DUID && txPacket.sduid == this->duid) {
+        // Only switch channels for packets ORIGINATING from this duck.
+        // Relayed packets (sduid != this->duid) stay on 922.8 MHz so
+        // intermediate MamaDucks can hear and forward them in the mesh.
+        // The SX1302 receives on all 8 channels simultaneously so it
+        // hears both paths.
         duckRadio.setUplinkFrequency(duckRadio.getRandomUplinkChannel());
       }
 
