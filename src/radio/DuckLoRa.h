@@ -55,8 +55,12 @@ class DuckLoRa {
 
     public:
         DuckLoRa() {
-            // Initialize the random number generator with a seed based on the current time in a non-arduino way
-            gen.seed(time(nullptr));
+            // Use hardware RNG on ESP32 for proper entropy; fall back to time() on Linux/PC
+            #ifdef ARDUINO
+                gen.seed(esp_random());
+            #else
+                gen.seed(time(nullptr));
+            #endif
         };
         DuckLoRa(DuckLoRa const&) = delete;
         DuckLoRa& operator=(DuckLoRa const&) = delete;
@@ -122,6 +126,26 @@ class DuckLoRa {
          * @returns A float representing the snr value.
          */
         float getSNR();
+
+        /**
+         * @brief Temporarily switch the radio to a randomly selected uplink
+         *        channel from CDPCFG_UPLINK_CHANNEL_POOL. Used before Papa-bound
+         *        transmissions to spread load across SX1302 demodulators.
+         *        The mesh channel is automatically restored in the TX_DONE
+         *        interrupt handler.
+         *
+         * @param freq Uplink frequency in MHz
+         * @returns DUCK_ERR_NONE on success, an error code otherwise.
+         */
+        int setUplinkFrequency(float freq);
+
+        /**
+         * @brief Pick a random channel from CDPCFG_UPLINK_CHANNEL_POOL using
+         *        the internal RNG.
+         *
+         * @returns A frequency in MHz.
+         */
+        float getRandomUplinkChannel();
 
     private:
         static volatile uint16_t interruptFlags;

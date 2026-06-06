@@ -215,6 +215,20 @@ std::optional<std::vector<uint8_t>> DuckLoRa::readReceivedData() { //return a st
     return packetVector;
 }
 
+int DuckLoRa::setUplinkFrequency(float freq) {
+    if (lora.setFrequency(freq) == RADIOLIB_ERR_INVALID_FREQUENCY) {
+        logerr_ln("ERROR setUplinkFrequency: invalid frequency");
+        return DUCKLORA_ERR_SETUP;
+    }
+    loginfo_ln("TX uplink channel: %.1f MHz", freq);
+    return DUCK_ERR_NONE;
+}
+
+float DuckLoRa::getRandomUplinkChannel() {
+    std::uniform_int_distribution<> dist(0, CDPCFG_UPLINK_CHANNEL_COUNT - 1);
+    return CDPCFG_UPLINK_CHANNEL_POOL[dist(gen)];
+}
+
 int DuckLoRa::sendData(uint8_t* data, int length)
 {
 
@@ -345,6 +359,7 @@ void DuckLoRa::serviceInterruptFlags() {
         if (DuckLoRa::interruptFlags & RADIOLIB_SX126X_IRQ_TX_DONE ) {
             loginfo_ln("SX1262 Interrupt flag was set: payload transmission complete");
             lora.finishTransmit();
+            lora.setFrequency(defaultRadioParams.band); // restore mesh channel
             goToReceiveMode(false);
         }
         if (DuckLoRa::interruptFlags & RADIOLIB_SX126X_IRQ_TIMEOUT ) {

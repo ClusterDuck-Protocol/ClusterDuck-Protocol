@@ -465,6 +465,12 @@ class Duck {
 
       router.getFilter().bloom_add(txPacket.muid.data(), MUID_LENGTH);
 
+      if (txPacket.dduid == PAPADUCK_DUID) {
+        // Switch to a random uplink channel so Papa-bound TX is spread across
+        // all 8 SX1302 demodulators. Mesh channel is restored in TX_DONE handler.
+        duckRadio.setUplinkFrequency(duckRadio.getRandomUplinkChannel());
+      }
+
       err = duckRadio.sendData(txPacket.asBytes());
       if (err != DUCK_ERR_NONE) {
         logerr_ln("ERROR Lora sendData failed, err = %d", err);
