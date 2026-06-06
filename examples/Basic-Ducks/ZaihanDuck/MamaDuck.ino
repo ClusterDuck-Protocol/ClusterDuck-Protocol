@@ -44,7 +44,7 @@
  
  // --- Function Declarations ---
  bool runSensor(void *);
- bool sendEmergency(String lat = "", String lng = "", String alt = "", String spd = "", String hdg = "");
+ bool sendEmergency(String lat = "", String lng = "", String alt = "", String spd = "", String hdg = "", bool gpsFromPhone = false);
  void handleDuckData(CdpPacket packet);
  void displayMessage(String msg);
  void displayAnnouncement(const String& msg);
@@ -92,12 +92,14 @@ static unsigned long lastUsbTxMs = 0;    // last time we wrote a frame to USB se
 // ── Phone GPS display (written from BLE task, rendered in main loop) ──────
 // display.xxx uses I2C which is not thread-safe; BLE callbacks run on the
 // NimBLE task so we must defer all display calls to the main loop.
-static volatile bool phoneGpsDisplayPending = false;
-static volatile bool phoneGpsNoFix          = false;
-static volatile bool gpsLoraOk              = false;  // result of last duck.sendData() for GPS
-static volatile bool gpsTxPending           = false;  // deferred GPS LoRa TX requested by handleGps()
-static char          gpsTxPayload[128]      = {};     // payload for deferred GPS TX
-static char          phoneGpsLatBuf[20]     = {};
+static volatile bool phoneGpsDisplayPending  = false;
+static volatile bool phoneGpsNoFix           = false;
+static volatile bool gpsLoraOk               = false;  // result of last duck.sendData() for GPS
+static volatile bool gpsTxPending            = false;  // deferred GPS LoRa TX requested by handleGps()
+static volatile bool bleConnectDisplayPending = false; // show BLE-connected splash from main loop
+static volatile bool usbConnectDisplayPending = false; // show USB-connected splash from main loop
+static char          gpsTxPayload[128]       = {};     // payload for deferred GPS TX
+static char          phoneGpsLatBuf[20]      = {};
 static char          phoneGpsLngBuf[20]     = {};
 static char          phoneGpsAltBuf[12]     = {};     // altitude in metres
 static char          phoneGpsSpdBuf[12]     = {};     // speed in km/h
@@ -108,6 +110,7 @@ static unsigned long gpsReqSentMs           = 0;      // millis() when CDK:GPSRE
 class ServerCallbacks : public NimBLEServerCallbacks {
   void onConnect(NimBLEServer* pServer, NimBLEConnInfo& connInfo) override {
     bleConnected = true;
+    bleConnectDisplayPending = true;  // notify main loop to render splash
     // Request longer connection interval to reduce radio duty cycle.
     // 80*1.25ms=100ms min, 160*1.25ms=200ms max, latency=4, timeout=4000ms.
     pServer->updateConnParams(connInfo.getConnHandle(), 80, 160, 4, 400);
@@ -273,6 +276,32 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     display.displayOff();
   }
 
+  // BLE connected splash — deferred from onConnect() callback.
+  if (bleConnectDisplayPending) {
+    bleConnectDisplayPending = false;
+    display.displayOn();
+    displayID();
+    display.setFont(ArialMT_Plain_10);
+    display.setTextAlignment(TEXT_ALIGN_CENTER);
+    display.drawString(64, 28, "BLUETOOTH\nTERSAMBUNG!");
+    display.display();
+    delay(2000);
+    displayHome();
+  }
+
+  // USB serial connected splash — shown once per connect/reconnect cycle.
+  if (usbConnectDisplayPending) {
+    usbConnectDisplayPending = false;
+    display.displayOn();
+    displayID();
+    display.setFont(ArialMT_Plain_10);
+    display.setTextAlignment(TEXT_ALIGN_CENTER);
+    display.drawString(64, 28, "USB BERSIRI\nTERSAMBUNG!");
+    display.display();
+    delay(2000);
+    displayHome();
+  }
+
    //timer.tick();
 
   heltec_loop();
@@ -298,15 +327,37 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
       Serial.println("[GPS] No valid fix — trying phone GPS");
     }
 #endif
-    // Fall back to last known phone GPS if device GPS unavailable and phone is connected
-    if (!gotGps && isPhoneConnected() && phoneGpsLatBuf[0] != '\0') {
-      gpsLat = String(phoneGpsLatBuf);
-      gpsLng = String(phoneGpsLngBuf);
-      if (phoneGpsAltBuf[0] != '\0') gpsAlt = String(phoneGpsAltBuf);
-      if (phoneGpsSpdBuf[0] != '\0') gpsSpd = String(phoneGpsSpdBuf);
-      if (phoneGpsHdgBuf[0] != '\0') gpsHdg = String(phoneGpsHdgBuf);
-      Serial.printf("[GPS] Using phone GPS: lat=%s lng=%s alt=%s spd=%s hdg=%s\n",
-                    gpsLat.c_str(), gpsLng.c_str(), gpsAlt.c_str(), gpsSpd.c_str(), gpsHdg.c_str());
+    // If no hardware GPS and phone is connected, use cached GPS.
+    // If cache is empty (e.g. GPS poll hasn't fired yet since connect),
+    // send CDK:GPSREQ now and wait up to 2.5 s for the phone to reply.
+    if (!gotGps && isPhoneConnected()) {
+      if (phoneGpsLatBuf[0] == '\0') {
+        displayID();
+        displayBatt();
+        display.setFont(ArialMT_Plain_10);
+        display.setTextAlignment(TEXT_ALIGN_CENTER);
+        display.drawString(64, 22, "MEMINTA GPS\nDARIPADA TELEFON...");
+        display.display();
+        broadcast("CDK:GPSREQ");
+        Serial.println("[SOS] Phone GPS cache empty — requesting fresh fix before SOS...");
+        unsigned long waitStart = millis();
+        while (phoneGpsLatBuf[0] == '\0' && millis() - waitStart < 2500) {
+          duck.run();
+          delay(50);
+        }
+        if (phoneGpsLatBuf[0] == '\0') {
+          Serial.println("[SOS] Phone GPS timeout — SOS will be sent without coordinates");
+        }
+      }
+      if (phoneGpsLatBuf[0] != '\0') {
+        gpsLat = String(phoneGpsLatBuf);
+        gpsLng = String(phoneGpsLngBuf);
+        if (phoneGpsAltBuf[0] != '\0') gpsAlt = String(phoneGpsAltBuf);
+        if (phoneGpsSpdBuf[0] != '\0') gpsSpd = String(phoneGpsSpdBuf);
+        if (phoneGpsHdgBuf[0] != '\0') gpsHdg = String(phoneGpsHdgBuf);
+        Serial.printf("[SOS] Phone GPS acquired: lat=%s lng=%s alt=%s spd=%s hdg=%s\n",
+                      gpsLat.c_str(), gpsLng.c_str(), gpsAlt.c_str(), gpsSpd.c_str(), gpsHdg.c_str());
+      }
     } else if (!gotGps) {
       Serial.println("[GPS] No GPS available — SOS sent without coordinates");
     }
@@ -317,7 +368,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     display.drawString(64, 22, "SEDANG HANTAR\nISYARAT KECEMASAN...");
     display.display();
 
-    sendEmergency(gpsLat, gpsLng, gpsAlt, gpsSpd, gpsHdg);
+    sendEmergency(gpsLat, gpsLng, gpsAlt, gpsSpd, gpsHdg, /* gpsFromPhone= */ !gotGps && gpsLat.length() > 0);
     //heltec_delay(1000);
   }
 
@@ -359,22 +410,62 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     displayBatt();
     display.setFont(ArialMT_Plain_10);
     if (tinyGps.location.isValid()) {
+      // Page 1: coordinates + satellite quality
       display.setTextAlignment(TEXT_ALIGN_LEFT);
       display.drawString(0, 14, "LAT:" + String(tinyGps.location.lat(), 5));
       display.drawString(0, 26, "LNG:" + String(tinyGps.location.lng(), 5));
       display.drawString(0, 38, "SATS:" + String(tinyGps.satellites.value()));
       display.drawString(0, 50, "AGE:" + String(tinyGps.location.age()) + "ms");
-      Serial.printf("[GPS] Triple-click: lat=%.5f, lng=%.5f, sats=%u\n",
+      display.display();
+      heltec_delay(2500);
+
+      // Page 2: date and time (UTC+8)
+      int h  = tinyGps.time.hour() + 8;
+      int mi = tinyGps.time.minute();
+      int sc = tinyGps.time.second();
+      int d  = tinyGps.date.day();
+      int mo = tinyGps.date.month();
+      int y  = tinyGps.date.year();
+      if (h >= 24) {
+        h -= 24; d++;
+        const uint8_t dim[] = {31,28,31,30,31,30,31,31,30,31,30,31};
+        uint8_t maxD = dim[mo - 1];
+        if (mo == 2 && (y % 4 == 0 && (y % 100 != 0 || y % 400 == 0))) maxD = 29;
+        if (d > maxD) { d = 1; mo++; if (mo > 12) { mo = 1; y++; } }
+      }
+      display.clear();
+      displayID();
+      displayBatt();
+      display.setFont(ArialMT_Plain_10);
+      display.setTextAlignment(TEXT_ALIGN_LEFT);
+      if (tinyGps.date.isValid() && tinyGps.time.isValid()) {
+        char dateBuf[20], timeBuf[20];
+        snprintf(dateBuf, sizeof(dateBuf), "DATE:%04d/%02d/%02d", y, mo, d);
+        snprintf(timeBuf, sizeof(timeBuf), "TIME:%02d:%02d:%02d", h, mi, sc);
+        display.drawString(0, 14, dateBuf);
+        display.drawString(0, 26, timeBuf);
+        display.drawString(0, 38, "(GMT+8 / UTC+8)");
+      } else {
+        display.setTextAlignment(TEXT_ALIGN_CENTER);
+        display.drawString(64, 28, "TARIKH/MASA\nTIADA ISYARAT");
+      }
+      display.display();
+      heltec_delay(2500);
+
+      Serial.printf("[GPS] Quadruple-click: lat=%.5f lng=%.5f sats=%u age=%lums date=%04d/%02d/%02d time=%02d:%02d:%02d\n",
                     tinyGps.location.lat(), tinyGps.location.lng(),
-                    tinyGps.satellites.value());
+                    tinyGps.satellites.value(), tinyGps.location.age(),
+                    y, mo, d, h, mi, sc);
     } else if (gpsModuleDetected) {
+      display.setFont(ArialMT_Plain_10);
       display.setTextAlignment(TEXT_ALIGN_CENTER);
       display.drawString(64, 28, "GPS: MODUL AKTIF\nMENUNGGU ISYARAT...");
-      Serial.println("[GPS] Triple-click: module active, no fix yet");
+      Serial.println("[GPS] Quadruple-click: module active, no fix yet");
     } else {
+      display.setFont(ArialMT_Plain_10);
       display.setTextAlignment(TEXT_ALIGN_CENTER);
       display.drawString(64, 28, "GPS: TIADA MODUL");
-      Serial.println("[GPS] Triple-click: no GPS module detected");
+      Serial.println("[GPS] Quadruple-click: no GPS module detected");
     }
     display.display();
     heltec_delay(5000);
@@ -406,7 +497,10 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     lastUsbRxMs = millis();  // mark USB as active
     char c = Serial.read();
     if (c == '\n') {
-      if (usbInBuf.startsWith("CDK:")) usbPhoneSeen = true;  // phone sent a valid frame
+      if (usbInBuf.startsWith("CDK:")) {
+        if (!usbPhoneSeen) usbConnectDisplayPending = true;  // first CDK frame → show splash
+        usbPhoneSeen = true;  // phone sent a valid frame
+      }
       handleFrame(usbInBuf);
       usbInBuf = "";
     }
@@ -757,7 +851,7 @@ void displayBatt() {
     }
  }
 
- bool sendEmergency(String lat, String lng, String alt, String spd, String hdg) {
+ bool sendEmergency(String lat, String lng, String alt, String spd, String hdg, bool gpsFromPhone) {
    bool failure;
    bool hasGps = (lat.length() > 0 && lng.length() > 0);
    int battPct = heltec_battery_percent(readVbat());
@@ -769,6 +863,7 @@ void displayBatt() {
      if (alt.length() > 0) loraMsg += ",ALT:" + std::string(alt.c_str());
      if (spd.length() > 0) loraMsg += ",SPD:" + std::string(spd.c_str());
      if (hdg.length() > 0) loraMsg += ",HDG:" + std::string(hdg.c_str());
+     if (gpsFromPhone)      loraMsg += ",GPS:PHONE";
    }
    loraMsg += ",BATT:" + std::to_string(battPct);
    Serial.print("[MAMA] sendEmergency data: ");
@@ -787,6 +882,7 @@ void displayBatt() {
      if (hasGps && alt.length() > 0) sosFrame += ",ALT:" + alt;
      if (hasGps && spd.length() > 0) sosFrame += ",SPD:" + spd;
      if (hasGps && hdg.length() > 0) sosFrame += ",HDG:" + hdg;
+     if (hasGps && gpsFromPhone)      sosFrame += ",GPS:PHONE";
      sosFrame += ",BATT:" + String(battPct);
      broadcast(sosFrame);
      displayID();
@@ -832,14 +928,8 @@ void displayBatt() {
 // the CDC ACM port open — no need to wait for the phone to send data first.
 // On hardware UART boards the fallback is the last-RX timestamp.
 static bool isPhoneConnected() {
-  if (bleConnected) return true;
-  if (usbPhoneSeen) return true;   // phone has sent a CDK frame via USB
-  // (bool)Serial checks DTR which Android apps typically don't assert, so we
-  // also treat USB as live if we've recently written frames to it — i.e. the
-  // periodic announcement loop is running, meaning the port is at least open.
-  bool usbTxRecent = (lastUsbTxMs > 0 && millis() - lastUsbTxMs < GPS_PHONE_TIMEOUT_MS);
-  if (usbTxRecent) return true;
-  return (lastUsbRxMs > 0 && millis() - lastUsbRxMs < GPS_PHONE_TIMEOUT_MS);
+  if (bleConnected) return true;    // NimBLE callback keeps this accurate
+  return usbPhoneSeen;              // set on CDK frame RX; cleared after USB_IDLE_TIMEOUT_MS of silence
 }
 
 // ── Broadcast on all active channels ────────────────────────────────

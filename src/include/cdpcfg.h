@@ -64,9 +64,9 @@
 /** @brief Asyncwebserver Port */
 #define CDPCFG_WEB_PORT 80
 
-/// Frequency Range. Set for US Region 915.0Mhz, Asia Region AS923 is 923.0Mhz
-#define CDPCFG_RF_LORA_FREQ 923.0f
-#define CDPCFG_RF_LORA_FREQ_HZ 923000000
+/// Frequency Range. Set for US Region 915.0Mhz, Asia Region AS923 is below 923.0Mhz
+#define CDPCFG_RF_LORA_FREQ 922.8f
+#define CDPCFG_RF_LORA_FREQ_HZ 92280000
 /// Bandwidth. Default is 125Mhz
 #define CDPCFG_RF_LORA_BW 125.0f
 /// Spread Factor
@@ -100,13 +100,14 @@
 /// CDP Channel Frequencies
 /// If AS923 RADIO is configured
 #define CDPCFG_RADIO_CHANNEL_1 CDPCFG_RF_LORA_FREQ
-#define CDPCFG_RADIO_CHANNEL_2 923.2
-#define CDPCFG_RADIO_CHANNEL_3 923.4
-#define CDPCFG_RADIO_CHANNEL_4 922.8
-#define CDPCFG_RADIO_CHANNEL_5 922.6
-#define CDPCFG_RADIO_CHANNEL_6 922.4
-#define CDPCFG_RADIO_CHANNEL_7 922.2
-#define CDPCFG_RADIO_CHANNEL_8 922.0
+#define CDPCFG_RADIO_CHANNEL_2 922.6
+#define CDPCFG_RADIO_CHANNEL_3 922.4
+#define CDPCFG_RADIO_CHANNEL_4 922.2
+#define CDPCFG_RADIO_CHANNEL_5 922.0
+#define CDPCFG_RADIO_CHANNEL_6 921.8
+#define CDPCFG_RADIO_CHANNEL_7 921.6
+#define CDPCFG_RADIO_CHANNEL_8 921.4
+#define CDPCFG_RADIO_CHANNEL_9 921.2
 
 // CDP Acceptable Signal Ranges
 #define RSSI_MAX (-20.0f)
