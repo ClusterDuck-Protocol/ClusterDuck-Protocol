@@ -616,7 +616,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
             Serial.println("📨 Message: " + message);
             display.displayOn();
             displayMessage(message);
-            std::snprintf(replyMsg, sizeof(replyMsg), "MSG_READ:TEXT:%s", message);
+            std::snprintf(replyMsg, sizeof(replyMsg), "MSG_READ:TEXT:%s", message.c_str());
             duck.sendData(22, replyMsg);
             //duck.sendData(22, "MSG_READ");
             // blink to show message arrive
