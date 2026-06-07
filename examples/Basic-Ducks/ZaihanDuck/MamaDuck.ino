@@ -35,7 +35,7 @@
   static bool gpsFix             = false;
 #endif
 
- #define DUCK_NAME "MUHAMMAD"
+ #define DUCK_NAME "IBRAHIM1"
  // Bluetooth Low energgy definitions
  #define NUS_SERVICE "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
  #define NUS_RX_CHAR "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
@@ -158,6 +158,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
  void setup() {
    heltec_setup(); 
    heltec_ve(true);
+
    if (duck.setupWithDefaults() != DUCK_ERR_NONE) {
      Serial.println("[MAMA] Failed to setup MamaDuck");
      return;
