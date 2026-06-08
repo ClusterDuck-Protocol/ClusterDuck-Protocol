@@ -105,10 +105,12 @@ enum topics {
   sleepstatus = 0x1B,
   // teensy status
   teensystatus = 0x1C,
-  // tbeam status
-  tbeamstatus = 0x1D,
+  // teensy health status
+  teensyhealth = 0x1D,
   // boot status
   boot = 0x1E,
+  // tbeam status
+  tbeamstatus = 0x1F,
   // Send duck commands
   dcmd = 0x16,
   //gps
@@ -300,6 +302,8 @@ class CdpPacket {
                 return "sleepstatus";
             case topics::teensystatus:
                 return "teensystatus";
+            case topics::teensyhealth:
+                return "teensyhealth";
             case topics::tbeamstatus:
                 return "tbeamstatus";
             case topics::boot:
