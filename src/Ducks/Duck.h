@@ -385,6 +385,10 @@ class Duck {
      */
     static bool sendSignalData(void* p){
       Duck* duckInstance = static_cast<Duck*>(p);
+      if (duckInstance->getType() == DuckType::PAPA) {
+        logdbg_ln("[DUCK] Skipping signal info send for PapaDuck.");
+        return true;
+      }
       int err;
       duckInstance->router.cullRoutingTable();
       std::optional<std::string> message = duckInstance->router.getEntriesFor(PAPADUCK_DUID, duckInstance->duid);
