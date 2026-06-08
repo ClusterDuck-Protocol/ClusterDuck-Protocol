@@ -486,7 +486,7 @@ class Duck {
 
     //Telemetry
     const int HEALTH_INTERVAL = 1000 * 60 * 15; //15 minutes
-    const int SIGNAL_INTERVAL = 1000 * 60 * 4; //4 minutes
+    const int SIGNAL_INTERVAL = 1000 * 60 * 10; //10 minutes
     int counter = 1;
     Timer<10> duckTimer;
 
