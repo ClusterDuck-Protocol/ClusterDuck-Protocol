@@ -130,7 +130,8 @@ private :
                 RouteJSON rrepDoc = RouteJSON(rxPacket.data);
                 std::optional<Duid> last = rrepDoc.getlastInPath();
                 Duid lastInPath = last.has_value() ? last.value() : rxPacket.sduid;
-                loginfo_ln("Received Route Response from DUID: %s", rxPacket.sduid.data(), rxPacket.sduid.size());
+                std::string sourceDuid(rxPacket.sduid.begin(), rxPacket.sduid.end());
+                loginfo_ln("Received Route Response from DUID: %s", sourceDuid.c_str());
 
                 std::optional<Duid> nextHop;
                 if(rxPacket.duckType == DuckType::PAPA){
