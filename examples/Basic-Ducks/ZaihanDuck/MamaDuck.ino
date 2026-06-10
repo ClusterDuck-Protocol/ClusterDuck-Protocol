@@ -21,6 +21,10 @@
  #include "image.h"
  #include <NimBLEDevice.h>
 
+// Access the RadioLib radio instance from DuckLoRa.cpp to read RSSI/SNR.
+// getSignalScore() is protected in Duck, so we reach the object directly.
+extern CDPCFG_LORA_CLASS lora;
+
 // ── Heltec V4 GPS support (L76K on UART1, Wireless Tracker pinout) ────────────
 // If your V4 variant uses different pins, adjust the defines below.
 #ifdef ARDUINO_heltec_wifi_lora_32_V4
@@ -35,7 +39,12 @@
   static bool gpsFix             = false;
 #endif
 
- #define DUCK_NAME "MUHAMMAD"
+#ifdef ARDUINO_heltec_wifi_lora_32_V4
+#define LORA_PA_POWER  7
+#define LORA_PA_EN     2
+#endif
+
+ #define DUCK_NAME "IBRAHIM1"
  // Bluetooth Low energgy definitions
  #define NUS_SERVICE "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
  #define NUS_RX_CHAR "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
@@ -97,7 +106,9 @@ static volatile bool phoneGpsNoFix           = false;
 static volatile bool gpsLoraOk               = false;  // result of last duck.sendData() for GPS
 static volatile bool gpsTxPending            = false;  // deferred GPS LoRa TX requested by handleGps()
 static volatile bool bleConnectDisplayPending = false; // show BLE-connected splash from main loop
+static volatile bool bleDisconnectDisplayPending = false; // show BLE-disconnected splash from main loop
 static volatile bool usbConnectDisplayPending = false; // show USB-connected splash from main loop
+static volatile bool usbDisconnectDisplayPending = false; // show USB-disconnected splash from main loop
 static char          gpsTxPayload[128]       = {};     // payload for deferred GPS TX
 static char          phoneGpsLatBuf[20]      = {};
 static char          phoneGpsLngBuf[20]     = {};
@@ -105,6 +116,14 @@ static char          phoneGpsAltBuf[12]     = {};     // altitude in metres
 static char          phoneGpsSpdBuf[12]     = {};     // speed in km/h
 static char          phoneGpsHdgBuf[12]     = {};     // heading in degrees
 static unsigned long gpsReqSentMs           = 0;      // millis() when CDK:GPSREQ was sent; 0 if none pending
+static int           lastSignalPct           = -1;     // last LoRa signal quality (0-100 %), -1 = no packet yet
+static unsigned long lastHomeRefreshMs       = 0;      // last time displayHome() was refreshed from the loop
+const  unsigned long HOME_REFRESH_MS         = 5000UL; // re-draw home screen every 5 s when display is on
+static bool          messagePending          = false;  // true while a received message occupies the screen
+static unsigned long messagePendingMs        = 0;      // millis() when message was shown (for auto-dismiss)
+const  unsigned long MESSAGE_DISPLAY_MS      = 10000UL; // auto-dismiss received message after 10 s
+static int           lastTxResult            = -1;     // -1=never sent, 0=success, >0=fail
+static unsigned long lastTxMs               = 0;      // millis() of most recent duck.sendData() call
 
 // ── BLE callbacks ─────────────────────────────────────────────────────
 class ServerCallbacks : public NimBLEServerCallbacks {
@@ -123,6 +142,7 @@ class ServerCallbacks : public NimBLEServerCallbacks {
   void onDisconnect(NimBLEServer*, NimBLEConnInfo& connInfo, int reason) override {
     bleConnected = false;
     bleInBuf = "";
+    bleDisconnectDisplayPending = true;  // notify main loop to render splash
     // Only restart advertising if USB is not currently active
     bool usbActive = (lastUsbRxMs > 0 && millis() - lastUsbRxMs < USB_IDLE_TIMEOUT_MS);
     if (!usbActive) {
@@ -158,6 +178,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
  void setup() {
    heltec_setup(); 
    heltec_ve(true);
+
    if (duck.setupWithDefaults() != DUCK_ERR_NONE) {
      Serial.println("[MAMA] Failed to setup MamaDuck");
      return;
@@ -289,6 +310,20 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     displayHome();
   }
 
+  // BLE disconnected splash — deferred from onDisconnect() callback.
+  if (bleDisconnectDisplayPending) {
+    bleDisconnectDisplayPending = false;
+    display.displayOn();
+    displayEnabled = true;
+    displayID();
+    display.setFont(ArialMT_Plain_10);
+    display.setTextAlignment(TEXT_ALIGN_CENTER);
+    display.drawString(64, 28, "BLUETOOTH\nTERPUTUS");
+    display.display();
+    delay(2000);
+    displayHome();
+  }
+
   // USB serial connected splash — shown once per connect/reconnect cycle.
   if (usbConnectDisplayPending) {
     usbConnectDisplayPending = false;
@@ -302,7 +337,52 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     displayHome();
   }
 
+  // USB serial disconnected splash — shown after USB_IDLE_TIMEOUT_MS of silence.
+  if (usbDisconnectDisplayPending) {
+    usbDisconnectDisplayPending = false;
+    display.displayOn();
+    displayEnabled = true;
+    displayID();
+    display.setFont(ArialMT_Plain_10);
+    display.setTextAlignment(TEXT_ALIGN_CENTER);
+    display.drawString(64, 28, "USB BERSIRI\nTERPUTUS");
+    display.display();
+    delay(2000);
+    displayHome();
+  }
+
    //timer.tick();
+
+  // Auto-dismiss received message after MESSAGE_DISPLAY_MS so the home screen
+  // (and signal percentage) keeps updating even if nobody presses the button.
+  if (messagePending && (millis() - messagePendingMs >= MESSAGE_DISPLAY_MS)) {
+    messagePending = false;
+    displayEnabled = true;
+    display.displayOn();
+    displayHome();
+  }
+
+  // Auto-refresh the home screen so the signal percentage stays current.
+  // Reads RSSI directly from the radio here so relay and RREQ packets
+  // (processed internally by CDP, never reaching handleDuckData) also
+  // contribute to the signal reading. Guard: rawRssi < 0 means a real
+  // packet has been received; 0 is the chip default before any reception.
+  // Skipped when a received message is occupying the screen (messagePending).
+  if (displayEnabled
+      && !phoneGpsDisplayPending
+      && !bleConnectDisplayPending
+      && !usbConnectDisplayPending
+      && !messagePending
+      && (millis() - lastHomeRefreshMs >= HOME_REFRESH_MS)) {
+    lastHomeRefreshMs = millis();
+    float rawRssi = lora.getRSSI();
+    if (rawRssi < 0.0f) {
+      float normRssi = constrain((rawRssi        - RSSI_MIN) / (RSSI_MAX - RSSI_MIN), 0.0f, 1.0f);
+      float normSnr  = constrain((lora.getSNR()  - SNR_MIN)  / (SNR_MAX  - SNR_MIN),  0.0f, 1.0f);
+      lastSignalPct  = (int)(((normRssi + normSnr) / 2.0f) * 100.0f);
+    }
+    displayHome();
+  }
 
   heltec_loop();
   // Button
@@ -373,12 +453,20 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
   }
 
   if (button.isSingleClick()) {
-    displayEnabled = !displayEnabled;
-    if (displayEnabled) {
+    if (messagePending) {
+      // Dismiss the current message and return to home screen.
+      messagePending = false;
+      displayEnabled = true;
       display.displayOn();
       displayHome();
     } else {
-      display.displayOff();
+      displayEnabled = !displayEnabled;
+      if (displayEnabled) {
+        display.displayOn();
+        displayHome();
+      } else {
+        display.displayOff();
+      }
     }
   }
 
@@ -483,6 +571,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     if (usbPhoneSeen && lastUsbRxMs > 0 && millis() - lastUsbRxMs > USB_IDLE_TIMEOUT_MS) {
       usbPhoneSeen      = false;
       lastUsbAnnounceMs = 0;
+      usbDisconnectDisplayPending = true;  // notify main loop to render splash
     }
     if (!usbPhoneSeen && millis() - lastUsbAnnounceMs >= 3000UL) {
       Serial.println("CDK:ID,VALUE:" DUCK_NAME);
@@ -616,6 +705,8 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
             Serial.println("📨 Message: " + message);
             display.displayOn();
             displayMessage(message);
+            messagePending   = true;           // keep on screen until dismissed or timeout
+            messagePendingMs  = millis();         // start auto-dismiss countdown
             std::snprintf(replyMsg, sizeof(replyMsg), "MSG_READ:TEXT:%s", message.c_str());
             duck.sendData(22, replyMsg);
             //duck.sendData(22, "MSG_READ");
@@ -799,14 +890,31 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
 
  void displayHome() {
     display.clear();
-    display.setTextAlignment(TEXT_ALIGN_RIGHT);
     display.setFont(ArialMT_Plain_10);
-    display.drawString(128, 0, buffer);          // ID top-right
+    // Row 1 (y=0): BATT left, ID right
     display.setTextAlignment(TEXT_ALIGN_LEFT);
-    display.drawString(0, 0, "BATT:" + String(heltec_battery_percent(readVbat())) + "%"); // battery top-left
-    display.setFont(ArialMT_Plain_10);
+    display.drawString(0, 0, "BATT:" + String(heltec_battery_percent(readVbat())) + "%");
+    display.setTextAlignment(TEXT_ALIGN_RIGHT);
+    display.drawString(128, 0, buffer);
+    // Row 2 (y=12): signal quality or TX status
     display.setTextAlignment(TEXT_ALIGN_CENTER);
-    display.drawString(64, 22, "TEKAN BUTANG ATAS\nSELAMA DUA SAAT UTK\n ISYARAT KECEMASAN");
+    String sigStr;
+    if (lastSignalPct >= 0) {
+      // Received-packet signal quality (most accurate)
+      if      (lastSignalPct <= 25) sigStr = "SIG: LEMAH ("   + String(lastSignalPct) + "%)";
+      else if (lastSignalPct <= 50) sigStr = "SIG: CUKUP ("   + String(lastSignalPct) + "%)";
+      else if (lastSignalPct <= 75) sigStr = "SIG: KUAT ("    + String(lastSignalPct) + "%)";
+      else                          sigStr = "SIG: SG.KUAT (" + String(lastSignalPct) + "%)";
+    } else if (lastTxResult == 0) {
+      sigStr = "BERJAYA HANTAR";
+    } else if (lastTxResult > 0) {
+      sigStr = "GAGAL HANTAR";
+    } else {
+      sigStr = "SIG: TIADA ISYARAT";
+    }
+    display.drawString(64, 12, sigStr);
+    // Row 3 (y=26): instruction text
+    display.drawString(64, 26, "TEKAN BUTANG ATAS\nSELAMA DUA SAAT UTK\nISYARAT KECEMASAN");
     display.display();
  }
 
@@ -871,6 +979,8 @@ void displayBatt() {
 
    // Send alert upward to PapaDuck — PapaDuck decides whether to re-broadcast.
    failure = duck.sendData(topics::alert, loraMsg);
+   lastTxResult = failure;   // 0 = success; track for signal-line display
+   lastTxMs     = millis();
    if (!failure) {
      counter++;
      display.displayOn();
@@ -971,13 +1081,14 @@ void handleFrame(const String& line) {
   String type = (comma == -1) ? body : body.substring(0, comma);
 
   // C++ can't switch on strings; map type to enum first
-  enum FrameType { FT_UNKNOWN, FT_SOS, FT_MSG, FT_PING, FT_MTALK, FT_GPS };
+  enum FrameType { FT_UNKNOWN, FT_SOS, FT_MSG, FT_PING, FT_MTALK, FT_GPS, FT_BYE };
   FrameType ft = FT_UNKNOWN;
   if      (type == "SOS")   ft = FT_SOS;
   else if (type == "MSG")   ft = FT_MSG;
   else if (type == "PING")  ft = FT_PING;
   else if (type == "MTALK") ft = FT_MTALK;
   else if (type == "GPS")   ft = FT_GPS;
+  else if (type == "BYE")   ft = FT_BYE;
 
   switch (ft) {
     case FT_SOS:   handleSOS(body);       break;
@@ -985,6 +1096,16 @@ void handleFrame(const String& line) {
     case FT_PING:  /* ID already broadcast above */ break;
     case FT_MTALK: handleMamaTalk(body);  break;
     case FT_GPS:   handleGps(body);       break;
+    case FT_BYE:
+      // Phone is about to disconnect — show Malay disconnect splash immediately
+      // rather than waiting for the idle timeout.
+      if (bleConnected) {
+        bleDisconnectDisplayPending = true;
+      } else {
+        usbPhoneSeen = false;
+        usbDisconnectDisplayPending = true;
+      }
+      break;
     default:       break;
   }
 }
