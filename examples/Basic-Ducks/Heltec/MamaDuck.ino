@@ -44,7 +44,7 @@ extern CDPCFG_LORA_CLASS lora;
 #define LORA_PA_EN     2
 #endif
 
- #define DUCK_NAME "IBRAHIM1"
+ #define DUCK_NAME "TMRH0004"
  // Bluetooth Low energgy definitions
  #define NUS_SERVICE "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
  #define NUS_RX_CHAR "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
@@ -201,7 +201,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
   display.init();
   display.flipScreenVertically();
 
-  display.drawXbm(0, 0, taqisystems_small_width, taqisystems_small_height, taqisystems_small_bits);
+  display.drawXbm(20, 0, taqisystems_small_width, taqisystems_small_height, taqisystems_small_bits);
   display.display();
   heltec_delay(10000);
   display.clear();
