@@ -385,6 +385,10 @@ class Duck {
      */
     static bool sendSignalData(void* p){
       Duck* duckInstance = static_cast<Duck*>(p);
+      if (duckInstance->getType() == DuckType::PAPA) {
+        logdbg_ln("[DUCK] Skipping signal info send for PapaDuck.");
+        return true;
+      }
       int err;
       duckInstance->router.cullRoutingTable();
       std::optional<std::string> message = duckInstance->router.getEntriesFor(PAPADUCK_DUID, duckInstance->duid);
@@ -486,7 +490,7 @@ class Duck {
 
     //Telemetry
     const int HEALTH_INTERVAL = 1000 * 60 * 15; //15 minutes
-    const int SIGNAL_INTERVAL = 1000 * 60;//0 * 7; //1 hour 2 min
+    const int SIGNAL_INTERVAL = 1000 * 60 * 10; //10 minutes
     int counter = 1;
     Timer<10> duckTimer;
 

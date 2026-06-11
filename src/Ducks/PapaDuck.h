@@ -132,7 +132,8 @@ void ifNotBroadcast(CdpPacket rxPacket, bool relay = false) {
             RouteJSON rrepDoc = RouteJSON(rxPacket.data);
             std::optional<Duid> last = rrepDoc.getlastInPath();
             Duid lastInPath = last.has_value() ? last.value() : rxPacket.sduid;
-            loginfo_ln("Received Route Response from DUID: %s", rxPacket.sduid.data(), rxPacket.sduid.size());
+            std::string sourceDuid(rxPacket.sduid.begin(), rxPacket.sduid.end());
+            loginfo_ln("Received Route Response from DUID: %s", sourceDuid.c_str());
 
             std::optional<Duid> nextHop = this->router.getBestNextHop(rrepDoc.getDestination());
             if((rrepDoc.getDestination() != this->duid) && (nextHop.has_value()) && (nextHop.value() !=  rxPacket.sduid)){ //and not papaduck_duid?
