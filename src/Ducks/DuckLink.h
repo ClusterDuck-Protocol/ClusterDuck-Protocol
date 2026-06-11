@@ -109,7 +109,7 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
                   //we still need to recieve rreps in case of ttl expiry
                   RouteJSON rrepDoc = RouteJSON(rxPacket.data);
                   std::string sourceDuid(rxPacket.sduid.begin(), rxPacket.sduid.end());
-                  loginfo_ln("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Received Route Response from DUID: %s", sourceDuid.c_str());
+                  loginfo_ln("Received Route Response from DUID: %s", sourceDuid.c_str());
                   //destination = sender of the rrep -> the last hop to current duck
                   std::optional<Duid> last = rrepDoc.getlastInPath();
                   Duid lastInPath = last.value();

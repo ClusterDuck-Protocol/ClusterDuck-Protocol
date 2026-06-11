@@ -97,20 +97,6 @@ enum topics {
   sig = 0x17,
   //battery level
   bat = 0x18,
-  // external battery status
-  externalbattery = 0x19,
-  // bird detection event
-  birddetection = 0x1A,
-  // sleep status
-  sleepstatus = 0x1B,
-  // teensy status
-  teensystatus = 0x1C,
-  // teensy health status
-  teensyhealth = 0x1D,
-  // boot status
-  boot = 0x1E,
-  // tbeam status
-  tbeamstatus = 0x1F,
   // Send duck commands
   dcmd = 0x16,
   //gps
@@ -294,20 +280,6 @@ class CdpPacket {
                 return "sensor";
             case topics::bat:
                 return "battery";
-            case topics::externalbattery:
-                return "externalbattery";
-            case topics::birddetection:
-                return "birddetection";
-            case topics::sleepstatus:
-                return "sleepstatus";
-            case topics::teensystatus:
-                return "teensystatus";
-            case topics::teensyhealth:
-                return "teensyhealth";
-            case topics::tbeamstatus:
-                return "tbeamstatus";
-            case topics::boot:
-                return "boot";
             case topics::sig:
                 return "signal health";
             case topics::alert:
