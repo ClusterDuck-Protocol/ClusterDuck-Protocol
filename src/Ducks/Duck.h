@@ -368,8 +368,14 @@ class Duck {
      */
     static bool sendHealth(void* p){
       Duck* duckInstance = static_cast<Duck*>(p);
-      std::string message = "C:" + std::to_string(duckInstance->counter) + "|" + "FM:" + std::to_string(freeMemory());
-      int err = duckInstance->sendData(topics::health, message);
+
+      JsonDocument doc;
+      doc["C"] = std::to_string(duckInstance->counter);
+      doc["FM"] = std::to_string(freeMemory());
+      std::string jsonString;
+      serializeJson(doc, jsonString);
+        
+      int err = duckInstance->sendData(topics::health, jsonString);
       if (err != DUCK_ERR_NONE) {
         duckInstance->counter++;
         loginfo_ln("[DUCK] health message failed to send.");
