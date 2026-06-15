@@ -49,11 +49,14 @@ class RouteJSON {
             }
             origin = json["origin"].as<const char*>();
             destination = json["destination"].as<const char*>();
-            logdbg_ln("Built RouteJSON from packet data: %s",json.as<std::string>().c_str());
+            const std::string serialized = asString();
+            logdbg_ln("Built RouteJSON from packet data: %s", serialized.c_str());
         }
 
         std::string asString(){
-            return json.as<std::string>();
+            std::string out;
+            serializeJson(json, out);
+            return out;
         }
 
         std::string convertReqToRep(){
@@ -67,7 +70,7 @@ class RouteJSON {
             std::string log;
             serializeJson(json, log);
 
-            return json.as<std::string>();
+            return asString();
         }
         Duid getOrigin(){
             Duid originDuid;
@@ -95,7 +98,7 @@ class RouteJSON {
             serializeJson(json, log);
             logdbg_ln("RREQ: %s", log.c_str());
 #endif
-            return json.as<std::string>();
+            return asString();
             //add rssi snr
         }
 
@@ -131,7 +134,7 @@ class RouteJSON {
         serializeJson(json, log);
         logdbg_ln("Packet: %s", log.c_str());
 
-        return json.as<std::string>();
+        return asString();
     }
 
   private:
