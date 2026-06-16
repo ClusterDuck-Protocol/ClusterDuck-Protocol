@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <arduino-timer.h>
+#include <Preferences.h>
 #include "../utils/DuckError.h"
 #include "../include/cdpcfg.h"
 #include "../radio/DuckLoRa.h"
@@ -79,7 +80,33 @@ class Duck {
 
     int setupWithDefaults() {
       this->setupSerial(115200);
-      int err = this->setupLoRaRadio();
+      if (!eeprom_preferences.begin("duck")) {
+        logerr_ln("Failed to initialise EEPROM, aborting duck setup");
+        return DUCK_ERR_EEPROM_INIT;
+      }
+ 
+      int tx_power = eeprom_preferences.getInt("tx_pwr", CDPCFG_RF_LORA_TXPOW);
+      if (tx_power < 0 || tx_power > 14) {
+          tx_power = CDPCFG_RF_LORA_TXPOW;
+      }
+
+      int sf = eeprom_preferences.getInt("sf", CDPCFG_RF_LORA_SF);
+      if (sf < 7 || sf > 12) {
+          sf = CDPCFG_RF_LORA_SF;
+      }
+      //should i close the eeprom_preferences here??
+
+      //lora config for use in phoenix
+      const LoRaConfigParams radioParam = {
+        /* band     = */ CDPCFG_RF_LORA_FREQ,
+        /* txPower  = */ tx_power,
+        /* bw       = */ CDPCFG_RF_LORA_BW,
+        /* sf       = */ sf,
+        /* gain     = */ CDPCFG_RF_LORA_GAIN,
+        /* func     = */ onInterrupt
+    };
+
+      int err = this->setupLoRaRadio(radioParam);
       if (err != DUCK_ERR_NONE) {
         logerr_ln("ERROR setupWithDefaults rc = %d",err); 
       } else{
@@ -389,11 +416,14 @@ class Duck {
      * @brief sendData that allows sending for signal info for DMS mapping on an internal timer
      * @returns DUCK_ERR_NONE if the data was sent successfully, an error code otherwise.
      */
-    static bool sendSignalData(void* p){
+    static bool sendSignalData(void* p){ //move this to mama/link?
       Duck* duckInstance = static_cast<Duck*>(p);
       if (duckInstance->getType() == DuckType::PAPA) {
         logdbg_ln("[DUCK] Skipping signal info send for PapaDuck.");
-        return true;
+        return false;
+      } else if (duckInstance->getType() == DuckType::DETECTOR) {
+        logdbg_ln("[DUCK] Skipping signal info send for Detector.");
+        return false;
       }
       int err;
       duckInstance->router.cullRoutingTable();
@@ -493,6 +523,7 @@ class Duck {
     Duck& operator=(Duck const&) = delete;
     SizedQueue rxQueue;
     SizedQueue txQueue;
+    Preferences eeprom_preferences;
 
     //Telemetry
     const int HEALTH_INTERVAL = 1000 * 60 * 15; //15 minutes

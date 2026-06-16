@@ -13,7 +13,6 @@
 #include "../include/cdpcfg.h"
 #include <arduino-timer.h>
 #include <Arduino.h>
-#include <EEPROM.h>
 #include <string>
 #include <vector>
 #include "DuckError.h"

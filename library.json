@@ -33,6 +33,7 @@
         "bakercp/CRC32": "2.0.1",
         "jgromes/RadioLib": "^7.6.0",
         "knolleary/PubSubClient":"^2.8",
-        "fastled/FastLED": "^3.10.3"
+        "fastled/FastLED": "^3.10.3",
+        "vshymanskyy/Preferences": "2.2.2"
     }
 }

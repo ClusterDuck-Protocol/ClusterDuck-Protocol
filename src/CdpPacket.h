@@ -99,6 +99,12 @@ enum topics {
   bat = 0x18,
   // external battery status
   externalbattery = 0x19,
+  //duck command for spreading factor and tx power
+  cmd_tx = 0x20,
+  //duck command for battery level for phoenix sleep
+  cmd_bat = 0x21,
+  //duck command for phoenix time sync
+  cmd_time = 0x22,
   // bird detection event
   birddetection = 0x1A,
   // sleep status
@@ -111,8 +117,6 @@ enum topics {
   boot = 0x1E,
   // tbeam status
   tbeamstatus = 0x1F,
-  // Send duck commands
-  dcmd = 0x16,
   //gps
   gps = 0xEA,
   // MQ7 Gas Sensor
@@ -137,7 +141,6 @@ enum reservedTopic {
   ping = 0x01,
   pong = 0x02,
   ack = 0x04,
-  cmd = 0x05,
   rreq = 0x06,
   rrep = 0x07,
   max_reserved = 0x0F
@@ -314,8 +317,12 @@ class CdpPacket {
                 return "alert";
             case topics::health:
                 return "health";
-            case topics::dcmd:
-                return "dcmd";
+            case topics::cmd_bat:
+                return "cmd_bat";
+            case topics::cmd_time:
+            return "cmd_time";
+            case topics::cmd_tx:
+            return "cmd_tx";
             case topics::mq7:
                 return "mq7";
             case topics::gp2y:
