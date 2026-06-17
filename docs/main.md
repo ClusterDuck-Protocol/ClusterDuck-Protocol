@@ -15,6 +15,9 @@ The protocol's network consists of nodes known as **Ducks**, playing one of thre
 ## Getting Started
 [Installation steps and initial setup guide.]
 
+## Transmission Ranges & Speeds
+For details on transmission ranges, speeds, latency, and lessons learned from real-world deployments, see the [Distances and Speeds Guide](distances_and_speeds.md).
+
 
 ## How to Contribute
 Join our vibrant community in enhancing and expanding the ClusterDuck Protocol. Whether it's code contributions, documentation, or community support, find out how you can make a difference in our [Discord].

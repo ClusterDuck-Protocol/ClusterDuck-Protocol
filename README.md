@@ -34,6 +34,11 @@ DuckLinks are a leaf node and offer no relay ability, having minimal routing. Th
 Check out the [Wiki](https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol/wiki/getting-started) to learn how to create your Duck Devices and set up a ClusterDuck Network. Feel free to visit the  [ClusterDuck Protocol](https://clusterduckprotocol.org/) website for more information on projects that the community is building. You can reach out directly on our [Discord Community](https://discord.gg/Cbgbzq353z) for any questions and/or to work with the community.
 
 
+# Transmission Ranges & Speeds
+
+For details on transmission ranges, speeds, latency, and lessons learned from real-world deployments (e.g., in Puerto Rico), see our [Distances and Speeds Guide](docs/distances_and_speeds.md).
+
+
 # Basic Usage
 ## Constructing a Duck
 ```c++
