@@ -27,6 +27,7 @@ class Duck {
   public:
     virtual ~Duck(){
     };
+    Preferences eeprom_preferences;
 
     /**
      * @brief Duck main running loop
@@ -103,7 +104,7 @@ class Duck {
         /* bw       = */ CDPCFG_RF_LORA_BW,
         /* sf       = */ sf,
         /* gain     = */ CDPCFG_RF_LORA_GAIN,
-        /* func     = */ onInterrupt
+        /* func     = */ duckRadio.onInterrupt
     };
 
       int err = this->setupLoRaRadio(radioParam);
@@ -523,7 +524,6 @@ class Duck {
     Duck& operator=(Duck const&) = delete;
     SizedQueue rxQueue;
     SizedQueue txQueue;
-    Preferences eeprom_preferences;
 
     //Telemetry
     const int HEALTH_INTERVAL = 1000 * 60 * 15; //15 minutes

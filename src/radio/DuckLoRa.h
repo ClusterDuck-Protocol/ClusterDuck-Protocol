@@ -58,6 +58,11 @@ class DuckLoRa {
             // Initialize the random number generator with a seed based on the current time in a non-arduino way
             gen.seed(time(nullptr));
         };
+         /*
+        * @brief Interrupt service routine for the LoRa module.
+        *
+        */
+       static void onInterrupt();
         DuckLoRa(DuckLoRa const&) = delete;
         DuckLoRa& operator=(DuckLoRa const&) = delete;
 
@@ -174,11 +179,7 @@ class DuckLoRa {
          */
         int sleep();
 
-        /*
-        * @brief Interrupt service routine for the LoRa module.
-        *
-        */
-        static void onInterrupt();
+       
 
 };
 

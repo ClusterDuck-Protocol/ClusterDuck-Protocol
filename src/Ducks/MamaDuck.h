@@ -80,68 +80,70 @@ private :
             case reservedTopic::pong:
                 loginfo_ln("PONG received. Ignoring!");
                 break;
-                case topics::cmd_bat:
-                  ArduinoJson::JsonDocument json;
-                  std::string packetStr(rxPacket.data.begin(), rxPacket.data.end());
-                  DeserializationError error = deserializeJson(json, packetStr);
-                  if (error) {
-                      logerr_ln("Duck Command cmd_tx deserialization failed: %s", error.c_str());
-                      break;
-                  }
-                  loginfo_ln("Command received, updating battery threshold for sleep");
-
-                  int battery_min = doc["min"];
-                  int battery_max = doc["max"];
-                  if ((battery_min < 0 || battery_min > 100) || (battery_max < 0 || battery_max > 100)) {
-                    logerr_ln("Invalid argument -- battery threshold min: %i , battery threshold max %i", battery_min, battery_max);
-                    err = DUCK_ERR_INVALID_ARGUMENT;
+            case topics::cmd_bat: {
+                ArduinoJson::JsonDocument json;
+                std::string packetStr(rxPacket.data.begin(), rxPacket.data.end());
+                DeserializationError error = deserializeJson(json, packetStr);
+                if (error) {
+                    logerr_ln("Duck Command cmd_tx deserialization failed: %s", error.c_str());
                     break;
-                  }
+                }
+                loginfo_ln("Command received, updating battery threshold for sleep");
 
-                  if (err == DUCK_ERR_NONE){
-                    eeprom_preferences.putInt("bat_min", battery_min);
-                    eeprom_preferences.putInt("bat_max", battery_max);
-                  }
+                int battery_min = json["min"];
+                int battery_max = json["max"];
+                if ((battery_min < 0 || battery_min > 100) || (battery_max < 0 || battery_max > 100)) {
+                logerr_ln("Invalid argument -- battery threshold min: %i , battery threshold max %i", battery_min, battery_max);
+                err = DUCK_ERR_INVALID_ARGUMENT;
+                break;
+                }
 
-                  err = this->broadcastPacket(rxPacket);
-                  if (err != DUCK_ERR_NONE) {
-                    logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
-                    } else {
-                        loginfo_ln("handleReceivedPacket: packet RELAY DONE");
-                    }
-                  break;
-              case topics::cmd_tx:
-                  ArduinoJson::JsonDocument json;
-                  std::string packetStr(rxPacket.data.begin(), rxPacket.data.end());
-                  DeserializationError error = deserializeJson(json, packetStr);
-                  if (error) {
-                      logerr_ln("Duck Command cmd_tx deserialization failed: %s", error.c_str());
-                      break;
-                  }
-                  loginfo_ln("Command received, updating transmission power");
-                  
-                  int tx_pwr = doc["tx_pwr"];
-                  int sf = doc["sf"];
+                if (err == DUCK_ERR_NONE){
+                this->eeprom_preferences.putInt("bat_min", battery_min);
+                this->eeprom_preferences.putInt("bat_max", battery_max);
+                }
 
-                  if ((tx_pwr < 0 || tx_pwr > 100) || (sf < 7 || sf > 12)) {
-                    logerr_ln("Invalid argument -- tx power: %i , spreading factor %i", tx_pwr, sf);
-                    err = DUCK_ERR_INVALID_ARGUMENT;
+                err = this->broadcastPacket(rxPacket);
+                if (err != DUCK_ERR_NONE) {
+                logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
+                } else {
+                    loginfo_ln("handleReceivedPacket: packet RELAY DONE");
+                }
+                break;
+            }
+            case topics::cmd_tx: {
+                ArduinoJson::JsonDocument json;
+                std::string packetStr(rxPacket.data.begin(), rxPacket.data.end());
+                DeserializationError error = deserializeJson(json, packetStr);
+                if (error) {
+                    logerr_ln("Duck Command cmd_tx deserialization failed: %s", error.c_str());
                     break;
-                  }
+                }
+                loginfo_ln("Command received, updating transmission power");
+                
+                int tx_pwr = json["tx_pwr"];
+                int sf = json["sf"];
 
-                  if (err == DUCK_ERR_NONE){
-                    eeprom_preferences.putInt("tx_pwr", tx_pwr);
-                    eeprom_preferences.putInt("sf", sf);
-                  }
-                 
-                  err = this->broadcastPacket(rxPacket);
-                  if (err != DUCK_ERR_NONE) {
-                    logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
-                    } else {
-                        loginfo_ln("handleReceivedPacket: packet RELAY DONE");
-                    }
-                  break;
-              case topics::cmd_time:
+                if ((tx_pwr < 0 || tx_pwr > 100) || (sf < 7 || sf > 12)) {
+                logerr_ln("Invalid argument -- tx power: %i , spreading factor %i", tx_pwr, sf);
+                err = DUCK_ERR_INVALID_ARGUMENT;
+                break;
+                }
+
+                if (err == DUCK_ERR_NONE){
+                this->eeprom_preferences.putInt("tx_pwr", tx_pwr);
+                this->eeprom_preferences.putInt("sf", sf);
+                }
+                
+                err = this->broadcastPacket(rxPacket);
+                if (err != DUCK_ERR_NONE) {
+                logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
+                } else {
+                    loginfo_ln("handleReceivedPacket: packet RELAY DONE");
+                }
+                break;
+            }
+              case topics::cmd_time:{
                   loginfo_ln("Command received, updating time to match papa");
                 //   err = this->broadcastPacket(rxPacket);
                 //   if (err != DUCK_ERR_NONE) {
@@ -150,6 +152,7 @@ private :
                 //         loginfo_ln("handleReceivedPacket: packet RELAY DONE");
                 //     }
                   break;
+              }
             default:
                 err = this->broadcastPacket(rxPacket);
                 if (err != DUCK_ERR_NONE) {
