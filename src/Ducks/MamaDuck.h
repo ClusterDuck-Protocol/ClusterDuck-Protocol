@@ -22,6 +22,9 @@ public:
      */
     void onReceiveDuckData(rxDoneCallback cb) { this->recvDataCallback = cb; }
 
+    /** Skip the RREQ discovery phase and go operational immediately. */
+    void goPublic() { this->router.setNetworkState(NetworkState::PUBLIC); }
+
     /**
      * @brief Get the DuckType
      * 
@@ -82,14 +85,16 @@ private :
                 break;
             }
             case reservedTopic::ping:
-                loginfo_ln("PING received. Sending PONG!");
+                loginfo_ln("PING received. Notifying sketch first, then sending PONG.");
+                // Call sketch BEFORE sendPong so the sketch can broadcast its
+                // own GPS packet.  That GPS packet reaches the pinging duck
+                // before the PONG, so the very first CDK:SEEN already includes
+                // GPS coordinates.
+                if (recvDataCallback) recvDataCallback(rxPacket);
                 err = this->sendPong();
                 if (err != DUCK_ERR_NONE) {
                     logerr_ln("ERROR failed to send pong message. rc = %d",err);
                 }
-                break;
-            case reservedTopic::pong:
-                loginfo_ln("PONG received. Ignoring!");
                 break;
             case reservedTopic::cmd:
                 loginfo_ln("Command received");
@@ -162,14 +167,22 @@ private :
             }
                 break;
             case reservedTopic::ping:
-                loginfo_ln("PING received. Sending PONG!");
+                loginfo_ln("PING received. Notifying sketch first, then sending PONG.");
+                // Call sketch BEFORE sendPong so the sketch can broadcast its
+                // own GPS packet.  That GPS packet reaches the pinging duck
+                // before the PONG, so the very first CDK:SEEN already includes
+                // GPS coordinates.
+                if (recvDataCallback) recvDataCallback(rxPacket);
                 err = this->sendPong();
                 if (err != DUCK_ERR_NONE) {
                     logerr_ln("ERROR failed to send pong message. rc = %d",err);
                 }
                 break;
             case reservedTopic::pong:
-                loginfo_ln("PONG received. Ignoring!");
+                loginfo_ln("PONG received from nearby duck.");
+                // Deliver to sketch so it can emit CDK:SEEN for peer discovery
+                // when the app triggers a CDK:SCAN → duck.sendPing() sweep.
+                if (recvDataCallback) recvDataCallback(rxPacket);
                 break;
             case reservedTopic::cmd:
                 loginfo_ln("Command received");
@@ -185,7 +198,10 @@ private :
             default:
                 loginfo_ln("ifNotBroadcast: default topic=%d relay=%d cbSet=%d", (int)rxPacket.topic, (int)relay, (recvDataCallback != nullptr ? 1 : 0));
                 if(relay){
-                    this->forwardPacket(rxPacket); 
+                    this->forwardPacket(rxPacket);
+                    // Also notify the sketch for relay packets so it can emit CDK:SEEN
+                    // frames for all overheard ducks (peer discovery in the mobile app).
+                    if (recvDataCallback) recvDataCallback(rxPacket);
                 } else if (recvDataCallback) {
                     // Packet is directly addressed to this duck — deliver to sketch
                     recvDataCallback(rxPacket);

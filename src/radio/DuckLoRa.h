@@ -129,19 +129,31 @@ class DuckLoRa {
 
         /**
          * @brief Temporarily switch the radio to a randomly selected uplink
-         *        channel from CDPCFG_UPLINK_CHANNEL_POOL. Used before Papa-bound
-         *        transmissions to spread load across SX1302 demodulators.
-         *        The mesh channel is automatically restored in the TX_DONE
-         *        interrupt handler.
+         *        channel from CDPCFG_UPLINK_CHANNEL_POOL.
          *
-         * @param freq Uplink frequency in MHz
+         * Called by Duck::sendToRadio() immediately before transmitting a
+         * Papa-bound packet that *originated* from this duck
+         * (sduid == this->duid). Relayed packets are never subject to channel
+         * switching and are always sent on the shared mesh channel
+         * (CDPCFG_RF_LORA_FREQ, 922.8 MHz) so that other MamaDucks can
+         * continue to hear and forward them.
+         *
+         * The mesh channel is automatically restored in the TX_DONE interrupt
+         * handler after the transmission completes.
+         *
+         * @param freq Uplink frequency in MHz (must be a member of
+         *             CDPCFG_UPLINK_CHANNEL_POOL)
          * @returns DUCK_ERR_NONE on success, an error code otherwise.
          */
         int setUplinkFrequency(float freq);
 
         /**
          * @brief Pick a random channel from CDPCFG_UPLINK_CHANNEL_POOL using
-         *        the internal RNG.
+         *        the internal Mersenne-Twister RNG.
+         *
+         * Each of the 8 AS923 channels (921.4–922.8 MHz, 200 kHz steps) is
+         * equally likely to be selected, spreading uplink traffic across all
+         * SX1302 demodulators.
          *
          * @returns A frequency in MHz.
          */

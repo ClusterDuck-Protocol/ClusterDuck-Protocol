@@ -124,6 +124,7 @@ static unsigned long messagePendingMs        = 0;      // millis() when message 
 const  unsigned long MESSAGE_DISPLAY_MS      = 10000UL; // auto-dismiss received message after 10 s
 static int           lastTxResult            = -1;     // -1=never sent, 0=success, >0=fail
 static unsigned long lastTxMs               = 0;      // millis() of most recent duck.sendData() call
+static volatile bool sosAckDisplayPending   = false;  // set by handleDuckData; rendered at top of loop()
 
 // ── BLE callbacks ─────────────────────────────────────────────────────
 class ServerCallbacks : public NimBLEServerCallbacks {
@@ -179,6 +180,36 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
    heltec_setup(); 
    heltec_ve(true);
 
+   // BLE init first — must run regardless of duck setup outcome
+   // so the device is always discoverable.
+   NimBLEDevice::init(DUCK_NAME);
+   NimBLEDevice::setPower(ESP_PWR_LVL_P9);
+   NimBLEServer* pServer = NimBLEDevice::createServer();
+   pServer->setCallbacks(new ServerCallbacks());
+   NimBLEService* pSvc = pServer->createService(NUS_SERVICE);
+   pTxChar = pSvc->createCharacteristic(NUS_TX_CHAR, NIMBLE_PROPERTY::NOTIFY);
+   NimBLECharacteristic* pRxChar = pSvc->createCharacteristic(
+     NUS_RX_CHAR, NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_NR);
+   pRxChar->setCallbacks(new RxCallbacks());
+   pSvc->start();
+   {
+     NimBLEAdvertising* pAdv = NimBLEDevice::getAdvertising();
+     pAdv->setMinInterval(160);
+     pAdv->setMaxInterval(160);
+     // ADV_IND: flags + name — iOS reads this on the very first packet.
+     NimBLEAdvertisementData advData;
+     advData.setFlags(0x06);  // LE General Discoverable | BR/EDR Not Supported
+     advData.setName(DUCK_NAME);
+     pAdv->setAdvertisementData(advData);
+     // SCAN_RSP: NUS service UUID — Android apps that filter by UUID see it here.
+     NimBLEAdvertisementData scanData;
+     scanData.addServiceUUID(NimBLEUUID(NUS_SERVICE));
+     pAdv->setScanResponseData(scanData);
+     NimBLEDevice::startAdvertising();
+     bleAdvSlowAfterMs = millis() + 30000;
+   }
+   Serial.println("[BLE] Advertising started");
+
    if (duck.setupWithDefaults() != DUCK_ERR_NONE) {
      Serial.println("[MAMA] Failed to setup MamaDuck");
      return;
@@ -223,40 +254,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
   Serial.println("[MAMA] Firmware v2 (with LAT/LNG support)");
   sendBattery();
 
-  // BLE init
-  NimBLEDevice::init(DUCK_NAME);
-  NimBLEDevice::setPower(ESP_PWR_LVL_P9); // +9 dBm — maximum ESP32 TX power for best range/discoverability
-  NimBLEServer* pServer = NimBLEDevice::createServer();
-  pServer->setCallbacks(new ServerCallbacks());
-  NimBLEService* pSvc = pServer->createService(NUS_SERVICE);
-  pTxChar = pSvc->createCharacteristic(NUS_TX_CHAR, NIMBLE_PROPERTY::NOTIFY);
-  NimBLECharacteristic* pRxChar = pSvc->createCharacteristic(
-    NUS_RX_CHAR, NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_NR);
-  pRxChar->setCallbacks(new RxCallbacks());
-  pSvc->start();
-  NimBLEAdvertising* pAdv = NimBLEDevice::getAdvertising();
-  // Advertising at 200–400 ms to reduce 2.4 GHz congestion when multiple ducks
-  // are deployed nearby. Units: 0.625 ms per BLE spec (320=200 ms, 640=400 ms).
-  // Fast advertising for first 30 s after boot — phones discover the device quickly.
-  // The loop() transitions to slow (200–400 ms) after bleAdvSlowAfterMs expires.
-  pAdv->setMinInterval(160);  // 100 ms — fast initial advertising
-  pAdv->setMaxInterval(160);
-  // Primary advertising packet: device name.
-  // Phones get the name on the very first advertising event without needing
-  // to request a scan response — far more reliable on Android where scan
-  // response delivery is inconsistent.
-  // Budget: Flags (3 B) + name header (2 B) + "ZAIHAN12" (8 B) = 13 B — well
-  // within the 31-byte ADV_IND payload limit.
-  NimBLEAdvertisementData advData;
-  advData.setName(DUCK_NAME);
-  pAdv->setAdvertisementData(advData);
-  // Scan response: NUS service UUID.
-  // Kept here for central devices that want to filter by service UUID.
-  NimBLEAdvertisementData scanData;
-  scanData.setCompleteServices(NimBLEUUID(NUS_SERVICE));
-  pAdv->setScanResponseData(scanData);
-  NimBLEDevice::startAdvertising();
-  bleAdvSlowAfterMs = millis() + 30000;  // transition to slow advertising after 30 s
+  // BLE already started at top of setup() before duck init
 
  }
 
@@ -349,6 +347,22 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     display.display();
     delay(2000);
     displayHome();
+  }
+
+  // SOS acknowledgement from operator — deferred from handleDuckData to avoid
+  // being overwritten by sendEmergency()'s post-send display sequence.
+  if (sosAckDisplayPending) {
+    sosAckDisplayPending = false;
+    displayEnabled = true;
+    display.displayOn();
+    displayID();
+    display.setFont(ArialMT_Plain_10);
+    display.setTextAlignment(TEXT_ALIGN_CENTER);
+    display.drawString(64, 22, "SOS DITERIMA!\nBANTUAN SEDANG\nDIHANTAR");
+    display.display();
+    blinkLed(3);
+    messagePending   = true;
+    messagePendingMs = millis();
   }
 
    //timer.tick();
@@ -596,22 +610,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     else if (c != '\r') usbInBuf += c;
   }
 
-  // Stop BLE advertising while USB serial is active; resume after idle timeout
-  if (lastUsbRxMs > 0 && millis() - lastUsbRxMs < USB_IDLE_TIMEOUT_MS) {
-    // USB is active — stop advertising to save power
-    if (bleAdvertising && !bleConnected) {
-      NimBLEDevice::stopAdvertising();
-      bleAdvertising = false;
-      Serial.println("[BLE] USB active — advertising paused.");
-    }
-  } else {
-    // USB idle / not connected — resume advertising
-    if (!bleAdvertising && !bleConnected) {
-      NimBLEDevice::startAdvertising();
-      bleAdvertising = true;
-      Serial.println("[BLE] USB idle — advertising resumed.");
-    }
-  }
+  // BLE advertising runs continuously — not suppressed by USB activity.
   // Transition fast → slow BLE advertising after 30 s
   if (bleAdvertising && !bleConnected && bleAdvSlowAfterMs > 0 && millis() >= bleAdvSlowAfterMs) {
     bleAdvSlowAfterMs = 0;
@@ -695,14 +694,33 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
 
     if (!isForMe && !isBroadcast) return;
 
+    // Announce the sender duck to the connected phone for peer-discovery.
+    // The app uses CDK:SEEN frames to populate the Nearby Ducks list in the
+    // Nearby screen so the user can tap a discovered peer to start an MTALK.
+    // Only MAMA and LINK ducks are surfaced — PAPA and DETECTOR are not
+    // addressable via MTALK so they are excluded.
+    if (packet.duckType == DuckType::MAMA || packet.duckType == DuckType::LINK) {
+        const char* typeStr = (packet.duckType == DuckType::MAMA) ? "MAMA" : "LINK";
+        char seenBuf[32];
+        snprintf(seenBuf, sizeof(seenBuf), "CDK:SEEN,ID:%.8s,TYPE:%s",
+                 (char*)packet.sduid.data(), typeStr);
+        broadcast(seenBuf);
+    }
+
     Serial.println("HANDLING RECEIVING DATA....");
 
     String message = String((char*)packet.data.data(), packet.data.size());
     char replyMsg[200];
 
     switch (packet.topic) {
-        case 22:  // Text message
+        case 22:  // Text message or operator command
             Serial.println("📨 Message: " + message);
+            if (message.indexOf("SOS DITERIMA") >= 0) {
+                sosAckDisplayPending = true;
+                broadcast("CDK:SOS_ACK,TEXT:SOS DITERIMA");
+                Serial.println("[MAMA] SOS acknowledged by operator");
+                break;
+            }
             display.displayOn();
             displayMessage(message);
             messagePending   = true;           // keep on screen until dismissed or timeout
@@ -1304,5 +1322,10 @@ void sendFrame(const String& frame) {
 }
 
 void blinkLed(int frequency) {
-    for (int n = 0; n <= frequency; n++) { heltec_led(100); delay(1000); heltec_led(0); delay(1000); }
+    for (int n = 0; n <= frequency; n++) {
+        heltec_led(100);
+        { unsigned long t = millis(); while (millis()-t < 200) { duck.run(); ::delay(10); } }
+        heltec_led(0);
+        { unsigned long t = millis(); while (millis()-t < 200) { duck.run(); ::delay(10); } }
+    }
 }

@@ -111,6 +111,9 @@ void BloomFilter::assignUniqueMessageId(CdpPacket& packet) {
       getNewUnique = this->bloom_check(packet.muid.data(), MUID_LENGTH);
       loginfo_ln("prepareForSending: new MUID -> %s",duckutils::convertToHex(packet.muid.data(), MUID_LENGTH).c_str());
     }
+    // Add own MUID to bloom so if a relay echoes this packet back, we
+    // recognise it as seen and won't re-relay (prevents radio-busy loops).
+    this->bloom_add(packet.muid.data(), MUID_LENGTH);
 }
 
 int BloomFilter::bloom_check(unsigned char* msg, int msgSize) {

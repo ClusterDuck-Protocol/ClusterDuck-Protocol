@@ -11,6 +11,7 @@
 
  #include <string>
  #include <cstdio>
+ #include <map>
  #include <arduino-timer.h>
  #include <CDP.h>
  #ifdef SERIAL_PORT_USBVIRTUAL
@@ -44,7 +45,7 @@ extern CDPCFG_LORA_CLASS lora;
 #define LORA_PA_EN     2
 #endif
 
- #define DUCK_NAME "TMRH0004"
+ #define DUCK_NAME "SHABREE1"
  // Bluetooth Low energgy definitions
  #define NUS_SERVICE "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
  #define NUS_RX_CHAR "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
@@ -84,7 +85,8 @@ extern CDPCFG_LORA_CLASS lora;
  char buffer[100];
  const char* s = DUCK_NAME;
 
-static NimBLECharacteristic* pTxChar = nullptr;
+static NimBLECharacteristic* pTxChar    = nullptr;
+static NimBLEServer*          pBleServer = nullptr;  // stored for updateConnParams
 static bool bleConnected = false;
 static String bleInBuf = "";
 static String usbInBuf = "";
@@ -116,28 +118,45 @@ static char          phoneGpsAltBuf[12]     = {};     // altitude in metres
 static char          phoneGpsSpdBuf[12]     = {};     // speed in km/h
 static char          phoneGpsHdgBuf[12]     = {};     // heading in degrees
 static unsigned long gpsReqSentMs           = 0;      // millis() when CDK:GPSREQ was sent; 0 if none pending
+static unsigned long gpsReqDeferredSendMs   = 0;      // millis() at which the main loop should send CDK:GPSREQ
+static unsigned long gpsDisplayClearMs      = 0;      // millis() at which the main loop should call display.displayOff()
 static int           lastSignalPct           = -1;     // last LoRa signal quality (0-100 %), -1 = no packet yet
 static unsigned long lastHomeRefreshMs       = 0;      // last time displayHome() was refreshed from the loop
 const  unsigned long HOME_REFRESH_MS         = 5000UL; // re-draw home screen every 5 s when display is on
 static bool          messagePending          = false;  // true while a received message occupies the screen
 static unsigned long messagePendingMs        = 0;      // millis() when message was shown (for auto-dismiss)
 const  unsigned long MESSAGE_DISPLAY_MS      = 10000UL; // auto-dismiss received message after 10 s
+static bool          emergencyDisplayPending = false;  // emergency screen — stays until program button pressed
 static int           lastTxResult            = -1;     // -1=never sent, 0=success, >0=fail
 static unsigned long lastTxMs               = 0;      // millis() of most recent duck.sendData() call
+static volatile bool sosAckDisplayPending   = false;  // set by handleDuckData; rendered at top of loop()
+static volatile unsigned long bleAnnounceAfterMs = 0; // millis() after which to send ID+battery post-connect
+static unsigned long          bleSplashClearMs   = 0; // millis() after which to call displayHome() after connect splash
+
+// ── Per-duck GPS cache ────────────────────────────────────────────────────────
+// Populated whenever a packet containing LAT:/LNG: fields arrives from any duck.
+// Entries are valid for 5 minutes (same TTL as the app's Nearby Ducks list).
+struct DuckGps { float lat; float lng; unsigned long tsMs; };
+static std::map<String, DuckGps> duckGpsCache;  // key: 8-char duck ID
+constexpr unsigned long DUCK_GPS_TTL_MS = 300000UL;  // 5 minutes
+
+// ── Custom discovery topics ───────────────────────────────────────────────────
+// BEACON (27) replaces the PING + separate GPS packet pair with a single packet
+// that embeds the sender's GPS inline.  The receiver replies with BEACON_ACK (28)
+// which also embeds its GPS.  Both sides get GPS-rich CDK:SEEN from the very first
+// received packet — no GPSREQ chain, no case-234 blocking delay, 2 TX not 4.
+static const uint8_t TOPIC_BEACON     = 27;
+static const uint8_t TOPIC_BEACON_ACK = 28;
+static volatile bool beaconAckPending = false;   // deferred BEACON_ACK TX
+static char          beaconAckPayload[80] = {};   // GPS payload for beacon ACK
+static unsigned long beaconAckDeferMs = 0;        // millis() after which ACK may be sent
 
 // ── BLE callbacks ─────────────────────────────────────────────────────
 class ServerCallbacks : public NimBLEServerCallbacks {
   void onConnect(NimBLEServer* pServer, NimBLEConnInfo& connInfo) override {
     bleConnected = true;
-    bleConnectDisplayPending = true;  // notify main loop to render splash
-    // Request longer connection interval to reduce radio duty cycle.
-    // 80*1.25ms=100ms min, 160*1.25ms=200ms max, latency=4, timeout=4000ms.
-    pServer->updateConnParams(connInfo.getConnHandle(), 80, 160, 4, 400);
-    // Do NOT delay() here — blocking the NimBLE task stalls iOS connection setup.
-    // CDK:ID and battery are sent from the main loop on the next iteration
-    // once bleConnected == true.
-    broadcast("CDK:ID,VALUE:" DUCK_NAME);
-    sendBattery();
+    bleAnnounceAfterMs = millis() + 700;
+    bleConnectDisplayPending = true;
   }
   void onDisconnect(NimBLEServer*, NimBLEConnInfo& connInfo, int reason) override {
     bleConnected = false;
@@ -179,10 +198,72 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
    heltec_setup(); 
    heltec_ve(true);
 
+   // Init display.
+   std::snprintf(buffer, sizeof(buffer), "ID:%s", s);
+   display.init();
+   display.flipScreenVertically();
+   display.clear();
+   display.display();
+
+   // BLE init first — must run regardless of duck setup outcome
+   // so the device is always discoverable.
+   NimBLEDevice::init(DUCK_NAME);
+   NimBLEDevice::setPower(ESP_PWR_LVL_P9);
+   // Use a random static address — Android 13 privacy mode on some OEMs
+   // refuses connections from peripherals with a static public address.
+   NimBLEDevice::setOwnAddrType(BLE_OWN_ADDR_RANDOM);
+   // Offer MTU 512 so Android 13 MTU exchange succeeds without fragmentation.
+   NimBLEDevice::setMTU(512);
+   // No bonding/MITM — open access for maximum disaster-scenario accessibility.
+   NimBLEDevice::setSecurityAuth(false, false, false);
+   NimBLEDevice::setSecurityIOCap(BLE_HS_IO_NO_INPUT_OUTPUT);
+   pBleServer = NimBLEDevice::createServer();
+   pBleServer->setCallbacks(new ServerCallbacks());
+   NimBLEService* pSvc = pBleServer->createService(NUS_SERVICE);
+   pTxChar = pSvc->createCharacteristic(NUS_TX_CHAR, NIMBLE_PROPERTY::NOTIFY);
+   NimBLECharacteristic* pRxChar = pSvc->createCharacteristic(
+     NUS_RX_CHAR, NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_NR);
+   pRxChar->setCallbacks(new RxCallbacks());
+   pSvc->start();
+   {
+     NimBLEAdvertising* pAdv = NimBLEDevice::getAdvertising();
+     pAdv->setMinInterval(160);
+     pAdv->setMaxInterval(160);
+     // Primary advert: flags + name (iOS CoreBluetooth discovers by name).
+     NimBLEAdvertisementData advData;
+     advData.setFlags(0x06);  // LE General Discoverable | BR/EDR Not Supported
+     advData.setName(DUCK_NAME);
+     pAdv->setAdvertisementData(advData);
+     // Scan response: NUS service UUID so Android 13 validates the service
+     // during scanning and doesn't drop the connection immediately after linking.
+     NimBLEAdvertisementData scanRsp;
+     scanRsp.addServiceUUID(NUS_SERVICE);
+     pAdv->setScanResponseData(scanRsp);
+     bool bleOk = NimBLEDevice::startAdvertising();
+     bleAdvSlowAfterMs = millis() + 30000;
+     Serial.println(bleOk ? "[BLE] Advertising started OK" : "[BLE] startAdvertising FAILED");
+     if (!bleOk) {
+       // Show error briefly so the operator knows BLE failed to start.
+       display.clear();
+       display.setFont(ArialMT_Plain_10);
+       display.setTextAlignment(TEXT_ALIGN_CENTER);
+       display.drawString(64, 22, "RALAT BLE\nTIDAK BOLEH IKLAN");
+       display.display();
+       heltec_delay(2000);
+       display.clear();
+       display.display();
+     }
+   }
+
    if (duck.setupWithDefaults() != DUCK_ERR_NONE) {
      Serial.println("[MAMA] Failed to setup MamaDuck");
      return;
    }
+   // Without this the duck spends up to 80 s in SEARCHING state where
+   // duck.run() silently discards every received packet and sendData()
+   // transmits nothing. Both ducks are standalone peers — no join needed.
+   duck.goPublic();
+   Serial.println("[MAMA] Network state: PUBLIC");
  
    setupOK = true;
    Serial.println("[MAMA] Setup OK!");
@@ -196,9 +277,9 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
 #endif
 
   esp_sleep_wakeup_cause_t wakeup_reason = esp_sleep_get_wakeup_cause();
-  std::snprintf(buffer, sizeof(buffer), "ID:%s", s);
 
-  display.init();
+  // Display already initialised at top of setup(); just show the splash.
+  display.clear();
   display.flipScreenVertically();
 
   display.drawXbm(20, 0, taqisystems_small_width, taqisystems_small_height, taqisystems_small_bits);
@@ -223,40 +304,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
   Serial.println("[MAMA] Firmware v2 (with LAT/LNG support)");
   sendBattery();
 
-  // BLE init
-  NimBLEDevice::init(DUCK_NAME);
-  NimBLEDevice::setPower(ESP_PWR_LVL_P9); // +9 dBm — maximum ESP32 TX power for best range/discoverability
-  NimBLEServer* pServer = NimBLEDevice::createServer();
-  pServer->setCallbacks(new ServerCallbacks());
-  NimBLEService* pSvc = pServer->createService(NUS_SERVICE);
-  pTxChar = pSvc->createCharacteristic(NUS_TX_CHAR, NIMBLE_PROPERTY::NOTIFY);
-  NimBLECharacteristic* pRxChar = pSvc->createCharacteristic(
-    NUS_RX_CHAR, NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_NR);
-  pRxChar->setCallbacks(new RxCallbacks());
-  pSvc->start();
-  NimBLEAdvertising* pAdv = NimBLEDevice::getAdvertising();
-  // Advertising at 200–400 ms to reduce 2.4 GHz congestion when multiple ducks
-  // are deployed nearby. Units: 0.625 ms per BLE spec (320=200 ms, 640=400 ms).
-  // Fast advertising for first 30 s after boot — phones discover the device quickly.
-  // The loop() transitions to slow (200–400 ms) after bleAdvSlowAfterMs expires.
-  pAdv->setMinInterval(160);  // 100 ms — fast initial advertising
-  pAdv->setMaxInterval(160);
-  // Primary advertising packet: device name.
-  // Phones get the name on the very first advertising event without needing
-  // to request a scan response — far more reliable on Android where scan
-  // response delivery is inconsistent.
-  // Budget: Flags (3 B) + name header (2 B) + "ZAIHAN12" (8 B) = 13 B — well
-  // within the 31-byte ADV_IND payload limit.
-  NimBLEAdvertisementData advData;
-  advData.setName(DUCK_NAME);
-  pAdv->setAdvertisementData(advData);
-  // Scan response: NUS service UUID.
-  // Kept here for central devices that want to filter by service UUID.
-  NimBLEAdvertisementData scanData;
-  scanData.setCompleteServices(NimBLEUUID(NUS_SERVICE));
-  pAdv->setScanResponseData(scanData);
-  NimBLEDevice::startAdvertising();
-  bleAdvSlowAfterMs = millis() + 30000;  // transition to slow advertising after 30 s
+  // BLE already started at top of setup() before duck init
 
  }
 
@@ -298,6 +346,8 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
   }
 
   // BLE connected splash — deferred from onConnect() callback.
+  // Non-blocking: show splash immediately, schedule displayHome() 2 s later
+  // so loop() keeps running (duck.run(), heltec_loop()) during the window.
   if (bleConnectDisplayPending) {
     bleConnectDisplayPending = false;
     display.displayOn();
@@ -306,8 +356,24 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     display.setTextAlignment(TEXT_ALIGN_CENTER);
     display.drawString(64, 28, "BLUETOOTH\nTERSAMBUNG!");
     display.display();
-    delay(2000);
-    displayHome();
+    bleSplashClearMs = millis() + 2000;
+  }
+
+  if (bleSplashClearMs > 0 && millis() >= bleSplashClearMs) {
+    bleSplashClearMs = 0;
+    if (!emergencyDisplayPending && !messagePending) displayHome();
+  }
+
+  // Deferred post-connect announce — send ID + battery after Android has
+  // finished MTU negotiation and service discovery (~500 ms after connect).
+  // Sending these in onConnect() itself triggers GATT error 133 on Android.
+  if (bleAnnounceAfterMs > 0 && millis() >= bleAnnounceAfterMs && bleConnected) {
+    bleAnnounceAfterMs = 0;
+    broadcast("CDK:ID,VALUE:" DUCK_NAME);
+    sendBattery();
+    Serial.println("[BLE] Post-connect announce sent (ID + battery)");
+  } else if (bleAnnounceAfterMs > 0 && !bleConnected) {
+    bleAnnounceAfterMs = 0;  // cancelled — phone disconnected before window
   }
 
   // BLE disconnected splash — deferred from onDisconnect() callback.
@@ -351,6 +417,23 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     displayHome();
   }
 
+  // SOS acknowledgement from operator — deferred from handleDuckData to avoid
+  // being overwritten by sendEmergency()'s post-send display sequence.
+  if (sosAckDisplayPending) {
+    sosAckDisplayPending = false;
+    displayEnabled = true;
+    display.displayOn();
+    displayID();
+    display.setFont(ArialMT_Plain_10);
+    display.setTextAlignment(TEXT_ALIGN_CENTER);
+    display.drawString(64, 22, "SOS DITERIMA!\nBANTUAN SEDANG\nDIHANTAR");
+    display.display();
+    blinkLed(3);
+    messagePending   = false;  // SOS ack is treated as an emergency — button-only dismiss
+    emergencyDisplayPending = true;
+    displayEnabled = true;
+  }
+
    //timer.tick();
 
   // Auto-dismiss received message after MESSAGE_DISPLAY_MS so the home screen
@@ -373,6 +456,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
       && !bleConnectDisplayPending
       && !usbConnectDisplayPending
       && !messagePending
+      && !emergencyDisplayPending
       && (millis() - lastHomeRefreshMs >= HOME_REFRESH_MS)) {
     lastHomeRefreshMs = millis();
     float rawRssi = lora.getRSSI();
@@ -453,7 +537,13 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
   }
 
   if (button.isSingleClick()) {
-    if (messagePending) {
+    if (emergencyDisplayPending) {
+      // Dismiss the emergency message and return to home screen.
+      emergencyDisplayPending = false;
+      displayEnabled = true;
+      display.displayOn();
+      displayHome();
+    } else if (messagePending) {
       // Dismiss the current message and return to home screen.
       messagePending = false;
       displayEnabled = true;
@@ -575,7 +665,10 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     }
     if (!usbPhoneSeen && millis() - lastUsbAnnounceMs >= 3000UL) {
       Serial.println("CDK:ID,VALUE:" DUCK_NAME);
-      sendBattery();
+      // Only send battery over BLE when NOT already BLE-connected — the
+      // deferred announce + periodic 60 s timer handle the BLE cadence.
+      // Firing every 3 s from the USB discovery loop floods Android.
+      if (!bleConnected) sendBattery();
       lastBattMs        = millis();
       lastUsbAnnounceMs = millis();
     }
@@ -596,23 +689,25 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     else if (c != '\r') usbInBuf += c;
   }
 
-  // Stop BLE advertising while USB serial is active; resume after idle timeout
-  if (lastUsbRxMs > 0 && millis() - lastUsbRxMs < USB_IDLE_TIMEOUT_MS) {
-    // USB is active — stop advertising to save power
-    if (bleAdvertising && !bleConnected) {
+  // BLE advertising suppressed while a USB serial phone session is active.
+  // "Active" means the phone has sent at least one CDK: frame AND the last
+  // frame arrived within USB_IDLE_TIMEOUT_MS.  Opening the serial monitor
+  // alone (no CDK frames) does NOT suppress BLE.
+  if (!bleConnected) {
+    if (usbPhoneSeen && bleAdvertising) {
       NimBLEDevice::stopAdvertising();
       bleAdvertising = false;
-      Serial.println("[BLE] USB active — advertising paused.");
-    }
-  } else {
-    // USB idle / not connected — resume advertising
-    if (!bleAdvertising && !bleConnected) {
+    } else if (!usbPhoneSeen && !bleAdvertising) {
+      NimBLEAdvertising* pAdv = NimBLEDevice::getAdvertising();
+      pAdv->setMinInterval(160);
+      pAdv->setMaxInterval(160);
+      bleAdvSlowAfterMs = millis() + 30000;
       NimBLEDevice::startAdvertising();
       bleAdvertising = true;
-      Serial.println("[BLE] USB idle — advertising resumed.");
     }
   }
-  // Transition fast → slow BLE advertising after 30 s
+
+  // Transition fast → slow BLE advertising after 30 s (only when active)
   if (bleAdvertising && !bleConnected && bleAdvSlowAfterMs > 0 && millis() >= bleAdvSlowAfterMs) {
     bleAdvSlowAfterMs = 0;
     NimBLEAdvertising* pAdv = NimBLEDevice::getAdvertising();
@@ -622,8 +717,8 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     NimBLEDevice::startAdvertising();
   }
 
-  // Periodic battery update every 60 s
-  if (millis() - lastBattMs >= 60000UL) {
+  // Periodic battery update: every 10 s when BLE connected, 60 s otherwise
+  if (millis() - lastBattMs >= (bleConnected ? 10000UL : 60000UL)) {
     sendBattery();
     lastBattMs = millis();
     // Reduce BLE TX power when battery is low so the LDO can still sustain
@@ -676,6 +771,62 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     Serial.printf("[GPS] Deferred LoRa TX %s: %s\n", gpsLoraOk ? "OK" : "FAILED", gpsTxPayload);
   }
 
+  // ── Deferred BEACON_ACK TX ──────────────────────────────────────────
+  // Two-stage defer: when beaconAckPending is set, arm a 350 ms deadline
+  // so the relay TX started by forwardPacket() inside handleReceivedPacket
+  // (~160 ms on air) has time to complete before we start a new TX.
+  if (beaconAckPending && beaconAckDeferMs == 0) {
+    beaconAckDeferMs = millis() + 350;
+    Serial.println("[BEACON] ACK TX armed (350 ms relay-clear delay)");
+  }
+  if (beaconAckDeferMs > 0 && millis() >= beaconAckDeferMs && !gpsTxPending) {
+    beaconAckDeferMs = 0;
+    beaconAckPending = false;
+    int result = duck.sendData(TOPIC_BEACON_ACK, std::string(beaconAckPayload), BROADCAST_DUID);
+    Serial.printf("[BEACON] ACK TX %s: %s\n", result == 0 ? "OK" : "FAILED", beaconAckPayload);
+  }
+
+  // ── Deferred GPS display clear ──────────────────────────────────────────
+  // Replaces the blocking delay() that was inside case 234 of handleDuckData.
+  if (gpsDisplayClearMs > 0 && millis() >= gpsDisplayClearMs) {
+    gpsDisplayClearMs = 0;
+    display.displayOff();
+  }
+
+  // ── Deferred CDK:GPSREQ dispatch ────────────────────────────────────────
+  // CDK:GPSREQ must NOT be sent as an immediate BLE follow-up to CDK:SEEN or
+  // CDK:SCAN_ACK — Android's BLE stack silently drops the second of two rapid
+  // back-to-back notifications.  We schedule it here, 300-400 ms after the
+  // preceding notification, so both deliveries succeed.
+  if (gpsReqDeferredSendMs > 0 && millis() >= gpsReqDeferredSendMs) {
+    gpsReqDeferredSendMs = 0;
+    if (isPhoneConnected() && phoneGpsLatBuf[0] == '\0') {
+      broadcast("CDK:GPSREQ");
+      gpsReqSentMs = millis();
+      Serial.println("[GPS] Deferred CDK:GPSREQ sent");
+    } else if (phoneGpsLatBuf[0] != '\0' && !gpsTxPending) {
+      // GPS already cached from a previous GPSREQ — respond immediately
+      // without a new round-trip to the phone so OpenDMS always gets an answer.
+      char gpsBuf[128];
+      std::snprintf(gpsBuf, sizeof(gpsBuf), "GPS,SRC:PHONE,LAT:%s,LNG:%s",
+                    phoneGpsLatBuf, phoneGpsLngBuf);
+      if (phoneGpsAltBuf[0] != '\0')
+        strncat(gpsBuf, (",ALT:" + String(phoneGpsAltBuf)).c_str(), sizeof(gpsBuf) - strlen(gpsBuf) - 1);
+      if (phoneGpsSpdBuf[0] != '\0')
+        strncat(gpsBuf, (",SPD:" + String(phoneGpsSpdBuf)).c_str(), sizeof(gpsBuf) - strlen(gpsBuf) - 1);
+      if (phoneGpsHdgBuf[0] != '\0')
+        strncat(gpsBuf, (",HDG:" + String(phoneGpsHdgBuf)).c_str(), sizeof(gpsBuf) - strlen(gpsBuf) - 1);
+      char battSuffix[16];
+      std::snprintf(battSuffix, sizeof(battSuffix), ",BATT:%d", heltec_battery_percent(readVbat()));
+      strncat(gpsBuf, battSuffix, sizeof(gpsBuf) - strlen(gpsBuf) - 1);
+      strncpy(gpsTxPayload, gpsBuf, sizeof(gpsTxPayload) - 1);
+      gpsTxPending = true;
+      Serial.printf("[GPS] Deferred GPS TX from cache: %s\n", gpsBuf);
+    } else {
+      Serial.println("[GPS] Deferred CDK:GPSREQ skipped (no phone)");
+    }
+  }
+
   // ── GPS request timeout fallback ────────────────────────────────────────
   // If CDK:GPSREQ was sent but the phone never replied within 10 s, report
   // no-fix to the mesh so OpenDMS gets an answer instead of silence.
@@ -693,20 +844,164 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     bool isForMe = (memcmp(packet.dduid.data(), duck.getDuckId().data(), 8) == 0);
     bool isBroadcast = (packet.dduid[0] == 0xFF);
 
-    if (!isForMe && !isBroadcast) return;
+    Serial.printf("[RX] topic=%u duckType=%u isForMe=%d isBroadcast=%d src=%.8s\n",
+                  packet.topic, (uint8_t)packet.duckType, (int)isForMe, (int)isBroadcast,
+                  (char*)packet.sduid.data());
+    // Debug to USB serial only — broadcasting to BLE here causes a back-to-back
+    // notify immediately before CDK:SEEN which Android drops reliably.
+    Serial.printf("CDK:STATUS,RX_TOPIC:%u,RX_TYPE:%u\n",
+                  packet.topic, (uint8_t)packet.duckType);
+
+    // ── 1. Extract GPS from this packet and update cache ─────────────────────
+    // Any packet whose data contains LAT:/LNG: fields (GPS reports, SOS, etc.)
+    // is used to cache the sender's location.  This runs BEFORE CDK:SEEN so
+    // the emitted frame includes GPS on the very first packet from a duck.
+    {
+        String pdata = String((char*)packet.data.data(), packet.data.size());
+        Serial.printf("[RX-GPS] topic=%u src=%.8s payload=%.48s\n",
+                      packet.topic, (char*)packet.sduid.data(), pdata.c_str());
+        int latIdx = pdata.indexOf("LAT:");
+        int lngIdx = pdata.indexOf("LNG:");
+        if (latIdx >= 0 && lngIdx >= 0) {
+            int latEnd = pdata.indexOf(',', latIdx + 4);
+            int lngEnd = pdata.indexOf(',', lngIdx + 4);
+            float lat = pdata.substring(latIdx + 4, latEnd < 0 ? (int)pdata.length() : latEnd).toFloat();
+            float lng = pdata.substring(lngIdx + 4, lngEnd < 0 ? (int)pdata.length() : lngEnd).toFloat();
+            // Skip null-island (0,0) which indicates a missing fix
+            if (!(lat == 0.0f && lng == 0.0f)) {
+                String sid((char*)packet.sduid.data(), 8);
+                duckGpsCache[sid] = { lat, lng, millis() };
+                Serial.printf("[RX-GPS] Cached GPS for %.8s: lat=%.6f lng=%.6f\n",
+                              (char*)packet.sduid.data(), lat, lng);
+            } else {
+                Serial.println("[RX-GPS] Skipped GPS: null-island (0,0)");
+            }
+        } else {
+            Serial.printf("[RX-GPS] No LAT/LNG in payload (topic=%u)\n", packet.topic);
+        }
+    }
+
+    // ── 2. Emit CDK:SEEN for ALL overheard ducks ─────────────────────────────
+    // Include GPS coordinates when cached and fresh (within DUCK_GPS_TTL_MS).
+    // Emit for every duck type so the app sees PAPA, LINK, DETC etc. too.
+    {
+        const char* typeStr = "UNKN";
+        switch ((uint8_t)packet.duckType) {
+            case DuckType::MAMA:     typeStr = "MAMA"; break;
+            case DuckType::LINK:     typeStr = "LINK"; break;
+            case DuckType::PAPA:     typeStr = "PAPA"; break;
+            case DuckType::DETECTOR: typeStr = "DETC"; break;
+            default: break;
+        }
+        String sid((char*)packet.sduid.data(), 8);
+        sid.trim();
+        if (sid.length() > 0 && sid != String((char*)duck.getDuckId().data(), 8).c_str()) {
+            // Don't report ourselves
+            auto gpsIt = duckGpsCache.find(sid);
+            if (gpsIt != duckGpsCache.end() && millis() - gpsIt->second.tsMs < DUCK_GPS_TTL_MS) {
+                char seenBuf[80];
+                snprintf(seenBuf, sizeof(seenBuf), "CDK:SEEN,ID:%.8s,TYPE:%s,LAT:%.6f,LNG:%.6f",
+                         (char*)packet.sduid.data(), typeStr, gpsIt->second.lat, gpsIt->second.lng);
+                Serial.printf("[SEEN] Emitting with GPS: %s\n", seenBuf);
+                broadcast(seenBuf);
+            } else {
+                char seenBuf[48];
+                snprintf(seenBuf, sizeof(seenBuf), "CDK:SEEN,ID:%.8s,TYPE:%s",
+                         (char*)packet.sduid.data(), typeStr);
+                Serial.printf("[SEEN] Emitting without GPS (cache %s): %s\n",
+                              gpsIt != duckGpsCache.end() ? "expired" : "miss", seenBuf);
+                broadcast(seenBuf);
+            }
+        } else {
+            Serial.printf("[SEEN] Skipped: sid='%s' (self or empty)\n", sid.c_str());
+        }
+    }
+
+    // Relay packets: SEEN already emitted above; no further processing needed.
+    // Exception: BEACON / BEACON_ACK use PAPADUCK_DUID as a "all nearby mamas"
+    // address so isForMe=0 and isBroadcast=0 — they must reach the switch below.
+    if (!isForMe && !isBroadcast
+        && packet.topic != TOPIC_BEACON && packet.topic != TOPIC_BEACON_ACK) return;
 
     Serial.println("HANDLING RECEIVING DATA....");
 
     String message = String((char*)packet.data.data(), packet.data.size());
     char replyMsg[200];
+    Serial.println("[RX] payload: " + message);
 
     switch (packet.topic) {
-        case 22:  // Text message
+        case reservedTopic::ping: {
+            // Another duck pinged us — fetch our GPS and broadcast it so the
+            // pinging duck (and any listener) can cache our location.
+            char gpsPayload[80] = {};
+            bool haveHardwareGps = false;
+#ifdef ARDUINO_heltec_wifi_lora_32_V4
+            // Priority 1: hardware GPS with a fresh fix.
+            if (tinyGps.location.isValid() && tinyGps.location.age() < 30000) {
+                snprintf(gpsPayload, sizeof(gpsPayload), "GPS,LAT:%.6f,LNG:%.6f",
+                         tinyGps.location.lat(), tinyGps.location.lng());
+                haveHardwareGps = true;
+            }
+#endif
+            if (!haveHardwareGps) {
+                // Priority 2: phone GPS. Use the cache if it's already populated.
+                // If the cache is empty, defer a CDK:GPSREQ to the main loop
+                // (300 ms from now) so it is NOT sent as a rapid BLE follow-up
+                // immediately after the CDK:SEEN emitted above — Android's BLE
+                // stack silently drops the second of two back-to-back notifications,
+                // which would leave phoneGpsLatBuf permanently empty on the first
+                // ping after a fresh connection.
+                if (phoneGpsLatBuf[0] == '\0' && isPhoneConnected()) {
+                    if (gpsReqDeferredSendMs == 0) {
+                        gpsReqDeferredSendMs = millis() + 300;
+                    }
+                    Serial.println("[PING] GPS cache empty — CDK:GPSREQ deferred to main loop");
+                }
+                if (phoneGpsLatBuf[0] != '\0') {
+                    snprintf(gpsPayload, sizeof(gpsPayload), "GPS,LAT:%s,LNG:%s",
+                             phoneGpsLatBuf, phoneGpsLngBuf);
+                }
+            }
+            if (gpsPayload[0] != '\0') {
+                // Never call duck.sendData() from inside recvDataCallback — it races
+                // with the radio's TX_DONE ISR and aborts the transmission (same
+                // reason handleGps() uses gpsTxPending).
+                // If the phone responded to GPSREQ, handleGps() already set
+                // gpsTxPayload + gpsTxPending with the full telemetry payload.
+                // Only override here for the cached-GPS path.
+                if (!gpsTxPending) {
+                    strncpy(gpsTxPayload, gpsPayload, sizeof(gpsTxPayload) - 1);
+                    gpsTxPending = true;
+                }
+                Serial.printf("[PING] GPS TX deferred: %s\n", gpsPayload);
+            }
+            break;
+        }
+
+        case 22:  // Text message / operator command
             Serial.println("📨 Message: " + message);
+            if (message.indexOf("SOS DITERIMA") >= 0) {
+                // Debounce: ignore duplicate SOS_ACK packets arriving via multiple
+                // relay paths within 5 s of the first one.  Relay echoes arrive
+                // within ~1-2 s; OpenDMS retransmissions are spaced 10 s apart,
+                // so a 5 s window catches mesh duplicates without swallowing retries.
+                static unsigned long lastSosAckMs = 0;
+                if (millis() - lastSosAckMs < 5000UL) {
+                    Serial.println("[MAMA] SOS_ACK duplicate suppressed (debounce)");
+                    break;
+                }
+                lastSosAckMs = millis();
+                // SOS acknowledgment from operator — defer display to top of loop()
+                // so it is never overwritten by the in-progress sendEmergency() sequence.
+                sosAckDisplayPending = true;
+                broadcast("CDK:SOS_ACK,TEXT:SOS DITERIMA");
+                Serial.println("[MAMA] SOS acknowledged by operator");
+                break;
+            }
             display.displayOn();
             displayMessage(message);
-            messagePending   = true;           // keep on screen until dismissed or timeout
-            messagePendingMs  = millis();         // start auto-dismiss countdown
+            emergencyDisplayPending = true;   // operator message — stay until button pressed
+            displayEnabled = true;
             std::snprintf(replyMsg, sizeof(replyMsg), "MSG_READ:TEXT:%s", message.c_str());
             duck.sendData(22, replyMsg);
             //duck.sendData(22, "MSG_READ");
@@ -770,8 +1065,9 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
               duck.sendData(topics::gps, std::string(gpsBuf));
               Serial.printf("[GPS] Hardware GPS sent (age: %lums): %s\n",
                             tinyGps.location.age(), gpsBuf);
-              delay(3000);
-              display.displayOff();
+              // Non-blocking display clear — delay() here would block duck.run() for
+              // 3 s, causing the SX1262 FIFO to fill up and corrupt queued packets.
+              gpsDisplayClearMs = millis() + 3000;
             } else {
               // No hardware fix — request from phone if connected, else report to mesh.
               bool phoneConnected = isPhoneConnected();
@@ -789,8 +1085,12 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
               if (phoneConnected) {
                 display.drawString(64, 28, "MEMINTA DATA GPS\nDARIPADA TELEFON...");
                 display.display();
-                broadcast("CDK:GPSREQ");
-                gpsReqSentMs = millis();  // start timeout — fallback fires in loop() if phone doesn't respond
+                // Defer CDK:GPSREQ — sending it immediately after CDK:SEEN causes Android's
+                // BLE stack to silently drop one of the two rapid-succession notifications.
+                // The main loop sends it 400 ms later, after CDK:SEEN has been processed.
+                if (gpsReqDeferredSendMs == 0) {
+                  gpsReqDeferredSendMs = millis() + 400;
+                }
               } else {
                 display.drawString(64, 28, "TIADA TELEFON\nTIADA DATA GPS");
                 display.display();
@@ -800,15 +1100,18 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
                 duck.sendData(topics::gps, std::string(noGpsBuf));
                 Serial.println("[GPS] No phone connected — sent " + String(noGpsBuf));
               }
-              delay(2000);
-              display.displayOff();
+              // Non-blocking display clear — delay() here blocks duck.run() for 2 s,
+              // preventing the radio from reading queued packets and corrupting the
+              // SX1262 FIFO when a second packet arrives before the first is read.
+              gpsDisplayClearMs = millis() + 2000;
             }
 #else
             // No GPS hardware on this board — request from phone if connected, else report to mesh.
             {
               bool phoneConnected = isPhoneConnected();
-              Serial.printf("[GPS] No GPS hardware — phone %s\n",
-                            phoneConnected ? "connected, requesting" : "not connected");
+              Serial.printf("[GPS] No GPS hardware — phone %s, cache %s\n",
+                            phoneConnected ? "connected" : "not connected",
+                            phoneGpsLatBuf[0] != '\0' ? "hot" : "empty");
               display.displayOn();
               display.clear();
               display.setFont(ArialMT_Plain_10);
@@ -818,10 +1121,22 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
               display.drawString(128, 0, buffer);
               display.setTextAlignment(TEXT_ALIGN_CENTER);
               if (phoneConnected) {
-                display.drawString(64, 28, "MEMINTA DATA GPS\nDARIPADA TELEFON...");
+                if (phoneGpsLatBuf[0] != '\0') {
+                  // Cache hot — will respond immediately from cache in deferred dispatch
+                  display.setTextAlignment(TEXT_ALIGN_LEFT);
+                  display.drawString(0, 14, "MENGHANTAR DATA GPS");
+                  display.drawString(0, 28, "LAT:" + String(phoneGpsLatBuf));
+                  display.drawString(0, 42, "LNG:" + String(phoneGpsLngBuf));
+                } else {
+                  display.drawString(64, 28, "MEMINTA DATA GPS\nDARIPADA TELEFON...");
+                }
                 display.display();
-                broadcast("CDK:GPSREQ");
-                gpsReqSentMs = millis();  // start timeout — fallback fires in loop() if phone doesn't respond
+                // Defer GPS response — sending immediately after CDK:SEEN causes Android's
+                // BLE stack to silently drop one of the two rapid-succession notifications.
+                // The main loop sends GPSREQ (or uses cache) 400 ms later.
+                if (gpsReqDeferredSendMs == 0) {
+                  gpsReqDeferredSendMs = millis() + 400;
+                }
               } else {
                 display.drawString(64, 28, "TIADA TELEFON\nTIADA DATA GPS");
                 display.display();
@@ -831,10 +1146,72 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
                 duck.sendData(topics::gps, std::string(noGpsBuf));
                 Serial.println("[GPS] No phone connected — sent " + String(noGpsBuf));
               }
-              delay(2000);
-              display.displayOff();
+              // Non-blocking display clear — delay() here blocks duck.run() for 2 s,
+              // preventing the radio from reading queued packets and corrupting the
+              // SX1262 FIFO when a second packet arrives before the first is read.
+              gpsDisplayClearMs = millis() + 2000;
             }
 #endif
+            break;
+        }
+
+        case TOPIC_BEACON: {  // 27 — combined discovery + GPS beacon
+            // GPS coordinates were already extracted into duckGpsCache in
+            // section 1 above, and CDK:SEEN (with GPS) was already emitted
+            // in section 2 above — nothing extra needed for the app side.
+            //
+            // Reply with our own GPS so the sender can also populate its
+            // duckGpsCache and emit a GPS-rich CDK:SEEN on our behalf.
+            // Defer the TX to main loop (can't call duck.sendData inside
+            // recvDataCallback — TX abort race with the LoRa ISR).
+            //
+            // Skip relayed copies of our own BEACON — the CDP default relay
+            // path re-broadcasts PAPADUCK_DUID packets back at us, so we
+            // would otherwise ACK our own packet and create a flag deadlock.
+            if (memcmp(packet.sduid.data(), duck.getDuckId().data(), 8) == 0) {
+                Serial.println("[BEACON] Ignoring relay of own BEACON");
+                break;
+            }
+            Serial.printf("[BEACON] Received from %.8s — preparing ACK\n",
+                          (char*)packet.sduid.data());
+            if (!beaconAckPending && !gpsTxPending) {
+                char ownGps[80] = {};
+#ifdef ARDUINO_heltec_wifi_lora_32_V4
+                if (tinyGps.location.isValid() && tinyGps.location.age() < 30000) {
+                    snprintf(ownGps, sizeof(ownGps), "GPS,LAT:%.6f,LNG:%.6f",
+                             tinyGps.location.lat(), tinyGps.location.lng());
+                } else
+#endif
+                if (phoneGpsLatBuf[0] != '\0') {
+                    snprintf(ownGps, sizeof(ownGps), "GPS,LAT:%s,LNG:%s",
+                             phoneGpsLatBuf, phoneGpsLngBuf);
+                } else {
+                    strncpy(ownGps, "GPS,FIX:0", sizeof(ownGps) - 1);
+                    Serial.println("[BEACON] No GPS for ACK — requesting from phone (deferred)");
+                    if (isPhoneConnected() && gpsReqDeferredSendMs == 0) {
+                        gpsReqDeferredSendMs = millis() + 300;
+                    }
+                }
+                strncpy(beaconAckPayload, ownGps, sizeof(beaconAckPayload) - 1);
+                beaconAckPending = true;
+                Serial.printf("[BEACON] ACK queued: %s\n", ownGps);
+            } else {
+                Serial.printf("[BEACON] ACK skipped: beaconAckPending=%d gpsTxPending=%d\n",
+                              (int)beaconAckPending, (int)gpsTxPending);
+            }
+            break;
+        }
+
+        case TOPIC_BEACON_ACK: {  // 28 — reply to our beacon
+            // GPS already extracted in section 1 → duckGpsCache updated.
+            // CDK:SEEN (with GPS) already emitted in section 2.
+            // Nothing further needed — the app side is already updated.
+            if (memcmp(packet.sduid.data(), duck.getDuckId().data(), 8) == 0) {
+                Serial.println("[BEACON] Ignoring relay of own BEACON_ACK");
+                break;
+            }
+            Serial.printf("[BEACON] ACK received from %.8s — CDK:SEEN emitted\n",
+                          (char*)packet.sduid.data());
             break;
         }
 
@@ -913,7 +1290,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
       sigStr = "SIG: TIADA ISYARAT";
     }
     display.drawString(64, 12, sigStr);
-    // Row 3 (y=26): instruction text
+
     display.drawString(64, 26, "TEKAN BUTANG ATAS\nSELAMA DUA SAAT UTK\nISYARAT KECEMASAN");
     display.display();
  }
@@ -964,8 +1341,9 @@ void displayBatt() {
    bool hasGps = (lat.length() > 0 && lng.length() > 0);
    int battPct = heltec_battery_percent(readVbat());
 
-   // Human-readable LoRa payload — clearly identifies hardware button origin
-   std::string loraMsg = "SOS,SRC:DEVICE,ID:" DUCK_NAME;
+   // Human-readable LoRa payload — DeviceID is carried in the MQTT envelope
+   // by the gateway so we don't need to repeat it in the payload bytes.
+   std::string loraMsg = "SOS,SRC:DEVICE";
    if (hasGps) {
      loraMsg += ",LAT:" + std::string(lat.c_str()) + ",LNG:" + std::string(lng.c_str());
      if (alt.length() > 0) loraMsg += ",ALT:" + std::string(alt.c_str());
@@ -986,7 +1364,7 @@ void displayBatt() {
      display.displayOn();
      blinkLed(3);
      // Notify connected phone (USB or BLE) that hardware button SOS was sent
-     String sosFrame = "CDK:SOS,SRC:DEVICE,ID:" DUCK_NAME
+     String sosFrame = "CDK:SOS,SRC:DEVICE"
                        ",LAT:" + (hasGps ? lat : "none") +
                        ",LNG:" + (hasGps ? lng : "none");
      if (hasGps && alt.length() > 0) sosFrame += ",ALT:" + alt;
@@ -1008,8 +1386,19 @@ void displayBatt() {
      display.display();
      blinkLed(2);
 
+     // Keep calling duck.run() for 2 s so the TX_DONE interrupt is serviced
+     // promptly and the radio re-enters RX mode before the SOS ack arrives.
+     // A plain heltec_delay() blocks duck.run(), which leaves the radio stuck
+     // in TX state and causes MamaDuck to miss the incoming ack packet.
      /*displayBatt(); */
-     heltec_delay(2000);
+     {
+       unsigned long endMs = millis() + 2000UL;
+       while (millis() < endMs) {
+         duck.run();
+         heltec_loop();
+         ::delay(10);
+       }
+     }
 
      display.clear();
      displayID();
@@ -1067,21 +1456,32 @@ void displayAnnouncement(const String& msg) {
     display.setTextAlignment(TEXT_ALIGN_LEFT);
     display.drawStringMaxWidth(0, 26, 128, upper);
     display.display();
+    emergencyDisplayPending = true;  // hold until program button pressed
+    displayEnabled = true;
 }
 
 // ── Frame dispatcher ────────────────────────────────────────────────
 void handleFrame(const String& line) {
   if (!line.startsWith("CDK:")) return;  // ignore noise
 
-  // Re-announce identity so the app recovers device ID after reconnect
-  broadcast("CDK:ID,VALUE:" DUCK_NAME);
+  Serial.printf("[FRAME] Received: %s (via %s)\n",
+                line.c_str(), bleConnected ? "BLE" : "USB");
+  // Rate-limit ID response to once per 10 s so rapid incoming frames
+  // don't flood Android's BLE notification queue and cause a disconnect.
+  {
+    static unsigned long lastIdBcastMs = 0;
+    if (millis() - lastIdBcastMs >= 10000UL) {
+      broadcast("CDK:ID,VALUE:" DUCK_NAME);
+      lastIdBcastMs = millis();
+    }
+  }
 
   String body = line.substring(4);  // strip "CDK:"
   int comma = body.indexOf(',');
   String type = (comma == -1) ? body : body.substring(0, comma);
 
   // C++ can't switch on strings; map type to enum first
-  enum FrameType { FT_UNKNOWN, FT_SOS, FT_MSG, FT_PING, FT_MTALK, FT_GPS, FT_BYE };
+  enum FrameType { FT_UNKNOWN, FT_SOS, FT_MSG, FT_PING, FT_MTALK, FT_GPS, FT_BYE, FT_SCAN };
   FrameType ft = FT_UNKNOWN;
   if      (type == "SOS")   ft = FT_SOS;
   else if (type == "MSG")   ft = FT_MSG;
@@ -1089,6 +1489,7 @@ void handleFrame(const String& line) {
   else if (type == "MTALK") ft = FT_MTALK;
   else if (type == "GPS")   ft = FT_GPS;
   else if (type == "BYE")   ft = FT_BYE;
+  else if (type == "SCAN")  ft = FT_SCAN;
 
   switch (ft) {
     case FT_SOS:   handleSOS(body);       break;
@@ -1096,6 +1497,39 @@ void handleFrame(const String& line) {
     case FT_PING:  /* ID already broadcast above */ break;
     case FT_MTALK: handleMamaTalk(body);  break;
     case FT_GPS:   handleGps(body);       break;
+    case FT_SCAN: {
+      // Send a BEACON (topic 27) with our GPS embedded in the payload.
+      // Nearby ducks running this firmware reply with BEACON_ACK (topic 28)
+      // which also carries their GPS — so both sides get a GPS-rich CDK:SEEN
+      // from the very first packet, with no separate GPS-request chain.
+      // Legacy ducks that don't understand topic 27 still respond to the CDP
+      // PING emitted by their own scan, so backward compatibility is preserved.
+      char gpsPayload[80] = {};
+#ifdef ARDUINO_heltec_wifi_lora_32_V4
+      if (tinyGps.location.isValid() && tinyGps.location.age() < 30000) {
+        snprintf(gpsPayload, sizeof(gpsPayload), "GPS,LAT:%.6f,LNG:%.6f",
+                 tinyGps.location.lat(), tinyGps.location.lng());
+      } else
+#endif
+      if (phoneGpsLatBuf[0] != '\0') {
+        snprintf(gpsPayload, sizeof(gpsPayload), "GPS,LAT:%s,LNG:%s",
+                 phoneGpsLatBuf, phoneGpsLngBuf);
+      } else {
+        // No GPS yet — send FIX:0 so the receiver still sees us in CDK:SEEN
+        // and knows we exist even without coordinates this cycle.
+        strncpy(gpsPayload, "GPS,FIX:0", sizeof(gpsPayload) - 1);
+        // Request GPS from phone so next beacon or ACK carries real coordinates.
+        if (isPhoneConnected() && gpsReqDeferredSendMs == 0 && gpsReqSentMs == 0) {
+          gpsReqDeferredSendMs = millis() + 300;
+          Serial.println("[SCAN] Phone GPS cache empty — deferring CDK:GPSREQ");
+        }
+      }
+      int beaconResult = duck.sendData(TOPIC_BEACON, std::string(gpsPayload), BROADCAST_DUID);
+      Serial.printf("[SCAN] BEACON result=%d payload=%s\n", beaconResult, gpsPayload);
+      broadcast(beaconResult == 0 ? "CDK:STATUS,SCAN:ping_sent" : "CDK:STATUS,SCAN:ping_failed");
+      broadcast("CDK:SCAN_ACK");
+      break;
+    }
     case FT_BYE:
       // Phone is about to disconnect — show Malay disconnect splash immediately
       // rather than waiting for the idle timeout.
@@ -1159,18 +1593,9 @@ void handleSOS(const String& body) {
   display.drawString(128, 0, buffer);
   display.display();
 
-  heltec_delay(5000);
-
-  // Reset back screen
-  display.clear();
-  displayID();
-  displayBatt();
-  display.setFont(ArialMT_Plain_10);
-  display.setTextAlignment(TEXT_ALIGN_CENTER);
-  display.drawString(64, 22, "TEKAN BUTANG ATAS\nSELAMA 2 SAAT UTK\nISYARAT KECEMASAN");
-  display.display();
-  //heltec_delay(5000);
-  displayHome();
+  // Hold success screen until program button is pressed.
+  emergencyDisplayPending = true;
+  displayEnabled = true;
 }
 
 void handleMsg(const String& body) {
@@ -1304,5 +1729,10 @@ void sendFrame(const String& frame) {
 }
 
 void blinkLed(int frequency) {
-    for (int n = 0; n <= frequency; n++) { heltec_led(100); delay(1000); heltec_led(0); delay(1000); }
+    for (int n = 0; n <= frequency; n++) {
+        heltec_led(100);
+        { unsigned long t = millis(); while (millis()-t < 200) { duck.run(); ::delay(10); } }
+        heltec_led(0);
+        { unsigned long t = millis(); while (millis()-t < 200) { duck.run(); ::delay(10); } }
+    }
 }

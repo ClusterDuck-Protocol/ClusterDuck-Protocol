@@ -453,8 +453,25 @@ class Duck {
     /**
      * @brief Passes data to radiolib for rx
      *
-     * @param txPacket CdpPacket to be sent 
+     * @param txPacket CdpPacket to be sent
      * @return DUCK_ERR_NONE if the data was sent successfully, an error code otherwise.
+     *
+     * @note **Uplink channel spreading**
+     *
+     * When this duck is the *originator* of a Papa-bound packet
+     * (dduid == PAPADUCK_DUID && sduid == this->duid), the radio is
+     * temporarily switched to a randomly selected channel from
+     * CDPCFG_UPLINK_CHANNEL_POOL before transmission. This spreads TX
+     * load across all 8 SX1302 demodulators and reduces last-hop
+     * collisions at the gateway.
+     *
+     * Relayed packets (sduid != this->duid) are always sent on the shared
+     * mesh channel (922.8 MHz, CDPCFG_RF_LORA_FREQ) regardless of their
+     * destination, including when the destination is PapaDuck. This is
+     * intentional: intermediate MamaDucks must be able to hear and forward
+     * packets on the common channel. PapaDuck's SX1302 receives on all 8
+     * channels simultaneously, so it will receive relayed packets on
+     * 922.8 MHz without any issue.
      */
     int sendToRadio(CdpPacket& txPacket) {
       int err = txPacket.prepareForSending();
@@ -466,11 +483,9 @@ class Duck {
       router.getFilter().bloom_add(txPacket.muid.data(), MUID_LENGTH);
 
       if (txPacket.dduid == PAPADUCK_DUID && txPacket.sduid == this->duid) {
-        // Only switch channels for packets ORIGINATING from this duck.
-        // Relayed packets (sduid != this->duid) stay on 922.8 MHz so
-        // intermediate MamaDucks can hear and forward them in the mesh.
-        // The SX1302 receives on all 8 channels simultaneously so it
-        // hears both paths.
+        // Channel spreading: only for packets originating from this duck.
+        // Relayed packets (sduid != this->duid) stay on 922.8 MHz so that
+        // other MamaDucks in the mesh can still hear and forward them.
         duckRadio.setUplinkFrequency(duckRadio.getRandomUplinkChannel());
       }
 
