@@ -86,8 +86,12 @@ std::optional<std::string> DuckRouter::getEntriesFor(Duid targetDuid, Duid thisD
     if (target == routingTable.end()) {
         return std::nullopt;
     }
+    std::string strSourceDuid = duckutils::hexToString(duckutils::duidAsString(thisDuck));
 
-    doc["s"] = duckutils::hexToString(duckutils::duidAsString(thisDuck));
+    Serial.printf("text = [%s]\n", strSourceDuid.c_str());
+
+    doc["s"] = strSourceDuid;
+
     JsonArray neighborsArr = doc["n"].to<JsonArray>();
 
     auto entry = target->second.begin();
