@@ -18,6 +18,7 @@
 #include "../routing/RouteJSON.h"
 #include "../routing/SizedQueue.h"
 #include "../utils/MemoryFree.h"
+#include <ESP32Time.h>
 
 #define NET_JOIN_DELAY 15000L
 
@@ -28,7 +29,7 @@ class Duck {
     virtual ~Duck(){
     };
     Preferences eeprom_preferences;
-
+    ESP32Time rtc; 
     /**
      * @brief Duck main running loop
      */
@@ -85,7 +86,10 @@ class Duck {
         logerr_ln("Failed to initialise EEPROM, aborting duck setup");
         return DUCK_ERR_EEPROM_INIT;
       }
- 
+
+      eeprom_preferences.putFloat("teensy_off", BAT_TEENSY_POWER_OFF_V);
+      eeprom_preferences.putFloat("teensy_on", BAT_TEENSY_POWER_ON_V);
+
       int tx_power = eeprom_preferences.getInt("tx_pwr", CDPCFG_RF_LORA_TXPOW);
       if (tx_power < 0 || tx_power > 14) {
           tx_power = CDPCFG_RF_LORA_TXPOW;

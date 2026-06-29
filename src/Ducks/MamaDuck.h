@@ -4,6 +4,7 @@
 #include "Duck.h"
 #include "../utils/MemoryFree.h"
 
+
 template <typename WifiCapability = DuckWifiNone, typename RadioType = DuckLoRa>
 class MamaDuck : public Duck<WifiCapability, RadioType> {
 public:
@@ -90,9 +91,11 @@ private :
                 }
                 loginfo_ln("Command received, updating battery threshold for sleep");
 
-                int battery_min = json["min"];
-                int battery_max = json["max"];
-                if ((battery_min < 0 || battery_min > 100) || (battery_max < 0 || battery_max > 100)) {
+                float battery_min = json["min"];
+                float battery_max = json["max"];
+                
+                //what is the min and max possible voltages
+                if ((battery_min < BAT_V_EMPTY || battery_min > BAT_V_FULL) || (battery_max < BAT_V_EMPTY || battery_max > BAT_V_FULL)) {
                 logerr_ln("Invalid argument -- battery threshold min: %i , battery threshold max %i", battery_min, battery_max);
                 err = DUCK_ERR_INVALID_ARGUMENT;
                 break;
@@ -124,7 +127,7 @@ private :
                 int tx_pwr = json["tx_pwr"];
                 int sf = json["sf"];
 
-                if ((tx_pwr < 0 || tx_pwr > 100) || (sf < 7 || sf > 12)) {
+                if ((tx_pwr < 0 || tx_pwr > 20) || (sf < 7 || sf > 12)) {
                 logerr_ln("Invalid argument -- tx power: %i , spreading factor %i", tx_pwr, sf);
                 err = DUCK_ERR_INVALID_ARGUMENT;
                 break;
@@ -144,13 +147,29 @@ private :
                 break;
             }
               case topics::cmd_time:{
-                  loginfo_ln("Command received, updating time to match papa");
-                //   err = this->broadcastPacket(rxPacket);
-                //   if (err != DUCK_ERR_NONE) {
-                //     logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
-                //     } else {
-                //         loginfo_ln("handleReceivedPacket: packet RELAY DONE");
-                //     }
+                  loginfo_ln(" !!!!!!!!!!!!!!!!!!!Command received, updating time to match papa");
+                  ArduinoJson::JsonDocument json;
+                  std::string packetStr(rxPacket.data.begin(), rxPacket.data.end());
+
+                    DeserializationError error = deserializeJson(json, packetStr);
+                    if (error) {
+                        Serial.print("JSON parse failed: ");
+                        Serial.println(error.c_str());
+                        return;
+                    }
+
+                    uint32_t epoch = json["epoch"].as<uint32_t>();
+
+                    this->rtc.setTime(epoch);
+
+                    Serial.printf("RTC set to %u\n", epoch);
+
+                  err = this->broadcastPacket(rxPacket);
+                  if (err != DUCK_ERR_NONE) {
+                    logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
+                    } else {
+                        loginfo_ln("handleReceivedPacket: packet RELAY DONE");
+                    }
                   break;
               }
             default:
