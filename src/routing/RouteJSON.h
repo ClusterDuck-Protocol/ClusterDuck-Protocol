@@ -23,8 +23,8 @@ class RouteJSON {
          * @param sourceDevice the source device DUID
          */
         RouteJSON(Duid targetDevice, Duid sourceDevice) {
-            json["origin"] = duckutils::duidAsString(sourceDevice);
-            json["destination"] = duckutils::duidAsString(targetDevice);
+            json["origin"] = duckutils::hexToString(duckutils::duidAsString(sourceDevice));
+            json["destination"] = duckutils::hexToString(duckutils::duidAsString(targetDevice));
             json["path"].as<ArduinoJson::JsonArray>();
 
             std::string log;
@@ -90,7 +90,7 @@ class RouteJSON {
          * @return the newly modified Arduino JSON document
          */
         std::string addToPath(Duid deviceId){
-            objPath.push_back(duckutils::duidAsString(deviceId));
+            objPath.push_back(duckutils::hexToString(duckutils::duidAsString(deviceId)));
             json["path"].to<ArduinoJson::JsonArray>(); //.to erases content of the field in the doc, but .as does not modify the doc at all.
             updateJsonPath(); //so we will manually copy the local obj path to the doc
 #ifdef CDP_LOG_DEBUG
