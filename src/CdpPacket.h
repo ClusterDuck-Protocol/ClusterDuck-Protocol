@@ -131,6 +131,8 @@ enum topics {
   pir = 0xFD,
   // bmp180 
   bmp180 = 0xFE,
+  // SHT40 temperature & humidity sensor
+  sht40 = 0xF9,
   // Max supported topics
   max_topics = 0xFF
 };
@@ -335,6 +337,8 @@ class CdpPacket {
                 return "pir";
             case topics::bmp180:
                 return "bmp180";
+            case topics::sht40:
+                return "sht40";
             case reservedTopic::ping:
                 return "ping";
             case reservedTopic::pong:
