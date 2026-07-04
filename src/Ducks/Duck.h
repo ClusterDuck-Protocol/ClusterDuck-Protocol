@@ -62,7 +62,8 @@ class Duck {
             std::optional<CdpPacket> txPacket = txQueue.dequeue(); 
             if(txPacket.has_value()){
               Serial.println("send a queued packet");
-              this->sendData(txPacket->topic, txPacket->data.data(), txPacket->data.size(), txPacket->dduid); //we can't guratnee that this is the correct function for sending the next packet
+             
+              this->sendToRadio(txPacket.value());
             }
         }
       } else {
@@ -142,7 +143,8 @@ class Duck {
         std::optional<Duid> nextHop = router.getBestNextHop(txPacket.dduid);
         if(nextHop.has_value() || txPacket.dduid == PAPADUCK_DUID || txPacket.dduid == BROADCAST_DUID){
           router.getFilter().assignUniqueMessageId(txPacket);
-          err = sendToRadio(txPacket);
+          txQueue.enqueue(txPacket);
+          err = DUCK_ERR_NONE;
         } else {
             if((millis() - this->lastRreqTime) > 30000){
               loginfo_ln("[DUCK] Destination not in table, sending new RREQ.");
@@ -178,7 +180,8 @@ class Duck {
         std::optional<Duid> nextHop = router.getBestNextHop(txPacket.dduid);
         if(nextHop.has_value() || txPacket.dduid == PAPADUCK_DUID || txPacket.dduid == BROADCAST_DUID){
           router.getFilter().assignUniqueMessageId(txPacket);
-          err = sendToRadio(txPacket);
+          txQueue.enqueue(txPacket);
+          err = DUCK_ERR_NONE;
         } else {
             if((millis() - this->lastRreqTime) > 30000){
               loginfo_ln("[DUCK] Destination not in table, sending new RREQ.");
@@ -269,7 +272,8 @@ class Duck {
         logdbg_ln("broadcastPacket: Packet already seen. No relay.");
       } else{
         packet.hopCount++;
-        err = sendToRadio(packet);
+        txQueue.enqueue(packet);
+        err = DUCK_ERR_NONE;
       }
       return err;
     }
@@ -622,6 +626,7 @@ class Duck {
         rxQueue.enqueue(rxPacket);
         //move handle receieve packet to duck base, turn old handlereceive into route protocol?
     }
+    
 };
 
 #endif
