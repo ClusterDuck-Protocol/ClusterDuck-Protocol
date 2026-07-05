@@ -141,13 +141,19 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
                   break;
               }
               case topics::cmd_time:{
-                  loginfo_ln("Command received, updating time to match papa");
-                  // err = this->broadcastPacket(rxPacket);
-                  // if (err != DUCK_ERR_NONE) {
-                  //   logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
-                  //   } else {
-                  //       loginfo_ln("handleReceivedPacket: packet RELAY DONE");
-                  //   }
+                  loginfo_ln(" !!!!!!!!!!!!!!!!!!!Command received, updating time to match papa");
+                  ArduinoJson::JsonDocument json;
+
+                    std::string packetStr(rxPacket.data.begin(), rxPacket.data.end());
+                    DeserializationError error = deserializeJson(json, packetStr);
+                    if (error) {
+                        logerr("JSON parse failed: ");
+                        logerr(error.c_str());
+                    } else{
+                      uint32_t epoch = json["epoch"].as<uint32_t>();
+                      this->rtc.setTime(epoch);
+                      Serial.printf("RTC set to %u\n", epoch);
+                    }
                   break;
               }
               default:

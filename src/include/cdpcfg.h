@@ -60,6 +60,11 @@
 /** @brief Asyncwebserver Port */
 #define CDPCFG_WEB_PORT 80
 
+#define BAT_TEENSY_POWER_OFF_V 3.45f
+#define BAT_TEENSY_POWER_ON_V 3.63f
+#define BAT_V_EMPTY 3.2f
+#define BAT_V_FULL 4.2f
+
 /// Frequency Range. Set for US Region 915.0Mhz
 #define CDPCFG_RF_LORA_FREQ 915.0f
 #define CDPCFG_RF_LORA_FREQ_HZ 915000000
@@ -68,7 +73,7 @@
 /// Spread Factor
 #define CDPCFG_RF_LORA_SF 7
 /// Transmit Power
-#define CDPCFG_RF_LORA_TXPOW 4
+#define CDPCFG_RF_LORA_TXPOW 14
 /// Antenna Gain correction
 #define CDPCFG_RF_LORA_GAIN 0
 

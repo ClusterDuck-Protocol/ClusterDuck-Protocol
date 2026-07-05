@@ -18,6 +18,7 @@
 #include "../routing/RouteJSON.h"
 #include "../routing/SizedQueue.h"
 #include "../utils/MemoryFree.h"
+#include <ESP32Time.h>
 
 #define NET_JOIN_DELAY 15000L
 
@@ -28,7 +29,7 @@ class Duck {
     virtual ~Duck(){
     };
     Preferences eeprom_preferences;
-
+    ESP32Time rtc; 
     /**
      * @brief Duck main running loop
      */
@@ -61,7 +62,8 @@ class Duck {
             std::optional<CdpPacket> txPacket = txQueue.dequeue(); 
             if(txPacket.has_value()){
               Serial.println("send a queued packet");
-              this->sendData(txPacket->topic, txPacket->data.data(), txPacket->data.size(), txPacket->dduid); //we can't guratnee that this is the correct function for sending the next packet
+             
+              this->sendToRadio(txPacket.value());
             }
         }
       } else {
@@ -85,7 +87,10 @@ class Duck {
         logerr_ln("Failed to initialise EEPROM, aborting duck setup");
         return DUCK_ERR_EEPROM_INIT;
       }
- 
+
+      eeprom_preferences.putFloat("teensy_off", BAT_TEENSY_POWER_OFF_V);
+      eeprom_preferences.putFloat("teensy_on", BAT_TEENSY_POWER_ON_V);
+
       int tx_power = eeprom_preferences.getInt("tx_pwr", CDPCFG_RF_LORA_TXPOW);
       if (tx_power < 0 || tx_power > 14) {
           tx_power = CDPCFG_RF_LORA_TXPOW;
@@ -138,7 +143,8 @@ class Duck {
         std::optional<Duid> nextHop = router.getBestNextHop(txPacket.dduid);
         if(nextHop.has_value() || txPacket.dduid == PAPADUCK_DUID || txPacket.dduid == BROADCAST_DUID){
           router.getFilter().assignUniqueMessageId(txPacket);
-          err = sendToRadio(txPacket);
+          txQueue.enqueue(txPacket);
+          err = DUCK_ERR_NONE;
         } else {
             if((millis() - this->lastRreqTime) > 30000){
               loginfo_ln("[DUCK] Destination not in table, sending new RREQ.");
@@ -174,7 +180,8 @@ class Duck {
         std::optional<Duid> nextHop = router.getBestNextHop(txPacket.dduid);
         if(nextHop.has_value() || txPacket.dduid == PAPADUCK_DUID || txPacket.dduid == BROADCAST_DUID){
           router.getFilter().assignUniqueMessageId(txPacket);
-          err = sendToRadio(txPacket);
+          txQueue.enqueue(txPacket);
+          err = DUCK_ERR_NONE;
         } else {
             if((millis() - this->lastRreqTime) > 30000){
               loginfo_ln("[DUCK] Destination not in table, sending new RREQ.");
@@ -265,7 +272,8 @@ class Duck {
         logdbg_ln("broadcastPacket: Packet already seen. No relay.");
       } else{
         packet.hopCount++;
-        err = sendToRadio(packet);
+        txQueue.enqueue(packet);
+        err = DUCK_ERR_NONE;
       }
       return err;
     }
@@ -618,6 +626,7 @@ class Duck {
         rxQueue.enqueue(rxPacket);
         //move handle receieve packet to duck base, turn old handlereceive into route protocol?
     }
+    
 };
 
 #endif

@@ -4,7 +4,7 @@
 void DuckRouter::insertIntoRoutingTable(Duid deviceID, Duid nextHop, SignalScore signalInfo) {
 
     Neighbor neighborRecord(deviceID, nextHop, signalInfo, millis());
-    auto index = routingTable.find(duckutils::duidAsString(deviceID));
+    auto index = routingTable.find(duckutils::hexToString(duckutils::duidAsString(deviceID)));
     if (index == routingTable.end()) { //need to make sure we aren't adding Link1276->Link1276 to Mama1262
         std::list<Neighbor> neighborList;
         neighborList.push_back(neighborRecord);
@@ -20,7 +20,7 @@ void DuckRouter::insertIntoRoutingTable(Duid deviceID, Duid nextHop, SignalScore
 
 std::optional<Duid> DuckRouter::getBestNextHop(Duid targetDeviceId){
     //check if nextHop = the duid of the last duid in path/last duid that relayed to the current duck so that it doesn't transmit back the way it came from
-    auto nextHopRecord = routingTable.find(duckutils::duidAsString(targetDeviceId));
+    auto nextHopRecord = routingTable.find(duckutils::hexToString(duckutils::duidAsString(targetDeviceId)));
     if (nextHopRecord == routingTable.end()) {
         return std::nullopt; // No entry found
     }
@@ -80,13 +80,13 @@ void DuckRouter::cullRoutingTable(size_t maxSize) {
 };
 
 std::optional<std::string> DuckRouter::getEntriesFor(Duid targetDuid, Duid thisDuck){
-    auto target = routingTable.find(duckutils::duidAsString(targetDuid));
+    auto target = routingTable.find(duckutils::hexToString(duckutils::duidAsString(targetDuid)));
     JsonDocument doc;
 
     if (target == routingTable.end()) {
         return std::nullopt;
     }
-    std::string strSourceDuid = duckutils::hexToString(duckutils::duidAsString(thisDuck));
+    std::string strSourceDuid = duckutils::hexToString(duckutils::hexToString(duckutils::duidAsString(thisDuck)));
 
     Serial.printf("text = [%s]\n", strSourceDuid.c_str());
 
@@ -97,7 +97,7 @@ std::optional<std::string> DuckRouter::getEntriesFor(Duid targetDuid, Duid thisD
     auto entry = target->second.begin();
     while(entry != target->second.end()){
         JsonArray node = neighborsArr.createNestedArray();
-        node.add(duckutils::hexToString(duckutils::duidAsString(entry->getDuid())));
+        node.add(duckutils::hexToString(duckutils::hexToString(duckutils::duidAsString(entry->getDuid()))));
         node.add(entry->getRssi());
         node.add(entry->getSnr());
         entry++;
