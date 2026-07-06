@@ -89,10 +89,9 @@ private :
                     logerr_ln("Duck Command cmd_tx deserialization failed: %s", error.c_str());
                     break;
                 }
-                loginfo_ln("Command received, updating battery threshold for sleep");
-
                 float battery_min = json["min"];
                 float battery_max = json["max"];
+                loginfo_ln("Command received, updating battery sleep thresholds: off(min)=%.3fV on(max)=%.3fV", battery_min, battery_max);
                 
                 //what is the min and max possible voltages
                 if ((battery_min < BAT_V_EMPTY || battery_min > BAT_V_FULL) || (battery_max < BAT_V_EMPTY || battery_max > BAT_V_FULL)) {
