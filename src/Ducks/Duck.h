@@ -88,8 +88,15 @@ class Duck {
         return DUCK_ERR_EEPROM_INIT;
       }
 
-      eeprom_preferences.putFloat("teensy_off", BAT_TEENSY_POWER_OFF_V);
-      eeprom_preferences.putFloat("teensy_on", BAT_TEENSY_POWER_ON_V);
+      // Seed the Teensy battery sleep thresholds only if they have never been
+      // set. Writing unconditionally here would clobber any value pushed over
+      // the mesh via a cmd_bat command on every reboot.
+      if (!eeprom_preferences.isKey("teensy_off")) {
+        eeprom_preferences.putFloat("teensy_off", BAT_TEENSY_POWER_OFF_V);
+      }
+      if (!eeprom_preferences.isKey("teensy_on")) {
+        eeprom_preferences.putFloat("teensy_on", BAT_TEENSY_POWER_ON_V);
+      }
 
       int tx_power = eeprom_preferences.getInt("tx_pwr", CDPCFG_RF_LORA_TXPOW);
       if (tx_power < 0 || tx_power > 14) {
