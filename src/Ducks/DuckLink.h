@@ -87,17 +87,20 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
                   }
                   loginfo_ln("Command received, updating battery threshold for sleep");
 
-                  int battery_min = json["min"];
-                  int battery_max = json["max"];
-                  if ((battery_min < 0 || battery_min > 100) || (battery_max < 0 || battery_max > 100)) {
-                    logerr_ln("Invalid argument -- battery threshold min: %i , battery threshold max %i", battery_min, battery_max);
+                  float battery_min = json["min"];
+                  float battery_max = json["max"];
+                  if ((battery_min < BAT_V_EMPTY || battery_min > BAT_V_FULL) || (battery_max < BAT_V_EMPTY || battery_max > BAT_V_FULL)) {
+                    logerr_ln("Invalid argument -- battery threshold min: %f , battery threshold max %f", battery_min, battery_max);
                     err = DUCK_ERR_INVALID_ARGUMENT;
                     break;
                   }
 
                   if (err == DUCK_ERR_NONE){
-                    this->eeprom_preferences.putInt("bat_min", battery_min);
-                    this->eeprom_preferences.putInt("bat_max", battery_max);
+                    // min = Teensy power-off threshold, max = power-on/recovery
+                    // threshold, both in volts. Store as float under the same
+                    // keys seeded in Duck::setupWithDefaults.
+                    this->eeprom_preferences.putFloat("teensy_off", battery_min);
+                    this->eeprom_preferences.putFloat("teensy_on", battery_max);
                   }
 
                   err = this->broadcastPacket(rxPacket);

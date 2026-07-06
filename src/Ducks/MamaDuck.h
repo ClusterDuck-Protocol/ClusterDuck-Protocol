@@ -102,8 +102,12 @@ private :
                 }
 
                 if (err == DUCK_ERR_NONE){
-                this->eeprom_preferences.putInt("bat_min", battery_min);
-                this->eeprom_preferences.putInt("bat_max", battery_max);
+                // min = Teensy power-off threshold, max = power-on/recovery
+                // threshold, both in volts. Store as float under the same keys
+                // seeded in Duck::setupWithDefaults so the firmware reads one
+                // source of truth.
+                this->eeprom_preferences.putFloat("teensy_off", battery_min);
+                this->eeprom_preferences.putFloat("teensy_on", battery_max);
                 }
 
                 err = this->broadcastPacket(rxPacket);
