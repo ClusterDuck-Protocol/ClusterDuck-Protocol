@@ -159,10 +159,10 @@ std::optional<std::vector<uint8_t>> DuckLoRa::readReceivedData() { //return a st
 
     packet_length = lora.getPacketLength();
 
-    if (packet_length < MIN_PACKET_LENGTH) {
+    if (packet_length < MIN_PACKET_LENGTH || packet_length > PACKET_LENGTH) {
         logerr_ln("ERROR  handlePacket rx data size invalid: %d", packet_length);
-
-        rxState = goToReceiveMode(true); // go back to receive mode and reset the receive flag
+        goToReceiveMode(true); // go back to receive mode and reset the receive flag
+        return std::nullopt;
     }
 
     loginfo_ln("readReceivedData() - packet length returns: %d", packet_length);

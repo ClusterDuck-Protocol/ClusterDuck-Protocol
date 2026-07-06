@@ -108,6 +108,10 @@ void ifNotBroadcast(CdpPacket rxPacket, bool relay = false) {
     switch(rxPacket.topic) {
         case reservedTopic::rreq: {
             RouteJSON rreqDoc = RouteJSON(rxPacket.data);
+            if (!rreqDoc.isValid()) {
+                logerr_ln("handleReceivedPacket: dropping malformed RREQ");
+                break;
+            }
             //route requests are just forwarded so we can use the sduid as the origin
             std::optional<Duid> last = rreqDoc.getlastInPath();
             Duid lastInPath = last.has_value() ? last.value() : rxPacket.sduid;
@@ -130,6 +134,10 @@ void ifNotBroadcast(CdpPacket rxPacket, bool relay = false) {
         case reservedTopic::rrep: {
             //we still need to recieve rreps in case of ttl expiry
             RouteJSON rrepDoc = RouteJSON(rxPacket.data);
+            if (!rrepDoc.isValid()) {
+                logerr_ln("handleReceivedPacket: dropping malformed RREP");
+                break;
+            }
             std::optional<Duid> last = rrepDoc.getlastInPath();
             Duid lastInPath = last.has_value() ? last.value() : rxPacket.sduid;
             std::string sourceDuid(rxPacket.sduid.begin(), rxPacket.sduid.end());
