@@ -129,7 +129,9 @@ class DuckLoRa {
         float getSNR();
 
     private:
-        static volatile uint16_t interruptFlags;
+        // Set to true by onInterrupt() (ISR context) only. The actual IRQ flags
+        // are read from the radio in loop context by serviceInterruptFlags().
+        static volatile bool interruptPending;
         static volatile bool receivedFlag;
         volatile bool isSetup = false;
         unsigned long lastReceiveTime = 0L;

@@ -21,7 +21,7 @@ CDPCFG_LORA_CLASS lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO0,
                   CDPCFG_PIN_LORA_RST, CDPCFG_PIN_LORA_DIO1);
 #endif
 
-volatile uint16_t DuckLoRa::interruptFlags = 0;
+volatile bool DuckLoRa::interruptPending = false;
 volatile bool DuckLoRa::receivedFlag = false;
 
 const LoRaConfigParams DuckLoRa::defaultRadioParams = {
@@ -314,79 +314,98 @@ int DuckLoRa::sleep()
 }
 
 void DuckLoRa::serviceInterruptFlags() {
-    if (DuckLoRa::interruptFlags != 0) {
+    if (!DuckLoRa::interruptPending) {
+        return;
+    }
+
+    // Clear the pending latch BEFORE reading the flags off the radio. If DIO1
+    // fires again while we are servicing, the ISR re-sets interruptPending and
+    // we pick the new event up on the next loop instead of silently dropping it
+    // (the read-then-clear race that could leave the node parked in standby).
+    DuckLoRa::interruptPending = false;
+
+    // Safe to touch SPI here: this runs in loop context, not the ISR.
+    uint16_t flags = lora.getIrqFlags();
+    if (flags == 0) {
+        return;
+    }
 
 #ifdef CDPCFG_RADIO_SX1262
         // SX1262 flags
-        if (DuckLoRa::interruptFlags & RADIOLIB_SX126X_CMD_CLEAR_IRQ_STATUS) {
+        if (flags & RADIOLIB_SX126X_CMD_CLEAR_IRQ_STATUS) {
             logdbg_ln("SX1262 Interrupt flag was set: clear IRQ status");
         }
-        if (DuckLoRa::interruptFlags & RADIOLIB_SX126X_CMD_CLEAR_DEVICE_ERRORS) {
+        if (flags & RADIOLIB_SX126X_CMD_CLEAR_DEVICE_ERRORS) {
             logdbg_ln("SX1262 Interrupt flag was set: clear device errors");
         }
-        if (DuckLoRa::interruptFlags & RADIOLIB_SX126X_IRQ_CRC_ERR ) {
+        if (flags & RADIOLIB_SX126X_IRQ_CRC_ERR ) {
             logdbg_ln("SX1262 Interrupt flag was set: payload CRC error");
+            // goToReceiveMode() re-arms the radio (startReceive clears the IRQ
+            // status). Do NOT call lora.standby() afterwards: that immediately
+            // knocks the radio back out of receive and the node goes deaf.
             goToReceiveMode(false);
-            lora.standby();
         }
-        if (DuckLoRa::interruptFlags & RADIOLIB_SX126X_IRQ_HEADER_ERR ) {
+        if (flags & RADIOLIB_SX126X_IRQ_HEADER_ERR ) {
             logdbg_ln("SX1262 Interrupt flag was set: header CRC error");
             goToReceiveMode(false);
-            lora.standby();
         }
-        if (DuckLoRa::interruptFlags & RADIOLIB_SX126X_IRQ_RX_DONE ) {
+        if (flags & RADIOLIB_SX126X_IRQ_RX_DONE ) {
             logdbg_ln("SX1262 Interrupt flag was set: packet reception complete");
             setReceiveFlag(true);
             lora.standby(); // we are done receiving, go to standby. We can't sleep because read buffer is not empty
         }
-        if (DuckLoRa::interruptFlags & RADIOLIB_SX126X_IRQ_TX_DONE ) {
+        if (flags & RADIOLIB_SX126X_IRQ_TX_DONE ) {
             logdbg_ln("SX1262 Interrupt flag was set: payload transmission complete");
             lora.finishTransmit();
             goToReceiveMode(false);
         }
-        if (DuckLoRa::interruptFlags & RADIOLIB_SX126X_IRQ_TIMEOUT ) {
+        if (flags & RADIOLIB_SX126X_IRQ_TIMEOUT ) {
             logdbg_ln("SX1262 Interrupt flag was set: timeout");
             goToReceiveMode(false);
         }
 #else
         // SX127X flags
-        if (DuckLoRa::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_RX_TIMEOUT) {
+        if (flags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_RX_TIMEOUT) {
             goToReceiveMode(true); // go back to receive mode and reset the receive flag
             logdbg_ln("SX127x Interrupt flag was set: timeout");
         }
-        if (DuckLoRa::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_RX_DONE) {
+        if (flags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_RX_DONE) {
             logdbg_ln("SX127x Interrupt flag was set: packet reception complete");
             setReceiveFlag(true); // set the receive flag and we stay in receive mode
             lora.standby(); // we are done receiving, go to standby. We can't sleep because read buffer is not empty
         }
-        if (DuckLoRa::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_PAYLOAD_CRC_ERROR) {
+        if (flags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_PAYLOAD_CRC_ERROR) {
             goToReceiveMode(true); // go back to receive mode and reset the receive flag
             logdbg_ln("SX127x Interrupt flag was set: payload CRC error");
         }
-        if (DuckLoRa::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_VALID_HEADER) {
+        if (flags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_VALID_HEADER) {
             logdbg_ln("SX127x Interrupt flag was set: valid header received");
         }
-        if (DuckLoRa::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_TX_DONE) {
+        if (flags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_TX_DONE) {
             logdbg_ln("SX127x Interrupt flag was set: payload transmission complete");
             goToReceiveMode(false); // go back to receive mode and reset the receive flag
         }
-        if (DuckLoRa::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_CAD_DONE) {
+        if (flags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_CAD_DONE) {
             logdbg_ln("SX127x Interrupt flag was set: CAD complete");
         }
-        if (DuckLoRa::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_FHSS_CHANGE_CHANNEL) {
+        if (flags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_FHSS_CHANGE_CHANNEL) {
             logdbg_ln("SX127x Interrupt flag was set: FHSS change channel");
         }
-        if (DuckLoRa::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_CAD_DETECTED) {
+        if (flags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_CAD_DETECTED) {
             logdbg_ln("SX127x Interrupt flag was set: valid LoRa signal detected during CAD operation");
         }
 #endif
-        DuckLoRa::interruptFlags = 0;
-    }
 }
 
 // IMPORTANT: this function MUST be 'void' type and MUST NOT have any arguments!
 void DuckLoRa::onInterrupt(void) {
-    interruptFlags = lora.getIrqFlags();
+    // ISR context: do NOT touch the SPI bus here. lora.getIrqFlags() issues a
+    // full SPI transaction (including a BUSY-line wait and the arduino-esp32 SPI
+    // HAL lock) which can deadlock or corrupt the bus if DIO1 fires while the
+    // main loop is mid-transfer (startTransmit / readData / startReceive). The
+    // documented RadioLib pattern is for the ISR to only latch a flag; the flags
+    // are then read from loop context in serviceInterruptFlags().
+    interruptPending = true;
 }
 
 int DuckLoRa::startTransmitData(uint8_t* data, int length) {
