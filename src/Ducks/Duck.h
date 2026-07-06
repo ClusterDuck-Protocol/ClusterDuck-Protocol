@@ -88,9 +88,7 @@ class Duck {
         return DUCK_ERR_EEPROM_INIT;
       }
 
-      // Seed the Teensy battery sleep thresholds only if they have never been
-      // set. Writing unconditionally here would clobber any value pushed over
-      // the mesh via a cmd_bat command on every reboot.
+      // Seed the Teensy battery sleep thresholds only if they have never been set.
       if (!eeprom_preferences.isKey("teensy_off")) {
         eeprom_preferences.putFloat("teensy_off", BAT_TEENSY_POWER_OFF_V);
       }
