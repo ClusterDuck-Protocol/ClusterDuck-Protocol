@@ -96,16 +96,16 @@ class Duck {
         eeprom_preferences.putFloat("teensy_on", BAT_TEENSY_POWER_ON_V);
       }
 
-      int tx_power = eeprom_preferences.getInt("txPwr", CDPCFG_RF_LORA_TXPOW);
-      if (tx_power < 0 || tx_power > 14) {
-          tx_power = CDPCFG_RF_LORA_TXPOW;
+      int txPwr = eeprom_preferences.getInt("txPwr", CDPCFG_RF_LORA_TXPOW);
+      if (txPwr < 14 || txPwr > 22) {
+          txPwr = CDPCFG_RF_LORA_TXPOW;
       }
       //should i close the eeprom_preferences here??
 
       //lora config for use in phoenix
       const LoRaConfigParams radioParam = {
         /* band     = */ CDPCFG_RF_LORA_FREQ,
-        /* txPower  = */ tx_power,
+        /* txPower  = */ txPwr,
         /* bw       = */ CDPCFG_RF_LORA_BW,
         /* sf       = */ CDPCFG_RF_LORA_SF,
         /* gain     = */ CDPCFG_RF_LORA_GAIN,
