@@ -54,7 +54,7 @@ private :
     }
 
     void ifBroadcast(CdpPacket rxPacket) {
-        int err;
+        int err = DUCK_ERR_NONE;
         switch(rxPacket.topic) {
             case reservedTopic::rreq: {
                 if(rxPacket.hopCount <= 0){
@@ -105,8 +105,13 @@ private :
                 // threshold, both in volts. Store as float under the same keys
                 // seeded in Duck::setupWithDefaults so the firmware reads one
                 // source of truth.
-                this->eeprom_preferences.putFloat("teensy_off", battery_min);
-                this->eeprom_preferences.putFloat("teensy_on", battery_max);
+                const size_t offBytes = this->eeprom_preferences.putFloat("teensy_off", battery_min);
+                const size_t onBytes = this->eeprom_preferences.putFloat("teensy_on", battery_max);
+                if (offBytes != sizeof(float) || onBytes != sizeof(float)) {
+                    logerr_ln("Failed to persist battery sleep thresholds to Preferences");
+                    err = DUCK_ERR_EEPROM_WRITE;
+                    break;
+                }
                 }
 
                 err = this->broadcastPacket(rxPacket);

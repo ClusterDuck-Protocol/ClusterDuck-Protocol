@@ -98,8 +98,13 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
                     // min = Teensy power-off threshold, max = power-on/recovery
                     // threshold, both in volts. Store as float under the same
                     // keys seeded in Duck::setupWithDefaults.
-                    this->eeprom_preferences.putFloat("teensy_off", battery_min);
-                    this->eeprom_preferences.putFloat("teensy_on", battery_max);
+                    const size_t offBytes = this->eeprom_preferences.putFloat("teensy_off", battery_min);
+                    const size_t onBytes = this->eeprom_preferences.putFloat("teensy_on", battery_max);
+                    if (offBytes != sizeof(float) || onBytes != sizeof(float)) {
+                      logerr_ln("Failed to persist battery sleep thresholds to Preferences");
+                      err = DUCK_ERR_EEPROM_WRITE;
+                      break;
+                    }
                   }
 
                   err = this->broadcastPacket(rxPacket);
