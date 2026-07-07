@@ -98,8 +98,13 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
                     // min = Teensy power-off threshold, max = power-on/recovery
                     // threshold, both in volts. Store as float under the same
                     // keys seeded in Duck::setupWithDefaults.
-                    this->eeprom_preferences.putFloat("teensy_off", battery_min);
-                    this->eeprom_preferences.putFloat("teensy_on", battery_max);
+                    const size_t offBytes = this->eeprom_preferences.putFloat("teensy_off", battery_min);
+                    const size_t onBytes = this->eeprom_preferences.putFloat("teensy_on", battery_max);
+                    if (offBytes != sizeof(float) || onBytes != sizeof(float)) {
+                      logerr_ln("Failed to persist battery sleep thresholds to Preferences");
+                      err = DUCK_ERR_EEPROM_WRITE;
+                      break;
+                    }
                   }
 
                   err = this->broadcastPacket(rxPacket);
@@ -168,6 +173,10 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
           switch(rxPacket.topic) {
               case reservedTopic::rreq: {
                   RouteJSON rreqDoc = RouteJSON(rxPacket.data);
+                  if (!rreqDoc.isValid()) {
+                      logerr_ln("handleReceivedPacket: dropping malformed RREQ");
+                      break;
+                  }
                   if(!relay) {
                       loginfo_ln("handleReceivedPacket: Sending RREP");
                       std::optional<Duid> last = rreqDoc.getlastInPath();
@@ -185,12 +194,16 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
               case reservedTopic::rrep: {
                   //we still need to recieve rreps in case of ttl expiry
                   RouteJSON rrepDoc = RouteJSON(rxPacket.data);
+                  if (!rrepDoc.isValid()) {
+                      logerr_ln("handleReceivedPacket: dropping malformed RREP");
+                      break;
+                  }
                   std::string sourceDuid(rxPacket.sduid.begin(), rxPacket.sduid.end());
                   loginfo_ln("Received Route Response from DUID: %s", sourceDuid.c_str());
                   //destination = sender of the rrep -> the last hop to current duck
                   std::optional<Duid> last = rrepDoc.getlastInPath();
-                  Duid lastInPath = last.value();
-                  
+                  Duid lastInPath = last.has_value() ? last.value() : rxPacket.sduid;
+
                   this->router.insertIntoRoutingTable(rrepDoc.getOrigin(), lastInPath, this->getSignalScore());
               }
                   break;

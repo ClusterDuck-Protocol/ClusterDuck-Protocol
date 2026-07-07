@@ -23,9 +23,12 @@ class RouteJSON {
          * @param sourceDevice the source device DUID
          */
         RouteJSON(Duid targetDevice, Duid sourceDevice) {
-            json["origin"] = duckutils::hexToString(duckutils::duidAsString(sourceDevice));
-            json["destination"] = duckutils::hexToString(duckutils::duidAsString(targetDevice));
+            origin = duckutils::hexToString(duckutils::duidAsString(sourceDevice));
+            destination = duckutils::hexToString(duckutils::duidAsString(targetDevice));
+            json["origin"] = origin;
+            json["destination"] = destination;
             json["path"].as<ArduinoJson::JsonArray>();
+            valid = true;
 
             std::string log;
             serializeJson(json, log);
@@ -35,6 +38,7 @@ class RouteJSON {
         //Create JSON from rxPacket
         /**
          * @brief Construct a new Route JSON object from received packet data
+         * check isValid() before using the parsed values
          *
          * @param packetData the received packet data as a byte vector
          */
@@ -43,15 +47,41 @@ class RouteJSON {
             DeserializationError error = deserializeJson(json, packetStr);
             if (error) {
                 logerr_ln("RouteJSON deserialization failed: %s", error.c_str());
+                return;
             }
+
+            const char* originPtr = json["origin"].as<const char*>();
+            const char* destinationPtr = json["destination"].as<const char*>();
+            if (originPtr == nullptr || destinationPtr == nullptr) {
+                logerr_ln("RouteJSON missing origin/destination");
+                return;
+            }
+            origin = originPtr;
+            destination = destinationPtr;
+            if (origin.size() != DUID_LENGTH || destination.size() != DUID_LENGTH) {
+                logerr_ln("RouteJSON origin/destination length invalid (%d/%d)",
+                          (int)origin.size(), (int)destination.size());
+                return;
+            }
+
             for (JsonVariant value : json["path"].as<JsonArray>()) {
-                objPath.push_back(value);  // Copy each element to myPath
+                std::string entry = value.as<std::string>();
+                if (entry.size() != DUID_LENGTH) {
+                    logerr_ln("RouteJSON path entry length invalid (%d)", (int)entry.size());
+                    return;
+                }
+                objPath.push_back(entry);
             }
-            origin = json["origin"].as<const char*>();
-            destination = json["destination"].as<const char*>();
+
+            valid = true;
             const std::string serialized = asString();
             logdbg_ln("Built RouteJSON from packet data: %s", serialized.c_str());
         }
+
+        /**
+         * @brief returns false if the packet data could not be parsed
+         */
+        bool isValid() const { return valid; }
 
         std::string asString(){
             std::string out;
@@ -74,12 +104,18 @@ class RouteJSON {
         }
         Duid getOrigin(){
             Duid originDuid;
-            std::copy(origin.begin(), origin.end(), originDuid.begin());
+            originDuid.fill(0);
+            if (origin.size() == DUID_LENGTH) {
+                std::copy(origin.begin(), origin.end(), originDuid.begin());
+            }
             return originDuid;
         }
         Duid getDestination(){
             Duid destinationDuid;
-            std::copy(destination.begin(), destination.end(), destinationDuid.begin());
+            destinationDuid.fill(0);
+            if (destination.size() == DUID_LENGTH) {
+                std::copy(destination.begin(), destination.end(), destinationDuid.begin());
+            }
             return destinationDuid;
         }
 
@@ -105,13 +141,12 @@ class RouteJSON {
         std::optional<Duid> getlastInPath(){
             Duid lastDuid;
             if(objPath.size() > 0){
-                auto last = objPath[objPath.size()-1];
-                std::copy(last.begin(), last.end(),lastDuid.begin());
-
-                std::string log;
-                serializeJson(json, log);
-                logdbg_ln("RREQ: %s", log.c_str());
-
+                const std::string& last = objPath[objPath.size()-1];
+                if (last.size() != DUID_LENGTH) {
+                    logdbg_ln("RREQ path entry has invalid length, ignoring");
+                    return std::nullopt;
+                }
+                std::copy(last.begin(), last.end(), lastDuid.begin());
                 return lastDuid;
 
             } else{
@@ -123,13 +158,17 @@ class RouteJSON {
     /**
      * @brief pop the last duck node from the route response path
      *
-     * @param deviceId of the duck node to be removed
      * @return the newly modified Arduino JSON document
      */
     std::string popFromPath(){
+        if (objPath.empty()) {
+            //pop_back on an empty vector is UB
+            logdbg_ln("popFromPath: path already empty, nothing to pop");
+            return asString();
+        }
         objPath.pop_back();
         updateJsonPath();
-        
+
         std::string log;
         serializeJson(json, log);
         logdbg_ln("Packet: %s", log.c_str());
@@ -142,6 +181,7 @@ class RouteJSON {
         std::vector<std::string> objPath;
         std::string origin;
         std::string destination;
+        bool valid = false;
 
         void updateJsonPath(){
             JsonArray path = json["path"].to<JsonArray>();
