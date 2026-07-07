@@ -141,6 +141,8 @@ private :
                   }
 
                   if (err == DUCK_ERR_NONE){
+                    Serial.print("updating tx power to value : ");
+                    Serial.println(txPwr);
                     this->eeprom_preferences.putInt("txPwr", txPwr);
                   }
                  

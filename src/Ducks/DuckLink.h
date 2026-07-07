@@ -135,6 +135,8 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
 
                   if (err == DUCK_ERR_NONE){
                     this->eeprom_preferences.putInt("txPwr", txPwr);
+                    Serial.print("updating tx power to value : ");
+                    Serial.println(txPwr);
                   }
                  
                   err = this->broadcastPacket(rxPacket);

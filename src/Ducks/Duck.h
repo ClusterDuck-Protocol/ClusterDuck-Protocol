@@ -100,6 +100,8 @@ class Duck {
       if (txPwr < 14 || txPwr > 22) {
           txPwr = CDPCFG_RF_LORA_TXPOW;
       }
+      Serial.print("tx power value on startup : ");
+      Serial.println(txPwr);
       //should i close the eeprom_preferences here??
 
       //lora config for use in phoenix
