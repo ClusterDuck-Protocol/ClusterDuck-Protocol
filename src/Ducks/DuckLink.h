@@ -125,18 +125,16 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
                   }
                   loginfo_ln("Command received, updating transmission power");
                   
-                  int tx_pwr = json["tx_pwr"];
-                  int sf = json["sf"];
+                  int txPwr = json["txPwr"];
 
-                  if ((tx_pwr < 0 || tx_pwr > 100) || (sf < 7 || sf > 12)) {
-                    logerr_ln("Invalid argument -- tx power: %i , spreading factor %i", tx_pwr, sf);
+                  if (txPwr < 14 || txPwr > 22) {
+                    logerr_ln("Invalid argument -- tx power: %i", txPwr);
                     err = DUCK_ERR_INVALID_ARGUMENT;
                     break;
                   }
 
                   if (err == DUCK_ERR_NONE){
-                    this->eeprom_preferences.putInt("tx_pwr", tx_pwr);
-                    this->eeprom_preferences.putInt("sf", sf);
+                    this->eeprom_preferences.putInt("txPwr", txPwr);
                   }
                  
                   err = this->broadcastPacket(rxPacket);

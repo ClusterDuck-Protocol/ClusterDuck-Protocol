@@ -124,35 +124,33 @@ private :
             }
             case topics::cmd_tx: {
                 ArduinoJson::JsonDocument json;
-                std::string packetStr(rxPacket.data.begin(), rxPacket.data.end());
-                DeserializationError error = deserializeJson(json, packetStr);
-                if (error) {
-                    logerr_ln("Duck Command cmd_tx deserialization failed: %s", error.c_str());
+                  std::string packetStr(rxPacket.data.begin(), rxPacket.data.end());
+                  DeserializationError error = deserializeJson(json, packetStr);
+                  if (error) {
+                      logerr_ln("Duck Command cmd_tx deserialization failed: %s", error.c_str());
+                      break;
+                  }
+                  loginfo_ln("Command received, updating transmission power");
+                  
+                  int txPwr = json["txPwr"];
+
+                  if (txPwr < 14 || txPwr > 22) {
+                    logerr_ln("Invalid argument -- tx power: %i", txPwr);
+                    err = DUCK_ERR_INVALID_ARGUMENT;
                     break;
-                }
-                loginfo_ln("Command received, updating transmission power");
-                
-                int tx_pwr = json["tx_pwr"];
-                int sf = json["sf"];
+                  }
 
-                if ((tx_pwr < 0 || tx_pwr > 20) || (sf < 7 || sf > 12)) {
-                logerr_ln("Invalid argument -- tx power: %i , spreading factor %i", tx_pwr, sf);
-                err = DUCK_ERR_INVALID_ARGUMENT;
-                break;
-                }
-
-                if (err == DUCK_ERR_NONE){
-                this->eeprom_preferences.putInt("tx_pwr", tx_pwr);
-                this->eeprom_preferences.putInt("sf", sf);
-                }
-                
-                err = this->broadcastPacket(rxPacket);
-                if (err != DUCK_ERR_NONE) {
-                logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
-                } else {
-                    loginfo_ln("handleReceivedPacket: packet RELAY DONE");
-                }
-                break;
+                  if (err == DUCK_ERR_NONE){
+                    this->eeprom_preferences.putInt("txPwr", txPwr);
+                  }
+                 
+                  err = this->broadcastPacket(rxPacket);
+                  if (err != DUCK_ERR_NONE) {
+                    logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
+                    } else {
+                        loginfo_ln("handleReceivedPacket: packet RELAY DONE");
+                    }
+                  break;
             }
               case topics::cmd_time:{
                   loginfo_ln(" !!!!!!!!!!!!!!!!!!!Command received, updating time to match papa");

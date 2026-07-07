@@ -96,14 +96,9 @@ class Duck {
         eeprom_preferences.putFloat("teensy_on", BAT_TEENSY_POWER_ON_V);
       }
 
-      int tx_power = eeprom_preferences.getInt("tx_pwr", CDPCFG_RF_LORA_TXPOW);
+      int tx_power = eeprom_preferences.getInt("txPwr", CDPCFG_RF_LORA_TXPOW);
       if (tx_power < 0 || tx_power > 14) {
           tx_power = CDPCFG_RF_LORA_TXPOW;
-      }
-
-      int sf = eeprom_preferences.getInt("sf", CDPCFG_RF_LORA_SF);
-      if (sf < 7 || sf > 12) {
-          sf = CDPCFG_RF_LORA_SF;
       }
       //should i close the eeprom_preferences here??
 
@@ -112,7 +107,7 @@ class Duck {
         /* band     = */ CDPCFG_RF_LORA_FREQ,
         /* txPower  = */ tx_power,
         /* bw       = */ CDPCFG_RF_LORA_BW,
-        /* sf       = */ sf,
+        /* sf       = */ CDPCFG_RF_LORA_SF,
         /* gain     = */ CDPCFG_RF_LORA_GAIN,
         /* func     = */ duckRadio.onInterrupt
     };
