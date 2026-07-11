@@ -105,6 +105,8 @@ enum topics {
   cmd_bat = 0x21,
   //duck command for phoenix time sync
   cmd_time = 0x22,
+  // acoustic metric
+  acoustic_metric = 0x23, 
   // bird detection event
   birddetection = 0x1A,
   // sleep status
