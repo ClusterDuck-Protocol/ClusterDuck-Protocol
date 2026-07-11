@@ -328,7 +328,7 @@ class CdpPacket {
             case topics::cmd_tx:
                 return "cmd_tx";
             case topics::acousticmetric:
-                return "acousticmetric"
+                return "acousticmetric";
             case topics::mq7:
                 return "mq7";
             case topics::gp2y:
