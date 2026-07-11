@@ -106,7 +106,7 @@ enum topics {
   //duck command for phoenix time sync
   cmd_time = 0x22,
   // acoustic metric
-  acoustic_metric = 0x23, 
+  acousticmetric = 0x23, 
   // bird detection event
   birddetection = 0x1A,
   // sleep status
@@ -324,9 +324,11 @@ class CdpPacket {
             case topics::cmd_bat:
                 return "cmd_bat";
             case topics::cmd_time:
-            return "cmd_time";
+                return "cmd_time";
             case topics::cmd_tx:
-            return "cmd_tx";
+                return "cmd_tx";
+            case topics::acousticmetric:
+                return "acousticmetric"
             case topics::mq7:
                 return "mq7";
             case topics::gp2y:
