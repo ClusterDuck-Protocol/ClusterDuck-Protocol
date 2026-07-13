@@ -20,7 +20,7 @@
 #include "../utils/MemoryFree.h"
 #include <ESP32Time.h>
 
-#define NET_JOIN_DELAY 15000L
+#define NET_JOIN_DELAY 5200L
 
 //templated class to require some radio capability
 template <typename WifiCapability = DuckWifiNone, typename RadioType = DuckLoRa>
@@ -72,7 +72,7 @@ class Duck {
           router.setNetworkState(NetworkState::PUBLIC);
         } else{
             attemptNetworkJoin();
-            if(router.getNetworkState() == NetworkState::SEARCHING && (millis() > (NET_JOIN_DELAY * 5 + 5000L))){
+            if(router.getNetworkState() == NetworkState::SEARCHING && (millis() > (NET_JOIN_DELAY * 3 + 5000L))){
               loginfo_ln("No existing network found, creating new CDP network...");
               router.setNetworkState(NetworkState::PUBLIC);
             }
