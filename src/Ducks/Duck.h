@@ -537,8 +537,8 @@ class Duck {
     SizedQueue txQueue;
 
     //Telemetry
-    const int HEALTH_INTERVAL = 1000 * 60 * 15; //15 minutes
-    const int SIGNAL_INTERVAL = 1000 * 60 * 10; //10 minutes
+    const int HEALTH_INTERVAL = (1000 * 60 * 60 * 2) + (1000 * 60 * 12) ; //2 Hours 12 Minutes
+    const int SIGNAL_INTERVAL = (1000 * 60 * 60 * 3) + (1000 * 60 * 15); //3 hours 15 minutes
     int counter = 1;
     Timer<10> duckTimer;
 
