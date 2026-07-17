@@ -415,9 +415,9 @@ class Duck {
         
       int err = duckInstance->sendData(topics::health, jsonString);
       if (err != DUCK_ERR_NONE) {
-        duckInstance->counter++;
         loginfo_ln("[DUCK] health message failed to send.");
       } else {
+        duckInstance->counter++;
         loginfo_ln("[DUCK] health message successfully sent.");
       }
       return true;
