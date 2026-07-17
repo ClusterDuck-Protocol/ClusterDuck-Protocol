@@ -143,7 +143,7 @@ class Duck {
         CdpPacket txPacket = CdpPacket(targetDevice, topic, app_data, this->duid, this->getType());
 
         std::optional<Duid> nextHop = router.getBestNextHop(txPacket.dduid);
-        if(nextHop.has_value() || txPacket.dduid == PAPADUCK_DUID || txPacket.dduid == BROADCAST_DUID){
+        if(nextHop.has_value() || txPacket.dduid == BROADCAST_DUID){
           router.getFilter().assignUniqueMessageId(txPacket);
           txQueue.enqueue(txPacket);
           err = DUCK_ERR_NONE;
@@ -152,6 +152,8 @@ class Duck {
               loginfo_ln("[DUCK] Destination not in table, sending new RREQ.");
               RouteJSON rreqDoc = RouteJSON(txPacket.dduid, this->duid);
               rreqDoc.addToPath(this->duid);
+              router.getFilter().assignUniqueMessageId(txPacket);
+              txQueue.enqueue(txPacket); //temporary, need to figure out how to defer until rrep received
               sendRouteRequest(txPacket.dduid, rreqDoc);
               this->lastRreqTime = millis();
             }
@@ -180,7 +182,7 @@ class Duck {
         CdpPacket txPacket = CdpPacket(targetDevice, topic, app_data, this->duid, this->getType());
 
         std::optional<Duid> nextHop = router.getBestNextHop(txPacket.dduid);
-        if(nextHop.has_value() || txPacket.dduid == PAPADUCK_DUID || txPacket.dduid == BROADCAST_DUID){
+        if(nextHop.has_value() || txPacket.dduid == BROADCAST_DUID){
           router.getFilter().assignUniqueMessageId(txPacket);
           txQueue.enqueue(txPacket);
           err = DUCK_ERR_NONE;
@@ -189,7 +191,9 @@ class Duck {
               loginfo_ln("[DUCK] Destination not in table, sending new RREQ.");
               RouteJSON rreqDoc = RouteJSON(txPacket.dduid, this->duid);
               rreqDoc.addToPath(this->duid);
-              sendRouteRequest(txPacket.dduid, rreqDoc);
+              router.getFilter().assignUniqueMessageId(txPacket);
+              txQueue.enqueue(txPacket); //temporary, need to figure out how to defer until rrep received
+              sendRouteRequest(txPacket.dduid, rreqDoc); //shouldn't this enqueue a route req packet? should we queue the original packet?
               this->lastRreqTime = millis();
             }
         }
