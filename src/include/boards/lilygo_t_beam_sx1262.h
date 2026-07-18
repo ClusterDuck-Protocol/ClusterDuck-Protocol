@@ -27,5 +27,7 @@
 #define CDPCFG_PIN_LORA_BUSY    32
 
 // Oled Display settings
-#define CDPCFG_OLED_NONE
+#define CDPCFG_PIN_OLED_DATA 21
+#define CDPCFG_PIN_OLED_CLOCK 22
+#define CDPCFG_PIN_OLED_RESET 16
 #endif
