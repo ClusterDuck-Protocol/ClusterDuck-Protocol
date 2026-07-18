@@ -97,9 +97,9 @@ std::string toString(const std::vector<T>& vec) {
 }
 
 /**
- * @brief Convert an array into an ASCII string.
+ * @brief Convert a container into an ASCII string.
  *
- * @param arr An array to convert
+ * @param arr Any container type to convert
  * @returns A std::string representing the byte array in ASCII.
  *
  */
