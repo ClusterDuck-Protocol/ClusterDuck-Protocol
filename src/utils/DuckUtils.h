@@ -19,6 +19,7 @@
 #include "DuckError.h"
 #include <functional>
 #include <thread>
+#include <iomanip>
 
 namespace duckutils {
 
@@ -105,11 +106,15 @@ std::string toString(const std::vector<T>& vec) {
 template<typename Container>
 std::string toString(const Container& arr) {
     std::string result;
-    for (const auto& element : arr) {
-        if (!std::isprint(element)) {
-            return "ERROR: Non-printable character";
+    for (unsigned char c : arr) {
+        if (std::isprint(c)) {
+            result += static_cast<char>(c);
+        } else {
+            // Convert non-printable byte to hex string (e.g., 0x0A -> "0A")
+            std::ostringstream oss;
+            oss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(c);
+            result += oss.str();
         }
-        result += static_cast<char>(element);
     }
     return result;
 }
