@@ -14,7 +14,7 @@ class SizedQueue{
     }else{
      loginfo_ln("[ROUTER] rx packet queue max size exceeded");
     }
-    loginfo_ln("[ROUTER] queue size: %d", maxSize);
+    loginfo_ln("[ROUTER] queue size: %d", packetQueue.size());
   }
 
   std::optional<CdpPacket> dequeue(){
