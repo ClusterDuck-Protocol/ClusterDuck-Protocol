@@ -1,15 +1,16 @@
 #include "DuckRouter.h"
 
 void DuckRouter::insertIntoRoutingTable(Duid deviceID, Duid nextHop, SignalScore signalInfo) {
-
     Neighbor neighborRecord(deviceID, nextHop, signalInfo, millis());
     auto index = routingTable.find(duckutils::toString(deviceID));
     if (index == routingTable.end()) { //need to make sure we aren't adding Link1276->Link1276 to Mama1262
+        logdbg_ln("Adding new neighbor record to routing table for deviceID: %s", duckutils::toString(deviceID));
         std::list<Neighbor> neighborList;
         neighborList.push_back(neighborRecord);
         routingTable.insert(std::make_pair(neighborRecord.getDeviceId(), neighborList));
     } else {
         // Update existing record
+        logdbg_ln("Updating existing neighbor record in routing table for deviceID: %s", duckutils::toString(deviceID));
         index->second.remove_if([neighborRecord](const Neighbor& n) {
             return n.getLastSeen() < neighborRecord.getLastSeen() && n.getDeviceId() == neighborRecord.getDeviceId();
         });
@@ -19,8 +20,10 @@ void DuckRouter::insertIntoRoutingTable(Duid deviceID, Duid nextHop, SignalScore
 
 std::optional<Duid> DuckRouter::getBestNextHop(Duid targetDeviceId){
     //check if nextHop = the duid of the last duid in path/last duid that relayed to the current duck so that it doesn't transmit back the way it came from
+    logdbg_ln("Searching for best next hop for target device ID: %s", duckutils::toString(targetDeviceId));
     auto nextHopRecord = routingTable.find(duckutils::toString(targetDeviceId));
     if (nextHopRecord == routingTable.end()) {
+        logdbg_ln("No routing entry found for target device ID: %s", duckutils::toString(targetDeviceId));
         return std::nullopt; // No entry found
     }
     nextHopRecord->second.sort(std::greater<>());
