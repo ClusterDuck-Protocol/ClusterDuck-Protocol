@@ -590,10 +590,7 @@ class Duck {
           logerr_ln("ERROR Failed to build packet: %s err = %i",getDuckErrorString(err), err);
           return err;
         }
-        err = duckRadio.sendData(txPacket.asBytes());
-        if (err != DUCK_ERR_NONE) {
-          logerr_ln("ERROR Lora sendData failed, err = %d", err);
-        }
+        txQueue.enqueue(txPacket);
       } 
       return err;
     }
