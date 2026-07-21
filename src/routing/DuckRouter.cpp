@@ -29,7 +29,7 @@ std::optional<Duid> DuckRouter::getBestNextHop(Duid targetDeviceId){
     Duid nextHopId;
     std::copy(nextHopStr.begin(), nextHopStr.end(),nextHopId.begin());
 
-    if(nextHopRecord->second.front().getLastSeen() >= millis()- ROUTE_TTL){ 
+    if ((uint32_t)(millis() - nextHopRecord->second.front().getLastSeen()) >= ROUTE_TTL) {
         Serial.printf(
             "millis=%lu lastSeen=%lu ttl=%lu threshold=%lu\n",
             millis(),
@@ -55,7 +55,7 @@ void DuckRouter::cullRoutingTable(size_t maxSize) {
         
         auto entry = neighborList.begin();
         while(entry != neighborList.end()) {
-            if (entry->getLastSeen() >= millis()- ROUTE_TTL) {
+            if ((uint32_t)(millis() - entry->getLastSeen()) >= ROUTE_TTL) {
                 loginfo_ln("[ROUTER] culling route with ttl expired");
                 entry = neighborList.erase(entry);
             } else {
