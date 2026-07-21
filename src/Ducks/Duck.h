@@ -71,6 +71,11 @@ class Duck {
           loginfo_ln("Detector duck -- bypassing network search.");
           router.setNetworkState(NetworkState::PUBLIC);
         } else{
+            std::optional<CdpPacket> txPacket = reqQueue.dequeue();
+            if(txPacket.has_value()){
+              Serial.println("process next rreq");
+              this->sendToRadio(txPacket.value());
+            }
             attemptNetworkJoin();
             if(router.getNetworkState() == NetworkState::SEARCHING && (millis() > (NET_JOIN_DELAY * 3 + 5000L))){
               loginfo_ln("No existing network found, creating new CDP network...");
@@ -539,6 +544,7 @@ class Duck {
     Duck& operator=(Duck const&) = delete;
     SizedQueue rxQueue;
     SizedQueue txQueue;
+    SizedQueue reqQueue;
 
     //Telemetry
     const int HEALTH_INTERVAL = (1000 * 60 * 60 * 2) + (1000 * 60 * 12) ; //2 Hours 12 Minutes
@@ -590,7 +596,12 @@ class Duck {
           logerr_ln("ERROR Failed to build packet: %s err = %i",getDuckErrorString(err), err);
           return err;
         }
-        txQueue.enqueue(txPacket);
+        if (topic == reservedTopic::rreq){
+          reqQueue.enqueue(txPacket);
+        } else{
+          txQueue.enqueue(txPacket);
+        }
+        
       } 
       return err;
     }
