@@ -59,11 +59,13 @@ class Duck {
       
             //routeProtocol.processPacket(rxQueue.dequeu())
             //semd a txPacket if any -- hopefully doing both doesnt take too much time
-            std::optional<CdpPacket> txPacket = txQueue.dequeue(); 
-            if(txPacket.has_value()){
-              Serial.println("send a queued packet");
-             
-              this->sendToRadio(txPacket.value());
+            if((millis() - this->lastPacketTx) > CDPCFG_MAX_PACKET_SEND_RATE){
+                std::optional<CdpPacket> txPacket = txQueue.dequeue(); 
+              if(txPacket.has_value()){
+                Serial.println("send a queued packet");
+                this->lastPacketTx = millis();
+                this->sendToRadio(txPacket.value());
+              }
             }
         }
       } else {
@@ -312,6 +314,7 @@ class Duck {
     }
 
     unsigned long lastRreqTime = 0L;
+    unsigned long lastPacketTx = 0L;
 
     /**
      * @brief Set up USB serial port
