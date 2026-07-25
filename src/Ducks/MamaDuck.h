@@ -62,6 +62,15 @@ private :
         this->router.getFilter().bloom_add(rxPacket.muid.data(), MUID_LENGTH);
     }
 
+    /**
+     * @brief Handles packets that are meant for broadcasing (i.e RREQ, PING, CMD, etc).
+     * Overrides the pure virtual function in Duck base class.
+     * Only responds to neighbors to decrease strain on the network.
+     * @param rxPacket the received packet to be processed by the mama duck if it's a broadcast packet (RREQ, PING, CMD, etc).
+     * If it's a RREQ with hop count > 0, it will send a response.
+     * If it's a PING, a PONG will be sent back. If it's a CMD, it will be relayed.
+     * @param err
+     */
     void ifBroadcast(CdpPacket rxPacket, int err) {
         switch(rxPacket.topic) {
             case reservedTopic::rreq: {
@@ -89,7 +98,7 @@ private :
                 loginfo_ln("Command received");
 
                 err = this->broadcastPacket(rxPacket);
-                
+
                 if (err != DUCK_ERR_NONE) {
                     logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
                 } else {
@@ -106,6 +115,15 @@ private :
         }
     }
 
+    /**
+     * @brief Handles packets that are meant for specific targets (i.e RREP, PONG, etc).
+     * If the RREQ is not meant for the mama duck but is still a directed packet, it will be relayed; otherwise, sends RREP.
+     * If the packet is a RREP meant for the mama duck, it will update the routing table with the path information; otherwise, it will be relayed to the next hop.
+     * Overrides the pure virtual function in Duck base class.
+     * @param rxPacket
+     * @param err
+     * @param relay
+     */
     void ifNotBroadcast(CdpPacket rxPacket, int err, bool relay = false) {
 
         switch(rxPacket.topic) {
@@ -141,7 +159,7 @@ private :
                 if((rrepDoc.getDestination() != this->duid) && (nextHop.has_value()) && (nextHop.value() !=  rxPacket.sduid)){
                     rrepDoc.popFromPath();
                     rrepDoc.addToPath(this->duid);
-                    //route responses need a way to keep tray of who relayed the packet, but a response needs to be directed and not broadly relayed
+                    //route responses need a way to keep track of who relayed the packet, but a response needs to be directed and not broadly relayed
                     this->sendRouteResponse(rrepDoc.getDestination(), rrepDoc.asString()); //so here the "relaying" duck is known from sduid
                     this->router.insertIntoRoutingTable(rxPacket.sduid, lastInPath, this->getSignalScore());
                 } else {
