@@ -1,5 +1,7 @@
 #include "DuckWifi.h"
 
+#ifndef CDPCFG_WIFI_NONE
+
 int DuckWifi::reconnect(std::string ssid, std::string password) {
     return DUCK_ERR_NONE;
 }
@@ -87,3 +89,5 @@ std::string loadWifiPassword() {
     }
     return epass;
 }
+
+#endif  // CDPCFG_WIFI_NONE

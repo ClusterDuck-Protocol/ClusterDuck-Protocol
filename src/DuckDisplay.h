@@ -15,6 +15,7 @@
 
 #include "include/cdpcfg.h"
 #include <Arduino.h>
+#include <array>
 #include <vector>
 #include <string>
 

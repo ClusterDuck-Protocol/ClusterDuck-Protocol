@@ -80,8 +80,19 @@ int DuckLoRa::setupRadio(const LoRaConfigParams &config) {
         logerr_ln("ERROR  initializing LoRa driver. state = %d", rc);
         return DUCKLORA_ERR_BEGIN;
     }
-    
-    loginfo_ln("Setting up LoRa radio parameters...");
+
+#ifdef CDPCFG_LORA_TCXO_VOLTAGE
+    // Board uses a TCXO reference oscillator; configure voltage before RF params.
+    rc = lora.setTCXO(CDPCFG_LORA_TCXO_VOLTAGE);
+    if (rc != RADIOLIB_ERR_NONE && rc != RADIOLIB_ERR_INVALID_TCXO_VOLTAGE) {
+        logerr_ln("ERROR  TCXO config failed: %d", rc);
+        return DUCKLORA_ERR_SETUP;
+    }
+#endif
+#ifdef CDPCFG_LORA_DIO2_RF_SWITCH
+    // Board uses DIO2 to drive the RF switch (common on SX1262 modules).
+    lora.setDio2AsRfSwitch(true);
+#endif
     rc = lora.setFrequency(config.band);
     if (rc == RADIOLIB_ERR_INVALID_FREQUENCY) {
         logerr_ln("ERROR  frequency is invalid");
@@ -215,20 +226,6 @@ std::optional<std::vector<uint8_t>> DuckLoRa::readReceivedData() { //return a st
     return packetVector;
 }
 
-int DuckLoRa::setUplinkFrequency(float freq) {
-    if (lora.setFrequency(freq) == RADIOLIB_ERR_INVALID_FREQUENCY) {
-        logerr_ln("ERROR setUplinkFrequency: invalid frequency");
-        return DUCKLORA_ERR_SETUP;
-    }
-    loginfo_ln("TX uplink channel: %.1f MHz", freq);
-    return DUCK_ERR_NONE;
-}
-
-float DuckLoRa::getRandomUplinkChannel() {
-    std::uniform_int_distribution<> dist(0, CDPCFG_UPLINK_CHANNEL_COUNT - 1);
-    return CDPCFG_UPLINK_CHANNEL_POOL[dist(gen)];
-}
-
 int DuckLoRa::sendData(uint8_t* data, int length)
 {
 
@@ -244,16 +241,13 @@ void DuckLoRa::delay(size_t size) {
     // Delay the transmission if we have received within the last 5 seconds
     if ((millis() - this->lastReceiveTime) < 5000L) {
         std::uniform_int_distribution<> distrib(0, 3000L);
-        std::chrono::milliseconds txdelay(distrib(gen));
-        
-        // Add the time on air to the delay
-        // txdelay_ms += lora.getTimeOnAir(size);
+        int txdelay_ms = distrib(gen);
 
-        loginfo_ln("Last receive was %ld ms ago, delaying transmission by %ld ms", millis() - this->lastReceiveTime, txdelay.count());
+        loginfo_ln("Last receive was %ld ms ago, delaying transmission by %d ms",
+                   millis() - this->lastReceiveTime, txdelay_ms);
 
         // Use FreeRTOS task delay, which will not block other tasks
-        // must pass ticks, so convert from ms to ticks
-        vTaskDelay(txdelay.count());
+        vTaskDelay(txdelay_ms);
     }
 }
 

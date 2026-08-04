@@ -1,13 +1,13 @@
 #ifndef DUCKWIFI_H
 #define DUCKWIFI_H
 
-// #ifdef CDPCFG_WIFI_NONE
-// #pragma info "WARNING: WiFi is disabled. DuckNet will not be available."
-// #else
+// Pull in board config first so CDPCFG_WIFI_NONE is defined before the guard.
+#include "../include/cdpcfg.h"
+
+#ifndef CDPCFG_WIFI_NONE
 
 #include "../utils/DuckError.h"
 #include "../utils/DuckLogger.h"
-#include "../include/cdpcfg.h"
 #include <Update.h>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
@@ -59,5 +59,7 @@ class DuckWifi {
          */
         int loadWiFiCredentials();
 };
+
+#endif  // CDPCFG_WIFI_NONE
 
 #endif

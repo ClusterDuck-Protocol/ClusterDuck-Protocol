@@ -482,13 +482,6 @@ class Duck {
 
       router.getFilter().bloom_add(txPacket.muid.data(), MUID_LENGTH);
 
-      if (txPacket.dduid == PAPADUCK_DUID && txPacket.sduid == this->duid) {
-        // Channel spreading: only for packets originating from this duck.
-        // Relayed packets (sduid != this->duid) stay on 922.8 MHz so that
-        // other MamaDucks in the mesh can still hear and forward them.
-        duckRadio.setUplinkFrequency(duckRadio.getRandomUplinkChannel());
-      }
-
       err = duckRadio.sendData(txPacket.asBytes());
       if (err != DUCK_ERR_NONE) {
         logerr_ln("ERROR Lora sendData failed, err = %d", err);

@@ -22,7 +22,9 @@
 #include "./CdpPacket.h"
 #include "./utils/DuckError.h"
 #include "./utils/DuckLogger.h"
+#ifndef CDPCFG_WIFI_NONE
 #include "./wifi/DuckWifi.h"
+#endif
 #define CDP_STRINGIFY(x) #x
 #define CDP_VALUE(x) CDP_STRINGIFY(x)
 

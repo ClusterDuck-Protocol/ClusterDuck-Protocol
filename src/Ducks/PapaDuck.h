@@ -2,9 +2,16 @@
 #define PAPADUCK_H
 
 #include "Duck.h"
+#ifndef CDPCFG_WIFI_NONE
 #include "../wifi/DuckWifi.h"
+#endif
+#include "../wifi/DuckWifiNone.h"
 
+#ifdef CDPCFG_WIFI_NONE
+template <typename WifiCapability = DuckWifiNone, typename RadioType = DuckLoRa>
+#else
 template <typename WifiCapability = DuckWifi, typename RadioType = DuckLoRa>
+#endif
 class PapaDuck : public Duck<WifiCapability, RadioType> {
 public:
   using Duck<WifiCapability, RadioType>::Duck;

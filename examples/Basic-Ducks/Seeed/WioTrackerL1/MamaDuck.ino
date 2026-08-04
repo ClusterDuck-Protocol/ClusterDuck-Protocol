@@ -7,12 +7,6 @@
  *   - Radio:   SX1262 (SPI, TCXO 1.8 V, DIO2 RF switch)
  *   - Display: SH1106 128×64 OLED (I2C)
  *   - GPS:     L76KB NMEA (Serial1, 9600 baud)
- *   - BLE:     Nordic UART Service (NUS) via raw SoftDevice S140 v7 API.
- *              The Adafruit Bluefruit wrapper is NOT used — it calls
- *              nrfx_power_uninit() via usb_softdevice_pre_enable(), which
- *              races with usb_device_task (FreeRTOS) and kills USB CDC.
- *              Raw SD API avoids that wrapper while replicating only the
- *              pre/post USB-handover steps required for coexistence.
  *
  * Ported from examples/Basic-Ducks/Seeed/MamaDuck.ino (ESP32 / NimBLE / Heltec).
  * Platform differences:
@@ -29,18 +23,16 @@
 #include <map>
 #include <CDP.h>
 #include <U8g2lib.h>
-#include <Wire.h>
 #include <TinyGPSPlus.h>
+#include <bluefruit.h>   // Adafruit Bluefruit52Lib — Nordic UART Service
 
-// ── BLE enable flag ───────────────────────────────────────────────────────────
-// Set to 1 to enable Bluetooth LE (Nordic UART Service via Bluefruit52Lib).
-// Requires SVC dispatcher + SoftDevice S140 infrastructure in setup().
-#define ENABLE_BLE 0
-
-#if ENABLE_BLE
-#include <bluefruit.h>   // Bluefruit52Lib: Bluefruit singleton + BLEUart
-#endif
 #include "image.h"
+
+// ADC_RESOLUTION is not defined in this board's variant.h; 14-bit gives
+// full-scale 16383 and must match the analogReadResolution(14) call in setup().
+#ifndef ADC_RESOLUTION
+#  define ADC_RESOLUTION 14
+#endif
 
 // Access the RadioLib radio instance from DuckLoRa.cpp to read RSSI/SNR.
 extern CDPCFG_LORA_CLASS lora;
@@ -60,11 +52,11 @@ static bool gpsModuleDetected = false;
 static bool gpsFix            = false;
 
 // ── Display ───────────────────────────────────────────────────────────────────
-// SH1106 128×64 hardware I2C at address 0x3D (confirmed by I2C scan).
-// U8G2 uses 8-bit addresses internally (7-bit << 1), so setI2CAddress(0x7A)
-// is called before every display.begin().  Wire.begin() configures NRF_TWIM0
-// directly; see setupBLE() for the TWIM0 release/reinit around sd_enable.
-U8G2_SH1106_128X64_NONAME_F_HW_I2C display(U8G2_R0, U8X8_PIN_NONE);
+// SH1106 128×64 software I2C (bit-bang GPIO).
+// SW I2C bypasses TWIM entirely, so it works both before AND after
+// sd_softdevice_enable() — unlike Wire/HW-I2C which hangs post-sd_enable.
+// SCL = D15 = P0.05, SDA = D14 = P0.06 (same physical pins as HW I2C).
+U8G2_SH1106_128X64_NONAME_F_SW_I2C display(U8G2_R0, /*clock/SCL*/15, /*data/SDA*/14, U8X8_PIN_NONE);
 
 // U8g2 uses baseline y-coordinates.  These helpers mirror the heltec library's
 // top-left convention so ported code can use integer pixel rows (0 = top).
@@ -74,7 +66,7 @@ U8G2_SH1106_128X64_NONAME_F_HW_I2C display(U8G2_R0, U8X8_PIN_NONE);
 
 // Declare here so Arduino's auto-prototype generator sees it before any function
 // that returns this type (enum must precede its first use in generated .cpp).
-enum BtnEvent { BTN_NONE, BTN_SINGLE, BTN_TRIPLE, BTN_QUAD, BTN_HOLD_2S };
+enum BtnEvent { BTN_NONE, BTN_SINGLE, BTN_DOUBLE, BTN_TRIPLE, BTN_QUAD, BTN_HOLD_2S };
 
 // Draw string starting at top-left pixel (x, y_from_top).
 static inline void dspStr(int x, int y, const char* s) {
@@ -115,33 +107,16 @@ static inline void dspPowerSave(uint8_t on) {
     if (gDisplayOk) display.setPowerSave(on);
 }
 
-// Probe and initialise the SSD1306 OLED early in setup().
+// Probe and initialise the SH1106 OLED early in setup().
+// Address is hardcoded 0x3D (confirmed by scan; SA0 pin is HIGH on this board).
+// No Wire/TWIM used — SW I2C bit-bangs GPIO directly, so TWIM never claims
+// pins D14/D15 and display works both before and after sd_softdevice_enable().
 static void initDisplay() {
     // Give the display time to power up before first I2C access.
     delay(50);
-    Wire.begin();
 
-    // Auto-detect I2C address — try 0x3D first, fall back to 0x3C.
-    // SA0 pin on SH1106 sets address: HIGH=0x3D, LOW=0x3C.
-    uint8_t foundAddr = 0;
-    for (uint8_t a : {(uint8_t)0x3D, (uint8_t)0x3C}) {
-        Wire.beginTransmission(a);
-        Wire.write(0x00);   // avoids TWIM_109 errata (MAXCNT=0 corrupts TX)
-        if (Wire.endTransmission() == 0) { foundAddr = a; break; }
-    }
-
-    if (foundAddr == 0) {
-        // No display found — 4 fast blinks so the user can see it without serial.
-        for (int i = 0; i < 4; i++) {
-            NRF_P1->OUTSET = (1u<<1); delay(80);
-            NRF_P1->OUTCLR = (1u<<1); delay(80);
-        }
-        Serial.println("[DISP] ERROR: no SH1106 found at 0x3D or 0x3C"); Serial.flush();
-        return;   // gDisplayOk stays false
-    }
-    Serial.printf("[DISP] SH1106 found at 0x%02X\n", foundAddr); Serial.flush();
-
-    display.setI2CAddress(foundAddr << 1);
+    // SH1106 address 0x3D (7-bit) → 0x7A (8-bit as U8G2 expects).
+    display.setI2CAddress(0x3D << 1);
     if (!display.begin()) {
         // begin() failed — 6 fast blinks.
         for (int i = 0; i < 6; i++) {
@@ -155,7 +130,7 @@ static void initDisplay() {
     display.setPowerSave(0);
     display.setFont(u8g2_font_6x10_tf);
     gDisplayOk = true;
-    Serial.printf("[DISP] init OK (addr=0x%02X)\n", foundAddr); Serial.flush();
+    Serial.println("[DISP] init OK (SW I2C, addr=0x3D)"); Serial.flush();
 }
 // Show 1-2 centred status lines.  No-op if display not found.
 static void dspStatus(const char* line1, const char* line2 = nullptr) {
@@ -167,154 +142,29 @@ static void dspStatus(const char* line1, const char* line2 = nullptr) {
     display.sendBuffer();
 }
 
-#if ENABLE_BLE
-// ── SVC Dispatcher: SoftDevice SVC forwarding ────────────────────────────────
-// The meshcore-dev BSP fork's FreeRTOSConfig.h defines:
-//   #define vPortSVCHandler SVC_Handler
-// This makes port.c compile the naked FreeRTOS task-start handler as the ONLY
-// SVC_Handler.  SoftDevice API calls (sd_softdevice_enable etc.) use SVC 0x10+;
-// hitting the FreeRTOS handler with those numbers corrupts CPU state → HardFault.
-//
-// Fix (no BSP modification): relocate the vector table to RAM, replace the SVC
-// slot (entry 11) with svc_dispatch, and update SCB->VTOR.
-//   SVC 0   → original FreeRTOS handler (task-start, called once at scheduler init)
-//   SVC ≥ 1 → MBR SVC_Handler at *(uint32_t*)0x0000002C (nRF52840 always-present)
-//             The MBR routes the call to S140 before / at SD enable time.
-//             After sd_softdevice_enable(), the SD installs itself in VTOR and
-//             intercepts all SD SVCs directly — svc_dispatch is no longer used.
-
-#define VTOR_NUM_VECTORS  80U   // nRF52840: 16 Cortex-M4 core + 64 peripheral IRQs
-static uint32_t g_ramVectors[VTOR_NUM_VECTORS] __attribute__((aligned(512)));
-// C linkage so the inline assembly pseudo-instruction "ldr r0, =name" can find it.
-extern "C" uint32_t g_freeRtosSvcHandler;
-uint32_t g_freeRtosSvcHandler;
-// Forward declaration — defined later in this file, installed into g_ramVectors[3].
-extern "C" void HardFault_Handler(void);
-
-static __attribute__((naked)) void svc_dispatch(void) {
-    __asm volatile (
-        // Determine caller stack: PSP (thread mode) or MSP (handler mode).
-        "tst    lr, #4          \n"
-        "ite    eq              \n"
-        "mrseq  r0, msp         \n"
-        "mrsne  r0, psp         \n"
-        // Stacked PC is at frame offset +24.
-        // The SVC instruction that caused the exception is 2 bytes before PC.
-        "ldr    r1, [r0, #24]   \n"
-        "ldrb   r2, [r1, #-2]   \n"   // SVC immediate (0-255)
-        // SVC 0 = FreeRTOS (first-task start) — tail-call the saved handler.
-        "cmp    r2, #0          \n"
-        "bne    1f              \n"
-        "ldr    r0, =g_freeRtosSvcHandler \n"
-        "ldr    r0, [r0]        \n"
-        "bx     r0              \n"
-        // SVC ≥ 1 = SoftDevice — forward DIRECTLY to S140's own SVC_Handler.
-        // S140 vector table base is 0x1000; SVC_Handler is entry 11 → offset 0x2C.
-        // So S140's SVC_Handler address lives at 0x102C.
-        //
-        // NOTE: We do NOT route through the MBR's SVC_Handler (at *(0x002C)).
-        // The MBR's handler for SVC != 0x18 reads the *registered* app-vector-table
-        // base (0x27000, set by the bootloader) and jumps to FLASH[0x27000+0x2C] =
-        // vPortSVCHandler in the flash table — completely wrong for SD SVCs.
-        // Going directly to S140's SVC_Handler bypasses that broken path.
-        "1:                     \n"
-        "movs   r0, #0x10       \n"   // r0 = 0x10
-        "lsls   r0, r0, #8      \n"   // r0 = 0x1000 (S140 vector table base)
-        "ldr    r0, [r0, #0x2C] \n"   // r0 = *(0x102C) = S140's SVC_Handler
-        "bx     r0              \n"
-    );
-}
-
-// Call once from setup() before any sd_* API call.
-static void install_svc_dispatcher(void) {
-    const uint32_t* vt = (const uint32_t*)SCB->VTOR;
-    for (uint32_t i = 0; i < VTOR_NUM_VECTORS; ++i)
-        g_ramVectors[i] = vt[i];
-    // Save the FreeRTOS SVC_Handler (entry 11) and replace with our dispatcher.
-    g_freeRtosSvcHandler = g_ramVectors[11];
-    g_ramVectors[11] = ((uint32_t)svc_dispatch) | 1u;   // Thumb bit set
-    // Also install our custom HardFault handler (entry 3) for diagnostics.
-    g_ramVectors[3]  = ((uint32_t)HardFault_Handler) | 1u;
-    // Commit: memory barrier then update VTOR.
-    __DMB();
-    SCB->VTOR = (uint32_t)g_ramVectors;
-    __DSB();
-    __ISB();
-    // Diagnostic: read S140 SVC_Handler address from 0x102C.
-    // If ACL-protected, this causes a HardFault (printed by our handler above).
-    uint32_t s140svc = *(volatile const uint32_t*)0x102CUL;
-    Serial.printf("[SVC] g_ramVectors=0x%08X VTOR=0x%08X 0x102C=0x%08X\n",
-                  (unsigned)g_ramVectors, (unsigned)SCB->VTOR, (unsigned)s140svc);
-    Serial.println("[SVC] dispatcher installed (SD SVC forwarding active)");
-    Serial.flush();
-}
-#endif // ENABLE_BLE
-
-#if ENABLE_BLE
-// ── HardFault handler ───────────────────────────────────────────────────────
-// Print stacked PC, LR, CFSR on HardFault then reset. Installed via g_ramVectors
-// noinit section survives soft reset — used to pass fault info to next boot.
-#define FAULT_MAGIC 0xBEEFDEADU
-__attribute__((section(".noinit"))) static uint32_t gFaultMagic;
-__attribute__((section(".noinit"))) static uint32_t gFaultPC;
-__attribute__((section(".noinit"))) static uint32_t gFaultLR;
-__attribute__((section(".noinit"))) static uint32_t gFaultCFSR;
-__attribute__((section(".noinit"))) static uint32_t gFaultHFSR;
-// BLE init step tracker — survives reset so we can print it on next boot.
-// Written before each sd_* call; read on next boot via printBleStep().
-#define BLE_STEP_MAGIC 0xBEEC0FFEU
-__attribute__((section(".noinit"))) static uint32_t gBleStepMagic;
-__attribute__((section(".noinit"))) static uint32_t gBleStep;  // last reached step
-__attribute__((section(".noinit"))) static uint32_t gBleRc;    // last error code
-
-// (VTOR relocation) so it overrides the weak BSP stub.
-// IMPORTANT: This runs in exception context — NO delay(), NO vTaskDelay(), NO Serial.
-// delay() calls vTaskDelay() which is illegal from an ISR and triggers configASSERT,
-// hanging the device silently. We only write to noinit RAM then reset; the
-// [FAULT-PREV] block at the top of setup() prints everything on the next boot.
-static void __attribute__((noinline)) hardFaultPrint(uint32_t* frame, uint32_t lr) {
-    gFaultPC    = frame[6];
-    gFaultLR    = frame[5];
-    gFaultCFSR  = SCB->CFSR;
-    gFaultHFSR  = SCB->HFSR;
-    gFaultMagic = FAULT_MAGIC;
-    // Blink 5 fast times using raw registers (safe in exception context)
-    NRF_P1->DIRSET = (1u<<1);
-    for (int i = 0; i < 5; i++) {
-        NRF_P1->OUTSET = (1u<<1); for(volatile uint32_t d=0; d<3200000u; d++) {}
-        NRF_P1->OUTCLR = (1u<<1); for(volatile uint32_t d=0; d<3200000u; d++) {}
-    }
-    NVIC_SystemReset();
-}
-extern "C" void __attribute__((naked)) HardFault_Handler(void) {
-    __asm volatile(
-        "tst    lr, #4   \n"
-        "ite    eq       \n"
-        "mrseq  r0, msp  \n"
-        "mrsne  r0, psp  \n"
-        "mov    r1, lr   \n"
-        "b      %0       \n"
-        : : "i"(hardFaultPrint) : "r0", "r1"
-    );
-}
-#endif // ENABLE_BLE
-
 // ── BLE state ────────────────────────────────────────────────────────────────
-#if ENABLE_BLE
-static BLEUart                bleuart;
-static uint16_t               bleConnHandle    = BLE_CONN_HANDLE_INVALID;
-static bool                   blePhoneSeen     = false;
-static unsigned long          lastBleRxMs      = 0;
-static char                   bleRxLine[256]   = {};
-static volatile bool          bleRxPending     = false;
-static String                 bleInBuf         = "";
-#else
-// BLE disabled — minimal stubs so non-BLE code compiles unchanged.
-static bool                   blePhoneSeen     = false;
-static unsigned long          lastBleRxMs      = 0;
-static char                   bleRxLine[256]   = {};
-static volatile bool          bleRxPending     = false;
-#endif
+// Modelled directly on MeshCore's SerialBLEInterface (nrf52/SerialBLEInterface.cpp).
+// No PIN/pairing — open NUS (Nordic UART Service).  BLE is initialised last in
+// setup(), after all other hardware, mirroring MeshCore's setup() ordering.
+static BLEUart  bleuart;
+static bool     blePhoneSeen          = false;
+static String   bleInBuf              = "";
+static volatile bool bleRxPending     = false;
+static char     bleRxLine[512]        = {};
+static bool     bleAdvertisingStarted = false;
+static unsigned long lastBleHealthMs  = 0;
+#define BLE_HEALTH_INTERVAL_MS 10000UL
+
+
+
+// BLE connection params (from MeshCore): units 1.25 ms / 10 ms.
+#define BLE_MIN_CONN_INTERVAL  12   // 15 ms
+#define BLE_MAX_CONN_INTERVAL  24   // 30 ms
+#define BLE_SLAVE_LATENCY       4
+#define BLE_CONN_SUP_TIMEOUT  200   // 2000 ms
+
+static void setupBLE();
+static void bleSendLine(const String& line);
 
 // ── USB Serial state ──────────────────────────────────────────────────────────
 static String         usbInBuf            = "";
@@ -402,12 +252,154 @@ bool sendEmergency(String lat = "", String lng = "", String alt = "",
 static float readVbat();
 static int batteryPercent(float vbat);
 static bool isPhoneConnected();
-#if ENABLE_BLE
-static void setupBLE();
-static void bleSendLine(const String& line);
-#else
-static inline void bleSendLine(const String&) {}  // no-op when BLE disabled
-#endif
+
+// ── SVC dispatch & fault handling ────────────────────────────────────────────
+// Strong SVC_Handler overrides the BSP's weak vPortSVCHandler (port.c patched).
+// Routes: MSP path / SVC 0 → FreeRTOS first-task restore (vPortStartFirstTask)
+//         PSP path, SVC >0 → SoftDevice handler at *(0x102C)
+// After sd_softdevice_enable(), VTOR=0x00000000 (MBR routing); all subsequent
+// SD SVC calls go MBR→SD directly — no RAM VT needed.
+extern "C" { extern void * volatile pxCurrentTCB; }
+
+extern "C" __attribute__((naked, used)) void SVC_Handler(void) {
+    __asm volatile (
+        "tst   lr, #0x04         \n"   // EXC_RETURN bit2: 0=MSP, 1=PSP
+        "beq   1f                \n"   // MSP → FreeRTOS first-task start
+        "mrs   r0, psp           \n"
+        "ldr   r1, [r0, #0x18]   \n"   // stacked PC
+        "ldrb  r2, [r1, #-2]     \n"   // SVC immediate byte
+        "cmp   r2, #0            \n"
+        "bne   2f                \n"   // SVC>0 → SD
+        "1:                      \n"
+        "ldr   r3, =pxCurrentTCB \n"
+        "ldr   r1, [r3]          \n"
+        "ldr   r0, [r1]          \n"
+        "ldmia r0!, {r4-r11, r14}\n"
+        "msr   psp, r0           \n"
+        "isb                     \n"
+        "mov   r0, #0            \n"
+        "msr   basepri, r0       \n"
+        "bx    r14               \n"
+        "2:                      \n"
+        "ldr   r1, =0x102C       \n"
+        "ldr   r1, [r1]          \n"
+        "bx    r1               \n"
+    );
+}
+
+// Override BSP's HardFault_Handler (NVIC_SystemReset) with SOS LED blinks
+// so a fault is visible without a serial monitor.  debug.cpp patched weak.
+extern "C" void HardFault_Handler(void) {
+    NRF_P1->DIRSET = (1u << 1);
+    while (true) {
+        for (int i=0;i<3;i++){NRF_P1->OUTSET=(1u<<1);for(volatile uint32_t d=0;d<1920000u;d++){}NRF_P1->OUTCLR=(1u<<1);for(volatile uint32_t d=0;d<1920000u;d++){}}
+        for(volatile uint32_t d=0;d<3840000u;d++){}
+        for (int i=0;i<3;i++){NRF_P1->OUTSET=(1u<<1);for(volatile uint32_t d=0;d<6400000u;d++){}NRF_P1->OUTCLR=(1u<<1);for(volatile uint32_t d=0;d<3200000u;d++){}}
+        for(volatile uint32_t d=0;d<3840000u;d++){}
+        for (int i=0;i<3;i++){NRF_P1->OUTSET=(1u<<1);for(volatile uint32_t d=0;d<1920000u;d++){}NRF_P1->OUTCLR=(1u<<1);for(volatile uint32_t d=0;d<1920000u;d++){}}
+        for(volatile uint32_t d=0;d<9600000u;d++){}
+    }
+}
+
+static void ble_on_connect(uint16_t /*conn_handle*/) {
+    blePhoneSeen = true;
+    usbConnectDisplayPending = true;
+    Serial.println("[BLE] connected"); Serial.flush();
+    broadcast("CDK:ID,VALUE:" DUCK_NAME);
+    sendBattery();
+}
+
+static void ble_on_disconnect(uint16_t /*conn_handle*/, uint8_t reason) {
+    blePhoneSeen = false;
+    usbDisconnectDisplayPending = true;
+    bleInBuf = "";
+    Serial.printf("[BLE] disconnected reason=0x%02X\n", reason); Serial.flush();
+}
+
+static void ble_uart_rx_cb(uint16_t /*conn_handle*/) {
+    // Called from BLE task context — buffer the line, set flag for loop().
+    while (bleuart.available()) {
+        char c = (char)bleuart.read();
+        if (c == '\n') {
+            if (bleInBuf.length() > 0) {
+                bleInBuf.toCharArray(bleRxLine, sizeof(bleRxLine));
+                bleRxPending = true;
+            }
+            bleInBuf = "";
+        } else if (c != '\r') {
+            if (bleInBuf.length() < (sizeof(bleRxLine) - 2))
+                bleInBuf += c;
+        }
+    }
+}
+
+static void bleSendLine(const String& line) {
+    if (!blePhoneSeen || !Bluefruit.connected()) return;
+    String payload = line.endsWith("\n") ? line : line + "\n";
+    bleuart.write((const uint8_t*)payload.c_str(), payload.length());
+}
+
+static bool bleIsAdvertising() {
+    ble_gap_addr_t addr;
+    return (sd_ble_gap_adv_addr_get(0, &addr) == NRF_SUCCESS);
+}
+
+// Called last in setup() — after Serial, display, GPS, CDP/LoRa are all stable.
+static void setupBLE() {
+    // Disable ConnLed: D12 is the BUZZER on Wio Tracker L1, not an LED.
+    // Without this, _startConnLed() fires a 4 Hz FreeRTOS timer that clicks the buzzer.
+    Bluefruit.autoConnLed(false);
+    Bluefruit.configPrphBandwidth(BANDWIDTH_MAX);
+    bool ble_ok = Bluefruit.begin(1, 0);
+    // Enable DC-DC — must be after begin() (SD must be running first).
+    // Reduces coil-whine from RADIO current spikes during advertising.
+    sd_power_dcdc_mode_set(NRF_POWER_DCDC_ENABLE);
+    if (!ble_ok) {
+        dspStatus("BLE FAIL", "begin()");
+        Serial.println("[BLE] begin() FAILED"); Serial.flush();
+        return;
+    }
+    Serial.println("[BLE] begin() OK"); Serial.flush();
+
+    // ── PPCP + name ──────────────────────────────────────────────────────────
+    ble_gap_conn_params_t ppcp;
+    ppcp.min_conn_interval = BLE_MIN_CONN_INTERVAL;
+    ppcp.max_conn_interval = BLE_MAX_CONN_INTERVAL;
+    ppcp.slave_latency     = BLE_SLAVE_LATENCY;
+    ppcp.conn_sup_timeout  = BLE_CONN_SUP_TIMEOUT;
+    sd_ble_gap_ppcp_set(&ppcp);
+    Bluefruit.setTxPower(4);
+    Bluefruit.setName(DUCK_NAME);
+
+    // ── callbacks + NUS UART ─────────────────────────────────────────────────
+    Bluefruit.Periph.setConnectCallback(ble_on_connect);
+    Bluefruit.Periph.setDisconnectCallback(ble_on_disconnect);
+    bleuart.begin();
+    bleuart.setRxCallback(ble_uart_rx_cb);
+
+    // ── advertising ──────────────────────────────────────────────────────────
+    Bluefruit.Advertising.addFlags(BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE);
+    Bluefruit.Advertising.addTxPower();
+    Bluefruit.Advertising.addService(bleuart);
+    Bluefruit.ScanResponse.addName();
+    Bluefruit.Advertising.restartOnDisconnect(true);
+    // Fast interval 160×0.625ms=100ms (was 20ms) — reduces coil-whine tick rate
+    // while still being discoverable. Slow interval 244×0.625ms≈152ms unchanged.
+    // Fast timeout 10s (was 30s) — switches to slow mode sooner.
+    Bluefruit.Advertising.setInterval(160, 244);
+    Bluefruit.Advertising.setFastTimeout(10);
+
+    if (!Bluefruit.Advertising.start(0)) {
+        Serial.println("[BLE] Advertising.start() FAILED"); Serial.flush();
+        dspStatus("BLE FAIL", "adv.start()");
+        return;
+    }
+    bleAdvertisingStarted = true;
+    lastBleHealthMs = millis();
+    sd_power_gpregret_clr(0, 0xFF);
+    dspStatus("ADV STARTED!", DUCK_NAME);
+    Serial.println("[BLE] advertising as '" DUCK_NAME "'"); Serial.flush();
+}
 
 // ── Busy-wait LED blink helper ─────────────────────────────────────────────
 // Works without FreeRTOS tick or any library.  LED is D11 = P1.01.
@@ -420,186 +412,19 @@ static inline void bleSendLine(const String&) {}  // no-op when BLE disabled
     for(volatile uint32_t _d=0;_d<32000000u;_d++){} \
 } while(0)
 
-#if ENABLE_BLE
-// ── Bluefruit BLE implementation ─────────────────────────────────────────────
-//
-// Bluefruit.begin() handles the complete SD + BLE enable sequence:
-//   usb_softdevice_pre_enable()  → nrfx_power teardown (same 3 calls as before)
-//   sd_softdevice_enable()       → S140 v7, RC clock (USE_LFRC from variant.h)
-//   usb_softdevice_post_enable() → re-register USB power events via SD
-//   sd_ble_cfg_set() + sd_ble_enable()
-// Bluefruit's internal adafruit_soc_task FreeRTOS task handles SD SOC events
-// (USB power reconnect) and BLE events, replacing our manual ble_soc_task.
-
-// Connect / disconnect callbacks — called from Bluefruit's event task context.
-static void bleConnectCb(uint16_t conn_handle) {
-    bleConnHandle = conn_handle;
-    blePhoneSeen  = true;
-    dspStatus("Connected", DUCK_NAME);
-    Serial.printf("[BLE] Phone connected (h=%u)\n", conn_handle); Serial.flush();
-}
-static void bleDisconnectCb(uint16_t conn_handle, uint8_t reason) {
-    (void)conn_handle;
-    bleConnHandle = BLE_CONN_HANDLE_INVALID;
-    blePhoneSeen  = false;
-    dspStatus("Advertising", DUCK_NAME);
-    Serial.printf("[BLE] Disconnected (reason=0x%02X)\n", reason); Serial.flush();
-}
-
-// BLE UART RX callback — called from Bluefruit event task when data arrives.
-static void bleUartRxCb(uint16_t /*conn_handle*/) {
-    while (bleuart.available()) {
-        char c = (char)bleuart.read();
-        if (c == '\n') {
-            if (!bleRxPending) {
-                strncpy(bleRxLine, bleInBuf.c_str(), sizeof(bleRxLine)-1);
-                bleRxLine[sizeof(bleRxLine)-1] = '\0';
-                bleRxPending = true;
-            }
-            bleInBuf = "";
-        } else if (c != '\r') {
-            bleInBuf += c;
-        }
-    }
-    lastBleRxMs = millis();
-}
-
-// Send a text line to the connected phone via NUS TX notifications.
-static void bleSendLine(const String& line) {
-    if (!bleuart.notifyEnabled()) return;
-    String payload = line.endsWith("\n") ? line : line + "\n";
-    bleuart.write((const uint8_t*)payload.c_str(),
-                  (size_t)min((int)payload.length(), 512));
-}
-
-// Enable BLE stack, register NUS, start advertising.
-static void setupBLE() {
-    Serial.println("[BLE] setupBLE() entered"); Serial.flush();
-    if (*(volatile const uint32_t*)0x00001000U == 0xFFFFFFFFU) {
-        Serial.println("[BLE] S140 not in flash — BLE disabled"); return;
-    }
-    Serial.println("[BLE] S140 found"); Serial.flush();
-    dspStatus("BLE init", nullptr);
-
-    gBleStepMagic = BLE_STEP_MAGIC;
-    gBleStep = 0; gBleRc = 0;
-
-    // Bluefruit.begin(peripheral, central) calls usb_softdevice_pre_enable() then
-    // sd_softdevice_enable() then usb_softdevice_post_enable() then sd_ble_enable().
-    // This is the BSP-native path — no manual TWIM0/PSEL teardown needed or wanted.
-    //
-    // ── Priority-3 IRQ quarantine ─────────────────────────────────────────────
-    // S140 sd_softdevice_enable() returns NRF_ERROR_SDM_INCORRECT_INTERRUPT_CONFIGURATION
-    // if ANY application IRQ is enabled at priority 0–4 when it is called.
-    // Three BSP drivers set their IRQs to priority 3 and may be enabled:
-    //   • Wire_nRF52.cpp:  SPIM0_SPIS0_TWIM0 at priority 3 — set by initDisplay()
-    //   • Uart.cpp:        UARTE0_UART0      at priority 3 — set by Serial1.begin()
-    //   • tusb_hal_nrf.c:  USBD_IRQn         at priority 3 — set when USB cable is
-    //                      connected; usb_softdevice_pre_enable() (called inside
-    // Quarantine only the two APP-priority IRQs (priority 3) that conflict with
-    // sd_softdevice_enable().  USBD and POWER_CLOCK must NOT be disabled here:
-    //   POWER_CLOCK — the SD and usb_softdevice_pre_enable(→nrfx_power_uninit) manage
-    //                 this IRQ; disabling it prevents the SD from detecting USB VBUS.
-    //   USBD       — TinyUSB manages this; usb_softdevice_post_enable re-enables it
-    //                 via the SD event task (tusb_hal_nrf_power_event).  Disabling it
-    //                 here breaks the USB CDC re-enumeration after SD enable.
-    Serial.println("[BLE] disabling priority-3 IRQs (TWIM0 + UARTE0 only)..."); Serial.flush();
-    NVIC_DisableIRQ(SPIM0_SPIS0_TWIM0_TWIS0_SPI0_TWI0_IRQn);  // Wire/TWIM0 at prio 3
-    NVIC_ClearPendingIRQ(SPIM0_SPIS0_TWIM0_TWIS0_SPI0_TWI0_IRQn);
-    NVIC_DisableIRQ(UARTE0_UART0_IRQn);                         // Serial/UARTE0 at prio 3
-    NVIC_ClearPendingIRQ(UARTE0_UART0_IRQn);
-    // NOTE: do NOT call vTaskSuspendAll() here.  Bluefruit.begin() creates
-    // FreeRTOS semaphores and tasks internally, and pvPortMalloc() suspends
-    // the scheduler itself for heap operations — nesting causes issues.
-
-    // Diagnostic: dump NVIC ISER so we can see which IRQs are active.
-    Serial.printf("[BLE] NVIC ISER[0]=0x%08lX ISER[1]=0x%08lX\n",
-                  (unsigned long)NVIC->ISER[0], (unsigned long)NVIC->ISER[1]);
-    Serial.flush();
-
-    gBleStep = 1;
-    // Do NOT write GPREGRET before Bluefruit.begin() — if a crash occurs before the
-    // success path clears it, the Adafruit bootloader may misinterpret the value.
-    Serial.println("[BLE] calling Bluefruit.begin..."); Serial.flush();
-    bool _bleOk = Bluefruit.begin(1, 0);
-    if (!_bleOk) {
-        gBleStep = 0x10; gBleRc = 1;
-        // SD never initialized — restore quarantined IRQs (TWIM0 + UARTE0 only).
-        NVIC_EnableIRQ(SPIM0_SPIS0_TWIM0_TWIS0_SPI0_TWI0_IRQn);
-        NVIC_EnableIRQ(UARTE0_UART0_IRQn);
-        Serial.println("[BLE] Bluefruit.begin FAILED"); Serial.flush();
-        dspStatus("BLE FAIL", "begin()");
-        BLINK_LED(8);
-        return;
-    }
-    // After sd_softdevice_enable() the SD owns NRF_POWER — direct register
-    // writes to GPREGRET etc. cause a HardFault.  Use sd_power_gpregret_set()
-    // if a post-SD GPREGRET write is ever needed.
-    // Re-enable the two quarantined app-priority IRQs.
-    // USBD + POWER_CLOCK are handled by the SD event task (usb_softdevice_post_enable).
-    NVIC_EnableIRQ(UARTE0_UART0_IRQn);                           // GPS Serial1
-    NVIC_EnableIRQ(SPIM0_SPIS0_TWIM0_TWIS0_SPI0_TWI0_IRQn);     // Wire/TWIM0
-    BLINK_LED(2); // 2 blinks: SD + BLE stack on
-
-    // Display was already initialised in initDisplay(); Wire/TWIM0 is unaffected by
-    // Bluefruit.begin() — no re-init needed.  Just update the status text.
-    dspStatus("BLE: SD on", nullptr);
-
-    gBleStep = 5;
-    Bluefruit.setName(DUCK_NAME);
-    Bluefruit.Periph.setConnectCallback(bleConnectCb);
-    Bluefruit.Periph.setDisconnectCallback(bleDisconnectCb);
-
-    // NUS service (Nordic UART Service, full 128-bit UUID) via BLEUart.
-    gBleStep = 6;
-    bleuart.setRxCallback(bleUartRxCb);
-    bleuart.begin();
-    dspStatus("BLE: stack on", nullptr);
-    BLINK_LED(4); // 4 blinks: NUS service registered
-
-    // Advertising: name in adv packet so nRF Connect sees it during passive scan.
-    // Service UUID (128-bit, 18 bytes) goes to scan response to stay under 31-byte limit.
-    // Packet breakdown: Flags(3) + TxPower(3) + Name(10) = 16 bytes ✓
-    gBleStep = 7;
-    Bluefruit.Advertising.addFlags(BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE);
-    Bluefruit.Advertising.addTxPower();
-    Bluefruit.Advertising.addName();            // device name "IBRAHIM1" in adv packet
-    Bluefruit.ScanResponse.addService(bleuart); // NUS 128-bit UUID in scan response
-    Bluefruit.Advertising.restartOnDisconnect(true);
-    Bluefruit.Advertising.setInterval(32, 244); // 20 ms fast / 152.5 ms slow
-    Bluefruit.Advertising.setFastTimeout(30);   // fast mode for 30 s
-    bool _advOk = Bluefruit.Advertising.start(0);
-    if (!_advOk) {
-        gBleStep = 0x20;
-        Serial.println("[BLE] Advertising.start() returned FALSE"); Serial.flush();
-        dspStatus("ADV FAIL", "start() false");
-        // 3 groups of 2 blinks = advertising start failed
-        BLINK_LED(2); BLINK_LED(2); BLINK_LED(2);
-        return;  // gBleStep != 99 → setup() will catch this
-    }
-
-    dspStatus("Advertising", DUCK_NAME);
-    BLINK_LED(6); // 6 blinks: advertising CONFIRMED running
-
-    gBleStep = 99;
-    // SD owns NRF_POWER after sd_softdevice_enable — do not write GPREGRET directly.
-    Serial.printf("[BLE] Advertising as '%s' (NUS/BLEUart)\n", DUCK_NAME); Serial.flush();
-}
-#endif // ENABLE_BLE
-
 // ── Battery ADC ───────────────────────────────────────────────────────────────
 static float readVbat() {
-    // Drive BAT_CTL HIGH to enable the battery voltage-divider (active HIGH on
+    // Drive BAT_READ HIGH to enable the battery voltage-divider (active HIGH on
     // Seeed nRF52840 designs — a LOW gate keeps the switch open).
-    pinMode(BAT_CTL, OUTPUT);
-    digitalWrite(BAT_CTL, HIGH);
+    pinMode(BAT_READ, OUTPUT);
+    digitalWrite(BAT_READ, HIGH);
     delay(5);
     // analogReadResolution(ADC_RESOLUTION) is called in setup(), so
     // analogRead() returns a 14-bit value (0–16383).
-    float raw  = (float)analogRead(PIN_VBAT_READ);
+    float raw  = (float)analogRead(PIN_VBAT);
     float vbat = raw / (float)((1 << ADC_RESOLUTION) - 1) * AREF_VOLTAGE * ADC_MULTIPLIER;
-    // Return BAT_CTL pin to input (Hi-Z) to save power.
-    pinMode(BAT_CTL, INPUT);
+    // Return BAT_READ pin to input (Hi-Z) to save power.
+    pinMode(BAT_READ, INPUT);
     return vbat;
 }
 
@@ -622,7 +447,7 @@ static BtnEvent checkButton() {
     const uint32_t HOLD_MS   = 2000;
     const uint32_t CLICK_GAP = 400;   // max ms between clicks in a multi-click burst
 
-    bool btnDown = (digitalRead(PIN_BUTTON1) == LOW);  // active LOW
+    bool btnDown = (digitalRead(CANCEL_BUTTON_PIN) == LOW);  // active LOW
 
     if (btnDown && !wasDown) {
         wasDown      = true;
@@ -647,6 +472,7 @@ static BtnEvent checkButton() {
         uint8_t n  = clickCount;
         clickCount = 0;
         if      (n == 1) return BTN_SINGLE;
+        else if (n == 2) return BTN_DOUBLE;
         else if (n == 3) return BTN_TRIPLE;
         else if (n >= 4) return BTN_QUAD;
     }
@@ -656,13 +482,6 @@ static BtnEvent checkButton() {
 // ── Setup ─────────────────────────────────────────────────────────────────────
 
 void setup() {
-    // VTOR persists across NVIC_SystemReset() — only relevant when SVC dispatcher
-    // is active (ENABLE_BLE). Safe to reset regardless.
-#if ENABLE_BLE
-    SCB->VTOR = 0x27000UL;
-    __DSB(); __ISB();
-#endif
-
     // 1 LED blink = firmware is alive, setup() entered (visible before Serial init).
     // If you see no LED activity at all after reset, the firmware is not running.
     BLINK_LED(1);
@@ -675,24 +494,7 @@ void setup() {
     initDisplay();
     dspStatus("Booting...", DUCK_NAME);
 
-    // USB CDC will only enumerate AFTER Bluefruit.begin() starts the SD event task.
-    // Do not wait for it here — we initialise CDP first, BLE last.
     Serial.println("[BOOT] Seeed Wio Tracker L1 Pro MamaDuck"); Serial.flush();
-#if ENABLE_BLE
-    {
-        uint8_t gp = (uint8_t)(NRF_POWER->GPREGRET & 0xFFu);
-        if (gp & 0x80u) {
-            uint8_t step = gp & 0x7Fu;
-            Serial.printf("[BLE-PREV-GP] step=0x%02X (%u)\n", step, step); Serial.flush();
-            NRF_POWER->GPREGRET = 0;
-        }
-    }
-    if (gFaultMagic == FAULT_MAGIC) {
-        gFaultMagic = 0;
-        Serial.printf("[FAULT-PREV] PC=0x%08X LR=0x%08X CFSR=0x%08X HFSR=0x%08X\n",
-                      gFaultPC, gFaultLR, gFaultCFSR, gFaultHFSR); Serial.flush();
-    }
-#endif // ENABLE_BLE
     Serial.println("[SETUP] USB serial ready"); Serial.flush();
 
     // ADC resolution — must be called before any analogRead().
@@ -701,21 +503,27 @@ void setup() {
     analogReadResolution(ADC_RESOLUTION);
 
     // LED + Button
-    pinMode(PIN_LED,     OUTPUT);
-    digitalWrite(PIN_LED, LOW);
-    pinMode(PIN_BUTTON1, INPUT_PULLUP);   // active LOW
+    pinMode(PIN_LED1,     OUTPUT);
+    digitalWrite(PIN_LED1, LOW);
+    pinMode(CANCEL_BUTTON_PIN, INPUT_PULLUP);   // active LOW
 
     // GPS — wake the L76KB before starting Serial1
-    pinMode(PIN_GPS_WAKEUP, OUTPUT);
-    digitalWrite(PIN_GPS_WAKEUP, HIGH);   // STDBY_N high = active
+    pinMode(PIN_GPS_STANDBY, OUTPUT);
+    digitalWrite(PIN_GPS_STANDBY, HIGH);   // STDBY_N high = active
     Serial1.begin(GPS_BAUDRATE);
     Serial.println("[GPS] Serial1 started at " + String(GPS_BAUDRATE) + " baud"); Serial.flush();
+
+    // Enable all three GNSS constellations for faster and more reliable signal acquisition.
+    // The L76KB default is GPS-only; adding GLONASS + BeiDou roughly triples visible satellites.
+    // PMTK353: GPS(1) + GLONASS(1) + BeiDou(1) + Galileo(0) + NAVIC(0) — checksum 0x2A verified.
+    delay(100);  // brief settle time after module power-on
+    Serial1.println("$PMTK353,1,1,1,0,0*2A");
+    delay(50);
 
     // initDisplay() + dspStatus("Booting...") were moved to before the Serial
     // wait at the top of setup() so the display always shows content on boot.
 
     // ── CDP init (LoRa / routing / storage) ─────────────────────────────────
-    // Do this BEFORE BLE so LoRa and I2C are stable before sd_softdevice_enable.
     dspStatus("CDP init", DUCK_NAME);
     if (duck.setupWithDefaults() != DUCK_ERR_NONE) {
         BLINK_LED(10);  // 10 blinks = CDP setup failed
@@ -731,45 +539,8 @@ void setup() {
     dspStatus("CDP OK", DUCK_NAME);
     Serial.println("[MAMA] CDP OK"); Serial.flush();
 
-#if ENABLE_BLE
-    // ── BLE last (SoftDevice + NUS advertising) ───────────────────────────────
-    display.setI2CAddress(0x3D << 1);
-    display.begin();
-    display.setContrast(255);
-    display.setPowerSave(0);
-    display.setFont(u8g2_font_6x10_tf);
-    dspStatus("BLE init", DUCK_NAME);
-
-    Serial.println("[SETUP] calling install_svc_dispatcher..."); Serial.flush();
-    install_svc_dispatcher();
-    Serial.println("[SETUP] install_svc_dispatcher done"); Serial.flush();
-
-    Serial.println("[SETUP] calling setupBLE..."); Serial.flush();
-    setupBLE();
-    Serial.println("[SETUP] setupBLE returned"); Serial.flush();
-
-    // Third display init: after SoftDevice is fully up.
-    display.setI2CAddress(0x3D << 1);
-    display.begin();
-    display.setContrast(255);
-    display.setPowerSave(0);
-    display.setFont(u8g2_font_6x10_tf);
-
-    if (gBleStep != 99u) {
-        Serial.printf("[BLE] init failed at step 0x%02X\n", (unsigned)gBleStep); Serial.flush();
-        char dspFail[22];
-        snprintf(dspFail, sizeof(dspFail), "step=%02X", (unsigned)gBleStep);
-        dspStatus("BLE FAIL", dspFail);
-        BLINK_LED(8);
-    } else {
-        BLINK_LED(3); BLINK_LED(3);
-        dspStatus("BLE OK", DUCK_NAME);
-        Serial.println("[BLE] init OK"); Serial.flush();
-    }
-    delay(300);
-#else
-    // BLE disabled — re-init display after CDP/LoRa are stable then show ready.
-    // Only reinit if the first initDisplay() succeeded (address already known).
+    // Re-init display after CDP/LoRa are stable (before BLE, which may
+    // also disturb I2C — setupBLE() does a second re-init after begin()).
     if (gDisplayOk) {
         display.begin();
         display.setContrast(255);
@@ -778,7 +549,17 @@ void setup() {
         dspStatus("CDP Ready", DUCK_NAME);
     }
     BLINK_LED(3);
-#endif // ENABLE_BLE
+
+    // BLE init goes last — same order as MeshCore (radio/filesystem first,
+    // BLE last).  setupBLE() calls Bluefruit.begin() and starts advertising.
+    setupBLE();
+
+    // Re-assert GPS wakeup — BLE init can take several hundred ms.
+    digitalWrite(PIN_GPS_STANDBY, HIGH);
+
+    // Re-configure button — defensive in case BLE/SD peripheral init disturbed it.
+    pinMode(CANCEL_BUTTON_PIN, INPUT_PULLUP);
+
     Serial.println("[MAMA] Setup complete"); Serial.flush();
     Serial.println("CDK:ID,VALUE:" DUCK_NAME);
     sendBattery();
@@ -798,8 +579,8 @@ void loop() {
     if (!loopEntryBlinked) {
         loopEntryBlinked = true;
         for (int _i = 0; _i < 7; _i++) {
-            digitalWrite(PIN_LED, HIGH); delay(50);
-            digitalWrite(PIN_LED, LOW);  delay(50);
+            digitalWrite(PIN_LED1, HIGH); delay(50);
+            digitalWrite(PIN_LED1, LOW);  delay(50);
         }
         delay(400);
     }
@@ -811,7 +592,7 @@ void loop() {
     // Wait up to 5 s for the serial monitor to attach so [DISP] logs are visible.
     static unsigned long loopFirstMs = 0;
     if (loopFirstMs == 0) loopFirstMs = millis();
-    if (!Serial && millis() - loopFirstMs < 5000) return;
+    if (!Serial && millis() - loopFirstMs < 500) return;
 
     static bool displayProbed = false;
     if (!displayProbed) {
@@ -823,7 +604,7 @@ void loop() {
             dspStrCenter(36, "CDP MAMADUCKLING");
             dspStrCenter(48, "nRF52840 / SX1262");
             dspEnd();
-            delay(3000);
+            delay(1000);
             displayHome();
         }
     }
@@ -1070,6 +851,23 @@ void loop() {
         }
     }
 
+    // ── BLE incoming (dispatched from ble_uart_rx_cb ISR-context) ──────────────
+    if (bleRxPending) {
+        String line = String(bleRxLine);
+        bleRxPending = false;
+        if (line.startsWith("CDK:")) handleFrame(line);
+    }
+
+    // BLE advertising watchdog — mirrors MeshCore's health-check logic.
+    if (bleAdvertisingStarted && !Bluefruit.connected() &&
+        millis() - lastBleHealthMs >= BLE_HEALTH_INTERVAL_MS) {
+        lastBleHealthMs = millis();
+        if (!bleIsAdvertising()) {
+            Serial.println("[BLE] watchdog: restarting advertising"); Serial.flush();
+            Bluefruit.Advertising.start(0);
+        }
+    }
+
     while (Serial.available()) {
         lastUsbRxMs = millis();
         char c = Serial.read();
@@ -1084,23 +882,6 @@ void loop() {
             usbInBuf += c;
         }
     }
-
-    // ── BLE incoming (line dispatched from ble_soc_task) ──────────────────────
-#if ENABLE_BLE
-    if (bleRxPending) {
-        String line = String(bleRxLine);
-        bleRxPending = false;
-        if (line.startsWith("CDK:")) {
-            if (!blePhoneSeen) usbConnectDisplayPending = true;
-            blePhoneSeen = true;
-        }
-        handleFrame(line);
-    }
-    if (blePhoneSeen && lastBleRxMs > 0 && millis() - lastBleRxMs > USB_IDLE_TIMEOUT_MS) {
-        blePhoneSeen = false;
-        usbDisconnectDisplayPending = true;
-    }
-#endif // ENABLE_BLE
 
     // Periodic battery update every 60 s.
     if (millis() - lastBattMs >= 60000UL) {
@@ -1420,7 +1201,7 @@ void displayHome() {
     dspBegin();
     dspStr(0, 0, ("BATT:" + String(batteryPercent(readVbat())) + "%").c_str());
     dspStrRight(0, idBuf);
-    // Signal / TX status
+    // Signal / TX status (no percentage — keeps the line short)
     String sigStr;
     if      (lastSignalPct >= 0 && lastSignalPct <= 25) sigStr = "SIG: LEMAH ("   + String(lastSignalPct) + "%)";
     else if (lastSignalPct >= 0 && lastSignalPct <= 50) sigStr = "SIG: CUKUP ("   + String(lastSignalPct) + "%)";
@@ -1429,10 +1210,21 @@ void displayHome() {
     else if (lastTxResult == 0)                         sigStr = "BERJAYA HANTAR";
     else if (lastTxResult >  0)                         sigStr = "GAGAL HANTAR";
     else                                                sigStr = "SIG: TIADA ISYARAT";
-    dspStrCenter(12, sigStr.c_str());
-    dspStrCenter(26, "TEKAN BUTANG ATAS");
-    dspStrCenter(38, "SELAMA DUA SAAT UTK");
-    dspStrCenter(50, "ISYARAT KECEMASAN");
+    dspStrCenter(13, sigStr.c_str());
+    // GPS status
+    char gpsLine[22];
+    if (!gpsModuleDetected) {
+        strncpy(gpsLine, "GPS: TIADA MODUL", sizeof(gpsLine));
+    } else if (tinyGps.location.isValid() && tinyGps.location.age() < 5000UL) {
+        snprintf(gpsLine, sizeof(gpsLine), "GPS: FIX %uSAT",
+                 (unsigned)(tinyGps.satellites.isValid() ? tinyGps.satellites.value() : 0));
+    } else {
+        snprintf(gpsLine, sizeof(gpsLine), "GPS: CARI %uSAT",
+                 (unsigned)(tinyGps.satellites.isValid() ? tinyGps.satellites.value() : 0));
+    }
+    dspStrCenter(26, gpsLine);
+    dspStrCenter(40, "TEKAN BUTANG ATAS");
+    dspStrCenter(53, "2 SAAT = KECEMASAN");
     dspEnd();
 }
 
@@ -1478,18 +1270,18 @@ void displayAnnouncement(const String& msg) {
 // ── LED ───────────────────────────────────────────────────────────────────────
 void flashLED() {
     for (int i = 0; i < 5; i++) {
-        digitalWrite(PIN_LED, HIGH);
+        digitalWrite(PIN_LED1, HIGH);
         delay(200);
-        digitalWrite(PIN_LED, LOW);
+        digitalWrite(PIN_LED1, LOW);
         delay(200);
     }
 }
 
 void blinkLed(int times) {
     for (int n = 0; n < times; n++) {
-        digitalWrite(PIN_LED, HIGH);
+        digitalWrite(PIN_LED1, HIGH);
         { unsigned long t = millis(); while (millis() - t < 200) { duck.run(); delay(5); } }
-        digitalWrite(PIN_LED, LOW);
+        digitalWrite(PIN_LED1, LOW);
         { unsigned long t = millis(); while (millis() - t < 200) { duck.run(); delay(5); } }
     }
 }
@@ -1566,7 +1358,7 @@ static bool isPhoneConnected() {
 void broadcast(const String& frame) {
     String payload = frame.endsWith("\n") ? frame : frame + "\n";
     Serial.print(payload);
-    bleSendLine(payload);   // no-op if BLE is not connected
+    bleSendLine(payload);
 }
 
 // ── Frame dispatcher ──────────────────────────────────────────────────────────

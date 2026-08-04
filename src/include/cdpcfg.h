@@ -21,6 +21,7 @@
 #include "boards/ttgo_t_beam_v1_sx1276.h"
 #include "boards/lilygo_t_beam_supreme_sx1262.h"
 #include "boards/lilygo_sim7000g_lora.h"
+#include "boards/seeed_wio_tracker_l1.h"
 #endif
 
 // version definitions
@@ -96,43 +97,6 @@
 #define CDPCFG_PIN_RGBLED_G 4
 /// CDP RGB Led BLUE Pin default value
 #define CDPCFG_PIN_RGBLED_B 2
-
-/// CDP Channel Frequencies
-/// AS923 channels (200 kHz spacing) monitored by the SX1302 multi-SF
-/// demodulators at PapaDuck.
-///
-/// CDPCFG_RADIO_CHANNEL_1 (922.8 MHz) is the shared **mesh channel** used
-/// by all ducks for inter-duck communication and for relaying packets.
-/// Channels 2–8 are **uplink-only** channels used exclusively by originating
-/// MamaDucks when transmitting Papa-bound packets (see CDPCFG_UPLINK_CHANNEL_POOL).
-#define CDPCFG_RADIO_CHANNEL_1 CDPCFG_RF_LORA_FREQ  // 922.8 — mesh channel
-#define CDPCFG_RADIO_CHANNEL_2 922.6f
-#define CDPCFG_RADIO_CHANNEL_3 922.4f
-#define CDPCFG_RADIO_CHANNEL_4 922.2f
-#define CDPCFG_RADIO_CHANNEL_5 922.0f
-#define CDPCFG_RADIO_CHANNEL_6 921.8f
-#define CDPCFG_RADIO_CHANNEL_7 921.6f
-#define CDPCFG_RADIO_CHANNEL_8 921.4f
-
-/// Uplink channel pool — all 8 AS923 channels monitored by the SX1302.
-///
-/// A duck picks randomly from this pool *only* when it is the original
-/// sender of a Papa-bound packet (CdpPacket::sduid == this duck's duid).
-/// Relayed packets — including those being relayed toward PapaDuck —
-/// are always transmitted on CDPCFG_RADIO_CHANNEL_1 (922.8 MHz) so that
-/// intermediate MamaDucks can still receive and forward them on the
-/// shared mesh channel.
-static const float CDPCFG_UPLINK_CHANNEL_POOL[] = {
-    CDPCFG_RADIO_CHANNEL_1,   // 922.8
-    CDPCFG_RADIO_CHANNEL_2,   // 922.6
-    CDPCFG_RADIO_CHANNEL_3,   // 922.4
-    CDPCFG_RADIO_CHANNEL_4,   // 922.2
-    CDPCFG_RADIO_CHANNEL_5,   // 922.0
-    CDPCFG_RADIO_CHANNEL_6,   // 921.8
-    CDPCFG_RADIO_CHANNEL_7,   // 921.6
-    CDPCFG_RADIO_CHANNEL_8,   // 921.4
-};
-#define CDPCFG_UPLINK_CHANNEL_COUNT 8
 
 // CDP Acceptable Signal Ranges
 #define RSSI_MAX (-20.0f)

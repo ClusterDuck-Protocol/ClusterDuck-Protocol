@@ -13,12 +13,20 @@
 #include "../include/cdpcfg.h"
 #include <arduino-timer.h>
 #include <Arduino.h>
+#ifndef CDPCFG_WIFI_NONE
 #include <EEPROM.h>
+#endif
 #include <string>
 #include <vector>
 #include "DuckError.h"
 #include <functional>
+// std::thread / std::chrono are only available on targets that provide a full
+// C++11 threading implementation (Linux, ESP32).  Platforms using newlib-nano
+// (e.g., nRF52840 / ARM Cortex-M) do not ship pthreads, so we exclude the
+// Timer template class on those targets.  It is never used inside CDP itself.
+#if !defined(ARDUINO_ARCH_NRF52) && !defined(ARDUINO_ARCH_SAMD)
 #include <thread>
+#endif
 
 namespace duckutils {
 
@@ -124,7 +132,14 @@ template<typename T,size_t S>
 std::array<T,S> stringToArray(const std::string& str) {
     std::array<T,S> arr;
     if (str.size() > S) {
+#if defined(__cpp_exceptions) && __cpp_exceptions
         throw std::out_of_range("String size exceeds array size");
+#else
+        // Exceptions disabled — silently truncate to array capacity.
+        arr.fill(0);
+        for (size_t i = 0; i < S; ++i) arr[i] = static_cast<T>(str[i]);
+        return arr;
+#endif
     }
     for (size_t i = 0; i < str.size(); ++i) {
         arr[i] = static_cast<T>(str[i]);
@@ -190,6 +205,8 @@ uint32_t toUint32(const uint8_t* data);
  * 
  * @returns A Timer instance.
  */
+// Timer utility (requires std::thread / std::chrono — not available on newlib-nano targets).
+#if !defined(ARDUINO_ARCH_NRF52) && !defined(ARDUINO_ARCH_SAMD)
 template <class callable, class... arguments>
 class Timer
     {
@@ -226,9 +243,11 @@ private:
         }
 
     };
+#endif  // !ARDUINO_ARCH_NRF52 && !ARDUINO_ARCH_SAMD
 
 bool getDetectState();
 bool flipDetectState();
 
-}
-#endif
+}  // namespace duckutils
+
+#endif  // DUCKUTILS_H_

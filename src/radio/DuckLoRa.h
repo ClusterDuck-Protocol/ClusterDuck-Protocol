@@ -17,6 +17,11 @@
 #include "utils/DuckUtils.h"
 #include <RadioLib.h>
 #include <memory>
+// Arduino.h defines abs/round as macros which conflict with std::chrono on some
+// toolchains (e.g. ARM newlib-nano).  Undefine them before the include;
+// Arduino.h's include guard prevents re-definition when included again.
+#undef abs
+#undef round
 #include <chrono>
 #include <random>//replace to reduce program size
 
@@ -55,9 +60,11 @@ class DuckLoRa {
 
     public:
         DuckLoRa() {
-            // Use hardware RNG on ESP32 for proper entropy; fall back to time() on Linux/PC
-            #ifdef ARDUINO
+            // Use hardware RNG on ESP32 for proper entropy; fall back to millis()/rand on other targets
+            #ifdef ESP32
                 gen.seed(esp_random());
+            #elif defined(ARDUINO)
+                gen.seed(millis() ^ analogRead(0));
             #else
                 gen.seed(time(nullptr));
             #endif
@@ -126,38 +133,6 @@ class DuckLoRa {
          * @returns A float representing the snr value.
          */
         float getSNR();
-
-        /**
-         * @brief Temporarily switch the radio to a randomly selected uplink
-         *        channel from CDPCFG_UPLINK_CHANNEL_POOL.
-         *
-         * Called by Duck::sendToRadio() immediately before transmitting a
-         * Papa-bound packet that *originated* from this duck
-         * (sduid == this->duid). Relayed packets are never subject to channel
-         * switching and are always sent on the shared mesh channel
-         * (CDPCFG_RF_LORA_FREQ, 922.8 MHz) so that other MamaDucks can
-         * continue to hear and forward them.
-         *
-         * The mesh channel is automatically restored in the TX_DONE interrupt
-         * handler after the transmission completes.
-         *
-         * @param freq Uplink frequency in MHz (must be a member of
-         *             CDPCFG_UPLINK_CHANNEL_POOL)
-         * @returns DUCK_ERR_NONE on success, an error code otherwise.
-         */
-        int setUplinkFrequency(float freq);
-
-        /**
-         * @brief Pick a random channel from CDPCFG_UPLINK_CHANNEL_POOL using
-         *        the internal Mersenne-Twister RNG.
-         *
-         * Each of the 8 AS923 channels (921.4–922.8 MHz, 200 kHz steps) is
-         * equally likely to be selected, spreading uplink traffic across all
-         * SX1302 demodulators.
-         *
-         * @returns A frequency in MHz.
-         */
-        float getRandomUplinkChannel();
 
     private:
         static volatile uint16_t interruptFlags;
