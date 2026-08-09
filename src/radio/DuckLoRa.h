@@ -134,6 +134,28 @@ class DuckLoRa {
          */
         float getSNR();
 
+        /**
+         * @brief Pick a uniformly random channel from CDPCFG_UPLINK_CHANNEL_POOL.
+         *
+         * Used to spread uplink traffic (packets originated locally and
+         * addressed directly to PapaDuck) across the gateway's SX1302
+         * multi-SF demodulators. See docs/uplink-channel-spreading.md.
+         *
+         * @returns frequency in MHz of the randomly selected uplink channel.
+         */
+        float getRandomUplinkChannel();
+
+        /**
+         * @brief Temporarily switch the radio to the given frequency for an
+         * uplink transmission. The mesh channel (CDPCFG_RF_LORA_FREQ) is
+         * automatically restored after the transmission completes, in the
+         * TX_DONE interrupt handling done by serviceInterruptFlags().
+         *
+         * @param freqMHz frequency in MHz to switch to
+         * @returns DUCK_ERR_NONE if the frequency was set successfully, an error code otherwise.
+         */
+        int setUplinkFrequency(float freqMHz);
+
     private:
         static volatile uint16_t interruptFlags;
         static volatile bool receivedFlag;

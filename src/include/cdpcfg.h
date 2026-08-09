@@ -70,6 +70,30 @@
 #define CDPCFG_RF_LORA_FREQ_HZ 92280000
 /// Bandwidth. Default is 125Mhz
 #define CDPCFG_RF_LORA_BW 125.0f
+
+/**
+ * @brief Uplink channel spreading pool (AS923, 200 kHz spacing).
+ *
+ * When a duck originates a packet addressed directly to PapaDuck, it
+ * transmits on a randomly selected channel from this pool instead of the
+ * shared mesh channel (CDPCFG_RADIO_CHANNEL_1 / CDPCFG_RF_LORA_FREQ). This
+ * spreads last-hop uplink traffic across all of PapaDuck's SX1302
+ * multi-SF demodulators, reducing collisions. Relayed packets always stay
+ * on the shared mesh channel. See docs/uplink-channel-spreading.md.
+ */
+#define CDPCFG_RADIO_CHANNEL_1 922.8f
+#define CDPCFG_RADIO_CHANNEL_2 922.6f
+#define CDPCFG_RADIO_CHANNEL_3 922.4f
+#define CDPCFG_RADIO_CHANNEL_4 922.2f
+#define CDPCFG_RADIO_CHANNEL_5 922.0f
+#define CDPCFG_RADIO_CHANNEL_6 921.8f
+#define CDPCFG_RADIO_CHANNEL_7 921.6f
+#define CDPCFG_RADIO_CHANNEL_8 921.4f
+
+#define CDPCFG_UPLINK_CHANNEL_POOL { \
+  CDPCFG_RADIO_CHANNEL_1, CDPCFG_RADIO_CHANNEL_2, CDPCFG_RADIO_CHANNEL_3, \
+  CDPCFG_RADIO_CHANNEL_4, CDPCFG_RADIO_CHANNEL_5, CDPCFG_RADIO_CHANNEL_6, \
+  CDPCFG_RADIO_CHANNEL_7, CDPCFG_RADIO_CHANNEL_8 }
 /// Spread Factor
 //#define CDPCFG_RF_LORA_SF 7
 #define CDPCFG_RF_LORA_SF 7

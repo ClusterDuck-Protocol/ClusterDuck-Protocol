@@ -482,6 +482,13 @@ class Duck {
 
       router.getFilter().bloom_add(txPacket.muid.data(), MUID_LENGTH);
 
+      bool isUplinkToPapa = (txPacket.dduid == PAPADUCK_DUID) &&
+                             (txPacket.sduid == this->duid);
+      if (isUplinkToPapa) {
+        float uplinkFreq = duckRadio.getRandomUplinkChannel();
+        duckRadio.setUplinkFrequency(uplinkFreq);
+      }
+
       err = duckRadio.sendData(txPacket.asBytes());
       if (err != DUCK_ERR_NONE) {
         logerr_ln("ERROR Lora sendData failed, err = %d", err);

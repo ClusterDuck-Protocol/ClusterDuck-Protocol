@@ -295,6 +295,25 @@ float DuckLoRa::getSNR()
     return lora.getSNR();
 }
 
+float DuckLoRa::getRandomUplinkChannel() {
+    static const float pool[] = CDPCFG_UPLINK_CHANNEL_POOL;
+    std::uniform_int_distribution<> distrib(0, ARRAY_LENGTH(pool) - 1);
+    return pool[distrib(gen)];
+}
+
+int DuckLoRa::setUplinkFrequency(float freqMHz) {
+    if (!isSetup) {
+        logerr_ln("ERROR  LoRa radio not setup");
+        return DUCKLORA_ERR_NOT_INITIALIZED;
+    }
+    int rc = lora.setFrequency(freqMHz);
+    if (rc != RADIOLIB_ERR_NONE) {
+        logerr_ln("ERROR  setUplinkFrequency failed, freq = %f, rc = %d", freqMHz, rc);
+        return DUCKLORA_ERR_SETUP;
+    }
+    return DUCK_ERR_NONE;
+}
+
 int DuckLoRa::standBy()
 { 
     int rc = DUCK_ERR_NONE;
@@ -380,6 +399,7 @@ void DuckLoRa::serviceInterruptFlags() {
         }
         if (DuckLoRa::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_TX_DONE) {
             loginfo_ln("SX127x Interrupt flag was set: payload transmission complete");
+            lora.setFrequency(defaultRadioParams.band); // restore mesh channel
             goToReceiveMode(false); // go back to receive mode and reset the receive flag
         }
         if (DuckLoRa::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_CAD_DONE) {
