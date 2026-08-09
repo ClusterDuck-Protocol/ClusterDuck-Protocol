@@ -20,6 +20,7 @@
 
 #include <string>
 #include <cstdio>
+#include <cstring>
 #include <map>
 #include <CDP.h>
 #include <U8g2lib.h>
@@ -27,6 +28,7 @@
 #include <bluefruit.h>   // Adafruit Bluefruit52Lib — Nordic UART Service
 
 #include "image.h"
+#include "Lang.h"
 
 // ADC_RESOLUTION is not defined in this board's variant.h; 14-bit gives
 // full-scale 16383 and must match the analogReadResolution(14) call in setup().
@@ -44,7 +46,19 @@ Define ARDUINO_SEEED_WIO_TRACKER_L1 (or use env:local_wio_tracker_l1)."
 #endif
 
 // ── Identification ────────────────────────────────────────────────────────────
-#define DUCK_NAME "IBRAHIM1"   // MUST be exactly 8 bytes and unique on the mesh
+// Duck ID: MUST be exactly 8 bytes and unique on the mesh.
+// To pin a fixed, human-readable ID, `#define DUCK_ID "MYDUCK01"` above this
+// line (exactly 8 characters). If DUCK_ID is left undefined, one is
+// auto-derived below from this board's factory-unique BLE device address
+// (see duckesp::getDuckMacAddress()), so every device gets a distinct,
+// reboot-stable ID with no manual configuration required.
+// NOTE: the ID-generation function itself lives further down (after enum
+// BtnEvent) so it isn't the first function definition in the file --
+// Arduino's ctags-based prototype generator inserts all forward-declared
+// prototypes right before the first function definition it finds, and
+// those prototypes must come after BtnEvent's declaration.
+static char DUCK_ID_BUF[9] = {0};
+#define DUCK_NAME DUCK_ID_BUF   // kept so the rest of this sketch is unchanged
 
 // ── GPS ───────────────────────────────────────────────────────────────────────
 static TinyGPSPlus tinyGps;
@@ -67,6 +81,22 @@ U8G2_SH1106_128X64_NONAME_F_SW_I2C display(U8G2_R0, /*clock/SCL*/15, /*data/SDA*
 // Declare here so Arduino's auto-prototype generator sees it before any function
 // that returns this type (enum must precede its first use in generated .cpp).
 enum BtnEvent { BTN_NONE, BTN_SINGLE, BTN_DOUBLE, BTN_TRIPLE, BTN_QUAD, BTN_HOLD_2S };
+
+// Fills DUCK_ID_BUF with either the user-defined DUCK_ID literal or an
+// 8-char ID auto-derived from this board's factory-unique BLE device
+// address. Called once, below, before DUCK_ID_BUF's first use.
+static bool initDuckId() {
+#ifdef DUCK_ID
+    strncpy(DUCK_ID_BUF, DUCK_ID, 8);
+#else
+    std::string mac = duckesp::getDuckMacAddress(false);  // unformatted hex, e.g. "E4B4C2A1B2C3"
+    std::string id  = (mac.length() >= 8) ? mac.substr(mac.length() - 8) : std::string("DUCK0000");
+    memcpy(DUCK_ID_BUF, id.c_str(), 8);
+#endif
+    DUCK_ID_BUF[8] = '\0';
+    return true;
+}
+static bool duckIdReady = initDuckId();
 
 // Draw string starting at top-left pixel (x, y_from_top).
 static inline void dspStr(int x, int y, const char* s) {
@@ -319,7 +349,7 @@ static void ble_on_connect(uint16_t /*conn_handle*/) {
     blePhoneSeen = true;
     usbConnectDisplayPending = true;
     Serial.println("[BLE] connected"); Serial.flush();
-    broadcast("CDK:ID,VALUE:" DUCK_NAME);
+    broadcast(String("CDK:ID,VALUE:") + DUCK_ID_BUF);
     sendBattery();
 }
 
@@ -412,7 +442,7 @@ static void setupBLE() {
     lastBleHealthMs = millis();
     sd_power_gpregret_clr(0, 0xFF);
     dspStatus("ADV STARTED!", DUCK_NAME);
-    Serial.println("[BLE] advertising as '" DUCK_NAME "'"); Serial.flush();
+    Serial.println(String("[BLE] advertising as '") + DUCK_ID_BUF + "'"); Serial.flush();
 }
 
 // ── Busy-wait LED blink helper ─────────────────────────────────────────────
@@ -455,7 +485,7 @@ static int batteryPercent(float vbat) {
 static void showHoldProgress(uint32_t heldMs) {
     dspBegin();
     dspStrRight(0, idBuf);
-    dspStrCenter(14, "TAHAN UNTUK SOS");
+    dspStrCenter(14, TXT_HOLD_FOR_SOS);
 
     const int barX = 14, barY = 30, barW = 100, barH = 14;
     display.drawFrame(barX, barY, barW, barH);
@@ -631,7 +661,7 @@ void setup() {
     pinMode(CANCEL_BUTTON_PIN, INPUT_PULLUP);
 
     Serial.println("[MAMA] Setup complete"); Serial.flush();
-    Serial.println("CDK:ID,VALUE:" DUCK_NAME);
+    Serial.println(String("CDK:ID,VALUE:") + DUCK_ID_BUF);
     sendBattery();
 }
 
@@ -688,15 +718,15 @@ void loop() {
         dspStr(0, 0, ("BATT:" + String(batteryPercent(readVbat())) + "%").c_str());
         dspStrRight(0, idBuf);
         if (phoneGpsNoFix) {
-            dspStrCenter(26, "GPS TELEFON");
-            dspStrCenter(38, "TIADA ISYARAT");
+            dspStrCenter(26, TXT_PHONE_GPS);
+            dspStrCenter(38, TXT_NO_SIGNAL);
             dspEnd();
             delay(2000);
         } else {
-            dspStr(0, 14, gpsLoraOk ? "BERJAYA HANTAR GPS!" : "GAGAL HANTAR GPS!");
+            dspStr(0, 14, gpsLoraOk ? TXT_GPS_SENT_OK : TXT_GPS_SEND_FAIL);
             dspStr(0, 28, ("LAT:" + String(phoneGpsLatBuf)).c_str());
             dspStr(0, 40, ("LNG:" + String(phoneGpsLngBuf)).c_str());
-            dspStr(0, 52, "SRC:TELEFON");
+            dspStr(0, 52, TXT_SRC_PHONE);
             dspEnd();
             delay(3000);
         }
@@ -709,8 +739,8 @@ void loop() {
         dspPowerSave(0);
         dspBegin();
         dspStrRight(0, idBuf);
-        dspStrCenter(26, "USB BERSIRI");
-        dspStrCenter(38, "TERSAMBUNG!");
+        dspStrCenter(26, TXT_USB_SERIAL);
+        dspStrCenter(38, TXT_CONNECTED_BANG);
         dspEnd();
         delay(2000);
         displayHome();
@@ -721,8 +751,8 @@ void loop() {
         displayEnabled = true;
         dspBegin();
         dspStrRight(0, idBuf);
-        dspStrCenter(26, "USB BERSIRI");
-        dspStrCenter(38, "TERPUTUS");
+        dspStrCenter(26, TXT_USB_SERIAL);
+        dspStrCenter(38, TXT_DISCONNECTED);
         dspEnd();
         delay(2000);
         displayHome();
@@ -735,9 +765,9 @@ void loop() {
         dspPowerSave(0);
         dspBegin();
         dspStrRight(0, idBuf);
-        dspStrCenter(16, "SOS DITERIMA!");
-        dspStrCenter(28, "BANTUAN SEDANG");
-        dspStrCenter(40, "DIHANTAR");
+        dspStrCenter(16, TXT_SOS_RECEIVED);
+        dspStrCenter(28, TXT_HELP_BEING);
+        dspStrCenter(40, TXT_SENT);
         dspEnd();
         blinkLed(3);
         messagePending = false;
@@ -788,8 +818,8 @@ void loop() {
             dspBegin();
             dspStrRight(0, idBuf);
             displayBatt();
-            dspStrCenter(22, "SEDANG HANTAR");
-            dspStrCenter(34, "ISYARAT KECEMASAN...");
+            dspStrCenter(22, TXT_SENDING);
+            dspStrCenter(34, TXT_EMERGENCY_SIGNAL_DOTS);
             dspEnd();
             sendEmergency(gpsLat, gpsLng, gpsAlt, gpsSpd, gpsHdg, /* gpsFromPhone= */ false);
         } else if (phoneGpsLatBuf[0] != '\0') {
@@ -797,8 +827,8 @@ void loop() {
             dspBegin();
             dspStrRight(0, idBuf);
             displayBatt();
-            dspStrCenter(22, "SEDANG HANTAR");
-            dspStrCenter(34, "ISYARAT KECEMASAN...");
+            dspStrCenter(22, TXT_SENDING);
+            dspStrCenter(34, TXT_EMERGENCY_SIGNAL_DOTS);
             dspEnd();
             sendEmergency(String(phoneGpsLatBuf), String(phoneGpsLngBuf),
                           phoneGpsAltBuf[0] ? String(phoneGpsAltBuf) : "",
@@ -811,9 +841,9 @@ void loop() {
             // or duck.run(). Single-click cancels this while it's pending.
             dspBegin();
             dspStrRight(0, idBuf);
-            dspStrCenter(22, "MEMINTA GPS");
-            dspStrCenter(34, "DARIPADA TELEFON...");
-            dspStrCenter(46, "(KLIK UNTUK BATAL)");
+            dspStrCenter(22, TXT_REQUESTING_GPS);
+            dspStrCenter(34, TXT_FROM_PHONE_DOTS);
+            dspStrCenter(46, TXT_CLICK_TO_CANCEL);
             dspEnd();
             broadcast("CDK:GPSREQ");
             sosPending     = true;
@@ -824,8 +854,8 @@ void loop() {
             dspBegin();
             dspStrRight(0, idBuf);
             displayBatt();
-            dspStrCenter(22, "SEDANG HANTAR");
-            dspStrCenter(34, "ISYARAT KECEMASAN...");
+            dspStrCenter(22, TXT_SENDING);
+            dspStrCenter(34, TXT_EMERGENCY_SIGNAL_DOTS);
             dspEnd();
             sendEmergency("", "", "", "", "", /* gpsFromPhone= */ false);
         }
@@ -877,7 +907,7 @@ void loop() {
         displayEnabled = true;
         dspBegin();
         dspStrRight(0, idBuf);
-        dspStrCenter(28, "ROGER DIHANTAR!");
+        dspStrCenter(28, TXT_ROGER_SENT);
         dspEnd();
         delay(2000);
         displayHome();
@@ -924,14 +954,14 @@ void loop() {
                 dspStr(0, 26, timeBuf);
                 dspStr(0, 38, "(GMT+8 / UTC+8)");
             } else {
-                dspStrCenter(26, "TARIKH/MASA");
-                dspStrCenter(38, "TIADA ISYARAT");
+                dspStrCenter(26, TXT_DATE_TIME);
+                dspStrCenter(38, TXT_NO_SIGNAL);
             }
             dspEnd();
             delay(2500);
         } else {
-            dspStrCenter(28, gpsModuleDetected ? "GPS: MODUL AKTIF" : "GPS: TIADA MODUL");
-            dspStrCenter(40, gpsModuleDetected ? "MENUNGGU ISYARAT..." : "(Serial1)");
+            dspStrCenter(28, gpsModuleDetected ? TXT_GPS_MODULE_ACTIVE : TXT_GPS_NO_MODULE);
+            dspStrCenter(40, gpsModuleDetected ? TXT_WAITING_SIGNAL_DOTS : "(Serial1)");
             dspEnd();
             delay(2500);
         }
@@ -947,7 +977,7 @@ void loop() {
             usbDisconnectDisplayPending = true;
         }
         if (!usbPhoneSeen && millis() - lastUsbAnnounceMs >= 3000UL) {
-            Serial.println("CDK:ID,VALUE:" DUCK_NAME);
+            Serial.println(String("CDK:ID,VALUE:") + DUCK_ID_BUF);
             sendBattery();
             lastBattMs        = millis();
             lastUsbAnnounceMs = millis();
@@ -1052,8 +1082,8 @@ void loop() {
             dspBegin();
             dspStrRight(0, idBuf);
             displayBatt();
-            dspStrCenter(22, "SEDANG HANTAR");
-            dspStrCenter(34, "ISYARAT KECEMASAN...");
+            dspStrCenter(22, TXT_SENDING);
+            dspStrCenter(34, TXT_EMERGENCY_SIGNAL_DOTS);
             dspEnd();
             sendEmergency(String(phoneGpsLatBuf), String(phoneGpsLngBuf),
                           phoneGpsAltBuf[0] ? String(phoneGpsAltBuf) : "",
@@ -1065,8 +1095,8 @@ void loop() {
             dspBegin();
             dspStrRight(0, idBuf);
             displayBatt();
-            dspStrCenter(22, "SEDANG HANTAR");
-            dspStrCenter(34, "ISYARAT KECEMASAN...");
+            dspStrCenter(22, TXT_SENDING);
+            dspStrCenter(34, TXT_EMERGENCY_SIGNAL_DOTS);
             dspEnd();
             sendEmergency("", "", "", "", "", /* gpsFromPhone= */ false);
         }
@@ -1239,7 +1269,7 @@ void handleDuckData(CdpPacket packet) {
                 dspBegin();
                 dspStr(0, 0, ("BATT:" + String(batteryPercent(readVbat())) + "%").c_str());
                 dspStrRight(0, idBuf);
-                dspStr(0, 14, "MENGHANTAR DATA GPS");
+                dspStr(0, 14, TXT_SENDING_GPS_DATA);
                 dspStr(0, 28, ("LAT:" + String(tinyGps.location.lat(), 5)).c_str());
                 dspStr(0, 40, ("LNG:" + String(tinyGps.location.lng(), 5)).c_str());
                 dspEnd();
@@ -1254,18 +1284,18 @@ void handleDuckData(CdpPacket packet) {
                 dspStrRight(0, idBuf);
                 if (phoneConnected) {
                     if (phoneGpsLatBuf[0] != '\0') {
-                        dspStr(0, 14, "MENGHANTAR DATA GPS");
+                        dspStr(0, 14, TXT_SENDING_GPS_DATA);
                         dspStr(0, 28, ("LAT:" + String(phoneGpsLatBuf)).c_str());
                         dspStr(0, 42, ("LNG:" + String(phoneGpsLngBuf)).c_str());
                     } else {
-                        dspStrCenter(28, "MEMINTA DATA GPS");
-                        dspStrCenter(40, "DARIPADA TELEFON...");
+                        dspStrCenter(28, TXT_REQUESTING_GPS_DATA);
+                        dspStrCenter(40, TXT_FROM_PHONE_DOTS);
                     }
                     dspEnd();
                     if (gpsReqDeferredSendMs == 0) gpsReqDeferredSendMs = millis() + 400;
                 } else {
-                    dspStrCenter(28, "TIADA TELEFON");
-                    dspStrCenter(40, "TIADA DATA GPS");
+                    dspStrCenter(28, TXT_NO_PHONE);
+                    dspStrCenter(40, TXT_NO_GPS_DATA);
                     dspEnd();
                     char noGpsBuf[64];
                     snprintf(noGpsBuf, sizeof(noGpsBuf), "GPS,FIX:0,SRC:NONE,REASON:NO_PHONE,BATT:%d",
@@ -1346,28 +1376,28 @@ void displayHome() {
     dspStrRight(0, idBuf);
     // Signal / TX status (no percentage — keeps the line short)
     String sigStr;
-    if      (lastSignalPct >= 0 && lastSignalPct <= 25) sigStr = "SIG: LEMAH ("   + String(lastSignalPct) + "%)";
-    else if (lastSignalPct >= 0 && lastSignalPct <= 50) sigStr = "SIG: CUKUP ("   + String(lastSignalPct) + "%)";
-    else if (lastSignalPct >= 0 && lastSignalPct <= 75) sigStr = "SIG: KUAT ("    + String(lastSignalPct) + "%)";
-    else if (lastSignalPct >  75)                       sigStr = "SIG: SG.KUAT (" + String(lastSignalPct) + "%)";
-    else if (lastTxResult == 0)                         sigStr = "BERJAYA HANTAR";
-    else if (lastTxResult >  0)                         sigStr = "GAGAL HANTAR";
-    else                                                sigStr = "SIG: TIADA ISYARAT";
+    if      (lastSignalPct >= 0 && lastSignalPct <= 25) sigStr = TXT_SIG_WEAK   + String(lastSignalPct) + "%)";
+    else if (lastSignalPct >= 0 && lastSignalPct <= 50) sigStr = TXT_SIG_OK   + String(lastSignalPct) + "%)";
+    else if (lastSignalPct >= 0 && lastSignalPct <= 75) sigStr = TXT_SIG_STRONG    + String(lastSignalPct) + "%)";
+    else if (lastSignalPct >  75)                       sigStr = TXT_SIG_VSTRONG + String(lastSignalPct) + "%)";
+    else if (lastTxResult == 0)                         sigStr = TXT_SEND_OK;
+    else if (lastTxResult >  0)                         sigStr = TXT_SEND_FAIL;
+    else                                                sigStr = TXT_SIG_NONE;
     dspStrCenter(13, sigStr.c_str());
     // GPS status
     char gpsLine[22];
     if (!gpsModuleDetected) {
-        strncpy(gpsLine, "GPS: TIADA MODUL", sizeof(gpsLine));
+        strncpy(gpsLine, TXT_GPS_NO_MODULE, sizeof(gpsLine));
     } else if (tinyGps.location.isValid() && tinyGps.location.age() < 5000UL) {
         snprintf(gpsLine, sizeof(gpsLine), "GPS: FIX %uSAT",
                  (unsigned)(tinyGps.satellites.isValid() ? tinyGps.satellites.value() : 0));
     } else {
-        snprintf(gpsLine, sizeof(gpsLine), "GPS: CARI %uSAT",
+        snprintf(gpsLine, sizeof(gpsLine), TXT_GPS_SEARCH_FMT,
                  (unsigned)(tinyGps.satellites.isValid() ? tinyGps.satellites.value() : 0));
     }
     dspStrCenter(26, gpsLine);
-    dspStrCenter(40, "TEKAN BUTANG ATAS");
-    dspStrCenter(53, "2 SAAT = KECEMASAN");
+    dspStrCenter(40, TXT_PRESS_BUTTON_ABOVE);
+    dspStrCenter(53, TXT_2SEC_EMERGENCY);
     dspEnd();
 }
 
@@ -1461,7 +1491,7 @@ bool sendEmergency(String lat, String lng, String alt, String spd, String hdg, b
     bool hasGps  = (lat.length() > 0 && lng.length() > 0);
     int  battPct = batteryPercent(readVbat());
 
-    std::string loraMsg = "SOS,SRC:DEVICE,ID:" DUCK_NAME;
+    std::string loraMsg = "SOS,SRC:DEVICE,ID:" + std::string(DUCK_ID_BUF);
     if (hasGps) {
         loraMsg += ",LAT:" + std::string(lat.c_str()) + ",LNG:" + std::string(lng.c_str());
         if (alt.length() > 0) loraMsg += ",ALT:" + std::string(alt.c_str());
@@ -1479,8 +1509,8 @@ bool sendEmergency(String lat, String lng, String alt, String spd, String hdg, b
         counter++;
         dspPowerSave(0);
         blinkLed(3);
-        String sosFrame = String("CDK:SOS,SRC:DEVICE,ID:" DUCK_NAME
-                                 ",LAT:") + (hasGps ? lat : "none") +
+        String sosFrame = String("CDK:SOS,SRC:DEVICE,ID:") + DUCK_ID_BUF +
+                                 ",LAT:" + (hasGps ? lat : "none") +
                           ",LNG:" + (hasGps ? lng : "none");
         if (hasGps && alt.length() > 0) sosFrame += ",ALT:" + alt;
         if (hasGps && spd.length() > 0) sosFrame += ",SPD:" + spd;
@@ -1491,9 +1521,9 @@ bool sendEmergency(String lat, String lng, String alt, String spd, String hdg, b
         dspBegin();
         dspStrRight(0, idBuf);
         displayBatt();
-        dspStrCenter(22, "BERJAYA HANTAR");
-        dspStrCenter(34, "ISYARAT KECEMASAN");
-        dspStrCenter(46, hasGps ? "DENGAN GPS!" : "TANPA GPS!");
+        dspStrCenter(22, TXT_SEND_OK);
+        dspStrCenter(34, TXT_EMERGENCY_SIGNAL);
+        dspStrCenter(46, hasGps ? TXT_WITH_GPS : TXT_WITHOUT_GPS);
         dspEnd();
         blinkLed(2);
         if (!hasGps) {
@@ -1508,9 +1538,9 @@ bool sendEmergency(String lat, String lng, String alt, String spd, String hdg, b
         dspBegin();
         dspStrRight(0, idBuf);
         displayBatt();
-        dspStrCenter(22, "RALAT. TIDAK BOLEH");
-        dspStrCenter(34, "HANTAR ISYARAT");
-        dspStrCenter(46, "KECEMASAN");
+        dspStrCenter(22, TXT_SOS_ERR_CANNOT);
+        dspStrCenter(34, TXT_SEND_SIGNAL);
+        dspStrCenter(46, TXT_EMERGENCY);
         dspEnd();
         beepBuzzer(2, 60, 60);      // SOS failed — fast double = error
     }
@@ -1532,7 +1562,7 @@ void broadcast(const String& frame) {
 // ── Frame dispatcher ──────────────────────────────────────────────────────────
 void handleFrame(const String& line) {
     if (!line.startsWith("CDK:")) return;
-    broadcast("CDK:ID,VALUE:" DUCK_NAME);
+    broadcast(String("CDK:ID,VALUE:") + DUCK_ID_BUF);
     String body   = line.substring(4);
     int    comma  = body.indexOf(',');
     String type   = (comma == -1) ? body : body.substring(0, comma);
@@ -1591,8 +1621,8 @@ void handleSOS(const String& body) {
     dspBegin();
     dspStrRight(0, idBuf);
     displayBatt();
-    dspStrCenter(22, "SEDANG HANTAR");
-    dspStrCenter(34, "ISYARAT KECEMASAN...");
+    dspStrCenter(22, TXT_SENDING);
+    dspStrCenter(34, TXT_EMERGENCY_SIGNAL_DOTS);
     dspEnd();
 
     String message = "SOS,LAT:" + lat + ",LNG:" + lng;
@@ -1609,9 +1639,9 @@ void handleSOS(const String& body) {
     dspBegin();
     dspStrRight(0, idBuf);
     displayBatt();
-    dspStrCenter(22, "BERJAYA HANTAR");
-    dspStrCenter(34, "ISYARAT KECEMASAN");
-    dspStrCenter(46, "DENGAN GPS!");
+    dspStrCenter(22, TXT_SEND_OK);
+    dspStrCenter(34, TXT_EMERGENCY_SIGNAL);
+    dspStrCenter(46, TXT_WITH_GPS);
     dspEnd();
     emergencyDisplayPending = true;
     displayEnabled          = true;
@@ -1629,7 +1659,7 @@ void handleMsg(const String& body) {
     dspBegin();
     dspStrRight(0, idBuf);
     displayBatt();
-    dspStrCenter(22, "MESEJ TELAH DIHANTAR!");
+    dspStrCenter(22, TXT_MSG_SENT);
     dspEnd();
     blinkLed(1);
     displayHome();

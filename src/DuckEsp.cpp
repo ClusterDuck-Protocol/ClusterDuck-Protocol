@@ -40,6 +40,42 @@ namespace duckesp {
     return unformattedMac;
   }
 }
+#elif defined(ARDUINO_ARCH_NRF52)
+
+  void restartDuck() { NVIC_SystemReset(); }
+  int freeHeapMemory() {return -1;}
+  int getMinFreeHeap() {return -1;}
+  int getMaxAllocHeap() {return -1;}
+
+  std::string getDuckMacAddress(boolean format) {
+  // NRF_FICR->DEVICEADDR[0..1] holds the factory-programmed 48-bit Bluetooth
+  // device address for this chip -- the nRF52 equivalent of a WiFi MAC address.
+  char id1[15];
+  char id2[15];
+
+  snprintf(id1, 15, "%04X", (unsigned int)(NRF_FICR->DEVICEADDR[1] & 0xFFFF));
+  snprintf(id2, 15, "%08X", (unsigned int)NRF_FICR->DEVICEADDR[0]);
+
+  std::string ID1 = id1;
+  std::string ID2 = id2;
+
+  std::string unformattedMac = ID1 + ID2;
+
+  if (format == true) {
+    std::string formattedMac = "";
+    for (int i = 0; i < unformattedMac.length(); i++) {
+      if (i % 2 == 0 && i != 0) {
+        formattedMac += ":";
+        formattedMac += unformattedMac[i];
+      } else {
+        formattedMac += unformattedMac[i];
+      }
+    }
+    return formattedMac;
+  } else {
+    return unformattedMac;
+  }
+}
 #else
   void restartDuck() {}
   int freeHeapMemory() {return -1;}

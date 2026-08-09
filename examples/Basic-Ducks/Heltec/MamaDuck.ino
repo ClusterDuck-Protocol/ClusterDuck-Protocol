@@ -11,6 +11,7 @@
 
  #include <string>
  #include <cstdio>
+ #include <cstring>
  #include <map>
  #include <arduino-timer.h>
  #include <CDP.h>
@@ -20,6 +21,7 @@
  #include <heltec_unofficial.h>
 // #include "wifi.h"
  #include "image.h"
+ #include "Lang.h"
  #include <NimBLEDevice.h>
 
 // Access the RadioLib radio instance from DuckLoRa.cpp to read RSSI/SNR.
@@ -45,7 +47,27 @@ extern CDPCFG_LORA_CLASS lora;
 #define LORA_PA_EN     2
 #endif
 
- #define DUCK_NAME "SHABREE1"
+ // ── Device Identification ────────────────────────────────────────────────────
+ // Duck ID: MUST be exactly 8 bytes and unique on the mesh.
+ // To pin a fixed, human-readable ID, `#define DUCK_ID "MYDUCK01"` above this
+ // line (exactly 8 characters). If DUCK_ID is left undefined, one is
+ // auto-derived below from this board's factory-unique WiFi MAC/efuse address
+ // (see duckesp::getDuckMacAddress()), so every device gets a distinct,
+ // reboot-stable ID with no manual configuration required.
+ static char DUCK_ID_BUF[9] = {0};
+ static bool initDuckId() {
+ #ifdef DUCK_ID
+   strncpy(DUCK_ID_BUF, DUCK_ID, 8);
+ #else
+   std::string mac = duckesp::getDuckMacAddress(false);  // unformatted hex, e.g. "E4B4C2A1B2C3"
+   std::string id  = (mac.length() >= 8) ? mac.substr(mac.length() - 8) : std::string("DUCK0000");
+   memcpy(DUCK_ID_BUF, id.c_str(), 8);
+ #endif
+   DUCK_ID_BUF[8] = '\0';
+   return true;
+ }
+ static bool duckIdReady = initDuckId();
+ #define DUCK_NAME DUCK_ID_BUF   // kept so the rest of this sketch is unchanged
  // Bluetooth Low energgy definitions
  #define NUS_SERVICE "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
  #define NUS_RX_CHAR "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
@@ -258,7 +280,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
        display.clear();
        display.setFont(ArialMT_Plain_10);
        display.setTextAlignment(TEXT_ALIGN_CENTER);
-       display.drawString(64, 22, "RALAT BLE\nTIDAK BOLEH IKLAN");
+       display.drawString(64, 22, TXT_BLE_ADV_FAIL);
        display.display();
        heltec_delay(2000);
        display.clear();
@@ -311,7 +333,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
 #endif
 
   // Send ID + battery over USB immediately
-  Serial.println("CDK:ID,VALUE:" DUCK_NAME);
+  Serial.println(String("CDK:ID,VALUE:") + DUCK_ID_BUF);
   Serial.println("[MAMA] Firmware v2 (with LAT/LNG support)");
   sendBattery();
 
@@ -341,15 +363,15 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     display.drawString(128, 0, buffer);
     if (phoneGpsNoFix) {
       display.setTextAlignment(TEXT_ALIGN_CENTER);
-      display.drawString(64, 28, "GPS TELEFON\nTIADA ISYARAT");
+      display.drawString(64, 28, TXT_PHONE_GPS_NO_SIGNAL_2L);
       display.display();
       delay(2000);
     } else {
       display.setTextAlignment(TEXT_ALIGN_LEFT);
-      display.drawString(0, 14, gpsLoraOk ? "BERJAYA HANTAR GPS!" : "GAGAL HANTAR GPS!");
+      display.drawString(0, 14, gpsLoraOk ? TXT_GPS_SENT_OK : TXT_GPS_SEND_FAIL);
       display.drawString(0, 28, "LAT:" + String(phoneGpsLatBuf));
       display.drawString(0, 40, "LNG:" + String(phoneGpsLngBuf));
-      display.drawString(0, 52, "SRC:TELEFON");
+      display.drawString(0, 52, TXT_SRC_PHONE);
       display.display();
       delay(3000);
     }
@@ -365,7 +387,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     displayID();
     display.setFont(ArialMT_Plain_10);
     display.setTextAlignment(TEXT_ALIGN_CENTER);
-    display.drawString(64, 28, "BLUETOOTH\nTERSAMBUNG!");
+    display.drawString(64, 28, TXT_BT_CONNECTED);
     display.display();
     bleSplashClearMs = millis() + 2000;
   }
@@ -380,7 +402,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
   // Sending these in onConnect() itself triggers GATT error 133 on Android.
   if (bleAnnounceAfterMs > 0 && millis() >= bleAnnounceAfterMs && bleConnected) {
     bleAnnounceAfterMs = 0;
-    broadcast("CDK:ID,VALUE:" DUCK_NAME);
+    broadcast(String("CDK:ID,VALUE:") + DUCK_ID_BUF);
     sendBattery();
     Serial.println("[BLE] Post-connect announce sent (ID + battery)");
   } else if (bleAnnounceAfterMs > 0 && !bleConnected) {
@@ -395,7 +417,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     displayID();
     display.setFont(ArialMT_Plain_10);
     display.setTextAlignment(TEXT_ALIGN_CENTER);
-    display.drawString(64, 28, "BLUETOOTH\nTERPUTUS");
+    display.drawString(64, 28, TXT_BT_DISCONNECTED);
     display.display();
     delay(2000);
     displayHome();
@@ -408,7 +430,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     displayID();
     display.setFont(ArialMT_Plain_10);
     display.setTextAlignment(TEXT_ALIGN_CENTER);
-    display.drawString(64, 28, "USB BERSIRI\nTERSAMBUNG!");
+    display.drawString(64, 28, TXT_USB_CONNECTED);
     display.display();
     delay(2000);
     displayHome();
@@ -422,7 +444,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     displayID();
     display.setFont(ArialMT_Plain_10);
     display.setTextAlignment(TEXT_ALIGN_CENTER);
-    display.drawString(64, 28, "USB BERSIRI\nTERPUTUS");
+    display.drawString(64, 28, TXT_USB_DISCONNECTED);
     display.display();
     delay(2000);
     displayHome();
@@ -437,7 +459,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     displayID();
     display.setFont(ArialMT_Plain_10);
     display.setTextAlignment(TEXT_ALIGN_CENTER);
-    display.drawString(64, 22, "SOS DITERIMA!\nBANTUAN SEDANG\nDIHANTAR");
+    display.drawString(64, 22, TXT_SOS_ACK_DISPLAY);
     display.display();
     blinkLed(3);
     messagePending   = false;  // SOS ack is treated as an emergency — button-only dismiss
@@ -468,7 +490,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     displayBatt();
     display.setFont(ArialMT_Plain_10);
     display.setTextAlignment(TEXT_ALIGN_CENTER);
-    display.drawString(64, 22, "SEDANG HANTAR\nISYARAT KECEMASAN...");
+    display.drawString(64, 22, TXT_SENDING_SOS_2L);
     display.display();
     sendEmergency(gpsLat, gpsLng, gpsAlt, gpsSpd, gpsHdg, gpsFromPhone);
   }
@@ -576,7 +598,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
         displayBatt();
         display.setFont(ArialMT_Plain_10);
         display.setTextAlignment(TEXT_ALIGN_CENTER);
-        display.drawString(64, 22, "MEMINTA GPS\nDARIPADA TELEFON...");
+        display.drawString(64, 22, TXT_REQ_GPS_FROM_PHONE_2L);
         display.display();
         broadcast("CDK:GPSREQ");
         Serial.println("[SOS] Phone GPS cache empty — requesting fresh fix before SOS...");
@@ -601,7 +623,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
       displayBatt();
       display.setFont(ArialMT_Plain_10);
       display.setTextAlignment(TEXT_ALIGN_CENTER);
-      display.drawString(64, 22, "SEDANG HANTAR\nISYARAT KECEMASAN...");
+      display.drawString(64, 22, TXT_SENDING_SOS_2L);
       display.display();
 
       sendEmergency(gpsLat, gpsLng, gpsAlt, gpsSpd, gpsHdg, /* gpsFromPhone= */ !gotGps && gpsLat.length() > 0);
@@ -616,7 +638,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
       displayBatt();
       display.setFont(ArialMT_Plain_10);
       display.setTextAlignment(TEXT_ALIGN_CENTER);
-      display.drawString(64, 22, "SOS DIBATALKAN");
+      display.drawString(64, 22, TXT_SOS_CANCELLED);
       display.display();
       heltec_delay(1000);
       displayHome();
@@ -661,7 +683,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     displayBatt();
     display.setFont(ArialMT_Plain_10);
     display.setTextAlignment(TEXT_ALIGN_CENTER);
-    display.drawString(64, 28, "ROGER DIHANTAR!");
+    display.drawString(64, 28, TXT_ROGER_SENT);
     display.display();
     heltec_delay(2000);
     displayHome();
@@ -715,7 +737,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
         display.drawString(0, 38, "(GMT+8 / UTC+8)");
       } else {
         display.setTextAlignment(TEXT_ALIGN_CENTER);
-        display.drawString(64, 28, "TARIKH/MASA\nTIADA ISYARAT");
+        display.drawString(64, 28, TXT_DATETIME_NO_SIGNAL_2L);
       }
       display.display();
       heltec_delay(2500);
@@ -727,12 +749,12 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     } else if (gpsModuleDetected) {
       display.setFont(ArialMT_Plain_10);
       display.setTextAlignment(TEXT_ALIGN_CENTER);
-      display.drawString(64, 28, "GPS: MODUL AKTIF\nMENUNGGU ISYARAT...");
+      display.drawString(64, 28, TXT_GPS_MODULE_ACTIVE_2L);
       Serial.println("[GPS] Triple-click: module active, no fix yet");
     } else {
       display.setFont(ArialMT_Plain_10);
       display.setTextAlignment(TEXT_ALIGN_CENTER);
-      display.drawString(64, 28, "GPS: TIADA MODUL");
+      display.drawString(64, 28, TXT_GPS_NO_MODULE);
       Serial.println("[GPS] Triple-click: no GPS module detected");
     }
     display.display();
@@ -754,7 +776,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
       usbDisconnectDisplayPending = true;  // notify main loop to render splash
     }
     if (!usbPhoneSeen && millis() - lastUsbAnnounceMs >= 3000UL) {
-      Serial.println("CDK:ID,VALUE:" DUCK_NAME);
+      Serial.println(String("CDK:ID,VALUE:") + DUCK_ID_BUF);
       // Only send battery over BLE when NOT already BLE-connected — the
       // deferred announce + periodic 60 s timer handle the BLE cadence.
       // Firing every 3 s from the USB discovery loop floods Android.
@@ -1147,7 +1169,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
               display.setTextAlignment(TEXT_ALIGN_RIGHT);
               display.drawString(128, 0, buffer);
               display.setTextAlignment(TEXT_ALIGN_LEFT);
-              display.drawString(0, 14, "MENGHANTAR DATA GPS");
+              display.drawString(0, 14, TXT_SENDING_GPS_DATA);
               display.drawString(0, 28, "LAT:" + String(tinyGps.location.lat(), 5));
               display.drawString(0, 40, "LNG:" + String(tinyGps.location.lng(), 5));
               display.drawString(0, 52, "ALT:" + String(altM, 1) + "m  SPD:" + String(spdKh, 1) + "km/h");
@@ -1173,7 +1195,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
               display.drawString(128, 0, buffer);
               display.setTextAlignment(TEXT_ALIGN_CENTER);
               if (phoneConnected) {
-                display.drawString(64, 28, "MEMINTA DATA GPS\nDARIPADA TELEFON...");
+                display.drawString(64, 28, TXT_REQ_GPS_DATA_FROM_PHONE_2L);
                 display.display();
                 // Defer CDK:GPSREQ — sending it immediately after CDK:SEEN causes Android's
                 // BLE stack to silently drop one of the two rapid-succession notifications.
@@ -1182,7 +1204,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
                   gpsReqDeferredSendMs = millis() + 400;
                 }
               } else {
-                display.drawString(64, 28, "TIADA TELEFON\nTIADA DATA GPS");
+                display.drawString(64, 28, TXT_NO_PHONE_NO_GPS_2L);
                 display.display();
                 char noGpsBuf[64];
                 std::snprintf(noGpsBuf, sizeof(noGpsBuf), "GPS,FIX:0,SRC:NONE,REASON:NO_PHONE,BATT:%d",
@@ -1214,11 +1236,11 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
                 if (phoneGpsLatBuf[0] != '\0') {
                   // Cache hot — will respond immediately from cache in deferred dispatch
                   display.setTextAlignment(TEXT_ALIGN_LEFT);
-                  display.drawString(0, 14, "MENGHANTAR DATA GPS");
+                  display.drawString(0, 14, TXT_SENDING_GPS_DATA);
                   display.drawString(0, 28, "LAT:" + String(phoneGpsLatBuf));
                   display.drawString(0, 42, "LNG:" + String(phoneGpsLngBuf));
                 } else {
-                  display.drawString(64, 28, "MEMINTA DATA GPS\nDARIPADA TELEFON...");
+                  display.drawString(64, 28, TXT_REQ_GPS_DATA_FROM_PHONE_2L);
                 }
                 display.display();
                 // Defer GPS response — sending immediately after CDK:SEEN causes Android's
@@ -1228,7 +1250,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
                   gpsReqDeferredSendMs = millis() + 400;
                 }
               } else {
-                display.drawString(64, 28, "TIADA TELEFON\nTIADA DATA GPS");
+                display.drawString(64, 28, TXT_NO_PHONE_NO_GPS_2L);
                 display.display();
                 char noGpsBuf[64];
                 std::snprintf(noGpsBuf, sizeof(noGpsBuf), "GPS,FIX:0,SRC:NONE,REASON:NO_PHONE,BATT:%d",
@@ -1368,20 +1390,20 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     String sigStr;
     if (lastSignalPct >= 0) {
       // Received-packet signal quality (most accurate)
-      if      (lastSignalPct <= 25) sigStr = "SIG: LEMAH ("   + String(lastSignalPct) + "%)";
-      else if (lastSignalPct <= 50) sigStr = "SIG: CUKUP ("   + String(lastSignalPct) + "%)";
-      else if (lastSignalPct <= 75) sigStr = "SIG: KUAT ("    + String(lastSignalPct) + "%)";
-      else                          sigStr = "SIG: SG.KUAT (" + String(lastSignalPct) + "%)";
+      if      (lastSignalPct <= 25) sigStr = TXT_SIG_WEAK   + String(lastSignalPct) + "%)";
+      else if (lastSignalPct <= 50) sigStr = TXT_SIG_OK   + String(lastSignalPct) + "%)";
+      else if (lastSignalPct <= 75) sigStr = TXT_SIG_STRONG    + String(lastSignalPct) + "%)";
+      else                          sigStr = TXT_SIG_VSTRONG + String(lastSignalPct) + "%)";
     } else if (lastTxResult == 0) {
-      sigStr = "BERJAYA HANTAR";
+      sigStr = TXT_SEND_OK;
     } else if (lastTxResult > 0) {
-      sigStr = "GAGAL HANTAR";
+      sigStr = TXT_SEND_FAIL;
     } else {
-      sigStr = "SIG: TIADA ISYARAT";
+      sigStr = TXT_SIG_NONE;
     }
     display.drawString(64, 12, sigStr);
 
-    display.drawString(64, 26, "TEKAN BUTANG ATAS\nSELAMA DUA SAAT UTK\nISYARAT KECEMASAN");
+    display.drawString(64, 26, TXT_HOME_HINT_3L);
     display.display();
  }
 
@@ -1444,7 +1466,7 @@ void displayBatt() {
    display.clear();
    display.setTextAlignment(TEXT_ALIGN_CENTER);
    display.setFont(ArialMT_Plain_10);
-   display.drawString(64, 8, "TAHAN UNTUK SOS");
+   display.drawString(64, 8, TXT_HOLD_FOR_SOS);
    display.drawProgressBar(4, 28, 120, 12, pct);
    display.display();
  }
@@ -1490,7 +1512,7 @@ void displayBatt() {
      displayBatt();
      display.setFont(ArialMT_Plain_10);
      display.setTextAlignment(TEXT_ALIGN_CENTER);
-     display.drawString(64, 22, hasGps ? "BERJAYA HANTAR\nISYARAT KECEMASAN\nDENGAN GPS!" : "BERJAYA HANTAR\nISYARAT KECEMASAN\nTANPA GPS!");
+     display.drawString(64, 22, hasGps ? TXT_SOS_SENT_GPS_3L : TXT_SOS_SENT_NOGPS_3L);
      if (!hasGps) blinkLed(2);  // extra blinks — distinct warning that the SOS went out without a location
 
      // no displayID. because this has no clear();
@@ -1519,7 +1541,7 @@ void displayBatt() {
      displayBatt();
      display.setFont(ArialMT_Plain_10);
      display.setTextAlignment(TEXT_ALIGN_CENTER);
-     display.drawString(64, 22, "TEKAN BUTANG ATAS\nSELAMA 2 SAAT UTK\nISYARAT KECEMASAN");
+     display.drawString(64, 22, TXT_SOS_SENT_HINT_3L);
      display.display();
      //heltec_delay(5000);
      displayHome();
@@ -1529,7 +1551,7 @@ void displayBatt() {
      displayBatt();
      display.setFont(ArialMT_Plain_10);
      display.setTextAlignment(TEXT_ALIGN_CENTER);
-     display.drawString(64, 22, "RALAT. TIDAK BOLEH\nHANTAR ISYARAT KECEMASAN");
+     display.drawString(64, 22, TXT_SOS_ERR_2L);
      display.display();
    }
    return true;
@@ -1585,7 +1607,7 @@ void handleFrame(const String& line) {
   {
     static unsigned long lastIdBcastMs = 0;
     if (millis() - lastIdBcastMs >= 10000UL) {
-      broadcast("CDK:ID,VALUE:" DUCK_NAME);
+      broadcast(String("CDK:ID,VALUE:") + DUCK_ID_BUF);
       lastIdBcastMs = millis();
     }
   }
@@ -1676,7 +1698,7 @@ void handleSOS(const String& body) {
   displayBatt();
   display.setFont(ArialMT_Plain_10);
   display.setTextAlignment(TEXT_ALIGN_CENTER);
-  display.drawString(64, 22, "SEDANG HANTAR\nISYARAT KECEMASAN...");
+  display.drawString(64, 22, TXT_SENDING_SOS_2L);
   display.display();
   // construct the message — include phone telemetry + device battery
   String message = "SOS,LAT:" + lat + ",LNG:" + lng;
@@ -1699,7 +1721,7 @@ void handleSOS(const String& body) {
   displayBatt();
   display.setFont(ArialMT_Plain_10);
   display.setTextAlignment(TEXT_ALIGN_CENTER);
-  display.drawString(64, 22, "BERJAYA HANTAR\nISYARAT KECEMASAN\nDENGAN GPS!");
+  display.drawString(64, 22, TXT_SOS_SENT_GPS_3L);
 
   // no displayID. because this has no clear();
   display.setTextAlignment(TEXT_ALIGN_RIGHT);
@@ -1733,7 +1755,7 @@ void handleMsg(const String& body) {
   displayBatt();
   display.setFont(ArialMT_Plain_10);
   display.setTextAlignment(TEXT_ALIGN_CENTER);
-  display.drawString(64, 22, "MESEJ TELAH DIHANTAR!");
+  display.drawString(64, 22, TXT_MSG_SENT);
   display.display();
   blinkLed(1);
   displayHome();
