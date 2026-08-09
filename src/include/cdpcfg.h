@@ -67,7 +67,7 @@
 
 /// Frequency Range. Set for US Region 915.0Mhz, Asia Region AS923 is below 923.0Mhz
 #define CDPCFG_RF_LORA_FREQ 922.8f
-#define CDPCFG_RF_LORA_FREQ_HZ 92280000
+#define CDPCFG_RF_LORA_FREQ_HZ 922800000
 /// Bandwidth. Default is 125Mhz
 #define CDPCFG_RF_LORA_BW 125.0f
 
