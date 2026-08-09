@@ -184,6 +184,15 @@ static volatile bool  usbConnectDisplayPending   = false;
 static volatile bool  usbDisconnectDisplayPending= false;
 static volatile bool  sosAckDisplayPending       = false;
 
+// ── SOS state (non-blocking) ─────────────────────────────────────────────────
+// Set when the 2s-hold has fired but we're waiting (asynchronously) on a
+// phone GPS reply before actually transmitting. A single click while this is
+// true cancels the pending SOS (see BTN_SINGLE handling in loop()).
+static bool           sosPending      = false;
+static unsigned long  sosWaitStartMs  = 0;
+const  unsigned long  SOS_GPS_WAIT_MS = 2500UL;
+const  uint32_t       SOS_HOLD_MS     = 2000UL;   // shared with checkButton()'s hold detection
+
 // ── GPS TX payload and phone GPS cache ───────────────────────────────────────
 static char gpsTxPayload[128]  = {};
 static char phoneGpsLatBuf[20] = {};
@@ -203,10 +212,14 @@ static unsigned long lastHomeRefreshMs    = 0;
 const  unsigned long HOME_REFRESH_MS      = 5000UL;
 
 // ── Message display ───────────────────────────────────────────────────────────
-static bool          messagePending       = false;
-static unsigned long messagePendingMs     = 0;
-const  unsigned long MESSAGE_DISPLAY_MS   = 10000UL;
+static bool          messagePending          = false;
 static bool          emergencyDisplayPending = false;
+static unsigned long sosAckUntilMs          = 0;    // epoch when SOS ACK screen auto-dismisses (0 = not active)
+const  unsigned long SOS_ACK_DISPLAY_MS     = 10000UL;
+
+// Beep requests from duck.run() callbacks are deferred here and executed in
+// loop() after duck.run() returns, avoiding recursive duck.run() deadlocks.
+static struct { int times; int onMs; int offMs; } gBeepReq = {};
 
 // ── Battery ───────────────────────────────────────────────────────────────────
 static unsigned long lastBattMs  = 0;
@@ -247,6 +260,7 @@ bool sendMamaTalk(const String& targetId, const String& msg, const String& mid =
 String extractField(const String& body, const String& key);
 void handleGps(const String& body);
 void blinkLed(int times);
+void beepBuzzer(int times, int onMs = 100, int offMs = 100);
 bool sendEmergency(String lat = "", String lng = "", String alt = "",
                    String spd = "", String hdg = "", bool gpsFromPhone = false);
 static float readVbat();
@@ -434,6 +448,24 @@ static int batteryPercent(float vbat) {
     return (int)constrain(pct, 0.0f, 100.0f);
 }
 
+// Draw a live progress bar while the SOS button is held, so the user gets
+// clear visual (not just audible) confirmation the hold is registering and
+// can see roughly how much longer is needed. Throttled by the caller so this
+// doesn't hammer the bit-banged SW-I2C bus every loop() iteration.
+static void showHoldProgress(uint32_t heldMs) {
+    dspBegin();
+    dspStrRight(0, idBuf);
+    dspStrCenter(14, "TAHAN UNTUK SOS");
+
+    const int barX = 14, barY = 30, barW = 100, barH = 14;
+    display.drawFrame(barX, barY, barW, barH);
+    uint32_t clampedMs = (heldMs > SOS_HOLD_MS) ? SOS_HOLD_MS : heldMs;
+    int fillW = (int)((uint32_t)(barW - 4) * clampedMs / SOS_HOLD_MS);
+    if (fillW > 0) display.drawBox(barX + 2, barY + 2, fillW, barH - 4);
+
+    dspEnd();
+}
+
 // ── Button debouncer ──────────────────────────────────────────────────────────
 // (enum BtnEvent declared earlier near top of file)
 
@@ -443,9 +475,13 @@ static BtnEvent checkButton() {
     static uint8_t  clickCount   = 0;
     static uint32_t lastReleaseMs = 0;
     static bool     holdFired    = false;
+    static uint8_t  holdBeepsFired = 0;   // how many hold-progress beeps fired this press
+    static bool     progressShown  = false; // true once the on-screen hold bar has been drawn this press
+    static uint32_t lastProgressDrawMs = 0;
 
-    const uint32_t HOLD_MS   = 2000;
-    const uint32_t CLICK_GAP = 400;   // max ms between clicks in a multi-click burst
+    const uint32_t HOLD_MS        = SOS_HOLD_MS;
+    const uint32_t CLICK_GAP      = 400;   // max ms between clicks in a multi-click burst
+    const uint32_t PROGRESS_DELAY = 200;   // ms held before showing the bar (avoids flicker on quick clicks)
 
     bool btnDown = (digitalRead(CANCEL_BUTTON_PIN) == LOW);  // active LOW
 
@@ -453,19 +489,51 @@ static BtnEvent checkButton() {
         wasDown      = true;
         pressStartMs = millis();
         holdFired    = false;
+        holdBeepsFired = 0;
+        progressShown  = false;
     }
-    // Detect 2-second hold while button is still pressed
+    // Live feedback while holding, so the user knows the SOS hold is being
+    // registered and roughly how much longer to keep pressing (helps avoid
+    // releasing too early, or wondering if the button is unresponsive).
+    if (wasDown && btnDown && !holdFired) {
+        uint32_t heldMs = millis() - pressStartMs;
+        if (holdBeepsFired < 1 && heldMs >= 500)  { beepBuzzer(1, 40, 0); holdBeepsFired = 1; }
+        if (holdBeepsFired < 2 && heldMs >= 1000) { beepBuzzer(1, 40, 0); holdBeepsFired = 2; }
+        if (holdBeepsFired < 3 && heldMs >= 1500) { beepBuzzer(2, 40, 40); holdBeepsFired = 3; }
+
+        if (heldMs >= PROGRESS_DELAY && (!progressShown || millis() - lastProgressDrawMs >= 100)) {
+            lastProgressDrawMs = millis();
+            progressShown      = true;
+            showHoldProgress(heldMs);
+        }
+    }
+    // Detect 2-second hold while button is still pressed (fast path).
     if (wasDown && btnDown && !holdFired && (millis() - pressStartMs >= HOLD_MS)) {
         holdFired  = true;
         wasDown    = false;
         clickCount = 0;
         return BTN_HOLD_2S;
     }
-    // Button released — count the click
+    // Button released — also check for hold on release in case polling was
+    // delayed by a beep (the button may have been released during the block).
     if (!btnDown && wasDown) {
         wasDown       = false;
         lastReleaseMs = millis();
-        if (!holdFired) clickCount++;
+        if (!holdFired && (millis() - pressStartMs >= HOLD_MS)) {
+            clickCount = 0;
+            return BTN_HOLD_2S;
+        }
+        if (!holdFired) {
+            clickCount++;
+            beepBuzzer(1, 25, 0);   // immediate tick per click so the user can
+                                    // self-correct a multi-click gesture in progress
+        }
+        // Released before the hold completed — restore whatever the screen
+        // showed before we interrupted it with the progress bar.
+        if (progressShown) {
+            progressShown = false;
+            displayHome();
+        }
     }
     // Evaluate click burst after the inter-click silence window expires
     if (!btnDown && !wasDown && clickCount > 0 && (millis() - lastReleaseMs >= CLICK_GAP)) {
@@ -502,9 +570,11 @@ void setup() {
     // this call is omitted.  14-bit gives full-scale 16383 (0x3FFF).
     analogReadResolution(ADC_RESOLUTION);
 
-    // LED + Button
+    // LED + Button + Buzzer
     pinMode(PIN_LED1,     OUTPUT);
     digitalWrite(PIN_LED1, LOW);
+    pinMode(12,           OUTPUT);              // D12 = Buzzer (active HIGH)
+    digitalWrite(12,      LOW);
     pinMode(CANCEL_BUTTON_PIN, INPUT_PULLUP);   // active LOW
 
     // GPS — wake the L76KB before starting Serial1
@@ -658,7 +728,7 @@ void loop() {
         displayHome();
     }
 
-    // SOS acknowledgement from operator.
+    // SOS acknowledgement from operator — show for SOS_ACK_DISPLAY_MS then auto-return home.
     if (sosAckDisplayPending) {
         sosAckDisplayPending = false;
         displayEnabled = true;
@@ -670,14 +740,13 @@ void loop() {
         dspStrCenter(40, "DIHANTAR");
         dspEnd();
         blinkLed(3);
-        messagePending          = false;
-        emergencyDisplayPending = true;
+        messagePending = false;
+        sosAckUntilMs  = millis() + SOS_ACK_DISPLAY_MS;
     }
 
-    // Auto-dismiss received message after MESSAGE_DISPLAY_MS.
-    if (messagePending && (millis() - messagePendingMs >= MESSAGE_DISPLAY_MS)) {
-        messagePending = false;
-        displayEnabled = true;
+    // Auto-dismiss SOS ACK screen after timeout.
+    if (sosAckUntilMs > 0 && millis() >= sosAckUntilMs) {
+        sosAckUntilMs = 0;
         dspPowerSave(0);
         displayHome();
     }
@@ -685,6 +754,7 @@ void loop() {
     // Auto-refresh home screen.
     if (displayEnabled && !phoneGpsDisplayPending
         && !usbConnectDisplayPending && !messagePending && !emergencyDisplayPending
+        && sosAckUntilMs == 0
         && (millis() - lastHomeRefreshMs >= HOME_REFRESH_MS)) {
         lastHomeRefreshMs = millis();
         float rawRssi = lora.getRSSI();
@@ -713,42 +783,67 @@ void loop() {
             gotGps = true;
         }
 
-        if (!gotGps && isPhoneConnected()) {
-            if (phoneGpsLatBuf[0] == '\0') {
-                dspBegin();
-                dspStrRight(0, idBuf);
-                dspStrCenter(22, "MEMINTA GPS");
-                dspStrCenter(34, "DARIPADA TELEFON...");
-                dspEnd();
-                broadcast("CDK:GPSREQ");
-                unsigned long waitStart = millis();
-                while (phoneGpsLatBuf[0] == '\0' && millis() - waitStart < 2500) {
-                    duck.run();
-                    delay(50);
-                }
-            }
-            if (phoneGpsLatBuf[0] != '\0') {
-                gpsLat = String(phoneGpsLatBuf);
-                gpsLng = String(phoneGpsLngBuf);
-                if (phoneGpsAltBuf[0] != '\0') gpsAlt = String(phoneGpsAltBuf);
-                if (phoneGpsSpdBuf[0] != '\0') gpsSpd = String(phoneGpsSpdBuf);
-                if (phoneGpsHdgBuf[0] != '\0') gpsHdg = String(phoneGpsHdgBuf);
-            }
+        if (gotGps) {
+            // Already have a local fix — send immediately, no need to wait.
+            dspBegin();
+            dspStrRight(0, idBuf);
+            displayBatt();
+            dspStrCenter(22, "SEDANG HANTAR");
+            dspStrCenter(34, "ISYARAT KECEMASAN...");
+            dspEnd();
+            sendEmergency(gpsLat, gpsLng, gpsAlt, gpsSpd, gpsHdg, /* gpsFromPhone= */ false);
+        } else if (phoneGpsLatBuf[0] != '\0') {
+            // We already have a cached phone fix from earlier — use it now.
+            dspBegin();
+            dspStrRight(0, idBuf);
+            displayBatt();
+            dspStrCenter(22, "SEDANG HANTAR");
+            dspStrCenter(34, "ISYARAT KECEMASAN...");
+            dspEnd();
+            sendEmergency(String(phoneGpsLatBuf), String(phoneGpsLngBuf),
+                          phoneGpsAltBuf[0] ? String(phoneGpsAltBuf) : "",
+                          phoneGpsSpdBuf[0] ? String(phoneGpsSpdBuf) : "",
+                          phoneGpsHdgBuf[0] ? String(phoneGpsHdgBuf) : "",
+                          /* gpsFromPhone= */ true);
+        } else if (isPhoneConnected()) {
+            // No fix yet — ask the phone and continue asynchronously below
+            // (see "Deferred SOS" block) so we don't block button polling
+            // or duck.run(). Single-click cancels this while it's pending.
+            dspBegin();
+            dspStrRight(0, idBuf);
+            dspStrCenter(22, "MEMINTA GPS");
+            dspStrCenter(34, "DARIPADA TELEFON...");
+            dspStrCenter(46, "(KLIK UNTUK BATAL)");
+            dspEnd();
+            broadcast("CDK:GPSREQ");
+            sosPending     = true;
+            sosWaitStartMs = millis();
+        } else {
+            // No local fix, no phone connected — send anyway, but make sure
+            // the user sees clearly that no location was included.
+            dspBegin();
+            dspStrRight(0, idBuf);
+            displayBatt();
+            dspStrCenter(22, "SEDANG HANTAR");
+            dspStrCenter(34, "ISYARAT KECEMASAN...");
+            dspEnd();
+            sendEmergency("", "", "", "", "", /* gpsFromPhone= */ false);
         }
-
-        dspBegin();
-        dspStrRight(0, idBuf);
-        displayBatt();
-        dspStrCenter(22, "SEDANG HANTAR");
-        dspStrCenter(34, "ISYARAT KECEMASAN...");
-        dspEnd();
-
-        sendEmergency(gpsLat, gpsLng, gpsAlt, gpsSpd, gpsHdg,
-                      /* gpsFromPhone= */ !gotGps && gpsLat.length() > 0);
     }
 
     if (btn == BTN_SINGLE) {
-        if (emergencyDisplayPending) {
+        if (sosPending) {
+            // Cancel a pending SOS that's still waiting on a phone GPS reply.
+            sosPending = false;
+            beepBuzzer(1, 60, 0);
+            dspPowerSave(0);
+            displayEnabled = true;
+            displayHome();
+        } else if (sosAckUntilMs > 0) {
+            sosAckUntilMs = 0;
+            dspPowerSave(0);
+            displayHome();
+        } else if (emergencyDisplayPending) {
             emergencyDisplayPending = false;
             displayEnabled = true;
             dspPowerSave(0);
@@ -769,7 +864,13 @@ void loop() {
         }
     }
 
-    if (btn == BTN_TRIPLE) {
+    // Double-click: Roger acknowledgement — moved from triple-click since
+    // this is the more time-critical rescue-coordination action and
+    // deserves the fewer-clicks slot. The old double-click battery-send
+    // feature was removed: battery is already auto-broadcast on BLE
+    // connect (ble_on_connect()) and periodically over USB, so a manual
+    // send added no information the phone didn't already have.
+    if (btn == BTN_DOUBLE) {
         duck.sendData(topics::status, std::string("MSG,SRC:DEVICE,TEXT:Roger"));
         broadcast("CDK:ACK,ID:ROGER");
         dspPowerSave(0);
@@ -782,7 +883,9 @@ void loop() {
         displayHome();
     }
 
-    if (btn == BTN_QUAD) {
+    // Triple-click: GPS/date-time pages — moved from quadruple-click now
+    // that only three gestures (single/double/triple) are used.
+    if (btn == BTN_TRIPLE) {
         dspPowerSave(0);
         displayEnabled = true;
         dspBegin();
@@ -908,6 +1011,13 @@ void loop() {
 
     duck.run();
 
+    // Execute any beep deferred from duck.run() callbacks (avoids recursive duck.run()).
+    if (gBeepReq.times > 0) {
+        int t = gBeepReq.times, on = gBeepReq.onMs, off = gBeepReq.offMs;
+        gBeepReq = {};
+        beepBuzzer(t, on, off);
+    }
+
     // ── Deferred GPS LoRa TX ──────────────────────────────────────────────────
     if (gpsTxPending) {
         gpsTxPending = false;
@@ -931,6 +1041,35 @@ void loop() {
     if (gpsDisplayClearMs > 0 && millis() >= gpsDisplayClearMs) {
         gpsDisplayClearMs = 0;
         dspPowerSave(1);
+    }
+
+    // ── Deferred SOS: waiting (non-blocking) for a phone GPS reply ───────────
+    // Triggered from BTN_HOLD_2S above when no local fix was available yet.
+    // Cancelled by a single click (see BTN_SINGLE handling above).
+    if (sosPending) {
+        if (phoneGpsLatBuf[0] != '\0') {
+            sosPending = false;
+            dspBegin();
+            dspStrRight(0, idBuf);
+            displayBatt();
+            dspStrCenter(22, "SEDANG HANTAR");
+            dspStrCenter(34, "ISYARAT KECEMASAN...");
+            dspEnd();
+            sendEmergency(String(phoneGpsLatBuf), String(phoneGpsLngBuf),
+                          phoneGpsAltBuf[0] ? String(phoneGpsAltBuf) : "",
+                          phoneGpsSpdBuf[0] ? String(phoneGpsSpdBuf) : "",
+                          phoneGpsHdgBuf[0] ? String(phoneGpsHdgBuf) : "",
+                          /* gpsFromPhone= */ true);
+        } else if (millis() - sosWaitStartMs >= SOS_GPS_WAIT_MS) {
+            sosPending = false;
+            dspBegin();
+            dspStrRight(0, idBuf);
+            displayBatt();
+            dspStrCenter(22, "SEDANG HANTAR");
+            dspStrCenter(34, "ISYARAT KECEMASAN...");
+            dspEnd();
+            sendEmergency("", "", "", "", "", /* gpsFromPhone= */ false);
+        }
     }
 
     // ── Deferred CDK:GPSREQ dispatch ─────────────────────────────────────────
@@ -1050,10 +1189,12 @@ void handleDuckData(CdpPacket packet) {
                 if (millis() - lastSosAckMs < 5000UL) break;
                 lastSosAckMs         = millis();
                 sosAckDisplayPending = true;
+                gBeepReq = {1, 500, 0};  // deferred: 1 long beep = SOS acknowledged (relief)
                 broadcast("CDK:SOS_ACK,TEXT:SOS DITERIMA");
                 break;
             }
             dspPowerSave(0);
+            beepBuzzer(1, 150, 0);     // immediate: beep before message appears
             displayMessage(message);
             emergencyDisplayPending = true;
             displayEnabled          = true;
@@ -1064,12 +1205,14 @@ void handleDuckData(CdpPacket packet) {
             break;
 
         case 23:
+            beepBuzzer(3, 80, 80);     // immediate: alert before anything else
             flashLED();
             broadcast(String("CDK:MSG,TEXT:") + message);
             duck.sendData(23, "ALERT_ACK");
             break;
 
         case 24:
+            beepBuzzer(3, 80, 80);     // rapid triple = emergency alert (announcement is danger)
             displayAnnouncement(message);
             blinkLed(1);
             broadcast(String("CDK:BCAST,TEXT:") + message);
@@ -1246,9 +1389,8 @@ void displayMessage(String msg) {
     if (msg.length() > 21) dspStr(0, 24, msg.substring(21, 42).c_str());
     if (msg.length() > 42) dspStr(0, 36, msg.substring(42, 63).c_str());
     dspEnd();
-    messagePending    = true;
-    messagePendingMs  = millis();
-    displayEnabled    = true;
+    messagePending  = true;
+    displayEnabled  = true;
 }
 
 void displayAnnouncement(const String& msg) {
@@ -1284,6 +1426,28 @@ void blinkLed(int times) {
         digitalWrite(PIN_LED1, LOW);
         { unsigned long t = millis(); while (millis() - t < 200) { duck.run(); delay(5); } }
     }
+}
+
+// Buzzer is D12 = P1.00 (passive buzzer — needs PWM at resonant frequency to be loud).
+// Safe to call from duck.run() callbacks: off-gaps use delay() not duck.run(),
+// avoiding recursive re-entry into the CDP stack.
+void beepBuzzer(int times, int onMs, int offMs) {
+    NRF_P1->DIRSET = (1u << 0);   // ensure D12 is output
+    for (int n = 0; n < times; n++) {
+        // Bit-bang ~2.5 kHz square wave for the on duration.
+        unsigned long endMs = millis() + (unsigned long)onMs;
+        while ((long)(endMs - millis()) > 0) {
+            NRF_P1->OUTSET = (1u << 0);
+            delayMicroseconds(200);
+            NRF_P1->OUTCLR = (1u << 0);
+            delayMicroseconds(200);
+        }
+        // Off gap: simple delay — safe from any call context.
+        if (n < times - 1 && offMs > 0) {
+            delay(offMs);
+        }
+    }
+    NRF_P1->OUTCLR = (1u << 0);   // ensure buzzer is silent after last beep
 }
 
 // ── Battery ───────────────────────────────────────────────────────────────────
@@ -1327,11 +1491,14 @@ bool sendEmergency(String lat, String lng, String alt, String spd, String hdg, b
         dspBegin();
         dspStrRight(0, idBuf);
         displayBatt();
-        dspStrCenter(22, hasGps ? "BERJAYA HANTAR" : "BERJAYA HANTAR");
-        dspStrCenter(34, hasGps ? "ISYARAT KECEMASAN" : "ISYARAT KECEMASAN");
-        dspStrCenter(46, hasGps ? "DENGAN GPS!"     : "");
+        dspStrCenter(22, "BERJAYA HANTAR");
+        dspStrCenter(34, "ISYARAT KECEMASAN");
+        dspStrCenter(46, hasGps ? "DENGAN GPS!" : "TANPA GPS!");
         dspEnd();
         blinkLed(2);
+        if (!hasGps) {
+            beepBuzzer(2, 60, 60);  // distinct warning: sent, but no location included
+        }
         {
             unsigned long endMs = millis() + 2000UL;
             while (millis() < endMs) { duck.run(); delay(10); }
@@ -1345,6 +1512,7 @@ bool sendEmergency(String lat, String lng, String alt, String spd, String hdg, b
         dspStrCenter(34, "HANTAR ISYARAT");
         dspStrCenter(46, "KECEMASAN");
         dspEnd();
+        beepBuzzer(2, 60, 60);      // SOS failed — fast double = error
     }
     return true;
 }

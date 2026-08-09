@@ -74,6 +74,8 @@ extern CDPCFG_LORA_CLASS lora;
  void handleGps(const String& body);
  static float readVbat();
  void blinkLed(int frequency);
+ static void quickBlink();
+ void showHoldProgress(uint32_t heldMs);
  static bool isPhoneConnected();
 
  // --- Global Variables ---
@@ -132,6 +134,15 @@ static unsigned long lastTxMs               = 0;      // millis() of most recent
 static volatile bool sosAckDisplayPending   = false;  // set by handleDuckData; rendered at top of loop()
 static volatile unsigned long bleAnnounceAfterMs = 0; // millis() after which to send ID+battery post-connect
 static unsigned long          bleSplashClearMs   = 0; // millis() after which to call displayHome() after connect splash
+
+// ── SOS state (non-blocking) ─────────────────────────────────────────────────
+// Set when the 2s-hold has fired but there's no cached phone GPS yet, so we
+// broadcast CDK:GPSREQ and wait (asynchronously) instead of blocking loop()
+// for up to 2.5 s. A single click while this is true cancels the pending SOS.
+static bool           sosPending        = false;
+static unsigned long  sosWaitStartMs    = 0;
+const  unsigned long  SOS_GPS_WAIT_MS   = 2500UL;
+const  uint32_t       SOS_HOLD_MS       = 2000UL;   // matches button.pressedFor(2000) below
 
 // ── Per-duck GPS cache ────────────────────────────────────────────────────────
 // Populated whenever a packet containing LAT:/LNG: fields arrives from any duck.
@@ -434,6 +445,34 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     displayEnabled = true;
   }
 
+  // Deferred SOS: continue once the phone's GPS reply arrives, or once the
+  // wait times out — replaces the old blocking while() loop inside the
+  // button.pressedFor(2000) handler so loop()/button polling never stalls.
+  if (sosPending && (phoneGpsLatBuf[0] != '\0' || millis() - sosWaitStartMs >= SOS_GPS_WAIT_MS)) {
+    sosPending = false;
+    String gpsLat = "", gpsLng = "", gpsAlt = "", gpsSpd = "", gpsHdg = "";
+    bool gpsFromPhone = false;
+    if (phoneGpsLatBuf[0] != '\0') {
+      gpsLat = String(phoneGpsLatBuf);
+      gpsLng = String(phoneGpsLngBuf);
+      if (phoneGpsAltBuf[0] != '\0') gpsAlt = String(phoneGpsAltBuf);
+      if (phoneGpsSpdBuf[0] != '\0') gpsSpd = String(phoneGpsSpdBuf);
+      if (phoneGpsHdgBuf[0] != '\0') gpsHdg = String(phoneGpsHdgBuf);
+      gpsFromPhone = true;
+      Serial.printf("[SOS] Phone GPS acquired: lat=%s lng=%s alt=%s spd=%s hdg=%s\n",
+                    gpsLat.c_str(), gpsLng.c_str(), gpsAlt.c_str(), gpsSpd.c_str(), gpsHdg.c_str());
+    } else {
+      Serial.println("[SOS] Phone GPS timeout — SOS will be sent without coordinates");
+    }
+    displayID();
+    displayBatt();
+    display.setFont(ArialMT_Plain_10);
+    display.setTextAlignment(TEXT_ALIGN_CENTER);
+    display.drawString(64, 22, "SEDANG HANTAR\nISYARAT KECEMASAN...");
+    display.display();
+    sendEmergency(gpsLat, gpsLng, gpsAlt, gpsSpd, gpsHdg, gpsFromPhone);
+  }
+
    //timer.tick();
 
   // Auto-dismiss received message after MESSAGE_DISPLAY_MS so the home screen
@@ -470,6 +509,39 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
 
   heltec_loop();
   // Button
+  // Escalating hold feedback toward the SOS threshold. HotButton's
+  // pressedFor(ms) fires exactly once per distinct increasing threshold
+  // during a single continuous hold, so no manual counter is needed here
+  // (unlike WioTracker's hand-rolled checkButton() debounce state machine).
+  {
+    static bool     holdProgressShown  = false;
+    static uint32_t holdPressStartMs   = 0;
+    static uint32_t lastProgressDrawMs = 0;
+    const  uint32_t PROGRESS_REDRAW_MS = 150UL;
+
+    if (button.pressed()) {
+      holdPressStartMs  = millis();
+      holdProgressShown = false;
+    }
+
+    if (button.pressedNow()) {
+      uint32_t heldMs = millis() - holdPressStartMs;
+      if (heldMs >= 300 && heldMs < SOS_HOLD_MS && (millis() - lastProgressDrawMs >= PROGRESS_REDRAW_MS)) {
+        showHoldProgress(heldMs);
+        lastProgressDrawMs = millis();
+        holdProgressShown  = true;
+      }
+    } else if (holdProgressShown) {
+      // Released before reaching the SOS threshold — restore the home screen.
+      holdProgressShown = false;
+      displayHome();
+    }
+
+    if (button.pressedFor(500) || button.pressedFor(1000) || button.pressedFor(1500)) {
+      quickBlink();
+    }
+  }
+
   if (button.pressedFor(2000)) {
     String gpsLat = "";
     String gpsLng = "";
@@ -494,8 +566,12 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     // If no hardware GPS and phone is connected, use cached GPS.
     // If cache is empty (e.g. GPS poll hasn't fired yet since connect),
     // send CDK:GPSREQ now and wait up to 2.5 s for the phone to reply.
+    bool sendNow = true;
     if (!gotGps && isPhoneConnected()) {
       if (phoneGpsLatBuf[0] == '\0') {
+        // No cached fix yet — request one and defer the actual send instead
+        // of blocking here for up to 2.5 s, which used to stall button
+        // polling and the rest of the mesh loop.
         displayID();
         displayBatt();
         display.setFont(ArialMT_Plain_10);
@@ -504,16 +580,10 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
         display.display();
         broadcast("CDK:GPSREQ");
         Serial.println("[SOS] Phone GPS cache empty — requesting fresh fix before SOS...");
-        unsigned long waitStart = millis();
-        while (phoneGpsLatBuf[0] == '\0' && millis() - waitStart < 2500) {
-          duck.run();
-          delay(50);
-        }
-        if (phoneGpsLatBuf[0] == '\0') {
-          Serial.println("[SOS] Phone GPS timeout — SOS will be sent without coordinates");
-        }
-      }
-      if (phoneGpsLatBuf[0] != '\0') {
+        sosPending     = true;
+        sosWaitStartMs = millis();
+        sendNow        = false;
+      } else {
         gpsLat = String(phoneGpsLatBuf);
         gpsLng = String(phoneGpsLngBuf);
         if (phoneGpsAltBuf[0] != '\0') gpsAlt = String(phoneGpsAltBuf);
@@ -525,19 +595,32 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     } else if (!gotGps) {
       Serial.println("[GPS] No GPS available — SOS sent without coordinates");
     }
-    displayID();
-    displayBatt();
-    display.setFont(ArialMT_Plain_10);
-    display.setTextAlignment(TEXT_ALIGN_CENTER);
-    display.drawString(64, 22, "SEDANG HANTAR\nISYARAT KECEMASAN...");
-    display.display();
 
-    sendEmergency(gpsLat, gpsLng, gpsAlt, gpsSpd, gpsHdg, /* gpsFromPhone= */ !gotGps && gpsLat.length() > 0);
-    //heltec_delay(1000);
+    if (sendNow) {
+      displayID();
+      displayBatt();
+      display.setFont(ArialMT_Plain_10);
+      display.setTextAlignment(TEXT_ALIGN_CENTER);
+      display.drawString(64, 22, "SEDANG HANTAR\nISYARAT KECEMASAN...");
+      display.display();
+
+      sendEmergency(gpsLat, gpsLng, gpsAlt, gpsSpd, gpsHdg, /* gpsFromPhone= */ !gotGps && gpsLat.length() > 0);
+    }
   }
 
   if (button.isSingleClick()) {
-    if (emergencyDisplayPending) {
+    if (sosPending) {
+      // Cancel the deferred SOS wait — user tapped instead of waiting it out.
+      sosPending = false;
+      displayID();
+      displayBatt();
+      display.setFont(ArialMT_Plain_10);
+      display.setTextAlignment(TEXT_ALIGN_CENTER);
+      display.drawString(64, 22, "SOS DIBATALKAN");
+      display.display();
+      heltec_delay(1000);
+      displayHome();
+    } else if (emergencyDisplayPending) {
       // Dismiss the emergency message and return to home screen.
       emergencyDisplayPending = false;
       displayEnabled = true;
@@ -560,7 +643,12 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     }
   }
 
-  if (button.isTripleClick()) {
+  // Double-click: Roger acknowledgement — moved from triple-click since
+  // this is the more time-critical rescue-coordination action and deserves
+  // the fewer-clicks slot. The old double-click battery-send feature was
+  // removed: battery is already auto-broadcast on BLE connect and
+  // periodically over USB, so a manual send added no new information.
+  if (button.isDoubleClick()) {
     // Send "Roger" confirmation to the rescuer over the LoRa mesh —
     // same topic (topics::status) and payload format as a phone-sent message.
     duck.sendData(topics::status, std::string("MSG,SRC:DEVICE,TEXT:Roger"));
@@ -579,8 +667,10 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     displayHome();
   }
 
+  // Triple-click: GPS/date-time pages — moved from quadruple-click now
+  // that only three gestures (single/double/triple) are used.
 #ifdef ARDUINO_heltec_wifi_lora_32_V4
-  if (button.isQuadrupleClick()) {
+  if (button.isTripleClick()) {
     display.displayOn();
     displayEnabled = true;
     display.clear();
@@ -630,7 +720,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
       display.display();
       heltec_delay(2500);
 
-      Serial.printf("[GPS] Quadruple-click: lat=%.5f lng=%.5f sats=%u age=%lums date=%04d/%02d/%02d time=%02d:%02d:%02d\n",
+      Serial.printf("[GPS] Triple-click: lat=%.5f lng=%.5f sats=%u age=%lums date=%04d/%02d/%02d time=%02d:%02d:%02d\n",
                     tinyGps.location.lat(), tinyGps.location.lng(),
                     tinyGps.satellites.value(), tinyGps.location.age(),
                     y, mo, d, h, mi, sc);
@@ -638,12 +728,12 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
       display.setFont(ArialMT_Plain_10);
       display.setTextAlignment(TEXT_ALIGN_CENTER);
       display.drawString(64, 28, "GPS: MODUL AKTIF\nMENUNGGU ISYARAT...");
-      Serial.println("[GPS] Quadruple-click: module active, no fix yet");
+      Serial.println("[GPS] Triple-click: module active, no fix yet");
     } else {
       display.setFont(ArialMT_Plain_10);
       display.setTextAlignment(TEXT_ALIGN_CENTER);
       display.drawString(64, 28, "GPS: TIADA MODUL");
-      Serial.println("[GPS] Quadruple-click: no GPS module detected");
+      Serial.println("[GPS] Triple-click: no GPS module detected");
     }
     display.display();
     heltec_delay(5000);
@@ -1336,6 +1426,29 @@ void displayBatt() {
     }
  }
 
+ // Fast, non-blocking-ish LED pulse used for per-tick hold feedback.
+ // blinkLed() is too slow (~400ms per blink, serviced by duck.run() in a wait
+ // loop) to use for escalating hold-progress ticks without noticeably
+ // delaying the next pressedFor() threshold check.
+ static void quickBlink() {
+   heltec_led(80);
+   delay(30);
+   heltec_led(0);
+ }
+
+ // Live progress bar shown while the button is held toward the 2s SOS
+ // threshold. Uses SSD1306Wire's native drawProgressBar() instead of
+ // WioTracker's hand-rolled u8g2 drawFrame/drawBox bar.
+ void showHoldProgress(uint32_t heldMs) {
+   uint8_t pct = (uint8_t)constrain((heldMs * 100UL) / SOS_HOLD_MS, 0UL, 100UL);
+   display.clear();
+   display.setTextAlignment(TEXT_ALIGN_CENTER);
+   display.setFont(ArialMT_Plain_10);
+   display.drawString(64, 8, "TAHAN UNTUK SOS");
+   display.drawProgressBar(4, 28, 120, 12, pct);
+   display.display();
+ }
+
  bool sendEmergency(String lat, String lng, String alt, String spd, String hdg, bool gpsFromPhone) {
    bool failure;
    bool hasGps = (lat.length() > 0 && lng.length() > 0);
@@ -1377,7 +1490,8 @@ void displayBatt() {
      displayBatt();
      display.setFont(ArialMT_Plain_10);
      display.setTextAlignment(TEXT_ALIGN_CENTER);
-     display.drawString(64, 22, hasGps ? "BERJAYA HANTAR\nISYARAT KECEMASAN\nDENGAN GPS!" : "BERJAYA HANTAR\nISYARAT KECEMASAN!");
+     display.drawString(64, 22, hasGps ? "BERJAYA HANTAR\nISYARAT KECEMASAN\nDENGAN GPS!" : "BERJAYA HANTAR\nISYARAT KECEMASAN\nTANPA GPS!");
+     if (!hasGps) blinkLed(2);  // extra blinks — distinct warning that the SOS went out without a location
 
      // no displayID. because this has no clear();
      display.setTextAlignment(TEXT_ALIGN_RIGHT);

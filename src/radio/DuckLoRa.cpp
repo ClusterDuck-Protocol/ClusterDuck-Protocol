@@ -131,8 +131,8 @@ int DuckLoRa::setupRadio(const LoRaConfigParams &config) {
 
     // set sync word to private network
 
-    //rc = lora.setSyncWord(0x12); //should this be passed?
-    rc = lora.setSyncWord(0x34); // public instead of ClusterDuck default 0x12
+    rc = lora.setSyncWord(0x12); //should this be passed?
+    //rc = lora.setSyncWord(0x34); // public instead of ClusterDuck default 0x12
 
     if (rc != RADIOLIB_ERR_NONE) {
         logerr_ln("ERROR  sync word is invalid");
@@ -380,6 +380,7 @@ void DuckLoRa::serviceInterruptFlags() {
         }
         if (DuckLoRa::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_TX_DONE) {
             loginfo_ln("SX127x Interrupt flag was set: payload transmission complete");
+            lora.setFrequency(defaultRadioParams.band); // restore mesh channel
             goToReceiveMode(false); // go back to receive mode and reset the receive flag
         }
         if (DuckLoRa::interruptFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_CAD_DONE) {
