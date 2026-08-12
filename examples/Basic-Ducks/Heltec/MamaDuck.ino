@@ -10,11 +10,15 @@
  */
 
  #include <string>
+ #include <vector>
  #include <cstdio>
  #include <cstring>
+ #include <cstdlib>
+ #include <cmath>
  #include <map>
  #include <arduino-timer.h>
  #include <CDP.h>
+ #include "payloads/DuckPayloads.h"
  #ifdef SERIAL_PORT_USBVIRTUAL
  #define Serial SERIAL_PORT_USBVIRTUAL
  #endif
@@ -135,7 +139,7 @@ static volatile bool bleConnectDisplayPending = false; // show BLE-connected spl
 static volatile bool bleDisconnectDisplayPending = false; // show BLE-disconnected splash from main loop
 static volatile bool usbConnectDisplayPending = false; // show USB-connected splash from main loop
 static volatile bool usbDisconnectDisplayPending = false; // show USB-disconnected splash from main loop
-static char          gpsTxPayload[128]       = {};     // payload for deferred GPS TX
+static std::vector<uint8_t> gpsTxPayload;              // encoded protobuf payload for deferred GPS TX
 static char          phoneGpsLatBuf[20]      = {};
 static char          phoneGpsLngBuf[20]     = {};
 static char          phoneGpsAltBuf[12]     = {};     // altitude in metres
@@ -672,8 +676,13 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
   // periodically over USB, so a manual send added no new information.
   if (button.isDoubleClick()) {
     // Send "Roger" confirmation to the rescuer over the LoRa mesh —
-    // same topic (topics::status) and payload format as a phone-sent message.
-    duck.sendData(topics::status, std::string("MSG,SRC:DEVICE,TEXT:Roger"));
+    // protobuf-encoded StatusMsg wrapped in a StatusReport (same topic,
+    // topics::status, as a phone-sent message).
+    duckcdp_StatusMsg rogerMsg = duckcdp_StatusMsg_init_zero;
+    rogerMsg.src = duckcdp_StatusMsgSrc_STATUS_MSG_SRC_DEVICE;
+    std::snprintf(rogerMsg.text, sizeof(rogerMsg.text), "%s", "Roger");
+    std::vector<uint8_t> rogerEncoded = duckpayload::encodeStatusReportMsg(rogerMsg);
+    duck.sendData(topics::status, rogerEncoded.data(), rogerEncoded.size());
     broadcast("CDK:ACK,ID:ROGER");
     Serial.println("[MAMA] Triple-click: Roger sent");
     display.displayOn();
@@ -878,9 +887,10 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
   // startReceive() and abort the GPS response startTransmit().
   if (gpsTxPending) {
     gpsTxPending = false;
-    int result = duck.sendData(topics::gps, std::string(gpsTxPayload));
+    int result = duck.sendData(topics::gps, gpsTxPayload.data(), gpsTxPayload.size());
     gpsLoraOk = (result == 0);
-    Serial.printf("[GPS] Deferred LoRa TX %s: %s\n", gpsLoraOk ? "OK" : "FAILED", gpsTxPayload);
+    Serial.printf("[GPS] Deferred LoRa TX %s (%u bytes)\n", gpsLoraOk ? "OK" : "FAILED",
+                  (unsigned)gpsTxPayload.size());
   }
 
   // ── Deferred BEACON_ACK TX ──────────────────────────────────────────
@@ -919,21 +929,19 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     } else if (phoneGpsLatBuf[0] != '\0' && !gpsTxPending) {
       // GPS already cached from a previous GPSREQ — respond immediately
       // without a new round-trip to the phone so OpenDMS always gets an answer.
-      char gpsBuf[128];
-      std::snprintf(gpsBuf, sizeof(gpsBuf), "GPS,SRC:PHONE,LAT:%s,LNG:%s",
-                    phoneGpsLatBuf, phoneGpsLngBuf);
-      if (phoneGpsAltBuf[0] != '\0')
-        strncat(gpsBuf, (",ALT:" + String(phoneGpsAltBuf)).c_str(), sizeof(gpsBuf) - strlen(gpsBuf) - 1);
-      if (phoneGpsSpdBuf[0] != '\0')
-        strncat(gpsBuf, (",SPD:" + String(phoneGpsSpdBuf)).c_str(), sizeof(gpsBuf) - strlen(gpsBuf) - 1);
-      if (phoneGpsHdgBuf[0] != '\0')
-        strncat(gpsBuf, (",HDG:" + String(phoneGpsHdgBuf)).c_str(), sizeof(gpsBuf) - strlen(gpsBuf) - 1);
-      char battSuffix[16];
-      std::snprintf(battSuffix, sizeof(battSuffix), ",BATT:%d", heltec_battery_percent(readVbat()));
-      strncat(gpsBuf, battSuffix, sizeof(gpsBuf) - strlen(gpsBuf) - 1);
-      strncpy(gpsTxPayload, gpsBuf, sizeof(gpsTxPayload) - 1);
+      duckcdp_GpsReading reading = duckcdp_GpsReading_init_zero;
+      reading.has_fix = true;
+      reading.source = duckcdp_GpsSource_GPS_SOURCE_PHONE;
+      reading.no_fix_reason = duckcdp_GpsNoFixReason_GPS_REASON_NONE;
+      reading.lat_e7 = (int32_t)lround(atof(phoneGpsLatBuf) * 1e7);
+      reading.lng_e7 = (int32_t)lround(atof(phoneGpsLngBuf) * 1e7);
+      if (phoneGpsAltBuf[0] != '\0') reading.alt_m = (int32_t)lround(atof(phoneGpsAltBuf));
+      if (phoneGpsSpdBuf[0] != '\0') reading.spd_dkmh = (uint32_t)lround(atof(phoneGpsSpdBuf) * 10);
+      if (phoneGpsHdgBuf[0] != '\0') reading.hdg_deg = (uint32_t)lround(atof(phoneGpsHdgBuf));
+      reading.batt_pct = heltec_battery_percent(readVbat());
+      gpsTxPayload = duckpayload::encodeGps(reading);
       gpsTxPending = true;
-      Serial.printf("[GPS] Deferred GPS TX from cache: %s\n", gpsBuf);
+      Serial.printf("[GPS] Deferred GPS TX from cache: lat=%s lng=%s\n", phoneGpsLatBuf, phoneGpsLngBuf);
     } else {
       Serial.println("[GPS] Deferred CDK:GPSREQ skipped (no phone)");
     }
@@ -944,11 +952,14 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
   // no-fix to the mesh so OpenDMS gets an answer instead of silence.
   if (gpsReqSentMs > 0 && !gpsTxPending && millis() - gpsReqSentMs > 10000UL) {
     gpsReqSentMs = 0;
-    char noGpsBuf[72];
-    std::snprintf(noGpsBuf, sizeof(noGpsBuf), "GPS,FIX:0,SRC:NONE,REASON:NO_RESPONSE,BATT:%d",
-                  heltec_battery_percent(readVbat()));
-    duck.sendData(topics::gps, std::string(noGpsBuf));
-    Serial.println("[GPS] GPSREQ timeout — no response from phone, sent: " + String(noGpsBuf));
+    duckcdp_GpsReading noGps = duckcdp_GpsReading_init_zero;
+    noGps.has_fix = false;
+    noGps.source = duckcdp_GpsSource_GPS_SOURCE_NONE;
+    noGps.no_fix_reason = duckcdp_GpsNoFixReason_GPS_REASON_NO_RESPONSE;
+    noGps.batt_pct = heltec_battery_percent(readVbat());
+    std::vector<uint8_t> encoded = duckpayload::encodeGps(noGps);
+    duck.sendData(topics::gps, encoded.data(), encoded.size());
+    Serial.println("[GPS] GPSREQ timeout — no response from phone, sent no-fix report.");
   }
  }
 
@@ -1038,20 +1049,25 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     Serial.println("HANDLING RECEIVING DATA....");
 
     String message = String((char*)packet.data.data(), packet.data.size());
-    char replyMsg[200];
     Serial.println("[RX] payload: " + message);
 
     switch (packet.topic) {
         case reservedTopic::ping: {
             // Another duck pinged us — fetch our GPS and broadcast it so the
             // pinging duck (and any listener) can cache our location.
-            char gpsPayload[80] = {};
+            duckcdp_GpsReading pingGps = duckcdp_GpsReading_init_zero;
+            bool haveGps = false;
             bool haveHardwareGps = false;
 #ifdef ARDUINO_heltec_wifi_lora_32_V4
             // Priority 1: hardware GPS with a fresh fix.
             if (tinyGps.location.isValid() && tinyGps.location.age() < 30000) {
-                snprintf(gpsPayload, sizeof(gpsPayload), "GPS,LAT:%.6f,LNG:%.6f",
-                         tinyGps.location.lat(), tinyGps.location.lng());
+                pingGps.has_fix = true;
+                pingGps.source = duckcdp_GpsSource_GPS_SOURCE_DEVICE;
+                pingGps.no_fix_reason = duckcdp_GpsNoFixReason_GPS_REASON_NONE;
+                pingGps.lat_e7 = (int32_t)lround(tinyGps.location.lat() * 1e7);
+                pingGps.lng_e7 = (int32_t)lround(tinyGps.location.lng() * 1e7);
+                pingGps.batt_pct = heltec_battery_percent(readVbat());
+                haveGps = true;
                 haveHardwareGps = true;
             }
 #endif
@@ -1070,11 +1086,16 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
                     Serial.println("[PING] GPS cache empty — CDK:GPSREQ deferred to main loop");
                 }
                 if (phoneGpsLatBuf[0] != '\0') {
-                    snprintf(gpsPayload, sizeof(gpsPayload), "GPS,LAT:%s,LNG:%s",
-                             phoneGpsLatBuf, phoneGpsLngBuf);
+                    pingGps.has_fix = true;
+                    pingGps.source = duckcdp_GpsSource_GPS_SOURCE_PHONE;
+                    pingGps.no_fix_reason = duckcdp_GpsNoFixReason_GPS_REASON_NONE;
+                    pingGps.lat_e7 = (int32_t)lround(atof(phoneGpsLatBuf) * 1e7);
+                    pingGps.lng_e7 = (int32_t)lround(atof(phoneGpsLngBuf) * 1e7);
+                    pingGps.batt_pct = heltec_battery_percent(readVbat());
+                    haveGps = true;
                 }
             }
-            if (gpsPayload[0] != '\0') {
+            if (haveGps) {
                 // Never call duck.sendData() from inside recvDataCallback — it races
                 // with the radio's TX_DONE ISR and aborts the transmission (same
                 // reason handleGps() uses gpsTxPending).
@@ -1082,15 +1103,23 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
                 // gpsTxPayload + gpsTxPending with the full telemetry payload.
                 // Only override here for the cached-GPS path.
                 if (!gpsTxPending) {
-                    strncpy(gpsTxPayload, gpsPayload, sizeof(gpsTxPayload) - 1);
+                    gpsTxPayload = duckpayload::encodeGps(pingGps);
                     gpsTxPending = true;
                 }
-                Serial.printf("[PING] GPS TX deferred: %s\n", gpsPayload);
+                Serial.printf("[PING] GPS TX deferred: lat_e7=%d lng_e7=%d\n", pingGps.lat_e7, pingGps.lng_e7);
             }
             break;
         }
 
         case 22:  // Text message / operator command
+            if (duckpayload::isProtobuf(packet.data.data(), packet.data.size())) {
+              duckcdp_OpText opText = duckcdp_OpText_init_zero;
+              if (!duckpayload::decodeOpText(packet.data.data(), packet.data.size(), opText)) {
+                Serial.println("[MSG] ERROR: failed to decode OpText payload.");
+                break;
+              }
+              message = String(opText.text);
+            }
             Serial.println("📨 Message: " + message);
             if (message.indexOf("SOS DITERIMA") >= 0) {
                 // Debounce: ignore duplicate SOS_ACK packets arriving via multiple
@@ -1114,9 +1143,13 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
             displayMessage(message);
             emergencyDisplayPending = true;   // operator message — stay until button pressed
             displayEnabled = true;
-            std::snprintf(replyMsg, sizeof(replyMsg), "MSG_READ:TEXT:%s", message.c_str());
-            duck.sendData(22, replyMsg);
-            //duck.sendData(22, "MSG_READ");
+            {
+              duckcdp_OpText ack = duckcdp_OpText_init_zero;
+              String ackText = "MSG_READ:TEXT:" + message;
+              std::snprintf(ack.text, sizeof(ack.text), "%s", ackText.c_str());
+              std::vector<uint8_t> encoded = duckpayload::encodeOpText(ack);
+              duck.sendData(22, encoded.data(), (int)encoded.size());
+            }
             // blink to show message arrive
             blinkLed(1);
             // send message to phone via both USB serial and Bluetooth Low energy
@@ -1126,13 +1159,30 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
             break;
 
         case 23:  // Alert
+            if (duckpayload::isProtobuf(packet.data.data(), packet.data.size())) {
+              duckcdp_OpText opText = duckcdp_OpText_init_zero;
+              if (duckpayload::decodeOpText(packet.data.data(), packet.data.size(), opText)) {
+                message = String(opText.text);
+              }
+            }
             Serial.println("⚠️  ALERT: " + message);
             flashLED();
             broadcast(String("CDK:MSG,TEXT:") + message);
-            duck.sendData(23, "ALERT_ACK");
+            {
+              duckcdp_OpText ack = duckcdp_OpText_init_zero;
+              std::snprintf(ack.text, sizeof(ack.text), "%s", "ALERT_ACK");
+              std::vector<uint8_t> encoded = duckpayload::encodeOpText(ack);
+              duck.sendData(23, encoded.data(), (int)encoded.size());
+            }
             break;
 
         case 24:  // Emergency broadcast from operator
+            if (duckpayload::isProtobuf(packet.data.data(), packet.data.size())) {
+              duckcdp_OpText opText = duckcdp_OpText_init_zero;
+              if (duckpayload::decodeOpText(packet.data.data(), packet.data.size(), opText)) {
+                message = String(opText.text);
+              }
+            }
             Serial.println("📢 Emergency Broadcast: " + message);
             displayAnnouncement(message);
             //flashLED();
@@ -1141,6 +1191,12 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
             broadcast(String("CDK:BCAST,TEXT:") + message);
             break;
         case 25:
+            if (duckpayload::isProtobuf(packet.data.data(), packet.data.size())) {
+              duckcdp_OpText opText = duckcdp_OpText_init_zero;
+              if (duckpayload::decodeOpText(packet.data.data(), packet.data.size(), opText)) {
+                message = String(opText.text);
+              }
+            }
             Serial.println("Personal message: " + message);
             broadcast(String("CDK:PMSG,TEXT:") + message);
             break;
@@ -1328,7 +1384,44 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
         }
 
         case 26:  // MamaDuck-to-MamaDuck (MTALK)
-            Serial.println("[MTALK] Received: " + message);
+            if (duckpayload::isProtobuf(packet.data.data(), packet.data.size())) {
+              // ── Protobuf-encoded MTalk (see duck_payloads.proto) ─────────
+              duckcdp_MTalk mtalk = duckcdp_MTalk_init_zero;
+              if (!duckpayload::decodeMTalk(packet.data.data(), packet.data.size(), mtalk)) {
+                Serial.println("[MTALK] ERROR: failed to decode MTalk payload.");
+                break;
+              }
+              String senderId = String((char*)packet.sduid.data(), 8);
+              String mid = String(mtalk.mid);
+              if (mtalk.kind == duckcdp_MTalkKind_MTALK_ACK) {
+                // Delivery receipt coming back to the original sender.
+                Serial.println("[MTALK] Received ACK mid=" + mid);
+                broadcast("CDK:MACK,ID:" + mid + ",FROM:" + senderId);
+              } else {
+                // Incoming message.
+                String text = String(mtalk.text);
+                Serial.println("[MTALK] Received: " + text);
+                String frameOut = "CDK:MTALK,TEXT:" + text + ",FROM:" + senderId;
+                if (mid.length() > 0) frameOut += ",MID:" + mid;
+                broadcast(frameOut);
+                // Send targeted delivery receipt back to the original sender.
+                if (mid.length() > 0) {
+                  std::array<uint8_t, 8> senderDuid;
+                  for (int i = 0; i < 8; i++) senderDuid[i] = packet.sduid[i];
+                  duckcdp_MTalk ack = duckcdp_MTalk_init_zero;
+                  ack.kind = duckcdp_MTalkKind_MTALK_ACK;
+                  std::snprintf(ack.mid, sizeof(ack.mid), "%s", mid.c_str());
+                  std::vector<uint8_t> encoded = duckpayload::encodeMTalk(ack);
+                  if (!encoded.empty()) {
+                    duck.sendData(26, encoded.data(), (int)encoded.size(), senderDuid);
+                    Serial.println("[MTALK] MACK sent back to " + senderId);
+                  }
+                }
+              }
+              break;
+            }
+            // ── Legacy plain-text MTALK (pre-protobuf firmware) ──────────────
+            Serial.println("[MTALK] Received (legacy): " + message);
             if (message.startsWith("[MACK:")) {
               // ── Delivery receipt coming back to the original sender ───────
               // Forward to app: CDK:MACK,ID:<mid>,FROM:<senderDuckId>
@@ -1476,22 +1569,29 @@ void displayBatt() {
    bool hasGps = (lat.length() > 0 && lng.length() > 0);
    int battPct = heltec_battery_percent(readVbat());
 
-   // Human-readable LoRa payload — DeviceID is carried in the MQTT envelope
-   // by the gateway so we don't need to repeat it in the payload bytes.
-   std::string loraMsg = "SOS,SRC:DEVICE";
+   // Protobuf-encode the alert (see duck_payloads.proto: SosAlert) —
+   // DeviceID is carried in the MQTT envelope by the gateway so we don't
+   // need to repeat it in the payload bytes.
+   duckcdp_SosAlert alertMsg = duckcdp_SosAlert_init_zero;
+   alertMsg.origin = duckcdp_SosOrigin_SOS_ORIGIN_DEVICE;
+   alertMsg.has_gps = hasGps;
    if (hasGps) {
-     loraMsg += ",LAT:" + std::string(lat.c_str()) + ",LNG:" + std::string(lng.c_str());
-     if (alt.length() > 0) loraMsg += ",ALT:" + std::string(alt.c_str());
-     if (spd.length() > 0) loraMsg += ",SPD:" + std::string(spd.c_str());
-     if (hdg.length() > 0) loraMsg += ",HDG:" + std::string(hdg.c_str());
-     if (gpsFromPhone)      loraMsg += ",GPS:PHONE";
+     alertMsg.gps_source = gpsFromPhone ? duckcdp_GpsSource_GPS_SOURCE_PHONE
+                                         : duckcdp_GpsSource_GPS_SOURCE_DEVICE;
+     alertMsg.lat_e7 = (int32_t)lround(atof(lat.c_str()) * 1e7);
+     alertMsg.lng_e7 = (int32_t)lround(atof(lng.c_str()) * 1e7);
+     if (alt.length() > 0) alertMsg.alt_m = (int32_t)lround(atof(alt.c_str()));
+     if (spd.length() > 0) alertMsg.spd_dkmh = (uint32_t)lround(atof(spd.c_str()) * 10);
+     if (hdg.length() > 0) alertMsg.hdg_deg = (uint32_t)lround(atof(hdg.c_str()));
+   } else {
+     alertMsg.gps_source = duckcdp_GpsSource_GPS_SOURCE_NONE;
    }
-   loraMsg += ",BATT:" + std::to_string(battPct);
-   Serial.print("[MAMA] sendEmergency data: ");
-   Serial.println(loraMsg.c_str());
+   alertMsg.batt_pct = battPct;
+   std::vector<uint8_t> encoded = duckpayload::encodeSos(alertMsg);
+   Serial.printf("[MAMA] sendEmergency data: %u bytes (hasGps=%d)\n", (unsigned)encoded.size(), hasGps);
 
    // Send alert upward to PapaDuck — PapaDuck decides whether to re-broadcast.
-   failure = duck.sendData(topics::alert, loraMsg);
+   failure = duck.sendData(topics::alert, encoded.data(), encoded.size());
    lastTxResult = failure;   // 0 = success; track for signal-line display
    lastTxMs     = millis();
    if (!failure) {
@@ -1701,12 +1801,23 @@ void handleSOS(const String& body) {
   display.drawString(64, 22, TXT_SENDING_SOS_2L);
   display.display();
   // construct the message — include phone telemetry + device battery
-  String message = "SOS,LAT:" + lat + ",LNG:" + lng;
-  if (alt.length() > 0) message += ",ALT:" + alt;
-  if (spd.length() > 0) message += ",SPD:" + spd;
-  if (hdg.length() > 0) message += ",HDG:" + hdg;
-  message += ",BATT:" + String(battPct);  // no \n — sendData handles its own framing
-  int failure = duck.sendData(topics::status, std::string(message.c_str()));
+  duckcdp_SosAlert alertMsg = duckcdp_SosAlert_init_zero;
+  alertMsg.origin = duckcdp_SosOrigin_SOS_ORIGIN_PHONE;
+  bool hasGps = (lat.length() > 0 && lng.length() > 0);
+  alertMsg.has_gps = hasGps;
+  if (hasGps) {
+    alertMsg.gps_source = duckcdp_GpsSource_GPS_SOURCE_PHONE;
+    alertMsg.lat_e7 = (int32_t)lround(atof(lat.c_str()) * 1e7);
+    alertMsg.lng_e7 = (int32_t)lround(atof(lng.c_str()) * 1e7);
+    if (alt.length() > 0) alertMsg.alt_m = (int32_t)lround(atof(alt.c_str()));
+    if (spd.length() > 0) alertMsg.spd_dkmh = (uint32_t)lround(atof(spd.c_str()) * 10);
+    if (hdg.length() > 0) alertMsg.hdg_deg = (uint32_t)lround(atof(hdg.c_str()));
+  } else {
+    alertMsg.gps_source = duckcdp_GpsSource_GPS_SOURCE_NONE;
+  }
+  alertMsg.batt_pct = battPct;
+  std::vector<uint8_t> encoded = duckpayload::encodeStatusReportSos(alertMsg);
+  int failure = duck.sendData(topics::status, encoded.data(), encoded.size());
   // blink LED to show activity
   blinkLed(3);
   if (!failure) {
@@ -1744,8 +1855,19 @@ void handleMsg(const String& body) {
   Serial.print(" lng="); Serial.print(lng);
   Serial.print(" text="); Serial.println(text);
 
-  String message = "MSG,URGENCY:" + urgency + ",LAT:" + lat + ",LNG:" + lng + ",TEXT:" + text;  // no \n
-                                                                                                //
+  // Protobuf-encode the message (see duck_payloads.proto: StatusMsg,
+  // wrapped in a StatusReport on the `status` topic).
+  duckcdp_StatusMsg statusMsg = duckcdp_StatusMsg_init_zero;
+  statusMsg.src = duckcdp_StatusMsgSrc_STATUS_MSG_SRC_PHONE;
+  std::snprintf(statusMsg.urgency, sizeof(statusMsg.urgency), "%s", urgency.c_str());
+  bool hasGps = (lat.length() > 0 && lng.length() > 0);
+  statusMsg.has_gps = hasGps;
+  if (hasGps) {
+    statusMsg.lat_e7 = (int32_t)lround(atof(lat.c_str()) * 1e7);
+    statusMsg.lng_e7 = (int32_t)lround(atof(lng.c_str()) * 1e7);
+  }
+  std::snprintf(statusMsg.text, sizeof(statusMsg.text), "%s", text.c_str());
+
   // show send message status
   // Display status
   display.displayOn();
@@ -1760,7 +1882,8 @@ void handleMsg(const String& body) {
   blinkLed(1);
   displayHome();
 
-  int failure = duck.sendData(topics::status, std::string(message.c_str()));
+  std::vector<uint8_t> encoded = duckpayload::encodeStatusReportMsg(statusMsg);
+  int failure = duck.sendData(topics::status, encoded.data(), encoded.size());
   if (!failure) {
     Serial.println("[MAMA] send ok.");
     broadcast("CDK:ACK,ID:MSG");
@@ -1775,13 +1898,21 @@ bool sendMamaTalk(const String& targetId, const String& msg, const String& mid) 
     return false;
   }
   std::array<uint8_t, 8> targetDuid = duckutils::stringToArray<uint8_t, 8>(std::string(targetId.c_str()));
-  // Embed the MID as a trailing ",MID:<id>" suffix so the receiver can echo it
-  // back as a targeted delivery receipt ([MACK:<id>] on topic 26).
-  String payload = msg;
-  if (mid.length() > 0) payload += ",MID:" + mid;
-  int failure = duck.sendData(26, std::string(payload.c_str()), targetDuid);
+  // Protobuf-encode the chat message (see duck_payloads.proto: MTalk). The
+  // receiver echoes `mid` back as a targeted delivery receipt (MTALK_ACK on
+  // topic 26) when one is present.
+  duckcdp_MTalk mtalk = duckcdp_MTalk_init_zero;
+  mtalk.kind = duckcdp_MTalkKind_MTALK_MSG;
+  std::snprintf(mtalk.mid, sizeof(mtalk.mid), "%s", mid.c_str());
+  std::snprintf(mtalk.text, sizeof(mtalk.text), "%s", msg.c_str());
+  std::vector<uint8_t> encoded = duckpayload::encodeMTalk(mtalk);
+  if (encoded.empty()) {
+    Serial.println("[MTALK] ERROR: failed to encode MTalk message (too long?).");
+    return false;
+  }
+  int failure = duck.sendData(26, encoded.data(), (int)encoded.size(), targetDuid);
   if (!failure) {
-    Serial.println("[MAMA] MTALK sent to " + targetId + ": " + payload);
+    Serial.println("[MAMA] MTALK sent to " + targetId + ": " + msg);
     broadcast("CDK:ACK,ID:MTALK,TARGET:" + targetId);
   } else {
     Serial.println("[MAMA] MTALK send failed.");
@@ -1814,14 +1945,21 @@ void handleGps(const String& body) {
     // Defer duck.sendData() to after duck.run() to avoid TX abort race:
     // the stale TX_DONE interrupt from the relay would call startReceive()
     // and abort a GPS response startTransmit() that ran before duck.run().
-    std::snprintf(gpsTxPayload, sizeof(gpsTxPayload), "GPS,FIX:0,SRC:PHONE,REASON:NO_SIGNAL,BATT:%d",
-                 heltec_battery_percent(readVbat()));
+    duckcdp_GpsReading noFix = duckcdp_GpsReading_init_zero;
+    noFix.has_fix = false;
+    noFix.source = duckcdp_GpsSource_GPS_SOURCE_PHONE;
+    noFix.no_fix_reason = duckcdp_GpsNoFixReason_GPS_REASON_NO_SIGNAL;
+    noFix.batt_pct = heltec_battery_percent(readVbat());
+    gpsTxPayload = duckpayload::encodeGps(noFix);
     gpsTxPending = true;
     return;
   }
-  char gpsBuf[128];
-  std::snprintf(gpsBuf, sizeof(gpsBuf), "GPS,SRC:PHONE,LAT:%s,LNG:%s",
-                lat.c_str(), lng.c_str());
+  duckcdp_GpsReading reading = duckcdp_GpsReading_init_zero;
+  reading.has_fix = true;
+  reading.source = duckcdp_GpsSource_GPS_SOURCE_PHONE;
+  reading.no_fix_reason = duckcdp_GpsNoFixReason_GPS_REASON_NONE;
+  reading.lat_e7 = (int32_t)lround(atof(lat.c_str()) * 1e7);
+  reading.lng_e7 = (int32_t)lround(atof(lng.c_str()) * 1e7);
   strncpy(phoneGpsLatBuf, lat.c_str(), sizeof(phoneGpsLatBuf) - 1);
   strncpy(phoneGpsLngBuf, lng.c_str(), sizeof(phoneGpsLngBuf) - 1);
   // Cache optional telemetry for use by hardware SOS button fallback
@@ -1831,19 +1969,25 @@ void handleGps(const String& body) {
   phoneGpsAltBuf[0] = '\0';
   phoneGpsSpdBuf[0] = '\0';
   phoneGpsHdgBuf[0] = '\0';
-  if (alt.length() > 0) { strncpy(phoneGpsAltBuf, alt.c_str(), sizeof(phoneGpsAltBuf) - 1); strncat(gpsBuf, (",ALT:" + alt).c_str(), sizeof(gpsBuf) - strlen(gpsBuf) - 1); }
-  if (spd.length() > 0) { strncpy(phoneGpsSpdBuf, spd.c_str(), sizeof(phoneGpsSpdBuf) - 1); strncat(gpsBuf, (",SPD:" + spd).c_str(), sizeof(gpsBuf) - strlen(gpsBuf) - 1); }
-  if (hdg.length() > 0) { strncpy(phoneGpsHdgBuf, hdg.c_str(), sizeof(phoneGpsHdgBuf) - 1); strncat(gpsBuf, (",HDG:" + hdg).c_str(), sizeof(gpsBuf) - strlen(gpsBuf) - 1); }
-  // Append battery last so telemetry fields stay grouped
-  char battSuffix[16];
-  std::snprintf(battSuffix, sizeof(battSuffix), ",BATT:%d", heltec_battery_percent(readVbat()));
-  strncat(gpsBuf, battSuffix, sizeof(gpsBuf) - strlen(gpsBuf) - 1);
+  if (alt.length() > 0) {
+    strncpy(phoneGpsAltBuf, alt.c_str(), sizeof(phoneGpsAltBuf) - 1);
+    reading.alt_m = (int32_t)lround(atof(alt.c_str()));
+  }
+  if (spd.length() > 0) {
+    strncpy(phoneGpsSpdBuf, spd.c_str(), sizeof(phoneGpsSpdBuf) - 1);
+    reading.spd_dkmh = (uint32_t)lround(atof(spd.c_str()) * 10);
+  }
+  if (hdg.length() > 0) {
+    strncpy(phoneGpsHdgBuf, hdg.c_str(), sizeof(phoneGpsHdgBuf) - 1);
+    reading.hdg_deg = (uint32_t)lround(atof(hdg.c_str()));
+  }
+  reading.batt_pct = heltec_battery_percent(readVbat());
   phoneGpsNoFix = false;
   phoneGpsDisplayPending = true;  // render from main loop (I2C not thread-safe)
   // Defer duck.sendData() to after duck.run() — see comment above.
-  strncpy(gpsTxPayload, gpsBuf, sizeof(gpsTxPayload) - 1);
+  gpsTxPayload = duckpayload::encodeGps(reading);
   gpsTxPending = true;
-  Serial.printf("[GPS] GPS TX deferred: %s\n", gpsBuf);
+  Serial.printf("[GPS] GPS TX deferred: lat=%s lng=%s\n", lat.c_str(), lng.c_str());
 }
 
 String extractField(const String& body, const String& key) {

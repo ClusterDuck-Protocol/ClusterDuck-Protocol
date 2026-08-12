@@ -1,0 +1,73 @@
+name: Language Variants Build (Heltec V3 / Wio Tracker L1 Pro)
+
+on:
+  push:
+    paths:
+      - 'src/**'
+      - 'examples/Basic-Ducks/Heltec/**'
+      - 'examples/Basic-Ducks/Seeed/WioTrackerL1/**'
+      - 'tools/**'
+      - 'boards/**'
+      - 'platformio.ini'
+      - '.github/workflows/lang_variants_ci.yml'
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'examples/Basic-Ducks/Heltec/**'
+      - 'examples/Basic-Ducks/Seeed/WioTrackerL1/**'
+      - 'tools/**'
+      - 'boards/**'
+      - 'platformio.ini'
+      - '.github/workflows/lang_variants_ci.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Heltec V3 (Malay - default)
+            env: local_heltec_wifi_lora_32_V3
+            example_dir: Basic-Ducks/Heltec
+            lang_flag: ''
+          - name: Heltec V3 (English)
+            env: local_heltec_wifi_lora_32_V3
+            example_dir: Basic-Ducks/Heltec
+            lang_flag: '-DDUCK_LANG_EN'
+          - name: Wio Tracker L1 Pro (Malay - default)
+            env: local_wio_tracker_l1
+            example_dir: Basic-Ducks/Seeed/WioTrackerL1
+            lang_flag: ''
+          - name: Wio Tracker L1 Pro (English)
+            env: local_wio_tracker_l1
+            example_dir: Basic-Ducks/Seeed/WioTrackerL1
+            lang_flag: '-DDUCK_LANG_EN'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install PlatformIO
+        run: python -m pip install platformio
+
+      - name: Install CDP dependencies
+        run: platformio pkg install -e ${{ matrix.env }}
+
+      - name: Build (${{ matrix.name }})
+        env:
+          EXAMPLE_DIR: ${{ matrix.example_dir }}
+          PLATFORMIO_BUILD_FLAGS: ${{ matrix.lang_flag }}
+        run: platformio run -e ${{ matrix.env }}
+
+      - name: Upload build log
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: build-log-${{ matrix.env }}-${{ matrix.lang_flag == '' && 'malay' || 'english' }}
+          path: '*.log'

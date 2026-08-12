@@ -1,0 +1,20 @@
+# nanopb field size options for duck_payloads.proto
+#
+# GpsReading/SosAlert/HealthStatus have no string/bytes fields, so they need
+# no entries here (nanopb generates fully static structs automatically).
+#
+# MTalk carries free-form chat text, so its string fields need an explicit
+# max_size for nanopb to generate a static (non-malloc) struct. Sized so the
+# worst-case encoded message (1 marker byte + this message) stays within
+# CdpPacket's 229-byte DATA payload budget.
+duckcdp.MTalk.mid  max_size:5
+duckcdp.MTalk.text max_size:216
+
+# StatusMsg is wrapped inside StatusReport (oneof with SosAlert) on the
+# `status` topic; budget its strings so the worst case (marker + oneof
+# overhead + StatusMsg) still fits the 229-byte DATA payload.
+duckcdp.StatusMsg.urgency max_size:16
+duckcdp.StatusMsg.text    max_size:180
+
+# OpText is sent standalone on topics 22-25.
+duckcdp.OpText.text max_size:220

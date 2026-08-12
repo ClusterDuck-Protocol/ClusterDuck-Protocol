@@ -1,0 +1,137 @@
+// duck_payloads.proto
+//
+// Shared protobuf schema for CDP LoRa payloads sent on the `gps`, `alert`
+// (SOS) and `health` topics. This single schema is compiled twice:
+//   - with the nanopb plugin, for the embedded duck firmware (this repo)
+//   - with standard `protoc --cpp_out`, for the gateway/concentrator daemon
+//
+// All coordinate/telemetry fields use fixed-point integers instead of
+// floats/doubles to keep the wire format small and deterministic across
+// platforms:
+//   lat_e7 / lng_e7 : degrees * 1e7      (matches typical GPS precision, fits in a signed 32-bit int)
+//   alt_m           : altitude in whole meters
+//   spd_dkmh        : speed in km/h * 10 (one decimal place of precision)
+//   hdg_deg         : heading in degrees, 0-359
+//
+// The originating duck ID is NOT included in any of these messages: it is
+// already present in the CdpPacket header (`dduid`) that wraps every
+// payload, so repeating it here would be redundant.
+syntax = "proto3";
+
+package duckcdp;
+
+// Where a GPS fix (or lack of one) originated from.
+enum GpsSource {
+  GPS_SOURCE_NONE = 0;   // no GPS source available
+  GPS_SOURCE_DEVICE = 1; // duck's own onboard GPS module
+  GPS_SOURCE_PHONE = 2;  // GPS relayed from the paired phone app
+}
+
+// Why a GpsReading has no fix, when has_fix == false.
+enum GpsNoFixReason {
+  GPS_REASON_NONE = 0;        // not applicable (has_fix == true)
+  GPS_REASON_NO_SIGNAL = 1;   // GPS source present but no signal/fix yet
+  GPS_REASON_NO_RESPONSE = 2; // requested GPS from phone but got no reply
+}
+
+// Who/what triggered an SosAlert.
+enum SosOrigin {
+  SOS_ORIGIN_UNKNOWN = 0;
+  SOS_ORIGIN_DEVICE = 1; // triggered by the hardware SOS button
+  SOS_ORIGIN_PHONE = 2;  // triggered from the paired phone app
+}
+
+// GPS reading transmitted on the `gps` topic.
+message GpsReading {
+  bool has_fix = 1;
+  GpsSource source = 2;
+  GpsNoFixReason no_fix_reason = 3; // meaningful only when has_fix == false
+
+  // The following fields are only valid when has_fix == true.
+  sint32 lat_e7 = 4;
+  sint32 lng_e7 = 5;
+  sint32 alt_m = 6;
+  uint32 spd_dkmh = 7; // 0 if unknown
+  uint32 hdg_deg = 8;  // 0 if unknown
+  uint32 sats = 9;     // satellite count, 0 if unknown
+
+  uint32 batt_pct = 10; // device battery percentage, 0-100
+}
+
+// Emergency / SOS alert transmitted on the `alert` topic.
+message SosAlert {
+  SosOrigin origin = 1;
+  GpsSource gps_source = 2;
+
+  bool has_gps = 3;
+  // The following fields are only valid when has_gps == true.
+  sint32 lat_e7 = 4;
+  sint32 lng_e7 = 5;
+  sint32 alt_m = 6;
+  uint32 spd_dkmh = 7;
+  uint32 hdg_deg = 8;
+
+  uint32 batt_pct = 9; // device battery percentage, 0-100
+}
+
+// Periodic health/status report transmitted on the `health` topic.
+message HealthStatus {
+  uint32 counter = 1;    // monotonically increasing send counter
+  int32 free_memory = 2; // bytes of free heap/SRAM
+}
+
+// Kind of MTalk frame transmitted on topic 26 (MamaDuck-to-MamaDuck free-text
+// chat; a per-sketch example topic, not part of the core CdpPacket topics
+// enum).
+enum MTalkKind {
+  MTALK_MSG = 0; // a chat message; `text` (and optionally `mid`) are set
+  MTALK_ACK = 1; // delivery receipt for a previously sent `mid`
+}
+
+// MamaDuck-to-MamaDuck free-text message / delivery receipt, topic 26.
+// `mid` and `text` are bounded strings (see duck_payloads.options) so nanopb
+// can still generate a fully static struct.
+message MTalk {
+  MTalkKind kind = 1;
+  string mid = 2;  // optional 4-character message id (empty if unused)
+  string text = 3; // chat text; only meaningful when kind == MTALK_MSG
+}
+
+// Who composed a StatusMsg (see below).
+enum StatusMsgSrc {
+  STATUS_MSG_SRC_UNKNOWN = 0;
+  STATUS_MSG_SRC_PHONE = 1;  // composed by the paired phone app
+  STATUS_MSG_SRC_DEVICE = 2; // composed by the device itself (e.g. "Roger")
+}
+
+// Free-text status message sent on the `status` topic -- distinct from
+// SosAlert (see StatusReport below). Covers phone-composed chat/urgency
+// messages and the hardware "Roger" acknowledgement.
+message StatusMsg {
+  StatusMsgSrc src = 1;
+  string urgency = 2; // optional, phone-composed messages only; empty if unset
+  bool has_gps = 3;
+  sint32 lat_e7 = 4; // meaningful only when has_gps == true
+  sint32 lng_e7 = 5; // meaningful only when has_gps == true
+  string text = 6;
+}
+
+// Envelope for everything sent on the `status` topic: distinguishes a
+// phone-triggered SosAlert (see handleSOS) from a StatusMsg (chat / Roger
+// ack). The `alert` topic is unaffected -- it always carries a bare
+// SosAlert (see sendEmergency).
+message StatusReport {
+  oneof report {
+    SosAlert sos = 1;
+    StatusMsg msg = 2;
+  }
+}
+
+// Generic free-text payload for the operator/mesh text channels: topic 22
+// (text message / device command ack), 23 (alert), 24 (emergency
+// broadcast), 25 (personal message). These are per-sketch example topics,
+// not part of the core CdpPacket topics enum -- the *topic value* (not a
+// field in this message) determines how the text is handled.
+message OpText {
+  string text = 1;
+}
