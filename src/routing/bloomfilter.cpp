@@ -105,11 +105,20 @@ void BloomFilter::set_hash_results(unsigned char* msg, int msgSize,
 
 void BloomFilter::assignUniqueMessageId(CdpPacket& packet) {
 
+    // Bound the retry loop: if the filter is (nearly) saturated, retrying
+    // forever would hang the caller's send path indefinitely. Give up after
+    // a reasonable number of attempts and use the last generated MUID.
+    const int MAX_MUID_ATTEMPTS = 50;
     bool getNewUnique = true;
-    while (getNewUnique) {
+    int attempts = 0;
+    while (getNewUnique && attempts < MAX_MUID_ATTEMPTS) {
       duckutils::getRandomBytes(MUID_LENGTH, packet.muid.data());
       getNewUnique = this->bloom_check(packet.muid.data(), MUID_LENGTH);
       loginfo_ln("prepareForSending: new MUID -> %s",duckutils::convertToHex(packet.muid.data(), MUID_LENGTH).c_str());
+      attempts++;
+    }
+    if (getNewUnique) {
+      logerr_ln("assignUniqueMessageId: bloom filter appears saturated after %d attempts, using MUID anyway", attempts);
     }
     // Add own MUID to bloom so if a relay echoes this packet back, we
     // recognise it as seen and won't re-relay (prevents radio-busy loops).
@@ -181,14 +190,14 @@ void BloomFilter::bloom_add(unsigned char* msg, int msgSize) {
     if (this->nMsg >= this->maxMsgs) {
         if (this->activeFilter == 1){
             logdbg("Freezing filter 1, switching to filter 2\n");
-            for (int i = 0; i < (this->numSectors)/(this->bitsPerSector); i++) {
+            for (int i = 0; i < this->numSectors; i++) {
                     this->filter2[i] = 0;
             }
             this->activeFilter = 2;
         }
         else{
             logdbg("Freezing filter 2, switching to filter 1\n");
-            for (int i = 0; i < (this->numSectors)/(this->bitsPerSector); i++) {
+            for (int i = 0; i < this->numSectors; i++) {
                     this->filter1[i] = 0;
             }
             this->activeFilter = 1;

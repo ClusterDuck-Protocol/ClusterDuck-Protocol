@@ -263,3 +263,57 @@ the device was disconnected. The map gave no feedback.
   when all is well, unmissable red bar when disconnected).
 - Added `<SerialStatusBanner disconnectedOnly />` between the header and map
   in `app/(tabs)/map.tsx`.
+
+---
+
+## 13. Bloom Filter Reset Bug (Filter Saturation After Prolonged Uptime)
+
+**Symptom**  
+A duck could send/relay packets fine for hours, then stop being able to
+send or forward anything at all. Restarting the affected device (or, on the
+gateway, restarting the PapaDuck) temporarily fixed it. Since the two-phase
+bloom filter is randomly seeded per boot, the exact time-to-failure and
+which device appeared "stuck" varied — busier/longer-running senders hit it
+sooner, and on the gateway it was worse because a saturated filter caused
+`PapaDuck.h::handleReceivedPacket()` to drop **all** incoming packets, not
+just relay decisions.
+
+**Root Cause**  
+`BloomFilter::bloom_add()` clears the inactive filter array before switching
+to it, so it starts each new window empty. The clear loop used the wrong
+bound:
+```cpp
+for (int i = 0; i < (this->numSectors)/(this->bitsPerSector); i++) {
+    this->filter2[i] = 0;
+}
+```
+`filter1`/`filter2` are each allocated as `numSectors` words
+(`new unsigned int[this->numSectors]`), so a full clear requires looping
+`numSectors` times. Dividing by `bitsPerSector` (312/32 = 9 with the
+defaults) cleared only the first 9 of 312 words per switch. The remaining
+~303 words kept stale bits from earlier cycles, so after a handful of
+filter switches nearly every word in both filters had bits set. From then
+on `bloom_check()` returned "already seen" for almost any input — including
+brand-new, never-sent MUIDs — because it's declared a match as soon as
+every hashed bit position happens to already be set somewhere in the
+filter.
+
+**Fix** (`src/routing/bloomfilter.cpp`)  
+Loop the full array length on both switch branches:
+```cpp
+for (int i = 0; i < this->numSectors; i++) { this->filter2[i] = 0; }
+...
+for (int i = 0; i < this->numSectors; i++) { this->filter1[i] = 0; }
+```
+Also bounded the MUID-generation retry loop in `assignUniqueMessageId()`
+to `MAX_MUID_ATTEMPTS = 50` (with a `logerr_ln` warning on saturation)
+so a still-saturated filter can no longer hang the send path indefinitely
+instead of eventually giving up and sending anyway.
+
+**Important — separate vendored copy on the gateway**  
+The PapaDuck gateway (`clusterduckd`) vendors its own independent copy of
+`src/routing/bloomfilter.cpp` (not a symlink/submodule of this repo), so
+this fix had to be applied there separately. That copy was also missing
+the `bloom_add()` self-MUID fix from §1 above, which was restored at the
+same time. Any future bloom filter change here should be checked against
+that copy too, since the two can silently drift out of sync.
