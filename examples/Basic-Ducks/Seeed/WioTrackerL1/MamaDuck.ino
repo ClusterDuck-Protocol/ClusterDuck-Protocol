@@ -46,7 +46,6 @@ extern CDPCFG_LORA_CLASS lora;
 Define ARDUINO_SEEED_WIO_TRACKER_L1 (or use env:local_wio_tracker_l1)."
 #endif
 
-#define DUCK_ID "IBRAHIM1"
 // ── Identification ────────────────────────────────────────────────────────────
 // Duck ID: MUST be exactly 8 bytes and unique on the mesh.
 // To pin a fixed, human-readable ID, `#define DUCK_ID "MYDUCK01"` above this

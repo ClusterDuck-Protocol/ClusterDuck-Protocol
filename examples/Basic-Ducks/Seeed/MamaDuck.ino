@@ -12,6 +12,7 @@
  #include <string>
  #include <vector>
  #include <cstdio>
+ #include <cstring>
  #include <cstdlib>
  #include <cmath>
  #include <arduino-timer.h>
@@ -48,7 +49,27 @@ extern CDPCFG_LORA_CLASS lora;
 #define LORA_PA_EN     2
 #endif
 
- #define DUCK_NAME "IBRAHIM1"
+ // ── Device Identification ────────────────────────────────────────────────────
+ // Duck ID: MUST be exactly 8 bytes and unique on the mesh.
+ // To pin a fixed, human-readable ID, pass `-DDUCK_ID=\"MYDUCK01\"` as a build
+ // flag (exactly 8 characters). If DUCK_ID is left undefined, one is
+ // auto-derived below from this board's factory-unique BLE MAC/device address
+ // (see duckesp::getDuckMacAddress()), so every device gets a distinct,
+ // reboot-stable ID with no manual configuration required.
+ static char DUCK_ID_BUF[9] = {0};
+ static bool initDuckId() {
+ #ifdef DUCK_ID
+   strncpy(DUCK_ID_BUF, DUCK_ID, 8);
+ #else
+   std::string mac = duckesp::getDuckMacAddress(false);  // unformatted hex, e.g. "E4B4C2A1B2C3"
+   std::string id  = (mac.length() >= 8) ? mac.substr(mac.length() - 8) : std::string("DUCK0000");
+   memcpy(DUCK_ID_BUF, id.c_str(), 8);
+ #endif
+   DUCK_ID_BUF[8] = '\0';
+   return true;
+ }
+ static bool duckIdReady = initDuckId();
+ #define DUCK_NAME DUCK_ID_BUF   // kept so the rest of this sketch is unchanged
  // Bluetooth Low energgy definitions
  #define NUS_SERVICE "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
  #define NUS_RX_CHAR "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"

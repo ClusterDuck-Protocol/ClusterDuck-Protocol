@@ -18,12 +18,22 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: heltec_wifi_lora_32_V3-MamaDuck
+          - name: heltec_wifi_lora_32_V3-MamaDuck-ms
             env: local_heltec_wifi_lora_32_V3
             example_dir: Basic-Ducks/Heltec
-          - name: wio_tracker_l1-MamaDuck
+            lang_flag: ''
+          - name: heltec_wifi_lora_32_V3-MamaDuck-en
+            env: local_heltec_wifi_lora_32_V3
+            example_dir: Basic-Ducks/Heltec
+            lang_flag: '-DDUCK_LANG_EN'
+          - name: wio_tracker_l1-MamaDuck-ms
             env: local_wio_tracker_l1
             example_dir: Basic-Ducks/Seeed/WioTrackerL1
+            lang_flag: ''
+          - name: wio_tracker_l1-MamaDuck-en
+            env: local_wio_tracker_l1
+            example_dir: Basic-Ducks/Seeed/WioTrackerL1
+            lang_flag: '-DDUCK_LANG_EN'
 
     steps:
       - name: Checkout code
@@ -38,8 +48,10 @@ jobs:
         run: python -m pip install platformio
 
       - name: Build firmware
-        run: |
-          EXAMPLE_DIR=${{ matrix.example_dir }} platformio run -e ${{ matrix.env }}
+        env:
+          EXAMPLE_DIR: ${{ matrix.example_dir }}
+          PLATFORMIO_BUILD_FLAGS: ${{ matrix.lang_flag }}
+        run: platformio run -e ${{ matrix.env }}
 
       - name: Collect firmware artifacts
         run: |
@@ -57,28 +69,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: firmware-${{ matrix.name }}
-          path: release-assets/*
-          if-no-files-found: error
-
-  package-library:
-    name: Package library source
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Create library source archive
-        run: |
-          mkdir -p release-assets
-          git archive --format=zip \
-            --prefix="clusterduck-protocol-${GITHUB_REF_NAME}/" \
-            -o "release-assets/clusterduck-protocol-${GITHUB_REF_NAME}.zip" \
-            HEAD
-
-      - name: Upload library archive artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: library-source
           path: release-assets/*
           if-no-files-found: error
 
