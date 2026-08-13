@@ -48,7 +48,12 @@ jobs:
         # pass it via -I so cppcheck can resolve `#include <pb.h>` when
         # preprocessing duck_payloads.pb.h (otherwise PB_PROTO_HEADER_VERSION
         # is undefined and its generator-version #error guard misfires).
-        cppcheck --error-exitcode=1 --std=c++2a --force -Isrc/payloads/nanopb -isrc/payloads/nanopb src
+        # -UPB_SYSTEM_HEADER: this project never defines PB_SYSTEM_HEADER, so
+        # real builds always take pb.h's safe `#include <stdint.h>` etc.
+        # branch. --force makes cppcheck also speculatively explore the
+        # "PB_SYSTEM_HEADER is defined" branch, where it has no header path
+        # to substitute, causing a false "No header in #include" error.
+        cppcheck --error-exitcode=1 --std=c++2a --force -Isrc/payloads/nanopb -isrc/payloads/nanopb -UPB_SYSTEM_HEADER src
     - name: Install CDP dependencies
       run: |
         echo "Installing dependencies..."
