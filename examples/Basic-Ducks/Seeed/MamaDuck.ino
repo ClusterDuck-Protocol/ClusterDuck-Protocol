@@ -231,6 +231,14 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
   // BLE init
   NimBLEDevice::init(DUCK_NAME);
   NimBLEDevice::setPower(ESP_PWR_LVL_P9); // +9 dBm — maximum ESP32 TX power for best range/discoverability
+  // Offer MTU 512 so the phone's MTU exchange succeeds without fragmentation.
+  // Without this the ATT MTU stays at the 23-byte default, silently
+  // truncating/garbling any notification longer than ~20 bytes (e.g. MTALK
+  // chat text) regardless of what the connecting phone requests.
+  NimBLEDevice::setMTU(512);
+  // No bonding/MITM — open access for maximum disaster-scenario accessibility.
+  NimBLEDevice::setSecurityAuth(false, false, false);
+  NimBLEDevice::setSecurityIOCap(BLE_HS_IO_NO_INPUT_OUTPUT);
   NimBLEServer* pServer = NimBLEDevice::createServer();
   pServer->setCallbacks(new ServerCallbacks());
   NimBLEService* pSvc = pServer->createService(NUS_SERVICE);
