@@ -41,7 +41,11 @@ jobs:
     - name: Run cppcheck
       run: |
         cppcheck --version
-        cppcheck --error-exitcode=1 --std=c++2a --force src
+        # src/payloads/nanopb is vendored third-party code (unmodified
+        # upstream nanopb runtime) - excluded from lint since we don't
+        # own it and cppcheck flags a known false positive there
+        # (pb_write's NULL-buf "sizing pass" call into buf_write).
+        cppcheck --error-exitcode=1 --std=c++2a --force -isrc/payloads/nanopb src
     - name: Install CDP dependencies
       run: |
         echo "Installing dependencies..."
