@@ -42,33 +42,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: heltec_wifi_lora_32_V2-MamaDuck
-            env: local_heltec_wifi_lora_32_V2
-            example_dir: Basic-Ducks/Heltec
           - name: heltec_wifi_lora_32_V3-MamaDuck
             env: local_heltec_wifi_lora_32_V3
             example_dir: Basic-Ducks/Heltec
-          - name: heltec_wifi_lora_32_V4-MamaDuck
-            env: local_heltec_wifi_lora_32_V4
-            example_dir: Basic-Ducks/Heltec
-          - name: lilygo_t_beam_sx1262-DuckLink
-            env: local_lilygo_t_beam_sx1262
-            example_dir: Basic-Ducks/DuckLink
-          - name: lilygo_t_beam_sx1262-MamaDuck
-            env: local_lilygo_t_beam_sx1262
-            example_dir: Basic-Ducks/MamaDuck
-          - name: lilygo_t_beam_sx1262-PapaDuck
-            env: local_lilygo_t_beam_sx1262
-            example_dir: Basic-Ducks/PapaDuck
-          - name: lilygo_t_beam_sx1262-DetectorDuck
-            env: local_lilygo_t_beam_sx1262
-            example_dir: Basic-Ducks/DetectorDuck
-          - name: lilygo_t_beam_sx1276-MamaDuck
-            env: local_lilygo_t_beam_sx1276
-            example_dir: Basic-Ducks/MamaDuck
-          - name: ttgo_lora32_v1_3-MamaDuck
-            env: local_ttgo_lora32_v1_3
-            example_dir: Basic-Ducks/MamaDuck
           - name: wio_tracker_l1-MamaDuck
             env: local_wio_tracker_l1
             example_dir: Basic-Ducks/Seeed/WioTrackerL1
