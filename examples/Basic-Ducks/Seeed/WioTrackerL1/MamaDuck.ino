@@ -29,6 +29,7 @@
 
 #include "image.h"
 #include "Lang.h"
+#include "payloads/DuckPayloads.h"
 
 // ADC_RESOLUTION is not defined in this board's variant.h; 14-bit gives
 // full-scale 16383 and must match the analogReadResolution(14) call in setup().
@@ -1308,7 +1309,44 @@ void handleDuckData(CdpPacket packet) {
             break;
         }
 
-        case 26:
+        case 26:  // MamaDuck-to-MamaDuck (MTALK)
+            if (duckpayload::isProtobuf(packet.data.data(), packet.data.size())) {
+              // ── Protobuf-encoded MTalk (see duck_payloads.proto) ─────────
+              duckcdp_MTalk mtalk = duckcdp_MTalk_init_zero;
+              if (!duckpayload::decodeMTalk(packet.data.data(), packet.data.size(), mtalk)) {
+                break;
+              }
+              String senderId;
+              {
+                  char buf9[9]; memcpy(buf9, packet.sduid.data(), 8); buf9[8] = 0;
+                  senderId = String(buf9);
+              }
+              String mid = String(mtalk.mid);
+              if (mtalk.kind == duckcdp_MTalkKind_MTALK_ACK) {
+                // Delivery receipt coming back to the original sender.
+                broadcast("CDK:MACK,ID:" + mid + ",FROM:" + senderId);
+              } else {
+                // Incoming message.
+                String text = String(mtalk.text);
+                String frameOut = "CDK:MTALK,TEXT:" + text + ",FROM:" + senderId;
+                if (mid.length() > 0) frameOut += ",MID:" + mid;
+                broadcast(frameOut);
+                // Send targeted delivery receipt back to the original sender.
+                if (mid.length() > 0) {
+                  std::array<uint8_t, 8> senderDuid;
+                  for (int i = 0; i < 8; i++) senderDuid[i] = packet.sduid[i];
+                  duckcdp_MTalk ack = duckcdp_MTalk_init_zero;
+                  ack.kind = duckcdp_MTalkKind_MTALK_ACK;
+                  std::snprintf(ack.mid, sizeof(ack.mid), "%s", mid.c_str());
+                  std::vector<uint8_t> encoded = duckpayload::encodeMTalk(ack);
+                  if (!encoded.empty()) {
+                    duck.sendData(26, encoded.data(), (int)encoded.size(), senderDuid);
+                  }
+                }
+              }
+              break;
+            }
+            // ── Legacy plain-text MTALK (pre-protobuf firmware) ──────────────
             if (message.startsWith("[MACK:")) {
                 int   end      = message.indexOf(']', 6);
                 String ackId   = (end > 6) ? message.substring(6, end) : "";
@@ -1674,9 +1712,16 @@ bool sendMamaTalk(const String& targetId, const String& msg, const String& mid) 
     if (targetId.length() != 8) return false;
     std::array<uint8_t, 8> targetDuid =
         duckutils::stringToArray<uint8_t, 8>(std::string(targetId.c_str()));
-    String payload = msg;
-    if (mid.length() > 0) payload += ",MID:" + mid;
-    int failure = duck.sendData(26, std::string(payload.c_str()), targetDuid);
+    // Protobuf-encode the chat message (see duck_payloads.proto: MTalk). The
+    // receiver echoes `mid` back as a targeted delivery receipt (MTALK_ACK on
+    // topic 26) when one is present.
+    duckcdp_MTalk mtalk = duckcdp_MTalk_init_zero;
+    mtalk.kind = duckcdp_MTalkKind_MTALK_MSG;
+    std::snprintf(mtalk.mid, sizeof(mtalk.mid), "%s", mid.c_str());
+    std::snprintf(mtalk.text, sizeof(mtalk.text), "%s", msg.c_str());
+    std::vector<uint8_t> encoded = duckpayload::encodeMTalk(mtalk);
+    if (encoded.empty()) return false;
+    int failure = duck.sendData(26, encoded.data(), (int)encoded.size(), targetDuid);
     if (!failure) broadcast("CDK:ACK,ID:MTALK,TARGET:" + targetId);
     return !failure;
 }
