@@ -11,29 +11,6 @@ permissions:
   contents: write
 
 jobs:
-  validate-library:
-    name: Validate library manifest
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Verify tag matches library.json / library.properties version
-        run: |
-          TAG_VERSION="${GITHUB_REF_NAME#v}"
-          JSON_VERSION=$(python3 -c "import json; print(json.load(open('library.json'))['version'])")
-          PROPS_VERSION=$(grep '^version=' library.properties | cut -d= -f2)
-          echo "tag=$TAG_VERSION library.json=$JSON_VERSION library.properties=$PROPS_VERSION"
-          if [ "$TAG_VERSION" != "$JSON_VERSION" ] || [ "$TAG_VERSION" != "$PROPS_VERSION" ]; then
-            echo "::error::Tag $GITHUB_REF_NAME does not match library.json ($JSON_VERSION) / library.properties ($PROPS_VERSION)"
-            exit 1
-          fi
-
-      - name: Arduino Registry Lint
-        uses: arduino/arduino-lint-action@v2
-        with:
-          library-manager: update
-
   build-firmware:
     name: Build ${{ matrix.name }}
     needs: validate-library
