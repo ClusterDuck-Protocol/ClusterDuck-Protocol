@@ -74,7 +74,7 @@ jobs:
 
   publish-release:
     name: Publish GitHub Release
-    needs: [build-firmware, package-library]
+    needs: [build-firmware]
     runs-on: ubuntu-latest
     steps:
       - name: Download all artifacts
