@@ -13,7 +13,6 @@ permissions:
 jobs:
   build-firmware:
     name: Build ${{ matrix.name }}
-    needs: validate-library
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -63,7 +62,6 @@ jobs:
 
   package-library:
     name: Package library source
-    needs: validate-library
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
