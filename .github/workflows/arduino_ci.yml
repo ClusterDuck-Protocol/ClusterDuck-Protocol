@@ -44,8 +44,11 @@ jobs:
         # src/payloads/nanopb is vendored third-party code (unmodified
         # upstream nanopb runtime) - excluded from lint since we don't
         # own it and cppcheck flags a known false positive there
-        # (pb_write's NULL-buf "sizing pass" call into buf_write).
-        cppcheck --error-exitcode=1 --std=c++2a --force -isrc/payloads/nanopb src
+        # (pb_write's NULL-buf "sizing pass" call into buf_write). Still
+        # pass it via -I so cppcheck can resolve `#include <pb.h>` when
+        # preprocessing duck_payloads.pb.h (otherwise PB_PROTO_HEADER_VERSION
+        # is undefined and its generator-version #error guard misfires).
+        cppcheck --error-exitcode=1 --std=c++2a --force -Isrc/payloads/nanopb -isrc/payloads/nanopb src
     - name: Install CDP dependencies
       run: |
         echo "Installing dependencies..."
