@@ -1,0 +1,155 @@
+name: Release
+
+# Triggered by pushing a version tag, e.g.:
+#   git tag v5.0.0 && git push origin v5.0.0
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  validate-library:
+    name: Validate library manifest
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Verify tag matches library.json / library.properties version
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          JSON_VERSION=$(python3 -c "import json; print(json.load(open('library.json'))['version'])")
+          PROPS_VERSION=$(grep '^version=' library.properties | cut -d= -f2)
+          echo "tag=$TAG_VERSION library.json=$JSON_VERSION library.properties=$PROPS_VERSION"
+          if [ "$TAG_VERSION" != "$JSON_VERSION" ] || [ "$TAG_VERSION" != "$PROPS_VERSION" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match library.json ($JSON_VERSION) / library.properties ($PROPS_VERSION)"
+            exit 1
+          fi
+
+      - name: Arduino Registry Lint
+        uses: arduino/arduino-lint-action@v2
+        with:
+          library-manager: update
+
+  build-firmware:
+    name: Build ${{ matrix.name }}
+    needs: validate-library
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: heltec_wifi_lora_32_V2-MamaDuck
+            env: local_heltec_wifi_lora_32_V2
+            example_dir: Basic-Ducks/Heltec
+          - name: heltec_wifi_lora_32_V3-MamaDuck
+            env: local_heltec_wifi_lora_32_V3
+            example_dir: Basic-Ducks/Heltec
+          - name: heltec_wifi_lora_32_V4-MamaDuck
+            env: local_heltec_wifi_lora_32_V4
+            example_dir: Basic-Ducks/Heltec
+          - name: lilygo_t_beam_sx1262-DuckLink
+            env: local_lilygo_t_beam_sx1262
+            example_dir: Basic-Ducks/DuckLink
+          - name: lilygo_t_beam_sx1262-MamaDuck
+            env: local_lilygo_t_beam_sx1262
+            example_dir: Basic-Ducks/MamaDuck
+          - name: lilygo_t_beam_sx1262-PapaDuck
+            env: local_lilygo_t_beam_sx1262
+            example_dir: Basic-Ducks/PapaDuck
+          - name: lilygo_t_beam_sx1262-DetectorDuck
+            env: local_lilygo_t_beam_sx1262
+            example_dir: Basic-Ducks/DetectorDuck
+          - name: lilygo_t_beam_sx1276-MamaDuck
+            env: local_lilygo_t_beam_sx1276
+            example_dir: Basic-Ducks/MamaDuck
+          - name: ttgo_lora32_v1_3-MamaDuck
+            env: local_ttgo_lora32_v1_3
+            example_dir: Basic-Ducks/MamaDuck
+          - name: wio_tracker_l1-MamaDuck
+            env: local_wio_tracker_l1
+            example_dir: Basic-Ducks/Seeed/WioTrackerL1
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install PlatformIO
+        run: python -m pip install platformio
+
+      - name: Build firmware
+        run: |
+          EXAMPLE_DIR=${{ matrix.example_dir }} platformio run -e ${{ matrix.env }}
+
+      - name: Collect firmware artifacts
+        run: |
+          mkdir -p release-assets
+          build_dir=".pio/build/${{ matrix.env }}"
+          for f in firmware.bin firmware.factory.bin firmware.hex firmware.uf2; do
+            src="$build_dir/$f"
+            if [ -f "$src" ]; then
+              cp "$src" "release-assets/${{ matrix.name }}-$f"
+            fi
+          done
+          ls -la release-assets
+
+      - name: Upload firmware artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-${{ matrix.name }}
+          path: release-assets/*
+          if-no-files-found: error
+
+  package-library:
+    name: Package library source
+    needs: validate-library
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create library source archive
+        run: |
+          mkdir -p release-assets
+          git archive --format=zip \
+            --prefix="clusterduck-protocol-${GITHUB_REF_NAME}/" \
+            -o "release-assets/clusterduck-protocol-${GITHUB_REF_NAME}.zip" \
+            HEAD
+
+      - name: Upload library archive artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: library-source
+          path: release-assets/*
+          if-no-files-found: error
+
+  publish-release:
+    name: Publish GitHub Release
+    needs: [build-firmware, package-library]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Flatten artifacts into a single directory
+        run: |
+          mkdir -p release-assets
+          find artifacts -type f -exec cp {} release-assets/ \;
+          ls -la release-assets
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-assets/*
+          generate_release_notes: true
+          fail_on_unmatched_files: true
