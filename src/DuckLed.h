@@ -55,6 +55,14 @@ private:
   int greenPin;
   int bluePin;
 
+#if defined(ESP32) && ESP_ARDUINO_VERSION_MAJOR < 3
+  // arduino-esp32 < 3.0 needs explicit LEDC channels (pin-based API only
+  // exists from 3.0 onward).
+  static const int kRedChannel = 0;
+  static const int kGreenChannel = 1;
+  static const int kBlueChannel = 2;
+#endif
+
   DuckLed();
   DuckLed(DuckLed const&) = delete;
   DuckLed& operator=(DuckLed const&) = delete;
