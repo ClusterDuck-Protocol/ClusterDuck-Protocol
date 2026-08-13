@@ -18,7 +18,7 @@
     "platforms": ["espressif32"], 
     "license": "Apache-2.0",
     "build": {
-        "srcFilter": ["+<*>", "-<payloads/nanopb/*.c>"]
+        "srcFilter": ["+<*>"]
     },
     "export": {
         "include": [
