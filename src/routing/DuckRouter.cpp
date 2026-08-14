@@ -3,7 +3,9 @@
 void DuckRouter::insertIntoRoutingTable(Duid deviceID, Duid nextHop, SignalScore signalInfo) {
 
     Neighbor neighborRecord(deviceID, nextHop, signalInfo, millis());
-    auto index = routingTable.find(duckutils::toString(deviceID));
+    // NOTE: raw-byte key (matches Neighbor::getDeviceId()), NOT
+    // duckutils::toString() -- see Neighbor.h for why.
+    auto index = routingTable.find(std::string(deviceID.begin(), deviceID.end()));
     if (index == routingTable.end()) { //need to make sure we aren't adding Link1276->Link1276 to Mama1262
         std::list<Neighbor> neighborList;
         neighborList.push_back(neighborRecord);
@@ -19,7 +21,8 @@ void DuckRouter::insertIntoRoutingTable(Duid deviceID, Duid nextHop, SignalScore
 
 std::optional<Duid> DuckRouter::getBestNextHop(Duid targetDeviceId){
     //check if nextHop = the duid of the last duid in path/last duid that relayed to the current duck so that it doesn't transmit back the way it came from
-    auto nextHopRecord = routingTable.find(duckutils::toString(targetDeviceId));
+    // NOTE: raw-byte key, matches insertIntoRoutingTable()/Neighbor::getDeviceId().
+    auto nextHopRecord = routingTable.find(std::string(targetDeviceId.begin(), targetDeviceId.end()));
     if (nextHopRecord == routingTable.end()) {
         return std::nullopt; // No entry found
     }

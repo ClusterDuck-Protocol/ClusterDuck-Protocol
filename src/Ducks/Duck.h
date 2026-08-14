@@ -9,13 +9,24 @@
 #include "DuckTypes.h"
 #include "../utils/DuckUtils.h"
 #include <cassert>
+#include <unordered_map>
 #include "../CdpPacket.h"
 #include "../DuckEsp.h"
 #include "../wifi/DuckWifiNone.h"
 #include "../routing/DuckRouter.h"
 #include "../routing/RouteJSON.h"
+#include "../security/DuckIdentity.h"
+#include "../security/DuckCrypto.h"
+#include "../security/OpenDmsConfig.h"
 
 #define NET_JOIN_DELAY 15000L
+
+// Build-time default for encryptionEnabled_ (see setUplinkEncryptionEnabled()).
+// Off by default: sketches must opt in, either via this build flag
+// (-DDUCK_CRYPTO_DEFAULT_ENABLED=1 in platformio.ini) or at runtime.
+#ifndef DUCK_CRYPTO_DEFAULT_ENABLED
+#define DUCK_CRYPTO_DEFAULT_ENABLED 0
+#endif
 
 //templated class to require some radio capability
 template <typename WifiCapability = DuckWifiNone, typename RadioType = DuckLoRa>
@@ -30,6 +41,7 @@ class Duck {
     void run(){
       duckRadio.serviceInterruptFlags();
       Duck::logIfLowMemory();
+      opendmsconfig::checkSerialProvisioning();
       if(router.getNetworkState() == NetworkState::PUBLIC) {
         if(duckRadio.getReceiveFlag()){
           handleReceivedPacket();
@@ -51,7 +63,17 @@ class Duck {
 
     int setupWithDefaults() {
       this->setupSerial(115200);
-      int err = this->setupLoRaRadio();
+      int err = duckidentity::begin();
+      if (err != DUCK_ERR_NONE) {
+        logerr_ln("ERROR setupWithDefaults failed to initialize DuckIdentity rc = %d", err);
+        return err;
+      }
+      opendmsconfig::begin();
+      // Overwrite the constructor-supplied, human-readable name-derived DUID
+      // with the crypto-identity-derived DUID (SHA256(pubkey) truncated to
+      // DUID_LENGTH bytes), so mesh addressing is self-certifying.
+      duckidentity::getDuid(this->duid.data());
+      err = this->setupLoRaRadio();
       if (err != DUCK_ERR_NONE) {
       logerr_ln("ERROR setupWithDefaults rc = %d",err); 
       }
@@ -143,6 +165,132 @@ class Duck {
     }
 
     /**
+     * @brief Announce this Duck's own long-term X25519 public key so peers
+     * can learn it and use sendEncryptedData()/decrypt encrypted_data
+     * packets addressed to this Duck. Opt-in: nothing calls this
+     * automatically. TOFU on the receiving end -- there is no signature or
+     * verification beyond "first announcement seen for this SDUID wins".
+     * @returns DUCK_ERR_NONE if the data was sent successfully, an error code otherwise.
+     */
+    int announceIdentity(Duid targetDevice = BROADCAST_DUID){
+      std::vector<uint8_t> data(duckidentity::getPublicKey(), duckidentity::getPublicKey() + duckidentity::PUBLIC_KEY_LENGTH);
+      int err = sendReservedTopicData(targetDevice, reservedTopic::identity_announce, data);
+      if (err != DUCK_ERR_NONE){
+        logerr_ln("ERR: failed to send identity_announce");
+      }
+      return err;
+    }
+
+    /**
+     * @brief Send data end-to-end encrypted to a specific peer Duck (session
+     * mode, static-static X25519 ECDH between the two Ducks' long-term
+     * identities). The peer's public key must already be known -- see
+     * announceIdentity()/learnPeerIdentity() -- otherwise this returns
+     * DUCK_ERR_CRYPTO_ECDH_FAILED without sending anything. Opt-in: existing
+     * sendData() calls are completely unaffected.
+     * @param topic the application-level topic (embedded in the encrypted
+     * plaintext, NOT sent in cleartext -- the on-air topic is always
+     * reservedTopic::encrypted_data).
+     * @param data the plaintext application data to encrypt and send.
+     * @param targetDevice the peer Duck's DUID.
+     * @returns DUCK_ERR_NONE if the data was sent successfully, an error code otherwise.
+     */
+    int sendEncryptedData(uint8_t topic, const std::string data, Duid targetDevice){
+      std::optional<std::array<uint8_t, duckcrypto::PUBLIC_KEY_LENGTH>> peerKey = getPeerIdentity(targetDevice);
+      if (!peerKey.has_value()) {
+        logerr_ln("ERR: sendEncryptedData no known public key for peer, send announceIdentity() first");
+        return DUCK_ERR_CRYPTO_ECDH_FAILED;
+      }
+      std::vector<uint8_t> plaintext;
+      plaintext.reserve(1 + data.size());
+      plaintext.push_back(topic);
+      plaintext.insert(plaintext.end(), data.begin(), data.end());
+
+      std::vector<uint8_t> onAirData(duckcrypto::NONCE_LENGTH + plaintext.size() + duckcrypto::TAG_LENGTH);
+      uint8_t* nonceOut = onAirData.data();
+      uint8_t* ciphertextOut = onAirData.data() + duckcrypto::NONCE_LENGTH;
+      uint8_t* tagOut = onAirData.data() + duckcrypto::NONCE_LENGTH + plaintext.size();
+
+      std::array<uint8_t, HEADER_AAD_LENGTH> aad = buildHeaderAad(this->duid, targetDevice, reservedTopic::encrypted_data);
+      int rc = duckcrypto::encryptWithPeer(peerKey.value().data(), aad.data(), aad.size(),
+                                            plaintext.data(), plaintext.size(),
+                                            nonceOut, ciphertextOut, tagOut);
+      if (rc != DUCK_ERR_NONE) {
+        logerr_ln("ERR: sendEncryptedData encryptWithPeer failed rc = %d", rc);
+        return rc;
+      }
+
+      CdpPacket txPacket = CdpPacket(targetDevice, reservedTopic::encrypted_data, onAirData, this->duid, this->getType());
+      return routeAndSend(txPacket);
+    }
+
+    /**
+     * @brief Send data one-way sealed to OpenDMS's pinned static public key
+     * (src/security/OpenDmsConfig.h). Returns DUCK_ERR_CRYPTO_ECDH_FAILED
+     * without sending if OpenDMS's public key has not been configured
+     * (still the all-zero placeholder). Opt-in: existing sendData() calls
+     * are completely unaffected -- callers must explicitly use this method
+     * to get sealed uplink traffic.
+     * @param topic the application-level topic (embedded in the encrypted
+     * plaintext, NOT sent in cleartext -- the on-air topic is always
+     * reservedTopic::sealed_uplink).
+     * @param data the plaintext application data to seal and send.
+     * @param targetDevice the device UID to receive the message (default is all papa devices)
+     * @returns DUCK_ERR_NONE if the data was sent successfully, an error code otherwise.
+     */
+    int sendSealedData(uint8_t topic, const std::string data, const std::array<uint8_t,8> targetDevice = PAPADUCK_DUID){
+      if (!opendmsconfig::isConfigured()) {
+        logerr_ln("ERR: sendSealedData OpenDMS static public key is not configured");
+        return DUCK_ERR_CRYPTO_ECDH_FAILED;
+      }
+      std::vector<uint8_t> plaintext;
+      plaintext.reserve(1 + data.size());
+      plaintext.push_back(topic);
+      plaintext.insert(plaintext.end(), data.begin(), data.end());
+
+      std::vector<uint8_t> onAirData(duckcrypto::PUBLIC_KEY_LENGTH + duckcrypto::NONCE_LENGTH + plaintext.size() + duckcrypto::TAG_LENGTH);
+      uint8_t* ephemeralPubOut = onAirData.data();
+      uint8_t* nonceOut = onAirData.data() + duckcrypto::PUBLIC_KEY_LENGTH;
+      uint8_t* ciphertextOut = onAirData.data() + duckcrypto::PUBLIC_KEY_LENGTH + duckcrypto::NONCE_LENGTH;
+      uint8_t* tagOut = onAirData.data() + duckcrypto::PUBLIC_KEY_LENGTH + duckcrypto::NONCE_LENGTH + plaintext.size();
+
+      std::array<uint8_t, HEADER_AAD_LENGTH> aad = buildHeaderAad(this->duid, targetDevice, reservedTopic::sealed_uplink);
+      int rc = duckcrypto::sealToStatic(opendmsconfig::OPENDMS_STATIC_PUBLIC_KEY, aad.data(), aad.size(),
+                                         plaintext.data(), plaintext.size(),
+                                         ephemeralPubOut, nonceOut, ciphertextOut, tagOut);
+      if (rc != DUCK_ERR_NONE) {
+        logerr_ln("ERR: sendSealedData sealToStatic failed rc = %d", rc);
+        return rc;
+      }
+
+      CdpPacket txPacket = CdpPacket(targetDevice, reservedTopic::sealed_uplink, onAirData, this->duid, this->getType());
+      return routeAndSend(txPacket);
+    }
+
+    /**
+     * @brief Enable or disable this Duck's uplink-encryption preference at
+     * runtime. This is a plain preference flag read via
+     * isUplinkEncryptionEnabled() -- it does NOT change what sendData()
+     * does. Sketches decide whether to call sendData() or
+     * sendSealedData()/sendEncryptedData() by checking
+     * isUplinkEncryptionEnabled() themselves. Defaults to
+     * DUCK_CRYPTO_DEFAULT_ENABLED (off unless a build flag overrides it),
+     * and can be overridden either direction at runtime regardless of the
+     * build-time default.
+     */
+    void setUplinkEncryptionEnabled(bool enabled) {
+      encryptionEnabled_ = enabled;
+    }
+
+    /**
+     * @brief Whether this Duck currently prefers encrypted sends. See
+     * setUplinkEncryptionEnabled().
+     */
+    bool isUplinkEncryptionEnabled() const {
+      return encryptionEnabled_;
+    }
+
+    /**
      * @brief Get the duck's unique ID.
      * 
      * @returns A byte vector representing the duck's unique ID
@@ -192,6 +340,146 @@ class Duck {
     std::array<uint8_t,8> duid;
     DuckRouter router;
 
+    /// See setUplinkEncryptionEnabled()/isUplinkEncryptionEnabled(). Seeded
+    /// from the DUCK_CRYPTO_DEFAULT_ENABLED build flag (off by default);
+    /// freely overridable at runtime either direction.
+    bool encryptionEnabled_ = DUCK_CRYPTO_DEFAULT_ENABLED;
+
+    /// Maximum number of peer public keys cached via identity_announce.
+    /// Bounds RAM use; once full, new peers are simply not learned (no
+    /// eviction) until a reboot. Small mesh deployments only.
+    static constexpr size_t MAX_PEER_IDENTITIES = 16;
+    std::unordered_map<std::string, std::array<uint8_t, duckcrypto::PUBLIC_KEY_LENGTH>> peerIdentities;
+
+    /**
+     * @brief Record a peer's long-term public key, learned via a received
+     * identity_announce packet. TOFU: first announcement seen for a given
+     * DUID is trusted and kept; later announcements from the same DUID are
+     * ignored (does not overwrite), since accepting a later "announcement"
+     * blindly would let an attacker who spoofs an SDUID silently swap out
+     * an already-trusted peer's key.
+     */
+    void learnPeerIdentity(Duid peerDuid, const uint8_t* pubKey){
+      // NOTE: uses raw-byte string construction, NOT duckutils::toString() --
+      // that helper collapses any non-printable byte to the literal string
+      // "ERROR: Non-printable character", which would collide every
+      // hash-derived (non-printable) DUID into one bucket. std::string can
+      // safely hold arbitrary bytes including embedded NULs.
+      std::string key(peerDuid.begin(), peerDuid.end());
+      if (peerIdentities.count(key)) {
+        return;
+      }
+      if (peerIdentities.size() >= MAX_PEER_IDENTITIES) {
+        logerr_ln("learnPeerIdentity: peer identity cache full, dropping announce from %s", key.c_str());
+        return;
+      }
+      std::array<uint8_t, duckcrypto::PUBLIC_KEY_LENGTH> copy;
+      std::copy(pubKey, pubKey + duckcrypto::PUBLIC_KEY_LENGTH, copy.begin());
+      peerIdentities[key] = copy;
+      loginfo_ln("learnPeerIdentity: cached public key for peer %s", key.c_str());
+    }
+
+    /**
+     * @brief Look up a previously-learned peer's public key.
+     * @returns the peer's public key, or std::nullopt if no
+     * identity_announce has been received from that DUID yet.
+     */
+    std::optional<std::array<uint8_t, duckcrypto::PUBLIC_KEY_LENGTH>> getPeerIdentity(Duid peerDuid){
+      auto it = peerIdentities.find(std::string(peerDuid.begin(), peerDuid.end()));
+      if (it == peerIdentities.end()) {
+        return std::nullopt;
+      }
+      return it->second;
+    }
+
+    /// Length of the header-binding AAD built by buildHeaderAad(): sduid(8)
+    /// || dduid(8) || wire topic(1).
+    static constexpr size_t HEADER_AAD_LENGTH = 8 + 8 + 1;
+
+    /**
+     * @brief Build the additional-authenticated-data bytes used to bind an
+     * encrypted/sealed packet's cleartext CDP header to its ciphertext, so
+     * a relay can't splice a captured ciphertext onto a different sender,
+     * recipient, or topic and have it still authenticate.
+     *
+     * Deliberately excludes muid, hopCount, and dcrc: muid is assigned by
+     * the router *after* the packet (and therefore the ciphertext) is
+     * built, and hopCount/dcrc mutate on every relay hop -- binding either
+     * would make a legitimately multi-hop-relayed packet fail to decrypt
+     * at its final destination. sduid/dduid/topic are fixed by the
+     * original sender and never rewritten in transit, so they're safe (and
+     * sufficient) to bind. Both the encrypt and decrypt side MUST build
+     * this identically or authentication will fail.
+     */
+    static std::array<uint8_t, HEADER_AAD_LENGTH> buildHeaderAad(const Duid& sduid, const Duid& dduid, uint8_t topic){
+      std::array<uint8_t, HEADER_AAD_LENGTH> aad;
+      std::copy(sduid.begin(), sduid.end(), aad.begin());
+      std::copy(dduid.begin(), dduid.end(), aad.begin() + sduid.size());
+      aad[sduid.size() + dduid.size()] = topic;
+      return aad;
+    }
+
+    /**
+     * @brief Route and transmit a pre-built packet using the same
+     * best-next-hop / RREQ logic as sendData(). Shared by
+     * sendEncryptedData()/sendSealedData().
+     */
+    int routeAndSend(CdpPacket& txPacket){
+      int err = DUCK_ERR_NONE;
+      if (router.getNetworkState() != NetworkState::PUBLIC) {
+        return err;
+      }
+      std::optional<Duid> nextHop = router.getBestNextHop(txPacket.dduid);
+      if (nextHop.has_value() || txPacket.dduid == PAPADUCK_DUID || txPacket.dduid == BROADCAST_DUID) {
+        router.getFilter().assignUniqueMessageId(txPacket);
+        err = sendToRadio(txPacket);
+      } else {
+        if ((millis() - this->lastRreqTime) > 30000) {
+          loginfo_ln("[DUCK] Destination not in table, sending new RREQ.");
+          RouteJSON rreqDoc = RouteJSON(txPacket.dduid, this->duid);
+          rreqDoc.addToPath(this->duid);
+          sendRouteRequest(txPacket.dduid, rreqDoc);
+          this->lastRreqTime = millis();
+        }
+      }
+      return err;
+    }
+
+    /**
+     * @brief Attempt to decrypt a received reservedTopic::encrypted_data
+     * packet using the sender's cached public key (learned via a prior
+     * identity_announce). On success, returns the original app-level
+     * topic and decrypted payload so the caller can dispatch/deliver it
+     * as if it had been received via plain sendData(). Returns
+     * std::nullopt if the sender's key isn't known, the data is malformed,
+     * or authentication fails (message must be discarded either way).
+     */
+    std::optional<std::pair<uint8_t, std::vector<uint8_t>>> tryDecryptEncryptedData(const CdpPacket& rxPacket){
+      std::optional<std::array<uint8_t, duckcrypto::PUBLIC_KEY_LENGTH>> peerKey = getPeerIdentity(rxPacket.sduid);
+      if (!peerKey.has_value()) {
+        logerr_ln("tryDecryptEncryptedData: no known public key for sender, dropping.");
+        return std::nullopt;
+      }
+      if (rxPacket.data.size() < duckcrypto::NONCE_LENGTH + 1 + duckcrypto::TAG_LENGTH) {
+        logerr_ln("tryDecryptEncryptedData: data too short (%d bytes), dropping.", (int)rxPacket.data.size());
+        return std::nullopt;
+      }
+      size_t ciphertextLen = rxPacket.data.size() - duckcrypto::NONCE_LENGTH - duckcrypto::TAG_LENGTH;
+      const uint8_t* nonce = rxPacket.data.data();
+      const uint8_t* ciphertext = rxPacket.data.data() + duckcrypto::NONCE_LENGTH;
+      const uint8_t* tag = rxPacket.data.data() + duckcrypto::NONCE_LENGTH + ciphertextLen;
+      std::vector<uint8_t> plaintext(ciphertextLen);
+      std::array<uint8_t, HEADER_AAD_LENGTH> aad = buildHeaderAad(rxPacket.sduid, rxPacket.dduid, rxPacket.topic);
+      int rc = duckcrypto::decryptFromPeer(peerKey.value().data(), nonce, aad.data(), aad.size(),
+                                            ciphertext, ciphertextLen, tag, plaintext.data());
+      if (rc != DUCK_ERR_NONE) {
+        logerr_ln("tryDecryptEncryptedData: decrypt failed rc = %d, dropping.", rc);
+        return std::nullopt;
+      }
+      uint8_t topic = plaintext.front();
+      std::vector<uint8_t> payload(plaintext.begin() + 1, plaintext.end());
+      return std::make_pair(topic, payload);
+    }
 
     
     /**

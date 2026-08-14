@@ -122,6 +122,36 @@ enum reservedTopic {
   cmd = 0x05,
   rreq = 0x06,
   rrep = 0x07,
+  // Operator-initiated downlink command from OpenDMS, encrypted for a
+  // specific destination Duck. Data section is
+  // nonce(12) || ciphertext(N) || tag(16), decryptable via
+  // duckcrypto::decryptFromPeer() using this Duck's own identity private
+  // key and OpenDMS's pinned static public key (see
+  // src/security/OpenDmsConfig.h, docs/crypto-design.tex
+  // "OpenDMS -> Duck (operator-initiated downlink)"). Relays that are not
+  // the destination must forward blindly, same as any other topic -- they
+  // cannot decrypt traffic meant for a different Duck's identity.
+  encrypted_cmd = 0x08,
+  // One-way Duck -> OpenDMS uplink data, sealed anonymously to OpenDMS's
+  // pinned static public key (duckcrypto::sealToStatic()). Data section is
+  // ephemeralPublicKey(32) || nonce(12) || ciphertext(N) || tag(16); the
+  // first plaintext byte (once decrypted server-side) is the original
+  // app-level topic, followed by the actual payload. Relays forward
+  // blindly, same as any other topic; only OpenDMS (holding the matching
+  // static private key) can decrypt it.
+  sealed_uplink = 0x09,
+  // A Duck announcing its own long-term X25519 public key (32 raw bytes,
+  // the full data section) so peers can learn it for Duck<->Duck session
+  // encryption (see encrypted_data below). TOFU: first announcement seen
+  // for a given SDUID is trusted and cached.
+  identity_announce = 0x0A,
+  // Duck<->Duck session-encrypted data (duckcrypto::encryptWithPeer(),
+  // static-static X25519 ECDH between the two Ducks' long-term identities).
+  // Requires the recipient to have already learned the sender's public key
+  // via identity_announce. Data section is
+  // nonce(12) || ciphertext(N) || tag(16); the first plaintext byte is the
+  // original app-level topic, followed by the actual payload.
+  encrypted_data = 0x0B,
   max_reserved = 0x0F
 };
 
@@ -298,6 +328,14 @@ class CdpPacket {
                 return "ping";
             case reservedTopic::pong:
                 return "pong";
+            case reservedTopic::encrypted_cmd:
+                return "encrypted_cmd";
+            case reservedTopic::sealed_uplink:
+                return "sealed_uplink";
+            case reservedTopic::identity_announce:
+                return "identity_announce";
+            case reservedTopic::encrypted_data:
+                return "encrypted_data";
             default:
                 return "unknown";
             }

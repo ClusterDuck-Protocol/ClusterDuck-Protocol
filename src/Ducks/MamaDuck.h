@@ -3,6 +3,8 @@
 
 #include "Duck.h"
 #include "../utils/MemoryFree.h"
+#include "../security/DuckCrypto.h"
+#include "../security/OpenDmsConfig.h"
 
 template <typename WifiCapability = DuckWifiNone, typename RadioType = DuckLoRa>
 class MamaDuck : public Duck<WifiCapability, RadioType> {
@@ -107,6 +109,18 @@ private :
                     loginfo_ln("handleReceivedPacket: packet RELAY DONE");
                 }
                 break;
+            case reservedTopic::identity_announce:
+                loginfo_ln("Identity announce received (broadcast)");
+                if (rxPacket.data.size() == duckcrypto::PUBLIC_KEY_LENGTH) {
+                    this->learnPeerIdentity(rxPacket.sduid, rxPacket.data.data());
+                } else {
+                    logerr_ln("identity_announce malformed (%d bytes), dropping.", (int)rxPacket.data.size());
+                }
+                err = this->broadcastPacket(rxPacket);
+                if (err != DUCK_ERR_NONE) {
+                    logerr_ln("====> ERROR handleReceivedPacket failed to relay identity_announce. rc = %d",err);
+                }
+                break;
             default:
                 err = this->broadcastPacket(rxPacket);
                 if (err != DUCK_ERR_NONE) {
@@ -195,6 +209,99 @@ private :
                     loginfo_ln("handleReceivedPacket: packet RELAY DONE");
                 }
                 break;
+            case reservedTopic::encrypted_cmd: {
+                if (relay) {
+                    // Not addressed to us -- blind relay only. We can't
+                    // decrypt traffic meant for a different Duck's identity,
+                    // and must never try (session key derivation uses OUR
+                    // own private key).
+                    err = this->forwardPacket(rxPacket);
+                    if (err != DUCK_ERR_NONE) {
+                        logerr_ln("====> ERROR handleReceivedPacket failed to relay encrypted_cmd. rc = %d", err);
+                    }
+                    break;
+                }
+                if (!opendmsconfig::isConfigured()) {
+                    logerr_ln("encrypted_cmd received but OpenDMS static public key is not configured, dropping.");
+                    break;
+                }
+                if (rxPacket.data.size() < duckcrypto::NONCE_LENGTH + duckcrypto::TAG_LENGTH) {
+                    logerr_ln("encrypted_cmd received but data too short (%d bytes), dropping.", (int)rxPacket.data.size());
+                    break;
+                }
+                size_t ciphertextLen = rxPacket.data.size() - duckcrypto::NONCE_LENGTH - duckcrypto::TAG_LENGTH;
+                const uint8_t* nonce = rxPacket.data.data();
+                const uint8_t* ciphertext = rxPacket.data.data() + duckcrypto::NONCE_LENGTH;
+                const uint8_t* tag = rxPacket.data.data() + duckcrypto::NONCE_LENGTH + ciphertextLen;
+                std::vector<uint8_t> plaintext(ciphertextLen);
+                // encrypted_cmd is by definition always sent BY OpenDMS --
+                // only OpenDMS holds the matching static keypair that makes
+                // decryptFromPeer(OPENDMS_STATIC_PUBLIC_KEY, ...) succeed --
+                // so bind the AAD to the fixed PAPADUCK_DUID placeholder
+                // rather than rxPacket.sduid (the transient real DUID of
+                // whichever hub happened to relay this packet on-air, which
+                // OpenDMS cannot predict and which has no bearing on the
+                // security semantics). This mirrors sealed_uplink's already-
+                // established convention of using PAPADUCK_DUID wherever
+                // OpenDMS -- which has no DUID of its own -- needs to be
+                // referenced as a packet's logical sender or recipient.
+                std::array<uint8_t, Duck<WifiCapability, RadioType>::HEADER_AAD_LENGTH> aad = this->buildHeaderAad(PAPADUCK_DUID, rxPacket.dduid, rxPacket.topic);
+                int rc = duckcrypto::decryptFromPeer(opendmsconfig::OPENDMS_STATIC_PUBLIC_KEY,
+                                                      nonce, aad.data(), aad.size(),
+                                                      ciphertext, ciphertextLen, tag,
+                                                      plaintext.data());
+                if (rc != DUCK_ERR_NONE) {
+                    logerr_ln("encrypted_cmd decrypt failed rc = %d, dropping (auth failed or corrupt).", rc);
+                    break;
+                }
+                loginfo_ln("encrypted_cmd decrypted OK (%d bytes), delivering to sketch.", (int)plaintext.size());
+                rxPacket.data = plaintext;
+                if (recvDataCallback) {
+                    recvDataCallback(rxPacket);
+                }
+                break;
+            }
+            case reservedTopic::identity_announce:
+                // Directed identity_announce (rare -- usually broadcast, see
+                // ifBroadcast above). Learn it regardless of whether it was
+                // addressed to us; relay onward if we're not the target.
+                if (rxPacket.data.size() == duckcrypto::PUBLIC_KEY_LENGTH) {
+                    this->learnPeerIdentity(rxPacket.sduid, rxPacket.data.data());
+                } else {
+                    logerr_ln("identity_announce malformed (%d bytes), dropping.", (int)rxPacket.data.size());
+                }
+                if (relay) {
+                    err = this->forwardPacket(rxPacket);
+                    if (err != DUCK_ERR_NONE) {
+                        logerr_ln("====> ERROR handleReceivedPacket failed to relay identity_announce. rc = %d", err);
+                    }
+                }
+                break;
+            case reservedTopic::encrypted_data: {
+                if (relay) {
+                    // Not addressed to us -- blind relay only, same reasoning
+                    // as encrypted_cmd: session key derivation uses OUR own
+                    // private key, so we can never decrypt traffic meant for
+                    // a different Duck's identity.
+                    err = this->forwardPacket(rxPacket);
+                    if (err != DUCK_ERR_NONE) {
+                        logerr_ln("====> ERROR handleReceivedPacket failed to relay encrypted_data. rc = %d", err);
+                    }
+                    break;
+                }
+                std::optional<std::pair<uint8_t, std::vector<uint8_t>>> decrypted = this->tryDecryptEncryptedData(rxPacket);
+                if (!decrypted.has_value()) {
+                    // tryDecryptEncryptedData already logged the specific reason.
+                    break;
+                }
+                loginfo_ln("encrypted_data decrypted OK (%d bytes), delivering to sketch.", (int)decrypted->second.size());
+                rxPacket.topic = decrypted->first;
+                rxPacket.data = decrypted->second;
+                if (recvDataCallback) {
+                    recvDataCallback(rxPacket);
+                }
+                break;
+            }
             default:
                 loginfo_ln("ifNotBroadcast: default topic=%d relay=%d cbSet=%d", (int)rxPacket.topic, (int)relay, (recvDataCallback != nullptr ? 1 : 0));
                 if(relay){

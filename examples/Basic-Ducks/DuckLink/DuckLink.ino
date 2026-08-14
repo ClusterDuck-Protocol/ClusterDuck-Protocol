@@ -73,7 +73,14 @@ void loop() {
   Serial.print("[DUCKLINK] sensor data: ");
   Serial.println(message.c_str());
 
-  failure = duck.sendData(topics::health, message);
+  // Encryption is off by default (see DUCK_CRYPTO_DEFAULT_ENABLED /
+  // duck.setUplinkEncryptionEnabled()). When enabled, seal health data to
+  // OpenDMS's pinned static key instead of sending it in the clear.
+  if (duck.isUplinkEncryptionEnabled()) {
+    failure = duck.sendSealedData(topics::health, message);
+  } else {
+    failure = duck.sendData(topics::health, message);
+  }
   if (!failure) {
     counter++;
     Serial.println("[DUCKLINK] runSensor ok.");

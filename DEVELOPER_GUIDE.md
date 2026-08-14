@@ -7,6 +7,7 @@
 - [Testing](#testing)
 - [How to run the tests](#how-to-run-the-tests)
 - [How to run the examples](#how-to-run-the-examples)
+- [Field Provisioning: Setting the OpenDMS Public Key](#field-provisioning-setting-the-opendms-public-key)
 
 ## Introduction 
 This guide will help you install the ClusterDuck Protocol (CDP) on your development machine. The CDP is a set of libraries and tools that enable the development of mesh networks for IoT devices. The CDP is designed to be used with the PlatformIO development environment and is compatible with the Arduino framework and IDE as well.
@@ -105,3 +106,14 @@ Here are the steps to run the examples (on Linux or Mac OS). This assumes you ha
    $env:EXAMPLE_DIR="Basic-Ducks/DuckLink"
    platformio run -e prod_lilygo_t_beam_sx1276 -t upload
    ```
+
+## Field Provisioning: Setting the OpenDMS Public Key
+Each Duck decrypts operator-initiated downlink commands using this deployment's OpenDMS instance's static X25519 public key, `OPENDMS_STATIC_PUBLIC_KEY` (see `src/security/OpenDmsConfig.h` and `docs/crypto-design.tex`, "Field Operator Onboarding"). This key is **not secret** -- only the matching private key held by OpenDMS must stay confidential -- so it can be set either at compile time or, without reflashing, over the USB serial console.
+
+Connect to the device's serial console (e.g. `platformio device monitor`, or the Arduino Serial Monitor) at the baud rate configured by `setupSerial()` (115200 by default), then send one of the following plaintext commands, terminated with a newline:
+
+- `AT+OPENDMSKEY=<64 hex chars>` -- provisions the device with a new OpenDMS public key (32 bytes, hex-encoded). Only succeeds if the device does not already have a key configured; if it does, send `AT+OPENDMSKEY+RESET` first.
+- `AT+OPENDMSKEY+RESET` -- erases the currently configured key, allowing a new `AT+OPENDMSKEY=` write to be accepted.
+- `AT+OPENDMSKEY?` -- prints whether a key is currently configured, and its value in hex if so.
+
+No authentication is required to use these commands -- this is intentional, since the value being provisioned is public. The device persists the key to flash (LittleFS on nRF52, EEPROM on ESP32) so it survives reboots without needing to be re-sent.

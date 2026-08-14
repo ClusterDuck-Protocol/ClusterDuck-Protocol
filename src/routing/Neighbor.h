@@ -22,7 +22,15 @@ class Neighbor {
             return this->routingScore > other.routingScore;
         }
   
-      [[nodiscard]] std::string getDeviceId() const { return duckutils::toString(DeviceId); }
+      [[nodiscard]] std::string getDeviceId() const {
+        // NOTE: intentionally NOT duckutils::toString() -- that helper
+        // collapses any non-printable byte to the literal string
+        // "ERROR: Non-printable character", which would collide every
+        // hash-derived (non-printable) DUID into a single routing table
+        // bucket. std::string can safely hold arbitrary bytes, including
+        // embedded NULs, so this raw construction round-trips correctly.
+        return std::string(DeviceId.begin(), DeviceId.end());
+      }
       long getRoutingScore() const { return routingScore; }
       unsigned long getLastSeen() const { return lastSeen; }
       long getSnr() { return snr; }
