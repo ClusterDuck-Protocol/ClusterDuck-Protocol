@@ -178,14 +178,14 @@ void BloomFilter::bloom_add(unsigned char* msg, int msgSize) {
     if (this->nMsg >= this->maxMsgs) {
         if (this->activeFilter == 1){
             logdbg("Freezing filter 1, switching to filter 2\n");
-            for (int i = 0; i < (this->numSectors)/(this->bitsPerSector); i++) {
+            for (int i = 0; i < this->numSectors; i++) {
                     this->filter2[i] = 0;
             }
             this->activeFilter = 2;
         }
         else{
             logdbg("Freezing filter 2, switching to filter 1\n");
-            for (int i = 0; i < (this->numSectors)/(this->bitsPerSector); i++) {
+            for (int i = 0; i < this->numSectors; i++) {
                     this->filter1[i] = 0;
             }
             this->activeFilter = 1;
