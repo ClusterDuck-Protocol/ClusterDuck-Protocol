@@ -221,6 +221,67 @@ static const uint8_t TOPIC_BEACON     = 27;
 static const uint8_t TOPIC_BEACON_ACK = 28;
 static volatile bool beaconAckPending = false;   // deferred BEACON_ACK TX
 static char          beaconAckPayload[80] = {};   // GPS payload for beacon ACK
+
+// ── BEACON group-key encryption ─────────────────────────────────────────
+// TOPIC_BEACON/TOPIC_BEACON_ACK broadcast GPS coordinates for local
+// discovery, so neither of Duck.h's existing encryption modes fit:
+// sendSealedData() is only readable by OpenDMS, sendEncryptedData() only
+// by one already-known peer. If a mesh group key is provisioned (see
+// src/security/MeshGroupConfig.h), wrap the payload with
+// duckcrypto::encryptWithGroupKey() so it's opaque to eavesdroppers
+// outside this deployment while still readable by any duck holding the
+// same key. Falls back to sending in the clear if no group key is
+// configured, so discovery keeps working before/without provisioning.
+static const uint8_t BEACON_GROUP_MARKER = 0xE6;
+
+static std::string encryptBeaconPayload(uint8_t topic, const char* plaintext) {
+  size_t plaintextLen = strlen(plaintext);
+  uint8_t aad[9];
+  aad[0] = topic;
+  memcpy(aad + 1, duck.getDuckId().data(), 8);
+
+  std::vector<uint8_t> wire(1 + duckcrypto::NONCE_LENGTH + plaintextLen + duckcrypto::TAG_LENGTH);
+  wire[0] = BEACON_GROUP_MARKER;
+  uint8_t* nonce      = wire.data() + 1;
+  uint8_t* ciphertext = nonce + duckcrypto::NONCE_LENGTH;
+  uint8_t* tag        = ciphertext + plaintextLen;
+  duckcrypto::encryptWithGroupKey(meshgroupconfig::MESH_GROUP_KEY, aad, sizeof(aad),
+                                  (const uint8_t*)plaintext, plaintextLen,
+                                  nonce, ciphertext, tag);
+  return std::string(reinterpret_cast<const char*>(wire.data()), wire.size());
+}
+
+// Returns true and fills outPlaintext if `data` is a group-key-encrypted
+// BEACON payload that was successfully decrypted. Returns false (leaves
+// outPlaintext untouched) if it isn't marked as encrypted, no group key
+// is configured, or authentication fails -- callers should treat that the
+// same as any other unrecognized/plaintext payload.
+static bool decryptBeaconPayload(uint8_t topic, const uint8_t* sduid,
+                                  const std::vector<uint8_t>& data,
+                                  std::string& outPlaintext) {
+  if (data.size() < 1 + duckcrypto::NONCE_LENGTH + duckcrypto::TAG_LENGTH
+      || data[0] != BEACON_GROUP_MARKER || !meshgroupconfig::isConfigured()) {
+    return false;
+  }
+  const uint8_t* nonce = data.data() + 1;
+  const uint8_t* ciphertext = nonce + duckcrypto::NONCE_LENGTH;
+  size_t ciphertextLen = data.size() - 1 - duckcrypto::NONCE_LENGTH - duckcrypto::TAG_LENGTH;
+  const uint8_t* tag = ciphertext + ciphertextLen;
+
+  uint8_t aad[9];
+  aad[0] = topic;
+  memcpy(aad + 1, sduid, 8);
+
+  std::vector<uint8_t> plain(ciphertextLen);
+  int rc = duckcrypto::decryptWithGroupKey(meshgroupconfig::MESH_GROUP_KEY, nonce,
+                                           aad, sizeof(aad), ciphertext, ciphertextLen,
+                                           tag, plain.data());
+  if (rc != DUCK_ERR_NONE) {
+    return false;
+  }
+  outPlaintext.assign(reinterpret_cast<const char*>(plain.data()), plain.size());
+  return true;
+}
 static unsigned long beaconAckDeferMs = 0;        // millis() after which ACK may be sent
 
 // ── BLE callbacks ─────────────────────────────────────────────────────
@@ -948,7 +1009,10 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
   if (beaconAckDeferMs > 0 && millis() >= beaconAckDeferMs && !gpsTxPending) {
     beaconAckDeferMs = 0;
     beaconAckPending = false;
-    int result = duck.sendData(TOPIC_BEACON_ACK, std::string(beaconAckPayload), BROADCAST_DUID);
+    std::string beaconAckWire = meshgroupconfig::isConfigured()
+        ? encryptBeaconPayload(TOPIC_BEACON_ACK, beaconAckPayload)
+        : std::string(beaconAckPayload);
+    int result = duck.sendData(TOPIC_BEACON_ACK, beaconAckWire, BROADCAST_DUID);
     Serial.printf("[BEACON] ACK TX %s: %s\n", result == 0 ? "OK" : "FAILED", beaconAckPayload);
   }
 
@@ -1024,7 +1088,14 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     // is used to cache the sender's location.  This runs BEFORE CDK:SEEN so
     // the emitted frame includes GPS on the very first packet from a duck.
     {
-        String pdata = String((char*)packet.data.data(), packet.data.size());
+        String pdata;
+        std::string decryptedBeacon;
+        if ((packet.topic == TOPIC_BEACON || packet.topic == TOPIC_BEACON_ACK)
+            && decryptBeaconPayload(packet.topic, packet.sduid.data(), packet.data, decryptedBeacon)) {
+            pdata = String(decryptedBeacon.data(), decryptedBeacon.size());
+        } else {
+            pdata = String((char*)packet.data.data(), packet.data.size());
+        }
         Serial.printf("[RX-GPS] topic=%u src=%.8s payload=%.48s\n",
                       packet.topic, (char*)packet.sduid.data(), pdata.c_str());
         int latIdx = pdata.indexOf("LAT:");
@@ -1810,7 +1881,10 @@ void handleFrame(const String& line) {
           Serial.println("[SCAN] Phone GPS cache empty — deferring CDK:GPSREQ");
         }
       }
-      int beaconResult = duck.sendData(TOPIC_BEACON, std::string(gpsPayload), BROADCAST_DUID);
+      std::string beaconWire = meshgroupconfig::isConfigured()
+          ? encryptBeaconPayload(TOPIC_BEACON, gpsPayload)
+          : std::string(gpsPayload);
+      int beaconResult = duck.sendData(TOPIC_BEACON, beaconWire, BROADCAST_DUID);
       Serial.printf("[SCAN] BEACON result=%d payload=%s\n", beaconResult, gpsPayload);
       broadcast(beaconResult == 0 ? "CDK:STATUS,SCAN:ping_sent" : "CDK:STATUS,SCAN:ping_failed");
       broadcast("CDK:SCAN_ACK");

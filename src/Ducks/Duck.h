@@ -18,6 +18,7 @@
 #include "../security/DuckIdentity.h"
 #include "../security/DuckCrypto.h"
 #include "../security/OpenDmsConfig.h"
+#include "../security/MeshGroupConfig.h"
 
 #define NET_JOIN_DELAY 15000L
 
@@ -42,6 +43,7 @@ class Duck {
       duckRadio.serviceInterruptFlags();
       Duck::logIfLowMemory();
       opendmsconfig::checkSerialProvisioning();
+      meshgroupconfig::checkSerialProvisioning();
       if(router.getNetworkState() == NetworkState::PUBLIC) {
         if(duckRadio.getReceiveFlag()){
           handleReceivedPacket();
@@ -69,6 +71,7 @@ class Duck {
         return err;
       }
       opendmsconfig::begin();
+      meshgroupconfig::begin();
       err = this->setupLoRaRadio();
       if (err != DUCK_ERR_NONE) {
       logerr_ln("ERROR setupWithDefaults rc = %d",err); 
@@ -100,13 +103,22 @@ class Duck {
         app_data.insert(app_data.end(), data.begin(), data.end());
         CdpPacket txPacket = CdpPacket(targetDevice, topic, app_data, this->duid, this->getType());
 
+        // LoRa is a shared broadcast medium -- every duck in range hears this
+        // transmission regardless of the dduid header, so a directed send
+        // does NOT need a known routing-table entry to go out over the air
+        // (the routing table only matters for an INTERMEDIATE relay deciding
+        // whether to forward a packet not addressed to it -- see
+        // forwardPacket()). Previously this silently dropped the packet
+        // (sending only an RREQ, with no retry once a route arrived) whenever
+        // the destination wasn't already cached, which broke any first-time
+        // directed send -- most visibly MTALK delivery receipts, a one-shot
+        // fire-and-forget send with no retry logic of its own.
         std::optional<Duid> nextHop = router.getBestNextHop(txPacket.dduid);
-        if(nextHop.has_value() || txPacket.dduid == PAPADUCK_DUID || txPacket.dduid == BROADCAST_DUID){
-          router.getFilter().assignUniqueMessageId(txPacket);
-          err = sendToRadio(txPacket);
-        } else {
+        router.getFilter().assignUniqueMessageId(txPacket);
+        err = sendToRadio(txPacket);
+        if(!nextHop.has_value() && txPacket.dduid != PAPADUCK_DUID && txPacket.dduid != BROADCAST_DUID){
             if((millis() - this->lastRreqTime) > 30000){
-              loginfo_ln("[DUCK] Destination not in table, sending new RREQ.");
+              loginfo_ln("[DUCK] Destination not in table, also sending RREQ to learn a route.");
               RouteJSON rreqDoc = RouteJSON(txPacket.dduid, this->duid);
               rreqDoc.addToPath(this->duid);
               sendRouteRequest(txPacket.dduid, rreqDoc);
@@ -138,13 +150,14 @@ class Duck {
         app_data.insert(app_data.end(), &data[0], &data[length]);
         CdpPacket txPacket = CdpPacket(targetDevice, topic, app_data, this->duid, this->getType());
 
+        // See the std::string overload above for why a directed send must
+        // physically transmit even without a cached routing-table entry.
         std::optional<Duid> nextHop = router.getBestNextHop(txPacket.dduid);
-        if(nextHop.has_value() || txPacket.dduid == PAPADUCK_DUID || txPacket.dduid == BROADCAST_DUID){
-          router.getFilter().assignUniqueMessageId(txPacket);
-          err = sendToRadio(txPacket);
-        } else {
+        router.getFilter().assignUniqueMessageId(txPacket);
+        err = sendToRadio(txPacket);
+        if(!nextHop.has_value() && txPacket.dduid != PAPADUCK_DUID && txPacket.dduid != BROADCAST_DUID){
             if((millis() - this->lastRreqTime) > 30000){
-              loginfo_ln("[DUCK] Destination not in table, sending new RREQ.");
+              loginfo_ln("[DUCK] Destination not in table, also sending RREQ to learn a route.");
               RouteJSON rreqDoc = RouteJSON(txPacket.dduid, this->duid);
               rreqDoc.addToPath(this->duid);
               sendRouteRequest(txPacket.dduid, rreqDoc);
@@ -429,13 +442,17 @@ class Duck {
       if (router.getNetworkState() != NetworkState::PUBLIC) {
         return err;
       }
+      // See sendData()'s std::string overload above for why a directed send
+      // must physically transmit even without a cached routing-table entry --
+      // this is shared by sendEncryptedData()/sendSealedData(), so it also
+      // fixes MTALK delivery receipts (sendEncryptedData) and sealed uplink
+      // sends to a not-yet-routed target.
       std::optional<Duid> nextHop = router.getBestNextHop(txPacket.dduid);
-      if (nextHop.has_value() || txPacket.dduid == PAPADUCK_DUID || txPacket.dduid == BROADCAST_DUID) {
-        router.getFilter().assignUniqueMessageId(txPacket);
-        err = sendToRadio(txPacket);
-      } else {
+      router.getFilter().assignUniqueMessageId(txPacket);
+      err = sendToRadio(txPacket);
+      if (!nextHop.has_value() && txPacket.dduid != PAPADUCK_DUID && txPacket.dduid != BROADCAST_DUID) {
         if ((millis() - this->lastRreqTime) > 30000) {
-          loginfo_ln("[DUCK] Destination not in table, sending new RREQ.");
+          loginfo_ln("[DUCK] Destination not in table, also sending RREQ to learn a route.");
           RouteJSON rreqDoc = RouteJSON(txPacket.dduid, this->duid);
           rreqDoc.addToPath(this->duid);
           sendRouteRequest(txPacket.dduid, rreqDoc);

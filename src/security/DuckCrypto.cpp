@@ -149,4 +149,48 @@ int sealToStatic(const uint8_t* destStaticPublicKey,
   return DUCK_ERR_NONE;
 }
 
+int encryptWithGroupKey(const uint8_t* groupKey,
+                         const uint8_t* aad, size_t aadLen,
+                         const uint8_t* plaintext, size_t plaintextLen,
+                         uint8_t* outNonce,
+                         uint8_t* outCiphertext,
+                         uint8_t* outTag) {
+  CryptRNG.rand(outNonce, NONCE_LENGTH);
+
+  ChaChaPoly cipher;
+  cipher.setKey(groupKey, KEY_LENGTH);
+  cipher.setIV(outNonce, NONCE_LENGTH);
+  if (aadLen > 0) {
+    cipher.addAuthData(aad, aadLen);
+  }
+  cipher.encrypt(outCiphertext, plaintext, plaintextLen);
+  cipher.computeTag(outTag, TAG_LENGTH);
+  cipher.clear();
+  return DUCK_ERR_NONE;
+}
+
+int decryptWithGroupKey(const uint8_t* groupKey,
+                        const uint8_t* nonce,
+                        const uint8_t* aad, size_t aadLen,
+                        const uint8_t* ciphertext, size_t ciphertextLen,
+                        const uint8_t* tag,
+                        uint8_t* outPlaintext) {
+  ChaChaPoly cipher;
+  cipher.setKey(groupKey, KEY_LENGTH);
+  cipher.setIV(nonce, NONCE_LENGTH);
+  if (aadLen > 0) {
+    cipher.addAuthData(aad, aadLen);
+  }
+  cipher.decrypt(outPlaintext, ciphertext, ciphertextLen);
+  bool ok = cipher.checkTag(tag, TAG_LENGTH);
+  cipher.clear();
+
+  if (!ok) {
+    memset(outPlaintext, 0, ciphertextLen);
+    logerr_ln("DuckCrypto: decryptWithGroupKey authentication failed, discarding message");
+    return DUCK_ERR_CRYPTO_AUTH_FAILED;
+  }
+  return DUCK_ERR_NONE;
+}
+
 } // namespace duckcrypto

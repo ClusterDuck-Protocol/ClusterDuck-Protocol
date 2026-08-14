@@ -22,6 +22,7 @@
 #include <cstdio>
 #include <cstring>
 #include <map>
+#include <set>
 #include <CDP.h>
 #include <U8g2lib.h>
 #include <TinyGPSPlus.h>
@@ -269,6 +270,68 @@ static unsigned long  beaconAckDeferMs  = 0;
 
 // ── Duck instance ─────────────────────────────────────────────────────────────
 MamaDuck duck(DUCK_NAME);
+
+// ── BEACON group-key encryption ──────────────────────────────────────────────
+// TOPIC_BEACON/TOPIC_BEACON_ACK broadcast GPS coordinates for local
+// discovery, so neither of Duck.h's existing encryption modes fit:
+// sendSealedData() is only readable by OpenDMS, sendEncryptedData() only
+// by one already-known peer. If a mesh group key is provisioned (see
+// src/security/MeshGroupConfig.h), wrap the payload with
+// duckcrypto::encryptWithGroupKey() so it's opaque to eavesdroppers
+// outside this deployment while still readable by any duck holding the
+// same key. Falls back to sending in the clear if no group key is
+// configured, so discovery keeps working before/without provisioning.
+static const uint8_t BEACON_GROUP_MARKER = 0xE6;
+
+static std::string encryptBeaconPayload(uint8_t topic, const char* plaintext) {
+  size_t plaintextLen = strlen(plaintext);
+  uint8_t aad[9];
+  aad[0] = topic;
+  memcpy(aad + 1, duck.getDuckId().data(), 8);
+
+  std::vector<uint8_t> wire(1 + duckcrypto::NONCE_LENGTH + plaintextLen + duckcrypto::TAG_LENGTH);
+  wire[0] = BEACON_GROUP_MARKER;
+  uint8_t* nonce      = wire.data() + 1;
+  uint8_t* ciphertext = nonce + duckcrypto::NONCE_LENGTH;
+  uint8_t* tag        = ciphertext + plaintextLen;
+  duckcrypto::encryptWithGroupKey(meshgroupconfig::MESH_GROUP_KEY, aad, sizeof(aad),
+                                  (const uint8_t*)plaintext, plaintextLen,
+                                  nonce, ciphertext, tag);
+  return std::string(reinterpret_cast<const char*>(wire.data()), wire.size());
+}
+
+// Returns true and fills outPlaintext if `data` is a group-key-encrypted
+// BEACON payload that was successfully decrypted. Returns false (leaves
+// outPlaintext untouched) if it isn't marked as encrypted, no group key
+// is configured, or authentication fails -- callers should treat that the
+// same as any other unrecognized/plaintext payload.
+static bool decryptBeaconPayload(uint8_t topic, const uint8_t* sduid,
+                                  const std::vector<uint8_t>& data,
+                                  std::string& outPlaintext) {
+  if (data.size() < 1 + duckcrypto::NONCE_LENGTH + duckcrypto::TAG_LENGTH
+      || data[0] != BEACON_GROUP_MARKER || !meshgroupconfig::isConfigured()) {
+    return false;
+  }
+  const uint8_t* nonce = data.data() + 1;
+  const uint8_t* ciphertext = nonce + duckcrypto::NONCE_LENGTH;
+  size_t ciphertextLen = data.size() - 1 - duckcrypto::NONCE_LENGTH - duckcrypto::TAG_LENGTH;
+  const uint8_t* tag = ciphertext + ciphertextLen;
+
+  uint8_t aad[9];
+  aad[0] = topic;
+  memcpy(aad + 1, sduid, 8);
+
+  std::vector<uint8_t> plain(ciphertextLen);
+  int rc = duckcrypto::decryptWithGroupKey(meshgroupconfig::MESH_GROUP_KEY, nonce,
+                                           aad, sizeof(aad), ciphertext, ciphertextLen,
+                                           tag, plain.data());
+  if (rc != DUCK_ERR_NONE) {
+    return false;
+  }
+  outPlaintext.assign(reinterpret_cast<const char*>(plain.data()), plain.size());
+  return true;
+}
+
 static bool setupOK = false;
 static int  counter = 1;
 static char idBuf[12];    // "ID:IBRAHIM1\0" header string shown on screen
@@ -299,8 +362,29 @@ static int sendUplink(uint8_t topic, const std::string data,
 // against older/plaintext-only peers. This is intentionally separate from
 // sendUplink() above: MTALK is Duck<->Duck session-mode traffic sealed to a
 // peer's identity key, NOT OpenDMS's static uplink key.
+//
+// Peers we've directed-announced our own identity to during this boot
+// session, so sendMamaLink() only does it once per peer instead of on every
+// message. This closes a one-directional key-exchange gap: the one-time
+// BROADCAST_DUID announceIdentity() in setup() may never reach a given peer
+// (e.g. it boots later, or was out of range at the time), so that peer can
+// still send us plaintext MTALK (fine, decodes regardless) but has no way to
+// know we can't yet decrypt anything IT encrypts for US -- and we have no
+// way to know whether IT already has OUR key either. Concretely: if we
+// receive an MTALK message and reply with an encrypted MTALK_ACK receipt via
+// sendEncryptedData(), and the original sender never learned our public
+// key, tryDecryptEncryptedData() on their end silently drops our ACK (no
+// known public key for sender) -- the message text still shows up fine on
+// their phone, but the delivery-receipt tick never updates. A directed
+// identity_announce() to that specific peer, sent right before we first
+// encrypt anything for it, closes that gap.
+static std::set<std::array<uint8_t, 8>> announcedIdentityTo;
+
 static int sendMamaLink(const std::string& data, const std::array<uint8_t, 8>& targetDuid) {
     if (duck.isUplinkEncryptionEnabled()) {
+        if (announcedIdentityTo.insert(targetDuid).second) {
+            duck.announceIdentity(targetDuid);
+        }
         int rc = duck.sendEncryptedData(26, data, targetDuid);
         if (rc == DUCK_ERR_NONE) return rc;
     }
@@ -1107,7 +1191,10 @@ void loop() {
     if (beaconAckDeferMs > 0 && millis() >= beaconAckDeferMs && !gpsTxPending) {
         beaconAckDeferMs = 0;
         beaconAckPending = false;
-        duck.sendData(TOPIC_BEACON_ACK, std::string(beaconAckPayload), BROADCAST_DUID);
+        std::string beaconAckWire = meshgroupconfig::isConfigured()
+            ? encryptBeaconPayload(TOPIC_BEACON_ACK, beaconAckPayload)
+            : std::string(beaconAckPayload);
+        duck.sendData(TOPIC_BEACON_ACK, beaconAckWire, BROADCAST_DUID);
         Serial.printf("[BEACON] ACK TX: %s\n", beaconAckPayload);
     }
 
@@ -1194,7 +1281,13 @@ void handleDuckData(CdpPacket packet) {
     // ── 1. Extract GPS from packet and update cache ───────────────────────────
     {
         String pdata;
-        {
+        std::string decryptedBeacon;
+        if ((packet.topic == TOPIC_BEACON || packet.topic == TOPIC_BEACON_ACK)
+            && decryptBeaconPayload(packet.topic, packet.sduid.data(), packet.data, decryptedBeacon)) {
+            // std::string guarantees a null terminator via c_str(), unlike
+            // Adafruit nRF52's String which has no (char*, len) ctor.
+            pdata = String(decryptedBeacon.c_str());
+        } else {
             // Adafruit nRF52 String has no (char*, len) ctor: null-terminate manually.
             std::vector<uint8_t> tmp = packet.data;
             tmp.push_back(0);
@@ -1684,7 +1777,10 @@ void handleFrame(const String& line) {
                 if (isPhoneConnected() && gpsReqDeferredSendMs == 0 && gpsReqSentMs == 0)
                     gpsReqDeferredSendMs = millis() + 300;
             }
-            int beaconResult = duck.sendData(TOPIC_BEACON, std::string(gpsPayload), BROADCAST_DUID);
+            std::string beaconWire = meshgroupconfig::isConfigured()
+                ? encryptBeaconPayload(TOPIC_BEACON, gpsPayload)
+                : std::string(gpsPayload);
+            int beaconResult = duck.sendData(TOPIC_BEACON, beaconWire, BROADCAST_DUID);
             broadcast(beaconResult == 0 ? "CDK:STATUS,SCAN:ping_sent" : "CDK:STATUS,SCAN:ping_failed");
             broadcast("CDK:SCAN_ACK");
             break;
