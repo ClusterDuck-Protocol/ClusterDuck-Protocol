@@ -134,11 +134,14 @@ enum reservedTopic {
   encrypted_cmd = 0x08,
   // One-way Duck -> OpenDMS uplink data, sealed anonymously to OpenDMS's
   // pinned static public key (duckcrypto::sealToStatic()). Data section is
-  // ephemeralPublicKey(32) || nonce(12) || ciphertext(N) || tag(16); the
-  // first plaintext byte (once decrypted server-side) is the original
-  // app-level topic, followed by the actual payload. Relays forward
-  // blindly, same as any other topic; only OpenDMS (holding the matching
-  // static private key) can decrypt it.
+  // topic(1, cleartext) || ephemeralPublicKey(32) || nonce(12) ||
+  // ciphertext(N) || tag(16). Only the ciphertext (the actual application
+  // payload) is encrypted -- the leading topic byte is sent in the clear
+  // (though bound into the AAD, so tampering with it breaks
+  // authentication) so relays and OpenDMS can see which topic this is
+  // without decrypting anything. Relays forward blindly, same as any other
+  // topic; only OpenDMS (holding the matching static private key) can
+  // decrypt the ciphertext.
   sealed_uplink = 0x09,
   // A Duck announcing its own long-term X25519 public key (32 raw bytes,
   // the full data section) so peers can learn it for Duck<->Duck session
@@ -149,8 +152,11 @@ enum reservedTopic {
   // static-static X25519 ECDH between the two Ducks' long-term identities).
   // Requires the recipient to have already learned the sender's public key
   // via identity_announce. Data section is
-  // nonce(12) || ciphertext(N) || tag(16); the first plaintext byte is the
-  // original app-level topic, followed by the actual payload.
+  // topic(1, cleartext) || nonce(12) || ciphertext(N) || tag(16). Only the
+  // ciphertext (the actual application payload) is encrypted -- the
+  // leading topic byte is sent in the clear (though bound into the AAD, so
+  // tampering with it breaks authentication) so relays can see which topic
+  // this is without decrypting anything.
   encrypted_data = 0x0B,
   max_reserved = 0x0F
 };

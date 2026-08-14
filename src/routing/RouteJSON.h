@@ -23,13 +23,8 @@ class RouteJSON {
          * @param sourceDevice the source device DUID
          */
         RouteJSON(Duid targetDevice, Duid sourceDevice) {
-            // DUIDs are hash-derived (SHA256(pubkey) truncated) and thus
-            // arbitrary binary, not printable ASCII -- duckutils::toString()
-            // returns a literal "ERROR: Non-printable character" string for
-            // any non-printable byte, which is virtually always true for a
-            // real DUID. Hex-encode instead so the value round-trips intact.
-            json["origin"] = duckutils::arrayToHexString(sourceDevice);
-            json["destination"] = duckutils::arrayToHexString(targetDevice);
+            json["origin"] = duckutils::toString(sourceDevice);
+            json["destination"] = duckutils::toString(targetDevice);
             json["path"].as<ArduinoJson::JsonArray>();
 
             std::string log;
@@ -75,15 +70,19 @@ class RouteJSON {
             return json.as<std::string>();
         }
         Duid getOrigin(){
-            // Decode via the bounds-safe hex decoder rather than a raw
-            // std::copy of an arbitrary-length JSON string into a fixed
-            // 8-byte array -- the latter overflows originDuid if `origin`
-            // is ever longer than DUID_LENGTH (e.g. a legacy/corrupt
-            // "ERROR: Non-printable character" value from an older build).
-            return duckutils::hexStringToArray<uint8_t, DUID_LENGTH>(origin);
+            // Bounds-safe copy: clamp to DUID_LENGTH so an oversized/corrupt
+            // `origin` string can never overflow the fixed-size Duid array
+            // (regression guard, independent of the plain-text encoding).
+            Duid originDuid{};
+            size_t n = origin.size() < originDuid.size() ? origin.size() : originDuid.size();
+            std::copy(origin.begin(), origin.begin() + n, originDuid.begin());
+            return originDuid;
         }
         Duid getDestination(){
-            return duckutils::hexStringToArray<uint8_t, DUID_LENGTH>(destination);
+            Duid destinationDuid{};
+            size_t n = destination.size() < destinationDuid.size() ? destination.size() : destinationDuid.size();
+            std::copy(destination.begin(), destination.begin() + n, destinationDuid.begin());
+            return destinationDuid;
         }
 
         /**
@@ -93,7 +92,7 @@ class RouteJSON {
          * @return the newly modified Arduino JSON document
          */
         std::string addToPath(Duid deviceId){
-            objPath.push_back(duckutils::arrayToHexString(deviceId));
+            objPath.push_back(duckutils::toString(deviceId));
             json["path"].to<ArduinoJson::JsonArray>(); //.to erases content of the field in the doc, but .as does not modify the doc at all.
             updateJsonPath(); //so we will manually copy the local obj path to the doc
 #ifdef CDP_LOG_DEBUG
@@ -108,7 +107,9 @@ class RouteJSON {
         std::optional<Duid> getlastInPath(){
             if(objPath.size() > 0){
                 auto last = objPath[objPath.size()-1];
-                Duid lastDuid = duckutils::hexStringToArray<uint8_t, DUID_LENGTH>(last);
+                Duid lastDuid{};
+                size_t n = last.size() < lastDuid.size() ? last.size() : lastDuid.size();
+                std::copy(last.begin(), last.begin() + n, lastDuid.begin());
 
                 std::string log;
                 serializeJson(json, log);

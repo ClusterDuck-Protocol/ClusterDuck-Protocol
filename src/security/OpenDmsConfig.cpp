@@ -207,6 +207,18 @@ void handleSerialLine(const std::string& line) {
 uint8_t OPENDMS_STATIC_PUBLIC_KEY[duckcrypto::PUBLIC_KEY_LENGTH] = {0};
 
 void begin() {
+#if defined(OPENDMS_STATIC_PUBLIC_KEY_HEX)
+  // Build-flag-provided key, e.g.
+  // -DOPENDMS_STATIC_PUBLIC_KEY_HEX=\"<64 hex chars>\" -- see
+  // tools/pubkey_to_c_array.py or `AT+OPENDMSKEY?` for the hex form of an
+  // existing key. Applied first so field-provisioned storage (below) can
+  // still override it if this device was later re-provisioned.
+  if (!hexDecodeKey(OPENDMS_STATIC_PUBLIC_KEY_HEX, OPENDMS_STATIC_PUBLIC_KEY)) {
+    logerr_ln("OpenDmsConfig: OPENDMS_STATIC_PUBLIC_KEY_HEX build flag is invalid "
+              "(expected %u hex characters)", (unsigned)KEY_HEX_LENGTH);
+  }
+#endif
+
   uint8_t stored[duckcrypto::PUBLIC_KEY_LENGTH];
   if (loadFromStorage(stored)) {
     memcpy(OPENDMS_STATIC_PUBLIC_KEY, stored, duckcrypto::PUBLIC_KEY_LENGTH);

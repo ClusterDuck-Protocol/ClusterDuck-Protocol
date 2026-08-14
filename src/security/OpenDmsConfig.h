@@ -5,7 +5,14 @@
  * docs/crypto-design.tex, "OpenDMS -> Duck (operator-initiated downlink)").
  *
  * OPENDMS_STATIC_PUBLIC_KEY ships as an all-zero placeholder, which
- * isConfigured() reports as "not configured". It can be set two ways:
+ * isConfigured() reports as "not configured". It can be set three ways:
+ *  - build flag: pass -DOPENDMS_STATIC_PUBLIC_KEY_HEX="<64 hex chars>" and
+ *    begin() decodes it into OPENDMS_STATIC_PUBLIC_KEY at startup -- see
+ *    tools/pubkey_to_c_array.py to convert the meshbeacon Laravel repo's
+ *    config/services.php `duck_crypto.public_key` / DUCK_CRYPTO_PUBLIC_KEY
+ *    (base64) to hex. NOTE: the flag is named *_HEX, not
+ *    OPENDMS_STATIC_PUBLIC_KEY, since the latter is this array's own name
+ *    and would break compilation if redefined as a macro.
  *  - compile-time: replace the initializer in OpenDmsConfig.cpp with the
  *    real deployment's key (base64-decoded to raw bytes) before flashing
  *    -- see the meshbeacon Laravel repo's config/services.php
@@ -14,6 +21,7 @@
  *    from flash if one was written via the serial provisioning command
  *    (see checkSerialProvisioning()), so a device does not need to be
  *    reflashed just to join a particular OpenDMS instance's mesh.
+ *    Overrides the build-flag/compile-time value if present.
  * This key is not secret (only the matching private key, held by OpenDMS,
  * must stay confidential), so compiling it into firmware/source control,
  * persisting it to flash, or writing it over an unauthenticated serial

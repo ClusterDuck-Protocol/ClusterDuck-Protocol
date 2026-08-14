@@ -106,6 +106,41 @@ extern CDPCFG_LORA_CLASS lora;
 
  // --- Global Variables ---
  MamaDuck duck(DUCK_NAME); // Device ID, MUST be 8 bytes and unique from other ducks;
+
+ // Routes GPS/status uplink sends through sendSealedData() (one-way seal to
+ // OpenDMS's pinned static public key, src/security/OpenDmsConfig.h) when
+ // the operator has enabled uplink encryption (duck.isUplinkEncryptionEnabled(),
+ // off by default -- see Duck.h's setUplinkEncryptionEnabled()); falls back to
+ // plain duck.sendData() otherwise. MamaDuck-to-MamaDuck traffic (MTALK, topic
+ // 26) is intentionally NOT routed through here -- that's session-mode via
+ // sendEncryptedData()/announceIdentity(), targeting a peer Duck's identity
+ // key, not OpenDMS's static key.
+ static int sendUplink(uint8_t topic, const std::string data,
+                        const std::array<uint8_t, 8> targetDevice = PAPADUCK_DUID) {
+     if (duck.isUplinkEncryptionEnabled()) {
+         return duck.sendSealedData(topic, data, targetDevice);
+     }
+     return duck.sendData(topic, data, targetDevice);
+ }
+
+ // Routes MamaDuck-to-MamaDuck (MTALK, topic 26) sends through
+ // sendEncryptedData() -- session-mode X25519 ECDH between this Duck's and
+ // the peer's long-term identities (see duck.announceIdentity() in setup()
+ // and Duck.h's learnPeerIdentity()) -- when uplink encryption is enabled.
+ // Falls back to plain duck.sendData() if encryption is disabled, or if no
+ // identity_announce has been received from that peer yet (sendEncryptedData
+ // returns non-zero without sending in that case), so MTALK still works
+ // against older/plaintext-only peers. This is intentionally separate from
+ // sendUplink() above: MTALK is Duck<->Duck session-mode traffic sealed to a
+ // peer's identity key, NOT OpenDMS's static uplink key.
+ static int sendMamaLink(const std::string& data, const std::array<uint8_t, 8>& targetDuid) {
+     if (duck.isUplinkEncryptionEnabled()) {
+         int rc = duck.sendEncryptedData(26, data, targetDuid);
+         if (rc == DUCK_ERR_NONE) return rc;
+     }
+     return duck.sendData(26, data, targetDuid);
+ }
+
  auto timer = timer_create_default();  // Creating a timer with default settings
  const int INTERVAL_MS = 10000;        // Interval in milliseconds between runSensor call
  int counter = 1;                      // Counter for the sensor data  
@@ -301,6 +336,15 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
    // transmits nothing. Both ducks are standalone peers — no join needed.
    duck.goPublic();
    Serial.println("[MAMA] Network state: PUBLIC");
+
+   // Broadcasts this Duck's long-term public key so peer MamaDucks can learn
+   // it (TOFU) and use sendEncryptedData()/decrypt encrypted_data packets
+   // addressed to this Duck (see sendMamaLink() above for MTALK). Only
+   // announced when encryption is actually enabled -- an unencrypted
+   // deployment has no use for it.
+   if (duck.isUplinkEncryptionEnabled()) {
+     duck.announceIdentity();
+   }
  
    setupOK = true;
    Serial.println("[MAMA] Setup OK!");
@@ -682,7 +726,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     rogerMsg.src = duckcdp_StatusMsgSrc_STATUS_MSG_SRC_DEVICE;
     std::snprintf(rogerMsg.text, sizeof(rogerMsg.text), "%s", "Roger");
     std::vector<uint8_t> rogerEncoded = duckpayload::encodeStatusReportMsg(rogerMsg);
-    duck.sendData(topics::status, rogerEncoded.data(), rogerEncoded.size());
+    sendUplink(topics::status, std::string(reinterpret_cast<const char*>(rogerEncoded.data()), rogerEncoded.size()));
     broadcast("CDK:ACK,ID:ROGER");
     Serial.println("[MAMA] Triple-click: Roger sent");
     display.displayOn();
@@ -887,7 +931,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
   // startReceive() and abort the GPS response startTransmit().
   if (gpsTxPending) {
     gpsTxPending = false;
-    int result = duck.sendData(topics::gps, gpsTxPayload.data(), gpsTxPayload.size());
+    int result = sendUplink(topics::gps, std::string(reinterpret_cast<const char*>(gpsTxPayload.data()), gpsTxPayload.size()));
     gpsLoraOk = (result == 0);
     Serial.printf("[GPS] Deferred LoRa TX %s (%u bytes)\n", gpsLoraOk ? "OK" : "FAILED",
                   (unsigned)gpsTxPayload.size());
@@ -958,7 +1002,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     noGps.no_fix_reason = duckcdp_GpsNoFixReason_GPS_REASON_NO_RESPONSE;
     noGps.batt_pct = heltec_battery_percent(readVbat());
     std::vector<uint8_t> encoded = duckpayload::encodeGps(noGps);
-    duck.sendData(topics::gps, encoded.data(), encoded.size());
+    sendUplink(topics::gps, std::string(reinterpret_cast<const char*>(encoded.data()), encoded.size()));
     Serial.println("[GPS] GPSREQ timeout — no response from phone, sent no-fix report.");
   }
  }
@@ -1111,6 +1155,12 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
             break;
         }
 
+        // encrypted_cmd (topic 8) is OpenDMS's decrypted operator downlink --
+        // MamaDuck.h's encrypted_cmd handler leaves packet.topic set to 8 after
+        // successful decryption (unlike encrypted_data, which restores the real
+        // app topic), so it must be handled here explicitly or the decrypted
+        // command (e.g. the SOS ack below) is silently dropped.
+        case reservedTopic::encrypted_cmd:
         case 22:  // Text message / operator command
             if (duckpayload::isProtobuf(packet.data.data(), packet.data.size())) {
               duckcdp_OpText opText = duckcdp_OpText_init_zero;
@@ -1148,7 +1198,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
               String ackText = "MSG_READ:TEXT:" + message;
               std::snprintf(ack.text, sizeof(ack.text), "%s", ackText.c_str());
               std::vector<uint8_t> encoded = duckpayload::encodeOpText(ack);
-              duck.sendData(22, encoded.data(), (int)encoded.size());
+              sendUplink(22, std::string(reinterpret_cast<const char*>(encoded.data()), encoded.size()));
             }
             // blink to show message arrive
             blinkLed(1);
@@ -1172,7 +1222,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
               duckcdp_OpText ack = duckcdp_OpText_init_zero;
               std::snprintf(ack.text, sizeof(ack.text), "%s", "ALERT_ACK");
               std::vector<uint8_t> encoded = duckpayload::encodeOpText(ack);
-              duck.sendData(23, encoded.data(), (int)encoded.size());
+              sendUplink(23, std::string(reinterpret_cast<const char*>(encoded.data()), encoded.size()));
             }
             break;
 
@@ -1230,7 +1280,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
               display.drawString(0, 40, "LNG:" + String(tinyGps.location.lng(), 5));
               display.drawString(0, 52, "ALT:" + String(altM, 1) + "m  SPD:" + String(spdKh, 1) + "km/h");
               display.display();
-              duck.sendData(topics::gps, std::string(gpsBuf));
+              sendUplink(topics::gps, std::string(gpsBuf));
               Serial.printf("[GPS] Hardware GPS sent (age: %lums): %s\n",
                             tinyGps.location.age(), gpsBuf);
               // Non-blocking display clear — delay() here would block duck.run() for
@@ -1265,7 +1315,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
                 char noGpsBuf[64];
                 std::snprintf(noGpsBuf, sizeof(noGpsBuf), "GPS,FIX:0,SRC:NONE,REASON:NO_PHONE,BATT:%d",
                               heltec_battery_percent(readVbat()));
-                duck.sendData(topics::gps, std::string(noGpsBuf));
+                sendUplink(topics::gps, std::string(noGpsBuf));
                 Serial.println("[GPS] No phone connected — sent " + String(noGpsBuf));
               }
               // Non-blocking display clear — delay() here blocks duck.run() for 2 s,
@@ -1311,7 +1361,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
                 char noGpsBuf[64];
                 std::snprintf(noGpsBuf, sizeof(noGpsBuf), "GPS,FIX:0,SRC:NONE,REASON:NO_PHONE,BATT:%d",
                               heltec_battery_percent(readVbat()));
-                duck.sendData(topics::gps, std::string(noGpsBuf));
+                sendUplink(topics::gps, std::string(noGpsBuf));
                 Serial.println("[GPS] No phone connected — sent " + String(noGpsBuf));
               }
               // Non-blocking display clear — delay() here blocks duck.run() for 2 s,
@@ -1413,7 +1463,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
                   std::snprintf(ack.mid, sizeof(ack.mid), "%s", mid.c_str());
                   std::vector<uint8_t> encoded = duckpayload::encodeMTalk(ack);
                   if (!encoded.empty()) {
-                    duck.sendData(26, encoded.data(), (int)encoded.size(), senderDuid);
+                    sendMamaLink(std::string(reinterpret_cast<const char*>(encoded.data()), encoded.size()), senderDuid);
                     Serial.println("[MTALK] MACK sent back to " + senderId);
                   }
                 }
@@ -1910,7 +1960,7 @@ bool sendMamaTalk(const String& targetId, const String& msg, const String& mid) 
     Serial.println("[MTALK] ERROR: failed to encode MTalk message (too long?).");
     return false;
   }
-  int failure = duck.sendData(26, encoded.data(), (int)encoded.size(), targetDuid);
+  int failure = sendMamaLink(std::string(reinterpret_cast<const char*>(encoded.data()), encoded.size()), targetDuid);
   if (!failure) {
     Serial.println("[MAMA] MTALK sent to " + targetId + ": " + msg);
     broadcast("CDK:ACK,ID:MTALK,TARGET:" + targetId);

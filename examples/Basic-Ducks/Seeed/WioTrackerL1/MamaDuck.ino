@@ -273,6 +273,40 @@ static bool setupOK = false;
 static int  counter = 1;
 static char idBuf[12];    // "ID:IBRAHIM1\0" header string shown on screen
 
+// Routes GPS/alert/status/roger uplink sends through sendSealedData() (one-
+// way seal to OpenDMS's pinned static public key, src/security/OpenDmsConfig.h)
+// when the operator has enabled uplink encryption (duck.isUplinkEncryptionEnabled(),
+// off by default -- see Duck.h's setUplinkEncryptionEnabled()); falls back to
+// plain duck.sendData() otherwise. MamaDuck-to-MamaDuck traffic (MTALK, topic
+// 26) is intentionally NOT routed through here -- that's session-mode via
+// sendEncryptedData()/announceIdentity(), targeting a peer Duck's identity
+// key, not OpenDMS's static key.
+static int sendUplink(uint8_t topic, const std::string data,
+                       const std::array<uint8_t, 8> targetDevice = PAPADUCK_DUID) {
+    if (duck.isUplinkEncryptionEnabled()) {
+        return duck.sendSealedData(topic, data, targetDevice);
+    }
+    return duck.sendData(topic, data, targetDevice);
+}
+
+// Routes MamaDuck-to-MamaDuck (MTALK, topic 26) sends through
+// sendEncryptedData() -- session-mode X25519 ECDH between this Duck's and
+// the peer's long-term identities (see duck.announceIdentity() in setup()
+// and Duck.h's learnPeerIdentity()) -- when uplink encryption is enabled.
+// Falls back to plain duck.sendData() if encryption is disabled, or if no
+// identity_announce has been received from that peer yet (sendEncryptedData
+// returns non-zero without sending in that case), so MTALK still works
+// against older/plaintext-only peers. This is intentionally separate from
+// sendUplink() above: MTALK is Duck<->Duck session-mode traffic sealed to a
+// peer's identity key, NOT OpenDMS's static uplink key.
+static int sendMamaLink(const std::string& data, const std::array<uint8_t, 8>& targetDuid) {
+    if (duck.isUplinkEncryptionEnabled()) {
+        int rc = duck.sendEncryptedData(26, data, targetDuid);
+        if (rc == DUCK_ERR_NONE) return rc;
+    }
+    return duck.sendData(26, data, targetDuid);
+}
+
 // ── Function declarations ─────────────────────────────────────────────────────
 void handleDuckData(CdpPacket packet);
 void displayMessage(String msg);
@@ -636,6 +670,15 @@ void setup() {
     duck.onReceiveDuckData(handleDuckData);
     setupOK = true;
     snprintf(idBuf, sizeof(idBuf), "ID:%s", DUCK_NAME);
+
+    // Broadcasts this Duck's long-term public key so OpenDMS and nearby
+    // MamaDucks can learn it (TOFU) and use encrypted_cmd/encrypted_data
+    // instead of plaintext (see Duck.h's announceIdentity()). Only
+    // announced when encryption is actually enabled -- an unencrypted
+    // deployment has no use for it.
+    if (duck.isUplinkEncryptionEnabled()) {
+        duck.announceIdentity();
+    }
     BLINK_LED(5);   // 5 blinks = CDP fully initialized
     dspStatus("CDP OK", DUCK_NAME);
     Serial.println("[MAMA] CDP OK"); Serial.flush();
@@ -902,7 +945,7 @@ void loop() {
     // connect (ble_on_connect()) and periodically over USB, so a manual
     // send added no information the phone didn't already have.
     if (btn == BTN_DOUBLE) {
-        duck.sendData(topics::status, std::string("MSG,SRC:DEVICE,TEXT:Roger"));
+        sendUplink(topics::status, std::string("MSG,SRC:DEVICE,TEXT:Roger"));
         broadcast("CDK:ACK,ID:ROGER");
         dspPowerSave(0);
         displayEnabled = true;
@@ -1052,7 +1095,7 @@ void loop() {
     // ── Deferred GPS LoRa TX ──────────────────────────────────────────────────
     if (gpsTxPending) {
         gpsTxPending = false;
-        int result = duck.sendData(topics::gps, std::string(gpsTxPayload));
+        int result = sendUplink(topics::gps, std::string(gpsTxPayload));
         gpsLoraOk   = (result == 0);
         Serial.printf("[GPS] Deferred TX %s: %s\n", gpsLoraOk ? "OK" : "FAILED", gpsTxPayload);
     }
@@ -1133,7 +1176,7 @@ void loop() {
         char noGpsBuf[72];
         snprintf(noGpsBuf, sizeof(noGpsBuf), "GPS,FIX:0,SRC:NONE,REASON:NO_RESPONSE,BATT:%d",
                  batteryPercent(readVbat()));
-        duck.sendData(topics::gps, std::string(noGpsBuf));
+        sendUplink(topics::gps, std::string(noGpsBuf));
     }
 
     delay(5);
@@ -1214,6 +1257,12 @@ void handleDuckData(CdpPacket packet) {
     char replyMsg[200];
 
     switch (packet.topic) {
+        // encrypted_cmd (topic 8) is OpenDMS's decrypted operator downlink --
+        // MamaDuck.h's encrypted_cmd handler leaves packet.topic set to 8 after
+        // successful decryption (unlike encrypted_data, which restores the real
+        // app topic), so it must be handled here explicitly or the decrypted
+        // command (e.g. the SOS ack below) is silently dropped.
+        case reservedTopic::encrypted_cmd:
         case 22:
             if (message.indexOf("SOS DITERIMA") >= 0) {
                 static unsigned long lastSosAckMs = 0;
@@ -1230,7 +1279,7 @@ void handleDuckData(CdpPacket packet) {
             emergencyDisplayPending = true;
             displayEnabled          = true;
             snprintf(replyMsg, sizeof(replyMsg), "MSG_READ:TEXT:%s", message.c_str());
-            duck.sendData(22, replyMsg);
+            sendUplink(22, std::string(replyMsg));
             blinkLed(1);
             broadcast(String("CDK:MSG,TEXT:") + message);
             break;
@@ -1239,7 +1288,7 @@ void handleDuckData(CdpPacket packet) {
             beepBuzzer(3, 80, 80);     // immediate: alert before anything else
             flashLED();
             broadcast(String("CDK:MSG,TEXT:") + message);
-            duck.sendData(23, "ALERT_ACK");
+            sendUplink(23, std::string("ALERT_ACK"));
             break;
 
         case 24:
@@ -1274,7 +1323,7 @@ void handleDuckData(CdpPacket packet) {
                 dspStr(0, 28, ("LAT:" + String(tinyGps.location.lat(), 5)).c_str());
                 dspStr(0, 40, ("LNG:" + String(tinyGps.location.lng(), 5)).c_str());
                 dspEnd();
-                duck.sendData(topics::gps, std::string(gpsBuf));
+                sendUplink(topics::gps, std::string(gpsBuf));
                 delay(3000);
                 dspPowerSave(1);
             } else {
@@ -1301,7 +1350,7 @@ void handleDuckData(CdpPacket packet) {
                     char noGpsBuf[64];
                     snprintf(noGpsBuf, sizeof(noGpsBuf), "GPS,FIX:0,SRC:NONE,REASON:NO_PHONE,BATT:%d",
                              batteryPercent(readVbat()));
-                    duck.sendData(topics::gps, std::string(noGpsBuf));
+                    sendUplink(topics::gps, std::string(noGpsBuf));
                 }
                 gpsDisplayClearMs = millis() + 2000;
             }
@@ -1339,7 +1388,8 @@ void handleDuckData(CdpPacket packet) {
                   std::snprintf(ack.mid, sizeof(ack.mid), "%s", mid.c_str());
                   std::vector<uint8_t> encoded = duckpayload::encodeMTalk(ack);
                   if (!encoded.empty()) {
-                    duck.sendData(26, encoded.data(), (int)encoded.size(), senderDuid);
+                    std::string encodedStr(reinterpret_cast<const char*>(encoded.data()), encoded.size());
+                    sendMamaLink(encodedStr, senderDuid);
                   }
                 }
               }
@@ -1374,7 +1424,7 @@ void handleDuckData(CdpPacket packet) {
                 if (mid.length() > 0) {
                     std::array<uint8_t, 8> senderDuid;
                     for (int i = 0; i < 8; i++) senderDuid[i] = packet.sduid[i];
-                    duck.sendData(26, std::string(("[MACK:" + mid + "]").c_str()), senderDuid);
+                    sendMamaLink(std::string(("[MACK:" + mid + "]").c_str()), senderDuid);
                 }
             }
             break;
@@ -1539,7 +1589,7 @@ bool sendEmergency(String lat, String lng, String alt, String spd, String hdg, b
     }
     loraMsg += ",BATT:" + std::to_string(battPct);
 
-    int failure = duck.sendData(topics::alert, loraMsg);
+    int failure = sendUplink(topics::alert, loraMsg);
     lastTxResult = failure;
     lastTxMs     = millis();
 
@@ -1669,7 +1719,7 @@ void handleSOS(const String& body) {
     if (hdg.length() > 0) message += ",HDG:" + hdg;
     message += ",BATT:" + String(battPct);
 
-    int failure = duck.sendData(topics::status, std::string(message.c_str()));
+    int failure = sendUplink(topics::status, std::string(message.c_str()));
     blinkLed(3);
     broadcast("CDK:ACK,ID:SOS");
 
@@ -1702,7 +1752,7 @@ void handleMsg(const String& body) {
     blinkLed(1);
     displayHome();
 
-    int failure = duck.sendData(topics::status, std::string(message.c_str()));
+    int failure = sendUplink(topics::status, std::string(message.c_str()));
     if (!failure) broadcast("CDK:ACK,ID:MSG");
 }
 
@@ -1720,7 +1770,8 @@ bool sendMamaTalk(const String& targetId, const String& msg, const String& mid) 
     std::snprintf(mtalk.text, sizeof(mtalk.text), "%s", msg.c_str());
     std::vector<uint8_t> encoded = duckpayload::encodeMTalk(mtalk);
     if (encoded.empty()) return false;
-    int failure = duck.sendData(26, encoded.data(), (int)encoded.size(), targetDuid);
+    std::string encodedStr(reinterpret_cast<const char*>(encoded.data()), encoded.size());
+    int failure = sendMamaLink(encodedStr, targetDuid);
     if (!failure) broadcast("CDK:ACK,ID:MTALK,TARGET:" + targetId);
     return !failure;
 }
