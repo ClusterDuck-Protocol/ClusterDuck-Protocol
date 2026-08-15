@@ -20,6 +20,10 @@
  #include <arduino-timer.h>
  #include <CDP.h>
  #include "payloads/DuckPayloads.h"
+ #include "../common/DuckIdFactory.h"
+ #include "../common/BeaconCrypto.h"
+ #include "../common/UplinkRouter.h"
+ #include "../common/CdkFrame.h"
  #ifdef SERIAL_PORT_USBVIRTUAL
  #define Serial SERIAL_PORT_USBVIRTUAL
  #endif
@@ -63,12 +67,10 @@ extern CDPCFG_LORA_CLASS lora;
  static bool initDuckId() {
  #ifdef DUCK_ID
    strncpy(DUCK_ID_BUF, DUCK_ID, 8);
- #else
-   std::string mac = duckesp::getDuckMacAddress(false);  // unformatted hex, e.g. "E4B4C2A1B2C3"
-   std::string id  = (mac.length() >= 8) ? mac.substr(mac.length() - 8) : std::string("DUCK0000");
-   memcpy(DUCK_ID_BUF, id.c_str(), 8);
- #endif
    DUCK_ID_BUF[8] = '\0';
+ #else
+   duckidfactory::deriveFromMac(DUCK_ID_BUF);
+ #endif
    return true;
  }
  static bool duckIdReady = initDuckId();
@@ -96,7 +98,6 @@ extern CDPCFG_LORA_CLASS lora;
  void handleMsg(const String& body);
  void handleMamaTalk(const String& body);
  bool sendMamaTalk(const String& targetId, const String& msg, const String& mid = "");
- String extractField(const String& body, const String& key);
  void sendFrame(const String& frame);
  void handleGps(const String& body);
  static float readVbat();
@@ -106,81 +107,10 @@ extern CDPCFG_LORA_CLASS lora;
  static bool isPhoneConnected();
 
  // --- Global Variables ---
- MamaDuck duck(DUCK_NAME); // Device ID, MUST be 8 bytes and unique from other ducks;
+ MamaDuck<DuckWifiNone, DuckLoRa> duck(DUCK_NAME); // Device ID, MUST be 8 bytes and unique from other ducks;
 
- // Routes GPS/status uplink sends through sendSealedData() (one-way seal to
- // OpenDMS's pinned static public key, src/security/OpenDmsConfig.h) when
- // the operator has enabled uplink encryption (duck.isUplinkEncryptionEnabled(),
- // off by default -- see Duck.h's setUplinkEncryptionEnabled()); falls back to
- // plain duck.sendData() otherwise. MamaDuck-to-MamaDuck traffic (MTALK, topic
- // 26) is intentionally NOT routed through here -- that's session-mode via
- // sendEncryptedData()/announceIdentity(), targeting a peer Duck's identity
- // key, not OpenDMS's static key.
- static int sendUplink(uint8_t topic, const std::string data,
-                        const std::array<uint8_t, 8> targetDevice = PAPADUCK_DUID) {
-     if (duck.isUplinkEncryptionEnabled()) {
-         return duck.sendSealedData(topic, data, targetDevice);
-     }
-     return duck.sendData(topic, data, targetDevice);
- }
-
- // SOS-only variant of sendUplink(): tries to seal via OpenDMS first, same as
- // every other uplink report, but -- unlike sendUplink() -- falls back to a
- // last-resort plaintext duck.sendData() if sealing fails (e.g. OpenDMS not
- // yet configured / ECDH failure). For life-safety SOS alerts, the operator
- // has explicitly chosen availability over confidentiality: better to leak
- // GPS location than to silently drop an emergency alert. Only use this for
- // the SOS panic-button flow (sendEmergency()/handleSOS()) -- everything
- // else (routine GPS/status reports, handleMsg()) stays fail-closed via
- // plain sendUplink() above.
- static int sendUplinkSos(uint8_t topic, const std::string data,
-                           const std::array<uint8_t, 8> targetDevice = PAPADUCK_DUID) {
-     int rc = sendUplink(topic, data, targetDevice);
-     if (rc != DUCK_ERR_NONE && duck.isUplinkEncryptionEnabled()) {
-         Serial.println("[MAMA] SOS seal failed -- falling back to cleartext (availability > confidentiality).");
-         return duck.sendData(topic, data, targetDevice);
-     }
-     return rc;
- }
-
- // Peers we've directed-announced our own identity to during this boot
- // session, so sendMamaLink() only does it once per peer instead of on every
- // message. This closes a one-directional key-exchange gap: the one-time
- // BROADCAST_DUID announceIdentity() in setup() may never reach a given peer
- // (e.g. it boots later, or was out of range at the time), so that peer can
- // still send us plaintext MTALK (fine, decodes regardless) but has no way
- // to know we can't yet decrypt anything IT encrypts for US -- and we have
- // no way to know whether IT already has OUR key either. Concretely: if we
- // receive an MTALK message and reply with an encrypted MTALK_ACK receipt via
- // sendEncryptedData(), and the original sender never learned our public
- // key, tryDecryptEncryptedData() on their end silently drops our ACK (no
- // known public key for sender) -- the message text still shows up fine on
- // their phone, but the delivery-receipt tick never updates. A directed
- // identity_announce() to that specific peer, sent right before we first
- // encrypt anything for it, closes that gap. (Ported from WioTrackerL1's
- // MamaDuck.ino, which already had this -- this sketch was missing it.)
- static std::set<std::array<uint8_t, 8>> announcedIdentityTo;
-
- // Routes MamaDuck-to-MamaDuck (MTALK, topic 26) sends through
- // sendEncryptedData() -- session-mode X25519 ECDH between this Duck's and
- // the peer's long-term identities (see duck.announceIdentity() in setup()
- // and Duck.h's learnPeerIdentity()) -- when uplink encryption is enabled.
- // MTALK encryption is permanent and mandatory
- // (Duck::isMamaLinkEncryptionEnabled() always true) -- unlike uplink
- // encryption, this is not an operator preference. Fail-closed: MTALK must
- // NEVER go out in cleartext, even if that means the message doesn't get
- // delivered -- e.g. sendEncryptedData() returns non-zero without sending
- // if no identity_announce has been received from that peer yet. The
- // periodic announceIdentity() re-broadcast in loop() closes that gap over
- // time without weakening this guarantee. This is intentionally separate
- // from sendUplink() above: MTALK is Duck<->Duck session-mode traffic
- // sealed to a peer's identity key, NOT OpenDMS's static uplink key.
- static int sendMamaLink(const std::string& data, const std::array<uint8_t, 8>& targetDuid) {
-     if (announcedIdentityTo.insert(targetDuid).second) {
-         duck.announceIdentity(targetDuid);
-     }
-     return duck.sendEncryptedData(26, data, targetDuid);
- }
+ // sendUplink()/sendUplinkSos()/sendMamaLink()/announcedIdentityTo now live
+ // in src/Ducks/UplinkRouter.h (shared with WioTrackerL1 and future boards).
  auto timer = timer_create_default();  // Creating a timer with default settings
  const int INTERVAL_MS = 10000;        // Interval in milliseconds between runSensor call
  int counter = 1;                      // Counter for the sensor data  
@@ -199,9 +129,8 @@ static bool          bleAdvertising    = true;   // track advertising state
 static unsigned long bleAdvSlowAfterMs = 0;      // millis() deadline; switch to slow adv after this
 static bool displayEnabled = true;       // track display on/off state
 
-// Timestamp of the last periodic (broadcast) identity re-announce -- see
-// the loop() call site below.
-static unsigned long lastIdentityAnnounceMs = 0;
+// lastIdentityAnnounceMs now lives in examples/Basic-Ducks/common/UplinkRouter.h
+// (shared with WioTrackerL1 and future boards).
 const unsigned long USB_IDLE_TIMEOUT_MS  = 30000UL;  // resume BLE after 30 s of USB silence
 const unsigned long GPS_PHONE_TIMEOUT_MS = 300000UL; // treat USB phone as gone after 5 min of silence
 static unsigned long lastBattMs = 0;
@@ -266,154 +195,9 @@ static const uint8_t TOPIC_BEACON_ACK = 28;
 static volatile bool beaconAckPending = false;   // deferred BEACON_ACK TX
 static char          beaconAckPayload[80] = {};   // GPS payload for beacon ACK
 
-// ── BEACON group-key encryption ─────────────────────────────────────────
-// TOPIC_BEACON/TOPIC_BEACON_ACK broadcast GPS coordinates for local
-// discovery, so neither of Duck.h's existing encryption modes fit:
-// sendSealedData() is only readable by OpenDMS, sendEncryptedData() only
-// by one already-known peer. If a mesh group key is provisioned (see
-// src/security/MeshGroupConfig.h), wrap the payload with
-// duckcrypto::encryptWithGroupKey() so it's opaque to eavesdroppers
-// outside this deployment while still readable by any duck holding the
-// same key. Falls back to sending in the clear if no group key is
-// configured, so discovery keeps working before/without provisioning.
-static const uint8_t BEACON_GROUP_MARKER = 0xE6;
-
-static std::string encryptBeaconPayload(uint8_t topic, const char* plaintext) {
-  size_t plaintextLen = strlen(plaintext);
-  uint8_t aad[9];
-  aad[0] = topic;
-  memcpy(aad + 1, duck.getDuckId().data(), 8);
-
-  std::vector<uint8_t> wire(1 + duckcrypto::NONCE_LENGTH + plaintextLen + duckcrypto::TAG_LENGTH);
-  wire[0] = BEACON_GROUP_MARKER;
-  uint8_t* nonce      = wire.data() + 1;
-  uint8_t* ciphertext = nonce + duckcrypto::NONCE_LENGTH;
-  uint8_t* tag        = ciphertext + plaintextLen;
-  duckcrypto::encryptWithGroupKey(meshgroupconfig::MESH_GROUP_KEY, aad, sizeof(aad),
-                                  (const uint8_t*)plaintext, plaintextLen,
-                                  nonce, ciphertext, tag);
-  return std::string(reinterpret_cast<const char*>(wire.data()), wire.size());
-}
-
-// Returns true and fills outPlaintext if `data` is a group-key-encrypted
-// BEACON payload that was successfully decrypted. Returns false (leaves
-// outPlaintext untouched) if it isn't marked as encrypted, no group key
-// is configured, or authentication fails -- callers should treat that the
-// same as any other unrecognized/plaintext payload.
-static bool decryptBeaconPayload(uint8_t topic, const uint8_t* sduid,
-                                  const std::vector<uint8_t>& data,
-                                  std::string& outPlaintext) {
-  if (data.size() < 1 + duckcrypto::NONCE_LENGTH + duckcrypto::TAG_LENGTH
-      || data[0] != BEACON_GROUP_MARKER || !meshgroupconfig::isConfigured()) {
-    return false;
-  }
-  const uint8_t* nonce = data.data() + 1;
-  const uint8_t* ciphertext = nonce + duckcrypto::NONCE_LENGTH;
-  size_t ciphertextLen = data.size() - 1 - duckcrypto::NONCE_LENGTH - duckcrypto::TAG_LENGTH;
-  const uint8_t* tag = ciphertext + ciphertextLen;
-
-  uint8_t aad[9];
-  aad[0] = topic;
-  memcpy(aad + 1, sduid, 8);
-
-  std::vector<uint8_t> plain(ciphertextLen);
-  int rc = duckcrypto::decryptWithGroupKey(meshgroupconfig::MESH_GROUP_KEY, nonce,
-                                           aad, sizeof(aad), ciphertext, ciphertextLen,
-                                           tag, plain.data());
-  if (rc != DUCK_ERR_NONE) {
-    return false;
-  }
-  outPlaintext.assign(reinterpret_cast<const char*>(plain.data()), plain.size());
-  return true;
-}
-
-// ── Emergency Broadcast (topic 24) group-key authentication ──────────────────
-// Authenticates OpenDMS-originated Emergency Broadcasts with the same
-// pre-shared mesh group key as BEACON, since encrypted_cmd can't address a
-// broadcast (it's point-to-point: a different shared secret per Duck via
-// static-static ECDH). Deliberately authenticated-but-NOT-encrypted: the
-// message text travels on-air as cleartext (so anyone in range -- including
-// devices that haven't been provisioned with the group key -- can still
-// read a life-safety alert), but the mesh group key still prevents anyone
-// without it from forging one. Done by calling
-// duckcrypto::encryptWithGroupKey()/decryptWithGroupKey() with the message
-// bytes passed as AAD (authenticated, not encrypted) and a zero-length
-// plaintext -- a standard, secure way to get a MAC (not confidentiality)
-// out of an AEAD primitive. AAD is bound to the fixed PAPADUCK_DUID
-// placeholder (not this device's own DUID, and not the sender's) since
-// OpenDMS has no DUID of its own and cannot predict which physical
-// gateway will relay the message -- same convention already used for
-// encrypted_cmd's AAD. Must match
-// DuckCryptoService::authenticateGroupBroadcast() on the Laravel side
-// exactly, byte for byte.
-//
-// Replay protection: a 4-byte big-endian monotonic counter (incremented
-// server-side on every broadcast OpenDMS sends, see
-// DuckCryptoService::authenticateGroupBroadcast()) is bound into the AAD
-// alongside the message, and this Duck rejects any validly-tagged
-// broadcast whose counter is not strictly greater than the last one it
-// accepted -- otherwise a captured broadcast (e.g. a stale "all clear")
-// could be replayed verbatim to confuse responders even without the
-// group key. The last-seen counter is tracked in RAM only (not persisted
-// to flash), so a reboot resets the baseline to 0 and a captured
-// broadcast could be replayed once, immediately after a reboot, before
-// any fresh broadcast arrives -- an accepted residual gap, see
-// docs/crypto-design.tex.
-// See docs/end-to-end-encryption-setup.md.
-static const uint8_t BROADCAST_AUTH_MARKER = 0xE8;
-static const size_t BROADCAST_COUNTER_LENGTH = 4;
-static uint32_t lastSeenBroadcastCounter = 0;
-
-// Returns true and fills outMessage if `data` is a validly-tagged,
-// not-already-seen Emergency Broadcast (message travels as cleartext;
-// only the tag is verified). Returns false (leaves outMessage untouched)
-// if it isn't marked as authenticated, no group key is configured,
-// verification fails, or the counter is not newer than the last accepted
-// broadcast (replay) -- callers must treat that the same as any other
-// unrecognized/forged payload, NOT as "fall back to trusting the raw
-// bytes" once meshgroupconfig::isConfigured().
-static bool verifyBroadcastMac(uint8_t topic, const std::vector<uint8_t>& data,
-                                std::string& outMessage) {
-  if (data.size() < 1 + duckcrypto::NONCE_LENGTH + BROADCAST_COUNTER_LENGTH + duckcrypto::TAG_LENGTH
-      || data[0] != BROADCAST_AUTH_MARKER || !meshgroupconfig::isConfigured()) {
-    return false;
-  }
-  const uint8_t* nonce = data.data() + 1;
-  const uint8_t* counterBytes = nonce + duckcrypto::NONCE_LENGTH;
-  const uint8_t* message = counterBytes + BROADCAST_COUNTER_LENGTH;
-  size_t messageLen = data.size() - 1 - duckcrypto::NONCE_LENGTH - BROADCAST_COUNTER_LENGTH - duckcrypto::TAG_LENGTH;
-  const uint8_t* tag = message + messageLen;
-
-  // AAD = topic(1) || PAPADUCK_DUID(8) || counter(4, big-endian) ||
-  // message(messageLen) -- must match
-  // DuckCryptoService::authenticateGroupBroadcast() exactly, byte for byte.
-  std::vector<uint8_t> aad(9 + BROADCAST_COUNTER_LENGTH + messageLen);
-  aad[0] = topic;
-  memcpy(aad.data() + 1, PAPADUCK_DUID.data(), 8);
-  memcpy(aad.data() + 9, counterBytes, BROADCAST_COUNTER_LENGTH);
-  memcpy(aad.data() + 9 + BROADCAST_COUNTER_LENGTH, message, messageLen);
-
-  uint8_t unused;
-  int rc = duckcrypto::decryptWithGroupKey(meshgroupconfig::MESH_GROUP_KEY, nonce,
-                                           aad.data(), aad.size(), &unused, 0,
-                                           tag, &unused);
-  if (rc != DUCK_ERR_NONE) {
-    return false;
-  }
-
-  // Counter is only trustworthy once the tag above has verified -- an
-  // attacker can't forge a higher counter without the group key, but we
-  // must not check freshness before authenticity.
-  uint32_t counter = (uint32_t(counterBytes[0]) << 24) | (uint32_t(counterBytes[1]) << 16)
-                   | (uint32_t(counterBytes[2]) << 8) | uint32_t(counterBytes[3]);
-  if (counter <= lastSeenBroadcastCounter) {
-    return false;
-  }
-  lastSeenBroadcastCounter = counter;
-
-  outMessage.assign(reinterpret_cast<const char*>(message), messageLen);
-  return true;
-}
+// encryptBeaconPayload()/decryptBeaconPayload()/verifyBroadcastMac() now
+// live in examples/Basic-Ducks/common/BeaconCrypto.h (shared with
+// WioTrackerL1 and future boards).
 
 static unsigned long beaconAckDeferMs = 0;        // millis() after which ACK may be sent
 
@@ -1836,7 +1620,32 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     }
     display.drawString(64, 12, sigStr);
 
-    display.drawString(64, 26, TXT_HOME_HINT_3L);
+    // Row 3 (y=24): GPS status -- mirrors WioTrackerL1's home-screen layout.
+    // V4 boards have a real L76K GPS module wired up (see the
+    // ARDUINO_heltec_wifi_lora_32_V4 block near the top of this file); other
+    // Heltec variants have no GPS hardware at all, so they always report
+    // "no module", the same fallback text Wio shows before its own module
+    // has been detected.
+#ifdef ARDUINO_heltec_wifi_lora_32_V4
+    char gpsLine[22];
+    if (!gpsModuleDetected) {
+      strncpy(gpsLine, TXT_GPS_NO_MODULE, sizeof(gpsLine));
+    } else if (tinyGps.location.isValid() && tinyGps.location.age() < 5000) {
+      snprintf(gpsLine, sizeof(gpsLine), "GPS: FIX %uSAT",
+                (unsigned)(tinyGps.satellites.isValid() ? tinyGps.satellites.value() : 0));
+    } else {
+      snprintf(gpsLine, sizeof(gpsLine), TXT_GPS_SEARCH_FMT,
+                (unsigned)(tinyGps.satellites.isValid() ? tinyGps.satellites.value() : 0));
+    }
+    display.drawString(64, 24, gpsLine);
+#else
+    display.drawString(64, 24, TXT_GPS_NO_MODULE);
+#endif
+
+    // Rows 4-5 (y=36/48): hold-for-SOS hint split across two short lines
+    // (was one 3-line block) to leave room for the GPS line above.
+    display.drawString(64, 36, TXT_PRESS_BUTTON_ABOVE);
+    display.drawString(64, 48, TXT_2SEC_EMERGENCY);
     display.display();
  }
 
@@ -2346,15 +2155,6 @@ void handleGps(const String& body) {
   gpsTxPayload = duckpayload::encodeGps(reading);
   gpsTxPending = true;
   Serial.printf("[GPS] GPS TX deferred: lat=%s lng=%s\n", lat.c_str(), lng.c_str());
-}
-
-String extractField(const String& body, const String& key) {
-  String search = key + ":";
-  int idx = body.indexOf(search);
-  if (idx == -1) return "";
-  int start = idx + search.length();
-  int end = body.indexOf(',', start);
-  return (end == -1) ? body.substring(start) : body.substring(start, end);
 }
 
 // ── Send a CDK frame to the app ──────────────────────────────────
