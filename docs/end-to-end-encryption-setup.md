@@ -11,7 +11,7 @@ underlying design; this doc is the operational "how do I turn it on" guide.
 |---|---|---|---|
 | **1. Operator commands** (`encrypted_cmd`/`dcmd` topics 8/22, plus ALERT/23 and PMSG/25) | Static-static X25519 ECDH between OpenDMS (Laravel) and the device's own identity keypair | SOS ack, GPS requests, operator/alert/private messages | Yes — falls back to plaintext if either side lacks keys; **fail-closed** once `opendmsconfig::isConfigured()` (see below) |
 | **2. Uplink + MTALK** (GPS/status/alert/roger uplinks, MamaDuck↔MamaDuck chat, topic 26) | One-way seal to OpenDMS's static key (uplink) / session ECDH between two Ducks' identities (MTALK) | Live location, mesh chat | Yes — gated by `Duck::isUplinkEncryptionEnabled()`, off unless explicitly enabled; **fail-closed** for MTALK once enabled |
-| **3. Group broadcast** (BEACON/BEACON_ACK discovery, and the Emergency Broadcast button, topic 24) | Pre-shared symmetric key (`MESH_GROUP_KEY`), shared by every Duck in the deployment and by Laravel | Local discovery broadcasts, GPS in BEACON, Emergency Broadcast text | Yes — falls back to plaintext if no group key is provisioned; **fail-closed** once `meshgroupconfig::isConfigured()` |
+| **3. Group broadcast** (BEACON/BEACON_ACK discovery, and the Emergency Broadcast button, topic 24) | Pre-shared symmetric key (`MESH_GROUP_KEY`), shared by every Duck in the deployment and by Laravel | GPS in BEACON (encrypted); Emergency Broadcast text (authenticated only — message stays cleartext, forgery is prevented) | Yes — falls back to unauthenticated/plaintext if no group key is provisioned; **fail-closed** once `meshgroupconfig::isConfigured()` |
 
 Skipping any one layer means that traffic stays plaintext even if the other
 two are fully configured. **Fail-closed** means once a layer's key is
@@ -120,16 +120,20 @@ Then provision it on each device the same three ways as Step 2:
 Every Duck in the same deployment must share this exact key.
 
 **Also set it in Laravel's `.env`**, so `StatusController::broadcast()` (the
-Emergency Broadcast button) can produce authenticated ciphertext the
-devices will actually accept:
+Emergency Broadcast button) can produce an authenticated broadcast the
+devices will actually accept. Emergency Broadcast is MAC-only, not
+encrypted — `DuckCryptoService::authenticateGroupBroadcast()` sends the
+message as cleartext with an authentication tag appended, so anyone in
+range can still read a life-safety alert, but only a holder of the group
+key can produce one that verifies:
 
 ```env
 DUCK_MESH_GROUP_KEY=<the same 64 hex chars as above>
 ```
 
 If `DUCK_MESH_GROUP_KEY` is left empty, `MqttService::sendGroupBroadcast()`
-sends the broadcast as plaintext instead — which any device with its own
-mesh group key configured will now silently drop (see below), so the
+sends the broadcast unauthenticated instead — which any device with its
+own mesh group key configured will now silently drop (see below), so the
 button will appear to work in Laravel but reach no provisioned device.
 
 ## Step 4 — Enable uplink encryption
@@ -223,9 +227,10 @@ Verify each layer is actually active:
   `platformio.ini` env used); GPS uplinks will use `sealed_uplink` on the
   wire instead of the plain application topic.
 - **Emergency Broadcast**: check Laravel logs after pressing the button —
-  `MqttService: sendGroupBroadcast encrypted successfully` means it worked;
-  `"...mesh group key not configured, sending plaintext broadcast"` means
-  `DUCK_MESH_GROUP_KEY` isn't set in Laravel's `.env` yet.
+  `MqttService: sendGroupBroadcast authenticated successfully` means it
+  worked; `"...mesh group key not configured, sending unauthenticated
+  broadcast"` means `DUCK_MESH_GROUP_KEY` isn't set in Laravel's `.env`
+  yet.
 
 ## Fail-closed behavior once a layer is configured
 
@@ -248,12 +253,14 @@ message.
 - **Once `meshgroupconfig::isConfigured()`** (Step 3 done): BEACON and
   BEACON_ACK require successful group-key decryption before their GPS
   payload is trusted at all (an undecryptable BEACON's coordinates are
-  discarded, not displayed); Emergency Broadcast (topic 24) requires
-  successful decryption of its own app-level group-key scheme (marker byte
-  `0xE7`, distinct from BEACON's own marker and from the CDP framework's
-  `reservedTopic::group_broadcast`) before the text is displayed/relayed —
-  see `decryptBroadcastPayload()` in `MamaDuck.ino` and
-  `DuckCryptoService::encryptGroupBroadcast()` on the Laravel side.
+  discarded, not displayed); Emergency Broadcast (topic 24) is
+  authenticated, not encrypted — the message itself always travels as
+  cleartext, but a device with the group key configured requires the
+  accompanying tag to verify (marker byte `0xE8`, distinct from BEACON's
+  own marker and from the CDP framework's `reservedTopic::group_broadcast`)
+  before the text is displayed/relayed, and rejects an untagged/forged
+  packet outright — see `verifyBroadcastMac()` in `MamaDuck.ino` and
+  `DuckCryptoService::authenticateGroupBroadcast()` on the Laravel side.
 
 A practical consequence: partially configuring a deployment (e.g. giving
 some devices a mesh group key but leaving Laravel's `DUCK_MESH_GROUP_KEY`

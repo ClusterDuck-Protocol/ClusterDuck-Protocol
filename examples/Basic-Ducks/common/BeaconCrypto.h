@@ -27,6 +27,7 @@
 #include <cstring>
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include "Ducks/MamaDuck.h"
 #include "CdpPacket.h"
 #include "security/DuckCrypto.h"
@@ -45,45 +46,84 @@ extern MamaDuck<DuckWifiNone, DuckLoRa> duck;
 // outside this deployment while still readable by any duck holding the
 // same key. Falls back to sending in the clear if no group key is
 // configured, so discovery keeps working before/without provisioning.
+//
+// Replay protection: a 4-byte big-endian monotonic counter (incremented
+// on this device every time it sends a BEACON or BEACON_ACK) is bound
+// into the AAD, and receivers reject anything not strictly greater than
+// the last counter seen from that specific sender -- otherwise a captured
+// packet (``duck X at location Y'') could be replayed later to make a
+// stale cached location look current in duckGpsCache. Unlike Emergency
+// Broadcast's single authority (OpenDMS), every Duck sends its own
+// BEACON/BEACON_ACK, so freshness is tracked per-sender (keyed by the raw
+// 8-byte DUID) rather than with one global baseline. Like Emergency
+// Broadcast's counter, this baseline is RAM-only (not persisted to
+// flash), so a reboot resets a sender's baseline to 0 and a captured
+// packet from that sender could be replayed once, immediately after a
+// reboot, before a fresh one arrives from them -- the same accepted
+// residual gap documented for Emergency Broadcast, see
+// docs/crypto-design.tex.
 inline const uint8_t BEACON_GROUP_MARKER = 0xE6;
+inline const size_t BEACON_COUNTER_LENGTH = 4;
+inline uint32_t nextBeaconCounter = 0;
+inline std::unordered_map<std::string, uint32_t> lastSeenBeaconCounter;
 
 inline std::string encryptBeaconPayload(uint8_t topic, const char* plaintext) {
   size_t plaintextLen = strlen(plaintext);
-  uint8_t aad[9];
+  uint32_t counter = ++nextBeaconCounter;
+  uint8_t counterBytes[BEACON_COUNTER_LENGTH];
+  counterBytes[0] = uint8_t(counter >> 24);
+  counterBytes[1] = uint8_t(counter >> 16);
+  counterBytes[2] = uint8_t(counter >> 8);
+  counterBytes[3] = uint8_t(counter);
+
+  // AAD = topic(1) || sduid(8) || counter(4, big-endian) -- the counter
+  // must be authenticated (tamper-proof) even though it also appears in
+  // the clear in the wire framing below, so a receiver can trust it
+  // before deciding whether the packet is fresh.
+  uint8_t aad[9 + BEACON_COUNTER_LENGTH];
   aad[0] = topic;
   memcpy(aad + 1, duck.getDuckId().data(), 8);
+  memcpy(aad + 9, counterBytes, BEACON_COUNTER_LENGTH);
 
-  std::vector<uint8_t> wire(1 + duckcrypto::NONCE_LENGTH + plaintextLen + duckcrypto::TAG_LENGTH);
+  std::vector<uint8_t> wire(1 + duckcrypto::NONCE_LENGTH + BEACON_COUNTER_LENGTH
+                             + plaintextLen + duckcrypto::TAG_LENGTH);
   wire[0] = BEACON_GROUP_MARKER;
-  uint8_t* nonce      = wire.data() + 1;
-  uint8_t* ciphertext = nonce + duckcrypto::NONCE_LENGTH;
-  uint8_t* tag        = ciphertext + plaintextLen;
+  uint8_t* nonce        = wire.data() + 1;
+  uint8_t* counterField = nonce + duckcrypto::NONCE_LENGTH;
+  uint8_t* ciphertext   = counterField + BEACON_COUNTER_LENGTH;
+  uint8_t* tag          = ciphertext + plaintextLen;
+  memcpy(counterField, counterBytes, BEACON_COUNTER_LENGTH);
   duckcrypto::encryptWithGroupKey(meshgroupconfig::MESH_GROUP_KEY, aad, sizeof(aad),
                                   (const uint8_t*)plaintext, plaintextLen,
                                   nonce, ciphertext, tag);
   return std::string(reinterpret_cast<const char*>(wire.data()), wire.size());
 }
 
-// Returns true and fills outPlaintext if `data` is a group-key-encrypted
-// BEACON payload that was successfully decrypted. Returns false (leaves
-// outPlaintext untouched) if it isn't marked as encrypted, no group key
-// is configured, or authentication fails -- callers should treat that the
-// same as any other unrecognized/plaintext payload.
+// Returns true and fills outPlaintext if `data` is a group-key-encrypted,
+// not-already-seen BEACON payload that was successfully decrypted.
+// Returns false (leaves outPlaintext untouched) if it isn't marked as
+// encrypted, no group key is configured, authentication fails, or the
+// counter is not newer than the last one accepted from this sender
+// (replay) -- callers should treat that the same as any other
+// unrecognized/plaintext payload.
 inline bool decryptBeaconPayload(uint8_t topic, const uint8_t* sduid,
                                   const std::vector<uint8_t>& data,
                                   std::string& outPlaintext) {
-  if (data.size() < 1 + duckcrypto::NONCE_LENGTH + duckcrypto::TAG_LENGTH
+  if (data.size() < 1 + duckcrypto::NONCE_LENGTH + BEACON_COUNTER_LENGTH + duckcrypto::TAG_LENGTH
       || data[0] != BEACON_GROUP_MARKER || !meshgroupconfig::isConfigured()) {
     return false;
   }
   const uint8_t* nonce = data.data() + 1;
-  const uint8_t* ciphertext = nonce + duckcrypto::NONCE_LENGTH;
-  size_t ciphertextLen = data.size() - 1 - duckcrypto::NONCE_LENGTH - duckcrypto::TAG_LENGTH;
+  const uint8_t* counterBytes = nonce + duckcrypto::NONCE_LENGTH;
+  const uint8_t* ciphertext = counterBytes + BEACON_COUNTER_LENGTH;
+  size_t ciphertextLen = data.size() - 1 - duckcrypto::NONCE_LENGTH - BEACON_COUNTER_LENGTH
+                         - duckcrypto::TAG_LENGTH;
   const uint8_t* tag = ciphertext + ciphertextLen;
 
-  uint8_t aad[9];
+  uint8_t aad[9 + BEACON_COUNTER_LENGTH];
   aad[0] = topic;
   memcpy(aad + 1, sduid, 8);
+  memcpy(aad + 9, counterBytes, BEACON_COUNTER_LENGTH);
 
   std::vector<uint8_t> plain(ciphertextLen);
   int rc = duckcrypto::decryptWithGroupKey(meshgroupconfig::MESH_GROUP_KEY, nonce,
@@ -92,9 +132,26 @@ inline bool decryptBeaconPayload(uint8_t topic, const uint8_t* sduid,
   if (rc != DUCK_ERR_NONE) {
     return false;
   }
+
+  // Counter is only trustworthy once the tag above has verified -- an
+  // attacker can't forge a higher counter without the group key, but we
+  // must not check freshness before authenticity. Tracked per sender
+  // (keyed by the raw 8-byte DUID, NOT duckutils::toString() -- see
+  // Neighbor.h -- so non-printable DUID bytes don't collapse distinct
+  // senders into the same bucket).
+  uint32_t counter = (uint32_t(counterBytes[0]) << 24) | (uint32_t(counterBytes[1]) << 16)
+                   | (uint32_t(counterBytes[2]) << 8) | uint32_t(counterBytes[3]);
+  std::string senderKey(reinterpret_cast<const char*>(sduid), 8);
+  auto seen = lastSeenBeaconCounter.find(senderKey);
+  if (seen != lastSeenBeaconCounter.end() && counter <= seen->second) {
+    return false;
+  }
+  lastSeenBeaconCounter[senderKey] = counter;
+
   outPlaintext.assign(reinterpret_cast<const char*>(plain.data()), plain.size());
   return true;
 }
+
 
 // ── Emergency Broadcast (topic 24) group-key authentication ──────────────────
 // Authenticates OpenDMS-originated Emergency Broadcasts with the same
