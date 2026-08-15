@@ -2,6 +2,16 @@
 
 #ifndef CDPCFG_WIFI_NONE
 
+// IMPORTANT: always pass EEPROM_TOTAL_SIZE (not a literal 512) to
+// EEPROM.begin() below -- see the matching, more detailed comment in
+// DuckIdentity.cpp's EEPROM_TOTAL_SIZE. In short: ESP32's EEPROM.h shares
+// one NVS blob across DuckWifi, DuckIdentity, OpenDmsConfig and
+// MeshGroupConfig, and calling begin() with a smaller size than what's
+// currently stored permanently truncates (erases) every other module's
+// data at higher offsets. Must stay in sync (same value) across all four
+// files. DuckWifi only uses bytes [0, 96) (SSID/password) itself.
+constexpr int EEPROM_TOTAL_SIZE = 528;
+
 int DuckWifi::reconnect(std::string ssid, std::string password) {
     return DUCK_ERR_NONE;
 }
@@ -40,7 +50,7 @@ int saveWifiCredentials(std::string ssid, std::string password) {
       logerr("Invalid SSID or password\n");
       return DUCK_ERR_INVALID_ARGUMENT;
     }
-    if (!EEPROM.begin(512)) {
+    if (!EEPROM.begin(EEPROM_TOTAL_SIZE)) {
       logerr("Failed to initialise EEPROM\n");
       return DUCK_ERR_EEPROM_INIT;
     }
@@ -69,7 +79,7 @@ int saveWifiCredentials(std::string ssid, std::string password) {
   }
   
 std::string loadWifiSsid() {
-    EEPROM.begin(512); //Initialasing EEPROM
+    EEPROM.begin(EEPROM_TOTAL_SIZE); //Initialasing EEPROM
     std::string esid;
     // loop through saved SSID characters
     for (int i = 0; i < 32; ++i)
@@ -80,7 +90,7 @@ std::string loadWifiSsid() {
 }
   
 std::string loadWifiPassword() {
-    EEPROM.begin(512); //Initialasing EEPROM
+    EEPROM.begin(EEPROM_TOTAL_SIZE); //Initialasing EEPROM
     std::string epass = "";
     // loop through saved Password characters
     for (int i = 32; i < 96; ++i)

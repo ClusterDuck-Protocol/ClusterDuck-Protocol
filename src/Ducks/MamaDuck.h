@@ -1,6 +1,7 @@
 #ifndef MAMADUCK_H
 #define MAMADUCK_H
 
+#include <set>
 #include "Duck.h"
 #include "../utils/MemoryFree.h"
 #include "../security/DuckCrypto.h"
@@ -37,6 +38,22 @@ public:
 private :
     WifiCapability duckWifi;
     rxDoneCallback recvDataCallback;
+
+    /**
+     * @brief Peers we've replied to with our own announceIdentity() after
+     * receiving a directed identity_announce FROM them. See the
+     * identity_announce case in ifNotBroadcast() below: without this
+     * reciprocal reply, TOFU key exchange is one-directional -- a peer
+     * that announces its identity to us (e.g. because it's about to send
+     * us an encrypted MTALK) lets US learn ITS key, but gives it no way
+     * to learn OURS, so anything WE try to encrypt back to it keeps
+     * failing with "no known public key for peer" until that peer's own
+     * independent periodic/boot broadcast happens to reach us. Replying
+     * once per peer closes that gap within one round trip. Bounded by
+     * only recording each peer once (insert-if-absent) to avoid an
+     * infinite announce/reply/announce/reply loop between two Ducks.
+     */
+    std::set<Duid> repliedIdentityTo_;
     /**
      * @brief Handles any packets received by the duck. Overrides the pure virtual function in Duck base class.
      * Could be a RREQ, RREP, PING, PONG or DATA packet on its associated topic.
@@ -121,6 +138,27 @@ private :
                     logerr_ln("====> ERROR handleReceivedPacket failed to relay identity_announce. rc = %d",err);
                 }
                 break;
+            case reservedTopic::group_broadcast: {
+                // Relay the ciphertext as-received first -- downstream Ducks
+                // need the original bytes to decrypt it themselves, even if
+                // this Duck can't (e.g. no group key configured, or a
+                // different deployment's key).
+                err = this->broadcastPacket(rxPacket);
+                if (err != DUCK_ERR_NONE) {
+                    logerr_ln("====> ERROR handleReceivedPacket failed to relay group_broadcast. rc = %d", err);
+                }
+                std::optional<std::pair<uint8_t, std::vector<uint8_t>>> decrypted = this->tryDecryptGroupData(rxPacket);
+                if (decrypted.has_value()) {
+                    loginfo_ln("group_broadcast decrypted OK (%d bytes), delivering to sketch.", (int)decrypted->second.size());
+                    rxPacket.topic = decrypted->first;
+                    rxPacket.data = decrypted->second;
+                    rxPacket.wasAuthenticated = true;
+                    if (recvDataCallback) {
+                        recvDataCallback(rxPacket);
+                    }
+                }
+                break;
+            }
             default:
                 err = this->broadcastPacket(rxPacket);
                 if (err != DUCK_ERR_NONE) {
@@ -256,6 +294,7 @@ private :
                 }
                 loginfo_ln("encrypted_cmd decrypted OK (%d bytes), delivering to sketch.", (int)plaintext.size());
                 rxPacket.data = plaintext;
+                rxPacket.wasAuthenticated = true;
                 if (recvDataCallback) {
                     recvDataCallback(rxPacket);
                 }
@@ -275,6 +314,16 @@ private :
                     if (err != DUCK_ERR_NONE) {
                         logerr_ln("====> ERROR handleReceivedPacket failed to relay identity_announce. rc = %d", err);
                     }
+                } else if (this->isMamaLinkEncryptionEnabled() && repliedIdentityTo_.insert(rxPacket.sduid).second) {
+                    // Addressed directly to us: this peer wants to talk to
+                    // us and just gave us its key -- reply with ours so it
+                    // can decrypt/authenticate what we send back, instead of
+                    // waiting on its own periodic/boot broadcast to reach us
+                    // independently. See repliedIdentityTo_'s doc comment.
+                    // MTALK encryption is permanent (isMamaLinkEncryptionEnabled()
+                    // always true), so this reply always fires regardless of
+                    // the operator's uplink-encryption preference.
+                    this->announceIdentity(rxPacket.sduid);
                 }
                 break;
             case reservedTopic::encrypted_data: {
@@ -297,6 +346,7 @@ private :
                 loginfo_ln("encrypted_data decrypted OK (%d bytes), delivering to sketch.", (int)decrypted->second.size());
                 rxPacket.topic = decrypted->first;
                 rxPacket.data = decrypted->second;
+                rxPacket.wasAuthenticated = true;
                 if (recvDataCallback) {
                     recvDataCallback(rxPacket);
                 }

@@ -47,6 +47,21 @@ constexpr char IDENTITY_FILE_PATH[] = "/duckidentity.bin";
 #else
 constexpr int IDENTITY_EEPROM_OFFSET = 128;
 constexpr int IDENTITY_EEPROM_SIZE = 256;
+// IMPORTANT: always pass EEPROM_TOTAL_SIZE (not IDENTITY_EEPROM_SIZE) to
+// EEPROM.begin() below. On ESP32, EEPROM.h is backed by a single named NVS
+// blob shared by every module that calls EEPROM.begin() (DuckIdentity,
+// OpenDmsConfig, MeshGroupConfig, DuckWifi). If any module calls begin()
+// with a size SMALLER than what's already stored, the ESP32 core's
+// EEPROMClass::begin() immediately TRUNCATES the stored NVS blob down to
+// that smaller size (nvs_set_blob with the shorter length) -- permanently
+// discarding every other module's data living at higher offsets. Since
+// duckidentity::begin() runs first every boot (see Duck::setupWithDefaults()),
+// requesting only IDENTITY_EEPROM_SIZE (256) here was silently wiping
+// OpenDmsConfig's (offset 400) and MeshGroupConfig's (offset 464) stored
+// keys on every single reboot. EEPROM_TOTAL_SIZE must stay >= the highest
+// (offset + size) used by ANY of these four files; bump it in all four if
+// the layout ever grows.
+constexpr int EEPROM_TOTAL_SIZE = 528;
 #endif
 constexpr uint8_t IDENTITY_MAGIC = 0xDC; // "Duck Crypto"
 
@@ -106,7 +121,7 @@ bool loadFromStorage() {
   file.close();
   return true;
 #else
-  EEPROM.begin(IDENTITY_EEPROM_SIZE);
+  EEPROM.begin(EEPROM_TOTAL_SIZE);
   if (EEPROM.read(IDENTITY_EEPROM_OFFSET) != IDENTITY_MAGIC) {
     return false;
   }
@@ -135,7 +150,7 @@ int saveToStorage() {
   file.close();
   return DUCK_ERR_NONE;
 #else
-  EEPROM.begin(IDENTITY_EEPROM_SIZE);
+  EEPROM.begin(EEPROM_TOTAL_SIZE);
   EEPROM.write(IDENTITY_EEPROM_OFFSET, IDENTITY_MAGIC);
   for (size_t i = 0; i < PUBLIC_KEY_LENGTH; i++) {
     EEPROM.write(IDENTITY_EEPROM_OFFSET + 1 + i, publicKey[i]);
@@ -204,7 +219,7 @@ int reset() {
     return DUCK_ERR_IDENTITY_STORAGE_WRITE;
   }
 #else
-  EEPROM.begin(IDENTITY_EEPROM_SIZE);
+  EEPROM.begin(EEPROM_TOTAL_SIZE);
   EEPROM.write(IDENTITY_EEPROM_OFFSET, 0x00);
   if (!EEPROM.commit()) {
     logerr_ln("DuckIdentity: failed to erase stored identity");

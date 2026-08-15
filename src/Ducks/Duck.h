@@ -281,6 +281,55 @@ class Duck {
     }
 
     /**
+     * @brief Send data authenticated-broadcast to any Duck in the
+     * deployment holding the same pre-shared mesh group key (see
+     * src/security/MeshGroupConfig.h). Intended for local broadcast
+     * discovery traffic (e.g. BEACON/BEACON_ACK) that must be readable by
+     * every nearby Duck, not just one known peer (sendEncryptedData()) or
+     * OpenDMS (sendSealedData()).
+     *
+     * Falls back to a plain, unauthenticated sendData() broadcast if no
+     * group key has been provisioned yet (meshgroupconfig::isConfigured()
+     * == false) -- discovery availability matters more than
+     * confidentiality in that case (see MeshGroupConfig.h's file-level doc
+     * comment), so callers can use this unconditionally without checking
+     * isConfigured() themselves first.
+     * @param topic the application-level topic. Sent as a cleartext (but
+     * AAD-authenticated once a group key is configured) prefix byte -- the
+     * on-air packet topic is reservedTopic::group_broadcast once
+     * encrypted, or the plain `topic` itself in the unconfigured fallback.
+     * @param data the plaintext application data to encrypt (or send in
+     * the clear, if no group key is configured yet) and broadcast.
+     * @param targetDevice defaults to BROADCAST_DUID -- group mode is
+     * meant for broadcast, though a directed send is technically possible.
+     * @returns DUCK_ERR_NONE if the data was sent successfully, an error code otherwise.
+     */
+    int sendGroupData(uint8_t topic, const std::string data, const std::array<uint8_t,8> targetDevice = BROADCAST_DUID){
+      if (!meshgroupconfig::isConfigured()) {
+        loginfo_ln("sendGroupData: mesh group key not configured, falling back to plaintext broadcast.");
+        return sendData(topic, data, targetDevice);
+      }
+
+      std::vector<uint8_t> onAirData(1 + duckcrypto::NONCE_LENGTH + data.size() + duckcrypto::TAG_LENGTH);
+      onAirData[0] = topic;  // cleartext, AAD-authenticated -- not encrypted
+      uint8_t* nonceOut = onAirData.data() + 1;
+      uint8_t* ciphertextOut = onAirData.data() + 1 + duckcrypto::NONCE_LENGTH;
+      uint8_t* tagOut = onAirData.data() + 1 + duckcrypto::NONCE_LENGTH + data.size();
+
+      std::array<uint8_t, HEADER_AAD_LENGTH> aad = buildHeaderAad(this->duid, targetDevice, topic);
+      int rc = duckcrypto::encryptWithGroupKey(meshgroupconfig::MESH_GROUP_KEY, aad.data(), aad.size(),
+                                                reinterpret_cast<const uint8_t*>(data.data()), data.size(),
+                                                nonceOut, ciphertextOut, tagOut);
+      if (rc != DUCK_ERR_NONE) {
+        logerr_ln("ERR: sendGroupData encryptWithGroupKey failed rc = %d", rc);
+        return rc;
+      }
+
+      CdpPacket txPacket = CdpPacket(targetDevice, reservedTopic::group_broadcast, onAirData, this->duid, this->getType());
+      return routeAndSend(txPacket);
+    }
+
+    /**
      * @brief Enable or disable this Duck's uplink-encryption preference at
      * runtime. This is a plain preference flag read via
      * isUplinkEncryptionEnabled() -- it does NOT change what sendData()
@@ -301,6 +350,23 @@ class Duck {
      */
     bool isUplinkEncryptionEnabled() const {
       return encryptionEnabled_;
+    }
+
+    /**
+     * @brief Whether MamaDuck-to-MamaDuck (MTALK, topic 26) traffic must be
+     * end-to-end encrypted. Unlike uplink encryption -- an
+     * operator-configurable preference toggled via
+     * setUplinkEncryptionEnabled()/isUplinkEncryptionEnabled() -- MTALK
+     * encryption is permanent and mandatory: this always returns true.
+     * Mesh chat between Ducks is always sealed to each peer's identity key
+     * (session-mode X25519 ECDH, see sendEncryptedData()/announceIdentity())
+     * regardless of whether the operator has enabled uplink encryption.
+     * Exists as its own named accessor (rather than sketches hardcoding
+     * `true` inline) so the policy is documented and expressed in one
+     * place.
+     */
+    bool isMamaLinkEncryptionEnabled() const {
+      return true;
     }
 
     /**
@@ -492,6 +558,43 @@ class Duck {
                                             ciphertext, ciphertextLen, tag, payload.data());
       if (rc != DUCK_ERR_NONE) {
         logerr_ln("tryDecryptEncryptedData: decrypt failed rc = %d, dropping.", rc);
+        return std::nullopt;
+      }
+      return std::make_pair(topic, payload);
+    }
+
+    /**
+     * @brief Attempt to decrypt a received reservedTopic::group_broadcast
+     * packet using the deployment's pre-shared mesh group key (see
+     * src/security/MeshGroupConfig.h). On success, returns the original
+     * app-level topic and decrypted payload so the caller can
+     * dispatch/deliver it as if it had been received via plain
+     * sendData(). Returns std::nullopt if no group key is configured, the
+     * data is malformed, or authentication fails (message must be
+     * discarded either way, though callers should still relay the
+     * original ciphertext blindly -- other Ducks in the mesh may hold the
+     * group key even if this one doesn't).
+     */
+    std::optional<std::pair<uint8_t, std::vector<uint8_t>>> tryDecryptGroupData(const CdpPacket& rxPacket){
+      if (!meshgroupconfig::isConfigured()) {
+        logerr_ln("tryDecryptGroupData: mesh group key not configured, dropping.");
+        return std::nullopt;
+      }
+      if (rxPacket.data.size() < 1 + duckcrypto::NONCE_LENGTH + duckcrypto::TAG_LENGTH) {
+        logerr_ln("tryDecryptGroupData: data too short (%d bytes), dropping.", (int)rxPacket.data.size());
+        return std::nullopt;
+      }
+      uint8_t topic = rxPacket.data.front();
+      size_t ciphertextLen = rxPacket.data.size() - 1 - duckcrypto::NONCE_LENGTH - duckcrypto::TAG_LENGTH;
+      const uint8_t* nonce = rxPacket.data.data() + 1;
+      const uint8_t* ciphertext = rxPacket.data.data() + 1 + duckcrypto::NONCE_LENGTH;
+      const uint8_t* tag = rxPacket.data.data() + 1 + duckcrypto::NONCE_LENGTH + ciphertextLen;
+      std::vector<uint8_t> payload(ciphertextLen);
+      std::array<uint8_t, HEADER_AAD_LENGTH> aad = buildHeaderAad(rxPacket.sduid, rxPacket.dduid, topic);
+      int rc = duckcrypto::decryptWithGroupKey(meshgroupconfig::MESH_GROUP_KEY, nonce, aad.data(), aad.size(),
+                                                ciphertext, ciphertextLen, tag, payload.data());
+      if (rc != DUCK_ERR_NONE) {
+        logerr_ln("tryDecryptGroupData: decrypt failed rc = %d, dropping.", rc);
         return std::nullopt;
       }
       return std::make_pair(topic, payload);

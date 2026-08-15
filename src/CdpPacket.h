@@ -158,6 +158,19 @@ enum reservedTopic {
   // tampering with it breaks authentication) so relays can see which topic
   // this is without decrypting anything.
   encrypted_data = 0x0B,
+  // Broadcast data authenticated with the deployment's pre-shared mesh
+  // group symmetric key (duckcrypto::encryptWithGroupKey(), see
+  // src/security/MeshGroupConfig.h), meant to be readable by any Duck
+  // holding the same group key -- unlike encrypted_data (single known
+  // peer) or encrypted_cmd (OpenDMS only), neither of which fit a
+  // "readable by any/all nearby ducks" broadcast. Data section is
+  // topic(1, cleartext) || nonce(12) || ciphertext(N) || tag(16), same
+  // layout as encrypted_data. Ducks without the group key configured
+  // simply can't decrypt it (authentication fails) but still relay it
+  // blindly for others in the mesh that might. Falls back to a plain,
+  // unauthenticated broadcast (Duck::sendData()) if the sender itself has
+  // no group key configured yet -- see Duck::sendGroupData().
+  group_broadcast = 0x0C,
   max_reserved = 0x0F
 };
 
@@ -272,6 +285,18 @@ class CdpPacket {
         std::vector<uint8_t> data;
         //time received
         unsigned long timeReceived;
+        /// Runtime-only (never serialized on-air): set true by MamaDuck.h's
+        /// receive handlers only when this packet's payload was actually
+        /// decrypted/authenticated (encrypted_cmd, encrypted_data,
+        /// group_broadcast decrypt success) before being restored to its
+        /// real application topic and delivered to the sketch. Left false
+        /// for every other delivery path, including a bare/forged packet
+        /// arriving directly on that same application topic (e.g. MTALK's
+        /// plaintext sendData() fallback, or a spoofed packet). Sketches
+        /// that want to reject unauthenticated traffic once encryption is
+        /// enabled (Duck::isUplinkEncryptionEnabled()) should check this
+        /// flag rather than trusting the topic number alone.
+        bool wasAuthenticated = false;
 
 
         /**
@@ -342,6 +367,8 @@ class CdpPacket {
                 return "identity_announce";
             case reservedTopic::encrypted_data:
                 return "encrypted_data";
+            case reservedTopic::group_broadcast:
+                return "group_broadcast";
             default:
                 return "unknown";
             }

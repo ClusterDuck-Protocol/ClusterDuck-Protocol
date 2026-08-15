@@ -36,6 +36,15 @@ constexpr char KEY_FILE_PATH[] = "/meshgroupkey.bin";
 #else
 constexpr int MESH_EEPROM_OFFSET = 464;
 constexpr int MESH_EEPROM_SIZE = 64;
+// IMPORTANT: always pass EEPROM_TOTAL_SIZE (not MESH_EEPROM_SIZE +
+// MESH_EEPROM_OFFSET) to EEPROM.begin() below -- see the matching, more
+// detailed comment in DuckIdentity.cpp's EEPROM_TOTAL_SIZE. In short:
+// ESP32's EEPROM.h shares one NVS blob across DuckIdentity, OpenDmsConfig,
+// MeshGroupConfig and DuckWifi, and calling begin() with a smaller size
+// than what's currently stored permanently truncates (erases) every other
+// module's data at higher offsets. Must stay in sync (same value) across
+// all four files.
+constexpr int EEPROM_TOTAL_SIZE = 528;
 #endif
 constexpr uint8_t KEY_MAGIC = 0xDB; // "Duck group key" (0xDA is OpenDmsConfig's)
 
@@ -64,7 +73,7 @@ bool loadFromStorage(uint8_t* outKey) {
   file.close();
   return true;
 #else
-  EEPROM.begin(MESH_EEPROM_SIZE + MESH_EEPROM_OFFSET);
+  EEPROM.begin(EEPROM_TOTAL_SIZE);
   if (EEPROM.read(MESH_EEPROM_OFFSET) != KEY_MAGIC) {
     return false;
   }
@@ -89,7 +98,7 @@ int saveToStorage(const uint8_t* key) {
   file.close();
   return DUCK_ERR_NONE;
 #else
-  EEPROM.begin(MESH_EEPROM_SIZE + MESH_EEPROM_OFFSET);
+  EEPROM.begin(EEPROM_TOTAL_SIZE);
   EEPROM.write(MESH_EEPROM_OFFSET, KEY_MAGIC);
   for (size_t i = 0; i < duckcrypto::KEY_LENGTH; i++) {
     EEPROM.write(MESH_EEPROM_OFFSET + 1 + i, key[i]);
@@ -111,7 +120,7 @@ int eraseStorage() {
   }
   return DUCK_ERR_NONE;
 #else
-  EEPROM.begin(MESH_EEPROM_SIZE + MESH_EEPROM_OFFSET);
+  EEPROM.begin(EEPROM_TOTAL_SIZE);
   EEPROM.write(MESH_EEPROM_OFFSET, 0x00);
   if (!EEPROM.commit()) {
     logerr_ln("MeshGroupConfig: failed to erase stored key");
