@@ -22,6 +22,7 @@
 #include "./CdpPacket.h"
 #include "./utils/DuckError.h"
 #include "./utils/DuckLogger.h"
+#include "./security/DuckIdentity.h"
 #ifndef CDPCFG_WIFI_NONE
 #include "./wifi/DuckWifi.h"
 #endif

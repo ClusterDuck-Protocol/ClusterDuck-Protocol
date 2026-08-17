@@ -62,4 +62,12 @@
 #define DUCK_ERR_EEPROM_WRITE        -7001
 #define DUCK_ERR_EEPROM_READ         -7002
 
+// Failed to persist this Duck's cryptographic identity to flash
+#define DUCK_ERR_IDENTITY_STORAGE_WRITE -8000
+
+// X25519 ECDH exchange rejected the peer's public key (invalid/weak point)
+#define DUCK_ERR_CRYPTO_ECDH_FAILED -8100
+// ChaChaPoly authentication tag did not match (tampered/corrupt/wrong key)
+#define DUCK_ERR_CRYPTO_AUTH_FAILED -8101
+
 #endif

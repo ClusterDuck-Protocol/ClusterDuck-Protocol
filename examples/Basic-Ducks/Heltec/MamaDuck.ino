@@ -16,9 +16,15 @@
  #include <cstdlib>
  #include <cmath>
  #include <map>
+ #include <set>
  #include <arduino-timer.h>
  #include <CDP.h>
  #include "payloads/DuckPayloads.h"
+ #include "../common/DuckIdFactory.h"
+ #include "../common/BeaconCrypto.h"
+ #include "../common/UplinkRouter.h"
+ #include "../common/CdkFrame.h"
+ #include "security/SecurityEventCounters.h"
  #ifdef SERIAL_PORT_USBVIRTUAL
  #define Serial SERIAL_PORT_USBVIRTUAL
  #endif
@@ -62,12 +68,10 @@ extern CDPCFG_LORA_CLASS lora;
  static bool initDuckId() {
  #ifdef DUCK_ID
    strncpy(DUCK_ID_BUF, DUCK_ID, 8);
- #else
-   std::string mac = duckesp::getDuckMacAddress(false);  // unformatted hex, e.g. "E4B4C2A1B2C3"
-   std::string id  = (mac.length() >= 8) ? mac.substr(mac.length() - 8) : std::string("DUCK0000");
-   memcpy(DUCK_ID_BUF, id.c_str(), 8);
- #endif
    DUCK_ID_BUF[8] = '\0';
+ #else
+   duckidfactory::deriveFromMac(DUCK_ID_BUF);
+ #endif
    return true;
  }
  static bool duckIdReady = initDuckId();
@@ -95,7 +99,6 @@ extern CDPCFG_LORA_CLASS lora;
  void handleMsg(const String& body);
  void handleMamaTalk(const String& body);
  bool sendMamaTalk(const String& targetId, const String& msg, const String& mid = "");
- String extractField(const String& body, const String& key);
  void sendFrame(const String& frame);
  void handleGps(const String& body);
  static float readVbat();
@@ -105,7 +108,10 @@ extern CDPCFG_LORA_CLASS lora;
  static bool isPhoneConnected();
 
  // --- Global Variables ---
- MamaDuck duck(DUCK_NAME); // Device ID, MUST be 8 bytes and unique from other ducks;
+ MamaDuck<DuckWifiNone, DuckLoRa> duck(DUCK_NAME); // Device ID, MUST be 8 bytes and unique from other ducks;
+
+ // sendUplink()/sendUplinkSos()/sendMamaLink()/announcedIdentityTo now live
+ // in src/Ducks/UplinkRouter.h (shared with WioTrackerL1 and future boards).
  auto timer = timer_create_default();  // Creating a timer with default settings
  const int INTERVAL_MS = 10000;        // Interval in milliseconds between runSensor call
  int counter = 1;                      // Counter for the sensor data  
@@ -123,6 +129,9 @@ static bool usbPhoneSeen = false;        // true once phone sends any CDK frame 
 static bool          bleAdvertising    = true;   // track advertising state
 static unsigned long bleAdvSlowAfterMs = 0;      // millis() deadline; switch to slow adv after this
 static bool displayEnabled = true;       // track display on/off state
+
+// lastIdentityAnnounceMs now lives in examples/Basic-Ducks/common/UplinkRouter.h
+// (shared with WioTrackerL1 and future boards).
 const unsigned long USB_IDLE_TIMEOUT_MS  = 30000UL;  // resume BLE after 30 s of USB silence
 const unsigned long GPS_PHONE_TIMEOUT_MS = 300000UL; // treat USB phone as gone after 5 min of silence
 static unsigned long lastBattMs = 0;
@@ -182,10 +191,15 @@ constexpr unsigned long DUCK_GPS_TTL_MS = 300000UL;  // 5 minutes
 // that embeds the sender's GPS inline.  The receiver replies with BEACON_ACK (28)
 // which also embeds its GPS.  Both sides get GPS-rich CDK:SEEN from the very first
 // received packet — no GPSREQ chain, no case-234 blocking delay, 2 TX not 4.
-static const uint8_t TOPIC_BEACON     = 27;
-static const uint8_t TOPIC_BEACON_ACK = 28;
+static const uint8_t TOPIC_BEACON     = 0x20;  // 32 -- was 27 (collided with topics::encrypted_cmd=0x1B)
+static const uint8_t TOPIC_BEACON_ACK = 0x21;  // 33 -- was 28 (collided with topics::sealed_uplink=0x1C)
 static volatile bool beaconAckPending = false;   // deferred BEACON_ACK TX
 static char          beaconAckPayload[80] = {};   // GPS payload for beacon ACK
+
+// encryptBeaconPayload()/decryptBeaconPayload()/verifyBroadcastMac() now
+// live in examples/Basic-Ducks/common/BeaconCrypto.h (shared with
+// WioTrackerL1 and future boards).
+
 static unsigned long beaconAckDeferMs = 0;        // millis() after which ACK may be sent
 
 // ── BLE callbacks ─────────────────────────────────────────────────────
@@ -301,6 +315,14 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
    // transmits nothing. Both ducks are standalone peers — no join needed.
    duck.goPublic();
    Serial.println("[MAMA] Network state: PUBLIC");
+
+   // Broadcasts this Duck's long-term public key so peer MamaDucks can learn
+   // it (TOFU) and use sendEncryptedData()/decrypt encrypted_data packets
+   // addressed to this Duck (see sendMamaLink() above for MTALK). MTALK
+   // encryption is permanent (Duck::isMamaLinkEncryptionEnabled() is always
+   // true), so this announce always happens regardless of the operator's
+   // uplink-encryption preference.
+   duck.announceIdentity();
  
    setupOK = true;
    Serial.println("[MAMA] Setup OK!");
@@ -682,7 +704,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     rogerMsg.src = duckcdp_StatusMsgSrc_STATUS_MSG_SRC_DEVICE;
     std::snprintf(rogerMsg.text, sizeof(rogerMsg.text), "%s", "Roger");
     std::vector<uint8_t> rogerEncoded = duckpayload::encodeStatusReportMsg(rogerMsg);
-    duck.sendData(topics::status, rogerEncoded.data(), rogerEncoded.size());
+    sendUplink(topics::status, std::string(reinterpret_cast<const char*>(rogerEncoded.data()), rogerEncoded.size()));
     broadcast("CDK:ACK,ID:ROGER");
     Serial.println("[MAMA] Triple-click: Roger sent");
     display.displayOn();
@@ -787,10 +809,20 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     if (!usbPhoneSeen && millis() - lastUsbAnnounceMs >= 3000UL) {
       Serial.println(String("CDK:ID,VALUE:") + DUCK_ID_BUF);
       // Only send battery over BLE when NOT already BLE-connected — the
-      // deferred announce + periodic 60 s timer handle the BLE cadence.
+      // deferred announce + periodic 10 s timer handle the BLE cadence.
       // Firing every 3 s from the USB discovery loop floods Android.
-      if (!bleConnected) sendBattery();
-      lastBattMs        = millis();
+      // IMPORTANT: only touch lastBattMs when we actually sent a battery
+      // update here. This block runs every 3 s whenever no USB host has
+      // replied yet (usbPhoneSeen stays false for BLE-only phones), so
+      // unconditionally resetting lastBattMs was starving the "every 10 s
+      // while BLE connected" periodic resend below -- it never got 10 s of
+      // uninterrupted elapsed time to fire, so the very first (and
+      // possibly CCCD-not-yet-subscribed, thus silently dropped) post-connect
+      // battery notify was the ONLY one the phone would ever receive.
+      if (!bleConnected) {
+        sendBattery();
+        lastBattMs = millis();
+      }
       lastUsbAnnounceMs = millis();
     }
   }
@@ -850,6 +882,39 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
       displayHome();
     }
   }
+
+  // Periodic identity re-announce every 5 min (broadcast), so a peer that
+  // missed the one-time announceIdentity() in setup() -- e.g. it booted
+  // later, or was out of LoRa range at the time, or the broadcast packet
+  // was simply lost (not uncommon over LoRa) -- eventually learns this
+  // Duck's public key too. Without this, sendMamaLink() would keep
+  // returning non-zero (fail-closed, no cleartext fallback) against that
+  // one peer indefinitely -- MTALK looks like it sent successfully
+  // (CDK:ACK) but never arrives -- until both sides have mutually
+  // exchanged identities at least once. Runs unconditionally: MTALK
+  // encryption is permanent (Duck::isMamaLinkEncryptionEnabled() always
+  // true), independent of the operator's uplink-encryption preference.
+  if (millis() - lastIdentityAnnounceMs >= 300000UL) {
+    duck.announceIdentity();
+    lastIdentityAnnounceMs = millis();
+  }
+
+  // Periodic fail-closed rejection-count report, every 5 min, only when
+  // there's something to report (see SecurityEventCounters.h) -- lets an
+  // operator tell "keys are fine, we're blocking forged traffic" apart
+  // from "our own config/key is broken and legitimate traffic is being
+  // silently dropped", without ever trusting the rejected data itself.
+  // Uses the existing plaintext topics::status uplink (already relayed
+  // and stored as-is by MeshBeacon Ops), so no new wire format or
+  // server-side changes are needed.
+  static unsigned long lastSecEventsReportMs = 0;
+  if (millis() - lastSecEventsReportMs >= 300000UL) {
+    lastSecEventsReportMs = millis();
+    if (securityevents::hasEvents()) {
+      sendUplink(topics::status, securityevents::summary());
+      securityevents::reset();
+    }
+  }
   delay(5);
 
 #ifdef ARDUINO_heltec_wifi_lora_32_V4
@@ -887,7 +952,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
   // startReceive() and abort the GPS response startTransmit().
   if (gpsTxPending) {
     gpsTxPending = false;
-    int result = duck.sendData(topics::gps, gpsTxPayload.data(), gpsTxPayload.size());
+    int result = sendUplink(topics::gps, std::string(reinterpret_cast<const char*>(gpsTxPayload.data()), gpsTxPayload.size()));
     gpsLoraOk = (result == 0);
     Serial.printf("[GPS] Deferred LoRa TX %s (%u bytes)\n", gpsLoraOk ? "OK" : "FAILED",
                   (unsigned)gpsTxPayload.size());
@@ -904,7 +969,10 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
   if (beaconAckDeferMs > 0 && millis() >= beaconAckDeferMs && !gpsTxPending) {
     beaconAckDeferMs = 0;
     beaconAckPending = false;
-    int result = duck.sendData(TOPIC_BEACON_ACK, std::string(beaconAckPayload), BROADCAST_DUID);
+    std::string beaconAckWire = meshgroupconfig::isConfigured()
+        ? encryptBeaconPayload(TOPIC_BEACON_ACK, beaconAckPayload)
+        : std::string(beaconAckPayload);
+    int result = duck.sendData(TOPIC_BEACON_ACK, beaconAckWire, BROADCAST_DUID);
     Serial.printf("[BEACON] ACK TX %s: %s\n", result == 0 ? "OK" : "FAILED", beaconAckPayload);
   }
 
@@ -958,7 +1026,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     noGps.no_fix_reason = duckcdp_GpsNoFixReason_GPS_REASON_NO_RESPONSE;
     noGps.batt_pct = heltec_battery_percent(readVbat());
     std::vector<uint8_t> encoded = duckpayload::encodeGps(noGps);
-    duck.sendData(topics::gps, encoded.data(), encoded.size());
+    sendUplink(topics::gps, std::string(reinterpret_cast<const char*>(encoded.data()), encoded.size()));
     Serial.println("[GPS] GPSREQ timeout — no response from phone, sent no-fix report.");
   }
  }
@@ -966,6 +1034,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
  void handleDuckData(CdpPacket packet) {
     bool isForMe = (memcmp(packet.dduid.data(), duck.getDuckId().data(), 8) == 0);
     bool isBroadcast = (packet.dduid[0] == 0xFF);
+    bool beaconAuthenticated = false;
 
     Serial.printf("[RX] topic=%u duckType=%u isForMe=%d isBroadcast=%d src=%.8s\n",
                   packet.topic, (uint8_t)packet.duckType, (int)isForMe, (int)isBroadcast,
@@ -980,7 +1049,25 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     // is used to cache the sender's location.  This runs BEFORE CDK:SEEN so
     // the emitted frame includes GPS on the very first packet from a duck.
     {
-        String pdata = String((char*)packet.data.data(), packet.data.size());
+        String pdata;
+        std::string decryptedBeacon;
+        bool isBeaconTopic = (packet.topic == TOPIC_BEACON || packet.topic == TOPIC_BEACON_ACK);
+        if (isBeaconTopic
+            && decryptBeaconPayload(packet.topic, packet.sduid.data(), packet.data, decryptedBeacon)) {
+            beaconAuthenticated = true;
+            pdata = String(decryptedBeacon.data(), decryptedBeacon.size());
+        } else if (isBeaconTopic && meshgroupconfig::isConfigured()) {
+            // A mesh group key IS provisioned (BEACON encryption is
+            // explicitly enabled for this deployment) but decryption
+            // failed here -- forged/corrupt, or a different deployment's
+            // key. Never fall back to trusting the raw bytes as plaintext
+            // GPS in that case: that would let anyone in LoRa range spoof
+            // another duck's location with a bare, unencrypted TOPIC_BEACON
+            // packet. Leave pdata empty so the LAT:/LNG: lookup below finds
+            // nothing.
+        } else {
+            pdata = String((char*)packet.data.data(), packet.data.size());
+        }
         Serial.printf("[RX-GPS] topic=%u src=%.8s payload=%.48s\n",
                       packet.topic, (char*)packet.sduid.data(), pdata.c_str());
         int latIdx = pdata.indexOf("LAT:");
@@ -1111,7 +1198,24 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
             break;
         }
 
+        // encrypted_cmd (topic 8) is OpenDMS's decrypted operator downlink --
+        // MamaDuck.h's encrypted_cmd handler leaves packet.topic set to 8 after
+        // successful decryption (unlike encrypted_data, which restores the real
+        // app topic), so it must be handled here explicitly or the decrypted
+        // command (e.g. the SOS ack below) is silently dropped.
+        case topics::encrypted_cmd:
         case 22:  // Text message / operator command
+            // Plaintext dcmd (topic 22) is NOT authenticated -- unlike
+            // topics::encrypted_cmd (topic 0x1B), which only ever
+            // reaches here after MamaDuck.h has already decrypted it
+            // successfully. Once this device has a real OpenDMS key pinned
+            // (opendmsconfig::isConfigured()), the deployment has opted
+            // into authenticated operator commands, so reject the
+            // plaintext fallback outright instead of displaying it.
+            if (packet.topic == 22 && opendmsconfig::isConfigured()) {
+                Serial.println("[MSG] Plaintext dcmd (topic 22) received but OpenDMS key is configured (encryption required), dropping.");
+                break;
+            }
             if (duckpayload::isProtobuf(packet.data.data(), packet.data.size())) {
               duckcdp_OpText opText = duckcdp_OpText_init_zero;
               if (!duckpayload::decodeOpText(packet.data.data(), packet.data.size(), opText)) {
@@ -1148,7 +1252,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
               String ackText = "MSG_READ:TEXT:" + message;
               std::snprintf(ack.text, sizeof(ack.text), "%s", ackText.c_str());
               std::vector<uint8_t> encoded = duckpayload::encodeOpText(ack);
-              duck.sendData(22, encoded.data(), (int)encoded.size());
+              sendUplink(22, std::string(reinterpret_cast<const char*>(encoded.data()), encoded.size()));
             }
             // blink to show message arrive
             blinkLed(1);
@@ -1158,7 +1262,14 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
             //Serial.println("CDK:MSG,TEXT:" + text);
             break;
 
+        // Plaintext ALERT (topic 23) -- NOT authenticated, same forgeable
+        // class as plaintext dcmd above. Reject once the device has opted
+        // into authenticated operator commands.
         case 23:  // Alert
+            if (opendmsconfig::isConfigured()) {
+                Serial.println("[MSG] Plaintext ALERT (topic 23) received but OpenDMS key is configured (encryption required), dropping.");
+                break;
+            }
             if (duckpayload::isProtobuf(packet.data.data(), packet.data.size())) {
               duckcdp_OpText opText = duckcdp_OpText_init_zero;
               if (duckpayload::decodeOpText(packet.data.data(), packet.data.size(), opText)) {
@@ -1172,25 +1283,55 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
               duckcdp_OpText ack = duckcdp_OpText_init_zero;
               std::snprintf(ack.text, sizeof(ack.text), "%s", "ALERT_ACK");
               std::vector<uint8_t> encoded = duckpayload::encodeOpText(ack);
-              duck.sendData(23, encoded.data(), (int)encoded.size());
+              sendUplink(23, std::string(reinterpret_cast<const char*>(encoded.data()), encoded.size()));
             }
             break;
 
-        case 24:  // Emergency broadcast from operator
-            if (duckpayload::isProtobuf(packet.data.data(), packet.data.size())) {
-              duckcdp_OpText opText = duckcdp_OpText_init_zero;
-              if (duckpayload::decodeOpText(packet.data.data(), packet.data.size(), opText)) {
-                message = String(opText.text);
-              }
+        // Emergency broadcast from operator (topic 24) -- authenticated
+        // (not encrypted) with the mesh group key when configured (see
+        // verifyBroadcastMac() above and
+        // DuckCryptoService::authenticateGroupBroadcast() on the Laravel
+        // side). Deliberately readable by anyone in range -- only forgery
+        // is prevented, not confidentiality. Falls back to the legacy
+        // plaintext/protobuf parsing below only when no mesh group key is
+        // provisioned yet; once one is, an unverifiable broadcast is
+        // dropped instead of displayed.
+        case 24: {
+            std::string verifiedBroadcast;
+            bool broadcastAuthenticated = verifyBroadcastMac(24, packet.data, verifiedBroadcast);
+            if (meshgroupconfig::isConfigured() && !broadcastAuthenticated) {
+                Serial.println("[BCAST] BROADCAST (topic 24) received but mesh group key is configured (authentication required) and MAC verification failed, dropping.");
+                securityevents::recordBroadcastRejected();
+                break;
             }
-            Serial.println("📢 Emergency Broadcast: " + message);
-            displayAnnouncement(message);
+            String broadcastText;
+            if (broadcastAuthenticated) {
+                broadcastText = String(verifiedBroadcast.c_str());
+            } else {
+                broadcastText = message;
+                if (duckpayload::isProtobuf(packet.data.data(), packet.data.size())) {
+                  duckcdp_OpText opText = duckcdp_OpText_init_zero;
+                  if (duckpayload::decodeOpText(packet.data.data(), packet.data.size(), opText)) {
+                    broadcastText = String(opText.text);
+                  }
+                }
+            }
+            Serial.println("📢 Emergency Broadcast: " + broadcastText);
+            displayAnnouncement(broadcastText);
             //flashLED();
             blinkLed(1);
             // Forward to connected phone via USB serial and BLE
-            broadcast(String("CDK:BCAST,TEXT:") + message);
+            broadcast(String("CDK:BCAST,TEXT:") + broadcastText);
             break;
+        }
+        // Plaintext PMSG (topic 25) -- NOT authenticated, same forgeable
+        // class as plaintext dcmd above. Reject once the device has opted
+        // into authenticated operator commands.
         case 25:
+            if (opendmsconfig::isConfigured()) {
+                Serial.println("[MSG] Plaintext PMSG (topic 25) received but OpenDMS key is configured (encryption required), dropping.");
+                break;
+            }
             if (duckpayload::isProtobuf(packet.data.data(), packet.data.size())) {
               duckcdp_OpText opText = duckcdp_OpText_init_zero;
               if (duckpayload::decodeOpText(packet.data.data(), packet.data.size(), opText)) {
@@ -1230,7 +1371,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
               display.drawString(0, 40, "LNG:" + String(tinyGps.location.lng(), 5));
               display.drawString(0, 52, "ALT:" + String(altM, 1) + "m  SPD:" + String(spdKh, 1) + "km/h");
               display.display();
-              duck.sendData(topics::gps, std::string(gpsBuf));
+              sendUplink(topics::gps, std::string(gpsBuf));
               Serial.printf("[GPS] Hardware GPS sent (age: %lums): %s\n",
                             tinyGps.location.age(), gpsBuf);
               // Non-blocking display clear — delay() here would block duck.run() for
@@ -1265,7 +1406,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
                 char noGpsBuf[64];
                 std::snprintf(noGpsBuf, sizeof(noGpsBuf), "GPS,FIX:0,SRC:NONE,REASON:NO_PHONE,BATT:%d",
                               heltec_battery_percent(readVbat()));
-                duck.sendData(topics::gps, std::string(noGpsBuf));
+                sendUplink(topics::gps, std::string(noGpsBuf));
                 Serial.println("[GPS] No phone connected — sent " + String(noGpsBuf));
               }
               // Non-blocking display clear — delay() here blocks duck.run() for 2 s,
@@ -1311,7 +1452,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
                 char noGpsBuf[64];
                 std::snprintf(noGpsBuf, sizeof(noGpsBuf), "GPS,FIX:0,SRC:NONE,REASON:NO_PHONE,BATT:%d",
                               heltec_battery_percent(readVbat()));
-                duck.sendData(topics::gps, std::string(noGpsBuf));
+                sendUplink(topics::gps, std::string(noGpsBuf));
                 Serial.println("[GPS] No phone connected — sent " + String(noGpsBuf));
               }
               // Non-blocking display clear — delay() here blocks duck.run() for 2 s,
@@ -1324,6 +1465,11 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
         }
 
         case TOPIC_BEACON: {  // 27 — combined discovery + GPS beacon
+            if (meshgroupconfig::isConfigured() && !beaconAuthenticated) {
+                Serial.println("[BEACON] Mesh group key configured but BEACON not authenticated, dropping (no ACK).");
+                securityevents::recordBeaconRejected();
+                break;
+            }
             // GPS coordinates were already extracted into duckGpsCache in
             // section 1 above, and CDK:SEEN (with GPS) was already emitted
             // in section 2 above — nothing extra needed for the app side.
@@ -1371,6 +1517,11 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
         }
 
         case TOPIC_BEACON_ACK: {  // 28 — reply to our beacon
+            if (meshgroupconfig::isConfigured() && !beaconAuthenticated) {
+                Serial.println("[BEACON] Mesh group key configured but BEACON_ACK not authenticated, dropping.");
+                securityevents::recordBeaconRejected();
+                break;
+            }
             // GPS already extracted in section 1 → duckGpsCache updated.
             // CDK:SEEN (with GPS) already emitted in section 2.
             // Nothing further needed — the app side is already updated.
@@ -1384,6 +1535,10 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
         }
 
         case 26:  // MamaDuck-to-MamaDuck (MTALK)
+            if (!packet.wasAuthenticated) {
+                Serial.println("[MTALK] Packet was not authenticated (encrypted_data), dropping -- MTALK encryption is mandatory.");
+                break;
+            }
             if (duckpayload::isProtobuf(packet.data.data(), packet.data.size())) {
               // ── Protobuf-encoded MTalk (see duck_payloads.proto) ─────────
               duckcdp_MTalk mtalk = duckcdp_MTalk_init_zero;
@@ -1413,7 +1568,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
                   std::snprintf(ack.mid, sizeof(ack.mid), "%s", mid.c_str());
                   std::vector<uint8_t> encoded = duckpayload::encodeMTalk(ack);
                   if (!encoded.empty()) {
-                    duck.sendData(26, encoded.data(), (int)encoded.size(), senderDuid);
+                    sendMamaLink(std::string(reinterpret_cast<const char*>(encoded.data()), encoded.size()), senderDuid);
                     Serial.println("[MTALK] MACK sent back to " + senderId);
                   }
                 }
@@ -1496,7 +1651,32 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     }
     display.drawString(64, 12, sigStr);
 
-    display.drawString(64, 26, TXT_HOME_HINT_3L);
+    // Row 3 (y=24): GPS status -- mirrors WioTrackerL1's home-screen layout.
+    // V4 boards have a real L76K GPS module wired up (see the
+    // ARDUINO_heltec_wifi_lora_32_V4 block near the top of this file); other
+    // Heltec variants have no GPS hardware at all, so they always report
+    // "no module", the same fallback text Wio shows before its own module
+    // has been detected.
+#ifdef ARDUINO_heltec_wifi_lora_32_V4
+    char gpsLine[22];
+    if (!gpsModuleDetected) {
+      strncpy(gpsLine, TXT_GPS_NO_MODULE, sizeof(gpsLine));
+    } else if (tinyGps.location.isValid() && tinyGps.location.age() < 5000) {
+      snprintf(gpsLine, sizeof(gpsLine), "GPS: FIX %uSAT",
+                (unsigned)(tinyGps.satellites.isValid() ? tinyGps.satellites.value() : 0));
+    } else {
+      snprintf(gpsLine, sizeof(gpsLine), TXT_GPS_SEARCH_FMT,
+                (unsigned)(tinyGps.satellites.isValid() ? tinyGps.satellites.value() : 0));
+    }
+    display.drawString(64, 24, gpsLine);
+#else
+    display.drawString(64, 24, TXT_GPS_NO_MODULE);
+#endif
+
+    // Rows 4-5 (y=36/48): hold-for-SOS hint split across two short lines
+    // (was one 3-line block) to leave room for the GPS line above.
+    display.drawString(64, 36, TXT_PRESS_BUTTON_ABOVE);
+    display.drawString(64, 48, TXT_2SEC_EMERGENCY);
     display.display();
  }
 
@@ -1508,19 +1688,42 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     display.display();
  }
 
-/** Read battery voltage with VBAT_CTRL HIGH (library uses LOW which reads 0 on this board). */
+/**
+ * Read battery voltage, auto-detecting the VBAT_CTRL sense-divider enable
+ * polarity. The stock heltec_unofficial library drives VBAT_CTRL LOW to
+ * enable the divider (see heltec_vbat()), but some board revisions/batches
+ * wire the enable transistor inverted and need HIGH instead. Driving the
+ * wrong polarity leaves the divider disabled, so the ADC reads a floating
+ * near-0V node and heltec_battery_percent() gets stuck reporting 0% --
+ * which looks like "battery level never gets broadcast" to the phone app,
+ * since every CDK:BATT frame still goes out, just with LEVEL:0. Try the
+ * library's documented LOW polarity first and only fall back to HIGH if
+ * that reads implausibly low for a connected LiPo.
+ */
 static float readVbat() {
   pinMode(VBAT_CTRL, OUTPUT);
-  digitalWrite(VBAT_CTRL, HIGH);
+  digitalWrite(VBAT_CTRL, LOW);
   delay(5);
-  float vbat = analogRead(VBAT_ADC) / 238.7;
+  int rawLow = analogRead(VBAT_ADC);
+  float vbat = rawLow / 238.7;
+  bool usedHigh = false;
+  int rawHigh = -1;
+  if (vbat < 1.0f) {
+    digitalWrite(VBAT_CTRL, HIGH);
+    delay(5);
+    rawHigh = analogRead(VBAT_ADC);
+    vbat = rawHigh / 238.7;
+    usedHigh = true;
+  }
   pinMode(VBAT_CTRL, INPUT);
+  Serial.printf("[BATT DEBUG] rawLow=%d vbat=%.3f usedHigh=%d rawHigh=%d\n",
+                rawLow, vbat, usedHigh, rawHigh);
   return vbat;
-  return heltec_vbat();
 }
 
 void sendBattery() {
   int pct = heltec_battery_percent(readVbat());
+  Serial.printf("[BATT DEBUG] sendBattery() pct=%d bleConnected=%d\n", pct, bleConnected);
   broadcast("CDK:BATT,LEVEL:" + String(pct));
 }
 
@@ -1591,7 +1794,14 @@ void displayBatt() {
    Serial.printf("[MAMA] sendEmergency data: %u bytes (hasGps=%d)\n", (unsigned)encoded.size(), hasGps);
 
    // Send alert upward to PapaDuck — PapaDuck decides whether to re-broadcast.
-   failure = duck.sendData(topics::alert, encoded.data(), encoded.size());
+   // Routed through sendUplinkSos() (not a direct duck.sendData()) so this
+   // seals via OpenDMS the same as every other uplink report when uplink
+   // encryption is enabled -- SOS alerts carry the victim's GPS location,
+   // which must not go out in the clear any more than a routine GPS report
+   // does. Unlike sendUplink(), sendUplinkSos() falls back to cleartext as a
+   // last resort if sealing fails, since dropping an emergency alert is
+   // worse than leaking location for this specific flow.
+   failure = sendUplinkSos(topics::alert, std::string(reinterpret_cast<const char*>(encoded.data()), encoded.size()));
    lastTxResult = failure;   // 0 = success; track for signal-line display
    lastTxMs     = millis();
    if (!failure) {
@@ -1676,7 +1886,10 @@ void broadcast(const String& frame) {
   // BLE — only if a phone is connected
   if (bleConnected && pTxChar) {
     pTxChar->setValue(payload.c_str());
-    pTxChar->notify();
+    bool notifyOk = pTxChar->notify();
+    if (payload.startsWith("CDK:BATT")) {
+      Serial.printf("[BATT DEBUG] notify() returned %d for: %s", notifyOk, payload.c_str());
+    }
   }
 }
 
@@ -1760,7 +1973,10 @@ void handleFrame(const String& line) {
           Serial.println("[SCAN] Phone GPS cache empty — deferring CDK:GPSREQ");
         }
       }
-      int beaconResult = duck.sendData(TOPIC_BEACON, std::string(gpsPayload), BROADCAST_DUID);
+      std::string beaconWire = meshgroupconfig::isConfigured()
+          ? encryptBeaconPayload(TOPIC_BEACON, gpsPayload)
+          : std::string(gpsPayload);
+      int beaconResult = duck.sendData(TOPIC_BEACON, beaconWire, BROADCAST_DUID);
       Serial.printf("[SCAN] BEACON result=%d payload=%s\n", beaconResult, gpsPayload);
       broadcast(beaconResult == 0 ? "CDK:STATUS,SCAN:ping_sent" : "CDK:STATUS,SCAN:ping_failed");
       broadcast("CDK:SCAN_ACK");
@@ -1817,7 +2033,12 @@ void handleSOS(const String& body) {
   }
   alertMsg.batt_pct = battPct;
   std::vector<uint8_t> encoded = duckpayload::encodeStatusReportSos(alertMsg);
-  int failure = duck.sendData(topics::status, encoded.data(), encoded.size());
+  // Routed through sendUplinkSos() (not a direct duck.sendData()) so a
+  // phone-triggered SOS -- which carries GPS just like sendEmergency()'s
+  // device-triggered path -- also gets sealed via OpenDMS when uplink
+  // encryption is enabled, with a last-resort cleartext fallback if sealing
+  // fails (availability > confidentiality for SOS).
+  int failure = sendUplinkSos(topics::status, std::string(reinterpret_cast<const char*>(encoded.data()), encoded.size()));
   // blink LED to show activity
   blinkLed(3);
   if (!failure) {
@@ -1883,7 +2104,10 @@ void handleMsg(const String& body) {
   displayHome();
 
   std::vector<uint8_t> encoded = duckpayload::encodeStatusReportMsg(statusMsg);
-  int failure = duck.sendData(topics::status, encoded.data(), encoded.size());
+  // Routed through sendUplink() (not a direct duck.sendData()) -- this
+  // report can carry GPS (LAT/LNG above), so it must seal the same way as
+  // every other uplink report when uplink encryption is enabled.
+  int failure = sendUplink(topics::status, std::string(reinterpret_cast<const char*>(encoded.data()), encoded.size()));
   if (!failure) {
     Serial.println("[MAMA] send ok.");
     broadcast("CDK:ACK,ID:MSG");
@@ -1910,7 +2134,7 @@ bool sendMamaTalk(const String& targetId, const String& msg, const String& mid) 
     Serial.println("[MTALK] ERROR: failed to encode MTalk message (too long?).");
     return false;
   }
-  int failure = duck.sendData(26, encoded.data(), (int)encoded.size(), targetDuid);
+  int failure = sendMamaLink(std::string(reinterpret_cast<const char*>(encoded.data()), encoded.size()), targetDuid);
   if (!failure) {
     Serial.println("[MAMA] MTALK sent to " + targetId + ": " + msg);
     broadcast("CDK:ACK,ID:MTALK,TARGET:" + targetId);
@@ -1988,15 +2212,6 @@ void handleGps(const String& body) {
   gpsTxPayload = duckpayload::encodeGps(reading);
   gpsTxPending = true;
   Serial.printf("[GPS] GPS TX deferred: lat=%s lng=%s\n", lat.c_str(), lng.c_str());
-}
-
-String extractField(const String& body, const String& key) {
-  String search = key + ":";
-  int idx = body.indexOf(search);
-  if (idx == -1) return "";
-  int start = idx + search.length();
-  int end = body.indexOf(',', start);
-  return (end == -1) ? body.substring(start) : body.substring(start, end);
 }
 
 // ── Send a CDK frame to the app ──────────────────────────────────

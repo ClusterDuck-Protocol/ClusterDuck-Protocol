@@ -70,13 +70,18 @@ class RouteJSON {
             return json.as<std::string>();
         }
         Duid getOrigin(){
-            Duid originDuid;
-            std::copy(origin.begin(), origin.end(), originDuid.begin());
+            // Bounds-safe copy: clamp to DUID_LENGTH so an oversized/corrupt
+            // `origin` string can never overflow the fixed-size Duid array
+            // (regression guard, independent of the plain-text encoding).
+            Duid originDuid{};
+            size_t n = origin.size() < originDuid.size() ? origin.size() : originDuid.size();
+            std::copy(origin.begin(), origin.begin() + n, originDuid.begin());
             return originDuid;
         }
         Duid getDestination(){
-            Duid destinationDuid;
-            std::copy(destination.begin(), destination.end(), destinationDuid.begin());
+            Duid destinationDuid{};
+            size_t n = destination.size() < destinationDuid.size() ? destination.size() : destinationDuid.size();
+            std::copy(destination.begin(), destination.begin() + n, destinationDuid.begin());
             return destinationDuid;
         }
 
@@ -100,10 +105,11 @@ class RouteJSON {
         }
 
         std::optional<Duid> getlastInPath(){
-            Duid lastDuid;
             if(objPath.size() > 0){
                 auto last = objPath[objPath.size()-1];
-                std::copy(last.begin(), last.end(),lastDuid.begin());
+                Duid lastDuid{};
+                size_t n = last.size() < lastDuid.size() ? last.size() : lastDuid.size();
+                std::copy(last.begin(), last.begin() + n, lastDuid.begin());
 
                 std::string log;
                 serializeJson(json, log);

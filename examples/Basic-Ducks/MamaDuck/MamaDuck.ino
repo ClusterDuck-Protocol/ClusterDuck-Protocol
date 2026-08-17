@@ -40,6 +40,15 @@
      return;
    }
  
+   // Broadcasts this Duck's long-term public key so OpenDMS can learn it
+   // (TOFU) and send an encrypted SOS acknowledgment instead of a
+   // plaintext one (see SendSosAck::buildMessage() in the OpenDMS repo).
+   // Only announced when encryption is actually enabled -- an unencrypted
+   // deployment has no use for it.
+   if (duck.isUplinkEncryptionEnabled()) {
+     duck.announceIdentity();
+   }
+
    timer.every(INTERVAL_MS, runSensor); // Triggers runSensor every INTERVAL_MS
    
    setupOK = true;
@@ -76,7 +85,14 @@
    Serial.print("[MAMA] sensor data: ");
    Serial.println(message.c_str());
  
-   failure = duck.sendData(topics::health, message);
+   // Encryption is off by default (see DUCK_CRYPTO_DEFAULT_ENABLED /
+   // duck.setUplinkEncryptionEnabled()). When enabled, seal health data to
+   // OpenDMS's pinned static key instead of sending it in the clear.
+   if (duck.isUplinkEncryptionEnabled()) {
+     failure = duck.sendSealedData(topics::health, message);
+   } else {
+     failure = duck.sendData(topics::health, message);
+   }
    if (!failure) {
      counter++;
      Serial.println("[MAMA] runSensor ok.");

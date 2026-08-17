@@ -12,6 +12,7 @@
 #include <PubSubClient.h>
 #include <WiFiClientSecure.h>
 #include <queue>
+#include <vector>
 
 // --- WIFI Configuration ---
 const std::string WIFI_SSID="";         // Replace with WiFi SSID
@@ -99,6 +100,40 @@ bool setup_mqtt(void)
     return true;
 }
 
+// Minimal base64 decoder for the hub/command MQTT JSON contract. OpenDMS
+// base64-encodes both the "target" DUID and (for reservedTopic::
+// encrypted_cmd) the "message" field, since real DUIDs/ciphertext are
+// arbitrary binary and are not valid JSON/UTF-8 text on their own -- see
+// app/Services/MqttService::sendCommand() (meshbeacon repo) and
+// docs/crypto-design.tex, "OpenDMS -> Duck (operator-initiated
+// downlink)". Hand-rolled here (rather than pulling in a library) to stay
+// portable across every board this sketch's variants target.
+static int base64CharValue(char c) {
+  if (c >= 'A' && c <= 'Z') return c - 'A';
+  if (c >= 'a' && c <= 'z') return c - 'a' + 26;
+  if (c >= '0' && c <= '9') return c - '0' + 52;
+  if (c == '+') return 62;
+  if (c == '/') return 63;
+  return -1;
+}
+
+static std::vector<uint8_t> base64Decode(const std::string& input) {
+  std::vector<uint8_t> out;
+  int val = 0, bits = -8;
+  for (unsigned char c : input) {
+    if (c == '=') break;
+    int v = base64CharValue(static_cast<char>(c));
+    if (v < 0) continue; // skip whitespace/newlines
+    val = (val << 6) + v;
+    bits += 6;
+    if (bits >= 0) {
+      out.push_back(static_cast<uint8_t>((val >> bits) & 0xFF));
+      bits -= 8;
+    }
+  }
+  return out;
+}
+
 // Incoming MQTT messages from the controller
 // This needs to be fast, so we simply queue the raw message
 // And we can process them in the main loop
@@ -135,17 +170,36 @@ void handleIncomingMqttMessages(void) {
     int topic = doc["topic"];
     String targetId = doc["target"];
 
-    // Resolve target DUID: "BROADCAST" maps to the all-0xFF broadcast address,
-    // otherwise convert the device ID string to a Duid array.
+    // Resolve target DUID: "BROADCAST" is a literal sentinel; any other
+    // value is base64-encoded raw bytes (real DUIDs are arbitrary binary,
+    // not valid JSON/UTF-8 text -- see app/Services/MqttService::
+    // sendCommand() in the meshbeacon repo), so it must be decoded back to
+    // bytes here rather than treated as literal characters.
     std::array<uint8_t, 8> target;
     if (targetId == "BROADCAST") {
       target = BROADCAST_DUID;
     } else {
-      target = duckutils::stringToArray<uint8_t, 8>(std::string(targetId.c_str()));
+      std::vector<uint8_t> targetBytes = base64Decode(std::string(targetId.c_str()));
+      target.fill(0);
+      for (size_t i = 0; i < targetBytes.size() && i < target.size(); i++) {
+        target[i] = targetBytes[i];
+      }
+    }
+
+    // topics::encrypted_cmd's message is base64(nonce || ciphertext
+    // || tag) -- arbitrary binary -- for the same JSON-transport reason;
+    // decode it back to raw bytes before handing it to sendData(). Other
+    // topics (e.g. plaintext dcmd) carry literal text and need no decoding.
+    std::string payload;
+    if (topic == topics::encrypted_cmd) {
+      std::vector<uint8_t> messageBytes = base64Decode(std::string(message.c_str()));
+      payload.assign(messageBytes.begin(), messageBytes.end());
+    } else {
+      payload = std::string(message.c_str());
     }
 
     // Send data using the hub's sendData method
-    int failure = hub.sendData(topic, std::string(message.c_str()), target);
+    int failure = hub.sendData(topic, payload, target);
     if (failure) 
        Serial.println("Send failed.");
   }

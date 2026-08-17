@@ -168,6 +168,37 @@ std::string arrayToHexString(const std::array<T,S> arr) {
     return buf;
 }
 
+/**
+ * @brief Decode a hex string (as produced by arrayToHexString) back into a
+ * fixed-size byte array. Bounds-safe by construction: at most S bytes are
+ * ever written into the returned array regardless of the input string's
+ * length, unlike a raw std::copy of arbitrary string content into a
+ * fixed-size std::array. Any non-hex-digit character stops decoding early;
+ * remaining bytes are left zero-initialized.
+ *
+ * @param hex the hex string to decode
+ * @returns A std::array of bytes decoded from the hex string.
+ */
+template<typename T,size_t S>
+std::array<T,S> hexStringToArray(const std::string& hex) {
+    std::array<T,S> arr{};
+    auto hexDigit = [](char c) -> int {
+        if (c >= '0' && c <= '9') return c - '0';
+        if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+        if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+        return -1;
+    };
+    size_t availableBytes = hex.size() / 2;
+    size_t maxBytes = (availableBytes < S) ? availableBytes : S;
+    for (size_t i = 0; i < maxBytes; i++) {
+        int hi = hexDigit(hex[i * 2]);
+        int lo = hexDigit(hex[i * 2 + 1]);
+        if (hi < 0 || lo < 0) break;
+        arr[i] = static_cast<T>((hi << 4) | lo);
+    }
+    return arr;
+}
+
 
 /**
  * @brief Compare two vectors with regard to both size and contents.

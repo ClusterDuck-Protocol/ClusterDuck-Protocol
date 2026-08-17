@@ -60,6 +60,8 @@
   #define TXT_SEND_SIGNAL            "SEND SIGNAL"
   #define TXT_EMERGENCY              "EMERGENCY"
   #define TXT_MSG_SENT               "MESSAGE SENT!"
+  #define TXT_IDENTITY               "IDENTITY"
+  #define TXT_PROVISIONED_BANG       "PROVISIONED!"
 
 #else  // Bahasa Melayu (default)
 
@@ -107,5 +109,7 @@
   #define TXT_SEND_SIGNAL            "HANTAR ISYARAT"
   #define TXT_EMERGENCY              "KECEMASAN"
   #define TXT_MSG_SENT               "MESEJ TELAH DIHANTAR!"
+  #define TXT_IDENTITY               "IDENTITI"
+  #define TXT_PROVISIONED_BANG       "DITAULIAHKAN!"
 
 #endif

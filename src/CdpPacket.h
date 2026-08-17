@@ -95,6 +95,58 @@ enum topics {
   health = 0x15,
   // Send duck commands
   dcmd = 0x16,
+  // Operator-initiated downlink command from OpenDMS, encrypted for a
+  // specific destination Duck. Data section is
+  // nonce(12) || ciphertext(N) || tag(16), decryptable via
+  // duckcrypto::decryptFromPeer() using this Duck's own identity private
+  // key and OpenDMS's pinned static public key (see
+  // src/security/OpenDmsConfig.h, docs/crypto-design.tex
+  // "OpenDMS -> Duck (operator-initiated downlink)"). Relays that are not
+  // the destination must forward blindly, same as any other topic -- they
+  // cannot decrypt traffic meant for a different Duck's identity. Moved
+  // out of reservedTopic (2026-08) -- these crypto transports are
+  // application-level topics like any other, not core CDP protocol
+  // topics, and reservedTopic's 0x00-0x0F range was nearly exhausted.
+  encrypted_cmd = 0x1B,
+  // One-way Duck -> OpenDMS uplink data, sealed anonymously to OpenDMS's
+  // pinned static public key (duckcrypto::sealToStatic()). Data section is
+  // topic(1, cleartext) || ephemeralPublicKey(32) || nonce(12) ||
+  // ciphertext(N) || tag(16). Only the ciphertext (the actual application
+  // payload) is encrypted -- the leading topic byte is sent in the clear
+  // (though bound into the AAD, so tampering with it breaks
+  // authentication) so relays and OpenDMS can see which topic this is
+  // without decrypting anything. Relays forward blindly, same as any other
+  // topic; only OpenDMS (holding the matching static private key) can
+  // decrypt the ciphertext.
+  sealed_uplink = 0x1C,
+  // A Duck announcing its own long-term X25519 public key (32 raw bytes,
+  // the full data section) so peers can learn it for Duck<->Duck session
+  // encryption (see encrypted_data below). TOFU: first announcement seen
+  // for a given SDUID is trusted and cached.
+  identity_announce = 0x1D,
+  // Duck<->Duck session-encrypted data (duckcrypto::encryptWithPeer(),
+  // static-static X25519 ECDH between the two Ducks' long-term identities).
+  // Requires the recipient to have already learned the sender's public key
+  // via identity_announce. Data section is
+  // topic(1, cleartext) || nonce(12) || ciphertext(N) || tag(16). Only the
+  // ciphertext (the actual application payload) is encrypted -- the
+  // leading topic byte is sent in the clear (though bound into the AAD, so
+  // tampering with it breaks authentication) so relays can see which topic
+  // this is without decrypting anything.
+  encrypted_data = 0x1E,
+  // Broadcast data authenticated with the deployment's pre-shared mesh
+  // group symmetric key (duckcrypto::encryptWithGroupKey(), see
+  // src/security/MeshGroupConfig.h), meant to be readable by any Duck
+  // holding the same group key -- unlike encrypted_data (single known
+  // peer) or encrypted_cmd (OpenDMS only), neither of which fit a
+  // "readable by any/all nearby ducks" broadcast. Data section is
+  // topic(1, cleartext) || nonce(12) || ciphertext(N) || tag(16), same
+  // layout as encrypted_data. Ducks without the group key configured
+  // simply can't decrypt it (authentication fails) but still relay it
+  // blindly for others in the mesh that might. Falls back to a plain,
+  // unauthenticated broadcast (Duck::sendData()) if the sender itself has
+  // no group key configured yet -- see Duck::sendGroupData().
+  group_broadcast = 0x1F,
   //gps
   gps = 0xEA,
   // MQ7 Gas Sensor
@@ -236,6 +288,18 @@ class CdpPacket {
         std::vector<uint8_t> data;
         //time received
         unsigned long timeReceived;
+        /// Runtime-only (never serialized on-air): set true by MamaDuck.h's
+        /// receive handlers only when this packet's payload was actually
+        /// decrypted/authenticated (encrypted_cmd, encrypted_data,
+        /// group_broadcast decrypt success) before being restored to its
+        /// real application topic and delivered to the sketch. Left false
+        /// for every other delivery path, including a bare/forged packet
+        /// arriving directly on that same application topic (e.g. MTALK's
+        /// plaintext sendData() fallback, or a spoofed packet). Sketches
+        /// that want to reject unauthenticated traffic once encryption is
+        /// enabled (Duck::isUplinkEncryptionEnabled()) should check this
+        /// flag rather than trusting the topic number alone.
+        bool wasAuthenticated = false;
 
 
         /**
@@ -298,6 +362,16 @@ class CdpPacket {
                 return "ping";
             case reservedTopic::pong:
                 return "pong";
+            case topics::encrypted_cmd:
+                return "encrypted_cmd";
+            case topics::sealed_uplink:
+                return "sealed_uplink";
+            case topics::identity_announce:
+                return "identity_announce";
+            case topics::encrypted_data:
+                return "encrypted_data";
+            case topics::group_broadcast:
+                return "group_broadcast";
             default:
                 return "unknown";
             }

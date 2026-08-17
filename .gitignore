@@ -6,3 +6,7 @@
 a.out
 cmake-build-*
 ClusterDuck-Protokoll.code-workspace
+docs/*.aux
+docs/*.log
+docs/*.out
+docs/*.toc
