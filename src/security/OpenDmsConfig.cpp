@@ -44,11 +44,11 @@ constexpr int OPENDMS_EEPROM_SIZE = 64;
 // OPENDMS_EEPROM_OFFSET) to EEPROM.begin() below -- see the matching, more
 // detailed comment in DuckIdentity.cpp's EEPROM_TOTAL_SIZE. In short:
 // ESP32's EEPROM.h shares one NVS blob across DuckIdentity, OpenDmsConfig,
-// MeshGroupConfig and DuckWifi, and calling begin()
+// MeshGroupConfig, DuckWifi and RadioRegionConfig, and calling begin()
 // with a smaller size than what's currently stored permanently truncates
 // (erases) every other module's data at higher offsets. Must stay in
 // sync (same value) across all such files.
-constexpr int EEPROM_TOTAL_SIZE = 528;
+constexpr int EEPROM_TOTAL_SIZE = 536;
 #endif
 constexpr uint8_t KEY_MAGIC = 0xDA; // "Duck Agency key"
 

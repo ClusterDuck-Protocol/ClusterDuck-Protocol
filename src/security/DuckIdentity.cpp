@@ -50,7 +50,8 @@ constexpr int IDENTITY_EEPROM_SIZE = 256;
 // IMPORTANT: always pass EEPROM_TOTAL_SIZE (not IDENTITY_EEPROM_SIZE) to
 // EEPROM.begin() below. On ESP32, EEPROM.h is backed by a single named NVS
 // blob shared by every module that calls EEPROM.begin() (DuckIdentity,
-// OpenDmsConfig, MeshGroupConfig, DuckWifi). If any module calls begin()
+// OpenDmsConfig, MeshGroupConfig, DuckWifi, RadioRegionConfig). If any
+// module calls begin()
 // with a size SMALLER than what's already stored, the ESP32 core's
 // EEPROMClass::begin() immediately TRUNCATES the stored NVS blob down to
 // that smaller size (nvs_set_blob with the shorter length) -- permanently
@@ -62,10 +63,10 @@ constexpr int IDENTITY_EEPROM_SIZE = 256;
 // (offset + size) used by ANY module sharing this NVS blob; bump it
 // everywhere if the layout ever grows.
 // Fixed layout: DuckWifi [0, 96), DuckIdentity [128, 384), OpenDmsConfig
-// [400, 464), MeshGroupConfig [464, 528).
+// [400, 464), MeshGroupConfig [464, 528), RadioRegionConfig [528, 536).
 // This must match the same constant in OpenDmsConfig.cpp,
-// MeshGroupConfig.cpp and DuckWifi.cpp.
-constexpr int EEPROM_TOTAL_SIZE = 528;
+// MeshGroupConfig.cpp, DuckWifi.cpp and RadioRegionConfig.cpp.
+constexpr int EEPROM_TOTAL_SIZE = 536;
 #endif
 constexpr uint8_t IDENTITY_MAGIC = 0xDC; // "Duck Crypto"
 

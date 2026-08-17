@@ -19,6 +19,7 @@
 #include "../security/DuckCrypto.h"
 #include "../security/OpenDmsConfig.h"
 #include "../security/MeshGroupConfig.h"
+#include "../radio/RadioRegionConfig.h"
 
 #define NET_JOIN_DELAY 15000L
 
@@ -44,6 +45,7 @@ class Duck {
       Duck::logIfLowMemory();
       opendmsconfig::checkSerialProvisioning();
       meshgroupconfig::checkSerialProvisioning();
+      radioregionconfig::checkSerialProvisioning();
       if(router.getNetworkState() == NetworkState::PUBLIC) {
         if(duckRadio.getReceiveFlag()){
           handleReceivedPacket();
@@ -72,6 +74,7 @@ class Duck {
       }
       opendmsconfig::begin();
       meshgroupconfig::begin();
+      radioregionconfig::begin();
       err = this->setupLoRaRadio();
       if (err != DUCK_ERR_NONE) {
       logerr_ln("ERROR setupWithDefaults rc = %d",err); 
@@ -191,12 +194,13 @@ class Duck {
      * @returns DUCK_ERR_NONE if the data was sent successfully, an error code otherwise.
      */
     int announceIdentity(Duid targetDevice = BROADCAST_DUID){
+      loginfo_ln("Announcing Identity...");
       std::vector<uint8_t> data(duckidentity::getPublicKey(), duckidentity::getPublicKey() + duckidentity::PUBLIC_KEY_LENGTH);
       int err = sendReservedTopicData(targetDevice, topics::identity_announce, data);
       if (err != DUCK_ERR_NONE){
         logerr_ln("ERR: failed to send identity_announce");
       }
-      return err;
+      return err; 
     }
 
     /**

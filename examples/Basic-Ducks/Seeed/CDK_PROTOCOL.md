@@ -149,6 +149,24 @@ CDK:ACK,ID:<frame_type>[,TARGET:<duck_id>]
 
 ---
 
+### `CDK:RADIOREGION`
+Reply to a phone `CDK:RADIOREGION` query, or an ack after a successful region write.
+Also sent (error form) after a rejected write.
+
+```
+CDK:RADIOREGION,VALUE:<region_code>[,STATUS:ok,REBOOT_REQUIRED:1]
+CDK:RADIOREGION,ERROR:<unknown_region|write_failed>
+```
+
+| Field | Description |
+|-------|-------------|
+| `VALUE` | Active/newly-set region code: one of `MY`, `SG`, `PH`, `ID`, `US`, `UK` |
+| `STATUS` | `ok`, present only after a successful write |
+| `REBOOT_REQUIRED` | `1` after a successful write -- the new region only takes effect after the device reboots; the running radio is not retuned live |
+| `ERROR` | `unknown_region` (VALUE didn't match a known code) or `write_failed` (flash write failed) |
+
+---
+
 ## Frames sent **by the phone → device**
 
 ### `CDK:PING`
@@ -221,6 +239,25 @@ CDK:MTALK,TARGET:<duck_id>,TEXT:<text>[,MID:<4-char-id>]
 | `TARGET` | Exactly 8-character destination duck ID |
 | `TEXT` | Message body |
 | `MID` | Optional 4-character message ID; echoed back in `CDK:MACK` |
+
+---
+
+### `CDK:RADIOREGION`
+Sets or queries the device's LoRa region preset (mesh channel + uplink channel pool).
+Send with no `VALUE` field to query the currently active region; the device replies
+with `CDK:RADIOREGION,VALUE:<region_code>`.
+
+```
+CDK:RADIOREGION[,VALUE:<region_code>]
+```
+
+| Field | Description |
+|-------|-------------|
+| `VALUE` | Optional. One of `MY`, `SG`, `PH`, `ID`, `US`, `UK`. Omit to query the current region instead of changing it. |
+
+Changing the region persists it to flash and updates the mesh channel/uplink pool used
+on the *next* boot; the device must be rebooted (see `REBOOT_REQUIRED:1` in the device's
+ack) for the change to actually take effect on air.
 
 ---
 

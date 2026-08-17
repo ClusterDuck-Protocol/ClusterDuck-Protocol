@@ -302,6 +302,7 @@ void handleMsg(const String& body);
 void handleMamaTalk(const String& body);
 bool sendMamaTalk(const String& targetId, const String& msg, const String& mid = "");
 void handleGps(const String& body);
+void handleRadioRegion(const String& body);
 void handleGpsRequestCommand();
 void blinkLed(int times);
 void beepBuzzer(int times, int onMs = 100, int offMs = 100);
@@ -1826,7 +1827,7 @@ void handleFrame(const String& line) {
     int    comma  = body.indexOf(',');
     String type   = (comma == -1) ? body : body.substring(0, comma);
 
-    enum FrameType { FT_UNKNOWN, FT_SOS, FT_MSG, FT_PING, FT_MTALK, FT_GPS, FT_BYE, FT_SCAN };
+    enum FrameType { FT_UNKNOWN, FT_SOS, FT_MSG, FT_PING, FT_MTALK, FT_GPS, FT_BYE, FT_SCAN, FT_RADIOREGION };
     FrameType ft = FT_UNKNOWN;
     if      (type == "SOS")   ft = FT_SOS;
     else if (type == "MSG")   ft = FT_MSG;
@@ -1835,6 +1836,7 @@ void handleFrame(const String& line) {
     else if (type == "GPS")   ft = FT_GPS;
     else if (type == "BYE")   ft = FT_BYE;
     else if (type == "SCAN")  ft = FT_SCAN;
+    else if (type == "RADIOREGION") ft = FT_RADIOREGION;
 
     switch (ft) {
         case FT_SOS:   handleSOS(body);   break;
@@ -1842,6 +1844,7 @@ void handleFrame(const String& line) {
         case FT_PING:  /* ID already broadcast */ break;
         case FT_MTALK: handleMamaTalk(body); break;
         case FT_GPS:   handleGps(body);   break;
+        case FT_RADIOREGION: handleRadioRegion(body); break;
         case FT_SCAN: {
             char gpsPayload[80] = {};
             if (tinyGps.location.isValid() && tinyGps.location.age() < 30000) {
@@ -1992,6 +1995,33 @@ void handleGps(const String& body) {
     phoneGpsDisplayPending = true;
     strncpy(gpsTxPayload, gpsBuf, sizeof(gpsTxPayload) - 1);
     gpsTxPending = true;
+}
+
+// Handles CDK:RADIOREGION frames from the app (mobile-app settings screen):
+// with a VALUE field, sets/persists the LoRa region preset via
+// RadioRegionConfig; without one, reports the currently active region. A
+// region change only takes effect after the device is rebooted -- the
+// radio was already initialized with the previous band at boot -- so a
+// successful write's ACK always includes REBOOT_REQUIRED:1.
+void handleRadioRegion(const String& body) {
+    String value = extractField(body, "VALUE");
+    if (value.length() == 0) {
+        broadcast(String("CDK:RADIOREGION,VALUE:") +
+                  radioregionconfig::regionName(radioregionconfig::getCurrentRegion()));
+        return;
+    }
+    radioregionconfig::RadioRegion region;
+    if (!radioregionconfig::regionFromName(value.c_str(), &region)) {
+        broadcast("CDK:RADIOREGION,ERROR:unknown_region");
+        return;
+    }
+    int rc = radioregionconfig::setRegion(region);
+    if (rc == DUCK_ERR_NONE) {
+        broadcast(String("CDK:RADIOREGION,VALUE:") + radioregionconfig::regionName(region) +
+                  ",STATUS:ok,REBOOT_REQUIRED:1");
+    } else {
+        broadcast("CDK:RADIOREGION,ERROR:write_failed");
+    }
 }
 
 // extractField() now lives in examples/Basic-Ducks/common/CdkFrame.h

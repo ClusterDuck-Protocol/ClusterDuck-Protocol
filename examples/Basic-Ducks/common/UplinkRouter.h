@@ -43,6 +43,7 @@ extern MamaDuck<DuckWifiNone, DuckLoRa> duck;
 // key, not OpenDMS's static key.
 inline int sendUplink(uint8_t topic, const std::string data,
                        const std::array<uint8_t, 8> targetDevice = PAPADUCK_DUID) {
+
     if (duck.isUplinkEncryptionEnabled()) {
         return duck.sendSealedData(topic, data, targetDevice);
     }
@@ -83,6 +84,7 @@ inline int sendUplinkSos(uint8_t topic, const std::string data,
 // their phone, but the delivery-receipt tick never updates. A directed
 // identity_announce() to that specific peer, sent right before we first
 // encrypt anything for it, closes that gap.
+// also applicable to sendUplink()
 inline std::set<std::array<uint8_t, 8>> announcedIdentityTo;
 
 // Timestamp of the last periodic (broadcast) identity re-announce -- read
@@ -101,6 +103,7 @@ inline unsigned long lastIdentityAnnounceMs = 0;
 // if sendEncryptedData() fails because this peer's identity key isn't known
 // yet. The periodic announceIdentity() re-broadcast in loop() closes that
 // gap over time.
+
 inline int sendMamaLink(const std::string& data, const std::array<uint8_t, 8>& targetDuid) {
     if (announcedIdentityTo.insert(targetDuid).second) {
         duck.announceIdentity(targetDuid);

@@ -24,7 +24,7 @@ CDPCFG_LORA_CLASS lora = new Module(CDPCFG_PIN_LORA_CS, CDPCFG_PIN_LORA_DIO0,
 volatile uint16_t DuckLoRa::interruptFlags = 0;
 volatile bool DuckLoRa::receivedFlag = false;
 
-const LoRaConfigParams DuckLoRa::defaultRadioParams = {
+LoRaConfigParams DuckLoRa::defaultRadioParams = {
     /* band     = */ CDPCFG_RF_LORA_FREQ,
     /* txPower  = */ CDPCFG_RF_LORA_TXPOW,
     /* bw       = */ CDPCFG_RF_LORA_BW,
@@ -32,6 +32,8 @@ const LoRaConfigParams DuckLoRa::defaultRadioParams = {
     /* gain     = */ CDPCFG_RF_LORA_GAIN,
     /* func     = */ onInterrupt
 };
+
+float DuckLoRa::uplinkChannelPool[8] = CDPCFG_UPLINK_CHANNEL_POOL;
 
 int DuckLoRa::checkLoRaParameters(LoRaConfigParams config) { //this can be improved
     int rc = DUCK_ERR_NONE;
@@ -296,9 +298,8 @@ float DuckLoRa::getSNR()
 }
 
 float DuckLoRa::getRandomUplinkChannel() {
-    static const float pool[] = CDPCFG_UPLINK_CHANNEL_POOL;
-    std::uniform_int_distribution<> distrib(0, ARRAY_LENGTH(pool) - 1);
-    return pool[distrib(gen)];
+    std::uniform_int_distribution<> distrib(0, ARRAY_LENGTH(uplinkChannelPool) - 1);
+    return uplinkChannelPool[distrib(gen)];
 }
 
 int DuckLoRa::setUplinkFrequency(float freqMHz) {
