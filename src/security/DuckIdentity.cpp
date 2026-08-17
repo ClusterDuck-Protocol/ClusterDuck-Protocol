@@ -59,8 +59,12 @@ constexpr int IDENTITY_EEPROM_SIZE = 256;
 // requesting only IDENTITY_EEPROM_SIZE (256) here was silently wiping
 // OpenDmsConfig's (offset 400) and MeshGroupConfig's (offset 464) stored
 // keys on every single reboot. EEPROM_TOTAL_SIZE must stay >= the highest
-// (offset + size) used by ANY of these four files; bump it in all four if
-// the layout ever grows.
+// (offset + size) used by ANY module sharing this NVS blob; bump it
+// everywhere if the layout ever grows.
+// Fixed layout: DuckWifi [0, 96), DuckIdentity [128, 384), OpenDmsConfig
+// [400, 464), MeshGroupConfig [464, 528).
+// This must match the same constant in OpenDmsConfig.cpp,
+// MeshGroupConfig.cpp and DuckWifi.cpp.
 constexpr int EEPROM_TOTAL_SIZE = 528;
 #endif
 constexpr uint8_t IDENTITY_MAGIC = 0xDC; // "Duck Crypto"

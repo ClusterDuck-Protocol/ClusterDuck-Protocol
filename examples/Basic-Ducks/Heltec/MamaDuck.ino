@@ -24,6 +24,7 @@
  #include "../common/BeaconCrypto.h"
  #include "../common/UplinkRouter.h"
  #include "../common/CdkFrame.h"
+ #include "security/SecurityEventCounters.h"
  #ifdef SERIAL_PORT_USBVIRTUAL
  #define Serial SERIAL_PORT_USBVIRTUAL
  #endif
@@ -190,8 +191,8 @@ constexpr unsigned long DUCK_GPS_TTL_MS = 300000UL;  // 5 minutes
 // that embeds the sender's GPS inline.  The receiver replies with BEACON_ACK (28)
 // which also embeds its GPS.  Both sides get GPS-rich CDK:SEEN from the very first
 // received packet — no GPSREQ chain, no case-234 blocking delay, 2 TX not 4.
-static const uint8_t TOPIC_BEACON     = 27;
-static const uint8_t TOPIC_BEACON_ACK = 28;
+static const uint8_t TOPIC_BEACON     = 0x20;  // 32 -- was 27 (collided with topics::encrypted_cmd=0x1B)
+static const uint8_t TOPIC_BEACON_ACK = 0x21;  // 33 -- was 28 (collided with topics::sealed_uplink=0x1C)
 static volatile bool beaconAckPending = false;   // deferred BEACON_ACK TX
 static char          beaconAckPayload[80] = {};   // GPS payload for beacon ACK
 
@@ -808,10 +809,20 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     if (!usbPhoneSeen && millis() - lastUsbAnnounceMs >= 3000UL) {
       Serial.println(String("CDK:ID,VALUE:") + DUCK_ID_BUF);
       // Only send battery over BLE when NOT already BLE-connected — the
-      // deferred announce + periodic 60 s timer handle the BLE cadence.
+      // deferred announce + periodic 10 s timer handle the BLE cadence.
       // Firing every 3 s from the USB discovery loop floods Android.
-      if (!bleConnected) sendBattery();
-      lastBattMs        = millis();
+      // IMPORTANT: only touch lastBattMs when we actually sent a battery
+      // update here. This block runs every 3 s whenever no USB host has
+      // replied yet (usbPhoneSeen stays false for BLE-only phones), so
+      // unconditionally resetting lastBattMs was starving the "every 10 s
+      // while BLE connected" periodic resend below -- it never got 10 s of
+      // uninterrupted elapsed time to fire, so the very first (and
+      // possibly CCCD-not-yet-subscribed, thus silently dropped) post-connect
+      // battery notify was the ONLY one the phone would ever receive.
+      if (!bleConnected) {
+        sendBattery();
+        lastBattMs = millis();
+      }
       lastUsbAnnounceMs = millis();
     }
   }
@@ -886,6 +897,23 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
   if (millis() - lastIdentityAnnounceMs >= 300000UL) {
     duck.announceIdentity();
     lastIdentityAnnounceMs = millis();
+  }
+
+  // Periodic fail-closed rejection-count report, every 5 min, only when
+  // there's something to report (see SecurityEventCounters.h) -- lets an
+  // operator tell "keys are fine, we're blocking forged traffic" apart
+  // from "our own config/key is broken and legitimate traffic is being
+  // silently dropped", without ever trusting the rejected data itself.
+  // Uses the existing plaintext topics::status uplink (already relayed
+  // and stored as-is by MeshBeacon Ops), so no new wire format or
+  // server-side changes are needed.
+  static unsigned long lastSecEventsReportMs = 0;
+  if (millis() - lastSecEventsReportMs >= 300000UL) {
+    lastSecEventsReportMs = millis();
+    if (securityevents::hasEvents()) {
+      sendUplink(topics::status, securityevents::summary());
+      securityevents::reset();
+    }
   }
   delay(5);
 
@@ -1175,10 +1203,10 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
         // successful decryption (unlike encrypted_data, which restores the real
         // app topic), so it must be handled here explicitly or the decrypted
         // command (e.g. the SOS ack below) is silently dropped.
-        case reservedTopic::encrypted_cmd:
+        case topics::encrypted_cmd:
         case 22:  // Text message / operator command
             // Plaintext dcmd (topic 22) is NOT authenticated -- unlike
-            // reservedTopic::encrypted_cmd (topic 8), which only ever
+            // topics::encrypted_cmd (topic 0x1B), which only ever
             // reaches here after MamaDuck.h has already decrypted it
             // successfully. Once this device has a real OpenDMS key pinned
             // (opendmsconfig::isConfigured()), the deployment has opted
@@ -1273,6 +1301,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
             bool broadcastAuthenticated = verifyBroadcastMac(24, packet.data, verifiedBroadcast);
             if (meshgroupconfig::isConfigured() && !broadcastAuthenticated) {
                 Serial.println("[BCAST] BROADCAST (topic 24) received but mesh group key is configured (authentication required) and MAC verification failed, dropping.");
+                securityevents::recordBroadcastRejected();
                 break;
             }
             String broadcastText;
@@ -1438,6 +1467,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
         case TOPIC_BEACON: {  // 27 — combined discovery + GPS beacon
             if (meshgroupconfig::isConfigured() && !beaconAuthenticated) {
                 Serial.println("[BEACON] Mesh group key configured but BEACON not authenticated, dropping (no ACK).");
+                securityevents::recordBeaconRejected();
                 break;
             }
             // GPS coordinates were already extracted into duckGpsCache in
@@ -1489,6 +1519,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
         case TOPIC_BEACON_ACK: {  // 28 — reply to our beacon
             if (meshgroupconfig::isConfigured() && !beaconAuthenticated) {
                 Serial.println("[BEACON] Mesh group key configured but BEACON_ACK not authenticated, dropping.");
+                securityevents::recordBeaconRejected();
                 break;
             }
             // GPS already extracted in section 1 → duckGpsCache updated.
@@ -1657,19 +1688,42 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     display.display();
  }
 
-/** Read battery voltage with VBAT_CTRL HIGH (library uses LOW which reads 0 on this board). */
+/**
+ * Read battery voltage, auto-detecting the VBAT_CTRL sense-divider enable
+ * polarity. The stock heltec_unofficial library drives VBAT_CTRL LOW to
+ * enable the divider (see heltec_vbat()), but some board revisions/batches
+ * wire the enable transistor inverted and need HIGH instead. Driving the
+ * wrong polarity leaves the divider disabled, so the ADC reads a floating
+ * near-0V node and heltec_battery_percent() gets stuck reporting 0% --
+ * which looks like "battery level never gets broadcast" to the phone app,
+ * since every CDK:BATT frame still goes out, just with LEVEL:0. Try the
+ * library's documented LOW polarity first and only fall back to HIGH if
+ * that reads implausibly low for a connected LiPo.
+ */
 static float readVbat() {
   pinMode(VBAT_CTRL, OUTPUT);
-  digitalWrite(VBAT_CTRL, HIGH);
+  digitalWrite(VBAT_CTRL, LOW);
   delay(5);
-  float vbat = analogRead(VBAT_ADC) / 238.7;
+  int rawLow = analogRead(VBAT_ADC);
+  float vbat = rawLow / 238.7;
+  bool usedHigh = false;
+  int rawHigh = -1;
+  if (vbat < 1.0f) {
+    digitalWrite(VBAT_CTRL, HIGH);
+    delay(5);
+    rawHigh = analogRead(VBAT_ADC);
+    vbat = rawHigh / 238.7;
+    usedHigh = true;
+  }
   pinMode(VBAT_CTRL, INPUT);
+  Serial.printf("[BATT DEBUG] rawLow=%d vbat=%.3f usedHigh=%d rawHigh=%d\n",
+                rawLow, vbat, usedHigh, rawHigh);
   return vbat;
-  return heltec_vbat();
 }
 
 void sendBattery() {
   int pct = heltec_battery_percent(readVbat());
+  Serial.printf("[BATT DEBUG] sendBattery() pct=%d bleConnected=%d\n", pct, bleConnected);
   broadcast("CDK:BATT,LEVEL:" + String(pct));
 }
 
@@ -1832,7 +1886,10 @@ void broadcast(const String& frame) {
   // BLE — only if a phone is connected
   if (bleConnected && pTxChar) {
     pTxChar->setValue(payload.c_str());
-    pTxChar->notify();
+    bool notifyOk = pTxChar->notify();
+    if (payload.startsWith("CDK:BATT")) {
+      Serial.printf("[BATT DEBUG] notify() returned %d for: %s", notifyOk, payload.c_str());
+    }
   }
 }
 

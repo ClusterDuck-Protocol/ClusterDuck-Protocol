@@ -18,7 +18,10 @@ two are fully configured. **Fail-closed** means once a layer's key is
 provisioned on a device, that device rejects unauthenticated traffic on the
 topics it covers instead of accepting it as plaintext — see
 [Fail-closed behavior](#fail-closed-behavior-once-a-layer-is-configured)
-below.
+below. [Step 7](#step-7--optional-cryptographically-signed-identity_announce-manufacturing)
+also documents an optional, additive fourth layer — cryptographically
+signed `identity_announce` — for fleets doing dedicated device
+manufacturing/provisioning.
 
 ---
 
@@ -257,7 +260,7 @@ message.
   authenticated, not encrypted — the message itself always travels as
   cleartext, but a device with the group key configured requires the
   accompanying tag to verify (marker byte `0xE8`, distinct from BEACON's
-  own marker and from the CDP framework's `reservedTopic::group_broadcast`)
+  own marker and from the CDP framework's `topics::group_broadcast`)
   before the text is displayed/relayed, and rejects an untagged/forged
   packet outright — see `verifyBroadcastMac()` in `MamaDuck.ino` and
   `DuckCryptoService::authenticateGroupBroadcast()` on the Laravel side.

@@ -6,6 +6,7 @@
 #include "../utils/MemoryFree.h"
 #include "../security/DuckCrypto.h"
 #include "../security/OpenDmsConfig.h"
+#include "../security/SecurityEventCounters.h"
 
 template <typename WifiCapability = DuckWifiNone, typename RadioType = DuckLoRa>
 class MamaDuck : public Duck<WifiCapability, RadioType> {
@@ -54,6 +55,22 @@ private :
      * infinite announce/reply/announce/reply loop between two Ducks.
      */
     std::set<Duid> repliedIdentityTo_;
+
+    /**
+     * @brief Consecutive encrypted_cmd decrypt failures since the last
+     * success (or the last re-announce). See its use in ifNotBroadcast()'s
+     * topics::encrypted_cmd case: repeated failures while OpenDMS is
+     * configured are more likely key/identity drift (e.g. a stale TOFU
+     * entry on OpenDMS's side) than an ongoing attack, so once this
+     * crosses ENCRYPTED_CMD_FAILURE_REANNOUNCE_THRESHOLD, this Duck
+     * re-broadcasts its own identity so OpenDMS can re-learn/re-confirm
+     * the correct key rather than silently dropping every command
+     * forever. Does not loosen any verification -- the failing packet is
+     * still dropped either way.
+     */
+    uint8_t consecutiveEncryptedCmdFailures_ = 0;
+    static constexpr uint8_t ENCRYPTED_CMD_FAILURE_REANNOUNCE_THRESHOLD = 3;
+
     /**
      * @brief Handles any packets received by the duck. Overrides the pure virtual function in Duck base class.
      * Could be a RREQ, RREP, PING, PONG or DATA packet on its associated topic.
@@ -126,19 +143,15 @@ private :
                     loginfo_ln("handleReceivedPacket: packet RELAY DONE");
                 }
                 break;
-            case reservedTopic::identity_announce:
+            case topics::identity_announce:
                 loginfo_ln("Identity announce received (broadcast)");
-                if (rxPacket.data.size() == duckcrypto::PUBLIC_KEY_LENGTH) {
-                    this->learnPeerIdentity(rxPacket.sduid, rxPacket.data.data());
-                } else {
-                    logerr_ln("identity_announce malformed (%d bytes), dropping.", (int)rxPacket.data.size());
-                }
+                this->learnPeerIdentity(rxPacket.sduid, rxPacket.data);
                 err = this->broadcastPacket(rxPacket);
                 if (err != DUCK_ERR_NONE) {
                     logerr_ln("====> ERROR handleReceivedPacket failed to relay identity_announce. rc = %d",err);
                 }
                 break;
-            case reservedTopic::group_broadcast: {
+            case topics::group_broadcast: {
                 // Relay the ciphertext as-received first -- downstream Ducks
                 // need the original bytes to decrypt it themselves, even if
                 // this Duck can't (e.g. no group key configured, or a
@@ -247,7 +260,7 @@ private :
                     loginfo_ln("handleReceivedPacket: packet RELAY DONE");
                 }
                 break;
-            case reservedTopic::encrypted_cmd: {
+            case topics::encrypted_cmd: {
                 if (relay) {
                     // Not addressed to us -- blind relay only. We can't
                     // decrypt traffic meant for a different Duck's identity,
@@ -290,8 +303,16 @@ private :
                                                       plaintext.data());
                 if (rc != DUCK_ERR_NONE) {
                     logerr_ln("encrypted_cmd decrypt failed rc = %d, dropping (auth failed or corrupt).", rc);
+                    securityevents::recordEncryptedCmdRejected();
+                    if (++consecutiveEncryptedCmdFailures_ >= ENCRYPTED_CMD_FAILURE_REANNOUNCE_THRESHOLD) {
+                        logerr_ln("encrypted_cmd: %u consecutive decrypt failures, re-announcing identity in case of key drift.",
+                                  (unsigned)consecutiveEncryptedCmdFailures_);
+                        this->announceIdentity();
+                        consecutiveEncryptedCmdFailures_ = 0;
+                    }
                     break;
                 }
+                consecutiveEncryptedCmdFailures_ = 0;
                 loginfo_ln("encrypted_cmd decrypted OK (%d bytes), delivering to sketch.", (int)plaintext.size());
                 rxPacket.data = plaintext;
                 rxPacket.wasAuthenticated = true;
@@ -300,15 +321,11 @@ private :
                 }
                 break;
             }
-            case reservedTopic::identity_announce:
+            case topics::identity_announce:
                 // Directed identity_announce (rare -- usually broadcast, see
                 // ifBroadcast above). Learn it regardless of whether it was
                 // addressed to us; relay onward if we're not the target.
-                if (rxPacket.data.size() == duckcrypto::PUBLIC_KEY_LENGTH) {
-                    this->learnPeerIdentity(rxPacket.sduid, rxPacket.data.data());
-                } else {
-                    logerr_ln("identity_announce malformed (%d bytes), dropping.", (int)rxPacket.data.size());
-                }
+                this->learnPeerIdentity(rxPacket.sduid, rxPacket.data);
                 if (relay) {
                     err = this->forwardPacket(rxPacket);
                     if (err != DUCK_ERR_NONE) {
@@ -326,7 +343,7 @@ private :
                     this->announceIdentity(rxPacket.sduid);
                 }
                 break;
-            case reservedTopic::encrypted_data: {
+            case topics::encrypted_data: {
                 if (relay) {
                     // Not addressed to us -- blind relay only, same reasoning
                     // as encrypted_cmd: session key derivation uses OUR own

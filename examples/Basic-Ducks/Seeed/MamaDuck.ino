@@ -808,7 +808,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
         // successful decryption (unlike encrypted_data, which restores the real
         // app topic), so it must be handled here explicitly or the decrypted
         // command (e.g. the SOS ack below) is silently dropped.
-        case reservedTopic::encrypted_cmd:
+        case topics::encrypted_cmd:
         case 22:  // Text message or operator command
             if (duckpayload::isProtobuf(packet.data.data(), packet.data.size())) {
               duckcdp_OpText opText = duckcdp_OpText_init_zero;
@@ -1112,15 +1112,30 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     display.display();
  }
 
-/** Read battery voltage with VBAT_CTRL HIGH (library uses LOW which reads 0 on this board). */
+/**
+ * Read battery voltage, auto-detecting the VBAT_CTRL sense-divider enable
+ * polarity. The stock heltec_unofficial library drives VBAT_CTRL LOW to
+ * enable the divider (see heltec_vbat()), but some board revisions/batches
+ * wire the enable transistor inverted and need HIGH instead. Driving the
+ * wrong polarity leaves the divider disabled, so the ADC reads a floating
+ * near-0V node and heltec_battery_percent() gets stuck reporting 0% --
+ * which looks like "battery level never gets broadcast" to the phone app,
+ * since every CDK:BATT frame still goes out, just with LEVEL:0. Try the
+ * library's documented LOW polarity first and only fall back to HIGH if
+ * that reads implausibly low for a connected LiPo.
+ */
 static float readVbat() {
   pinMode(VBAT_CTRL, OUTPUT);
-  digitalWrite(VBAT_CTRL, HIGH);
+  digitalWrite(VBAT_CTRL, LOW);
   delay(5);
   float vbat = analogRead(VBAT_ADC) / 238.7;
+  if (vbat < 1.0f) {
+    digitalWrite(VBAT_CTRL, HIGH);
+    delay(5);
+    vbat = analogRead(VBAT_ADC) / 238.7;
+  }
   pinMode(VBAT_CTRL, INPUT);
   return vbat;
-  return heltec_vbat();
 }
 
 void sendBattery() {

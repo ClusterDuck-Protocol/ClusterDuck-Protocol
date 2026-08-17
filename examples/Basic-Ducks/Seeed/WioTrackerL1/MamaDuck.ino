@@ -35,6 +35,7 @@
 #include "../../common/BeaconCrypto.h"
 #include "../../common/UplinkRouter.h"
 #include "../../common/CdkFrame.h"
+#include "security/SecurityEventCounters.h"
 
 // ADC_RESOLUTION is not defined in this board's variant.h; 14-bit gives
 // full-scale 16383 and must match the analogReadResolution(14) call in setup().
@@ -264,8 +265,8 @@ static std::map<String, DuckGps> duckGpsCache;
 constexpr unsigned long DUCK_GPS_TTL_MS = 300000UL;   // 5 minutes
 
 // ── Custom discovery topics (BEACON / BEACON_ACK) ────────────────────────────
-static const uint8_t  TOPIC_BEACON      = 27;
-static const uint8_t  TOPIC_BEACON_ACK  = 28;
+static const uint8_t  TOPIC_BEACON      = 0x20;  // 32 -- was 27 (collided with topics::encrypted_cmd=0x1B)
+static const uint8_t  TOPIC_BEACON_ACK  = 0x21;  // 33 -- was 28 (collided with topics::sealed_uplink=0x1C)
 static volatile bool  beaconAckPending  = false;
 static char           beaconAckPayload[80] = {};
 static unsigned long  beaconAckDeferMs  = 0;
@@ -1035,6 +1036,25 @@ void loop() {
         }
     }
 
+    // Periodic fail-closed rejection-count report, every 5 min, only when
+    // there's something to report (see SecurityEventCounters.h) -- lets an
+    // operator tell "keys are fine, we're blocking forged traffic" apart
+    // from "our own config/key is broken and legitimate traffic is being
+    // silently dropped", without ever trusting the rejected data itself.
+    // Uses the existing plaintext topics::status uplink (already relayed
+    // and stored as-is by MeshBeacon Ops), so no new wire format or
+    // server-side changes are needed.
+    {
+        static unsigned long lastSecEventsReportMs = 0;
+        if (millis() - lastSecEventsReportMs >= 300000UL) {
+            lastSecEventsReportMs = millis();
+            if (securityevents::hasEvents()) {
+                sendUplink(topics::status, securityevents::summary());
+                securityevents::reset();
+            }
+        }
+    }
+
     while (Serial.available()) {
         lastUsbRxMs = millis();
         char c = Serial.read();
@@ -1192,7 +1212,7 @@ void loop() {
 }
 
 // Services a "CMD:GPS_REQUEST" received inside an authenticated
-// encrypted_cmd payload (see reservedTopic::encrypted_cmd in
+// encrypted_cmd payload (see topics::encrypted_cmd in
 // handleDuckData() below). Deliberately NOT reachable from any plaintext
 // topic -- this is the exact action a rogue "operator" would want to
 // trigger to exfiltrate a duck's live location, so it must only run after
@@ -1356,7 +1376,7 @@ void handleDuckData(CdpPacket packet) {
         // a plaintext dcmd, but only OpenDMS's static private key can
         // produce a packet that decrypts successfully here (see
         // docs/crypto-design.tex).
-        case reservedTopic::encrypted_cmd:
+        case topics::encrypted_cmd:
             if (message.indexOf("SOS DITERIMA") >= 0) {
                 static unsigned long lastSosAckMs = 0;
                 if (millis() - lastSosAckMs < 5000UL) break;
@@ -1458,6 +1478,7 @@ void handleDuckData(CdpPacket packet) {
             bool broadcastAuthenticated = verifyBroadcastMac(24, packet.data, verifiedBroadcast);
             if (meshgroupconfig::isConfigured() && !broadcastAuthenticated) {
                 logerr_ln("BROADCAST (topic 24) received but mesh group key is configured (authentication required) and MAC verification failed, dropping.");
+                securityevents::recordBroadcastRejected();
                 break;
             }
             String broadcastText = broadcastAuthenticated ? String(verifiedBroadcast.c_str()) : message;
@@ -1486,7 +1507,7 @@ void handleDuckData(CdpPacket packet) {
         // topic that anyone in LoRa range could send to force this duck to
         // broadcast its live location. It's now only reachable via a
         // "CMD:GPS_REQUEST" payload inside an authenticated encrypted_cmd
-        // (see the reservedTopic::encrypted_cmd case above and
+        // (see the topics::encrypted_cmd case above and
         // handleGpsRequestCommand() below). A bare topic-234 packet simply
         // falls through to the default: case (ignored) below.
 
@@ -1569,6 +1590,7 @@ void handleDuckData(CdpPacket packet) {
         case TOPIC_BEACON: {
             if (meshgroupconfig::isConfigured() && !beaconAuthenticated) {
                 logerr_ln("TOPIC_BEACON received but mesh group key is configured (encryption required), dropping.");
+                securityevents::recordBeaconRejected();
                 break;
             }
             if (memcmp(packet.sduid.data(), duck.getDuckId().data(), 8) == 0) break;
@@ -1594,6 +1616,7 @@ void handleDuckData(CdpPacket packet) {
         case TOPIC_BEACON_ACK:
             if (meshgroupconfig::isConfigured() && !beaconAuthenticated) {
                 logerr_ln("TOPIC_BEACON_ACK received but mesh group key is configured (encryption required), dropping.");
+                securityevents::recordBeaconRejected();
                 break;
             }
             if (memcmp(packet.sduid.data(), duck.getDuckId().data(), 8) == 0) break;

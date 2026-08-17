@@ -1,5 +1,4 @@
 #include "OpenDmsConfig.h"
-#include <new>
 #include <Arduino.h>
 #include "../utils/DuckLogger.h"
 #include "../utils/DuckError.h"
@@ -24,7 +23,12 @@ namespace opendmsconfig {
 
 namespace {
 
-// Storage layout: magic byte + 32B public key.
+// Storage layout: magic byte + 32B public key + 1B checksum. The
+// checksum (see computeChecksum() below) is not a security boundary --
+// it exists only to detect flash/file corruption of an already-trusted
+// value, so a corrupted-but-nonzero key can't silently look "configured"
+// while blackholing every encrypted_cmd (see isConfigured()'s doc
+// comment in OpenDmsConfig.h).
 // ESP32 (and any other/unknown platform): EEPROM.h, at OPENDMS_EEPROM_OFFSET.
 // DuckWifi uses EEPROM.begin(512) for bytes 0-95 (SSID/password), and
 // DuckIdentity uses offset 128, size 256 (occupying bytes [128, 384)) --
@@ -40,10 +44,10 @@ constexpr int OPENDMS_EEPROM_SIZE = 64;
 // OPENDMS_EEPROM_OFFSET) to EEPROM.begin() below -- see the matching, more
 // detailed comment in DuckIdentity.cpp's EEPROM_TOTAL_SIZE. In short:
 // ESP32's EEPROM.h shares one NVS blob across DuckIdentity, OpenDmsConfig,
-// MeshGroupConfig and DuckWifi, and calling begin() with a smaller size
-// than what's currently stored permanently truncates (erases) every other
-// module's data at higher offsets. Must stay in sync (same value) across
-// all four files.
+// MeshGroupConfig and DuckWifi, and calling begin()
+// with a smaller size than what's currently stored permanently truncates
+// (erases) every other module's data at higher offsets. Must stay in
+// sync (same value) across all such files.
 constexpr int EEPROM_TOTAL_SIZE = 528;
 #endif
 constexpr uint8_t KEY_MAGIC = 0xDA; // "Duck Agency key"
@@ -55,6 +59,24 @@ constexpr size_t KEY_HEX_LENGTH = duckcrypto::PUBLIC_KEY_LENGTH * 2;
 constexpr size_t MAX_SERIAL_LINE_LENGTH = 128;
 
 std::string serialLineBuffer;
+
+// CRC-8-CCITT (poly 0x07) over the stored public key, used only to detect
+// flash/file corruption -- NOT a security/authentication primitive (this
+// key is not secret, see OpenDmsConfig.h). A mismatch means the stored
+// bytes were altered by something other than saveToStorage() (bit rot,
+// a failed/partial write, etc.), not a forgery -- an attacker able to
+// overwrite this device's own flash could just as easily overwrite the
+// checksum to match.
+uint8_t computeChecksum(const uint8_t* key) {
+  uint8_t crc = 0;
+  for (size_t i = 0; i < duckcrypto::PUBLIC_KEY_LENGTH; i++) {
+    crc ^= key[i];
+    for (int b = 0; b < 8; b++) {
+      crc = (crc & 0x80) ? (uint8_t)((crc << 1) ^ 0x07) : (uint8_t)(crc << 1);
+    }
+  }
+  return crc;
+}
 
 bool loadFromStorage(uint8_t* outKey) {
 #if defined(ARDUINO_ARCH_NRF52)
@@ -70,7 +92,15 @@ bool loadFromStorage(uint8_t* outKey) {
     return false;
   }
   file.read(outKey, duckcrypto::PUBLIC_KEY_LENGTH);
+  uint8_t storedChecksum = 0;
+  file.read(&storedChecksum, sizeof(storedChecksum));
   file.close();
+  if (storedChecksum != computeChecksum(outKey)) {
+    logerr_ln("OpenDmsConfig: stored key failed integrity check (checksum mismatch), "
+              "treating as not configured -- storage may be corrupted; re-provision "
+              "with AT+OPENDMSKEY+RESET then AT+OPENDMSKEY=...");
+    return false;
+  }
   return true;
 #else
   EEPROM.begin(EEPROM_TOTAL_SIZE);
@@ -79,6 +109,13 @@ bool loadFromStorage(uint8_t* outKey) {
   }
   for (size_t i = 0; i < duckcrypto::PUBLIC_KEY_LENGTH; i++) {
     outKey[i] = EEPROM.read(OPENDMS_EEPROM_OFFSET + 1 + i);
+  }
+  uint8_t storedChecksum = EEPROM.read(OPENDMS_EEPROM_OFFSET + 1 + duckcrypto::PUBLIC_KEY_LENGTH);
+  if (storedChecksum != computeChecksum(outKey)) {
+    logerr_ln("OpenDmsConfig: stored key failed integrity check (checksum mismatch), "
+              "treating as not configured -- storage may be corrupted; re-provision "
+              "with AT+OPENDMSKEY+RESET then AT+OPENDMSKEY=...");
+    return false;
   }
   return true;
 #endif
@@ -95,6 +132,8 @@ int saveToStorage(const uint8_t* key) {
   uint8_t magic = KEY_MAGIC;
   file.write(&magic, sizeof(magic));
   file.write(key, duckcrypto::PUBLIC_KEY_LENGTH);
+  uint8_t checksum = computeChecksum(key);
+  file.write(&checksum, sizeof(checksum));
   file.close();
   return DUCK_ERR_NONE;
 #else
@@ -103,6 +142,7 @@ int saveToStorage(const uint8_t* key) {
   for (size_t i = 0; i < duckcrypto::PUBLIC_KEY_LENGTH; i++) {
     EEPROM.write(OPENDMS_EEPROM_OFFSET + 1 + i, key[i]);
   }
+  EEPROM.write(OPENDMS_EEPROM_OFFSET + 1 + duckcrypto::PUBLIC_KEY_LENGTH, computeChecksum(key));
   if (!EEPROM.commit()) {
     logerr_ln("OpenDmsConfig: failed to commit key to storage");
     return DUCK_ERR_IDENTITY_STORAGE_WRITE;

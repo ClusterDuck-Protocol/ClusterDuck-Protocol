@@ -1,5 +1,4 @@
 #include "MeshGroupConfig.h"
-#include <new>
 #include <Arduino.h>
 #include "../utils/DuckLogger.h"
 #include "../utils/DuckError.h"
@@ -24,7 +23,11 @@ namespace meshgroupconfig {
 
 namespace {
 
-// Storage layout: magic byte + 32B key.
+// Storage layout: magic byte + 32B key + 1B checksum. The checksum (see
+// computeChecksum() below) is not a security boundary -- it exists only
+// to detect flash/file corruption of an already-trusted value, so a
+// corrupted-but-nonzero key can't silently look "configured" while
+// blackholing every BEACON/Emergency Broadcast verification.
 // ESP32 (and any other/unknown platform): EEPROM.h, at MESH_EEPROM_OFFSET.
 // DuckIdentity uses offset 128, size 256 (bytes [128, 384)); OpenDmsConfig
 // uses offset 400, size 64 (bytes [400, 464)) -- this offset (464) stays
@@ -40,10 +43,10 @@ constexpr int MESH_EEPROM_SIZE = 64;
 // MESH_EEPROM_OFFSET) to EEPROM.begin() below -- see the matching, more
 // detailed comment in DuckIdentity.cpp's EEPROM_TOTAL_SIZE. In short:
 // ESP32's EEPROM.h shares one NVS blob across DuckIdentity, OpenDmsConfig,
-// MeshGroupConfig and DuckWifi, and calling begin() with a smaller size
-// than what's currently stored permanently truncates (erases) every other
-// module's data at higher offsets. Must stay in sync (same value) across
-// all four files.
+// MeshGroupConfig and DuckWifi, and calling begin()
+// with a smaller size than what's currently stored permanently truncates
+// (erases) every other module's data at higher offsets. Must stay in
+// sync (same value) across all such files.
 constexpr int EEPROM_TOTAL_SIZE = 528;
 #endif
 constexpr uint8_t KEY_MAGIC = 0xDB; // "Duck group key" (0xDA is OpenDmsConfig's)
@@ -55,6 +58,23 @@ constexpr size_t KEY_HEX_LENGTH = duckcrypto::KEY_LENGTH * 2;
 constexpr size_t MAX_SERIAL_LINE_LENGTH = 128;
 
 std::string serialLineBuffer;
+
+// CRC-8-CCITT (poly 0x07) over the stored group key, used only to detect
+// flash/file corruption -- NOT a security/authentication primitive. A
+// mismatch means the stored bytes were altered by something other than
+// saveToStorage() (bit rot, a failed/partial write, etc.), not a
+// forgery -- an attacker able to overwrite this device's own flash could
+// just as easily overwrite the checksum to match.
+uint8_t computeChecksum(const uint8_t* key) {
+  uint8_t crc = 0;
+  for (size_t i = 0; i < duckcrypto::KEY_LENGTH; i++) {
+    crc ^= key[i];
+    for (int b = 0; b < 8; b++) {
+      crc = (crc & 0x80) ? (uint8_t)((crc << 1) ^ 0x07) : (uint8_t)(crc << 1);
+    }
+  }
+  return crc;
+}
 
 bool loadFromStorage(uint8_t* outKey) {
 #if defined(ARDUINO_ARCH_NRF52)
@@ -70,7 +90,15 @@ bool loadFromStorage(uint8_t* outKey) {
     return false;
   }
   file.read(outKey, duckcrypto::KEY_LENGTH);
+  uint8_t storedChecksum = 0;
+  file.read(&storedChecksum, sizeof(storedChecksum));
   file.close();
+  if (storedChecksum != computeChecksum(outKey)) {
+    logerr_ln("MeshGroupConfig: stored key failed integrity check (checksum mismatch), "
+              "treating as not configured -- storage may be corrupted; re-provision "
+              "with AT+MESHKEY+RESET then AT+MESHKEY=...");
+    return false;
+  }
   return true;
 #else
   EEPROM.begin(EEPROM_TOTAL_SIZE);
@@ -79,6 +107,13 @@ bool loadFromStorage(uint8_t* outKey) {
   }
   for (size_t i = 0; i < duckcrypto::KEY_LENGTH; i++) {
     outKey[i] = EEPROM.read(MESH_EEPROM_OFFSET + 1 + i);
+  }
+  uint8_t storedChecksum = EEPROM.read(MESH_EEPROM_OFFSET + 1 + duckcrypto::KEY_LENGTH);
+  if (storedChecksum != computeChecksum(outKey)) {
+    logerr_ln("MeshGroupConfig: stored key failed integrity check (checksum mismatch), "
+              "treating as not configured -- storage may be corrupted; re-provision "
+              "with AT+MESHKEY+RESET then AT+MESHKEY=...");
+    return false;
   }
   return true;
 #endif
@@ -95,6 +130,8 @@ int saveToStorage(const uint8_t* key) {
   uint8_t magic = KEY_MAGIC;
   file.write(&magic, sizeof(magic));
   file.write(key, duckcrypto::KEY_LENGTH);
+  uint8_t checksum = computeChecksum(key);
+  file.write(&checksum, sizeof(checksum));
   file.close();
   return DUCK_ERR_NONE;
 #else
@@ -103,6 +140,7 @@ int saveToStorage(const uint8_t* key) {
   for (size_t i = 0; i < duckcrypto::KEY_LENGTH; i++) {
     EEPROM.write(MESH_EEPROM_OFFSET + 1 + i, key[i]);
   }
+  EEPROM.write(MESH_EEPROM_OFFSET + 1 + duckcrypto::KEY_LENGTH, computeChecksum(key));
   if (!EEPROM.commit()) {
     logerr_ln("MeshGroupConfig: failed to commit key to storage");
     return DUCK_ERR_IDENTITY_STORAGE_WRITE;

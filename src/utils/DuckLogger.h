@@ -1,6 +1,8 @@
 #ifndef DUCKLOGGER_H
 #define DUCKLOGGER_H
 
+#include <new>
+
 
 #ifdef CDP_DEBUG
 #define CDP_LOG_ERROR

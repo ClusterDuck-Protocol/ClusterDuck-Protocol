@@ -186,12 +186,12 @@ void handleIncomingMqttMessages(void) {
       }
     }
 
-    // reservedTopic::encrypted_cmd's message is base64(nonce || ciphertext
+    // topics::encrypted_cmd's message is base64(nonce || ciphertext
     // || tag) -- arbitrary binary -- for the same JSON-transport reason;
     // decode it back to raw bytes before handing it to sendData(). Other
     // topics (e.g. plaintext dcmd) carry literal text and need no decoding.
     std::string payload;
-    if (topic == reservedTopic::encrypted_cmd) {
+    if (topic == topics::encrypted_cmd) {
       std::vector<uint8_t> messageBytes = base64Decode(std::string(message.c_str()));
       payload.assign(messageBytes.begin(), messageBytes.end());
     } else {

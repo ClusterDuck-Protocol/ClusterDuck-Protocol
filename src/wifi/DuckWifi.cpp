@@ -6,10 +6,11 @@
 // EEPROM.begin() below -- see the matching, more detailed comment in
 // DuckIdentity.cpp's EEPROM_TOTAL_SIZE. In short: ESP32's EEPROM.h shares
 // one NVS blob across DuckWifi, DuckIdentity, OpenDmsConfig and
-// MeshGroupConfig, and calling begin() with a smaller size than what's
-// currently stored permanently truncates (erases) every other module's
-// data at higher offsets. Must stay in sync (same value) across all four
-// files. DuckWifi only uses bytes [0, 96) (SSID/password) itself.
+// MeshGroupConfig, and calling begin() with a
+// smaller size than what's currently stored permanently truncates
+// (erases) every other module's data at higher offsets. Must stay in
+// sync (same value) across all such files. DuckWifi only uses bytes
+// [0, 96) (SSID/password) itself.
 constexpr int EEPROM_TOTAL_SIZE = 528;
 
 int DuckWifi::reconnect(std::string ssid, std::string password) {
