@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #include "../utils/DuckLogger.h"
 #include "../utils/DuckError.h"
+#include "../DuckEsp.h"
 #include "DuckLoRa.h"
 
 #include <cstddef>
@@ -156,6 +157,13 @@ int saveToStorage(uint8_t regionId) {
     logerr_ln("RadioRegionConfig: failed to open region file for writing");
     return DUCK_ERR_IDENTITY_STORAGE_WRITE;
   }
+  // FILE_O_WRITE opens in APPEND mode (seeks to EOF, does not truncate) --
+  // without this, every re-provision after the first would append instead
+  // of overwrite, so loadFromStorage() (which always reads from offset 0)
+  // would keep returning the very first region ever set, no matter how
+  // many times setRegion() is called afterward.
+  file.truncate(0);
+  file.seek(0);
   uint8_t magic = REGION_MAGIC;
   file.write(&magic, sizeof(magic));
   file.write(&regionId, sizeof(regionId));
@@ -209,7 +217,10 @@ void handleSerialLine(const std::string& line) {
     int rc = eraseStorage();
     if (rc == DUCK_ERR_NONE) {
       applyPreset(RadioRegion::MY);
-      loginfo_ln("RadioRegionConfig: reset to default region (MY)");
+      loginfo_ln("RadioRegionConfig: reset to default region (MY), rebooting...");
+      Serial.flush();
+      delay(300);  // let the serial response flush before resetting
+      duckesp::restartDuck();
     }
     return;
   }
@@ -223,7 +234,10 @@ void handleSerialLine(const std::string& line) {
     }
     int rc = setRegion(region);
     if (rc == DUCK_ERR_NONE) {
-      loginfo_ln("RadioRegionConfig: region set to %s", regionName(region));
+      loginfo_ln("RadioRegionConfig: region set to %s, rebooting...", regionName(region));
+      Serial.flush();
+      delay(300);  // let the serial response flush before resetting
+      duckesp::restartDuck();
     }
     return;
   }

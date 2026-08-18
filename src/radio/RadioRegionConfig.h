@@ -98,12 +98,14 @@ bool regionFromName(const std::string& code, RadioRegion* outRegion);
  *
  * NOTE: this does not retune an already-initialized radio -- the SX12xx
  * chip was already configured with the previous band in
- * setupLoRaRadio()/setupWithDefaults(). A device must be rebooted after
- * changing regions for the new mesh channel/uplink pool to actually take
- * effect on air. Callers (e.g. the BLE CDK:RADIOREGION handler) should
- * tell the operator/app a reboot is required.
+ * setupLoRaRadio()/setupWithDefaults(). A new mesh channel/uplink pool
+ * only takes effect on air after a reboot, so callers (serial
+ * AT+RADIOREGION= and the BLE CDK:RADIOREGION handler) auto-reboot the
+ * device a short moment after a successful call here, giving the
+ * serial/BLE response time to flush first.
  *
- * @return DUCK_ERR_NONE on success, an error code otherwise.
+ * @return DUCK_ERR_NONE on success, an error code otherwise. On success,
+ * the caller is expected to reboot the device shortly afterward.
  */
 int setRegion(RadioRegion region);
 
@@ -119,6 +121,10 @@ int setRegion(RadioRegion region);
  *  - "AT+RADIOREGION+RESET": erases the field-provisioned region from
  *    flash and reverts to the compile-time MY default.
  *  - "AT+RADIOREGION?": logs the currently active region code.
+ * A successful "AT+RADIOREGION=..." or "AT+RADIOREGION+RESET" auto-reboots
+ * the device shortly afterward (see setRegion()) so the new mesh
+ * channel/uplink pool takes effect immediately, without requiring the
+ * operator to power-cycle the device manually.
  * Should be polled once per main loop iteration.
  */
 void checkSerialProvisioning();

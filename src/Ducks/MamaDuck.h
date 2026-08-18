@@ -337,9 +337,10 @@ private :
                     // can decrypt/authenticate what we send back, instead of
                     // waiting on its own periodic/boot broadcast to reach us
                     // independently. See repliedIdentityTo_'s doc comment.
-                    // MTALK encryption is permanent (isMamaLinkEncryptionEnabled()
-                    // always true), so this reply always fires regardless of
-                    // the operator's uplink-encryption preference.
+                    // Only fires when MTALK encryption is actually enabled
+                    // for this build/runtime (isMamaLinkEncryptionEnabled());
+                    // otherwise MTALK traffic is unencrypted and no reply
+                    // announce is needed.
                     this->announceIdentity(rxPacket.sduid);
                 }
                 break;

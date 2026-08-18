@@ -148,6 +148,12 @@ int saveToStorage() {
     logerr_ln("DuckIdentity: failed to open identity file for writing");
     return DUCK_ERR_IDENTITY_STORAGE_WRITE;
   }
+  // FILE_O_WRITE opens in APPEND mode (seeks to EOF, does not truncate) --
+  // without this, a second save would append instead of overwrite, so
+  // loadFromStorage() (which always reads from offset 0) would keep
+  // returning the very first identity ever generated.
+  file.truncate(0);
+  file.seek(0);
   uint8_t magic = IDENTITY_MAGIC;
   file.write(&magic, sizeof(magic));
   file.write(publicKey, PUBLIC_KEY_LENGTH);

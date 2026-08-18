@@ -42,7 +42,33 @@ namespace duckesp {
 }
 #elif defined(ARDUINO_ARCH_NRF52)
 
-  void restartDuck() { NVIC_SystemReset(); }
+  // sd_softdevice_disable() was confirmed (via earlier bisection) to block
+  // forever on this board instead of returning, so a software reset can never
+  // be reached that way. Use the Watchdog Timer instead: it is independent
+  // hardware that resets the chip unconditionally when it expires, with no
+  // dependency on SoftDevice/interrupt state and nothing for software to
+  // deadlock on.
+  //
+  // Diagnostic only: this board has exactly one real user LED (D11/P1.01 --
+  // PIN_LED2/LED_BLUE is actually wired to the buzzer, not a second LED; see
+  // variant.cpp's g_ADigitalPinMap comments, which are authoritative over
+  // variant.h's stale "P1.15" comment). Hold that LED solidly on for several
+  // seconds BEFORE touching the WDT at all, so reachability of this function
+  // is unambiguous no matter what happens afterward.
+  void restartDuck() {
+    pinMode(LED_GREEN, OUTPUT);
+    digitalWrite(LED_GREEN, LED_STATE_ON);  // solid ON = reached restartDuck()
+    for (volatile uint32_t d = 0; d < 200000000u; d++) {}  // long hold, several seconds
+
+    NRF_WDT->CONFIG = (WDT_CONFIG_HALT_Pause << WDT_CONFIG_HALT_Pos) |
+                       (WDT_CONFIG_SLEEP_Run << WDT_CONFIG_SLEEP_Pos);
+    NRF_WDT->CRV = 32768;  // ~1s timeout (WDT runs off the 32.768kHz clock)
+    NRF_WDT->RREN |= WDT_RREN_RR0_Msk;
+    NRF_WDT->TASKS_START = 1;
+    // LED stays solidly on (already set above) while waiting for the WDT to fire.
+    // Do not feed/reload the watchdog -- let it expire and reset the chip.
+    while (true) {}
+  }
   int freeHeapMemory() {return -1;}
   int getMinFreeHeap() {return -1;}
   int getMaxAllocHeap() {return -1;}

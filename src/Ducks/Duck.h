@@ -351,12 +351,22 @@ class Duck {
      * does. Sketches decide whether to call sendData() or
      * sendSealedData()/sendEncryptedData() by checking
      * isUplinkEncryptionEnabled() themselves. Defaults to
-     * DUCK_CRYPTO_DEFAULT_ENABLED (off unless a build flag overrides it),
-     * and can be overridden either direction at runtime regardless of the
-     * build-time default.
+     * DUCK_CRYPTO_DEFAULT_ENABLED (off unless a build flag overrides it).
+     * Encryption can only ever be turned ON if DUCK_CRYPTO_DEFAULT_ENABLED
+     * was set to 1 at build time -- a runtime request to enable it on a
+     * build without crypto support is ignored (fail closed: no build-time
+     * support means no encryption, ever). It can still be turned OFF at
+     * runtime even on a crypto-enabled build.
      */
     void setUplinkEncryptionEnabled(bool enabled) {
+#if DUCK_CRYPTO_DEFAULT_ENABLED
       encryptionEnabled_ = enabled;
+#else
+      if (enabled) {
+        logerr_ln("ERR: cannot enable encryption at runtime -- firmware was built with DUCK_CRYPTO_DEFAULT_ENABLED=0.");
+      }
+      encryptionEnabled_ = false;
+#endif
     }
 
     /**
@@ -368,20 +378,19 @@ class Duck {
     }
 
     /**
-     * @brief Whether MamaDuck-to-MamaDuck (MTALK, topic 26) traffic must be
-     * end-to-end encrypted. Unlike uplink encryption -- an
-     * operator-configurable preference toggled via
-     * setUplinkEncryptionEnabled()/isUplinkEncryptionEnabled() -- MTALK
-     * encryption is permanent and mandatory: this always returns true.
-     * Mesh chat between Ducks is always sealed to each peer's identity key
-     * (session-mode X25519 ECDH, see sendEncryptedData()/announceIdentity())
-     * regardless of whether the operator has enabled uplink encryption.
-     * Exists as its own named accessor (rather than sketches hardcoding
-     * `true` inline) so the policy is documented and expressed in one
-     * place.
+     * @brief Whether MamaDuck-to-MamaDuck (MTALK, topic 26) traffic should
+     * be end-to-end encrypted. Tracks the same build/runtime-gated
+     * preference as isUplinkEncryptionEnabled() (see
+     * setUplinkEncryptionEnabled()) rather than being unconditionally
+     * mandatory: if the firmware was not built with
+     * DUCK_CRYPTO_DEFAULT_ENABLED=1, MTALK is sent and accepted in the
+     * clear, same as every other traffic class's "only encrypt if enabled
+     * at build" policy -- there is no exception for MTALK. Exists as its
+     * own named accessor (rather than sketches hardcoding a check inline)
+     * so the policy is documented and expressed in one place.
      */
     bool isMamaLinkEncryptionEnabled() const {
-      return true;
+      return encryptionEnabled_;
     }
 
     /**
@@ -436,7 +445,9 @@ class Duck {
 
     /// See setUplinkEncryptionEnabled()/isUplinkEncryptionEnabled(). Seeded
     /// from the DUCK_CRYPTO_DEFAULT_ENABLED build flag (off by default);
-    /// freely overridable at runtime either direction.
+    /// can be turned OFF at runtime regardless, but can only be turned ON
+    /// at runtime if DUCK_CRYPTO_DEFAULT_ENABLED was 1 at build time --
+    /// see setUplinkEncryptionEnabled()'s #if gate.
     bool encryptionEnabled_ = DUCK_CRYPTO_DEFAULT_ENABLED;
 
     /// Maximum number of peer public keys cached via identity_announce.

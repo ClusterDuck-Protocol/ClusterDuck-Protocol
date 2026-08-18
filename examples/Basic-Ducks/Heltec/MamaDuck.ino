@@ -1535,8 +1535,8 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
         }
 
         case 26:  // MamaDuck-to-MamaDuck (MTALK)
-            if (!packet.wasAuthenticated) {
-                Serial.println("[MTALK] Packet was not authenticated (encrypted_data), dropping -- MTALK encryption is mandatory.");
+            if (duck.isMamaLinkEncryptionEnabled() && !packet.wasAuthenticated) {
+                Serial.println("[MTALK] Packet was not authenticated (encrypted_data), dropping -- encryption is enabled for this build.");
                 break;
             }
             if (duckpayload::isProtobuf(packet.data.data(), packet.data.size())) {

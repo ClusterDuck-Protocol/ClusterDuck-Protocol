@@ -172,23 +172,37 @@ build_flags =
 
 ### Alternative: pass flags via the shell, no `platformio.ini` edit needed
 
-PlatformIO's `PLATFORMIO_BUILD_FLAGS` environment variable appends extra
-flags to whichever environment you build, without editing the file at all
-— useful for CI or per-device secrets you don't want committed:
+Do **not** use PlatformIO's `PLATFORMIO_BUILD_FLAGS` environment variable for
+this. It does not append to an environment's `build_flags` — it *replaces*
+it entirely (see `ProjectConfigBase.getraw()` in PlatformIO's
+`platformio/project/config.py`). Since every `*_encrypted` env already sets
+`build_flags` in `platformio.ini` (including `-DDUCK_CRYPTO_DEFAULT_ENABLED=1`
+and `-DMESH_GROUP_KEY_HEX=...`), setting `PLATFORMIO_BUILD_FLAGS` on top
+silently discards all of that — the build will look like it succeeded, but
+`DUCK_CRYPTO_DEFAULT_ENABLED` won't actually be `1`, so `announceIdentity()`
+won't be gated on but uplinks silently stay unsealed (or worse, depending on
+what else `build_flags` was providing for that env).
+
+Instead, use the plain (non-`PLATFORMIO_`-prefixed) `DUCK_ID`,
+`OPENDMS_STATIC_PUBLIC_KEY_HEX`, and `MESH_GROUP_KEY_HEX` environment
+variables, which [tools/custom_defines.py](../tools/custom_defines.py) picks
+up and merges into `CPPDEFINES` via `env.Append()` — this can't clobber
+`build_flags` since it never touches that option at all:
 
 ```bash
+DUCK_ID=MYDUCK01 \
+MESH_GROUP_KEY_HEX=<64 hex chars> \
+OPENDMS_STATIC_PUBLIC_KEY_HEX=<64 hex chars> \
 EXAMPLE_DIR=Basic-Ducks/Seeed/WioTrackerL1 \
-PLATFORMIO_BUILD_FLAGS='-DDUCK_CRYPTO_DEFAULT_ENABLED=1 -DMESH_GROUP_KEY_HEX=\"<64 hex chars>\" -DOPENDMS_STATIC_PUBLIC_KEY_HEX=\"<64 hex chars>\"' \
-pio run -e local_wio_tracker_l1 -t upload
+pio run -e local_wio_tracker_l1_encrypted -t upload
 ```
 
-Build against the plain `local_wio_tracker_l1` env (not `..._encrypted`)
-since the crypto flags are supplied here instead. Keep the `\"..\"`
-escaping exactly as shown (and the single quotes around the whole
-`PLATFORMIO_BUILD_FLAGS=...` value) — that's what makes the shell pass a
-literal `-DMESH_GROUP_KEY_HEX="<hex>"` through to the compiler as a proper
-C string literal, matching the same convention used inside
-`platformio.ini` itself.
+No quoting/escaping needed — `custom_defines.py` stringifies each value for
+you via `env.StringifyMacro()`. Build against the `..._encrypted` env as
+usual (not the plain one) so `DUCK_CRYPTO_DEFAULT_ENABLED`/the demo
+`MESH_GROUP_KEY_HEX` from `platformio.ini` still apply; the env vars above
+only override `DUCK_ID`/`OPENDMS_STATIC_PUBLIC_KEY_HEX`/`MESH_GROUP_KEY_HEX`
+specifically, on top of whatever `build_flags` the chosen env already sets.
 
 ## Step 5 — Device identity keypair (no action needed)
 
