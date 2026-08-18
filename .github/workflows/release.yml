@@ -57,7 +57,7 @@ jobs:
         run: |
           mkdir -p release-assets
           build_dir=".pio/build/${{ matrix.env }}"
-          for f in firmware.factory.bin firmware.hex firmware.uf2; do
+          for f in firmware.bin firmware.factory.bin firmware.hex firmware.uf2; do
             src="$build_dir/$f"
             if [ -f "$src" ]; then
               cp "$src" "release-assets/${{ matrix.name }}-$f"
