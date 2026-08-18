@@ -1535,8 +1535,8 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
         }
 
         case 26:  // MamaDuck-to-MamaDuck (MTALK)
-            if (!packet.wasAuthenticated) {
-                Serial.println("[MTALK] Packet was not authenticated (encrypted_data), dropping -- MTALK encryption is mandatory.");
+            if (duck.isMamaLinkEncryptionEnabled() && !packet.wasAuthenticated) {
+                Serial.println("[MTALK] Packet was not authenticated (encrypted_data), dropping -- encryption is enabled for this build.");
                 break;
             }
             if (duckpayload::isProtobuf(packet.data.data(), packet.data.size())) {
@@ -1930,7 +1930,7 @@ void handleFrame(const String& line) {
   String type = (comma == -1) ? body : body.substring(0, comma);
 
   // C++ can't switch on strings; map type to enum first
-  enum FrameType { FT_UNKNOWN, FT_SOS, FT_MSG, FT_PING, FT_MTALK, FT_GPS, FT_BYE, FT_SCAN };
+  enum FrameType { FT_UNKNOWN, FT_SOS, FT_MSG, FT_PING, FT_MTALK, FT_GPS, FT_BYE, FT_SCAN, FT_RADIOREGION };
   FrameType ft = FT_UNKNOWN;
   if      (type == "SOS")   ft = FT_SOS;
   else if (type == "MSG")   ft = FT_MSG;
@@ -1939,6 +1939,7 @@ void handleFrame(const String& line) {
   else if (type == "GPS")   ft = FT_GPS;
   else if (type == "BYE")   ft = FT_BYE;
   else if (type == "SCAN")  ft = FT_SCAN;
+  else if (type == "RADIOREGION") ft = FT_RADIOREGION;
 
   switch (ft) {
     case FT_SOS:   handleSOS(body);       break;
@@ -1946,6 +1947,7 @@ void handleFrame(const String& line) {
     case FT_PING:  /* ID already broadcast above */ break;
     case FT_MTALK: handleMamaTalk(body);  break;
     case FT_GPS:   handleGps(body);       break;
+    case FT_RADIOREGION: handleRadioRegion(body); break;
     case FT_SCAN: {
       // Send a BEACON (topic 27) with our GPS embedded in the payload.
       // Nearby ducks running this firmware reply with BEACON_ACK (topic 28)
@@ -2212,6 +2214,33 @@ void handleGps(const String& body) {
   gpsTxPayload = duckpayload::encodeGps(reading);
   gpsTxPending = true;
   Serial.printf("[GPS] GPS TX deferred: lat=%s lng=%s\n", lat.c_str(), lng.c_str());
+}
+
+// Handles CDK:RADIOREGION frames from the app (mobile-app settings screen):
+// with a VALUE field, sets/persists the LoRa region preset via
+// RadioRegionConfig; without one, reports the currently active region. A
+// region change only takes effect after the device is rebooted -- the
+// radio was already initialized with the previous band at boot -- so a
+// successful write's ACK always includes REBOOT_REQUIRED:1.
+void handleRadioRegion(const String& body) {
+  String value = extractField(body, "VALUE");
+  if (value.length() == 0) {
+    broadcast(String("CDK:RADIOREGION,VALUE:") +
+              radioregionconfig::regionName(radioregionconfig::getCurrentRegion()));
+    return;
+  }
+  radioregionconfig::RadioRegion region;
+  if (!radioregionconfig::regionFromName(value.c_str(), &region)) {
+    broadcast("CDK:RADIOREGION,ERROR:unknown_region");
+    return;
+  }
+  int rc = radioregionconfig::setRegion(region);
+  if (rc == DUCK_ERR_NONE) {
+    broadcast(String("CDK:RADIOREGION,VALUE:") + radioregionconfig::regionName(region) +
+              ",STATUS:ok,REBOOT_REQUIRED:1");
+  } else {
+    broadcast("CDK:RADIOREGION,ERROR:write_failed");
+  }
 }
 
 // ── Send a CDK frame to the app ──────────────────────────────────

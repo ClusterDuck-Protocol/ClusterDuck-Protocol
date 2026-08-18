@@ -44,11 +44,11 @@ constexpr int OPENDMS_EEPROM_SIZE = 64;
 // OPENDMS_EEPROM_OFFSET) to EEPROM.begin() below -- see the matching, more
 // detailed comment in DuckIdentity.cpp's EEPROM_TOTAL_SIZE. In short:
 // ESP32's EEPROM.h shares one NVS blob across DuckIdentity, OpenDmsConfig,
-// MeshGroupConfig and DuckWifi, and calling begin()
+// MeshGroupConfig, DuckWifi and RadioRegionConfig, and calling begin()
 // with a smaller size than what's currently stored permanently truncates
 // (erases) every other module's data at higher offsets. Must stay in
 // sync (same value) across all such files.
-constexpr int EEPROM_TOTAL_SIZE = 528;
+constexpr int EEPROM_TOTAL_SIZE = 536;
 #endif
 constexpr uint8_t KEY_MAGIC = 0xDA; // "Duck Agency key"
 
@@ -129,6 +129,12 @@ int saveToStorage(const uint8_t* key) {
     logerr_ln("OpenDmsConfig: failed to open key file for writing");
     return DUCK_ERR_IDENTITY_STORAGE_WRITE;
   }
+  // FILE_O_WRITE opens in APPEND mode (seeks to EOF, does not truncate) --
+  // without this, re-provisioning after the first write would append
+  // instead of overwrite, so loadFromStorage() (which always reads from
+  // offset 0) would keep returning the very first key ever set.
+  file.truncate(0);
+  file.seek(0);
   uint8_t magic = KEY_MAGIC;
   file.write(&magic, sizeof(magic));
   file.write(key, duckcrypto::PUBLIC_KEY_LENGTH);

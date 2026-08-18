@@ -72,7 +72,16 @@ class DuckLoRa {
         DuckLoRa(DuckLoRa const&) = delete;
         DuckLoRa& operator=(DuckLoRa const&) = delete;
 
-        static const LoRaConfigParams defaultRadioParams;
+        // Not const: RadioRegionConfig::begin()/setRegion() mutate .band
+        // at runtime to apply a field-provisioned region preset (see
+        // RadioRegionConfig.h). Falls back to the CDPCFG_RF_LORA_FREQ
+        // compile-time default (Malaysia) until/unless that happens.
+        static LoRaConfigParams defaultRadioParams;
+
+        // Uplink channel spreading pool used by getRandomUplinkChannel().
+        // Defaults to CDPCFG_UPLINK_CHANNEL_POOL; overridden at runtime by
+        // RadioRegionConfig to match the active region's preset.
+        static float uplinkChannelPool[8];
 
                 /**
          * @brief Initialize the LoRa chip.
