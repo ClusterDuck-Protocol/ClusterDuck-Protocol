@@ -43,8 +43,23 @@
 #  define ADC_RESOLUTION 14
 #endif
 
+// Declare here (before any function definition in this file, including
+// currentRssiDbm() just below) so Arduino's auto-prototype generator --
+// which inserts all forward-declared function prototypes immediately
+// before the first function definition it finds -- sees this enum before
+// any prototype that returns/takes it (e.g. checkButton() further down).
+enum BtnEvent { BTN_NONE, BTN_SINGLE, BTN_DOUBLE, BTN_TRIPLE, BTN_QUAD, BTN_HOLD_2S };
+
 // Access the RadioLib radio instance from DuckLoRa.cpp to read RSSI/SNR.
 extern CDPCFG_LORA_CLASS lora;
+
+// Current RSSI (dBm) of the last LoRa packet received by this duck's radio,
+// rounded to the nearest integer. Included in GPS-request responses and SOS
+// alerts so OpenDMS/the gateway gets a rough mesh-link-quality signal
+// alongside the location report.
+static int32_t currentRssiDbm() {
+  return (int32_t)lround(lora.getRSSI());
+}
 
 // ── Board sanity check ────────────────────────────────────────────────────────
 #ifndef ARDUINO_SEEED_WIO_TRACKER_L1
@@ -85,9 +100,9 @@ U8G2_SH1106_128X64_NONAME_F_SW_I2C display(U8G2_R0, /*clock/SCL*/15, /*data/SDA*
 #define DSP_LINE_H  13   // pixel rows between lines (generous for readability)
 #define DSP_ASCENT   8   // ascent of u8g2_font_6x10_tf
 
-// Declare here so Arduino's auto-prototype generator sees it before any function
-// that returns this type (enum must precede its first use in generated .cpp).
-enum BtnEvent { BTN_NONE, BTN_SINGLE, BTN_DOUBLE, BTN_TRIPLE, BTN_QUAD, BTN_HOLD_2S };
+// enum BtnEvent is declared near the top of the file (right before
+// currentRssiDbm()) so it precedes every function definition, per
+// Arduino's auto-prototype-generator ordering requirement explained there.
 
 // Fills DUCK_ID_BUF with either the user-defined DUCK_ID literal or an
 // 8-char ID auto-derived from this board's factory-unique BLE device
@@ -671,10 +686,10 @@ void setup() {
 
     // Broadcasts this Duck's long-term public key so OpenDMS and nearby
     // MamaDucks can learn it (TOFU) and use encrypted_cmd/encrypted_data
-    // instead of plaintext (see Duck.h's announceIdentity()). MTALK
-    // encryption is permanent (Duck::isMamaLinkEncryptionEnabled() is
-    // always true), so this announce always happens regardless of the
-    // operator's uplink-encryption preference.
+    // instead of plaintext (see Duck.h's announceIdentity()). Only useful
+    // once encryption is actually enabled for this build/runtime (see
+    // Duck::isMamaLinkEncryptionEnabled()/isUplinkEncryptionEnabled()), but
+    // harmless to broadcast unconditionally either way.
     duck.announceIdentity();
     BLINK_LED(5);   // 5 blinks = CDP fully initialized
     dspStatus("CDP OK", DUCK_NAME);
@@ -1082,13 +1097,12 @@ void loop() {
     // missed the one-time announceIdentity() in setup() -- e.g. it booted
     // later, or was out of LoRa range at the time, or the broadcast packet
     // was simply lost (not uncommon over LoRa) -- eventually learns this
-    // Duck's public key too. Without this, sendMamaLink() would keep
-    // returning non-zero (fail-closed, no cleartext fallback) against that
-    // one peer indefinitely -- MTALK looks like it sent successfully
-    // (CDK:ACK) but never arrives -- until both sides have mutually
-    // exchanged identities at least once. Runs unconditionally: MTALK
-    // encryption is permanent (Duck::isMamaLinkEncryptionEnabled() always
-    // true), independent of the operator's uplink-encryption preference.
+    // Duck's public key too. Without this, on a build/runtime where MTALK
+    // encryption is enabled, sendMamaLink() would keep returning non-zero
+    // against that one peer indefinitely until both sides have mutually
+    // exchanged identities at least once. Runs unconditionally (harmless
+    // when encryption is disabled -- sendMamaLink() falls back to plain
+    // sendData() regardless of whether identities were exchanged).
     if (millis() - lastIdentityAnnounceMs >= 300000UL) {
         duck.announceIdentity();
         lastIdentityAnnounceMs = millis();
@@ -1195,6 +1209,9 @@ void loop() {
             char battSuffix[16];
             snprintf(battSuffix, sizeof(battSuffix), ",BATT:%d", batteryPercent(readVbat()));
             strncat(gpsBuf, battSuffix, sizeof(gpsBuf) - strlen(gpsBuf) - 1);
+            char rssiSuffix[24];
+            snprintf(rssiSuffix, sizeof(rssiSuffix), ",RSSI:%d", (int)currentRssiDbm());
+            strncat(gpsBuf, rssiSuffix, sizeof(gpsBuf) - strlen(gpsBuf) - 1);
             strncpy(gpsTxPayload, gpsBuf, sizeof(gpsTxPayload) - 1);
             gpsTxPending = true;
         }
@@ -1203,9 +1220,9 @@ void loop() {
     // GPS request timeout fallback.
     if (gpsReqSentMs > 0 && !gpsTxPending && millis() - gpsReqSentMs > 10000UL) {
         gpsReqSentMs = 0;
-        char noGpsBuf[72];
-        snprintf(noGpsBuf, sizeof(noGpsBuf), "GPS,FIX:0,SRC:NONE,REASON:NO_RESPONSE,BATT:%d",
-                 batteryPercent(readVbat()));
+        char noGpsBuf[96];
+        snprintf(noGpsBuf, sizeof(noGpsBuf), "GPS,FIX:0,SRC:NONE,REASON:NO_RESPONSE,BATT:%d,RSSI:%d",
+                 batteryPercent(readVbat()), (int)currentRssiDbm());
         sendUplink(topics::gps, std::string(noGpsBuf));
     }
 
@@ -1226,11 +1243,11 @@ void handleGpsRequestCommand() {
         float spdKh  = tinyGps.speed.isValid()    ? tinyGps.speed.kmph()        : 0.0f;
         float hdgDeg = tinyGps.course.isValid()   ? tinyGps.course.deg()        : 0.0f;
         snprintf(gpsBuf, sizeof(gpsBuf),
-                 "GPS,LAT:%.6f,LNG:%.6f,ALT:%.1f,SPD:%.1f,HDG:%.1f,SATS:%u,BATT:%d",
+                 "GPS,LAT:%.6f,LNG:%.6f,ALT:%.1f,SPD:%.1f,HDG:%.1f,SATS:%u,BATT:%d,RSSI:%d",
                  tinyGps.location.lat(), tinyGps.location.lng(),
                  altM, spdKh, hdgDeg,
                  tinyGps.satellites.value(),
-                 batteryPercent(readVbat()));
+                 batteryPercent(readVbat()), (int)currentRssiDbm());
         dspPowerSave(0);
         dspBegin();
         dspStr(0, 0, ("BATT:" + String(batteryPercent(readVbat())) + "%").c_str());
@@ -1263,9 +1280,9 @@ void handleGpsRequestCommand() {
             dspStrCenter(28, TXT_NO_PHONE);
             dspStrCenter(40, TXT_NO_GPS_DATA);
             dspEnd();
-            char noGpsBuf[64];
-            snprintf(noGpsBuf, sizeof(noGpsBuf), "GPS,FIX:0,SRC:NONE,REASON:NO_PHONE,BATT:%d",
-                     batteryPercent(readVbat()));
+            char noGpsBuf[80];
+            snprintf(noGpsBuf, sizeof(noGpsBuf), "GPS,FIX:0,SRC:NONE,REASON:NO_PHONE,BATT:%d,RSSI:%d",
+                     batteryPercent(readVbat()), (int)currentRssiDbm());
             sendUplink(topics::gps, std::string(noGpsBuf));
         }
         gpsDisplayClearMs = millis() + 2000;
@@ -1757,6 +1774,7 @@ bool sendEmergency(String lat, String lng, String alt, String spd, String hdg, b
         if (gpsFromPhone)      loraMsg += ",GPS:PHONE";
     }
     loraMsg += ",BATT:" + std::to_string(battPct);
+    loraMsg += ",RSSI:" + std::to_string((int)currentRssiDbm());
 
     // Fail-safe (not fail-closed) for SOS: falls back to cleartext as a last
     // resort if sealing fails, since dropping an emergency alert is worse
@@ -1895,6 +1913,7 @@ void handleSOS(const String& body) {
     if (spd.length() > 0) message += ",SPD:" + spd;
     if (hdg.length() > 0) message += ",HDG:" + hdg;
     message += ",BATT:" + String(battPct);
+    message += ",RSSI:" + String((int)currentRssiDbm());
 
     int failure = sendUplinkSos(topics::status, std::string(message.c_str()));
     blinkLed(3);
@@ -1970,8 +1989,8 @@ void handleGps(const String& body) {
         phoneGpsNoFix          = true;
         phoneGpsDisplayPending = true;
         snprintf(gpsTxPayload, sizeof(gpsTxPayload),
-                 "GPS,FIX:0,SRC:PHONE,REASON:NO_SIGNAL,BATT:%d",
-                 batteryPercent(readVbat()));
+                 "GPS,FIX:0,SRC:PHONE,REASON:NO_SIGNAL,BATT:%d,RSSI:%d",
+                 batteryPercent(readVbat()), (int)currentRssiDbm());
         gpsTxPending = true;
         return;
     }
@@ -1991,6 +2010,9 @@ void handleGps(const String& body) {
     char battSuffix[16];
     snprintf(battSuffix, sizeof(battSuffix), ",BATT:%d", batteryPercent(readVbat()));
     strncat(gpsBuf, battSuffix, sizeof(gpsBuf) - strlen(gpsBuf) - 1);
+    char rssiSuffix[24];
+    snprintf(rssiSuffix, sizeof(rssiSuffix), ",RSSI:%d", (int)currentRssiDbm());
+    strncat(gpsBuf, rssiSuffix, sizeof(gpsBuf) - strlen(gpsBuf) - 1);
     phoneGpsNoFix          = false;
     phoneGpsDisplayPending = true;
     strncpy(gpsTxPayload, gpsBuf, sizeof(gpsTxPayload) - 1);
@@ -2000,9 +2022,9 @@ void handleGps(const String& body) {
 // Handles CDK:RADIOREGION frames from the app (mobile-app settings screen):
 // with a VALUE field, sets/persists the LoRa region preset via
 // RadioRegionConfig; without one, reports the currently active region. A
-// region change only takes effect after the device is rebooted -- the
-// radio was already initialized with the previous band at boot -- so a
-// successful write's ACK always includes REBOOT_REQUIRED:1.
+// region change only takes effect on air after the radio is
+// re-initialized with the new band, so a successful write's ACK includes
+// REBOOT_REQUIRED:1 and the device auto-reboots shortly after sending it.
 void handleRadioRegion(const String& body) {
     String value = extractField(body, "VALUE");
     if (value.length() == 0) {
@@ -2019,6 +2041,13 @@ void handleRadioRegion(const String& body) {
     if (rc == DUCK_ERR_NONE) {
         broadcast(String("CDK:RADIOREGION,VALUE:") + radioregionconfig::regionName(region) +
                   ",STATUS:ok,REBOOT_REQUIRED:1");
+        // Diagnostic only: 2 LED blinks confirms we reached this point without
+        // touching Serial -- Serial.println()/flush() here can block forever if
+        // the USB CDC TX buffer is full and unread (see setup()'s rationale for
+        // why success-path debug prints were removed there too).
+        BLINK_LED(2);
+        delay(300);  // let the BLE notification/serial line flush before resetting
+        duckesp::restartDuck();
     } else {
         broadcast("CDK:RADIOREGION,ERROR:write_failed");
     }

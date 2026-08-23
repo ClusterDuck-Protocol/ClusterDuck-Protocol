@@ -1541,9 +1541,9 @@ void handleGps(const String& body) {
 // Handles CDK:RADIOREGION frames from the app (mobile-app settings screen):
 // with a VALUE field, sets/persists the LoRa region preset via
 // RadioRegionConfig; without one, reports the currently active region. A
-// region change only takes effect after the device is rebooted -- the
-// radio was already initialized with the previous band at boot -- so a
-// successful write's ACK always includes REBOOT_REQUIRED:1.
+// region change only takes effect on air after the radio is
+// re-initialized with the new band, so a successful write's ACK includes
+// REBOOT_REQUIRED:1 and the device auto-reboots shortly after sending it.
 void handleRadioRegion(const String& body) {
   String value = extractField(body, "VALUE");
   if (value.length() == 0) {
@@ -1560,6 +1560,8 @@ void handleRadioRegion(const String& body) {
   if (rc == DUCK_ERR_NONE) {
     broadcast(String("CDK:RADIOREGION,VALUE:") + radioregionconfig::regionName(region) +
               ",STATUS:ok,REBOOT_REQUIRED:1");
+    delay(300);  // let the BLE notification/serial line flush before resetting
+    duckesp::restartDuck();
   } else {
     broadcast("CDK:RADIOREGION,ERROR:write_failed");
   }

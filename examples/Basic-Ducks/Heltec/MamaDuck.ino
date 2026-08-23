@@ -38,6 +38,14 @@
 // getSignalScore() is protected in Duck, so we reach the object directly.
 extern CDPCFG_LORA_CLASS lora;
 
+// Current RSSI (dBm) of the last LoRa packet received by this duck's radio,
+// rounded to the nearest integer. Included in GPS-request responses and SOS
+// alerts so OpenDMS/the gateway gets a rough mesh-link-quality signal
+// alongside the location report.
+static int32_t currentRssiDbm() {
+  return (int32_t)lround(lora.getRSSI());
+}
+
 // ── Heltec V4 GPS support (L76K on UART1, Wireless Tracker pinout) ────────────
 // If your V4 variant uses different pins, adjust the defines below.
 #ifdef ARDUINO_heltec_wifi_lora_32_V4
@@ -238,6 +246,19 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
   }
 };
 
+class TxCallbacks : public NimBLECharacteristicCallbacks {
+  // Fires exactly when the phone finishes GATT discovery + MTU negotiation
+  // and writes the CCCD to enable notifications -- far more reliable than
+  // the fixed post-connect timer below, which regularly fires before the
+  // phone has actually subscribed (discovery/MTU alone often takes longer
+  // than 700 ms on Android), silently dropping the ID/battery announce.
+  void onSubscribe(NimBLECharacteristic* pChar, NimBLEConnInfo& connInfo, uint16_t subValue) override {
+    if (subValue != 0) {
+      bleAnnounceAfterMs = millis() + 50;
+    }
+  }
+};
+
  /**
   * @brief Setup function to initialize the MamaDuck
   *
@@ -272,6 +293,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
    pBleServer->setCallbacks(new ServerCallbacks());
    NimBLEService* pSvc = pBleServer->createService(NUS_SERVICE);
    pTxChar = pSvc->createCharacteristic(NUS_TX_CHAR, NIMBLE_PROPERTY::NOTIFY);
+   pTxChar->setCallbacks(new TxCallbacks());
    NimBLECharacteristic* pRxChar = pSvc->createCharacteristic(
      NUS_RX_CHAR, NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_NR);
    pRxChar->setCallbacks(new RxCallbacks());
@@ -318,10 +340,10 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
 
    // Broadcasts this Duck's long-term public key so peer MamaDucks can learn
    // it (TOFU) and use sendEncryptedData()/decrypt encrypted_data packets
-   // addressed to this Duck (see sendMamaLink() above for MTALK). MTALK
-   // encryption is permanent (Duck::isMamaLinkEncryptionEnabled() is always
-   // true), so this announce always happens regardless of the operator's
-   // uplink-encryption preference.
+   // addressed to this Duck (see sendMamaLink() above for MTALK). Only
+   // useful once encryption is actually enabled for this build/runtime (see
+   // Duck::isMamaLinkEncryptionEnabled()/isUplinkEncryptionEnabled()), but
+   // harmless to broadcast unconditionally either way.
    duck.announceIdentity();
  
    setupOK = true;
@@ -887,13 +909,12 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
   // missed the one-time announceIdentity() in setup() -- e.g. it booted
   // later, or was out of LoRa range at the time, or the broadcast packet
   // was simply lost (not uncommon over LoRa) -- eventually learns this
-  // Duck's public key too. Without this, sendMamaLink() would keep
-  // returning non-zero (fail-closed, no cleartext fallback) against that
-  // one peer indefinitely -- MTALK looks like it sent successfully
-  // (CDK:ACK) but never arrives -- until both sides have mutually
-  // exchanged identities at least once. Runs unconditionally: MTALK
-  // encryption is permanent (Duck::isMamaLinkEncryptionEnabled() always
-  // true), independent of the operator's uplink-encryption preference.
+  // Duck's public key too. Without this, on a build/runtime where MTALK
+  // encryption is enabled, sendMamaLink() would keep returning non-zero
+  // against that one peer indefinitely until both sides have mutually
+  // exchanged identities at least once. Runs unconditionally (harmless
+  // when encryption is disabled -- sendMamaLink() falls back to plain
+  // sendData() regardless of whether identities were exchanged).
   if (millis() - lastIdentityAnnounceMs >= 300000UL) {
     duck.announceIdentity();
     lastIdentityAnnounceMs = millis();
@@ -1007,6 +1028,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
       if (phoneGpsSpdBuf[0] != '\0') reading.spd_dkmh = (uint32_t)lround(atof(phoneGpsSpdBuf) * 10);
       if (phoneGpsHdgBuf[0] != '\0') reading.hdg_deg = (uint32_t)lround(atof(phoneGpsHdgBuf));
       reading.batt_pct = heltec_battery_percent(readVbat());
+      reading.rssi_dbm = currentRssiDbm();
       gpsTxPayload = duckpayload::encodeGps(reading);
       gpsTxPending = true;
       Serial.printf("[GPS] Deferred GPS TX from cache: lat=%s lng=%s\n", phoneGpsLatBuf, phoneGpsLngBuf);
@@ -1025,6 +1047,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     noGps.source = duckcdp_GpsSource_GPS_SOURCE_NONE;
     noGps.no_fix_reason = duckcdp_GpsNoFixReason_GPS_REASON_NO_RESPONSE;
     noGps.batt_pct = heltec_battery_percent(readVbat());
+    noGps.rssi_dbm = currentRssiDbm();
     std::vector<uint8_t> encoded = duckpayload::encodeGps(noGps);
     sendUplink(topics::gps, std::string(reinterpret_cast<const char*>(encoded.data()), encoded.size()));
     Serial.println("[GPS] GPSREQ timeout — no response from phone, sent no-fix report.");
@@ -1352,11 +1375,12 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
               float spdKh = tinyGps.speed.isValid()    ? tinyGps.speed.kmph()        : 0.0f;
               float hdgDeg = tinyGps.course.isValid()  ? tinyGps.course.deg()        : 0.0f;
               std::snprintf(gpsBuf, sizeof(gpsBuf),
-                            "GPS,LAT:%.6f,LNG:%.6f,ALT:%.1f,SPD:%.1f,HDG:%.1f,SATS:%u,BATT:%d",
+                            "GPS,LAT:%.6f,LNG:%.6f,ALT:%.1f,SPD:%.1f,HDG:%.1f,SATS:%u,BATT:%d,RSSI:%d",
                             tinyGps.location.lat(), tinyGps.location.lng(),
                             altM, spdKh, hdgDeg,
                             tinyGps.satellites.value(),
-                            heltec_battery_percent(readVbat()));
+                            heltec_battery_percent(readVbat()),
+                            (int)currentRssiDbm());
               // Show transmission status on OLED before sending.
               display.displayOn();
               display.clear();
@@ -1403,9 +1427,9 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
               } else {
                 display.drawString(64, 28, TXT_NO_PHONE_NO_GPS_2L);
                 display.display();
-                char noGpsBuf[64];
-                std::snprintf(noGpsBuf, sizeof(noGpsBuf), "GPS,FIX:0,SRC:NONE,REASON:NO_PHONE,BATT:%d",
-                              heltec_battery_percent(readVbat()));
+                char noGpsBuf[80];
+                std::snprintf(noGpsBuf, sizeof(noGpsBuf), "GPS,FIX:0,SRC:NONE,REASON:NO_PHONE,BATT:%d,RSSI:%d",
+                              heltec_battery_percent(readVbat()), (int)currentRssiDbm());
                 sendUplink(topics::gps, std::string(noGpsBuf));
                 Serial.println("[GPS] No phone connected — sent " + String(noGpsBuf));
               }
@@ -1790,6 +1814,7 @@ void displayBatt() {
      alertMsg.gps_source = duckcdp_GpsSource_GPS_SOURCE_NONE;
    }
    alertMsg.batt_pct = battPct;
+   alertMsg.rssi_dbm = currentRssiDbm();
    std::vector<uint8_t> encoded = duckpayload::encodeSos(alertMsg);
    Serial.printf("[MAMA] sendEmergency data: %u bytes (hasGps=%d)\n", (unsigned)encoded.size(), hasGps);
 
@@ -1917,11 +1942,16 @@ void handleFrame(const String& line) {
                 line.c_str(), bleConnected ? "BLE" : "USB");
   // Rate-limit ID response to once per 10 s so rapid incoming frames
   // don't flood Android's BLE notification queue and cause a disconnect.
+  // `idBcastSent` guards the very first frame: without it, a genuine first
+  // request arriving within 10 s of boot would be silently dropped, since
+  // millis() - lastIdBcastMs(0) >= 10000 is false that early.
   {
     static unsigned long lastIdBcastMs = 0;
-    if (millis() - lastIdBcastMs >= 10000UL) {
+    static bool          idBcastSent   = false;
+    if (!idBcastSent || millis() - lastIdBcastMs >= 10000UL) {
       broadcast(String("CDK:ID,VALUE:") + DUCK_ID_BUF);
       lastIdBcastMs = millis();
+      idBcastSent = true;
     }
   }
 
@@ -2034,6 +2064,7 @@ void handleSOS(const String& body) {
     alertMsg.gps_source = duckcdp_GpsSource_GPS_SOURCE_NONE;
   }
   alertMsg.batt_pct = battPct;
+  alertMsg.rssi_dbm = currentRssiDbm();
   std::vector<uint8_t> encoded = duckpayload::encodeStatusReportSos(alertMsg);
   // Routed through sendUplinkSos() (not a direct duck.sendData()) so a
   // phone-triggered SOS -- which carries GPS just like sendEmergency()'s
@@ -2219,9 +2250,9 @@ void handleGps(const String& body) {
 // Handles CDK:RADIOREGION frames from the app (mobile-app settings screen):
 // with a VALUE field, sets/persists the LoRa region preset via
 // RadioRegionConfig; without one, reports the currently active region. A
-// region change only takes effect after the device is rebooted -- the
-// radio was already initialized with the previous band at boot -- so a
-// successful write's ACK always includes REBOOT_REQUIRED:1.
+// region change only takes effect on air after the radio is
+// re-initialized with the new band, so a successful write's ACK includes
+// REBOOT_REQUIRED:1 and the device auto-reboots shortly after sending it.
 void handleRadioRegion(const String& body) {
   String value = extractField(body, "VALUE");
   if (value.length() == 0) {
@@ -2238,6 +2269,8 @@ void handleRadioRegion(const String& body) {
   if (rc == DUCK_ERR_NONE) {
     broadcast(String("CDK:RADIOREGION,VALUE:") + radioregionconfig::regionName(region) +
               ",STATUS:ok,REBOOT_REQUIRED:1");
+    delay(300);  // let the BLE notification/serial line flush before resetting
+    duckesp::restartDuck();
   } else {
     broadcast("CDK:RADIOREGION,ERROR:write_failed");
   }
