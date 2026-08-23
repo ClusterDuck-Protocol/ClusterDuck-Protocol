@@ -274,7 +274,7 @@ const char* regionName(RadioRegion region) {
     case RadioRegion::ID: return "ID";
     case RadioRegion::US: return "US";
     case RadioRegion::UK: return "UK";
-    case RadioRegion::PS: return "PS";
+    case RadioRegion::PSE: return "PS";
   }
   return "MY";
 }

@@ -1,4 +1,4 @@
-w/**
+/**
  * @file MamaDuck.ino
  * @brief Implements a MamaDuck using the ClusterDuck Protocol (CDP).
  *

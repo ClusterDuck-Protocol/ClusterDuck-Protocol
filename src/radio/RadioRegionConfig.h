@@ -53,13 +53,17 @@ enum class RadioRegion : uint8_t {
   ID = 3, ///< Indonesia
   US = 4, ///< United States (FCC 915 sub-band)
   UK = 5, ///< United Kingdom (ETSI EU868-style SRD band)
-  PS = 6, ///< Palestine (ITU Region 1, ETSI EU868-style SRD band)
+  // Named PSE (not PS) because the Xtensa/ESP32 toolchain headers
+  // (xtensa/config/specreg.h, pulled in transitively via Arduino.h on
+  // Heltec/ESP32 builds) #define PS as a processor-status register
+  // number, which would corrupt this enum via macro substitution.
+  PSE = 6, ///< Palestine (ITU Region 1, ETSI EU868-style SRD band)
 };
 
 /// Number of channels in each region's uplink spreading pool.
 constexpr uint8_t UPLINK_POOL_SIZE = 8;
 
-/// Total number of supported regions (== RadioRegion::PS + 1).
+/// Total number of supported regions (== RadioRegion::PSE + 1).
 constexpr uint8_t REGION_COUNT = 7;
 
 /**
