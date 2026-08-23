@@ -1,4 +1,4 @@
-/**
+w/**
  * @file MamaDuck.ino
  * @brief Implements a MamaDuck using the ClusterDuck Protocol (CDP).
  *
@@ -238,6 +238,19 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
   }
 };
 
+class TxCallbacks : public NimBLECharacteristicCallbacks {
+  // Fires exactly when the phone finishes GATT discovery + MTU negotiation
+  // and writes the CCCD to enable notifications -- far more reliable than
+  // the fixed post-connect timer below, which regularly fires before the
+  // phone has actually subscribed (discovery/MTU alone often takes longer
+  // than 700 ms on Android), silently dropping the ID/battery announce.
+  void onSubscribe(NimBLECharacteristic* pChar, NimBLEConnInfo& connInfo, uint16_t subValue) override {
+    if (subValue != 0) {
+      bleAnnounceAfterMs = millis() + 50;
+    }
+  }
+};
+
  /**
   * @brief Setup function to initialize the MamaDuck
   *
@@ -272,6 +285,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
    pBleServer->setCallbacks(new ServerCallbacks());
    NimBLEService* pSvc = pBleServer->createService(NUS_SERVICE);
    pTxChar = pSvc->createCharacteristic(NUS_TX_CHAR, NIMBLE_PROPERTY::NOTIFY);
+   pTxChar->setCallbacks(new TxCallbacks());
    NimBLECharacteristic* pRxChar = pSvc->createCharacteristic(
      NUS_RX_CHAR, NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_NR);
    pRxChar->setCallbacks(new RxCallbacks());
@@ -318,10 +332,10 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
 
    // Broadcasts this Duck's long-term public key so peer MamaDucks can learn
    // it (TOFU) and use sendEncryptedData()/decrypt encrypted_data packets
-   // addressed to this Duck (see sendMamaLink() above for MTALK). MTALK
-   // encryption is permanent (Duck::isMamaLinkEncryptionEnabled() is always
-   // true), so this announce always happens regardless of the operator's
-   // uplink-encryption preference.
+   // addressed to this Duck (see sendMamaLink() above for MTALK). Only
+   // useful once encryption is actually enabled for this build/runtime (see
+   // Duck::isMamaLinkEncryptionEnabled()/isUplinkEncryptionEnabled()), but
+   // harmless to broadcast unconditionally either way.
    duck.announceIdentity();
  
    setupOK = true;
@@ -887,13 +901,12 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
   // missed the one-time announceIdentity() in setup() -- e.g. it booted
   // later, or was out of LoRa range at the time, or the broadcast packet
   // was simply lost (not uncommon over LoRa) -- eventually learns this
-  // Duck's public key too. Without this, sendMamaLink() would keep
-  // returning non-zero (fail-closed, no cleartext fallback) against that
-  // one peer indefinitely -- MTALK looks like it sent successfully
-  // (CDK:ACK) but never arrives -- until both sides have mutually
-  // exchanged identities at least once. Runs unconditionally: MTALK
-  // encryption is permanent (Duck::isMamaLinkEncryptionEnabled() always
-  // true), independent of the operator's uplink-encryption preference.
+  // Duck's public key too. Without this, on a build/runtime where MTALK
+  // encryption is enabled, sendMamaLink() would keep returning non-zero
+  // against that one peer indefinitely until both sides have mutually
+  // exchanged identities at least once. Runs unconditionally (harmless
+  // when encryption is disabled -- sendMamaLink() falls back to plain
+  // sendData() regardless of whether identities were exchanged).
   if (millis() - lastIdentityAnnounceMs >= 300000UL) {
     duck.announceIdentity();
     lastIdentityAnnounceMs = millis();
@@ -1917,11 +1930,16 @@ void handleFrame(const String& line) {
                 line.c_str(), bleConnected ? "BLE" : "USB");
   // Rate-limit ID response to once per 10 s so rapid incoming frames
   // don't flood Android's BLE notification queue and cause a disconnect.
+  // `idBcastSent` guards the very first frame: without it, a genuine first
+  // request arriving within 10 s of boot would be silently dropped, since
+  // millis() - lastIdBcastMs(0) >= 10000 is false that early.
   {
     static unsigned long lastIdBcastMs = 0;
-    if (millis() - lastIdBcastMs >= 10000UL) {
+    static bool          idBcastSent   = false;
+    if (!idBcastSent || millis() - lastIdBcastMs >= 10000UL) {
       broadcast(String("CDK:ID,VALUE:") + DUCK_ID_BUF);
       lastIdBcastMs = millis();
+      idBcastSent = true;
     }
   }
 
@@ -2219,9 +2237,9 @@ void handleGps(const String& body) {
 // Handles CDK:RADIOREGION frames from the app (mobile-app settings screen):
 // with a VALUE field, sets/persists the LoRa region preset via
 // RadioRegionConfig; without one, reports the currently active region. A
-// region change only takes effect after the device is rebooted -- the
-// radio was already initialized with the previous band at boot -- so a
-// successful write's ACK always includes REBOOT_REQUIRED:1.
+// region change only takes effect on air after the radio is
+// re-initialized with the new band, so a successful write's ACK includes
+// REBOOT_REQUIRED:1 and the device auto-reboots shortly after sending it.
 void handleRadioRegion(const String& body) {
   String value = extractField(body, "VALUE");
   if (value.length() == 0) {
@@ -2238,6 +2256,8 @@ void handleRadioRegion(const String& body) {
   if (rc == DUCK_ERR_NONE) {
     broadcast(String("CDK:RADIOREGION,VALUE:") + radioregionconfig::regionName(region) +
               ",STATUS:ok,REBOOT_REQUIRED:1");
+    delay(300);  // let the BLE notification/serial line flush before resetting
+    duckesp::restartDuck();
   } else {
     broadcast("CDK:RADIOREGION,ERROR:write_failed");
   }

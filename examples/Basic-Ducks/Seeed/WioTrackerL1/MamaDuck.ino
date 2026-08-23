@@ -671,10 +671,10 @@ void setup() {
 
     // Broadcasts this Duck's long-term public key so OpenDMS and nearby
     // MamaDucks can learn it (TOFU) and use encrypted_cmd/encrypted_data
-    // instead of plaintext (see Duck.h's announceIdentity()). MTALK
-    // encryption is permanent (Duck::isMamaLinkEncryptionEnabled() is
-    // always true), so this announce always happens regardless of the
-    // operator's uplink-encryption preference.
+    // instead of plaintext (see Duck.h's announceIdentity()). Only useful
+    // once encryption is actually enabled for this build/runtime (see
+    // Duck::isMamaLinkEncryptionEnabled()/isUplinkEncryptionEnabled()), but
+    // harmless to broadcast unconditionally either way.
     duck.announceIdentity();
     BLINK_LED(5);   // 5 blinks = CDP fully initialized
     dspStatus("CDP OK", DUCK_NAME);
@@ -1082,13 +1082,12 @@ void loop() {
     // missed the one-time announceIdentity() in setup() -- e.g. it booted
     // later, or was out of LoRa range at the time, or the broadcast packet
     // was simply lost (not uncommon over LoRa) -- eventually learns this
-    // Duck's public key too. Without this, sendMamaLink() would keep
-    // returning non-zero (fail-closed, no cleartext fallback) against that
-    // one peer indefinitely -- MTALK looks like it sent successfully
-    // (CDK:ACK) but never arrives -- until both sides have mutually
-    // exchanged identities at least once. Runs unconditionally: MTALK
-    // encryption is permanent (Duck::isMamaLinkEncryptionEnabled() always
-    // true), independent of the operator's uplink-encryption preference.
+    // Duck's public key too. Without this, on a build/runtime where MTALK
+    // encryption is enabled, sendMamaLink() would keep returning non-zero
+    // against that one peer indefinitely until both sides have mutually
+    // exchanged identities at least once. Runs unconditionally (harmless
+    // when encryption is disabled -- sendMamaLink() falls back to plain
+    // sendData() regardless of whether identities were exchanged).
     if (millis() - lastIdentityAnnounceMs >= 300000UL) {
         duck.announceIdentity();
         lastIdentityAnnounceMs = millis();
@@ -2000,9 +1999,9 @@ void handleGps(const String& body) {
 // Handles CDK:RADIOREGION frames from the app (mobile-app settings screen):
 // with a VALUE field, sets/persists the LoRa region preset via
 // RadioRegionConfig; without one, reports the currently active region. A
-// region change only takes effect after the device is rebooted -- the
-// radio was already initialized with the previous band at boot -- so a
-// successful write's ACK always includes REBOOT_REQUIRED:1.
+// region change only takes effect on air after the radio is
+// re-initialized with the new band, so a successful write's ACK includes
+// REBOOT_REQUIRED:1 and the device auto-reboots shortly after sending it.
 void handleRadioRegion(const String& body) {
     String value = extractField(body, "VALUE");
     if (value.length() == 0) {
@@ -2019,6 +2018,13 @@ void handleRadioRegion(const String& body) {
     if (rc == DUCK_ERR_NONE) {
         broadcast(String("CDK:RADIOREGION,VALUE:") + radioregionconfig::regionName(region) +
                   ",STATUS:ok,REBOOT_REQUIRED:1");
+        // Diagnostic only: 2 LED blinks confirms we reached this point without
+        // touching Serial -- Serial.println()/flush() here can block forever if
+        // the USB CDC TX buffer is full and unread (see setup()'s rationale for
+        // why success-path debug prints were removed there too).
+        BLINK_LED(2);
+        delay(300);  // let the BLE notification/serial line flush before resetting
+        duckesp::restartDuck();
     } else {
         broadcast("CDK:RADIOREGION,ERROR:write_failed");
     }
