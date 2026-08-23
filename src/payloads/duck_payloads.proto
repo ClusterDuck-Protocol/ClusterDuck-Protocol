@@ -56,6 +56,12 @@ message GpsReading {
   uint32 sats = 9;     // satellite count, 0 if unknown
 
   uint32 batt_pct = 10; // device battery percentage, 0-100
+
+  // RSSI (dBm) of the last LoRa packet received by this duck's radio at the
+  // time this reading was sent, e.g. from RadioLib's getRSSI(). 0 if no
+  // packet had been received yet / unavailable. Gives OpenDMS/the gateway a
+  // rough mesh-link-quality signal alongside the location report.
+  sint32 rssi_dbm = 11;
 }
 
 // Emergency / SOS alert transmitted on the `alert` topic.
@@ -72,6 +78,10 @@ message SosAlert {
   uint32 hdg_deg = 8;
 
   uint32 batt_pct = 9; // device battery percentage, 0-100
+
+  // RSSI (dBm) of the last LoRa packet received by this duck's radio at the
+  // time this alert was sent -- same meaning as GpsReading.rssi_dbm above.
+  sint32 rssi_dbm = 10;
 }
 
 // Periodic health/status report transmitted on the `health` topic.

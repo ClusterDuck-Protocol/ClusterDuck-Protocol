@@ -60,6 +60,11 @@ typedef struct _duckcdp_GpsReading {
     uint32_t hdg_deg; /* 0 if unknown */
     uint32_t sats; /* satellite count, 0 if unknown */
     uint32_t batt_pct; /* device battery percentage, 0-100 */
+    /* RSSI (dBm) of the last LoRa packet received by this duck's radio at the
+ time this reading was sent, e.g. from RadioLib's getRSSI(). 0 if no
+ packet had been received yet / unavailable. Gives OpenDMS/the gateway a
+ rough mesh-link-quality signal alongside the location report. */
+    int32_t rssi_dbm;
 } duckcdp_GpsReading;
 
 /* Emergency / SOS alert transmitted on the `alert` topic. */
@@ -74,6 +79,9 @@ typedef struct _duckcdp_SosAlert {
     uint32_t spd_dkmh;
     uint32_t hdg_deg;
     uint32_t batt_pct; /* device battery percentage, 0-100 */
+    /* RSSI (dBm) of the last LoRa packet received by this duck's radio at the
+ time this alert was sent -- same meaning as GpsReading.rssi_dbm above. */
+    int32_t rssi_dbm;
 } duckcdp_SosAlert;
 
 /* Periodic health/status report transmitted on the `health` topic. */
@@ -165,15 +173,15 @@ extern "C" {
 
 
 /* Initializer values for message structs */
-#define duckcdp_GpsReading_init_default          {0, _duckcdp_GpsSource_MIN, _duckcdp_GpsNoFixReason_MIN, 0, 0, 0, 0, 0, 0, 0}
-#define duckcdp_SosAlert_init_default            {_duckcdp_SosOrigin_MIN, _duckcdp_GpsSource_MIN, 0, 0, 0, 0, 0, 0, 0}
+#define duckcdp_GpsReading_init_default          {0, _duckcdp_GpsSource_MIN, _duckcdp_GpsNoFixReason_MIN, 0, 0, 0, 0, 0, 0, 0, 0}
+#define duckcdp_SosAlert_init_default            {_duckcdp_SosOrigin_MIN, _duckcdp_GpsSource_MIN, 0, 0, 0, 0, 0, 0, 0, 0}
 #define duckcdp_HealthStatus_init_default        {0, 0}
 #define duckcdp_MTalk_init_default               {_duckcdp_MTalkKind_MIN, "", ""}
 #define duckcdp_StatusMsg_init_default           {_duckcdp_StatusMsgSrc_MIN, "", 0, 0, 0, ""}
 #define duckcdp_StatusReport_init_default        {0, {duckcdp_SosAlert_init_default}}
 #define duckcdp_OpText_init_default              {""}
-#define duckcdp_GpsReading_init_zero             {0, _duckcdp_GpsSource_MIN, _duckcdp_GpsNoFixReason_MIN, 0, 0, 0, 0, 0, 0, 0}
-#define duckcdp_SosAlert_init_zero               {_duckcdp_SosOrigin_MIN, _duckcdp_GpsSource_MIN, 0, 0, 0, 0, 0, 0, 0}
+#define duckcdp_GpsReading_init_zero             {0, _duckcdp_GpsSource_MIN, _duckcdp_GpsNoFixReason_MIN, 0, 0, 0, 0, 0, 0, 0, 0}
+#define duckcdp_SosAlert_init_zero               {_duckcdp_SosOrigin_MIN, _duckcdp_GpsSource_MIN, 0, 0, 0, 0, 0, 0, 0, 0}
 #define duckcdp_HealthStatus_init_zero           {0, 0}
 #define duckcdp_MTalk_init_zero                  {_duckcdp_MTalkKind_MIN, "", ""}
 #define duckcdp_StatusMsg_init_zero              {_duckcdp_StatusMsgSrc_MIN, "", 0, 0, 0, ""}
@@ -191,6 +199,7 @@ extern "C" {
 #define duckcdp_GpsReading_hdg_deg_tag           8
 #define duckcdp_GpsReading_sats_tag              9
 #define duckcdp_GpsReading_batt_pct_tag          10
+#define duckcdp_GpsReading_rssi_dbm_tag          11
 #define duckcdp_SosAlert_origin_tag              1
 #define duckcdp_SosAlert_gps_source_tag          2
 #define duckcdp_SosAlert_has_gps_tag             3
@@ -200,6 +209,7 @@ extern "C" {
 #define duckcdp_SosAlert_spd_dkmh_tag            7
 #define duckcdp_SosAlert_hdg_deg_tag             8
 #define duckcdp_SosAlert_batt_pct_tag            9
+#define duckcdp_SosAlert_rssi_dbm_tag            10
 #define duckcdp_HealthStatus_counter_tag         1
 #define duckcdp_HealthStatus_free_memory_tag     2
 #define duckcdp_MTalk_kind_tag                   1
@@ -226,7 +236,8 @@ X(a, STATIC,   SINGULAR, SINT32,   alt_m,             6) \
 X(a, STATIC,   SINGULAR, UINT32,   spd_dkmh,          7) \
 X(a, STATIC,   SINGULAR, UINT32,   hdg_deg,           8) \
 X(a, STATIC,   SINGULAR, UINT32,   sats,              9) \
-X(a, STATIC,   SINGULAR, UINT32,   batt_pct,         10)
+X(a, STATIC,   SINGULAR, UINT32,   batt_pct,         10) \
+X(a, STATIC,   SINGULAR, SINT32,   rssi_dbm,         11)
 #define duckcdp_GpsReading_CALLBACK NULL
 #define duckcdp_GpsReading_DEFAULT NULL
 
@@ -239,7 +250,8 @@ X(a, STATIC,   SINGULAR, SINT32,   lng_e7,            5) \
 X(a, STATIC,   SINGULAR, SINT32,   alt_m,             6) \
 X(a, STATIC,   SINGULAR, UINT32,   spd_dkmh,          7) \
 X(a, STATIC,   SINGULAR, UINT32,   hdg_deg,           8) \
-X(a, STATIC,   SINGULAR, UINT32,   batt_pct,          9)
+X(a, STATIC,   SINGULAR, UINT32,   batt_pct,          9) \
+X(a, STATIC,   SINGULAR, SINT32,   rssi_dbm,         10)
 #define duckcdp_SosAlert_CALLBACK NULL
 #define duckcdp_SosAlert_DEFAULT NULL
 
@@ -298,11 +310,11 @@ extern const pb_msgdesc_t duckcdp_OpText_msg;
 
 /* Maximum encoded size of messages (where known) */
 #define DUCKCDP_DUCK_PAYLOADS_PB_H_MAX_SIZE      duckcdp_MTalk_size
-#define duckcdp_GpsReading_size                  48
+#define duckcdp_GpsReading_size                  54
 #define duckcdp_HealthStatus_size                17
 #define duckcdp_MTalk_size                       226
 #define duckcdp_OpText_size                      222
-#define duckcdp_SosAlert_size                    42
+#define duckcdp_SosAlert_size                    48
 #define duckcdp_StatusMsg_size                   215
 #define duckcdp_StatusReport_size                218
 

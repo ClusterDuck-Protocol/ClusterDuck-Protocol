@@ -53,13 +53,14 @@ enum class RadioRegion : uint8_t {
   ID = 3, ///< Indonesia
   US = 4, ///< United States (FCC 915 sub-band)
   UK = 5, ///< United Kingdom (ETSI EU868-style SRD band)
+  PS = 6, ///< Palestine (ITU Region 1, ETSI EU868-style SRD band)
 };
 
 /// Number of channels in each region's uplink spreading pool.
 constexpr uint8_t UPLINK_POOL_SIZE = 8;
 
-/// Total number of supported regions (== RadioRegion::UK + 1).
-constexpr uint8_t REGION_COUNT = 6;
+/// Total number of supported regions (== RadioRegion::PS + 1).
+constexpr uint8_t REGION_COUNT = 7;
 
 /**
  * @brief Load a previously field-provisioned region from flash, if one
@@ -114,7 +115,7 @@ int setRegion(RadioRegion region);
  *
  * Polls Serial for a complete line and, if present, handles one of:
  *  - "AT+RADIOREGION=<code>": sets and persists the region, where
- *    <code> is one of MY, SG, PH, ID, US, UK. Unlike OpenDmsConfig's key
+ *    <code> is one of MY, SG, PH, ID, US, UK, PS. Unlike OpenDmsConfig's key
  *    provisioning, this can be re-sent at any time to switch regions --
  *    a region choice is not a secret, so there's no need to fail closed
  *    or require a RESET first.

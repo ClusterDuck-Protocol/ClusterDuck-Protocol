@@ -38,6 +38,14 @@ w/**
 // getSignalScore() is protected in Duck, so we reach the object directly.
 extern CDPCFG_LORA_CLASS lora;
 
+// Current RSSI (dBm) of the last LoRa packet received by this duck's radio,
+// rounded to the nearest integer. Included in GPS-request responses and SOS
+// alerts so OpenDMS/the gateway gets a rough mesh-link-quality signal
+// alongside the location report.
+static int32_t currentRssiDbm() {
+  return (int32_t)lround(lora.getRSSI());
+}
+
 // ── Heltec V4 GPS support (L76K on UART1, Wireless Tracker pinout) ────────────
 // If your V4 variant uses different pins, adjust the defines below.
 #ifdef ARDUINO_heltec_wifi_lora_32_V4
@@ -1020,6 +1028,7 @@ class TxCallbacks : public NimBLECharacteristicCallbacks {
       if (phoneGpsSpdBuf[0] != '\0') reading.spd_dkmh = (uint32_t)lround(atof(phoneGpsSpdBuf) * 10);
       if (phoneGpsHdgBuf[0] != '\0') reading.hdg_deg = (uint32_t)lround(atof(phoneGpsHdgBuf));
       reading.batt_pct = heltec_battery_percent(readVbat());
+      reading.rssi_dbm = currentRssiDbm();
       gpsTxPayload = duckpayload::encodeGps(reading);
       gpsTxPending = true;
       Serial.printf("[GPS] Deferred GPS TX from cache: lat=%s lng=%s\n", phoneGpsLatBuf, phoneGpsLngBuf);
@@ -1038,6 +1047,7 @@ class TxCallbacks : public NimBLECharacteristicCallbacks {
     noGps.source = duckcdp_GpsSource_GPS_SOURCE_NONE;
     noGps.no_fix_reason = duckcdp_GpsNoFixReason_GPS_REASON_NO_RESPONSE;
     noGps.batt_pct = heltec_battery_percent(readVbat());
+    noGps.rssi_dbm = currentRssiDbm();
     std::vector<uint8_t> encoded = duckpayload::encodeGps(noGps);
     sendUplink(topics::gps, std::string(reinterpret_cast<const char*>(encoded.data()), encoded.size()));
     Serial.println("[GPS] GPSREQ timeout — no response from phone, sent no-fix report.");
@@ -1365,11 +1375,12 @@ class TxCallbacks : public NimBLECharacteristicCallbacks {
               float spdKh = tinyGps.speed.isValid()    ? tinyGps.speed.kmph()        : 0.0f;
               float hdgDeg = tinyGps.course.isValid()  ? tinyGps.course.deg()        : 0.0f;
               std::snprintf(gpsBuf, sizeof(gpsBuf),
-                            "GPS,LAT:%.6f,LNG:%.6f,ALT:%.1f,SPD:%.1f,HDG:%.1f,SATS:%u,BATT:%d",
+                            "GPS,LAT:%.6f,LNG:%.6f,ALT:%.1f,SPD:%.1f,HDG:%.1f,SATS:%u,BATT:%d,RSSI:%d",
                             tinyGps.location.lat(), tinyGps.location.lng(),
                             altM, spdKh, hdgDeg,
                             tinyGps.satellites.value(),
-                            heltec_battery_percent(readVbat()));
+                            heltec_battery_percent(readVbat()),
+                            (int)currentRssiDbm());
               // Show transmission status on OLED before sending.
               display.displayOn();
               display.clear();
@@ -1416,9 +1427,9 @@ class TxCallbacks : public NimBLECharacteristicCallbacks {
               } else {
                 display.drawString(64, 28, TXT_NO_PHONE_NO_GPS_2L);
                 display.display();
-                char noGpsBuf[64];
-                std::snprintf(noGpsBuf, sizeof(noGpsBuf), "GPS,FIX:0,SRC:NONE,REASON:NO_PHONE,BATT:%d",
-                              heltec_battery_percent(readVbat()));
+                char noGpsBuf[80];
+                std::snprintf(noGpsBuf, sizeof(noGpsBuf), "GPS,FIX:0,SRC:NONE,REASON:NO_PHONE,BATT:%d,RSSI:%d",
+                              heltec_battery_percent(readVbat()), (int)currentRssiDbm());
                 sendUplink(topics::gps, std::string(noGpsBuf));
                 Serial.println("[GPS] No phone connected — sent " + String(noGpsBuf));
               }
@@ -1803,6 +1814,7 @@ void displayBatt() {
      alertMsg.gps_source = duckcdp_GpsSource_GPS_SOURCE_NONE;
    }
    alertMsg.batt_pct = battPct;
+   alertMsg.rssi_dbm = currentRssiDbm();
    std::vector<uint8_t> encoded = duckpayload::encodeSos(alertMsg);
    Serial.printf("[MAMA] sendEmergency data: %u bytes (hasGps=%d)\n", (unsigned)encoded.size(), hasGps);
 
@@ -2052,6 +2064,7 @@ void handleSOS(const String& body) {
     alertMsg.gps_source = duckcdp_GpsSource_GPS_SOURCE_NONE;
   }
   alertMsg.batt_pct = battPct;
+  alertMsg.rssi_dbm = currentRssiDbm();
   std::vector<uint8_t> encoded = duckpayload::encodeStatusReportSos(alertMsg);
   // Routed through sendUplinkSos() (not a direct duck.sendData()) so a
   // phone-triggered SOS -- which carries GPS just like sendEmergency()'s

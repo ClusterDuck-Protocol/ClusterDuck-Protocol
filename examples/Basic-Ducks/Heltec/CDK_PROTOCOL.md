@@ -160,7 +160,7 @@ CDK:RADIOREGION,ERROR:<unknown_region|write_failed>
 
 | Field | Description |
 |-------|-------------|
-| `VALUE` | Active/newly-set region code: one of `MY`, `SG`, `PH`, `ID`, `US`, `UK` |
+| `VALUE` | Active/newly-set region code: one of `MY`, `SG`, `PH`, `ID`, `US`, `UK`, `PS` |
 | `STATUS` | `ok`, present only after a successful write |
 | `REBOOT_REQUIRED` | `1` after a successful write -- the new region only takes effect after the device reboots; the running radio is not retuned live |
 | `ERROR` | `unknown_region` (VALUE didn't match a known code) or `write_failed` (flash write failed) |
@@ -253,7 +253,7 @@ CDK:RADIOREGION[,VALUE:<region_code>]
 
 | Field | Description |
 |-------|-------------|
-| `VALUE` | Optional. One of `MY`, `SG`, `PH`, `ID`, `US`, `UK`. Omit to query the current region instead of changing it. |
+| `VALUE` | Optional. One of `MY`, `SG`, `PH`, `ID`, `US`, `UK`, `PS`. Omit to query the current region instead of changing it. |
 
 Changing the region persists it to flash and updates the mesh channel/uplink pool used
 on the *next* boot; the device must be rebooted (see `REBOOT_REQUIRED:1` in the device's

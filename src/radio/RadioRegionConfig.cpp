@@ -44,6 +44,12 @@ constexpr RadioRegionPreset PRESETS[] = {
   /* ID */ {916.8f, {916.8f, 916.6f, 916.4f, 916.2f, 916.0f, 915.8f, 915.6f, 915.4f}},
   /* US */ {915.2f, {915.2f, 915.0f, 914.8f, 914.6f, 914.4f, 914.2f, 914.0f, 913.8f}},
   /* UK */ {868.1f, {868.1f, 867.9f, 867.7f, 867.5f, 867.3f, 867.1f, 866.9f, 866.7f}},
+  // Palestine has no dedicated LoRa sub-GHz ISM allocation of its own on
+  // file; like most of ITU Region 1 lacking a country-specific plan, it
+  // falls back to the common ETSI EU868 SRD860-870MHz band, so this
+  // mirrors the UK preset's channel plan (see the file-level "not
+  // regulator-verified" caveat in RadioRegionConfig.h).
+  /* PS */ {868.1f, {868.1f, 867.9f, 867.7f, 867.5f, 867.3f, 867.1f, 866.9f, 866.7f}},
 };
 
 constexpr size_t PRESET_COUNT = sizeof(PRESETS) / sizeof(PRESETS[0]);
@@ -268,6 +274,7 @@ const char* regionName(RadioRegion region) {
     case RadioRegion::ID: return "ID";
     case RadioRegion::US: return "US";
     case RadioRegion::UK: return "UK";
+    case RadioRegion::PS: return "PS";
   }
   return "MY";
 }
