@@ -1370,18 +1370,25 @@ class TxCallbacks : public NimBLECharacteristicCallbacks {
 #ifdef ARDUINO_heltec_wifi_lora_32_V4
             if (tinyGps.location.isValid()) {
               // Hardware GPS is the priority source — send regardless of fix age.
-              char gpsBuf[128];
               float altM  = tinyGps.altitude.isValid() ? tinyGps.altitude.meters()  : 0.0f;
               float spdKh = tinyGps.speed.isValid()    ? tinyGps.speed.kmph()        : 0.0f;
               float hdgDeg = tinyGps.course.isValid()  ? tinyGps.course.deg()        : 0.0f;
-              std::snprintf(gpsBuf, sizeof(gpsBuf),
-                            "GPS,LAT:%.6f,LNG:%.6f,ALT:%.1f,SPD:%.1f,HDG:%.1f,SATS:%u,BATT:%d,RSSI:%d",
-                            tinyGps.location.lat(), tinyGps.location.lng(),
-                            altM, spdKh, hdgDeg,
-                            tinyGps.satellites.value(),
-                            heltec_battery_percent(readVbat()),
-                            (int)currentRssiDbm());
-              // Show transmission status on OLED before sending.
+              duckcdp_GpsReading reading = duckcdp_GpsReading_init_zero;
+              reading.has_fix = true;
+              reading.source = duckcdp_GpsSource_GPS_SOURCE_DEVICE;
+              reading.no_fix_reason = duckcdp_GpsNoFixReason_GPS_REASON_NONE;
+              reading.lat_e7 = (int32_t)lround(tinyGps.location.lat() * 1e7);
+              reading.lng_e7 = (int32_t)lround(tinyGps.location.lng() * 1e7);
+              reading.alt_m = (int32_t)lround(altM);
+              reading.spd_dkmh = (uint32_t)lround(spdKh * 10);
+              reading.hdg_deg = (uint32_t)lround(hdgDeg);
+              reading.sats = tinyGps.satellites.value();
+              reading.batt_pct = heltec_battery_percent(readVbat());
+              reading.rssi_dbm = currentRssiDbm();
+              std::vector<uint8_t> encoded = duckpayload::encodeGps(reading);
+              // Show transmission status on OLED before sending — matches
+              // WioTrackerL1's GPS-request display layout (BATT/ID header,
+              // "sending" line, LAT, LNG; no raw wire-format telemetry line).
               display.displayOn();
               display.clear();
               display.setFont(ArialMT_Plain_10);
@@ -1393,11 +1400,10 @@ class TxCallbacks : public NimBLECharacteristicCallbacks {
               display.drawString(0, 14, TXT_SENDING_GPS_DATA);
               display.drawString(0, 28, "LAT:" + String(tinyGps.location.lat(), 5));
               display.drawString(0, 40, "LNG:" + String(tinyGps.location.lng(), 5));
-              display.drawString(0, 52, "ALT:" + String(altM, 1) + "m  SPD:" + String(spdKh, 1) + "km/h");
               display.display();
-              sendUplink(topics::gps, std::string(gpsBuf));
-              Serial.printf("[GPS] Hardware GPS sent (age: %lums): %s\n",
-                            tinyGps.location.age(), gpsBuf);
+              sendUplink(topics::gps, std::string(reinterpret_cast<const char*>(encoded.data()), encoded.size()));
+              Serial.printf("[GPS] Hardware GPS sent (age: %lums, %u bytes)\n",
+                            tinyGps.location.age(), (unsigned)encoded.size());
               // Non-blocking display clear — delay() here would block duck.run() for
               // 3 s, causing the SX1262 FIFO to fill up and corrupt queued packets.
               gpsDisplayClearMs = millis() + 3000;
@@ -1427,11 +1433,15 @@ class TxCallbacks : public NimBLECharacteristicCallbacks {
               } else {
                 display.drawString(64, 28, TXT_NO_PHONE_NO_GPS_2L);
                 display.display();
-                char noGpsBuf[80];
-                std::snprintf(noGpsBuf, sizeof(noGpsBuf), "GPS,FIX:0,SRC:NONE,REASON:NO_PHONE,BATT:%d,RSSI:%d",
-                              heltec_battery_percent(readVbat()), (int)currentRssiDbm());
-                sendUplink(topics::gps, std::string(noGpsBuf));
-                Serial.println("[GPS] No phone connected — sent " + String(noGpsBuf));
+                duckcdp_GpsReading noGps = duckcdp_GpsReading_init_zero;
+                noGps.has_fix = false;
+                noGps.source = duckcdp_GpsSource_GPS_SOURCE_NONE;
+                noGps.no_fix_reason = duckcdp_GpsNoFixReason_GPS_REASON_NO_RESPONSE;
+                noGps.batt_pct = heltec_battery_percent(readVbat());
+                noGps.rssi_dbm = currentRssiDbm();
+                std::vector<uint8_t> encoded = duckpayload::encodeGps(noGps);
+                sendUplink(topics::gps, std::string(reinterpret_cast<const char*>(encoded.data()), encoded.size()));
+                Serial.println("[GPS] No phone connected — sent no-fix protobuf report.");
               }
               // Non-blocking display clear — delay() here blocks duck.run() for 2 s,
               // preventing the radio from reading queued packets and corrupting the
@@ -1473,11 +1483,15 @@ class TxCallbacks : public NimBLECharacteristicCallbacks {
               } else {
                 display.drawString(64, 28, TXT_NO_PHONE_NO_GPS_2L);
                 display.display();
-                char noGpsBuf[64];
-                std::snprintf(noGpsBuf, sizeof(noGpsBuf), "GPS,FIX:0,SRC:NONE,REASON:NO_PHONE,BATT:%d",
-                              heltec_battery_percent(readVbat()));
-                sendUplink(topics::gps, std::string(noGpsBuf));
-                Serial.println("[GPS] No phone connected — sent " + String(noGpsBuf));
+                duckcdp_GpsReading noGps = duckcdp_GpsReading_init_zero;
+                noGps.has_fix = false;
+                noGps.source = duckcdp_GpsSource_GPS_SOURCE_NONE;
+                noGps.no_fix_reason = duckcdp_GpsNoFixReason_GPS_REASON_NO_RESPONSE;
+                noGps.batt_pct = heltec_battery_percent(readVbat());
+                noGps.rssi_dbm = currentRssiDbm();
+                std::vector<uint8_t> encoded = duckpayload::encodeGps(noGps);
+                sendUplink(topics::gps, std::string(reinterpret_cast<const char*>(encoded.data()), encoded.size()));
+                Serial.println("[GPS] No phone connected — sent no-fix protobuf report.");
               }
               // Non-blocking display clear — delay() here blocks duck.run() for 2 s,
               // preventing the radio from reading queued packets and corrupting the

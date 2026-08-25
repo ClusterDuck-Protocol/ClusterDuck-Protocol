@@ -244,7 +244,7 @@ const  unsigned long  SOS_GPS_WAIT_MS = 2500UL;
 const  uint32_t       SOS_HOLD_MS     = 2000UL;   // shared with checkButton()'s hold detection
 
 // ── GPS TX payload and phone GPS cache ───────────────────────────────────────
-static char gpsTxPayload[128]  = {};
+static std::vector<uint8_t> gpsTxPayload;   // encoded protobuf payload for deferred GPS TX
 static char phoneGpsLatBuf[20] = {};
 static char phoneGpsLngBuf[20] = {};
 static char phoneGpsAltBuf[12] = {};
@@ -952,7 +952,13 @@ void loop() {
     // connect (ble_on_connect()) and periodically over USB, so a manual
     // send added no information the phone didn't already have.
     if (btn == BTN_DOUBLE) {
-        sendUplink(topics::status, std::string("MSG,SRC:DEVICE,TEXT:Roger"));
+        // protobuf-encoded StatusMsg wrapped in a StatusReport (same topic,
+        // matching handleMsg()'s phone-composed messages).
+        duckcdp_StatusMsg rogerMsg = duckcdp_StatusMsg_init_zero;
+        rogerMsg.src = duckcdp_StatusMsgSrc_STATUS_MSG_SRC_DEVICE;
+        std::snprintf(rogerMsg.text, sizeof(rogerMsg.text), "Roger");
+        std::vector<uint8_t> rogerEncoded = duckpayload::encodeStatusReportMsg(rogerMsg);
+        sendUplink(topics::status, std::string(reinterpret_cast<const char*>(rogerEncoded.data()), rogerEncoded.size()));
         broadcast("CDK:ACK,ID:ROGER");
         dspPowerSave(0);
         displayEnabled = true;
@@ -1136,9 +1142,9 @@ void loop() {
     // ── Deferred GPS LoRa TX ──────────────────────────────────────────────────
     if (gpsTxPending) {
         gpsTxPending = false;
-        int result = sendUplink(topics::gps, std::string(gpsTxPayload));
+        int result = sendUplink(topics::gps, std::string(reinterpret_cast<const char*>(gpsTxPayload.data()), gpsTxPayload.size()));
         gpsLoraOk   = (result == 0);
-        Serial.printf("[GPS] Deferred TX %s: %s\n", gpsLoraOk ? "OK" : "FAILED", gpsTxPayload);
+        Serial.printf("[GPS] Deferred TX %s (%u bytes)\n", gpsLoraOk ? "OK" : "FAILED", (unsigned)gpsTxPayload.size());
     }
 
     // ── Deferred BEACON_ACK TX ────────────────────────────────────────────────
@@ -1197,22 +1203,18 @@ void loop() {
             broadcast("CDK:GPSREQ");
             gpsReqSentMs = millis();
         } else if (phoneGpsLatBuf[0] != '\0' && !gpsTxPending) {
-            char gpsBuf[128];
-            snprintf(gpsBuf, sizeof(gpsBuf), "GPS,SRC:PHONE,LAT:%s,LNG:%s",
-                     phoneGpsLatBuf, phoneGpsLngBuf);
-            if (phoneGpsAltBuf[0] != '\0')
-                strncat(gpsBuf, (",ALT:" + String(phoneGpsAltBuf)).c_str(), sizeof(gpsBuf) - strlen(gpsBuf) - 1);
-            if (phoneGpsSpdBuf[0] != '\0')
-                strncat(gpsBuf, (",SPD:" + String(phoneGpsSpdBuf)).c_str(), sizeof(gpsBuf) - strlen(gpsBuf) - 1);
-            if (phoneGpsHdgBuf[0] != '\0')
-                strncat(gpsBuf, (",HDG:" + String(phoneGpsHdgBuf)).c_str(), sizeof(gpsBuf) - strlen(gpsBuf) - 1);
-            char battSuffix[16];
-            snprintf(battSuffix, sizeof(battSuffix), ",BATT:%d", batteryPercent(readVbat()));
-            strncat(gpsBuf, battSuffix, sizeof(gpsBuf) - strlen(gpsBuf) - 1);
-            char rssiSuffix[24];
-            snprintf(rssiSuffix, sizeof(rssiSuffix), ",RSSI:%d", (int)currentRssiDbm());
-            strncat(gpsBuf, rssiSuffix, sizeof(gpsBuf) - strlen(gpsBuf) - 1);
-            strncpy(gpsTxPayload, gpsBuf, sizeof(gpsTxPayload) - 1);
+            duckcdp_GpsReading reading = duckcdp_GpsReading_init_zero;
+            reading.has_fix = true;
+            reading.source = duckcdp_GpsSource_GPS_SOURCE_PHONE;
+            reading.no_fix_reason = duckcdp_GpsNoFixReason_GPS_REASON_NONE;
+            reading.lat_e7 = (int32_t)lround(atof(phoneGpsLatBuf) * 1e7);
+            reading.lng_e7 = (int32_t)lround(atof(phoneGpsLngBuf) * 1e7);
+            if (phoneGpsAltBuf[0] != '\0') reading.alt_m = (int32_t)lround(atof(phoneGpsAltBuf));
+            if (phoneGpsSpdBuf[0] != '\0') reading.spd_dkmh = (uint32_t)lround(atof(phoneGpsSpdBuf) * 10);
+            if (phoneGpsHdgBuf[0] != '\0') reading.hdg_deg = (uint32_t)lround(atof(phoneGpsHdgBuf));
+            reading.batt_pct = batteryPercent(readVbat());
+            reading.rssi_dbm = currentRssiDbm();
+            gpsTxPayload = duckpayload::encodeGps(reading);
             gpsTxPending = true;
         }
     }
@@ -1220,10 +1222,14 @@ void loop() {
     // GPS request timeout fallback.
     if (gpsReqSentMs > 0 && !gpsTxPending && millis() - gpsReqSentMs > 10000UL) {
         gpsReqSentMs = 0;
-        char noGpsBuf[96];
-        snprintf(noGpsBuf, sizeof(noGpsBuf), "GPS,FIX:0,SRC:NONE,REASON:NO_RESPONSE,BATT:%d,RSSI:%d",
-                 batteryPercent(readVbat()), (int)currentRssiDbm());
-        sendUplink(topics::gps, std::string(noGpsBuf));
+        duckcdp_GpsReading noGps = duckcdp_GpsReading_init_zero;
+        noGps.has_fix = false;
+        noGps.source = duckcdp_GpsSource_GPS_SOURCE_NONE;
+        noGps.no_fix_reason = duckcdp_GpsNoFixReason_GPS_REASON_NO_RESPONSE;
+        noGps.batt_pct = batteryPercent(readVbat());
+        noGps.rssi_dbm = currentRssiDbm();
+        std::vector<uint8_t> encoded = duckpayload::encodeGps(noGps);
+        sendUplink(topics::gps, std::string(reinterpret_cast<const char*>(encoded.data()), encoded.size()));
     }
 
     delay(5);
@@ -1238,16 +1244,22 @@ void loop() {
 // whoever holds OpenDMS's static private key.
 void handleGpsRequestCommand() {
     if (tinyGps.location.isValid()) {
-        char gpsBuf[128];
         float altM   = tinyGps.altitude.isValid() ? tinyGps.altitude.meters()  : 0.0f;
         float spdKh  = tinyGps.speed.isValid()    ? tinyGps.speed.kmph()        : 0.0f;
         float hdgDeg = tinyGps.course.isValid()   ? tinyGps.course.deg()        : 0.0f;
-        snprintf(gpsBuf, sizeof(gpsBuf),
-                 "GPS,LAT:%.6f,LNG:%.6f,ALT:%.1f,SPD:%.1f,HDG:%.1f,SATS:%u,BATT:%d,RSSI:%d",
-                 tinyGps.location.lat(), tinyGps.location.lng(),
-                 altM, spdKh, hdgDeg,
-                 tinyGps.satellites.value(),
-                 batteryPercent(readVbat()), (int)currentRssiDbm());
+        duckcdp_GpsReading reading = duckcdp_GpsReading_init_zero;
+        reading.has_fix = true;
+        reading.source = duckcdp_GpsSource_GPS_SOURCE_DEVICE;
+        reading.no_fix_reason = duckcdp_GpsNoFixReason_GPS_REASON_NONE;
+        reading.lat_e7 = (int32_t)lround(tinyGps.location.lat() * 1e7);
+        reading.lng_e7 = (int32_t)lround(tinyGps.location.lng() * 1e7);
+        reading.alt_m = (int32_t)lround(altM);
+        reading.spd_dkmh = (uint32_t)lround(spdKh * 10);
+        reading.hdg_deg = (uint32_t)lround(hdgDeg);
+        reading.sats = tinyGps.satellites.value();
+        reading.batt_pct = batteryPercent(readVbat());
+        reading.rssi_dbm = currentRssiDbm();
+        std::vector<uint8_t> encoded = duckpayload::encodeGps(reading);
         dspPowerSave(0);
         dspBegin();
         dspStr(0, 0, ("BATT:" + String(batteryPercent(readVbat())) + "%").c_str());
@@ -1256,7 +1268,7 @@ void handleGpsRequestCommand() {
         dspStr(0, 28, ("LAT:" + String(tinyGps.location.lat(), 5)).c_str());
         dspStr(0, 40, ("LNG:" + String(tinyGps.location.lng(), 5)).c_str());
         dspEnd();
-        sendUplink(topics::gps, std::string(gpsBuf));
+        sendUplink(topics::gps, std::string(reinterpret_cast<const char*>(encoded.data()), encoded.size()));
         delay(3000);
         dspPowerSave(1);
     } else {
@@ -1280,10 +1292,14 @@ void handleGpsRequestCommand() {
             dspStrCenter(28, TXT_NO_PHONE);
             dspStrCenter(40, TXT_NO_GPS_DATA);
             dspEnd();
-            char noGpsBuf[80];
-            snprintf(noGpsBuf, sizeof(noGpsBuf), "GPS,FIX:0,SRC:NONE,REASON:NO_PHONE,BATT:%d,RSSI:%d",
-                     batteryPercent(readVbat()), (int)currentRssiDbm());
-            sendUplink(topics::gps, std::string(noGpsBuf));
+            duckcdp_GpsReading noGps = duckcdp_GpsReading_init_zero;
+            noGps.has_fix = false;
+            noGps.source = duckcdp_GpsSource_GPS_SOURCE_NONE;
+            noGps.no_fix_reason = duckcdp_GpsNoFixReason_GPS_REASON_NO_RESPONSE;
+            noGps.batt_pct = batteryPercent(readVbat());
+            noGps.rssi_dbm = currentRssiDbm();
+            std::vector<uint8_t> encoded = duckpayload::encodeGps(noGps);
+            sendUplink(topics::gps, std::string(reinterpret_cast<const char*>(encoded.data()), encoded.size()));
         }
         gpsDisplayClearMs = millis() + 2000;
     }
@@ -1765,21 +1781,36 @@ bool sendEmergency(String lat, String lng, String alt, String spd, String hdg, b
     bool hasGps  = (lat.length() > 0 && lng.length() > 0);
     int  battPct = batteryPercent(readVbat());
 
-    std::string loraMsg = "SOS,SRC:DEVICE,ID:" + std::string(DUCK_ID_BUF);
+    // Protobuf-encode the alert (see duck_payloads.proto: SosAlert) --
+    // DeviceID is carried in the MQTT envelope by the gateway so we don't
+    // need to repeat it in the payload bytes.
+    duckcdp_SosAlert alertMsg = duckcdp_SosAlert_init_zero;
+    alertMsg.origin = duckcdp_SosOrigin_SOS_ORIGIN_DEVICE;
+    alertMsg.has_gps = hasGps;
     if (hasGps) {
-        loraMsg += ",LAT:" + std::string(lat.c_str()) + ",LNG:" + std::string(lng.c_str());
-        if (alt.length() > 0) loraMsg += ",ALT:" + std::string(alt.c_str());
-        if (spd.length() > 0) loraMsg += ",SPD:" + std::string(spd.c_str());
-        if (hdg.length() > 0) loraMsg += ",HDG:" + std::string(hdg.c_str());
-        if (gpsFromPhone)      loraMsg += ",GPS:PHONE";
+        alertMsg.gps_source = gpsFromPhone ? duckcdp_GpsSource_GPS_SOURCE_PHONE
+                                            : duckcdp_GpsSource_GPS_SOURCE_DEVICE;
+        alertMsg.lat_e7 = (int32_t)lround(atof(lat.c_str()) * 1e7);
+        alertMsg.lng_e7 = (int32_t)lround(atof(lng.c_str()) * 1e7);
+        if (alt.length() > 0) alertMsg.alt_m = (int32_t)lround(atof(alt.c_str()));
+        if (spd.length() > 0) alertMsg.spd_dkmh = (uint32_t)lround(atof(spd.c_str()) * 10);
+        if (hdg.length() > 0) alertMsg.hdg_deg = (uint32_t)lround(atof(hdg.c_str()));
+    } else {
+        alertMsg.gps_source = duckcdp_GpsSource_GPS_SOURCE_NONE;
     }
-    loraMsg += ",BATT:" + std::to_string(battPct);
-    loraMsg += ",RSSI:" + std::to_string((int)currentRssiDbm());
+    // Satellite count only comes from the onboard GPS module -- phone-relayed
+    // fixes (gpsFromPhone == true) don't carry a sat count, so sats stays 0.
+    if (!gpsFromPhone) {
+        alertMsg.sats = tinyGps.satellites.isValid() ? tinyGps.satellites.value() : 0;
+    }
+    alertMsg.batt_pct = battPct;
+    alertMsg.rssi_dbm = currentRssiDbm();
+    std::vector<uint8_t> encoded = duckpayload::encodeSos(alertMsg);
 
     // Fail-safe (not fail-closed) for SOS: falls back to cleartext as a last
     // resort if sealing fails, since dropping an emergency alert is worse
     // than leaking location for this specific flow.
-    int failure = sendUplinkSos(topics::alert, loraMsg);
+    int failure = sendUplinkSos(topics::alert, std::string(reinterpret_cast<const char*>(encoded.data()), encoded.size()));
     lastTxResult = failure;
     lastTxMs     = millis();
 
@@ -1908,14 +1939,27 @@ void handleSOS(const String& body) {
     dspStrCenter(34, TXT_EMERGENCY_SIGNAL_DOTS);
     dspEnd();
 
-    String message = "SOS,LAT:" + lat + ",LNG:" + lng;
-    if (alt.length() > 0) message += ",ALT:" + alt;
-    if (spd.length() > 0) message += ",SPD:" + spd;
-    if (hdg.length() > 0) message += ",HDG:" + hdg;
-    message += ",BATT:" + String(battPct);
-    message += ",RSSI:" + String((int)currentRssiDbm());
+    // Protobuf-encode the alert (see duck_payloads.proto: SosAlert, wrapped
+    // in a StatusReport on the `status` topic).
+    duckcdp_SosAlert alertMsg = duckcdp_SosAlert_init_zero;
+    alertMsg.origin = duckcdp_SosOrigin_SOS_ORIGIN_PHONE;
+    bool hasGps = (lat.length() > 0 && lng.length() > 0);
+    alertMsg.has_gps = hasGps;
+    if (hasGps) {
+        alertMsg.gps_source = duckcdp_GpsSource_GPS_SOURCE_PHONE;
+        alertMsg.lat_e7 = (int32_t)lround(atof(lat.c_str()) * 1e7);
+        alertMsg.lng_e7 = (int32_t)lround(atof(lng.c_str()) * 1e7);
+        if (alt.length() > 0) alertMsg.alt_m = (int32_t)lround(atof(alt.c_str()));
+        if (spd.length() > 0) alertMsg.spd_dkmh = (uint32_t)lround(atof(spd.c_str()) * 10);
+        if (hdg.length() > 0) alertMsg.hdg_deg = (uint32_t)lround(atof(hdg.c_str()));
+    } else {
+        alertMsg.gps_source = duckcdp_GpsSource_GPS_SOURCE_NONE;
+    }
+    alertMsg.batt_pct = battPct;
+    alertMsg.rssi_dbm = currentRssiDbm();
+    std::vector<uint8_t> encoded = duckpayload::encodeStatusReportSos(alertMsg);
 
-    int failure = sendUplinkSos(topics::status, std::string(message.c_str()));
+    int failure = sendUplinkSos(topics::status, std::string(reinterpret_cast<const char*>(encoded.data()), encoded.size()));
     blinkLed(3);
     broadcast("CDK:ACK,ID:SOS");
 
@@ -1937,7 +1981,19 @@ void handleMsg(const String& body) {
     String lat     = extractField(body, "LAT");
     String lng     = extractField(body, "LNG");
     String text    = extractField(body, "TEXT");
-    String message = "MSG,URGENCY:" + urgency + ",LAT:" + lat + ",LNG:" + lng + ",TEXT:" + text;
+
+    // Protobuf-encode the message (see duck_payloads.proto: StatusMsg,
+    // wrapped in a StatusReport on the `status` topic).
+    duckcdp_StatusMsg statusMsg = duckcdp_StatusMsg_init_zero;
+    statusMsg.src = duckcdp_StatusMsgSrc_STATUS_MSG_SRC_PHONE;
+    std::snprintf(statusMsg.urgency, sizeof(statusMsg.urgency), "%s", urgency.c_str());
+    bool hasGps = (lat.length() > 0 && lng.length() > 0);
+    statusMsg.has_gps = hasGps;
+    if (hasGps) {
+        statusMsg.lat_e7 = (int32_t)lround(atof(lat.c_str()) * 1e7);
+        statusMsg.lng_e7 = (int32_t)lround(atof(lng.c_str()) * 1e7);
+    }
+    std::snprintf(statusMsg.text, sizeof(statusMsg.text), "%s", text.c_str());
 
     dspPowerSave(0);
     dspBegin();
@@ -1948,7 +2004,8 @@ void handleMsg(const String& body) {
     blinkLed(1);
     displayHome();
 
-    int failure = sendUplink(topics::status, std::string(message.c_str()));
+    std::vector<uint8_t> encoded = duckpayload::encodeStatusReportMsg(statusMsg);
+    int failure = sendUplink(topics::status, std::string(reinterpret_cast<const char*>(encoded.data()), encoded.size()));
     if (!failure) broadcast("CDK:ACK,ID:MSG");
 }
 
@@ -1988,14 +2045,22 @@ void handleGps(const String& body) {
     if (lat.length() == 0 || lat == "none" || lng.length() == 0 || lng == "none") {
         phoneGpsNoFix          = true;
         phoneGpsDisplayPending = true;
-        snprintf(gpsTxPayload, sizeof(gpsTxPayload),
-                 "GPS,FIX:0,SRC:PHONE,REASON:NO_SIGNAL,BATT:%d,RSSI:%d",
-                 batteryPercent(readVbat()), (int)currentRssiDbm());
+        duckcdp_GpsReading noFix = duckcdp_GpsReading_init_zero;
+        noFix.has_fix = false;
+        noFix.source = duckcdp_GpsSource_GPS_SOURCE_PHONE;
+        noFix.no_fix_reason = duckcdp_GpsNoFixReason_GPS_REASON_NO_SIGNAL;
+        noFix.batt_pct = batteryPercent(readVbat());
+        noFix.rssi_dbm = currentRssiDbm();
+        gpsTxPayload = duckpayload::encodeGps(noFix);
         gpsTxPending = true;
         return;
     }
-    char gpsBuf[128];
-    snprintf(gpsBuf, sizeof(gpsBuf), "GPS,SRC:PHONE,LAT:%s,LNG:%s", lat.c_str(), lng.c_str());
+    duckcdp_GpsReading reading = duckcdp_GpsReading_init_zero;
+    reading.has_fix = true;
+    reading.source = duckcdp_GpsSource_GPS_SOURCE_PHONE;
+    reading.no_fix_reason = duckcdp_GpsNoFixReason_GPS_REASON_NONE;
+    reading.lat_e7 = (int32_t)lround(atof(lat.c_str()) * 1e7);
+    reading.lng_e7 = (int32_t)lround(atof(lng.c_str()) * 1e7);
     strncpy(phoneGpsLatBuf, lat.c_str(), sizeof(phoneGpsLatBuf) - 1);
     strncpy(phoneGpsLngBuf, lng.c_str(), sizeof(phoneGpsLngBuf) - 1);
     String alt = extractField(body, "ALT");
@@ -2004,18 +2069,14 @@ void handleGps(const String& body) {
     phoneGpsAltBuf[0] = '\0';
     phoneGpsSpdBuf[0] = '\0';
     phoneGpsHdgBuf[0] = '\0';
-    if (alt.length() > 0) { strncpy(phoneGpsAltBuf, alt.c_str(), sizeof(phoneGpsAltBuf) - 1); strncat(gpsBuf, (",ALT:" + alt).c_str(), sizeof(gpsBuf) - strlen(gpsBuf) - 1); }
-    if (spd.length() > 0) { strncpy(phoneGpsSpdBuf, spd.c_str(), sizeof(phoneGpsSpdBuf) - 1); strncat(gpsBuf, (",SPD:" + spd).c_str(), sizeof(gpsBuf) - strlen(gpsBuf) - 1); }
-    if (hdg.length() > 0) { strncpy(phoneGpsHdgBuf, hdg.c_str(), sizeof(phoneGpsHdgBuf) - 1); strncat(gpsBuf, (",HDG:" + hdg).c_str(), sizeof(gpsBuf) - strlen(gpsBuf) - 1); }
-    char battSuffix[16];
-    snprintf(battSuffix, sizeof(battSuffix), ",BATT:%d", batteryPercent(readVbat()));
-    strncat(gpsBuf, battSuffix, sizeof(gpsBuf) - strlen(gpsBuf) - 1);
-    char rssiSuffix[24];
-    snprintf(rssiSuffix, sizeof(rssiSuffix), ",RSSI:%d", (int)currentRssiDbm());
-    strncat(gpsBuf, rssiSuffix, sizeof(gpsBuf) - strlen(gpsBuf) - 1);
+    if (alt.length() > 0) { strncpy(phoneGpsAltBuf, alt.c_str(), sizeof(phoneGpsAltBuf) - 1); reading.alt_m = (int32_t)lround(atof(alt.c_str())); }
+    if (spd.length() > 0) { strncpy(phoneGpsSpdBuf, spd.c_str(), sizeof(phoneGpsSpdBuf) - 1); reading.spd_dkmh = (uint32_t)lround(atof(spd.c_str()) * 10); }
+    if (hdg.length() > 0) { strncpy(phoneGpsHdgBuf, hdg.c_str(), sizeof(phoneGpsHdgBuf) - 1); reading.hdg_deg = (uint32_t)lround(atof(hdg.c_str())); }
+    reading.batt_pct = batteryPercent(readVbat());
+    reading.rssi_dbm = currentRssiDbm();
     phoneGpsNoFix          = false;
     phoneGpsDisplayPending = true;
-    strncpy(gpsTxPayload, gpsBuf, sizeof(gpsTxPayload) - 1);
+    gpsTxPayload = duckpayload::encodeGps(reading);
     gpsTxPending = true;
 }
 

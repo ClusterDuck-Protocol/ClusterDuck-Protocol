@@ -82,6 +82,11 @@ message SosAlert {
   // RSSI (dBm) of the last LoRa packet received by this duck's radio at the
   // time this alert was sent -- same meaning as GpsReading.rssi_dbm above.
   sint32 rssi_dbm = 10;
+
+  // Satellite count at the time of this alert, 0 if unknown (e.g.
+  // gps_source == GPS_SOURCE_PHONE, where the device has no onboard fix
+  // info) -- same meaning as GpsReading.sats above.
+  uint32 sats = 11;
 }
 
 // Periodic health/status report transmitted on the `health` topic.
