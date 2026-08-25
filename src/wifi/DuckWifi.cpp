@@ -31,59 +31,62 @@ bool DuckWifi::connected() {
     return (WiFi.status() == WL_CONNECTED);
 }
 
-int saveWifiCredentials(std::string ssid, std::string password) {
+int DuckWifi::saveWifiCredentials(std::string ssid, std::string password) {
     int err = DUCK_ERR_NONE;
   
     if (ssid.empty() || password.empty()) {
-      logerr("Invalid SSID or password\n");
+      logerr_ln("Invalid SSID or password\n");
       return DUCK_ERR_INVALID_ARGUMENT;
     }
-    if (!EEPROM.begin(512)) {
-      logerr("Failed to initialise EEPROM\n");
-      return DUCK_ERR_EEPROM_INIT;
+    String ssidStr(ssid.c_str());
+    String passStr(password.c_str());
+
+    bool wifiSaved = wifi_eeprom.putString("wifi_ssid", ssidStr);
+    bool passSaved = wifi_eeprom.putString("wifi_pass", passStr);
+
+    if (!wifiSaved || !passSaved) {
+        logerr_ln("Failed to save WiFi credentials");
+        return DUCK_ERR_EEPROM_WRITE;
     }
-  
-    if (ssid.length() > 0 && password.length() > 0) {
-      loginfo("Clearing EEPROM\n");
-      for (int i = 0; i < 96; i++) {
-        EEPROM.write(i, 0);
-      }
-  
-      loginfo("updating EEPROM...\n");
-      for (int i = 0; i < ssid.length(); i++)
-      {
-        EEPROM.write(i, ssid[i]);
-      }
-      for (int i = 0; i < password.length(); ++i)
-      {
-        EEPROM.write(32 + i, password[i]);
-      }
-      if (!EEPROM.commit()) {
-        logerr("Failed to commit EEPROM\n");
-        err = DUCK_ERR_EEPROM_WRITE;
-      }
-    }
+    loginfo_ln("WiFi credentials saved successfully");
+    wifi_eeprom.end();
     return err;
   }
-  
-std::string loadWifiSsid() {
-    EEPROM.begin(512); //Initialasing EEPROM
-    std::string esid;
-    // loop through saved SSID characters
-    for (int i = 0; i < 32; ++i)
-    {
-      esid += char(EEPROM.read(i));
-    }
-    return esid;
+
+std::optional<std::string> DuckWifi::loadWifiSsid() {
+  if(initCredentialStorage()){
+    String pass = wifi_eeprom.getString("wifi_pass", "");
+    wifi_eeprom.end();
+    return std::string(pass.c_str());
+  } else{
+    logerr_ln("failed to load credentials -- eeprom preferences error");
+    return std::nullopt;
+  }
 }
   
-std::string loadWifiPassword() {
-    EEPROM.begin(512); //Initialasing EEPROM
-    std::string epass = "";
-    // loop through saved Password characters
-    for (int i = 32; i < 96; ++i)
-    {
-      epass += char(EEPROM.read(i));
+
+std::optional<std::string> DuckWifi::loadWifiPassword() {
+  if(initCredentialStorage()){
+    String ssid = wifi_eeprom.getString("wifi_ssid", "");
+    wifi_eeprom.end();
+    return std::string(ssid.c_str());
+  } else{
+    logerr_ln("failed to load credentials -- eeprom preferences error");
+    return std::nullopt;
+  }
+}
+
+bool DuckWifi::initCredentialStorage(){
+  if(!this->eeprom_initialized){
+    if (!wifi_eeprom.begin("duckwifi")) {
+      logerr_ln("Failed to initialise wifi preferences storage");
+      this->eeprom_initialized = false;
+      return false;
+    } else{
+      this->eeprom_initialized = true;
+      return true;
     }
-    return epass;
+  } else {
+    return true;
+  }
 }
