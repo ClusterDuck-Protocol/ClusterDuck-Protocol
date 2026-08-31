@@ -37,32 +37,23 @@ private :
      * Could be a RREQ, RREP, PING, PONG or DATA packet on its associated topic.
      *
      */
-    void handleReceivedPacket() override {
+    void handleReceivedPacket(CdpPacket rxPacket) override {
         loginfo_ln("====> handleReceivedPacket: START");
+        if (recvDataCallback) recvDataCallback(rxPacket);
 
-        int err;
-        std::optional<std::vector<uint8_t>> rxData = this->duckRadio.readReceivedData();
-        if (!rxData) {
-        logerr_ln("ERROR failed to get data from DuckRadio.");
-        return;
-        }
-        CdpPacket rxPacket(rxData.value());
-        logdbg_ln("Got data from radio. size: %d",rxPacket.size());
-
-        // recvDataCallback(rxPacket); crashes the duck if callback body not defined in sketch
-        
         //Check if Duck is desitination for this packet before relaying
         if (duckutils::isEqual(BROADCAST_DUID, rxPacket.dduid)) {
-            ifBroadcast(rxPacket, err);
+            ifBroadcast(rxPacket);
         } else if(duckutils::isEqual(this->duid, rxPacket.dduid)) { //Target device check
-            ifNotBroadcast(rxPacket, err);
+            ifNotBroadcast(rxPacket);
         } else { //If it's meant for a specific target but not this one
-            ifNotBroadcast(rxPacket, err, true);
+            ifNotBroadcast(rxPacket, true);
         }
         this->router.getFilter().bloom_add(rxPacket.muid.data(), MUID_LENGTH);
     }
 
-    void ifBroadcast(CdpPacket rxPacket, int err) {
+    void ifBroadcast(CdpPacket rxPacket) {
+        int err;
         switch(rxPacket.topic) {
             case reservedTopic::rreq: {
                 if(rxPacket.hopCount <= 0){
@@ -71,7 +62,11 @@ private :
                     rrepDoc.addToPath(this->duid);
                     this->sendRouteResponse(rxPacket.sduid, rrepDoc.asString());
                     // Update routing table with signal info
-                    this->router.insertIntoRoutingTable(rxPacket.sduid, rxPacket.sduid, this->getSignalScore()); //can only be one hop away
+                    if(rxPacket.duckType == DuckType::PAPA){
+                        this->router.insertIntoRoutingTable(PAPADUCK_DUID, PAPADUCK_DUID, this->getSignalScore());
+                    } else {
+                        this->router.insertIntoRoutingTable(rxPacket.sduid, rxPacket.sduid, this->getSignalScore()); //can only be one hop away
+                    }
                 }
                 break;
             }
@@ -106,8 +101,8 @@ private :
         }
     }
 
-    void ifNotBroadcast(CdpPacket rxPacket, int err, bool relay = false) {
-
+    void ifNotBroadcast(CdpPacket rxPacket, bool relay = false) {
+        int err;
         switch(rxPacket.topic) {
             case reservedTopic::rreq: {
                 RouteJSON rreqDoc = RouteJSON(rxPacket.data);
@@ -135,18 +130,33 @@ private :
                 RouteJSON rrepDoc = RouteJSON(rxPacket.data);
                 std::optional<Duid> last = rrepDoc.getlastInPath();
                 Duid lastInPath = last.has_value() ? last.value() : rxPacket.sduid;
-                loginfo_ln("Received Route Response from DUID: %s", rxPacket.sduid.data(), rxPacket.sduid.size());
+                std::string sourceDuid(rxPacket.sduid.begin(), rxPacket.sduid.end());
+                loginfo_ln("Received Route Response from DUID: %s", sourceDuid.c_str());
 
-                std::optional<Duid> nextHop = this->router.getBestNextHop(rrepDoc.getDestination());
+                std::optional<Duid> nextHop;
+                if(rxPacket.duckType == DuckType::PAPA){
+                    nextHop = this->router.getBestNextHop(PAPADUCK_DUID);
+                } else {
+                    nextHop = this->router.getBestNextHop(rrepDoc.getDestination());
+                }
+                
                 if((rrepDoc.getDestination() != this->duid) && (nextHop.has_value()) && (nextHop.value() !=  rxPacket.sduid)){
                     rrepDoc.popFromPath();
                     rrepDoc.addToPath(this->duid);
                     //route responses need a way to keep tray of who relayed the packet, but a response needs to be directed and not broadly relayed
                     this->sendRouteResponse(rrepDoc.getDestination(), rrepDoc.asString()); //so here the "relaying" duck is known from sduid
-                    this->router.insertIntoRoutingTable(rxPacket.sduid, lastInPath, this->getSignalScore());
+                    if(rxPacket.duckType == DuckType::PAPA){
+                        this->router.insertIntoRoutingTable(PAPADUCK_DUID, lastInPath, this->getSignalScore());
+                    } else {
+                        this->router.insertIntoRoutingTable(rxPacket.sduid, lastInPath, this->getSignalScore());
+                    }
                 } else {
                     //destination = sender of the rrep -> the last hop to current duck
-                    this->router.insertIntoRoutingTable(rrepDoc.getOrigin(), lastInPath, this->getSignalScore());
+                    if(rxPacket.duckType == DuckType::PAPA){
+                        this->router.insertIntoRoutingTable(PAPADUCK_DUID, lastInPath, this->getSignalScore());
+                    } else {
+                        this->router.insertIntoRoutingTable(rrepDoc.getOrigin(), lastInPath, this->getSignalScore());
+                    }
                 }
             }
                 break;

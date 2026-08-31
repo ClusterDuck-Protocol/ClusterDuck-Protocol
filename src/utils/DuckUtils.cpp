@@ -55,10 +55,43 @@ std::string convertToHex( uint8_t* data, int size) {
   }
   return buf;
 }
+std::string hexToString(const std::string& hex) {
+  if (hex.size() % 2 != 0) return "";
+
+  auto hexVal = [](char c) -> uint8_t {
+      if (c >= '0' && c <= '9') return c - '0';
+      if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+      if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+      return 0;
+  };
+
+  std::string out;
+  out.reserve(hex.size() / 2);
+
+  for (size_t i = 0; i < hex.size(); i += 2) {
+      uint8_t byte = (hexVal(hex[i]) << 4) | hexVal(hex[i + 1]);
+      out.push_back(static_cast<char>(byte));
+  }
+
+  return out;
+}
 
 std::string toString(uint8_t* data, int size) {
     std::string str = std::string(data, data + size); //data + size for the entire length
     return str;
+}
+
+std::string duidAsString(std::array<uint8_t,8> duid) {
+  static const char* hex = "0123456789ABCDEF";
+  std::string out;
+  out.reserve(duid.size() * 2);
+
+  for (size_t i = 0; i < duid.size(); i++) {
+      uint8_t b = duid[i];
+      out.push_back(hex[b >> 4]);
+      out.push_back(hex[b & 0x0F]);
+  }
+  return out;
 }
 
 uint32_t toUint32(const uint8_t* data) {

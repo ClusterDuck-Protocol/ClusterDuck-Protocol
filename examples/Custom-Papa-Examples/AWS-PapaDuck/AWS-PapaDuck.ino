@@ -22,6 +22,7 @@
 #ifdef CA_CERT
 #endif
 
+
 // --- WiFi Configuration ---
 #define WIFI_SSID ""                    // Your WiFi SSID (Needs to be 2.4 Ghz network)
 #define WIFI_PASSWORD ""                // Your WiFi Password
@@ -127,7 +128,8 @@ void handleDuckData(CdpPacket receivedPacket) {
 
   if (receivedPacket.topic != reservedTopic::ack && 
       receivedPacket.topic != reservedTopic::rrep && 
-      receivedPacket.topic != reservedTopic::rreq) {
+      receivedPacket.topic != reservedTopic::rreq &&
+      duck.muidNotReceived(receivedPacket.muid)) {
     if(quackJson(receivedPacket) == -1) {
       if(packetQueue.size() > QUEUE_SIZE_MAX) {
         packetQueue.pop();
@@ -135,8 +137,7 @@ void handleDuckData(CdpPacket receivedPacket) {
       } else {
         packetQueue.push(receivedPacket.data);
       }
-      Serial.print("[PAPA] New size of queue: ");
-      loginfo_ln(packetQueue.size());
+      loginfo_ln("[PAPA] New size of queue: %u", packetQueue.size());
     }
   }
 }
@@ -236,7 +237,7 @@ void publishQueue() {
   while(!packetQueue.empty()) {
     if(quackJson(packetQueue.front()) == 0) {
       packetQueue.pop();
-      loginfo_ln("[PAPA] Queue size: %i",packetQueue.size());
+      loginfo_ln("[PAPA] Queue size: %u", packetQueue.size());
     } else {
       return;
     }

@@ -10,7 +10,6 @@
  */
 
  #include <string>
- #include <arduino-timer.h>
  #include <CDP.h>
 
  #ifdef SERIAL_PORT_USBVIRTUAL
@@ -91,19 +90,16 @@ CRGB leds[NUM_LEDS];
   * @return true if data was successfully sent, false otherwise
   */
  bool runSensor(void *) {
-   bool failure;
-   
-   std::string message = "C:" + std::to_string(counter) + "|" + "FM:" + std::to_string(freeMemory());
-   loginfo("[MAMA] sensor data: ");
-   loginfo_ln(message.c_str());
- 
-   failure = duck.sendData(topics::health, message);
-   if (!failure) {
-     counter++;
-     loginfo_ln("[MAMA] runSensor ok.");
-   } else {
-     loginfo_ln("[MAMA] runSensor failed.");
-   }
-   return true;
+    bool failure;
+
+    std::string message = "Placeholder Sensor Data. C: " + std::to_string(counter);
+
+    failure = duck.sendData(topics::sensor, message);
+    if (!failure) {
+    Serial.println("[MAMA] runSensor ok.");
+    } else {
+    Serial.println("[MAMA] runSensor failed.");
+    }
+    return true;
  }
  

@@ -11,7 +11,7 @@
 #include <Update.h>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
-#include <EEPROM.h>
+#include <Preferences.h>
 
 class DuckWifi {
     public:
@@ -38,10 +38,32 @@ class DuckWifi {
          * @returns true if device wifi is connected, false otherwise. 
          */
         bool connected(); //change to an option with wifi name?
-
+        
+        /**
+         * @brief Write ssid to EEPROM
+         *
+         * @param val        the new ssid of the WiFi network
+         */
         void setSsid(std::string val);
-    
+
+        /**
+         * @brief Write password to EEPROM
+         *
+         * @param val        the new password of the WiFi network
+         */
         void setPassword(std::string val);
+
+        /**
+         * @brief retrieve ssid preference (previously eeprom)
+         * @return an optional with a string with the local storage wifi network ssid if retrieval success otherwise nullopt
+         */
+        std::optional<std::string> loadWifiSsid();
+
+        /**
+         * @brief retrieve password preference (previously eeprom)
+         * @return an optional with a string with the local storage wifi network password if retrieval success otherwise nullopt
+         */
+        std::optional<std::string> loadWifiPassword();
     protected:
     private:
         /**
@@ -54,10 +76,12 @@ class DuckWifi {
         int saveWifiCredentials(std::string ssid, std::string password);
 
         /**
-         * @brief Load Wifi credentials from EEPROM
-         * @return DUCK_ERR_NONE if successful, an error code otherwise.
+         * @brief initialize preferences for credentials storage (previously eeprom)
+         * @returns true if successful false if failure
          */
-        int loadWiFiCredentials();
+        bool initCredentialStorage();
+        bool eeprom_initialized = false;
+        Preferences wifi_eeprom;
 };
 #endif
 #endif

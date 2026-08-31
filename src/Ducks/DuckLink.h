@@ -18,40 +18,41 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
      */
     DuckType getType() { return DuckType::LINK; }
 
+    using rxDoneCallback = void (*)(CdpPacket data);
+    /**
+     * @brief Register callback for handling data received from duck devices
+     * 
+     * The callback will be invoked if the packet needs to be relayed (i.e not seen before)
+     * @param cb a callback to handle data received by the papa duck
+     */
+    void onReceiveDuckData(rxDoneCallback cb) { this->recvDataCallback = cb; }
+
   private:
+    rxDoneCallback recvDataCallback;
+
     /**
      * @brief Handles any packets received by the duck. Overrides the pure virtual function in Duck base class.
      */
-    void handleReceivedPacket() override{
-      if (this->duckRadio.getReceiveFlag()){
-          bool relay = false;
-          
-          loginfo_ln("====> handleReceivedPacket: START");
-  
-          int err;
-          std::optional<std::vector<uint8_t>> rxData = this->duckRadio.readReceivedData();
-          if (!rxData) {
-          logerr_ln("ERROR failed to get data from DuckRadio.");
-          return;
-          }
-          CdpPacket rxPacket(rxData.value());
-          logdbg_ln("Got data from radio. size: %d",rxPacket.size());
-  
-          // recvDataCallback(rxPacket.asBytes());
-          
-          //Check if Duck is desitination for this packet before relaying
-          if (duckutils::isEqual(BROADCAST_DUID, rxPacket.dduid)) {
-              ifBroadcast(rxPacket, err);
-          } else if(duckutils::isEqual(this->duid, rxPacket.dduid)) { //Target device check
-              ifNotBroadcast(rxPacket, err, false);
-          } else { //If it's meant for a specific target but not this one
-              ifNotBroadcast(rxPacket, err, true);
-          }
-          this->router.getFilter().bloom_add(rxPacket.muid.data(), MUID_LENGTH);
-      }
+    void handleReceivedPacket(CdpPacket rxPacket) override{
+        bool relay = false;
+        
+        loginfo_ln("====> handleReceivedPacket: START");
+
+        if (recvDataCallback) recvDataCallback(rxPacket);
+        
+        //Check if Duck is desitination for this packet before relaying
+        if (duckutils::isEqual(BROADCAST_DUID, rxPacket.dduid)) {
+            ifBroadcast(rxPacket);
+        } else if(duckutils::isEqual(this->duid, rxPacket.dduid)) { //Target device check
+            ifNotBroadcast(rxPacket, false);
+        } else { //If it's meant for a specific target but not this one
+            ifNotBroadcast(rxPacket, true);
+        }
+        this->router.getFilter().bloom_add(rxPacket.muid.data(), MUID_LENGTH);
     }
   
-      void ifBroadcast(CdpPacket rxPacket, int err) {
+      void ifBroadcast(CdpPacket rxPacket) {
+        int err;
           switch(rxPacket.topic) {
               case reservedTopic::rreq: {
                 if(rxPacket.hopCount <= 0){
@@ -61,7 +62,11 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
                   // Update routing table with signal info
                   std::optional<Duid> last = rrepDoc.getlastInPath();
                   Duid lastInPath = last.has_value() ? last.value() : rxPacket.sduid;
-                  this->router.insertIntoRoutingTable(rxPacket.sduid, lastInPath, this->getSignalScore());
+                  if(rxPacket.duckType == DuckType::PAPA){
+                    this->router.insertIntoRoutingTable(PAPADUCK_DUID, lastInPath, this->getSignalScore());
+                  } else {
+                    this->router.insertIntoRoutingTable(rxPacket.sduid, lastInPath, this->getSignalScore());
+                  }
                 }
                   break;
               }
@@ -81,7 +86,8 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
           }
       }
   
-      void ifNotBroadcast(CdpPacket rxPacket, int err, bool relay = false) {
+      void ifNotBroadcast(CdpPacket rxPacket, bool relay = false) {
+        int err;
           switch(rxPacket.topic) {
               case reservedTopic::rreq: {
                   RouteJSON rreqDoc = RouteJSON(rxPacket.data);
@@ -91,14 +97,19 @@ class DuckLink : public Duck<WifiCapability, RadioType> {
                       Duid lastInPath = last.has_value() ? last.value() : rxPacket.sduid;
                       rreqDoc.convertReqToRep();
                       this->sendRouteResponse(lastInPath, rreqDoc.asString());
-                      this->router.insertIntoRoutingTable(rxPacket.sduid, lastInPath, this->getSignalScore());
+                      if(rxPacket.duckType == DuckType::PAPA){
+                        this->router.insertIntoRoutingTable(PAPADUCK_DUID, lastInPath, this->getSignalScore());
+                      } else {
+                        this->router.insertIntoRoutingTable(rxPacket.sduid, lastInPath, this->getSignalScore());
+                      }
                   }
               }
                 break;
               case reservedTopic::rrep: {
                   //we still need to recieve rreps in case of ttl expiry
                   RouteJSON rrepDoc = RouteJSON(rxPacket.data);
-                  loginfo_ln("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Received Route Response from DUID: %s", rxPacket.sduid.data());
+                  std::string sourceDuid(rxPacket.sduid.begin(), rxPacket.sduid.end());
+                  loginfo_ln("Received Route Response from DUID: %s", sourceDuid.c_str());
                   //destination = sender of the rrep -> the last hop to current duck
                   std::optional<Duid> last = rrepDoc.getlastInPath();
                   Duid lastInPath = last.value();

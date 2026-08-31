@@ -93,6 +93,10 @@ enum topics {
   alert = 0x14,
   /// Device health status
   health = 0x15,
+  //node signal data
+  sig = 0x17,
+  //battery level
+  bat = 0x18,
   // Send duck commands
   dcmd = 0x16,
   //gps
@@ -129,9 +133,7 @@ enum reservedTopic {
  * @brief Use this DUID to send to all PapaDucks
  * 
  */
-static std::array<uint8_t,8> PAPADUCK_DUID = {0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00};
-
+static std::array<uint8_t,8> PAPADUCK_DUID = {0x31,0x31,0x31,0x31,0x31,0x31,0x31,0x31};
 /**
 * @brief Use this DUID to be received by every duck in the network
 * 
@@ -276,6 +278,10 @@ class CdpPacket {
                 return "gps";
             case topics::sensor:
                 return "sensor";
+            case topics::bat:
+                return "battery";
+            case topics::sig:
+                return "signal health";
             case topics::alert:
                 return "alert";
             case topics::health:

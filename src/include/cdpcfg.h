@@ -54,6 +54,12 @@
 /// Serial Console Baud Rate
 #define CDPCFG_SERIAL_BAUD 115200
 
+//Max TX and RX packet queue size
+#define CDPCFG_MAX_QUEUE_SIZE 10
+
+//minimum time between packets sent in milliseconds
+#define CDPCFG_PACKET_SEND_RATE 3000
+
 // Access point IP adress
 
 #define CDPCFG_AP_IP1 192
@@ -72,7 +78,7 @@
 /// Spread Factor
 #define CDPCFG_RF_LORA_SF 7
 /// Transmit Power
-#define CDPCFG_RF_LORA_TXPOW 14
+#define CDPCFG_RF_LORA_TXPOW 4
 /// Antenna Gain correction
 #define CDPCFG_RF_LORA_GAIN 0
 
@@ -107,8 +113,8 @@
 // CDP Acceptable Signal Ranges
 #define RSSI_MAX (-20.0f)
 #define RSSI_MIN (-131.0f)
-#define SNR_MAX 11.5f
-#define SNR_MIN (-11.5f)
+#define SNR_MAX 30.0f
+#define SNR_MIN (-30.0f)
 
 #ifndef CDPCFG_OLED_CLASS
 #if defined(CDPCFG_OLED_NONE)
