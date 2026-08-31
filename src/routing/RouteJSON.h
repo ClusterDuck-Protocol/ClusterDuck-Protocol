@@ -49,7 +49,7 @@ class RouteJSON {
             }
             origin = json["origin"].as<const char*>();
             destination = json["destination"].as<const char*>();
-            logdbg_ln("Built RouteJSON from packet data: %s",json.as<std::string>().c_str());
+            // logdbg_ln("Built RouteJSON from packet data: %s",json.as<std::string>().c_str()); //print error, fix with merge brenton changes
         }
 
         std::string asString(){
