@@ -57,6 +57,9 @@
 //Max TX and RX packet queue size
 #define CDPCFG_MAX_QUEUE_SIZE 10
 
+//minimum time between packets sent in milliseconds
+#define CDPCFG_PACKET_SEND_RATE 3000
+
 // Access point IP adress
 
 #define CDPCFG_AP_IP1 192
