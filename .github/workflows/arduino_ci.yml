@@ -25,7 +25,6 @@ jobs:
 
     - name: System setup
       run: |
-        sudo add-apt-repository --yes ppa:nnstreamer/ppa
         sudo apt-get update
         sudo apt-get -y install cppcheck
         python -m pip install pyserial
