@@ -40,7 +40,9 @@ jobs:
     - name: Install CDP dependencies
       run: |
         echo "Installing dependencies..."
-        platformio pkg install
+        # Only the environment the build steps use. The prod_ environments
+        # download the release tag, which doesn't exist before the release.
+        platformio pkg install -e local_lilygo_t_beam_sx1262
     # - name: Unit Tests
     #   run: |
     #     python -m pip install platformio
