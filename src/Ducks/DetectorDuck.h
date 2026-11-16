@@ -11,13 +11,14 @@ public:
   DetectorDuck(std::string name = "DETECTOR") : Duck<DuckWifiNone, RadioType>(std::move(name)) {}
   ~DetectorDuck() {}
 
-  /// callback definition for receiving RSSI value
+  /// callback definition for receiving the signal data of each pong
   using rxDoneCallback = void (*)(CdpPacket data);
-  
+
   /**
-   * @brief Regsiter a callback for receiving and handling RSSI value
+   * @brief Register a callback for the signal data of each pong. The packet's
+   * data is JSON such as {"rssi":-87.5,"snr":9.25}: RSSI in dBm, SNR in dB.
    *
-   * @param rssiCb a call back defined with the following signature: `void (*)(const int)`
+   * @param cb a callback with the signature `void (*)(CdpPacket data)`
    */
   void onReceiveDuckData(rxDoneCallback cb) { this->recvDataCallback = cb; }
 
