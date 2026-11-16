@@ -37,7 +37,7 @@ The smallest working sketch for each duck type. DuckLink, MamaDuck and PapaDuck 
 - a WS2812 status LED for setup, queued readings, send errors and received packets, with non-blocking flashes. It builds and runs without the LED on boards that have no `CDPCFG_PIN_LED1`.
 - remote time sync, remote TX power and deep sleep, all off by default, with the build flags to turn them on
 
-See [its README](Custom-Mama-Examples/Full-MamaDuck/README.md). QuackPack sensors will plug in at the hook in `sendReading()`; QuackPack integration and a guide for it come later.
+See [its README](Custom-Mama-Examples/Full-MamaDuck/README.md). A QuackPack sensor can add its readings at the hook in `sendReading()`; see [QuackPacks](#quackpacks).
 
 ## Custom-Papa-Examples
 
@@ -100,6 +100,12 @@ CDP 5.5 needs C++17 or newer. `src/config/cdp_common.ini` builds with `-std=gnu+
 
 [Open-mesh routing, health and diagnostics](../docs/open-mesh-routing.md) describes the mesh, the health and signal messages, time sync and deep sleep in detail.
 
-## Coming later
+## QuackPacks
 
-QuackPacks are sensor integrations maintained by OWL Integrations. Integrating them into these examples, and a guide for it, come later.
+QuackPacks are libraries maintained by OWL Integrations that add a feature to a duck. Each one lives in its own repository with its own example sketch and build setup:
+
+- [QuackPack-DuckGPS](https://github.com/Project-Owl/QuackPack-DuckGPS): GPS position and time
+- [QuackPack-DuckSleep](https://github.com/Project-Owl/QuackPack-DuckSleep): scheduled deep sleep and a low-battery hold for MamaDucks
+- [QuackPack-DuckDisplay](https://github.com/Project-Owl/QuackPack-DuckDisplay): OLED status display
+
+A QuackPack has no CDP dependency of its own. Your project pins CDP and each QuackPack in `lib_deps`, as the QuackPack's README shows.

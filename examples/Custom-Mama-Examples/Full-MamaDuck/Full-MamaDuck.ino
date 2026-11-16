@@ -222,7 +222,8 @@ bool sendReading(void*) {
 
   // --- QuackPack sensor hook ---
   // A QuackPack sensor will add its readings to doc here, for example
-  // doc["temp"] = 21.5. QuackPack integration and a guide for it come later.
+  // doc["temp"] = 21.5. Each QuackPack has its own example; see the
+  // QuackPacks section of examples/README.md.
   // Keep the whole payload within MAX_DATA_LENGTH (228 bytes): sendData()
   // rejects a larger one with DUCKPACKET_ERR_SIZE_INVALID.
 

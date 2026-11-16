@@ -36,6 +36,6 @@ In your own PlatformIO project, add the flag to `build_flags` instead.
 
 **Deep sleep warning:** a sleeping MamaDuck receives and relays nothing, so ducks that depend on it lose their path to the PapaDuck. Use it only for a duck that no other duck needs as a relay. Before sleeping, the sketch keeps calling `run()` until `txIdle()` is true (at most 10 s), then calls `prepareForSleep()` and `esp_deep_sleep_start()`. Waking up is a reboot, so the counter and uptime start again, and a duck that is never awake for 15 minutes sends no CDP health message.
 
-## Coming later
+## QuackPacks
 
-QuackPack sensors will plug in at the `QuackPack sensor hook` comment in `sendReading()`. QuackPack integration and a guide for it come later.
+A QuackPack sensor can add its readings at the `QuackPack sensor hook` comment in `sendReading()`. Each QuackPack has its own example; see [QuackPacks](../../README.md#quackpacks).

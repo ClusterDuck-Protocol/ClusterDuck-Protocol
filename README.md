@@ -77,7 +77,7 @@ For a full list of topics available for use, see [the topics page in the wiki](h
 
 ## Expanding Duck Capabilities with QuackPacks
 
-QuackPacks are sensor integrations and libraries maintained by [OWL Integrations], allowing you to quickly build out common use cases in the mesh. You can find offically supported QuackPacks in the [Project Owl GitHub](https://github.com/Project-Owl) complete with examples sketches and platformIO settings. 
+QuackPacks are sensor integrations and libraries maintained by [OWL Integrations], allowing you to quickly build out common use cases in the mesh. You can find officially supported QuackPacks in the [Project Owl GitHub](https://github.com/Project-Owl), complete with example sketches and PlatformIO settings. See [examples/README.md](examples/README.md#quackpacks) for the current list.
 
 # How to Contribute
 
