@@ -45,7 +45,7 @@ RREQ and RREP payloads are JSON. Device IDs are written as 8-character text. The
 
 ## Signal health (`topics::sig`, schema v2)
 
-Each non-Papa, non-Detector duck reports its direct neighbours every `CDPCFG_SIGNAL_INTERVAL_MS` (60 min). It also sends one snapshot with its first health heartbeat after boot, so a new installation shows up quickly.
+Each non-Papa, non-Detector duck reports its direct neighbours every `CDPCFG_SIGNAL_INTERVAL_MS` (30 min). It also sends one snapshot with its first health heartbeat after boot, so a new installation shows up quickly.
 
 ```json
 {"s":"RPNODE01","n":[["PEER0001",0.9512,0.75]],"o":1,"i":1,"tr":false,"a":42,"v":2}
@@ -152,7 +152,7 @@ All of these can be overridden at build time with `-D`.
 | Setting | Default | Purpose |
 |---|---|---|
 | `CDPCFG_HEALTH_INTERVAL_MS` | 15 min | Radio health message and serial diagnostics page |
-| `CDPCFG_SIGNAL_INTERVAL_MS` | 60 min | Signal-health report |
+| `CDPCFG_SIGNAL_INTERVAL_MS` | 30 min | Signal-health report |
 | `CDPCFG_ROUTE_KEEPALIVE_MS` | 10 min | Neighbour keepalive discovery |
 | `CDPCFG_ROUTE_TTL_MS` | 30 min | Route entry lifetime without refresh |
 | `CDPCFG_SIGNAL_MAX_NEIGHBORS` | 6 | Neighbours per signal-health message |
