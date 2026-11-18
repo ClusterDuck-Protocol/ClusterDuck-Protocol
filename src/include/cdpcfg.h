@@ -98,7 +98,7 @@
 
 // How often a duck reports its direct neighbours' signal (topics::sig).
 #ifndef CDPCFG_SIGNAL_INTERVAL_MS
-#define CDPCFG_SIGNAL_INTERVAL_MS (1000UL * 60UL * 60UL)   // 60 minutes
+#define CDPCFG_SIGNAL_INTERVAL_MS (1000UL * 60UL * 30UL)   // 30 minutes
 #endif
 
 // How long a routing table entry stays valid without being refreshed.
