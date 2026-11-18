@@ -22,9 +22,37 @@ public:
   friend class BloomFilterTester;
 
   /**
-   * @brief Initialize a bloom filter with default values
-   * 
-  */
+   * @brief Initialize a two-phase bloom filter with default configuration values
+   *
+   * This constructor initializes a space-efficient probabilistic data structure used for
+   * detecting duplicate messages in the ClusterDuck network. It creates a two-phase bloom
+   * filter that operates by maintaining two independent filter arrays that alternate based
+   * on message count thresholds, allowing old messages to be forgotten over time.
+   *
+   * @details Inner workings:
+   * - Allocates two unsigned int arrays (filter1 and filter2), each containing DEFAULT_NUM_SECTORS
+   *   elements initialized to zero
+   * - Sets the active filter to filter1 upon initialization
+   * - Draws DEFAULT_NUM_HASH_FUNCS seeds from esp_random(), so each duck has its own. The seeds
+   *   are not compared with each other, so two can be equal
+   * - Each seed gives one MurmurHash3 hash of the MUID, so the hashes are independent
+   *
+   * Default parameters used:
+   * - DEFAULT_NUM_SECTORS: 312 sectors for bit storage
+   * - DEFAULT_NUM_HASH_FUNCS: 2 independent hash functions
+   * - DEFAULT_BITS_PER_SECTOR: 32 bits per sector (matches unsigned int size)
+   * - DEFAULT_MAX_MESSAGES: 100 calls to bloom_add() before the filters rotate. A duck can add
+   *   the same MUID more than once, for example when it relays a packet, so this is fewer than
+   *   100 distinct messages
+   *
+   * The two phases make a sliding window counted in additions, not time: after maxMsgs additions
+   * the inactive filter is cleared and becomes active. bloom_check() looks in both filters, so a
+   * MUID is forgotten after between maxMsgs and 2 * maxMsgs further additions.
+   *
+   * @see BloomFilter(int, int, int, int) for the parameterized constructor
+   * @see bloom_add() to add messages to the active filter
+   * @see bloom_check() to check if a message exists in either filter
+   */
   BloomFilter() : BloomFilter(DEFAULT_NUM_SECTORS, DEFAULT_NUM_HASH_FUNCS, DEFAULT_BITS_PER_SECTOR, DEFAULT_MAX_MESSAGES) {
 
   }
@@ -82,7 +110,7 @@ private:
   int maxMsgs;
   int* Seeds;
 
-  static unsigned int djb2Hash(unsigned char* str, int seed, int msgSize);
+  static unsigned int murmur3Hash(const unsigned char* data, int seed, int length);
 
   /**
    * Generates a unique unsigned int index for each hash

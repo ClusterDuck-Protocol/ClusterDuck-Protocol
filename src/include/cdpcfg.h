@@ -25,8 +25,11 @@
 
 // version definitions
 #define CDP_VERSION_MAJOR  5
-#define CDP_VERSION_MINOR  0
-#define CDP_VERSION_PATCH  1
+#define CDP_VERSION_MINOR  5
+#define CDP_VERSION_PATCH  0
+#ifndef CDPCFG_BUILD_REVISION
+#define CDPCFG_BUILD_REVISION "unversioned"
+#endif
 
 #define CDP_VERSION ((((CDP_VERSION_MAJOR) << 16) | ((CDP_VERSION_MINOR) << 8) | (CDP_VERSION_PATCH)))
 
@@ -44,15 +47,83 @@
 #define CDPCFG_UPDATE_USERNAME "user"
 #define CDPCFG_UPDATE_PASSWORD "pass"
 
-#define CDPCFG_EEPROM_CRED_MAX 32
-#define CDPCFG_EEPROM_WIFI_USERNAME 0
-#define CDPCFG_EEPROM_WIFI_PASSWORD 32
-#define CDPCFG_EEPROM_CONTROL_USERNAME 64
-#define CDPCFG_EEPROM_CONTROL_PASSWORD 96
-#define CDPCFG_EEPROM_CHANNEL_VALUE 128
+// Remote duck commands. Commands are not authenticated, so any node in radio
+// range can send them; they are off by default. With a command off, ducks still
+// relay its packets for other ducks but ignore them themselves.
+//   CDPCFG_REMOTE_TIME_SYNC: act on topics::cmd_time (set the clock).
+//   CDPCFG_REMOTE_TX_POWER:  act on topics::cmd_tx (store a TX power for the
+//                            next boot, if the radio takes it).
+// Both default to CDPCFG_REMOTE_COMMANDS, so -DCDPCFG_REMOTE_COMMANDS=1 still
+// turns both on. Turn on time sync alone with -DCDPCFG_REMOTE_TIME_SYNC=1.
+#ifndef CDPCFG_REMOTE_COMMANDS
+#define CDPCFG_REMOTE_COMMANDS 0
+#endif
+#ifndef CDPCFG_REMOTE_TIME_SYNC
+#define CDPCFG_REMOTE_TIME_SYNC CDPCFG_REMOTE_COMMANDS
+#endif
+#ifndef CDPCFG_REMOTE_TX_POWER
+#define CDPCFG_REMOTE_TX_POWER CDPCFG_REMOTE_COMMANDS
+#endif
+
+// Oldest UTC time, in seconds since 1970, that a duck treats as valid
+// (default 2026-01-01). A topics::cmd_time with an older epoch is rejected,
+// and Duck::hasValidTime() stays false until the clock reaches it.
+#ifndef CDPCFG_TIME_MIN_EPOCH
+#define CDPCFG_TIME_MIN_EPOCH 1767225600UL
+#endif
 
 /// Serial Console Baud Rate
 #define CDPCFG_SERIAL_BAUD 115200
+
+// Packets each of the RX, data-TX and control-TX queues can hold.
+#ifndef CDPCFG_MAX_QUEUE_SIZE
+#define CDPCFG_MAX_QUEUE_SIZE 10
+#endif
+// Minimum time between two transmissions, in milliseconds.
+#ifndef CDPCFG_MAX_PACKET_SEND_RATE
+#define CDPCFG_MAX_PACKET_SEND_RATE 3000
+#endif
+
+// Bounded RAM for directly observed peers and destination alternatives.
+#define CDPCFG_MAX_DIRECT_NEIGHBORS 32
+#define CDPCFG_MAX_ROUTE_DESTINATIONS 64
+
+// How often a duck sends its health summary (topics::health) and logs one
+// detailed diagnostics page to serial. The first heartbeat also sends one
+// signal-health snapshot, so a new installation shows up without waiting a
+// full signal interval.
+#ifndef CDPCFG_HEALTH_INTERVAL_MS
+#define CDPCFG_HEALTH_INTERVAL_MS (1000UL * 60UL * 15UL)   // 15 minutes
+#endif
+
+// How often a duck reports its direct neighbours' signal (topics::sig).
+#ifndef CDPCFG_SIGNAL_INTERVAL_MS
+#define CDPCFG_SIGNAL_INTERVAL_MS (1000UL * 60UL * 30UL)   // 30 minutes
+#endif
+
+// How long a routing table entry stays valid without being refreshed.
+// Entries are refreshed when a packet is heard directly from that node
+// (hop count 0) and by the periodic route keepalive below, so this must stay
+// comfortably above CDPCFG_ROUTE_KEEPALIVE_MS or routes age out between
+// keepalives and every send falls back to an RREQ.
+#ifndef CDPCFG_ROUTE_TTL_MS
+#define CDPCFG_ROUTE_TTL_MS (1000UL * 60UL * 30UL)   // 30 minutes
+#endif
+
+// Most neighbours reported in one signal-health payload. The data section is
+// MAX_DATA_LENGTH (228) bytes and each entry costs roughly 26, so 6 leaves margin.
+// Entries are sorted best-signal-first and any truncation is logged.
+#ifndef CDPCFG_SIGNAL_MAX_NEIGHBORS
+#define CDPCFG_SIGNAL_MAX_NEIGHBORS 6
+#endif
+
+// How often a duck broadcasts a one-hop neighbour keepalive. Missing gateway
+// routes are separately discovered by a bounded, targeted RREQ.
+// Neighbours that hear it refresh our entry in their table and answer with an
+// RREP, which refreshes theirs in ours. Keep it well under CDPCFG_ROUTE_TTL_MS.
+#ifndef CDPCFG_ROUTE_KEEPALIVE_MS
+#define CDPCFG_ROUTE_KEEPALIVE_MS (1000UL * 60UL * 10UL)   // 10 minutes
+#endif
 
 // Access point IP adress
 
@@ -71,10 +142,19 @@
 #define CDPCFG_RF_LORA_BW 125.0f
 /// Spread Factor
 #define CDPCFG_RF_LORA_SF 7
-/// Transmit Power
+/// Transmit Power (dBm). Deployments that need more can override it at build time.
+#ifndef CDPCFG_RF_LORA_TXPOW
 #define CDPCFG_RF_LORA_TXPOW 14
+#endif
 /// Antenna Gain correction
 #define CDPCFG_RF_LORA_GAIN 0
+/// LoRa sync word. Ducks only hear radios using the same value, so separate
+/// deployments in range can pick different values to keep their traffic apart.
+/// This is not security: anyone who sets the same value hears and joins the mesh.
+/// 0x12 is the standard private (non-LoRaWAN) value; avoid 0x34, LoRaWAN's public one.
+#ifndef CDPCFG_RF_LORA_SYNC_WORD
+#define CDPCFG_RF_LORA_SYNC_WORD 0x12
+#endif
 
 /// CDP message buffer max length
 #define CDPCFG_CDP_BUFSIZE 256
@@ -107,8 +187,8 @@
 // CDP Acceptable Signal Ranges
 #define RSSI_MAX (-20.0f)
 #define RSSI_MIN (-131.0f)
-#define SNR_MAX 11.5f
-#define SNR_MIN (-11.5f)
+#define SNR_MAX 30.0f
+#define SNR_MIN (-30.0f)
 
 #ifndef CDPCFG_OLED_CLASS
 #if defined(CDPCFG_OLED_NONE)

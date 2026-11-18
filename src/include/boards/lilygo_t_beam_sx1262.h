@@ -26,6 +26,14 @@
 #define CDPCFG_PIN_LORA_DIO1    33
 #define CDPCFG_PIN_LORA_BUSY    32
 
-// Oled Display settings
+// Oled Display settings. The SSD1306 is optional on the T-Beam, so build with
+// -D ENABLE_DISPLAY when one is fitted. It has no reset line, and GPIO16 is
+// the PSRAM chip select on this board.
+#ifdef ENABLE_DISPLAY
+#define CDPCFG_PIN_OLED_DATA 21
+#define CDPCFG_PIN_OLED_CLOCK 22
+#define CDPCFG_PIN_OLED_RESET -1
+#else
 #define CDPCFG_OLED_NONE
+#endif
 #endif

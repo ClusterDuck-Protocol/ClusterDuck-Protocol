@@ -14,6 +14,8 @@ enum DuckError : int {
     DUCK_ERR_INVALID_ARGUMENT = -5101,
     /// Device Id is too long
     DUCK_ERR_ID_TOO_LONG = -5102,
+    /// Packet was not accepted into the bounded software queue.
+    DUCK_ERR_QUEUE_FULL = -5103,
     /// Lora module initialization error
     DUCKLORA_ERR_BEGIN = -1000,
     /// Lora module configuration error
@@ -26,7 +28,7 @@ enum DuckError : int {
     DUCKLORA_ERR_TRANSMIT = -1004,
     /// Failed to handle data received from the Lora module
     DUCKLORA_ERR_HANDLE_PACKET = -1050,
-    /// Attempted to send a message larger than 256 bytes
+    /// Attempted to send a message larger than the radio frame limit
     DUCKLORA_ERR_MSG_TOO_LARGE = -1051,
     /// Radio is busy sending data
     DUCKLORA_ERR_TX_BUSY = -1052,
@@ -85,6 +87,8 @@ inline const char* getDuckErrorString(int error) {
             return "Invalid argument";
         case DUCK_ERR_ID_TOO_LONG:
             return "Device Id is too long";
+        case DUCK_ERR_QUEUE_FULL:
+            return "Packet queue full";
         case DUCKLORA_ERR_BEGIN:
             return "Lora module initialization error";
         case DUCKLORA_ERR_SETUP:

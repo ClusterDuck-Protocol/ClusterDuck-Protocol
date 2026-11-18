@@ -11,15 +11,16 @@ public:
   DetectorDuck(std::string name = "DETECTOR") : Duck<DuckWifiNone, RadioType>(std::move(name)) {}
   ~DetectorDuck() {}
 
-  /// callback definition for receiving RSSI value
-  using rssiCallback = void (*)(const int);
-  
+  /// callback definition for receiving the signal data of each pong
+  using rxDoneCallback = void (*)(CdpPacket data);
+
   /**
-   * @brief Regsiter a callback for receiving and handling RSSI value
+   * @brief Register a callback for the signal data of each pong. The packet's
+   * data is JSON such as {"rssi":-87.5,"snr":9.25}: RSSI in dBm, SNR in dB.
    *
-   * @param rssiCb a call back defined with the following signature: `void (*)(const int)`
+   * @param cb a callback with the signature `void (*)(CdpPacket data)`
    */
-  void onReceiveRssi(rssiCallback rssiCb) { this->rssiCb = rssiCb; }
+  void onReceiveDuckData(rxDoneCallback cb) { this->recvDataCallback = cb; }
 
   /**
    * @brief Get the DuckType
@@ -29,24 +30,26 @@ public:
   DuckType getType() { return DuckType::DETECTOR; }
 
 private:
-  rssiCallback rssiCb;
+  rxDoneCallback recvDataCallback;
 
-  void handleReceivedPacket() {
-    loginfo_ln("====> handleReceivedPacket: START");
+  void handleReceivedPacket(CdpPacket rxPacket) {
+    logdbg_ln("====> handleReceivedPacket: START");
 
-    int err;
-    std::optional<std::vector<uint8_t>> rxData = this->duckRadio.readReceivedData();
-    if (!rxData) {
-    logerr_ln("ERROR failed to get data from DuckRadio.");
-    return;
-    }
-    CdpPacket rxPacket(rxData.value());
-    logdbg_ln("Got data from radio. size: %d",rxPacket.size());
-  
     if (rxPacket.topic == reservedTopic::pong) {
       logdbg("run() - got ping response!");
-      rssiCb(this->duckRadio.getRSSI());
-    }
+      CdpPacket signalDataPacket = rxPacket;
+
+      JsonDocument doc;
+      doc["rssi"] = this->duckRadio.getRSSI();
+      doc["snr"] = this->duckRadio.getSNR();
+
+      std::string jsonString;
+      serializeJson(doc, jsonString);
+
+      signalDataPacket.data = std::vector<byte>(jsonString.begin(), jsonString.end());
+
+      if (recvDataCallback) recvDataCallback(signalDataPacket);
+    } 
   }
 };
 #endif

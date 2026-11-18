@@ -35,12 +35,14 @@ Check out the [Wiki](https://github.com/ClusterDuck-Protocol/ClusterDuck-Protoco
 
 
 # Basic Usage
+The [examples](examples/README.md) folder has a complete sketch for each duck type, a full-featured MamaDuck, and how to build them with PlatformIO.
+
 ## Constructing a Duck
 ```c++
 DuckLink duck("LINK0001"); //Declare the duck type and pass in your Device ID name
 
 MamaDuck duck("MAMA0002"); //By default, DuckLinks and MamaDucks use LoRa radio but do not have wifi
-MamaDuck<DuckWifiNone, DuckLora> duck("MAMA0002"); //so these two MamaDuck constructors are equivalent
+MamaDuck<DuckWifiNone, DuckLoRa> duck("MAMA0002"); //so these two MamaDuck constructors are equivalent
 
 PapaDuck<DuckWifiNone> duck("PAPA0003"); //by default PapaDucks do have wifi enabled; when using local storage you may want to turn it off
 
@@ -56,23 +58,26 @@ PapaDuck<DuckWifiNone> duck("PAPA0003"); //by default PapaDucks do have wifi ena
 
 ## Sending Messages
 
-Once your duck has booted, it will begin searching for a CDP network to join. After joining or creating a network, your duck will be able to send messages into the mesh.
+A duck can send as soon as `setupWithDefaults()` has started its radio. There is no network to join: MamaDucks relay every message they hear, and ducks learn routes from the traffic around them. See [Open-mesh routing, health and diagnostics](docs/open-mesh-routing.md) for how this works. `sendData()` returns `DUCK_ERR_NONE` once the message is queued; that isn't a delivery receipt.
 ```c++
 std::string msg("I am alive!");
-duck.sendData(topics::health, msg); //send a health message relayed to all PapaDucks
+duck.sendData(topics::status, msg); //send a message to the PapaDuck, the default destination
 
-uint8_t* data;
-duck.sendData(topics::sensor, data, BROADCAST_DUID); //send raw byte sensor data, relayed to all ducks in the network
+std::vector<uint8_t> data = {0x01, 0x02, 0x03};
+duck.sendData(topics::sensor, data.data(), data.size(), BROADCAST_DUID); //send raw bytes to every duck in the network
 
-Duid destination("MAMADEST");
-duck.sendData(topics::alert, "power level: LOW", destination); //send an alert message only relayed to and read by MAMADEST
+Duid destination;
+std::copy_n("MAMADEST", destination.size(), destination.begin());
+duck.sendData(topics::alert, "power level: LOW", destination); //send an alert addressed to MAMADEST only
 ```
+
+Every duck except a DetectorDuck also sends its own health message on `topics::health` every 15 minutes, so use another topic for your own data. A PapaDuck doesn't send its health over LoRa: it passes it straight to its `onReceiveDuckData()` callback.
 
 For a full list of topics available for use, see [the topics page in the wiki](https://github.com/ClusterDuck-Protocol/ClusterDuck-Protocol/wiki/Message-Topics).
 
 ## Expanding Duck Capabilities with QuackPacks
 
-QuackPacks are sensor integrations and libraries maintained by [OWL Integrations], allowing you to quickly build out common use cases in the mesh. You can find offically supported QuackPacks in the [Project Owl GitHub](https://github.com/Project-Owl) complete with examples sketches and platformIO settings. 
+QuackPacks are sensor integrations and libraries maintained by [OWL Integrations], allowing you to quickly build out common use cases in the mesh. You can find officially supported QuackPacks in the [Project Owl GitHub](https://github.com/Project-Owl), complete with example sketches and PlatformIO settings. See [examples/README.md](examples/README.md#quackpacks) for the current list.
 
 # How to Contribute
 

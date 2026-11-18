@@ -60,8 +60,8 @@ function onMessageArrived(topic, msg) {
     mqttTopicCell.innerText = topic; // MQTT topic
     fromCell.innerText = msg.from;
     toCell.innerText = msg.to;
-    cdpTopicCell.innerText = msg.messageTopic; // CDP topic
-    responseCell.innerText = msg.responseExpected; // Whether a response is required
+    cdpTopicCell.innerText = msg.eventType; // CDP topic
+    responseCell.innerText = msg.RE; // Whether a response is required
     payloadCell.innerText = JSON.stringify(msg.payload);
 
     // Append the cells to the row

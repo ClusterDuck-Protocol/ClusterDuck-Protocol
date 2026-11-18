@@ -56,8 +56,13 @@ class DuckLoRa {
     public:
         DuckLoRa() {
             // Initialize the random number generator with a seed based on the current time in a non-arduino way
-            gen.seed(time(nullptr));
+            gen.seed(esp_random());
         };
+         /*
+        * @brief Interrupt service routine for the LoRa module.
+        *
+        */
+       static void onInterrupt();
         DuckLoRa(DuckLoRa const&) = delete;
         DuckLoRa& operator=(DuckLoRa const&) = delete;
 
@@ -70,6 +75,19 @@ class DuckLoRa {
          * @returns 0 if initialization was successful, an error code otherwise. 
          */
         int setupRadio(const LoRaConfigParams& config = defaultRadioParams);
+
+        /**
+         * @brief Check whether the radio takes a TX power, without changing it.
+         *
+         * Runs the same checks as setupRadio(), including RadioLib's own, so a
+         * value that passes here doesn't make radio setup fail. Of the 14 to 22
+         * dBm that topics::cmd_tx allows, an SX1276 takes 14 to 17 or 20 and an
+         * SX1262 takes all. Works before and after setupRadio().
+         *
+         * @param power TX power in dBm
+         * @returns DUCK_ERR_NONE if the radio takes it, DUCK_ERR_INVALID_ARGUMENT otherwise.
+         */
+        int checkTxPower(int power);
 
                 /**
          * @brief Send packet data out into the LoRa mesh network
@@ -107,6 +125,26 @@ class DuckLoRa {
          * @return true if the flag is set, false otherwise.
          */
         static bool getReceiveFlag() { return receivedFlag; }
+        uint32_t getTxDoneCount() const { return txDoneCount; }
+        uint32_t getTxTimeoutCount() const { return txTimeoutCount; }
+
+        /**
+         * @brief Check whether the radio still has work in progress.
+         *
+         * @return true while a transmission has not completed, a received packet
+         * has not been read, or an interrupt has not been serviced yet.
+         */
+        bool isBusy() const { return transmitting || receivedFlag || interruptPending; }
+
+        /**
+         * @brief Set the LoRa radio into sleep mode.
+         *
+         * The radio stays asleep until it is set up again, normally at the next
+         * boot.
+         * @returns DUCK_ERR_NONE if the chip is successfully set in sleep mode, an
+         * error code otherwise.
+         */
+        int sleep();
 
         /**
          * @brief Get the current RSSI value.
@@ -124,9 +162,15 @@ class DuckLoRa {
         float getSNR();
 
     private:
-        static volatile uint16_t interruptFlags;
+        // Set to true by onInterrupt() (ISR context) only. The actual IRQ flags
+        // are read from the radio in loop context by serviceInterruptFlags().
+        static volatile bool interruptPending;
         static volatile bool receivedFlag;
         volatile bool isSetup = false;
+        bool transmitting = false;
+        uint32_t txDoneCount = 0, txTimeoutCount = 0;
+        uint32_t txStartedAt = 0, txTimeoutMs = 0;
+        float lastRssi = 0, lastSnr = 0;
         unsigned long lastReceiveTime = 0L;
 
         static void setReceiveFlag(bool value) { receivedFlag = value; }
@@ -166,19 +210,7 @@ class DuckLoRa {
          */
         int standBy();
 
-        /**
-         * @brief Set the LoRa radio into sleep mode.
-         * 
-         * @returns DUCK_ERR_NONE if the chip is sucessfuly set in standby mode, an
-         * error code otherwise.   
-         */
-        int sleep();
-
-        /*
-        * @brief Interrupt service routine for the LoRa module.
-        *
-        */
-        static void onInterrupt();
+       
 
 };
 

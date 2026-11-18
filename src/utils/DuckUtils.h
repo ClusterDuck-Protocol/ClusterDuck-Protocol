@@ -13,12 +13,12 @@
 #include "../include/cdpcfg.h"
 #include <arduino-timer.h>
 #include <Arduino.h>
-#include <EEPROM.h>
 #include <string>
 #include <vector>
 #include "DuckError.h"
 #include <functional>
 #include <thread>
+#include <cctype>
 
 namespace duckutils {
 
@@ -66,50 +66,72 @@ std::string createUuid(int length = CDPCFG_UUID_LEN);
  * @returns A string representating the byte array in hexadecimal.
  */
 std::string convertToHex(uint8_t* data, int size);
+
+std::string hexToString(const std::string& hex);
 /**
- * @brief Convert a byte array into an ASCII string.
- * This function assumes that the byte array contains printable ASCII characters. Intended for debugging purposes.
+ * @brief Convert a byte array into an ASCII string, for logs.
  * @param data a byte array to convert
  * @param size the size of the array
- * @returns A std::string representing the byte array in ASCII.
+ * @returns A std::string representing the byte array in ASCII, with each
+ * non-printable byte written as two hex digits (see detail::appendPrintable).
  *
  */
 std::string toString(uint8_t* data, int size);
+
+
+std::string duidAsString(std::array<uint8_t,8> duid);
+
+// Exactly eight bytes, without a hex round trip or a terminating-NUL assumption.
+inline std::string duidToString(const std::array<uint8_t, 8>& duid) {
+    return std::string(duid.begin(), duid.end());
+}
+
+namespace detail {
+// Appends a printable ASCII byte as it is and any other byte as two upper-case
+// hex digits (0x0A becomes "0A"). The text "0A" and the byte 0x0A then look the
+// same, so this is for logs only: use duidToString() or convertToHex() for keys
+// and packet data.
+inline void appendPrintable(std::string& out, unsigned char c) {
+    static const char hex[] = "0123456789ABCDEF";
+    if (std::isprint(c)) {
+        out += static_cast<char>(c);
+    } else {
+        out += hex[c >> 4];
+        out += hex[c & 0x0F];
+    }
+}
+} // namespace detail
 
 /**
  * @brief Convert a vector into an ASCII string.
  * 
  * @param vec A vector to convert
- * @returns A std::string representing the byte array in ASCII.
- * 
+ * @returns A std::string representing the byte array in ASCII, with each
+ * non-printable byte written as two hex digits (see detail::appendPrintable).
+ *
  */
 template<typename T>
 std::string toString(const std::vector<T>& vec) {
     std::string result;
-    for (const auto& element : vec) {
-        if (!std::isprint(element)) {
-            return "ERROR: Non-printable character";
-        }
-        result += static_cast<char>(element);
+    for (unsigned char c : vec) {
+        detail::appendPrintable(result, c);
     }
     return result;
 }
 
 /**
- * @brief Convert an array into an ASCII string.
+ * @brief Convert a container into an ASCII string.
  *
- * @param arr An array to convert
- * @returns A std::string representing the byte array in ASCII.
+ * @param arr Any container type to convert
+ * @returns A std::string representing the byte array in ASCII, with each
+ * non-printable byte written as two hex digits (see detail::appendPrintable).
  *
  */
 template<typename Container>
 std::string toString(const Container& arr) {
     std::string result;
-    for (const auto& element : arr) {
-        if (!std::isprint(element)) {
-            return "ERROR: Non-printable character";
-        }
-        result += static_cast<char>(element);
+    for (unsigned char c : arr) {
+        detail::appendPrintable(result, c);
     }
     return result;
 }

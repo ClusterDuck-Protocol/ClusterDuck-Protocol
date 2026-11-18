@@ -4,6 +4,7 @@
 #include "Duck.h"
 #include "../utils/MemoryFree.h"
 
+
 template <typename WifiCapability = DuckWifiNone, typename RadioType = DuckLoRa>
 class MamaDuck : public Duck<WifiCapability, RadioType> {
 public:
@@ -17,8 +18,9 @@ public:
     /**
      * @brief Register callback for handling data received from duck devices
      * 
-     * The callback will be invoked if the packet needs to be relayed (i.e not seen before)
-     * @param cb a callback to handle data received by the papa duck
+     * The callback is invoked for every packet the duck hears, including repeated
+     * copies of the same message relayed by different ducks.
+     * @param cb a callback to handle data received by the mama duck
      */
     void onReceiveDuckData(rxDoneCallback cb) { this->recvDataCallback = cb; }
 
@@ -31,50 +33,50 @@ public:
 
 private :
     WifiCapability duckWifi;
-    rxDoneCallback recvDataCallback;
+    rxDoneCallback recvDataCallback = nullptr;
     /**
      * @brief Handles any packets received by the duck. Overrides the pure virtual function in Duck base class.
      * Could be a RREQ, RREP, PING, PONG or DATA packet on its associated topic.
      *
      */
-    void handleReceivedPacket() override {
-        loginfo_ln("====> handleReceivedPacket: START");
+    void handleReceivedPacket(CdpPacket rxPacket) override {
+        logdbg_ln("====> handleReceivedPacket: START");
+        if (recvDataCallback) recvDataCallback(rxPacket);
 
-        int err;
-        std::optional<std::vector<uint8_t>> rxData = this->duckRadio.readReceivedData();
-        if (!rxData) {
-        logerr_ln("ERROR failed to get data from DuckRadio.");
-        return;
-        }
-        CdpPacket rxPacket(rxData.value());
-        logdbg_ln("Got data from radio. size: %d",rxPacket.size());
-
-        // recvDataCallback(rxPacket); crashes the duck if callback body not defined in sketch
-        
         //Check if Duck is desitination for this packet before relaying
         if (duckutils::isEqual(BROADCAST_DUID, rxPacket.dduid)) {
-            ifBroadcast(rxPacket, err);
+            ifBroadcast(rxPacket);
         } else if(duckutils::isEqual(this->duid, rxPacket.dduid)) { //Target device check
-            ifNotBroadcast(rxPacket, err);
+            ifNotBroadcast(rxPacket);
         } else { //If it's meant for a specific target but not this one
-            ifNotBroadcast(rxPacket, err, true);
+            ifNotBroadcast(rxPacket, true);
         }
         this->router.getFilter().bloom_add(rxPacket.muid.data(), MUID_LENGTH);
     }
 
-    void ifBroadcast(CdpPacket rxPacket, int err) {
+    /**
+     * @brief Handle a packet addressed to every duck (BROADCAST_DUID).
+     *
+     * Route requests and replies never reach this function:
+     * Duck::processReceivedPacket() hands them to handleRoutingPacket() first.
+     * - PING: answered with a broadcast PONG. Neither is relayed, so PING and
+     *   PONG only reach direct neighbours.
+     * - PONG: ignored.
+     * - cmd_tx, if CDPCFG_REMOTE_TX_POWER is on: stores the new TX power
+     *   (14 to 22 dBm) for the next boot, if this duck's radio takes it, and
+     *   relays the packet. A command that doesn't parse or is outside 14 to 22
+     *   dBm is neither applied nor relayed.
+     * - cmd_time, if CDPCFG_REMOTE_TIME_SYNC is on: applyTimeCommand(), then
+     *   relayed whether or not the time was applied.
+     * - Anything else, including cmd_tx and cmd_time when their setting is
+     *   off: relayed with broadcastPacket(), which drops packets it has
+     *   already seen and packets that reached MAX_HOPS.
+     *
+     * @param rxPacket the received packet
+     */
+    void ifBroadcast(CdpPacket rxPacket) {
+        int err = DUCK_ERR_NONE;
         switch(rxPacket.topic) {
-            case reservedTopic::rreq: {
-                if(rxPacket.hopCount <= 0){
-                    loginfo_ln("RREQ received from %s. Sending Response!", rxPacket.sduid.data());
-                    RouteJSON rrepDoc = RouteJSON(rxPacket.sduid, this->duid);
-                    rrepDoc.addToPath(this->duid);
-                    this->sendRouteResponse(rxPacket.sduid, rrepDoc.asString());
-                    // Update routing table with signal info
-                    this->router.insertIntoRoutingTable(rxPacket.sduid, rxPacket.sduid, this->getSignalScore()); //can only be one hop away
-                }
-                break;
-            }
             case reservedTopic::ping:
                 loginfo_ln("PING received. Sending PONG!");
                 err = this->sendPong();
@@ -85,17 +87,52 @@ private :
             case reservedTopic::pong:
                 loginfo_ln("PONG received. Ignoring!");
                 break;
-            case reservedTopic::cmd:
-                loginfo_ln("Command received");
+#if CDPCFG_REMOTE_TX_POWER
+            case topics::cmd_tx: {
+                ArduinoJson::JsonDocument json;
+                  std::string packetStr(rxPacket.data.begin(), rxPacket.data.end());
+                  DeserializationError error = deserializeJson(json, packetStr);
+                  if (error) {
+                      logerr_ln("Duck Command cmd_tx deserialization failed: %s", error.c_str());
+                      break;
+                  }
+                  loginfo_ln("Command received, updating transmission power");
+                  
+                  int txPwr = json["txPwr"];
 
-                err = this->broadcastPacket(rxPacket);
-                
-                if (err != DUCK_ERR_NONE) {
+                  if (txPwr < 14 || txPwr > 22) {
+                    logerr_ln("Invalid argument -- tx power: %i", txPwr);
+                    err = DUCK_ERR_INVALID_ARGUMENT;
+                    break;
+                  }
+
+                  // Store only a value this duck's radio takes, or radio setup
+                  // fails at the next boot. Relay it either way: other ducks
+                  // may have a different radio.
+                  if (this->duckRadio.checkTxPower(txPwr) != DUCK_ERR_NONE) {
+                    logerr_ln("tx power %i dBm not supported by this radio, not stored", txPwr);
+                  } else {
+                    Serial.print("updating tx power to value : ");
+                    Serial.println(txPwr);
+                    this->eeprom_preferences.putInt("txPwr", txPwr);
+                  }
+                 
+                  err = this->broadcastPacket(rxPacket);
+                  if (err != DUCK_ERR_NONE) {
                     logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
-                } else {
-                    loginfo_ln("handleReceivedPacket: packet RELAY DONE");
-                }
-                break;
+                    } else {
+                        loginfo_ln("handleReceivedPacket: packet RELAY DONE");
+                    }
+                  break;
+            }
+#endif
+#if CDPCFG_REMOTE_TIME_SYNC
+            case topics::cmd_time:
+                // Must run before the relay below, which marks the message as seen.
+                // Relayed whether or not it was applied, like any other packet.
+                this->applyTimeCommand(rxPacket);
+                [[fallthrough]];
+#endif
             default:
                 err = this->broadcastPacket(rxPacket);
                 if (err != DUCK_ERR_NONE) {
@@ -106,50 +143,31 @@ private :
         }
     }
 
-    void ifNotBroadcast(CdpPacket rxPacket, int err, bool relay = false) {
-
+    /**
+     * @brief Handle a packet addressed to a single duck.
+     *
+     * Route requests and replies never reach this function:
+     * Duck::processReceivedPacket() hands them to handleRoutingPacket() first.
+     * - PING: answered with a broadcast PONG, even when relay is true. Not
+     *   passed on.
+     * - PONG: ignored, not passed on.
+     * - cmd_tx and cmd_time, if their setting is on: applied when addressed to
+     *   this duck, and then not passed on. cmd_tx is stored only if it is 14 to
+     *   22 dBm and this duck's radio takes it. Passed on with forwardPacket()
+     *   when addressed to another duck.
+     * - Anything else: passed on with forwardPacket() when relay is true. A
+     *   packet addressed to this duck only goes to the onReceiveDuckData()
+     *   callback, which handleReceivedPacket() has already called.
+     *
+     * forwardPacket() floods like broadcastPacket(): it doesn't need a route
+     * to the destination.
+     *
+     * @param rxPacket the received packet
+     * @param relay true if the packet is addressed to another duck
+     */
+    void ifNotBroadcast(CdpPacket rxPacket, bool relay = false) {
+        int err;
         switch(rxPacket.topic) {
-            case reservedTopic::rreq: {
-                RouteJSON rreqDoc = RouteJSON(rxPacket.data);
-                //route requests are just forwarded so we can use the sduid as the origin
-                std::optional<Duid> last = rreqDoc.getlastInPath();
-                Duid lastInPath = last.has_value() ? last.value() : rxPacket.sduid;
-                if(!relay) {
-                    loginfo_ln("handleReceivedPacket: Sending RREP");
-                    rxPacket.data = duckutils::stringToByteVector(rreqDoc.convertReqToRep());
-                    this->sendRouteResponse(lastInPath, rreqDoc.asString());
-                } else {
-                    rxPacket.data = duckutils::stringToByteVector(rreqDoc.addToPath(this->duid)); //why is this different from stringToArray
-                    err = this->forwardPacket(rxPacket);
-                    if (err != DUCK_ERR_NONE) {
-                        logerr_ln("====> ERROR handleReceivedPacket failed to relay RREQ. rc = %d",err);
-                    } else {
-                        loginfo_ln("handleReceivedPacket: RREQ packet RELAY DONE");
-                    }
-                }
-            }
-            break;
-          
-            case reservedTopic::rrep: {
-                //we still need to recieve rreps in case of ttl expiry
-                RouteJSON rrepDoc = RouteJSON(rxPacket.data);
-                std::optional<Duid> last = rrepDoc.getlastInPath();
-                Duid lastInPath = last.has_value() ? last.value() : rxPacket.sduid;
-                loginfo_ln("Received Route Response from DUID: %s", rxPacket.sduid.data(), rxPacket.sduid.size());
-
-                std::optional<Duid> nextHop = this->router.getBestNextHop(rrepDoc.getDestination());
-                if((rrepDoc.getDestination() != this->duid) && (nextHop.has_value()) && (nextHop.value() !=  rxPacket.sduid)){
-                    rrepDoc.popFromPath();
-                    rrepDoc.addToPath(this->duid);
-                    //route responses need a way to keep tray of who relayed the packet, but a response needs to be directed and not broadly relayed
-                    this->sendRouteResponse(rrepDoc.getDestination(), rrepDoc.asString()); //so here the "relaying" duck is known from sduid
-                    this->router.insertIntoRoutingTable(rxPacket.sduid, lastInPath, this->getSignalScore());
-                } else {
-                    //destination = sender of the rrep -> the last hop to current duck
-                    this->router.insertIntoRoutingTable(rrepDoc.getOrigin(), lastInPath, this->getSignalScore());
-                }
-            }
-                break;
             case reservedTopic::ping:
                 loginfo_ln("PING received. Sending PONG!");
                 err = this->sendPong();
@@ -160,17 +178,50 @@ private :
             case reservedTopic::pong:
                 loginfo_ln("PONG received. Ignoring!");
                 break;
-            case reservedTopic::cmd:
-                loginfo_ln("Command received");
-
-                err = this->broadcastPacket(rxPacket);
-                
-                if (err != DUCK_ERR_NONE) {
-                    logerr_ln("====> ERROR handleReceivedPacket failed to relay. rc = %d",err);
-                } else {
-                    loginfo_ln("handleReceivedPacket: packet RELAY DONE");
+#if CDPCFG_REMOTE_TX_POWER
+            case topics::cmd_tx: {
+                // A command for another duck is passed on, not applied here.
+                if (relay) {
+                    this->forwardPacket(rxPacket);
+                    break;
                 }
+                // Targeted cmd_tx used to log and do nothing, so a command aimed at a
+                // single duck was silently dropped. Apply the same update as the
+                // broadcast case; deliberately no relay, since this one is addressed
+                // to us.
+                ArduinoJson::JsonDocument json;
+                std::string packetStr(rxPacket.data.begin(), rxPacket.data.end());
+                DeserializationError error = deserializeJson(json, packetStr);
+                if (error) {
+                    logerr_ln("Duck Command cmd_tx deserialization failed: %s", error.c_str());
+                    break;
+                }
+                loginfo_ln("Command received, updating transmission power");
+
+                int txPwr = json["txPwr"];
+                if (txPwr < 14 || txPwr > 22) {
+                    logerr_ln("Invalid argument -- tx power: %i", txPwr);
+                    err = DUCK_ERR_INVALID_ARGUMENT;
+                    break;
+                }
+                // Store only a value this duck's radio takes, or radio setup
+                // fails at the next boot.
+                if (this->duckRadio.checkTxPower(txPwr) != DUCK_ERR_NONE) {
+                    logerr_ln("tx power %i dBm not supported by this radio, not stored", txPwr);
+                    break;
+                }
+                this->eeprom_preferences.putInt("txPwr", txPwr);
+                loginfo_ln("updating tx power to value : %i", txPwr);
                 break;
+            }
+#endif
+#if CDPCFG_REMOTE_TIME_SYNC
+            case topics::cmd_time:
+                // Addressed to us: apply it, no relay. Otherwise pass it on.
+                if (relay) this->forwardPacket(rxPacket);
+                else this->applyTimeCommand(rxPacket);
+                break;
+#endif
             default:
                 if(relay){
                     this->forwardPacket(rxPacket); 

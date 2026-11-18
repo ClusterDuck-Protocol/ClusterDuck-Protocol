@@ -1,17 +1,18 @@
 #include "CdpPacket.h"
 
 int CdpPacket::prepareForSending() {
-    uint8_t data_length = data.size();
+    const size_t data_length = data.size();
     buffer.clear();
 
     if ( data.empty() || data_length > MAX_DATA_LENGTH) {
         return DUCKPACKET_ERR_SIZE_INVALID;
     }
+    if (hopCount > MAX_HOPS) return DUCKPACKET_ERR_MAX_HOPS;
 
-    loginfo_ln("packet format: DATA LENGTH: %d - TOPIC (%s)", data_length, topicToString().c_str());
+    logdbg_ln("packet format: DATA LENGTH: %d - TOPIC (%s)", data_length, topicToString().c_str());
 
 // ----- insert packet header  -----
-    loginfo_ln("packet format: START");
+    logdbg_ln("packet format: START");
     std::string printStr;
 // source device uid
     buffer.insert(buffer.end(), this->sduid.begin(), this->sduid.end());
@@ -61,7 +62,11 @@ int CdpPacket::prepareForSending() {
     logdbg_ln("Data (HEX): %s", duckutils::convertToHex(this->data.data(), this->data.size()).c_str());
 
     buffer.shrink_to_fit();
+#ifdef CDPCFG_LOG_PACKET_HEX
+    loginfo_ln("Built packet (HEX): %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
+#else
     logdbg_ln("Built packet (HEX): %s", duckutils::convertToHex(buffer.data(), buffer.size()).c_str());
+#endif
 
     return DUCK_ERR_NONE;
 }

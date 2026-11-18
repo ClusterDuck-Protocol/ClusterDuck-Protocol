@@ -1,39 +1,58 @@
 /**
- * @file PapaDuck-Mqtt.ino
- * @brief Implements a PapaDuck hub that receives CDP messages and forwards them to an MQTT broker.
+ * @file PapaDuck.ino
+ * @brief A PapaDuck that forwards CDP messages to an MQTT broker over WiFi.
  *
- * The PapaDuck is a Wi-Fi enabled device that acts as a bridge between the CDP and the cloud (MQTT).
- * It parses incoming CDP packets, serializes them to JSON, and sends them securely to an MQTT broker.
+ * The PapaDuck is the gateway of the mesh: ducks address their data to it by
+ * default. This sketch joins a WiFi network, connects to an MQTT broker over
+ * TLS (test.mosquitto.org by default) and publishes every message the duck
+ * receives as JSON on MQTT_PUB_TOPIC. It also subscribes to MQTT_SUB_TOPIC and
+ * prints what arrives there. web/ holds a small browser page that shows the
+ * published messages.
  *
- * @date 2025-05-07
+ * - The receive callback gets every copy of a message: one per relay path that
+ *   reached this duck. This sketch publishes every copy; remove duplicates
+ *   downstream by MessageID, or call duck.muidNotReceived(packet.muid) in the
+ *   callback to drop them here.
+ * - Every 15 minutes the PapaDuck's own health (topics::health) also arrives in
+ *   the callback, as a packet from this duck with hop count 0. It doesn't go
+ *   over LoRa. This sketch publishes it like the health of any other duck.
+ * - Pings, pongs and other reserved topics are not published.
+ * - While it connects to the broker, the PapaDuck doesn't receive, and LoRa
+ *   packets that arrive then can be lost. The MQTT_TIMEOUT_S settings keep each
+ *   attempt short, and after each failed attempt it waits twice as long before
+ *   the next one, up to MQTT_RETRY_MAX_MS. WiFi reconnects by itself.
+ * - WiFi, TLS and MQTT don't fit the default 1.25 MB app partition. The root
+ *   platformio.ini sets board_build.partitions = no_ota.csv; use the same in
+ *   your own PlatformIO project.
  */
 
+#include <algorithm>
+#include <string>
 #include <CDP.h>
 #include <PubSubClient.h>
 #include <WiFiClientSecure.h>
-#include <queue>
 
-// Setup for W2812 (LED)
-#include <FastLED.h>
-#include <iostream>
-#include <pixeltypes.h>
-#define LED_TYPE WS2812
-#define NUM_LEDS 1
-#define COLOR_ORDER GRB
-#define BRIGHTNESS  128
-CRGB leds[NUM_LEDS];
+// --- Configuration ---
+const char DEVICE_ID[] = "PAPADUCK";            // exactly 8 characters, unique in the mesh
+const std::string WIFI_SSID = "";               // your WiFi network (2.4 GHz)
+const std::string WIFI_PASS = "";               // its password
 
-// --- WIFI Configuration ---
-const std::string WIFI_SSID="";         // Replace with WiFi SSID
-const std::string WIFI_PASS="";     // Replace with WiFi Password
+const char MQTT_SERVER[] = "test.mosquitto.org";
+const uint16_t MQTT_PORT = 8883;                // TLS
+const char MQTT_CLIENT_ID[] = "papa-duck-mqtt-1";  // must be unique on the broker
+const char MQTT_PUB_TOPIC[] = "hub/event";        // where this PapaDuck publishes
+const char MQTT_SUB_TOPIC[] = "incoming/say_hello";  // what it subscribes to
+const unsigned long MQTT_CHECK_MS = 5000;       // time between two connection checks
+const unsigned long MQTT_RETRY_MAX_MS = 60000;  // longest wait after failed attempts
+const uint16_t MQTT_TIMEOUT_S = 5;              // longest wait for each connection step
+// PubSubClient's default 256-byte buffer is too small for a 228-byte CDP
+// payload wrapped in JSON: publish() returns false when a message doesn't fit.
+// JSON writes a control byte, such as 0x00, as 6 characters, so a binary
+// payload can need about 1.6 KB.
+const uint16_t MQTT_BUFFER_SIZE = 2048;
 
-// --- MQTT Configuration ---
-#define MQTT_RETRY_DELAY_MS 500
-#define MQTT_SERVER     "test.mosquitto.org" 
-#define PORT            8883
-#define MQTT_CLIENT_ID  "papa-duck-mqtt-1"  // This must be unique
-// from https://test.mosquitto.org/
-static const char* mosquitto_ca_cert = \
+// CA certificate of test.mosquitto.org, from https://test.mosquitto.org/
+static const char MQTT_CA_CERT[] = \
 "-----BEGIN CERTIFICATE-----\n" \
 "MIIEAzCCAuugAwIBAgIUBY1hlCGvdj4NhBXkZ/uLUZNILAwwDQYJKoZIhvcNAQEL\n" \
 "BQAwgZAxCzAJBgNVBAYTAkdCMRcwFQYDVQQIDA5Vbml0ZWQgS2luZ2RvbTEOMAwG\n" \
@@ -59,207 +78,131 @@ static const char* mosquitto_ca_cert = \
 "m/XriWr/Cq4h/JfB7NTsezVslgkBaoU=\n" \
 "-----END CERTIFICATE-----\n";
 
-// --- Global Objects ---
-PapaDuck hub("PAPADUCK");                                     // PapaDuck instance
-WiFiClientSecure wifiClient;                      // Secure WiFi client
-PubSubClient mqttClient(wifiClient);              // MQTT client
-std::queue<std::string> mqttMessageQueue;         // Incoming mqtt messages
-std::string mqttPubTopic = "hub/event";           // Published by the hub
-std::string mqttSubTopic = "incoming/say_hello";  // Subscribed by the hub
-bool setupOK = false;                             // Flag to check if setup is complete
-auto timer = timer_create_default();              // Timer instance
-bool wifiConnected = false;                       // Flag to check if WiFi is connected
 
-// --- Function Declarations ---
-bool setup_mqtt(void);
-void mqtt_callback(char* topic, byte* message, unsigned int length);
-void handleIncomingMqttMessages(void);
-void processMessageFromDucks(std::vector<byte> packetBuffer);
-void handleDuckData(CdpPacket receivedPacket);
+// --- Globals ---
+PapaDuck duck(DEVICE_ID);
+auto timer = timer_create_default();
+WiFiClientSecure wifiClient;
+PubSubClient mqttClient(wifiClient);
+bool setupOK = false;
+unsigned long mqttRetryMs = MQTT_CHECK_MS;   // wait before the next connection check
 
-bool setup_mqtt(void) 
-{
-    bool connected = mqttClient.connected();
-    if (connected) {
-        return false;
-    }
-    
-    loginfo_ln("[HUB] MQTT client connecting to broker...");
+void handleDuckData(CdpPacket packet);
+void handleMqttMessage(char* topic, byte* payload, unsigned int length);
+bool connectMqtt(void*);
+void publishPacket(CdpPacket& packet);
 
-    // Connect to the MQTT broker with the client ID only
-    // If you need to use a username and password, use the connect method with 3 parameters below
-    // boolean mqttClient.connect(const char *id, const char *user, const char *pass) 
-    connected = mqttClient.connect(MQTT_CLIENT_ID);
-    if (!connected) {
-        loginfo_ln("[HUB] ERROR - Failed to connect to MQTT broker");
-        return false;
-    }
-
-    loginfo_ln("[HUB] MQTT client connected");
-
-    // This is an example if you want to subscribe to an incoming topic
-    if (!mqttClient.subscribe(mqttSubTopic.c_str(),0)) {
-        loginfo_ln("[HUB] ERROR - Failed to subscribe to topic");
-        return false;
-    }
-    
-    return true;
-}
-
-// Incoming MQTT messages from the controller
-// This needs to be fast, so we simply queue the raw message
-// And we can process them in the main loop
-void mqtt_callback(char* topic, byte* message, unsigned int length) {
-  
-  // Convert byte array to std::string
-  std::string msg(message, message + length);
-
-  loginfo("[HUB] Message arrived on topic: %s\n", topic);
-  loginfo("[HUB] queuing msg: %s\n", msg.c_str());
- 
-  // Push the raw message
-  mqttMessageQueue.push(msg);
-}
-
-void handleIncomingMqttMessages(void) {
-
-  while (!mqttMessageQueue.empty()) {
-    auto rawMessage = mqttMessageQueue.front(); 
-    mqttMessageQueue.pop();
-
-    JsonDocument doc;
-    DeserializationError err = deserializeJson(doc, rawMessage);
-    if (err) {
-      loginfo("[HUB] deserializeJson() failed with code: ");
-      loginfo_ln(err.c_str());
-      continue;
-    }
-    std::string jsonstat;
-    serializeJson(doc, jsonstat);
-    serializeJsonPretty(doc, std::cout);
-
-    // Process the topic and message here
-  }
-}
-
-void processMessageFromDucks(CdpPacket cdp_packet) {
-
-    JsonDocument doc;
-
-    int messageLength = cdp_packet.data.size();
-
-    loginfo("Packet data size=%d\n", messageLength);
-
-    std::string muid(cdp_packet.muid.begin(), cdp_packet.muid.end());
-    std::string sduid(cdp_packet.sduid.begin(), cdp_packet.sduid.end());
-    std::string cdpTopic = cdp_packet.topicToString();
-
-    loginfo("[HUB] got topic: %s from %s\n",cdpTopic.c_str(), sduid.c_str());
- 
-    // Counter Message
-    std::string payload(cdp_packet.data.begin(), cdp_packet.data.end());
-
-    // Forward the counter message to the MQTT broker
-    // This is a simple example, but you can do anything you want with the message here
-    // This example shows how the message from be transformed into something that matches your application
-    // uint32_t msgId = esp_random();
-    doc["from"] = "hub";
-    doc["to"] = "controller";
-    doc["RE"] = false; // This flag is used to indicate if the controller should respond to this message
-    doc["eventType"] = cdpTopic.c_str();
-    doc["MessageID"].set(muid);
-    
-    doc["payload"]["hops"].set(cdp_packet.hopCount);
-    doc["payload"]["duckType"].set(cdp_packet.duckType);
-    doc["payload"]["DeviceID"] = sduid.c_str();
-
-    doc["payload"]["Message"] = payload.c_str();  
-       
-    std::string jsonstat;
-    serializeJson(doc, jsonstat);
-    loginfo("%s\n",jsonstat.c_str());
-
-    if (hub.isWifiConnected()) {
-      setup_mqtt();  
-      if (mqttClient.publish(mqttPubTopic.c_str(), jsonstat.c_str(), jsonstat.length())) {
-        loginfo_ln("[HUB] Packet forwarded:");
-        serializeJsonPretty(doc, std::cout);
-        loginfo_ln("[HUB] Publish ok");
-        
-      } else {
-        loginfo_ln("[HUB] Publish failed");
-      }
-
-    } else {
-      loginfo_ln("[HUB] ERROR No WiFi connection!!!");
-    }
-}
-
-// The callback method simply takes the incoming packet and
-// converts it to a JSON string, before sending it out over MQTT
-void handleDuckData(CdpPacket receivedPacket) {
-  loginfo_ln("[HUB] got packet");
-  processMessageFromDucks(receivedPacket);
-}
-
-/**
- * @brief Setup function to initialize the PapaDuck
- *
- * - Sets up the Duck device ID (exactly 8 bytes).
- * - Initializes PapaDuck using default configuration.
- * - Sets up connection to WIFI.
- * - Sets up MQTT client.
- */
 void setup() {
-  // Initialize LED
-  FastLED.addLeds<LED_TYPE, CDPCFG_PIN_LED1, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalSMD5050 );
-  FastLED.setBrightness(BRIGHTNESS);
-  leds[0] = CRGB::Cyan;
-  FastLED.show();
-
-  // Set the CA cert for the WiFi client
-  wifiClient.setCACert(mosquitto_ca_cert);
-
-  // Setup the duck link with default settings and connect to WiFi
-  uint32_t err = hub.setupWithDefaults();
-  hub.joinWifiNetwork(WIFI_SSID, WIFI_PASS);
-
-  setupOK = true;
-  // register a callback to handle incoming data from duck in the network
-  hub.onReceiveDuckData(handleDuckData);
-
-  // setup MQTT client
-  mqttClient.setServer(MQTT_SERVER, PORT);
-  mqttClient.setCallback(mqtt_callback);
-  mqttClient.setKeepAlive(60);
-  
-  if (!setup_mqtt()) {
-    setupOK = false;
-    leds[0] = CRGB::Red;
-    FastLED.show();
+  // Starts the serial port at 115200 baud and the LoRa radio.
+  int err = duck.setupWithDefaults();
+  if (err != DUCK_ERR_NONE) {
+    Serial.printf("[PAPA] Setup failed, rc = %d (%s)\n", err, getDuckErrorString(err));
     return;
-  } else {
-    leds[0] = CRGB::Gold;
-    FastLED.show();
   }
-   
-  loginfo("[HUB] Ready!\n");
+  duck.onReceiveDuckData(handleDuckData);
+  setupOK = true;
+
+  // Retries a few times when the network isn't found, so this can take ~30 s.
+  // After that, the ESP32 reconnects to WiFi by itself.
+  duck.joinWifiNetwork(WIFI_SSID, WIFI_PASS);
+
+  wifiClient.setCACert(MQTT_CA_CERT);
+#if ESP_ARDUINO_VERSION_MAJOR < 3
+  wifiClient.setTimeout(MQTT_TIMEOUT_S);           // TCP connect, in seconds (ESP32 core 2.x)
+#endif
+  wifiClient.setHandshakeTimeout(MQTT_TIMEOUT_S);  // TLS handshake, in seconds
+  mqttClient.setServer(MQTT_SERVER, MQTT_PORT);
+  mqttClient.setCallback(handleMqttMessage);
+  mqttClient.setBufferSize(MQTT_BUFFER_SIZE);
+  mqttClient.setKeepAlive(60);
+  mqttClient.setSocketTimeout(MQTT_TIMEOUT_S);     // wait for the broker's answer
+  connectMqtt(nullptr);   // connects, and schedules the next check
+
+  Serial.println("[PAPA] Setup OK");
 }
 
-/**
- * @brief Main loop runs continuously.
- *
- * Executes scheduled tasks and maintains Duck operation.
- */
-void loop() 
-{
+void loop() {
   if (!setupOK) {
     return;
   }
-  hub.run();
+  duck.run();         // receives packets and calls handleDuckData()
   timer.tick();
+  mqttClient.loop();  // keeps the MQTT connection alive and calls handleMqttMessage()
+}
 
-  // Check for incoming messages from MQTT
-  mqttClient.loop();
-  handleIncomingMqttMessages();
+/**
+ * @brief Called by duck.run() for every packet the PapaDuck receives, and for
+ * its own health message.
+ */
+void handleDuckData(CdpPacket packet) {
+  if (packet.topic < reservedTopic::max_reserved) {
+    return;   // a reserved topic, such as a ping or pong
+  }
+  publishPacket(packet);
+}
+
+/**
+ * @brief Connect to the MQTT broker if WiFi is up and MQTT isn't, then
+ * schedule the next check. Called once from setup() and then by the timer.
+ * Each failed attempt doubles the wait before the next one, up to
+ * MQTT_RETRY_MAX_MS, because duck.run() doesn't run during an attempt.
+ * @returns false: this is a one-shot timer, and the next one is set here
+ */
+bool connectMqtt(void*) {
+  if (!mqttClient.connected() && duck.isWifiConnected()) {
+    Serial.printf("[PAPA] Connecting to MQTT broker %s\n", MQTT_SERVER);
+    // For a broker that needs a login: mqttClient.connect(MQTT_CLIENT_ID, user, password)
+    if (mqttClient.connect(MQTT_CLIENT_ID)) {
+      Serial.println("[PAPA] MQTT connected");
+      mqttRetryMs = MQTT_CHECK_MS;
+      if (!mqttClient.subscribe(MQTT_SUB_TOPIC)) {
+        Serial.printf("[PAPA] Failed to subscribe to %s\n", MQTT_SUB_TOPIC);
+      }
+    } else {
+      mqttRetryMs = std::min(2 * mqttRetryMs, MQTT_RETRY_MAX_MS);
+      Serial.printf("[PAPA] MQTT connect failed, state = %d, next attempt in %lu s\n",
+        mqttClient.state(), mqttRetryMs / 1000);
+    }
+  }
+  timer.in(mqttRetryMs, connectMqtt);
+  return false;
+}
+
+/**
+ * @brief Called by mqttClient.loop() for each message on MQTT_SUB_TOPIC.
+ */
+void handleMqttMessage(char* topic, byte* payload, unsigned int length) {
+  std::string message(reinterpret_cast<const char*>(payload), length);
+  Serial.printf("[PAPA] MQTT message on %s: %s\n", topic, message.c_str());
+  // Act on messages from the cloud here.
+}
+
+/**
+ * @brief Publish one CDP packet as JSON on MQTT_PUB_TOPIC.
+ */
+void publishPacket(CdpPacket& packet) {
+  JsonDocument doc;
+  doc["from"] = "hub";
+  doc["to"] = "controller";
+  doc["RE"] = false;   // whether the controller should reply
+  doc["eventType"] = packet.topicToString();
+  doc["MessageID"] = duckutils::toString(packet.muid);
+  doc["payload"]["hops"] = packet.hopCount;
+  doc["payload"]["duckType"] = packet.duckType;
+  doc["payload"]["DeviceID"] = duckutils::toString(packet.sduid);
+  doc["payload"]["Message"] = std::string(packet.data.begin(), packet.data.end());
+
+  std::string json;
+  serializeJson(doc, json);
+  Serial.printf("[PAPA] Received: %s\n", json.c_str());
+
+  if (!mqttClient.connected()) {
+    Serial.println("[PAPA] MQTT not connected, message not published");
+    return;
+  }
+  if (mqttClient.publish(MQTT_PUB_TOPIC, json.c_str())) {
+    Serial.println("[PAPA] Published");
+  } else {
+    Serial.println("[PAPA] Publish failed");
+  }
 }

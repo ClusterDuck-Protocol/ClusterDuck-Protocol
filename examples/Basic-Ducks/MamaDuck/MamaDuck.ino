@@ -1,109 +1,72 @@
 /**
  * @file MamaDuck.ino
- * @brief Implements a MamaDuck using the ClusterDuck Protocol (CDP).
- * 
- * This example firmware periodically sends sensor health data (counter and free memory) 
- * through a CDP mesh network. It also relays messages that it receives from other ducks
- * that has not seen yet.
- * 
- * @date 2025-05-07
+ * @brief A minimal MamaDuck for the ClusterDuck Protocol (CDP) 5.5.
+ *
+ * A MamaDuck is the core node of the mesh: it relays the messages it hears
+ * from other ducks (each one once, for up to 6 hops) and can send its own.
+ * This sketch sends a short text message on topics::sensor every
+ * SEND_INTERVAL_MS. Relaying needs no code: duck.run() does it.
+ *
+ * - There is no network to join: the duck can send as soon as
+ *   setupWithDefaults() has started the radio.
+ * - sendData() returns DUCK_ERR_NONE once the message is queued for the radio.
+ *   That is not a delivery receipt.
+ * - CDP sends this duck's own health on topics::health every 15 minutes. Send
+ *   your own data on another topic, such as topics::sensor.
+ *
+ * For a MamaDuck with a status LED, a JSON payload and the optional 5.5
+ * features, see examples/Custom-Mama-Examples/Full-MamaDuck.
  */
 
- #include <string>
- #include <arduino-timer.h>
- #include <CDP.h>
+#include <string>
+#include <CDP.h>
 
- #ifdef SERIAL_PORT_USBVIRTUAL
- #define Serial SERIAL_PORT_USBVIRTUAL
- #endif
+// --- Configuration ---
+const char DEVICE_ID[] = "MAMADUCK";          // exactly 8 characters, unique in the mesh
+const unsigned long SEND_INTERVAL_MS = 10000;  // time between two messages
 
+// --- Globals ---
+MamaDuck duck(DEVICE_ID);
+auto timer = timer_create_default();
+uint32_t counter = 1;   // number of the next message
+bool setupOK = false;
 
-// Setup for W2812 (LED)
-#include <FastLED.h>
-#include <pixeltypes.h>
-#define LED_TYPE WS2812
-#define NUM_LEDS 1
-#define COLOR_ORDER GRB
-#define BRIGHTNESS  128
-CRGB leds[NUM_LEDS];
- 
- // --- Function Declarations ---
- bool runSensor(void *);
- 
- // --- Global Variables ---
- MamaDuck duck("MAMADUCK"); // Device ID, MUST be 8 bytes and unique from other ducks;
- auto timer = timer_create_default();  // Creating a timer with default settings
- const int INTERVAL_MS = 10000;        // Interval in milliseconds between runSensor call
- int counter = 1;                      // Counter for the sensor data  
- bool setupOK = false;                 // Flag to check if setup is complete
- 
- /**
-  * @brief Setup function to initialize the MamaDuck
-  *
-  * - Sets up the Duck device ID (exactly 8 bytes).
-  * - Initializes MamaDuck using default configuration.
-  * - Sets up periodic execution of sensor data transmissions.
-  */
- void setup() {
-  // Initialize LED
-  FastLED.addLeds<LED_TYPE, CDPCFG_PIN_LED1, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalSMD5050 );
-  FastLED.setBrightness(BRIGHTNESS);
-  leds[0] = CRGB::Cyan;
-  FastLED.show();
- 
-   if (duck.setupWithDefaults() != DUCK_ERR_NONE) {
-      loginfo_ln("[MAMA] Failed to setup MamaDuck");
-      leds[0] = CRGB::Red;
-      FastLED.show();
-      return;
-    } else { 
-      leds[0] = CRGB::Gold;
-      FastLED.show();
-    }
- 
-   timer.every(INTERVAL_MS, runSensor); // Triggers runSensor every INTERVAL_MS
-   
-   setupOK = true;
-   loginfo_ln("[MAMA] Setup OK!");
- }
- 
- /**
-  * @brief Main loop runs continuously.
-  *
-  * Executes scheduled tasks and maintains Duck operation.
-  */
- void loop() {
-   if (!setupOK) {
-     return; 
-   }
-   timer.tick();
- 
-   duck.run();
- }
- 
- /**
-  * @brief Periodically executed to gather and send health data.
-  *
-  * Collects the current counter value and available free memory, formats them
-  * into a string, and transmits this data via CDP.
-  *
-  * @param unused Unused parameter required by the timer callback signature
-  * @return true if data was successfully sent, false otherwise
-  */
- bool runSensor(void *) {
-   bool failure;
-   
-   std::string message = "C:" + std::to_string(counter) + "|" + "FM:" + std::to_string(freeMemory());
-   loginfo("[MAMA] sensor data: ");
-   loginfo_ln(message.c_str());
- 
-   failure = duck.sendData(topics::health, message);
-   if (!failure) {
-     counter++;
-     loginfo_ln("[MAMA] runSensor ok.");
-   } else {
-     loginfo_ln("[MAMA] runSensor failed.");
-   }
-   return true;
- }
- 
+bool sendMessage(void*);
+
+void setup() {
+  // Starts the serial port at 115200 baud and the LoRa radio.
+  int err = duck.setupWithDefaults();
+  if (err != DUCK_ERR_NONE) {
+    Serial.printf("[MAMA] Setup failed, rc = %d (%s)\n", err, getDuckErrorString(err));
+    return;
+  }
+
+  timer.every(SEND_INTERVAL_MS, sendMessage);
+  setupOK = true;
+  Serial.println("[MAMA] Setup OK");
+}
+
+void loop() {
+  if (!setupOK) {
+    return;
+  }
+  timer.tick();
+  duck.run();   // relays received packets and sends queued messages
+}
+
+/**
+ * @brief Queue one message for the mesh. Called by the timer.
+ * @returns true to keep the timer running
+ */
+bool sendMessage(void*) {
+  std::string message = "Hello from " + std::string(DEVICE_ID) + " C:" + std::to_string(counter);
+
+  int err = duck.sendData(topics::sensor, message);
+  if (err == DUCK_ERR_NONE) {
+    Serial.printf("[MAMA] Queued: %s\n", message.c_str());
+    counter++;
+  } else {
+    Serial.printf("[MAMA] sendData failed, rc = %d (%s)\n", err, getDuckErrorString(err));
+  }
+  return true;
+}

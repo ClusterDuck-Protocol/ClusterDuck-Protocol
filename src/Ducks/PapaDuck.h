@@ -18,7 +18,10 @@ public:
   /**
    * @brief Register callback for handling data received from duck devices
    * 
-   * The callback will be invoked if the packet needs to be relayed (i.e not seen before)
+   * The callback is invoked for every packet the papa hears, including repeated
+   * copies of the same message relayed by different ducks. Duplicates are meant
+   * to be removed downstream (e.g. in the cloud), where every copy is still useful
+   * for coverage. Use muidNotReceived() to drop them locally instead.
    * @param cb a callback to handle data received by the papa duck
    */
   void onReceiveDuckData(rxDoneCallback cb) { this->recvDataCallback = cb; }
@@ -35,47 +38,82 @@ public:
     return this->duckWifi.connected();
   }
 
-private:
-  rxDoneCallback recvDataCallback;
-  
-  void handleReceivedPacket() {
-    loginfo_ln("====> handleReceivedPacket: START");
-    
-    int err;
-    std::optional<std::vector<uint8_t>> rxData = this->duckRadio.readReceivedData();
-    if (!rxData) {
-    logerr_ln("ERROR failed to get data from DuckRadio.");
-    return;
-    }
-    CdpPacket rxPacket(rxData.value());
-    logdbg_ln("Got data from radio. size: %d",rxPacket.size());
+  /// True if no copy of this message has been handled yet. Optional local dedup.
+  bool muidNotReceived(Muid muid){
+   return this->router.getFilter().bloom_check(muid.data(), MUID_LENGTH) == 0;
+  }
 
-    recvDataCallback(rxPacket);
+  /**
+   * @brief Send a UTC time to the mesh as topics::cmd_time, {"epoch":<seconds>}.
+   *
+   * Ducks built with CDPCFG_REMOTE_TIME_SYNC set their clock from it; other
+   * ducks only relay it. Send only a time you trust, such as one from NTP or
+   * the cellular network, and resend it periodically: a duck that missed it,
+   * or rebooted after a power loss, has no time until the next one.
+   * @param epoch UTC seconds since 1970, at least CDPCFG_TIME_MIN_EPOCH
+   * @param target BROADCAST_DUID for every duck, or one duck's DUID
+   * @returns DUCK_ERR_NONE if queued, DUCK_ERR_INVALID_ARGUMENT for an epoch
+   * below CDPCFG_TIME_MIN_EPOCH, or the sendData() error.
+   */
+  int sendTimeSync(uint32_t epoch, Duid target = BROADCAST_DUID) {
+    if (epoch < CDPCFG_TIME_MIN_EPOCH) {
+      logerr_ln("ERROR sendTimeSync epoch %lu is before %lu", (unsigned long)epoch,
+        (unsigned long)CDPCFG_TIME_MIN_EPOCH);
+      return DUCK_ERR_INVALID_ARGUMENT;
+    }
+    JsonDocument doc;
+    doc["epoch"] = epoch;
+    std::string payload;
+    serializeJson(doc, payload);
+    return this->sendData(topics::cmd_time, payload, target);
+  }
+
+protected:
+  /**
+   * @brief Hand the PapaDuck's own health message to the receive callback.
+   *
+   * The PapaDuck is where health messages go, so sending its own over LoRa
+   * would only use airtime. The callback gets it as a packet from this duck to
+   * PAPADUCK_DUID with hop count 0, the same way it gets health from the mesh,
+   * so the application can publish it to the cloud.
+   * @returns DUCK_ERR_NONE if delivered, DUCK_ERR_NOT_SUPPORTED without a
+   * callback, DUCKPACKET_ERR_SIZE_INVALID for an empty or oversized message.
+   */
+  int reportHealth(const std::string& message) override {
+    if (!recvDataCallback) return DUCK_ERR_NOT_SUPPORTED;
+    CdpPacket packet(PAPADUCK_DUID, topics::health,
+      std::vector<uint8_t>(message.begin(), message.end()), this->duid, getType());
+    this->router.getFilter().assignUniqueMessageId(packet);
+    const int err = packet.prepareForSending();
+    if (err != DUCK_ERR_NONE) return err;
+    CdpPacket delivered(packet.asBytes());
+    delivered.timeReceived = millis();
+    recvDataCallback(delivered);
+    return DUCK_ERR_NONE;
+  }
+
+private:
+  rxDoneCallback recvDataCallback = nullptr;
+  
+  void handleReceivedPacket(CdpPacket rxPacket) {
+    logdbg_ln("====> handleReceivedPacket: START");
+    
+    if (recvDataCallback) recvDataCallback(rxPacket);
 
     //Check if Duck is desitination for this packet before relaying
     if (duckutils::isEqual(BROADCAST_DUID, rxPacket.dduid)) {
-        ifBroadcast(rxPacket, err);
+        ifBroadcast(rxPacket);
     } else if(duckutils::isEqual(this->duid, rxPacket.dduid) || duckutils::isEqual(rxPacket.dduid, PAPADUCK_DUID)) { //Target device check
-        ifNotBroadcast(rxPacket, err);
+        ifNotBroadcast(rxPacket);
     } else { //If it's meant for a specific target but not this one
-        ifNotBroadcast(rxPacket, err, true);
+        ifNotBroadcast(rxPacket, true);
     }
     this->router.getFilter().bloom_add(rxPacket.muid.data(), MUID_LENGTH);
   } 
 
-  void ifBroadcast(CdpPacket rxPacket, int err) { 
+  void ifBroadcast(CdpPacket rxPacket) { 
+    int err;
     switch(rxPacket.topic) {
-        case reservedTopic::rreq: {
-            if(rxPacket.hopCount <= 0){
-                loginfo_ln("RREQ received from %s. Sending Response!", rxPacket.sduid.data());
-                RouteJSON rrepDoc = RouteJSON(rxPacket.sduid, this->duid);
-                rrepDoc.addToPath(this->duid);
-                this->sendRouteResponse(rxPacket.sduid, rrepDoc.asString());
-                // Update routing table with signal info
-                this->router.insertIntoRoutingTable(rxPacket.sduid, rxPacket.sduid, this->getSignalScore()); //can only be one hop away
-            }
-            break;
-        }
         case reservedTopic::ping:
             loginfo_ln("PING received. Sending PONG!");
             err = this->sendPong();
@@ -107,49 +145,9 @@ private:
     }
 }
 
-void ifNotBroadcast(CdpPacket rxPacket, int err, bool relay = false) {
+void ifNotBroadcast(CdpPacket rxPacket, bool relay = false) {
+    int err;
     switch(rxPacket.topic) {
-        case reservedTopic::rreq: {
-            RouteJSON rreqDoc = RouteJSON(rxPacket.data);
-            //route requests are just forwarded so we can use the sduid as the origin
-            std::optional<Duid> last = rreqDoc.getlastInPath();
-            Duid lastInPath = last.has_value() ? last.value() : rxPacket.sduid;
-            if(!relay) {
-                loginfo_ln("handleReceivedPacket: Sending RREP");
-                rxPacket.data = duckutils::stringToByteVector(rreqDoc.convertReqToRep());
-                this->sendRouteResponse(lastInPath, rreqDoc.asString());
-            } else {
-                rxPacket.data = duckutils::stringToByteVector(rreqDoc.addToPath(this->duid)); //why is this different from stringToArray
-                err = this->forwardPacket(rxPacket);
-                if (err != DUCK_ERR_NONE) {
-                    logerr_ln("====> ERROR handleReceivedPacket failed to relay RREQ. rc = %d",err);
-                } else {
-                    loginfo_ln("handleReceivedPacket: RREQ packet RELAY DONE");
-                }
-            }
-        }
-        break;
-      
-        case reservedTopic::rrep: {
-            //we still need to recieve rreps in case of ttl expiry
-            RouteJSON rrepDoc = RouteJSON(rxPacket.data);
-            std::optional<Duid> last = rrepDoc.getlastInPath();
-            Duid lastInPath = last.has_value() ? last.value() : rxPacket.sduid;
-            loginfo_ln("Received Route Response from DUID: %s", rxPacket.sduid.data(), rxPacket.sduid.size());
-
-            std::optional<Duid> nextHop = this->router.getBestNextHop(rrepDoc.getDestination());
-            if((rrepDoc.getDestination() != this->duid) && (nextHop.has_value()) && (nextHop.value() !=  rxPacket.sduid)){
-                rrepDoc.popFromPath();
-                rrepDoc.addToPath(this->duid);
-                //route responses need a way to keep tray of who relayed the packet, but a response needs to be directed and not broadly relayed
-                this->sendRouteResponse(rrepDoc.getDestination(), rrepDoc.asString()); //so here the "relaying" duck is known from sduid
-                this->router.insertIntoRoutingTable(rxPacket.sduid, lastInPath, this->getSignalScore());
-            } else {
-                //destination = sender of the rrep -> the last hop to current duck
-                this->router.insertIntoRoutingTable(rrepDoc.getOrigin(), lastInPath, this->getSignalScore());
-            }
-        }
-            break;
         case reservedTopic::ping:
             loginfo_ln("PING received. Sending PONG!");
             err = this->sendPong();
